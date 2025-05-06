@@ -9,9 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Error text in text field.
@@ -29,7 +29,7 @@ fun ErrorTextTextField(
             .fillMaxWidth()
             .padding(top = 4.dp),
         text = errorText,
-        style = MaterialTheme.typography.caption.copy(color = MegaOriginalTheme.colors.text.error),
+        style = MaterialTheme.typography.caption.copy(color = DSTokens.colors.text.error),
         textAlign = TextAlign.Start
     )
 }

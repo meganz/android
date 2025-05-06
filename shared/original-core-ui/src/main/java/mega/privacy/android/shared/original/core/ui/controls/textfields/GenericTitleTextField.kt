@@ -36,8 +36,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -83,16 +83,16 @@ fun GenericTitleTextField(
         }
 
         val textFieldColors = TextFieldDefaults.textFieldColors(
-            textColor = MegaOriginalTheme.colors.text.primary,
-            backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
-            cursorColor = MegaOriginalTheme.colors.border.strongSelected,
-            errorCursorColor = MegaOriginalTheme.colors.support.error,
-            errorIndicatorColor = MegaOriginalTheme.colors.support.error,
-            focusedLabelColor = MegaOriginalTheme.colors.text.primary,
+            textColor = DSTokens.colors.text.primary,
+            backgroundColor = DSTokens.colors.background.pageBackground,
+            cursorColor = DSTokens.colors.border.strongSelected,
+            errorCursorColor = DSTokens.colors.support.error,
+            errorIndicatorColor = DSTokens.colors.support.error,
+            focusedLabelColor = DSTokens.colors.text.primary,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            unfocusedLabelColor = MegaOriginalTheme.colors.text.onColorDisabled,
-            errorLabelColor = MegaOriginalTheme.colors.text.error,
+            unfocusedLabelColor = DSTokens.colors.text.onColorDisabled,
+            errorLabelColor = DSTokens.colors.text.error,
         )
 
         val customTextSelectionColors = customTextSelectionColors()
@@ -129,7 +129,7 @@ fun GenericTitleTextField(
                     ),
                 onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.h6.copy(
-                    color = MegaOriginalTheme.colors.text.primary,
+                    color = DSTokens.colors.text.primary,
                     textAlign = TextAlign.Start
                 ),
                 cursorBrush = SolidColor(textFieldColors.cursorColor(isError).value),
@@ -148,7 +148,7 @@ fun GenericTitleTextField(
                                 Text(
                                     text = stringResource(id = id),
                                     style = MaterialTheme.typography.h6.copy(
-                                        color = MegaOriginalTheme.colors.text.onColorDisabled,
+                                        color = DSTokens.colors.text.onColorDisabled,
                                         textAlign = TextAlign.Start
                                     ),
                                 )

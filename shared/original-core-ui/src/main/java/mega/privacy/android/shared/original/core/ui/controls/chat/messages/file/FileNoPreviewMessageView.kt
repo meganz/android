@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat.messages.file
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -20,13 +19,14 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * File message content for file without preview
@@ -49,7 +49,7 @@ internal fun FileNoPreviewMessageView(
     Row(
         modifier = modifier
             .background(
-                color = if (isMe) MegaOriginalTheme.colors.button.primary else MegaOriginalTheme.colors.background.surface2,
+                color = if (isMe) DSTokens.colors.button.primary else DSTokens.colors.background.surface2,
             )
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -97,7 +97,7 @@ private fun FileIcon(
 ) {
     fileTypeResId?.let {
         Icon(
-            tint = if (isMe) MegaOriginalTheme.colors.icon.inverse else MegaOriginalTheme.colors.icon.primary,
+            tint = if (isMe) DSTokens.colors.icon.inverse else DSTokens.colors.icon.primary,
             imageVector = ImageVector.vectorResource(fileTypeResId),
             contentDescription = null,
             modifier = modifier.testTag(FILE_MESSAGE_VIEW_FILE_TYPE_ICON_TEST_TAG),

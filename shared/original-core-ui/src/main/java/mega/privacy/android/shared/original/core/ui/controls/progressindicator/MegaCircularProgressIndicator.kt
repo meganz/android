@@ -10,12 +10,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
-import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.BackgroundColor
 import mega.android.core.ui.theme.values.SupportColor
+import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.backgroundColor
+import mega.privacy.android.shared.original.core.ui.theme.supportColor
 
 /**
  * Wrapper for [CircularProgressIndicator] to set default parameters to better represent the project theme
@@ -32,8 +34,8 @@ fun MegaCircularProgressIndicator(
 ) = if (progress != null) {
     CircularProgressIndicator(
         modifier = modifier,
-        color = MegaOriginalTheme.colors.icon.inverse.takeIf { useInverseColor }
-            ?: MegaOriginalTheme.colors.icon.accent,
+        color = DSTokens.colors.icon.inverse.takeIf { useInverseColor }
+            ?: DSTokens.colors.icon.accent,
         strokeWidth = strokeWidth,
         strokeCap = strokeCap,
         progress = progress,
@@ -41,8 +43,8 @@ fun MegaCircularProgressIndicator(
 } else {
     CircularProgressIndicator(
         modifier = modifier,
-        color = MegaOriginalTheme.colors.icon.inverse.takeIf { useInverseColor }
-            ?: MegaOriginalTheme.colors.icon.accent,
+        color = DSTokens.colors.icon.inverse.takeIf { useInverseColor }
+            ?: DSTokens.colors.icon.accent,
         strokeWidth = strokeWidth,
         strokeCap = strokeCap,
     )
@@ -64,22 +66,22 @@ fun MegaCircularProgressIndicator(
 ) = if (progress != null) {
     CircularProgressIndicator(
         modifier = modifier,
-        color = MegaOriginalTheme.supportColor(supportColor),
+        color = DSTokens.supportColor(supportColor),
         strokeWidth = strokeWidth,
         strokeCap = strokeCap,
         progress = progress,
         backgroundColor = backgroundColor?.let {
-            MegaOriginalTheme.backgroundColor(backgroundColor)
+            DSTokens.backgroundColor(backgroundColor)
         } ?: Color.Transparent
     )
 } else {
     CircularProgressIndicator(
         modifier = modifier,
-        color = MegaOriginalTheme.supportColor(supportColor),
+        color = DSTokens.supportColor(supportColor),
         strokeWidth = strokeWidth,
         strokeCap = strokeCap,
         backgroundColor = backgroundColor?.let {
-            MegaOriginalTheme.backgroundColor(backgroundColor)
+            DSTokens.backgroundColor(backgroundColor)
         } ?: Color.Transparent
     )
 }

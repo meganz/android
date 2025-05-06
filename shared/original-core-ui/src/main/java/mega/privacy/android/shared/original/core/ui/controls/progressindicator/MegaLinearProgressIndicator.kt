@@ -11,10 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Wrapper for [LinearProgressIndicator] to set default parameters to better represent the project theme
@@ -30,16 +30,16 @@ fun MegaLinearProgressIndicator(
     LinearProgressIndicator(
         modifier = modifier.fillMaxWidth(),
         progress = progress,
-        color = MegaOriginalTheme.colors.icon.accent,
+        color = DSTokens.colors.icon.accent,
         strokeCap = strokeCap,
-        backgroundColor = MegaOriginalTheme.colors.background.surface3
+        backgroundColor = DSTokens.colors.background.surface3
     )
 } else {
     LinearProgressIndicator(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colors.secondary,
         strokeCap = strokeCap,
-        backgroundColor = MegaOriginalTheme.colors.background.surface3
+        backgroundColor = DSTokens.colors.background.surface3
     )
 }
 

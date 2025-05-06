@@ -13,11 +13,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Button with icon
@@ -46,7 +46,7 @@ fun MegaButtonWithIcon(
                 contentDescription = null,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally),
-                colorFilter = ColorFilter.tint(color = if (enabled) iconColor else MegaOriginalTheme.colors.icon.disabled)
+                colorFilter = ColorFilter.tint(color = if (enabled) iconColor else DSTokens.colors.icon.disabled)
             )
         }
     }

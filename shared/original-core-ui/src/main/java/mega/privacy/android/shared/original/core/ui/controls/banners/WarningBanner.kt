@@ -28,11 +28,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.core.content.withStyledAttributes
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 class WarningBanner : AbstractComposeView {
     var text by mutableStateOf("")
@@ -87,8 +87,8 @@ fun WarningBanner(
     onCloseClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    val textColour = MegaOriginalTheme.colors.text.primary
-    val buttonColor = MegaOriginalTheme.colors.icon.primary
+    val textColour = DSTokens.colors.text.primary
+    val buttonColor = DSTokens.colors.icon.primary
     ProvideTextStyle(
         MaterialTheme.typography.caption.copy(color = textColour)
     ) {
@@ -144,7 +144,7 @@ private fun BannerContent(
 ) {
     Row(
         modifier = modifier
-            .background(MegaOriginalTheme.colors.notifications.notificationWarning),
+            .background(DSTokens.colors.notifications.notificationWarning),
         verticalAlignment = verticalAlignment
     ) {
         Box(

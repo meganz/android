@@ -23,10 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 
@@ -42,7 +42,7 @@ private fun InlineBaseBanner(
     onActionButtonClick: (() -> Unit)? = null,
     onCloseClick: (() -> Unit)? = null,
     iconResId: Int = R.drawable.ic_info,
-    backgroundColor: Color = MegaOriginalTheme.colors.notifications.notificationWarning,
+    backgroundColor: Color = DSTokens.colors.notifications.notificationWarning,
 ) {
     Box(
         modifier = modifier
@@ -97,7 +97,7 @@ private fun InlineBaseBanner(
                             ),
                             text = actionButtonText,
                             textDecoration = TextDecoration.Underline,
-                            color = MegaOriginalTheme.colors.support.info,
+                            color = DSTokens.colors.support.info,
                             style = MaterialTheme.typography.button.copy(
                                 fontWeight = FontWeight.Medium
                             )
@@ -113,7 +113,7 @@ private fun InlineBaseBanner(
                         .clickable { onCloseClick() }
                         .testTag(INLINE_BANNER_CLOSE_TEST_TAG),
                     painter = painterResource(id = R.drawable.ic_universal_close),
-                    tint = MegaOriginalTheme.colors.icon.primary,
+                    tint = DSTokens.colors.icon.primary,
                     contentDescription = "Banner Cancel"
                 )
             }
@@ -146,8 +146,8 @@ fun InlineWarningBanner(
         titleStyle = titleStyle,
         messageStyle = messageStyle,
         iconResId = mega.privacy.android.icon.pack.R.drawable.ic_alert_circle_regular_medium_outline,
-        iconColor = MegaOriginalTheme.colors.support.warning,
-        backgroundColor = MegaOriginalTheme.colors.notifications.notificationWarning
+        iconColor = DSTokens.colors.support.warning,
+        backgroundColor = DSTokens.colors.notifications.notificationWarning
     )
 }
 
@@ -169,8 +169,8 @@ fun InlineErrorBanner(
         onActionButtonClick = onActionButtonClick,
         modifier = modifier,
         iconResId = mega.privacy.android.icon.pack.R.drawable.ic_warning_icon,
-        iconColor = MegaOriginalTheme.colors.support.error,
-        backgroundColor = MegaOriginalTheme.colors.notifications.notificationError
+        iconColor = DSTokens.colors.support.error,
+        backgroundColor = DSTokens.colors.notifications.notificationError
     )
 }
 

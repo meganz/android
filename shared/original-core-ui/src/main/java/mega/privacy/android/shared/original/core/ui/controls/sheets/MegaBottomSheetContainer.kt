@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 
 /**
  * MegaBottomSheetContainer
@@ -31,7 +31,7 @@ fun MegaBottomSheetContainer(
                     topEnd = 8.dp
                 )
             )
-            .background(MegaOriginalTheme.colors.background.surface1),
+            .background(DSTokens.colors.background.surface1),
     ) {
         content()
     }

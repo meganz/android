@@ -16,11 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Card with header to display info
@@ -38,7 +38,7 @@ fun MegaCardWithHeader(
     Column(
         modifier = modifier.border(
             width = 1.dp,
-            color = MegaOriginalTheme.colors.border.strong,
+            color = DSTokens.colors.border.strong,
             shape = RoundedCornerShape(12.dp),
         )
     ) {
@@ -46,7 +46,7 @@ fun MegaCardWithHeader(
             modifier = modifier
                 .height(28.dp)
                 .background(
-                    color = MegaOriginalTheme.colors.background.surface1,
+                    color = DSTokens.colors.background.surface1,
                     shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
                 ),
         ) {

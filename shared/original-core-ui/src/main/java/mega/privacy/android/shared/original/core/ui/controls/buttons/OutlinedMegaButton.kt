@@ -26,9 +26,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -76,18 +76,18 @@ fun OutlinedMegaButton(
     @DrawableRes iconId: Int? = null,
 ) {
     val color = if (enabled) {
-        MegaOriginalTheme.colors.button.outline
+        DSTokens.colors.button.outline
     } else {
-        MegaOriginalTheme.colors.border.disabled
+        DSTokens.colors.border.disabled
     }
     TextButton(
         modifier = modifier.widthIn(min = 100.dp),
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
-            contentColor = MegaOriginalTheme.colors.text.accent,
+            backgroundColor = DSTokens.colors.background.pageBackground,
+            contentColor = DSTokens.colors.text.accent,
             disabledBackgroundColor = Color.Transparent,
-            disabledContentColor = MegaOriginalTheme.colors.text.disabled,
+            disabledContentColor = DSTokens.colors.text.disabled,
         ),
         onClick = onClick,
         shape = if (rounded) RoundedCornerShape(25.dp) else MaterialTheme.shapes.medium,

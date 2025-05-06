@@ -4,8 +4,9 @@ import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.shared.original.core.ui.theme.iconColor
 
 @Composable
 fun MegaIcon(
@@ -17,5 +18,5 @@ fun MegaIcon(
     painter = painter,
     contentDescription = contentDescription,
     modifier = modifier,
-    tint = MegaOriginalTheme.iconColor(tint)
+    tint = DSTokens.iconColor(tint)
 )

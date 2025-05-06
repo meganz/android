@@ -36,15 +36,15 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.android.core.ui.theme.values.TextColor
 
 internal const val INVALID_TIMESTAMP = "--:--"
 
@@ -82,9 +82,9 @@ fun CoreVoiceClipMessageView(
                 .clip(RoundedCornerShape(12.dp))
                 .background(
                     color = when {
-                        !exists -> MegaOriginalTheme.colors.button.disabled
-                        isMe -> MegaOriginalTheme.colors.icon.accent
-                        else -> MegaOriginalTheme.colors.background.surface2
+                        !exists -> DSTokens.colors.button.disabled
+                        isMe -> DSTokens.colors.icon.accent
+                        else -> DSTokens.colors.background.surface2
                     }
                 ),
             contentAlignment = Alignment.BottomCenter,
@@ -219,7 +219,7 @@ private fun PlaySlider(
         val progressToShow = if (isFingerDown) progressByUser else progressByMediaPlayer
         val progressPosition = progressToShow?.let { (it * heightList.size).toInt() } ?: 0
         val color =
-            if (isMe) MegaOriginalTheme.colors.icon.inverse else MegaOriginalTheme.colors.text.onColorDisabled
+            if (isMe) DSTokens.colors.icon.inverse else DSTokens.colors.text.onColorDisabled
 
         heightList.forEachIndexed { index, height ->
             val alpha = if (index < progressPosition) 1f else 0.5f
@@ -265,8 +265,8 @@ private fun PlayButton(
             .size(40.dp)
             .clip(CircleShape)
             .background(
-                color = if (exists) MegaOriginalTheme.colors.background.blur
-                else MegaOriginalTheme.colors.button.disabled,
+                color = if (exists) DSTokens.colors.background.blur
+                else DSTokens.colors.button.disabled,
             )
             .conditional(interactionEnabled) {
                 clickable(onClick = onPlayClicked)
@@ -279,7 +279,7 @@ private fun PlayButton(
         Icon(
             imageVector = ImageVector.vectorResource(iconId),
             contentDescription = "Play voice clip",
-            tint = if (!exists || isMe) MegaOriginalTheme.colors.icon.inverse else MegaOriginalTheme.colors.icon.onColor
+            tint = if (!exists || isMe) DSTokens.colors.icon.inverse else DSTokens.colors.icon.onColor
         )
     }
 }

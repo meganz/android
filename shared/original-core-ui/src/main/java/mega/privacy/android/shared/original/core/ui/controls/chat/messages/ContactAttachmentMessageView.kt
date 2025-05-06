@@ -23,13 +23,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.chat.ChatStatusIcon
 import mega.privacy.android.shared.original.core.ui.controls.chat.UiChatStatus
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 /**
@@ -55,7 +55,7 @@ fun ContactAttachmentMessageView(
 ) {
     ChatBubble(isMe = isMe, modifier = modifier) {
         CompositionLocalProvider(
-            LocalContentColor provides if (isMe) MegaOriginalTheme.colors.text.inverse else MegaOriginalTheme.colors.text.primary,
+            LocalContentColor provides if (isMe) DSTokens.colors.text.inverse else DSTokens.colors.text.primary,
         ) {
             ContactMessageContentView(
                 avatar = avatar,
@@ -103,7 +103,7 @@ fun ContactMessageContentView(
                 Box(
                     modifier = Modifier.border(
                         width = 1.dp,
-                        color = MegaOriginalTheme.colors.background.pageBackground,
+                        color = DSTokens.colors.background.pageBackground,
                         shape = CircleShape
                     )
                 ) {
@@ -126,9 +126,9 @@ fun ContactMessageContentView(
                         .align(Alignment.TopEnd)
                         .testTag(TEST_TAG_CONTACT_MESSAGE_CONTENT_VIEW_VERIFIED)
                         .size(22.dp)
-                        .border(1.dp, MegaOriginalTheme.colors.background.pageBackground, CircleShape)
+                        .border(1.dp, DSTokens.colors.background.pageBackground, CircleShape)
                         .background(
-                            color = MegaOriginalTheme.colors.indicator.blue,
+                            color = DSTokens.colors.indicator.blue,
                             shape = CircleShape
                         )
                 ) {
@@ -137,7 +137,7 @@ fun ContactMessageContentView(
                             .size(16.dp)
                             .align(Alignment.Center),
                         painter = painterResource(id = R.drawable.check),
-                        tint = MegaOriginalTheme.colors.icon.inverse,
+                        tint = DSTokens.colors.icon.inverse,
                         contentDescription = "Checked"
                     )
                 }
@@ -174,7 +174,7 @@ private fun ContactAttachmentMessageViewPreview(
                     modifier = Modifier
                         .size(40.dp)
                         .background(
-                            color = MegaOriginalTheme.colors.background.inverse,
+                            color = DSTokens.colors.background.inverse,
                             shape = CircleShape
                         ),
                 )
@@ -199,7 +199,7 @@ private fun VerifiedContactAttachmentMessageViewPreview(
                     modifier = Modifier
                         .size(40.dp)
                         .background(
-                            color = MegaOriginalTheme.colors.background.inverse,
+                            color = DSTokens.colors.background.inverse,
                             shape = CircleShape
                         ),
                 )

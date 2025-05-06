@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 
 /**
@@ -36,7 +36,7 @@ fun MegaCard(
                 ambientColor = MaterialTheme.colors.black_white,
             )
             .background(
-                color = MegaOriginalTheme.colors.background.surface1,
+                color = DSTokens.colors.background.surface1,
                 shape = roundedCornersShape,
             )
             .clickable {

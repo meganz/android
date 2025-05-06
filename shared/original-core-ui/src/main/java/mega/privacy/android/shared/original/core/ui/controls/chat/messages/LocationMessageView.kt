@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat.messages
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,10 +23,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Compose view for location message.
@@ -50,12 +50,12 @@ fun LocationMessageView(
         modifier = modifier
             .size(width = 256.dp, height = 200.dp)
             .background(
-                color = MegaOriginalTheme.colors.background.pageBackground,
+                color = DSTokens.colors.background.pageBackground,
                 shape = RoundedCornerShape(12.dp)
             )
             .border(
                 width = 1.dp,
-                color = if (isMe) MegaOriginalTheme.colors.border.strongSelected else MegaOriginalTheme.colors.background.surface2,
+                color = if (isMe) DSTokens.colors.border.strongSelected else DSTokens.colors.background.surface2,
                 shape = RoundedCornerShape(12.dp)
             )
     ) {
@@ -66,8 +66,8 @@ fun LocationMessageView(
                     .height(120.dp)
                     .clip(shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                     .background(
-                        color = if (isMe) MegaOriginalTheme.colors.border.strong
-                        else MegaOriginalTheme.colors.background.surface2
+                        color = if (isMe) DSTokens.colors.border.strong
+                        else DSTokens.colors.background.surface2
                     ),
                 bitmap = it,
                 contentScale = ContentScale.Crop,
@@ -79,14 +79,14 @@ fun LocationMessageView(
             text = title,
             style = MaterialTheme.typography.subtitle1,
             fontWeight = FontWeight.Normal,
-            color = MegaOriginalTheme.colors.text.primary
+            color = DSTokens.colors.text.primary
         )
         Text(
             modifier = Modifier.padding(start = 12.dp),
             text = geolocation,
             style = MaterialTheme.typography.subtitle2,
             fontWeight = FontWeight.Normal,
-            color = MegaOriginalTheme.colors.text.primary
+            color = DSTokens.colors.text.primary
         )
     }
 }

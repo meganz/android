@@ -16,10 +16,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Test Tag Management Message Icon
@@ -51,7 +51,7 @@ fun ChatManagementMessage(
                 .testTag(TEST_TAG_MANAGEMENT_MESSAGE_ICON),
             painter = painterResource(id = iconResId),
             contentDescription = "Call Icon Status",
-            tint = MegaOriginalTheme.colors.icon.primary
+            tint = DSTokens.colors.icon.primary
         )
 
         Text(
@@ -59,7 +59,7 @@ fun ChatManagementMessage(
             text = text,
             style = MaterialTheme.typography.subtitle2,
             fontWeight = FontWeight.Medium,
-            color = MegaOriginalTheme.colors.text.primary
+            color = DSTokens.colors.text.primary
         )
     }
 }

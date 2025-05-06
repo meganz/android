@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.transfers
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.net.Uri
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -21,12 +20,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Core component for a completed transfer item.
@@ -78,7 +78,7 @@ fun CompletedTransferItem(
                         .testTag(TEST_TAG_COMPLETED_TRANSFER_SUCCESS_ICON),
                     painter = painterResource(id = iconPackR.drawable.ic_check_circle_medium_regular_outline),
                     contentDescription = null,
-                    tint = MegaOriginalTheme.colors.support.success,
+                    tint = DSTokens.colors.support.success,
                 )
             }
             MegaText(

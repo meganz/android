@@ -11,9 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Date header
@@ -34,7 +34,7 @@ fun DateHeader(
                 .testTag(TEST_TAG_DATE_HEADER_TIME),
             text = dateString,
             style = MaterialTheme.typography.subtitle2,
-            color = MegaOriginalTheme.colors.text.secondary
+            color = DSTokens.colors.text.secondary
         )
     }
 }

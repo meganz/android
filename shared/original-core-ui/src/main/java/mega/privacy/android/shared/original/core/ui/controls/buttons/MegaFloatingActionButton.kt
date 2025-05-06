@@ -19,9 +19,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * MegaFloatingActionButton
@@ -45,7 +45,7 @@ fun MegaFloatingActionButton(
         modifier = modifier,
         style = style,
         enabled = enabled,
-        backgroundColor = MegaOriginalTheme.colors.button.primary,
+        backgroundColor = DSTokens.colors.button.primary,
         content = content,
     )
 }
@@ -56,10 +56,10 @@ internal fun MegaFloatingActionButton(
     modifier: Modifier = Modifier,
     style: FloatingActionButtonStyle = FloatingActionButtonStyle.Big,
     enabled: Boolean = true,
-    backgroundColor: Color = MegaOriginalTheme.colors.button.primary,
-    iconTintColor: Color = MegaOriginalTheme.colors.icon.inverse,
-    backgroundColorDisabled: Color = MegaOriginalTheme.colors.button.disabled,
-    iconTintColorDisabled: Color = MegaOriginalTheme.colors.text.onColorDisabled,
+    backgroundColor: Color = DSTokens.colors.button.primary,
+    iconTintColor: Color = DSTokens.colors.icon.inverse,
+    backgroundColorDisabled: Color = DSTokens.colors.button.disabled,
+    iconTintColorDisabled: Color = DSTokens.colors.text.onColorDisabled,
     content: @Composable () -> Unit,
 ) {
     FloatingActionButton(

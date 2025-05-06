@@ -50,7 +50,7 @@ import mega.privacy.android.shared.original.core.ui.controls.images.GridThumbnai
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.color_button_brand
 
@@ -101,14 +101,14 @@ fun NodeGridViewItem(
                 .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
                 .border(
                     width = 1.dp,
-                    color = if (isSelected) MegaOriginalTheme.colors.border.subtleSelected
-                    else MegaOriginalTheme.colors.border.subtle,
+                    color = if (isSelected) DSTokens.colors.border.subtleSelected
+                    else DSTokens.colors.border.subtle,
                     shape = RoundedCornerShape(5.dp),
                 )
                 .background(
                     if (isHighlighted)
-                        MegaOriginalTheme.colors.background.surface2
-                    else MegaOriginalTheme.colors.background.pageBackground
+                        DSTokens.colors.background.surface2
+                    else DSTokens.colors.background.pageBackground
                 )
                 .combinedClickable(
                     onClick = { onClick() },
@@ -143,7 +143,7 @@ fun NodeGridViewItem(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(MegaOriginalTheme.colors.background.blur)
+                                .background(DSTokens.colors.background.blur)
                         ) {
                             Icon(
                                 modifier = Modifier
@@ -152,7 +152,7 @@ fun NodeGridViewItem(
                                     .testTag(VIDEO_PLAY_ICON_TEST_TAG),
                                 painter = painterResource(id = IconPackR.drawable.ic_play_circle_medium_regular_solid),
                                 contentDescription = "Play Icon",
-                                tint = MegaOriginalTheme.colors.icon.onColor,
+                                tint = DSTokens.colors.icon.onColor,
                             )
                         }
                     }
@@ -252,7 +252,7 @@ private fun Footer(
         if (onMenuClick != null) {
             Icon(
                 painter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
-                tint = MegaOriginalTheme.colors.icon.secondary,
+                tint = DSTokens.colors.icon.secondary,
                 contentDescription = "More",
                 modifier = Modifier
                     .size(optionIconSize)
@@ -264,7 +264,7 @@ private fun Footer(
             if (isSelected) {
                 Icon(
                     painter = painterResource(id = IconPackR.drawable.ic_check_circle_medium_regular_solid),
-                    tint = MegaOriginalTheme.colors.icon.accent,
+                    tint = DSTokens.colors.icon.accent,
                     contentDescription = "Selected",
                     modifier = Modifier
                         .size(optionIconSize)

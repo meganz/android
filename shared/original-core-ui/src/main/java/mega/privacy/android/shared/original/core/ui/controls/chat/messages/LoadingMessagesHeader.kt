@@ -27,10 +27,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Loading messages header
@@ -43,7 +43,7 @@ fun LoadingMessagesHeader(
     val density = LocalDensity.current
 
     Box(modifier = modifier
-        .background(MegaOriginalTheme.colors.background.pageBackground)
+        .background(DSTokens.colors.background.pageBackground)
         .onGloballyPositioned {
             componentHeight = with(density) { it.size.height.toDp() }
         }) {
@@ -53,7 +53,7 @@ fun LoadingMessagesHeader(
             modifier = modifier
                 .fillMaxWidth()
                 .testTag(TEST_TAG_LOADING_MESSAGES),
-            colorFilter = ColorFilter.tint(MegaOriginalTheme.colors.background.surface2)
+            colorFilter = ColorFilter.tint(DSTokens.colors.background.surface2)
         )
         Spacer(
             modifier = Modifier
@@ -68,11 +68,11 @@ fun LoadingMessagesHeader(
 @Composable
 private fun shimmerBrush(): Brush {
     val shimmerColors = listOf(
-        MegaOriginalTheme.colors.background.pageBackground.copy(alpha = 0f),
-        MegaOriginalTheme.colors.background.pageBackground.copy(alpha = 0.2f),
-        MegaOriginalTheme.colors.background.pageBackground.copy(alpha = 0.6f),
-        MegaOriginalTheme.colors.background.pageBackground.copy(alpha = 0.2f),
-        MegaOriginalTheme.colors.background.pageBackground.copy(alpha = 0f),
+        DSTokens.colors.background.pageBackground.copy(alpha = 0f),
+        DSTokens.colors.background.pageBackground.copy(alpha = 0.2f),
+        DSTokens.colors.background.pageBackground.copy(alpha = 0.6f),
+        DSTokens.colors.background.pageBackground.copy(alpha = 0.2f),
+        DSTokens.colors.background.pageBackground.copy(alpha = 0f),
     )
 
     val transition = rememberInfiniteTransition(label = "")

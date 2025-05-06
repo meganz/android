@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 
 /**
  * BottomSheet used with compose navigation host
@@ -23,8 +23,8 @@ fun MegaBottomSheetLayout(
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
         modifier = modifier,
-        sheetBackgroundColor = MegaOriginalTheme.colors.background.surface1,
-        scrimColor = MegaOriginalTheme.colors.background.blur,
+        sheetBackgroundColor = DSTokens.colors.background.surface1,
+        scrimColor = DSTokens.colors.background.blur,
         content = content
     )
 }

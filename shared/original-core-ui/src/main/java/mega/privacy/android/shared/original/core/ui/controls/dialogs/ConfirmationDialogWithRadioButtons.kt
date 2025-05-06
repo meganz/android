@@ -27,14 +27,14 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.AlertDialogFlowRow
 import mega.privacy.android.shared.original.core.ui.controls.lists.SettingsItemWithRadioButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Confirmation dialog with radio button
@@ -171,7 +171,7 @@ private fun ScrollSeparator() = Spacer(
     Modifier
         .height(1.dp)
         .fillMaxWidth()
-        .background(MegaOriginalTheme.colors.border.strong)
+        .background(DSTokens.colors.border.strong)
 )
 
 

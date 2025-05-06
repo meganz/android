@@ -1,18 +1,18 @@
 package mega.privacy.android.shared.original.core.ui.controls.appbar
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
@@ -25,8 +25,8 @@ fun SelectModeAppBar(
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides
             MegaAppBarColors(
-                MegaOriginalTheme.colors.icon.accent,
-                MegaOriginalTheme.colors.text.accent
+                DSTokens.colors.icon.accent,
+                DSTokens.colors.text.accent
             )
 ) {
     BaseMegaAppBar(

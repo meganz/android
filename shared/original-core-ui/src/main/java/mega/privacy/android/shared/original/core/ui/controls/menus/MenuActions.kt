@@ -39,7 +39,7 @@ import mega.privacy.android.shared.original.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 
 
 /**
@@ -131,7 +131,7 @@ private fun RowScope.OverflowDropDown(
         DropdownMenu(
             modifier = Modifier
                 .semantics { testTagsAsResourceId = true }
-                .background(MegaOriginalTheme.colors.background.surface1),
+                .background(DSTokens.colors.background.surface1),
             expanded = showMoreMenu,
             onDismissRequest = {
                 showMoreMenu = false
@@ -188,9 +188,9 @@ private fun IconButtonWithTooltip(
                 painter = iconPainter,
                 contentDescription = description,
                 tint = when {
-                    enabled && highlightIconColor -> MegaOriginalTheme.colors.icon.accent
+                    enabled && highlightIconColor -> DSTokens.colors.icon.accent
                     enabled -> LocalMegaAppBarColors.current.iconsTintColor
-                    else -> MegaOriginalTheme.colors.icon.disabled
+                    else -> DSTokens.colors.icon.disabled
                 }
             )
         }

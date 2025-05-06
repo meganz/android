@@ -14,14 +14,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.status.MegaStatusIndicator
 import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Two line list item with status info
@@ -61,7 +61,7 @@ fun StatusListViewItem(
                 painter = painterResource(id = icon),
                 contentDescription = "Item icon",
                 colorFilter = if (applySecondaryColorIconTint) {
-                    ColorFilter.tint(MegaOriginalTheme.colors.icon.secondary)
+                    ColorFilter.tint(DSTokens.colors.icon.secondary)
                 } else {
                     null
                 }

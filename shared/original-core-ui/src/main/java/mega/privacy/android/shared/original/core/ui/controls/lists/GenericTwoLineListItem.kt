@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.lists
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -24,12 +23,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.textColor
 
 /**
  * Generic two line list item
@@ -74,7 +75,7 @@ fun GenericTwoLineListItem(
                 modifier = Modifier,
                 text = title,
                 style = MaterialTheme.typography.subtitle1,
-                color = MegaOriginalTheme.textColor(textColor = titleTextColor),
+                color = DSTokens.textColor(textColor = titleTextColor),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -85,7 +86,7 @@ fun GenericTwoLineListItem(
                     modifier = Modifier,
                     text = subtitle,
                     style = MaterialTheme.typography.subtitle2,
-                    color = MegaOriginalTheme.textColor(textColor = subtitleTextColor),
+                    color = DSTokens.textColor(textColor = subtitleTextColor),
                     maxLines = if (showEntireSubtitle) {
                         Int.MAX_VALUE
                     } else {
@@ -163,7 +164,7 @@ internal fun GenericTwoLineListItem(
 @Composable
 internal fun RowScope.TrailingIcons(trailingIcons: @Composable (RowScope.() -> Unit)?) {
     CompositionLocalProvider(
-        LocalContentColor provides MegaOriginalTheme.colors.icon.secondary,
+        LocalContentColor provides DSTokens.colors.icon.secondary,
         LocalContentAlpha provides 1f,
     ) {
         trailingIcons?.invoke(this)
@@ -183,14 +184,14 @@ internal fun TitleRow(
     ) {
         Box(modifier = Modifier.weight(1f, fill = fillTitleText)) {
             CompositionLocalProvider(
-                LocalContentColor provides MegaOriginalTheme.colors.text.primary,
+                LocalContentColor provides DSTokens.colors.text.primary,
                 LocalTextStyle provides MaterialTheme.typography.subtitle1,
             ) {
                 title()
             }
         }
         CompositionLocalProvider(
-            LocalContentColor provides MegaOriginalTheme.colors.icon.secondary,
+            LocalContentColor provides DSTokens.colors.icon.secondary,
             LocalContentAlpha provides 1f,
         ) {
             titleIcons?.invoke(this)
@@ -213,21 +214,21 @@ internal fun SubTitleRow(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             CompositionLocalProvider(
-                LocalContentColor provides MegaOriginalTheme.colors.icon.secondary,
+                LocalContentColor provides DSTokens.colors.icon.secondary,
                 LocalContentAlpha provides 1f,
             ) {
                 subTitlePrefixIcons?.invoke(this)
             }
             Box(modifier = Modifier.weight(1f, fill = fillSubTitleText)) {
                 CompositionLocalProvider(
-                    LocalContentColor provides MegaOriginalTheme.colors.text.secondary,
+                    LocalContentColor provides DSTokens.colors.text.secondary,
                     LocalTextStyle provides MaterialTheme.typography.subtitle2
                 ) {
                     subtitle()
                 }
             }
             CompositionLocalProvider(
-                LocalContentColor provides MegaOriginalTheme.colors.icon.secondary,
+                LocalContentColor provides DSTokens.colors.icon.secondary,
                 LocalContentAlpha provides 1f,
             ) {
                 subTitleSuffixIcons?.invoke(this)

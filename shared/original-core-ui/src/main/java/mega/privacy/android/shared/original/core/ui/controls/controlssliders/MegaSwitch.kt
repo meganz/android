@@ -48,7 +48,7 @@ import androidx.core.content.withStyledAttributes
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 
@@ -273,12 +273,12 @@ internal const val CHECKED_TAG = "mega_switch:icon_checked"
 private fun getColorForThumb(checked: Boolean, pressed: Boolean, enabled: Boolean) =
     if (enabled) {
         when {
-            !checked && !pressed -> MegaOriginalTheme.colors.components.selectionControl
-            !checked && pressed -> MegaOriginalTheme.colors.button.outlinePressed
-            else /*checked*/ -> MegaOriginalTheme.colors.background.surface1
+            !checked && !pressed -> DSTokens.colors.components.selectionControl
+            !checked && pressed -> DSTokens.colors.button.outlinePressed
+            else /*checked*/ -> DSTokens.colors.background.surface1
         }
     } else {
-        if (checked) MegaOriginalTheme.colors.background.pageBackground else MegaOriginalTheme.colors.border.disabled
+        if (checked) DSTokens.colors.background.pageBackground else DSTokens.colors.border.disabled
     }
 
 @Composable

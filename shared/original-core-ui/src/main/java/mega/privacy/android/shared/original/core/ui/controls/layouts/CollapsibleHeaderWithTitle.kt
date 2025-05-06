@@ -19,6 +19,7 @@ import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import androidx.constraintlayout.compose.Dimension
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBarSubTitle
@@ -26,7 +27,6 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBarTi
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBarTitleAndSubtitle
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 
 /**
@@ -134,10 +134,10 @@ private fun CollapsibleHeaderPreview() {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MegaOriginalTheme.colors.background.inverse),
+                    .background(DSTokens.colors.background.inverse),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "preview", color = MegaOriginalTheme.colors.text.accent)
+                Text(text = "preview", color = DSTokens.colors.text.accent)
             }
         }
     }

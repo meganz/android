@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.widgets
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.TweenSpec
@@ -43,10 +42,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -144,10 +144,10 @@ internal fun TransfersWidgetView(
         onClick = onClick,
         modifier = modifier
             .testTag(TAG_TRANSFERS_WIDGET),
-        backgroundColor = MegaOriginalTheme.colors.background.surface1,
+        backgroundColor = DSTokens.colors.background.surface1,
     ) {
 
-        val progressBackgroundColor = MegaOriginalTheme.colors.background.surface3
+        val progressBackgroundColor = DSTokens.colors.background.surface3
         val progressColor = progressColor(transfersInfo, completed)
         val progressArc = if (completed) 360f else transfersInfo.completedProgress * 360f
         Canvas(modifier = Modifier.size(diameter.dp)) {
@@ -190,7 +190,7 @@ internal fun TransfersWidgetView(
                         .padding(5.dp)
                         .size(16.dp)
                         .background(
-                            color = MegaOriginalTheme.colors.background.surface1,
+                            color = DSTokens.colors.background.surface1,
                             shape = CircleShape
                         )
                         .padding(2.dp)
@@ -204,12 +204,12 @@ internal fun TransfersWidgetView(
 
 @Composable
 private fun progressColor(transfersInfo: TransfersInfo, justCompleted: Boolean) =
-    if (justCompleted) MegaOriginalTheme.colors.support.success
+    if (justCompleted) DSTokens.colors.support.success
     else with(transfersInfo) {
         when (status) {
-            TransfersStatus.OverQuota -> MegaOriginalTheme.colors.support.warning
-            TransfersStatus.TransferError -> MegaOriginalTheme.colors.support.error
-            else -> MegaOriginalTheme.colors.icon.secondary
+            TransfersStatus.OverQuota -> DSTokens.colors.support.warning
+            TransfersStatus.TransferError -> DSTokens.colors.support.error
+            else -> DSTokens.colors.icon.secondary
         }
     }
 

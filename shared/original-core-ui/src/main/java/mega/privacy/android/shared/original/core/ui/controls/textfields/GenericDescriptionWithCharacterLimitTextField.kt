@@ -41,14 +41,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.R.drawable
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.drawableId
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body3
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * TextField Generic Description with Character Limit
@@ -94,11 +94,11 @@ fun GenericDescriptionWithCharacterLimitTextField(
                 .testTag(TEXT_FIELD_WITH_CHARACTER_LIMIT_VIEW_TEXT_FIELD),
             textStyle = MaterialTheme.typography.body3,
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                textColor = MegaOriginalTheme.colors.text.primary,
-                cursorColor = MegaOriginalTheme.colors.text.primary,
-                focusedBorderColor = MegaOriginalTheme.colors.border.strongSelected,
-                unfocusedBorderColor = MegaOriginalTheme.colors.border.strong,
-                errorBorderColor = MegaOriginalTheme.colors.support.error
+                textColor = DSTokens.colors.text.primary,
+                cursorColor = DSTokens.colors.text.primary,
+                focusedBorderColor = DSTokens.colors.border.strongSelected,
+                unfocusedBorderColor = DSTokens.colors.border.strong,
+                errorBorderColor = DSTokens.colors.support.error
             ),
             isError = isError,
             keyboardOptions = keyboardOption,
@@ -120,7 +120,7 @@ fun GenericDescriptionWithCharacterLimitTextField(
                                     .size(16.dp),
                                 imageVector = Icons.Default.Clear,
                                 contentDescription = "Clear text",
-                                tint = MegaOriginalTheme.colors.icon.primary
+                                tint = DSTokens.colors.icon.primary
                             )
                         }
                     }
@@ -156,7 +156,7 @@ fun GenericDescriptionWithCharacterLimitTextField(
                         .semantics {
                             drawableId = drawable.ic_warning_icon
                         },
-                    colorFilter = ColorFilter.tint(MegaOriginalTheme.colors.support.error)
+                    colorFilter = ColorFilter.tint(DSTokens.colors.support.error)
                 )
                 MegaText(
                     text = errorMessage,

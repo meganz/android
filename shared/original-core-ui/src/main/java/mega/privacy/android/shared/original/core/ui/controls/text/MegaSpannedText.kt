@@ -25,8 +25,9 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.textColor
 
 /**
  * High light text from mega format
@@ -57,7 +58,7 @@ fun MegaSpannedText(
     Text(
         modifier = modifier,
         text = spannedText(value, styles),
-        color = MegaOriginalTheme.textColor(textColor = color),
+        color = DSTokens.textColor(textColor = color),
         style = baseStyle,
         maxLines = maxLines,
         overflow = overflow,

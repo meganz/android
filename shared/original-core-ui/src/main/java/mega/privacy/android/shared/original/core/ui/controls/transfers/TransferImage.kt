@@ -25,10 +25,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
@@ -109,7 +109,7 @@ private fun LeadingIndicator(
     modifier = modifier
         .size(19.dp)
         .clip(CircleShape)
-        .background(color = MegaOriginalTheme.colors.background.pageBackground)
+        .background(color = DSTokens.colors.background.pageBackground)
         .testTag(
             if (isDownload) TEST_TAG_DOWNLOAD_LEADING_INDICATOR
             else TEST_TAG_UPLOAD_LEADING_INDICATOR
@@ -124,8 +124,8 @@ private fun LeadingIndicator(
             else R.drawable.ic_arrow_up_circle_small_thin_solid
         ),
         contentDescription = null,
-        tint = if (isDownload) MegaOriginalTheme.colors.indicator.green
-        else MegaOriginalTheme.colors.indicator.blue,
+        tint = if (isDownload) DSTokens.colors.indicator.green
+        else DSTokens.colors.indicator.blue,
     )
 }
 

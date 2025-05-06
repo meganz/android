@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.sheets
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -33,15 +32,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * BottomSheet
@@ -107,8 +107,8 @@ fun BottomSheet(
         sheetElevation = sheetElevation,
         sheetState = modalSheetState,
         sheetGesturesEnabled = sheetGesturesEnabled,
-        scrimColor = MegaOriginalTheme.colors.background.blur,
-        sheetBackgroundColor = MegaOriginalTheme.colors.background.surface1,
+        scrimColor = DSTokens.colors.background.blur,
+        sheetBackgroundColor = DSTokens.colors.background.surface1,
         sheetContent = {
             sheetBody()
             if (bottomInsetPadding) {

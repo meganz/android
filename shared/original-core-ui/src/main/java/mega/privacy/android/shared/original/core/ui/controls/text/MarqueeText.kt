@@ -11,9 +11,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.textColor
 
 /**
  * Marquee text.
@@ -31,7 +32,7 @@ fun MarqueeText(
     style: TextStyle = LocalTextStyle.current,
 ) = MarqueeText(
     text = text,
-    color = MegaOriginalTheme.textColor(color),
+    color = DSTokens.textColor(color),
     modifier = modifier,
     style = style
 )
@@ -67,7 +68,7 @@ private fun MarqueeTextPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         MarqueeText(
             text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-            color = MegaOriginalTheme.colors.text.secondary
+            color = DSTokens.colors.text.secondary
         )
     }
 }

@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 
 /**
  * Item status indicator
@@ -65,7 +65,7 @@ fun MegaStatusIndicator(
 @Composable
 fun StatusColor?.getStatusTextColor(): Color = this?.let {
     getStatusColor(statusColor = this)
-} ?: MegaOriginalTheme.colors.text.secondary
+} ?: DSTokens.colors.text.secondary
 
 /**
  * Gets the final [Color] from a [StatusColor] for an Icon
@@ -75,7 +75,7 @@ fun StatusColor?.getStatusTextColor(): Color = this?.let {
 @Composable
 fun StatusColor?.getStatusIconColor(): Color = this?.let {
     getStatusColor(statusColor = this)
-} ?: MegaOriginalTheme.colors.icon.secondary
+} ?: DSTokens.colors.icon.secondary
 
 /**
  * Gets the final [Color] from a [StatusColor]
@@ -86,10 +86,10 @@ fun StatusColor?.getStatusIconColor(): Color = this?.let {
 @Composable
 private fun getStatusColor(statusColor: StatusColor): Color =
     when (statusColor) {
-        StatusColor.Success -> MegaOriginalTheme.colors.support.success
-        StatusColor.Info -> MegaOriginalTheme.colors.support.info
-        StatusColor.Warning -> MegaOriginalTheme.colors.support.warning
-        StatusColor.Error -> MegaOriginalTheme.colors.support.error
+        StatusColor.Success -> DSTokens.colors.support.success
+        StatusColor.Info -> DSTokens.colors.support.info
+        StatusColor.Warning -> DSTokens.colors.support.warning
+        StatusColor.Error -> DSTokens.colors.support.error
     }
 
 /**

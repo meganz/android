@@ -10,11 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Camera preview bottom bar
@@ -29,7 +29,7 @@ fun CameraPreviewBottomBar(
 ) {
     Box(
         modifier = modifier
-            .background(color = MegaOriginalTheme.colors.background.pageBackground)
+            .background(color = DSTokens.colors.background.pageBackground)
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
             .height(172.dp),

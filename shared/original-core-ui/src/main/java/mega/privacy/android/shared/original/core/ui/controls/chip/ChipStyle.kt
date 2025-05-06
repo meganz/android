@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4Bold
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
@@ -67,15 +67,15 @@ data object DefaultChipStyle : ChipStyle {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun selectableChipColors(): SelectableChipColors = ChipDefaults.filterChipColors(
-        selectedBackgroundColor = MegaOriginalTheme.colors.components.selectionControl,
-        selectedContentColor = MegaOriginalTheme.colors.text.inverse,
-        selectedLeadingIconColor = MegaOriginalTheme.colors.icon.inverse,
-        backgroundColor = MegaOriginalTheme.colors.button.secondary,
-        contentColor = MegaOriginalTheme.colors.text.secondary,
-        leadingIconColor = MegaOriginalTheme.colors.icon.inverse,
-        disabledBackgroundColor = MegaOriginalTheme.colors.button.secondary,
-        disabledContentColor = MegaOriginalTheme.colors.text.secondary,
-        disabledLeadingIconColor = MegaOriginalTheme.colors.icon.secondary,
+        selectedBackgroundColor = DSTokens.colors.components.selectionControl,
+        selectedContentColor = DSTokens.colors.text.inverse,
+        selectedLeadingIconColor = DSTokens.colors.icon.inverse,
+        backgroundColor = DSTokens.colors.button.secondary,
+        contentColor = DSTokens.colors.text.secondary,
+        leadingIconColor = DSTokens.colors.icon.inverse,
+        disabledBackgroundColor = DSTokens.colors.button.secondary,
+        disabledContentColor = DSTokens.colors.text.secondary,
+        disabledLeadingIconColor = DSTokens.colors.icon.secondary,
     )
 
     /**
@@ -94,21 +94,21 @@ data object TransparentChipStyle : ChipStyle {
     @Composable
     override fun selectableChipColors(): SelectableChipColors = ChipDefaults.filterChipColors(
         selectedBackgroundColor = Color.Transparent,
-        selectedContentColor = MegaOriginalTheme.colors.text.primary,
-        selectedLeadingIconColor = MegaOriginalTheme.colors.icon.primary,
+        selectedContentColor = DSTokens.colors.text.primary,
+        selectedLeadingIconColor = DSTokens.colors.icon.primary,
         backgroundColor = Color.Transparent,
-        contentColor = MegaOriginalTheme.colors.text.primary,
-        leadingIconColor = MegaOriginalTheme.colors.icon.primary,
+        contentColor = DSTokens.colors.text.primary,
+        leadingIconColor = DSTokens.colors.icon.primary,
         disabledBackgroundColor = Color.Transparent,
-        disabledContentColor = MegaOriginalTheme.colors.text.primary,
-        disabledLeadingIconColor = MegaOriginalTheme.colors.icon.primary,
+        disabledContentColor = DSTokens.colors.text.primary,
+        disabledLeadingIconColor = DSTokens.colors.icon.primary,
     )
 
     @Composable
     override fun typography(): TextStyle = MaterialTheme.typography.subtitle2medium
 
     @Composable
-    override fun borderStyle() = BorderStroke(1.dp, MegaOriginalTheme.colors.border.strong)
+    override fun borderStyle() = BorderStroke(1.dp, DSTokens.colors.border.strong)
 }
 
 /**
@@ -119,19 +119,19 @@ data object RoundedChipStyle : ChipStyle {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun selectableChipColors(): SelectableChipColors = ChipDefaults.filterChipColors(
-        selectedBackgroundColor = MegaOriginalTheme.colors.components.selectionControl,
-        selectedContentColor = MegaOriginalTheme.colors.text.inverse,
-        selectedLeadingIconColor = MegaOriginalTheme.colors.icon.inverse,
-        backgroundColor = MegaOriginalTheme.colors.button.secondary,
-        contentColor = MegaOriginalTheme.colors.text.primary,
-        leadingIconColor = MegaOriginalTheme.colors.icon.primary,
-        disabledBackgroundColor = MegaOriginalTheme.colors.button.secondary,
-        disabledContentColor = MegaOriginalTheme.colors.text.secondary,
-        disabledLeadingIconColor = MegaOriginalTheme.colors.icon.secondary,
+        selectedBackgroundColor = DSTokens.colors.components.selectionControl,
+        selectedContentColor = DSTokens.colors.text.inverse,
+        selectedLeadingIconColor = DSTokens.colors.icon.inverse,
+        backgroundColor = DSTokens.colors.button.secondary,
+        contentColor = DSTokens.colors.text.primary,
+        leadingIconColor = DSTokens.colors.icon.primary,
+        disabledBackgroundColor = DSTokens.colors.button.secondary,
+        disabledContentColor = DSTokens.colors.text.secondary,
+        disabledLeadingIconColor = DSTokens.colors.icon.secondary,
     )
 
     @Composable
-    override fun borderStyle() = BorderStroke(1.dp, MegaOriginalTheme.colors.border.strong)
+    override fun borderStyle() = BorderStroke(1.dp, DSTokens.colors.border.strong)
 
     @Composable
     override fun typography(): TextStyle = MaterialTheme.typography.subtitle2medium
@@ -147,15 +147,15 @@ data object TagChipStyle : ChipStyle {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun selectableChipColors(): SelectableChipColors = ChipDefaults.filterChipColors(
-        selectedBackgroundColor = MegaOriginalTheme.colors.button.brand,
-        selectedContentColor = MegaOriginalTheme.colors.text.inverse,
-        selectedLeadingIconColor = MegaOriginalTheme.colors.icon.inverse,
-        backgroundColor = MegaOriginalTheme.colors.button.secondary,
-        contentColor = MegaOriginalTheme.colors.text.secondary,
-        leadingIconColor = MegaOriginalTheme.colors.icon.inverse,
-        disabledBackgroundColor = MegaOriginalTheme.colors.button.secondary,
-        disabledContentColor = MegaOriginalTheme.colors.text.secondary,
-        disabledLeadingIconColor = MegaOriginalTheme.colors.icon.secondary,
+        selectedBackgroundColor = DSTokens.colors.button.brand,
+        selectedContentColor = DSTokens.colors.text.inverse,
+        selectedLeadingIconColor = DSTokens.colors.icon.inverse,
+        backgroundColor = DSTokens.colors.button.secondary,
+        contentColor = DSTokens.colors.text.secondary,
+        leadingIconColor = DSTokens.colors.icon.inverse,
+        disabledBackgroundColor = DSTokens.colors.button.secondary,
+        disabledContentColor = DSTokens.colors.text.secondary,
+        disabledLeadingIconColor = DSTokens.colors.icon.secondary,
     )
 
     @Composable
@@ -204,10 +204,10 @@ sealed class NotificationChipStyle : ChipStyle {
      */
     data object Success : NotificationChipStyle() {
         @Composable
-        override fun backgroundColor() = MegaOriginalTheme.colors.notifications.notificationSuccess
+        override fun backgroundColor() = DSTokens.colors.notifications.notificationSuccess
 
         @Composable
-        override fun foregroundColor() = MegaOriginalTheme.colors.text.success
+        override fun foregroundColor() = DSTokens.colors.text.success
 
         @Composable
         override fun typography(): TextStyle = MaterialTheme.typography.body4
@@ -218,10 +218,10 @@ sealed class NotificationChipStyle : ChipStyle {
      */
     data object Info : NotificationChipStyle() {
         @Composable
-        override fun backgroundColor() = MegaOriginalTheme.colors.notifications.notificationInfo
+        override fun backgroundColor() = DSTokens.colors.notifications.notificationInfo
 
         @Composable
-        override fun foregroundColor() = MegaOriginalTheme.colors.text.info
+        override fun foregroundColor() = DSTokens.colors.text.info
 
         @Composable
         override fun typography(): TextStyle = MaterialTheme.typography.body4Bold
@@ -232,10 +232,10 @@ sealed class NotificationChipStyle : ChipStyle {
      */
     data object Warning : NotificationChipStyle() {
         @Composable
-        override fun backgroundColor() = MegaOriginalTheme.colors.notifications.notificationWarning
+        override fun backgroundColor() = DSTokens.colors.notifications.notificationWarning
 
         @Composable
-        override fun foregroundColor() = MegaOriginalTheme.colors.text.warning
+        override fun foregroundColor() = DSTokens.colors.text.warning
 
         @Composable
         override fun typography(): TextStyle = MaterialTheme.typography.body4Bold

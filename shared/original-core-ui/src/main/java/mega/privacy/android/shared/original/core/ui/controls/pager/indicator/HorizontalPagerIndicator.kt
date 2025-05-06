@@ -15,9 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * The indicator [Composable] for a [HorizontalPager].
@@ -42,9 +42,9 @@ fun HorizontalPagerIndicator(
     ) {
         repeat(pageSize) { iteration ->
             val color = if (currentPage == iteration) {
-                MegaOriginalTheme.colors.icon.accent
+                DSTokens.colors.icon.accent
             } else {
-                MegaOriginalTheme.colors.icon.onColorDisabled
+                DSTokens.colors.icon.onColorDisabled
             }
             Box(
                 modifier = Modifier

@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.map
 import mega.android.core.ui.theme.values.BackgroundColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.LocalMegaAppBarElevation
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -60,8 +61,8 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatin
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.backgroundColor
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.utils.accumulateDirectionalScrollOffsets
 
@@ -220,7 +221,7 @@ private fun MegaScaffold(
             },
             floatingActionButton = floatingActionButton,
             floatingActionButtonPosition = floatingActionButtonPosition,
-            backgroundColor = MegaOriginalTheme.colors.background.pageBackground.copy(
+            backgroundColor = DSTokens.colors.background.pageBackground.copy(
                 alpha = backgroundAlpha
             ),
             contentWindowInsets = contentWindowInsets,
@@ -230,7 +231,7 @@ private fun MegaScaffold(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(color = MegaOriginalTheme.colors.background.blur)
+                            .background(color = DSTokens.colors.background.blur)
                             .clickable(indication = null,
                                 interactionSource = remember { MutableInteractionSource() },
                                 onClick = { blurContent.invoke() }),
@@ -254,7 +255,7 @@ private fun BarContent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color = MegaOriginalTheme.colors.background.blur)
+                    .background(color = DSTokens.colors.background.blur)
                     .clickable(indication = null,
                         interactionSource = remember { MutableInteractionSource() },
                         onClick = { blurContent.invoke() })
@@ -270,7 +271,7 @@ private fun MegaScaffoldPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         val scrollState = rememberScrollState()
         MegaScaffold(
-            modifier = Modifier.background(MegaOriginalTheme.backgroundColor(backgroundColor = BackgroundColor.PageBackground)),
+            modifier = Modifier.background(DSTokens.backgroundColor(backgroundColor = BackgroundColor.PageBackground)),
             topBar = { MegaAppBar(appBarType = AppBarType.NONE, title = "Top bar title") },
             floatingActionButton = { MegaFloatingActionButton(onClick = { }) {} },
             hideFloatingActionButtonOnScrollUp = true,

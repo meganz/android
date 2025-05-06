@@ -20,10 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Chat bubble
@@ -45,25 +45,25 @@ fun ChatBubble(
             .clip(RoundedCornerShape(12.dp))
             .then(modifier)
             .background(
-                color = if (isMe) MegaOriginalTheme.colors.button.primary else MegaOriginalTheme.colors.background.surface2,
+                color = if (isMe) DSTokens.colors.button.primary else DSTokens.colors.background.surface2,
             )
     ) {
         Column(modifier = Modifier.width(IntrinsicSize.Max)) {
             CompositionLocalProvider(
-                LocalContentColor provides if (isMe) MegaOriginalTheme.colors.text.inverse else MegaOriginalTheme.colors.text.primary,
+                LocalContentColor provides if (isMe) DSTokens.colors.text.inverse else DSTokens.colors.text.primary,
                 LocalTextStyle provides MaterialTheme.typography.subtitle2,
             ) {
                 content()
             }
             CompositionLocalProvider(
-                LocalContentColor provides MegaOriginalTheme.colors.text.primary,
+                LocalContentColor provides DSTokens.colors.text.primary,
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(1.dp)
                         .background(
-                            color = MegaOriginalTheme.colors.background.pageBackground,
+                            color = DSTokens.colors.background.pageBackground,
                             shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp),
                         ),
                 ) {

@@ -16,9 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Text button
@@ -68,9 +68,9 @@ fun TextMegaButton(
     enabled = enabled,
     colors = ButtonDefaults.buttonColors(
         backgroundColor = Color.Transparent,
-        contentColor = MegaOriginalTheme.colors.text.accent,
+        contentColor = DSTokens.colors.text.accent,
         disabledBackgroundColor = Color.Transparent,
-        disabledContentColor = MegaOriginalTheme.colors.text.disabled,
+        disabledContentColor = DSTokens.colors.text.disabled,
     ),
     contentPadding = contentPadding
 ) {

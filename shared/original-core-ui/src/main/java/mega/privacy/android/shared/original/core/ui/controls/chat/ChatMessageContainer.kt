@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +35,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaCheckbox
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ChatBubble
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.LocationMessageView
@@ -46,10 +48,8 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.react
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.android.core.ui.theme.values.TextColor
 
 internal const val TEST_TAG_FORWARD_ICON = "chat_message_container:forward_icon"
 
@@ -216,7 +216,7 @@ private fun ForwardIcon(
             .clickable { onForwardClicked() },
         painter = painterResource(id = R.drawable.ic_forward_circle),
         contentDescription = "Icon Forward",
-        tint = MegaOriginalTheme.colors.icon.secondary
+        tint = DSTokens.colors.icon.secondary
     )
 }
 
@@ -254,7 +254,7 @@ private fun Preview(
                             modifier = it,
                             painter = painterResource(id = R.drawable.ic_emoji_smile_medium_regular),
                             contentDescription = "Avatar",
-                            tint = MegaOriginalTheme.colors.icon.secondary
+                            tint = DSTokens.colors.icon.secondary
                         )
                     },
                     content = parameter.content,

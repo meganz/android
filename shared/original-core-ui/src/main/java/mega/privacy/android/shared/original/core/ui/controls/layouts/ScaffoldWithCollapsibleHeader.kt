@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.layouts
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -44,7 +43,8 @@ import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import androidx.constraintlayout.compose.Dimension
-import mega.privacy.android.core.R
+import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.LocalMegaAppBarColors
@@ -55,7 +55,6 @@ import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -89,18 +88,18 @@ fun ScaffoldWithCollapsibleHeader(
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
-            .background(MegaOriginalTheme.colors.background.pageBackground)
+            .background(DSTokens.colors.background.pageBackground)
     ) {
         // calculate the dimensions and colors that are derived from scrollState
         val density = LocalDensity.current.density
         val hasHeaderBelowSystemBar = headerIncludingSystemBar != null
-        val needsInverseTitleColors = hasHeaderBelowSystemBar && MegaOriginalTheme.colors.isLight
-        val iconTintColorBase = MegaOriginalTheme.colors.icon.primary
+        val needsInverseTitleColors = hasHeaderBelowSystemBar && DSTokens.colors.isLight
+        val iconTintColorBase = DSTokens.colors.icon.primary
         val iconTintColorExpanded =
-            if (needsInverseTitleColors) MegaOriginalTheme.colors.icon.inverse else iconTintColorBase
-        val titleColorBase = MegaOriginalTheme.colors.text.primary
+            if (needsInverseTitleColors) DSTokens.colors.icon.inverse else iconTintColorBase
+        val titleColorBase = DSTokens.colors.text.primary
         val titleColorExpanded =
-            if (needsInverseTitleColors) MegaOriginalTheme.colors.text.inverse else titleColorBase
+            if (needsInverseTitleColors) DSTokens.colors.text.inverse else titleColorBase
         val targetAppBarElevation = LocalMegaAppBarElevation.current
 
         val headerHeight by remember {
@@ -371,7 +370,7 @@ private fun ScaffoldWithCollapsibleHeaderPreview(
                     Box(modifier = Modifier.fillMaxSize()) {
                         Text(
                             text = "Header above app bar",
-                            color = MegaOriginalTheme.colors.text.primary,
+                            color = DSTokens.colors.text.primary,
                             modifier = Modifier
                                 .align(Alignment.BottomStart)
                                 .padding(start = 16.dp)
@@ -398,7 +397,7 @@ private fun ScaffoldWithCollapsibleHeaderWithSubtitlePreview() {
                     .size(24.dp)
                     .padding(6.dp)
                     .background(
-                        MegaOriginalTheme.colors.components.selectionControl,
+                        DSTokens.colors.components.selectionControl,
                         shape = CircleShape
                     )
             )
@@ -437,17 +436,17 @@ private fun Content() = Column(
         .fillMaxSize()
         .padding(16.dp)
 ) {
-    Text("Content", color = MegaOriginalTheme.colors.text.primary)
-    Text("Content", color = MegaOriginalTheme.colors.text.primary)
-    Text("Content", color = MegaOriginalTheme.colors.text.primary)
-    Text("Content", color = MegaOriginalTheme.colors.text.primary)
+    Text("Content", color = DSTokens.colors.text.primary)
+    Text("Content", color = DSTokens.colors.text.primary)
+    Text("Content", color = DSTokens.colors.text.primary)
+    Text("Content", color = DSTokens.colors.text.primary)
 }
 
 @Composable
 private fun Header() = Box(
     modifier = Modifier
         .fillMaxSize()
-        .background(MegaOriginalTheme.colors.background.blur)
+        .background(DSTokens.colors.background.blur)
 )
 
 private fun getSampleToolbarActions(): List<MenuAction> = listOf(

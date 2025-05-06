@@ -11,11 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Chat error bubble.
@@ -28,7 +28,7 @@ fun ChatErrorBubble(
     Box(
         modifier = modifier
             .border(
-                BorderStroke(1.dp, SolidColor(MegaOriginalTheme.colors.text.error)),
+                BorderStroke(1.dp, SolidColor(DSTokens.colors.text.error)),
                 RoundedCornerShape(12.dp)
             ),
     ) {

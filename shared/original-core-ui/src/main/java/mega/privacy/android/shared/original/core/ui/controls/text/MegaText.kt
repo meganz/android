@@ -19,8 +19,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.textColor
 
 /**
  * Mega text.
@@ -55,7 +56,7 @@ fun MegaText(
     LongTextBehaviour.Marquee -> MarqueeText(
         text = text,
         modifier = Modifier.basicMarquee(),
-        color = MegaOriginalTheme.textColor(textColor = textColor),
+        color = DSTokens.textColor(textColor = textColor),
         style = style,
         textAlign = textAlign
     )
@@ -63,7 +64,7 @@ fun MegaText(
     else -> Text(
         text = text,
         modifier = modifier,
-        color = MegaOriginalTheme.textColor(textColor = textColor),
+        color = DSTokens.textColor(textColor = textColor),
         overflow = overflow.getTextOverflow(),
         maxLines = overflow.maxLines,
         minLines = minLines,
@@ -101,7 +102,7 @@ fun MegaText(
     text = text,
     modifier = modifier,
     overflow = overflow,
-    color = MegaOriginalTheme.textColor(textColor = textColor),
+    color = DSTokens.textColor(textColor = textColor),
     maxLines = maxLines,
     minLines = minLines,
     style = style,

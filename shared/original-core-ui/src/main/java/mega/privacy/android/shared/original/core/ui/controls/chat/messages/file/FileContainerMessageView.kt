@@ -29,10 +29,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * File message container, utility composable to animate the content size and apply load overly to file previews
@@ -55,7 +55,7 @@ internal fun FileContainerMessageView(
     Box(modifier = modifier.clip(RoundedCornerShape(12.dp))) {
         Box(
             modifier = Modifier
-                .background(MegaOriginalTheme.colors.background.surface2)
+                .background(DSTokens.colors.background.surface2)
                 .testTag(FILE_MESSAGE_VIEW_ROOT_TEST_TAG)
                 .onGloballyPositioned {
                     width = with(density) { it.size.width.toDp() }

@@ -10,9 +10,9 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Chat meeting button
@@ -34,10 +34,10 @@ fun ChatMeetingButton(
     enabled = enabled,
     shape = CircleShape,
     colors = ButtonDefaults.buttonColors(
-        backgroundColor = MegaOriginalTheme.colors.background.inverse,
-        contentColor = MegaOriginalTheme.colors.text.inverse,
-        disabledBackgroundColor = MegaOriginalTheme.colors.button.disabled,
-        disabledContentColor = MegaOriginalTheme.colors.text.disabled,
+        backgroundColor = DSTokens.colors.background.inverse,
+        contentColor = DSTokens.colors.text.inverse,
+        disabledBackgroundColor = DSTokens.colors.button.disabled,
+        disabledContentColor = DSTokens.colors.text.disabled,
     ),
     contentPadding = PaddingValues(16.dp),
     elevation = ButtonDefaults.elevation(8.dp),

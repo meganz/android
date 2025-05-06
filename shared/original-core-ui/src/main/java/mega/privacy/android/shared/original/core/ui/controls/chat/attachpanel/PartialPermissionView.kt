@@ -9,10 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Partial permission view
@@ -33,7 +33,7 @@ fun PartialPermissionView(
                 .clickable(onClick = onRequestPermission),
             painter = painterResource(id = R.drawable.ic_image_plus),
             contentDescription = "Image plus",
-            tint = MegaOriginalTheme.colors.icon.accent
+            tint = DSTokens.colors.icon.accent
         )
     }
 }

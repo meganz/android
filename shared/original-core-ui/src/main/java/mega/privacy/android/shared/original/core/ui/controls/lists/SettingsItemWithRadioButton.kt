@@ -20,11 +20,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaRadioButton
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * List 1 line item, variant "Settings item with RadioButton"
@@ -49,7 +49,7 @@ fun SettingsItemWithRadioButton(
         MegaRadioButton(selected = selected, onClick = onClick)
         Text(
             text = title,
-            color = MegaOriginalTheme.colors.text.primary,
+            color = DSTokens.colors.text.primary,
             textAlign = TextAlign.Start,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.subtitle1,

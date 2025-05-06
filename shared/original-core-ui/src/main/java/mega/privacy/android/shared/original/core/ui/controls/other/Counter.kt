@@ -10,11 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Small tooltip to show current position on Fast scroll
@@ -28,7 +28,7 @@ fun Counter(
         .height(28.dp)
         .widthIn(min = 28.dp),
     shape = CircleShape,
-    color = MegaOriginalTheme.colors.background.surface1,
+    color = DSTokens.colors.background.surface1,
     elevation = 8.dp
 ) {
     MegaText(

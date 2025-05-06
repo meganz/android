@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -35,7 +35,7 @@ fun MegaDivider(
     Divider(
         modifier = finalModifier,
         thickness = 1.dp,
-        color = if (strong) MegaOriginalTheme.colors.border.strong else MegaOriginalTheme.colors.border.subtle
+        color = if (strong) DSTokens.colors.border.strong else DSTokens.colors.border.subtle
     )
 }
 

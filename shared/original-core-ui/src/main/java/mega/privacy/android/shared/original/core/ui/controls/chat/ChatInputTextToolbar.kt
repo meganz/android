@@ -42,10 +42,10 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
@@ -118,7 +118,7 @@ fun ChatInputTextToolbar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = MegaOriginalTheme.colors.background.pageBackground)
+            .background(color = DSTokens.colors.background.pageBackground)
             .padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
         if (showExpandButton || isInputExpanded) {
@@ -132,7 +132,7 @@ fun ChatInputTextToolbar(
                     },
                 painter = painterResource(id = if (isInputExpanded) R.drawable.ic_collapse_text_input else R.drawable.ic_expand_text_input),
                 contentDescription = "Attachment icon",
-                tint = MegaOriginalTheme.colors.icon.secondary,
+                tint = DSTokens.colors.icon.secondary,
             )
         }
         VoiceClipRecorderView(
@@ -150,7 +150,7 @@ fun ChatInputTextToolbar(
                         .clickable(onClick = onAttachmentClick),
                     painter = painterResource(id = R.drawable.ic_plus),
                     contentDescription = "Attachment icon",
-                    tint = MegaOriginalTheme.colors.icon.secondary,
+                    tint = DSTokens.colors.icon.secondary,
                 )
 
                 Column(
@@ -161,7 +161,7 @@ fun ChatInputTextToolbar(
                         }
                         .conditional(!isInputExpanded) {
                             background(
-                                color = MegaOriginalTheme.colors.background.surface2,
+                                color = DSTokens.colors.background.surface2,
                                 shape = shape,
                             )
                         },
@@ -220,7 +220,7 @@ fun ChatInputTextToolbar(
                             }),
                         painter = painterResource(id = R.drawable.ic_send_horizontal),
                         contentDescription = "Send icon",
-                        tint = MegaOriginalTheme.colors.icon.accent
+                        tint = DSTokens.colors.icon.accent
                     )
                 }
                 AnimatedVisibility(
@@ -233,7 +233,7 @@ fun ChatInputTextToolbar(
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.ic_icon_mic_medium_regular_outline),
                         contentDescription = "mic icon",
-                        tint = MegaOriginalTheme.colors.icon.secondary,
+                        tint = DSTokens.colors.icon.secondary,
                         modifier = Modifier
                             .weight(1f)
                             .padding(start = 8.dp)

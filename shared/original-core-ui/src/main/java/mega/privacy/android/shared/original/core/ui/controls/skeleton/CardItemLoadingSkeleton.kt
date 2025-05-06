@@ -18,8 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
 
@@ -34,7 +34,7 @@ fun CardItemLoadingSkeleton(modifier: Modifier = Modifier) {
         modifier = modifier
             .testTag(TEST_TAG_CARD_ITEM_LOADING_SKELETON)
             .background(
-                color = MegaOriginalTheme.colors.background.surface1,
+                color = DSTokens.colors.background.surface1,
                 shape = RoundedCornerShape(6.dp),
             )
     ) {

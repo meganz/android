@@ -16,8 +16,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.TextUnit
 import mega.android.core.ui.theme.values.LinkColor
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.linkColor
+import mega.privacy.android.shared.original.core.ui.theme.textColor
 
 /**
  * Mega span style
@@ -56,7 +58,7 @@ fun megaSpanStyle(
     platformStyle: PlatformSpanStyle? = null,
     drawStyle: DrawStyle? = null,
 ) = SpanStyle(
-    color = color?.let { MegaOriginalTheme.textColor(textColor = color) } ?: Color.Unspecified,
+    color = color?.let { DSTokens.textColor(textColor = color) } ?: Color.Unspecified,
     fontSize = fontSize,
     fontWeight = fontWeight,
     fontStyle = fontStyle,
@@ -84,7 +86,7 @@ fun megaSpanStyle(
 fun megaSpanStyle(
     base: SpanStyle,
     color: TextColor,
-) = base.copy(color = MegaOriginalTheme.textColor(textColor = color))
+) = base.copy(color = DSTokens.textColor(textColor = color))
 
 
 /**
@@ -97,4 +99,4 @@ fun megaSpanStyle(
 fun megaSpanStyle(
     base: SpanStyle,
     linkColor: LinkColor,
-) = base.copy(color = MegaOriginalTheme.linkColor(linkColor = linkColor))
+) = base.copy(color = DSTokens.linkColor(linkColor = linkColor))

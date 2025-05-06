@@ -13,11 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Camera timer
@@ -33,7 +33,7 @@ fun CameraTimer(
     Row(
         modifier = modifier
             .background(
-                color = MegaOriginalTheme.colors.background.surface1.copy(alpha = 0.9f),
+                color = DSTokens.colors.background.surface1.copy(alpha = 0.9f),
                 shape = CircleShape
             )
             .padding(horizontal = 12.dp, vertical = 6.dp),
@@ -43,7 +43,7 @@ fun CameraTimer(
         Box(
             modifier = Modifier
                 .size(8.dp)
-                .background(color = MegaOriginalTheme.colors.components.interactive, shape = CircleShape)
+                .background(color = DSTokens.colors.components.interactive, shape = CircleShape)
         )
         MegaText(
             text = formattedTime,

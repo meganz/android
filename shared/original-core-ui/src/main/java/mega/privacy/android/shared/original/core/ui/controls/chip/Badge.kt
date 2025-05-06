@@ -18,12 +18,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.Typography
 import mega.privacy.android.shared.original.core.ui.theme.extensions.buttonNormal
 import mega.privacy.android.shared.original.core.ui.theme.extensions.buttonThin
-import mega.android.core.ui.theme.values.TextColor
 import kotlin.math.pow
 
 @Immutable
@@ -96,7 +96,7 @@ fun IconBadge(
     {
         Icon(
             imageVector = imageVector,
-            tint = MegaOriginalTheme.colors.icon.onColor,
+            tint = DSTokens.colors.icon.onColor,
             contentDescription = contentDescription,
             modifier = Modifier.size(size.iconSize()),
         )
@@ -125,7 +125,7 @@ private fun Badge(
         .height(size.height)
         .widthIn(min = size.height)
         .background(
-            MegaOriginalTheme.colors.components.interactive,
+            DSTokens.colors.components.interactive,
             shape = RoundedCornerShape(size.height / 2)
         ),
     content = content,

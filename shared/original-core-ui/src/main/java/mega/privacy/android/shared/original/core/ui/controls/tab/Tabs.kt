@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 
@@ -53,8 +53,8 @@ fun Tabs(
     pagerEnabled: Boolean = false,
     cells: @Composable TabsScope.() -> Unit,
 ) {
-    val activeColor = MegaOriginalTheme.colors.text.brand
-    val color = MegaOriginalTheme.colors.text.secondary
+    val activeColor = DSTokens.colors.text.brand
+    val color = DSTokens.colors.text.secondary
     val tabsScope = TabsScope(activeColor = activeColor, color = color)
     val coroutineScope = rememberCoroutineScope()
     val tabs = with(tabsScope) {
@@ -158,8 +158,8 @@ private fun TabText(text: String, suffix: @Composable (() -> Unit)? = null, sele
     Row {
         Text(
             text = text,
-            color = if (selected) MegaOriginalTheme.colors.text.brand
-            else MegaOriginalTheme.colors.text.secondary,
+            color = if (selected) DSTokens.colors.text.brand
+            else DSTokens.colors.text.secondary,
             style = MaterialTheme.typography.subtitle2medium,
         )
         suffix?.invoke()

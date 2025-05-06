@@ -38,7 +38,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.HighlightedTex
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.normalize
 
@@ -112,7 +112,7 @@ fun NodeListViewItem(
                 }
             )
             .then(
-                if (isHighlighted) Modifier.background(MegaOriginalTheme.colors.background.surface2)
+                if (isHighlighted) Modifier.background(DSTokens.colors.background.surface2)
                 else Modifier
             ),
         fillSubTitleText = showIsVerified.not(),
@@ -189,7 +189,7 @@ fun NodeListViewItem(
                     painter = painterResource(id = R.drawable.ic_alert_triangle),
                     contentDescription = "Dispute taken down",
                     modifier = Modifier.testTag(TAKEN_DOWN_ICON_TAG),
-                    tint = MegaOriginalTheme.colors.support.error
+                    tint = DSTokens.colors.support.error
                 )
             }
         },
@@ -207,7 +207,7 @@ fun NodeListViewItem(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_check_circle),
                     contentDescription = "Checked",
-                    tint = MegaOriginalTheme.colors.icon.accent,
+                    tint = DSTokens.colors.icon.accent,
                     modifier = Modifier
                         .size(16.dp)
                         .testTag(VERSION_ICON_TAG)
@@ -395,7 +395,7 @@ private fun GenericNodeListItemWithLongTitlePreview() {
             showVersion = true,
             showFavourite = true,
             showLink = true,
-            labelColor = MegaOriginalTheme.colors.indicator.pink,
+            labelColor = DSTokens.colors.indicator.pink,
             thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg"
         )
     }
@@ -415,7 +415,7 @@ private fun GenericNodeListItemPreview() {
             showVersion = true,
             showFavourite = true,
             showLink = true,
-            labelColor = MegaOriginalTheme.colors.indicator.pink,
+            labelColor = DSTokens.colors.indicator.pink,
             thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg"
         )
     }
@@ -435,7 +435,7 @@ private fun GenericNodeListItemWithoutMoreOptionPreview() {
             onInfoClicked = { },
             onMoreClicked = { },
             accessPermissionIcon = R.drawable.ic_sync,
-            labelColor = MegaOriginalTheme.colors.indicator.pink,
+            labelColor = DSTokens.colors.indicator.pink,
             showIsVerified = true,
             isTakenDown = true,
             thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg"

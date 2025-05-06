@@ -10,7 +10,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.R
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,7 +50,7 @@ class NodeListViewItemTest {
                     accessPermissionIcon = accessPermissionIcon,
                     showOffline = showOffline,
                     showVersion = showVersion,
-                    labelColor = MegaOriginalTheme.colors.indicator.pink,
+                    labelColor = DSTokens.colors.indicator.pink,
                     showLink = showLink,
                     isTakenDown = isTakenDown,
                     showFavourite = showFavourite,

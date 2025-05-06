@@ -18,11 +18,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Button with icon and text
@@ -41,8 +41,8 @@ fun MegaButtonWithIconAndText(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    iconColor: Color = MegaOriginalTheme.colors.icon.primary,
-    textColor: Color = MegaOriginalTheme.colors.text.primary,
+    iconColor: Color = DSTokens.colors.icon.primary,
+    textColor: Color = DSTokens.colors.text.primary,
     enabled: Boolean = true,
 ) {
     Column(modifier.clickable(enabled = enabled) { onClick() }) {
@@ -54,12 +54,12 @@ fun MegaButtonWithIconAndText(
                 .height(16.dp)
                 .width(16.dp)
                 .align(Alignment.CenterHorizontally),
-            colorFilter = ColorFilter.tint(color = if (enabled) iconColor else MegaOriginalTheme.colors.icon.disabled)
+            colorFilter = ColorFilter.tint(color = if (enabled) iconColor else DSTokens.colors.icon.disabled)
         )
         Text(
             text = text,
             Modifier.align(Alignment.CenterHorizontally),
-            style = MaterialTheme.typography.caption.copy(color = if (enabled) textColor else MegaOriginalTheme.colors.text.disabled)
+            style = MaterialTheme.typography.caption.copy(color = if (enabled) textColor else DSTokens.colors.text.disabled)
         )
     }
 }

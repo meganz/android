@@ -16,8 +16,8 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
 
@@ -38,7 +38,7 @@ internal fun BaseMegaAlertDialog(
         Text(
             text = text,
             style = MaterialTheme.typography.subtitle1,
-            color = MegaOriginalTheme.colors.text.secondary,
+            color = DSTokens.colors.text.secondary,
             modifier = Modifier.testTag(CONTENT_TAG),
         )
     },
@@ -110,7 +110,7 @@ internal fun BaseMegaAlertDialog(
         Text(
             text = text,
             style = MaterialTheme.typography.subtitle1,
-            color = MegaOriginalTheme.colors.text.secondary,
+            color = DSTokens.colors.text.secondary,
             modifier = Modifier.testTag(CONTENT_TAG),
         )
     },
@@ -135,7 +135,7 @@ private fun BaseMegaAlertDialog(
 ) = CompositionLocalProvider(LocalAbsoluteElevation provides 24.dp) {
     AlertDialog(
         modifier = modifier.semantics { testTagsAsResourceId = true },
-        backgroundColor = MegaOriginalTheme.colors.background.surface1,
+        backgroundColor = DSTokens.colors.background.surface1,
         title = title?.composeLet {
             Text(
                 modifier = Modifier
@@ -148,7 +148,7 @@ private fun BaseMegaAlertDialog(
                 text = it,
                 fontWeight = FontWeight.Medium,
                 style = MaterialTheme.typography.h6,
-                color = MegaOriginalTheme.colors.text.primary,
+                color = DSTokens.colors.text.primary,
             )
         },
         text = text,

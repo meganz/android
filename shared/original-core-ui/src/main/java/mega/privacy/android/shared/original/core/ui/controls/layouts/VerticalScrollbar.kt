@@ -37,9 +37,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.other.Counter
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 @Composable
 internal fun VerticalScrollbar(
@@ -255,11 +255,11 @@ private fun Thumb(modifier: Modifier = Modifier) =
             .offset(x = 8.dp)
             .size(thumbHeight),
         shape = CircleShape,
-        color = MegaOriginalTheme.colors.background.surface1,
+        color = DSTokens.colors.background.surface1,
         elevation = 8.dp
     ) {
         Icon(
-            tint = MegaOriginalTheme.colors.icon.secondary,
+            tint = DSTokens.colors.icon.secondary,
             modifier = Modifier
                 .padding(8.dp)
                 .testTag(THUMB_TAG),

@@ -16,11 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.raisedButtonColors
+import mega.privacy.android.shared.original.core.ui.theme.raisedErrorButtonColors
 
 /**
  * Raised default text button
@@ -105,11 +107,11 @@ private fun RaisedDefaultMegaButton(
     onClick = onClick,
     enabled = enabled,
     shape = MaterialTheme.shapes.medium,
-    colors = MegaOriginalTheme.colors.raisedButtonColors,
+    colors = DSTokens.colors.raisedButtonColors,
     border = if (enabled) {
         null
     } else {
-        BorderStroke(1.dp, MegaOriginalTheme.colors.border.disabled)
+        BorderStroke(1.dp, DSTokens.colors.border.disabled)
     },
     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
     elevation = ButtonDefaults.elevation(8.dp),
@@ -131,7 +133,7 @@ private fun RaisedErrorMegaButton(
     onClick = onClick,
     enabled = enabled,
     shape = MaterialTheme.shapes.medium,
-    colors = MegaOriginalTheme.colors.raisedErrorButtonColors,
+    colors = DSTokens.colors.raisedErrorButtonColors,
     border = null,
     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
     elevation = ButtonDefaults.elevation(8.dp),

@@ -36,10 +36,11 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.forma
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.format.FormatType
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.shared.original.core.ui.controls.text.megaSpanStyle
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.robotoMono
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.textColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 
@@ -141,7 +142,7 @@ private fun MessageTextView(
             LocalContentColor provides if (color == null) {
                 LocalContentColor.current
             } else {
-                MegaOriginalTheme.textColor(textColor = color)
+                DSTokens.textColor(textColor = color)
             }
         ) {
             Text(

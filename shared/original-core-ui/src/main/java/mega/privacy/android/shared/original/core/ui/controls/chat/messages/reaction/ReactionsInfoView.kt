@@ -29,6 +29,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
@@ -40,9 +42,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehavi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * View to show the information of reactions.
@@ -85,7 +85,7 @@ fun ReactionsInfoView(
                         .tabIndicatorOffset(tabPositions[pagerState.currentPage])
                         .height(2.dp)
                         .padding(horizontal = 13.dp)
-                        .background(color = MegaOriginalTheme.colors.components.selectionControl)
+                        .background(color = DSTokens.colors.components.selectionControl)
                 )
             },
             divider = {},

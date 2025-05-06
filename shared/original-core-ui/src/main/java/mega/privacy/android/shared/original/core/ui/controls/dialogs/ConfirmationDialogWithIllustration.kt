@@ -22,12 +22,12 @@ import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.BaseMegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.preview.PreviewStringParameters
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 
 /**
@@ -86,7 +86,7 @@ fun ConfirmationDialogWithIllustration(
                     .fillMaxWidth(),
                 text = title,
                 style = MaterialTheme.typography.h6,
-                color = MegaOriginalTheme.colors.text.primary,
+                color = DSTokens.colors.text.primary,
             )
             Image(
                 imageVector = ImageVector.vectorResource(illustrationId),
@@ -100,7 +100,7 @@ fun ConfirmationDialogWithIllustration(
                 modifier = Modifier.testTag(CONFIRMATION_DIALOG_WITH_ILLUSTRATION_BODY),
                 text = body,
                 style = MaterialTheme.typography.subtitle1,
-                color = MegaOriginalTheme.colors.text.secondary,
+                color = DSTokens.colors.text.secondary,
             )
         }
     },

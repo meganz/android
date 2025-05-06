@@ -9,11 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Chat unread message view
@@ -28,7 +28,7 @@ fun ChatUnreadMessageView(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = MegaOriginalTheme.colors.background.surface2)
+            .background(color = DSTokens.colors.background.surface2)
             .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {

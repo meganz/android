@@ -11,11 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.BaseMegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body3
 
@@ -45,7 +45,7 @@ fun ProgressDialog(
                     .fillMaxWidth(),
                 text = title,
                 style = MaterialTheme.typography.subtitle1,
-                color = MegaOriginalTheme.colors.text.primary,
+                color = DSTokens.colors.text.primary,
             )
             MegaLinearProgressIndicator(
                 progress = progress,
@@ -57,7 +57,7 @@ fun ProgressDialog(
                     modifier = Modifier.testTag(PROGRESS_SUBTITLE_TAG),
                     text = it,
                     style = MaterialTheme.typography.body3,
-                    color = MegaOriginalTheme.colors.text.primary,
+                    color = DSTokens.colors.text.primary,
                 )
             }
         }

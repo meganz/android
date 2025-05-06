@@ -18,9 +18,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
+import mega.android.core.ui.tokens.theme.colors.DSColors
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaColors
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
 
@@ -49,14 +49,14 @@ fun MegaSnackbar(
     },
     actionOnNewLine = actionOnNewLine,
     shape = MaterialTheme.shapes.small,
-    backgroundColor = MegaOriginalTheme.colors.components.toastBackground,
-    contentColor = MegaOriginalTheme.colors.text.inverse,
+    backgroundColor = DSTokens.colors.components.toastBackground,
+    contentColor = DSTokens.colors.text.inverse,
 )
 
 @Composable
 private fun SnackBarText(text: String) = Text(
     text = text,
-    color = MegaOriginalTheme.colors.text.inverse,
+    color = DSTokens.colors.text.inverse,
     style = MaterialTheme.typography.subtitle2,
 )
 
@@ -66,7 +66,7 @@ private fun SnackbarButton(
     onClick: () -> Unit,
 ) = TextButton(
     onClick = onClick,
-    colors = MegaOriginalTheme.colors.snackBarButtonColors,
+    colors = DSTokens.colors.snackBarButtonColors,
     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
 ) {
     Text(
@@ -75,7 +75,7 @@ private fun SnackbarButton(
     )
 }
 
-private val MegaColors.snackBarButtonColors
+private val DSColors.snackBarButtonColors
     @Composable
     get() = ButtonDefaults.buttonColors(
         backgroundColor = Color.Transparent,

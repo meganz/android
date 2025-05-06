@@ -16,10 +16,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 
@@ -40,10 +40,10 @@ internal fun AddReactionChip(
         modifier = Modifier
             .size(addReactionChipWidth, 24.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(color = MegaOriginalTheme.colors.background.surface2)
+            .background(color = DSTokens.colors.background.surface2)
             .border(
                 width = 1.dp,
-                color = MegaOriginalTheme.colors.border.disabled,
+                color = DSTokens.colors.border.disabled,
                 shape = RoundedCornerShape(12.dp)
             )
             .conditional(interactionEnabled) { clickable(onClick = onAddClicked) }
@@ -53,7 +53,7 @@ internal fun AddReactionChip(
         Icon(
             imageVector = ImageVector.vectorResource(R.drawable.ic_icon_add_small_regular_outline),
             contentDescription = null,
-            tint = MegaOriginalTheme.colors.icon.secondary,
+            tint = DSTokens.colors.icon.secondary,
         )
     }
 }

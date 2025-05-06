@@ -34,10 +34,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldProvider
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldState
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -210,7 +210,7 @@ private fun <T> GenericTextField(
                     .background(Color.Transparent)
                     .indicatorLine(true, isError, interactionSource, colors)
                     .fillMaxWidth(),
-                textStyle = MaterialTheme.typography.body1.copy(color = MegaOriginalTheme.colors.text.primary),
+                textStyle = MaterialTheme.typography.body1.copy(color = DSTokens.colors.text.primary),
                 cursorBrush = SolidColor(colors.cursorColor(isError).value),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = keyboardType,

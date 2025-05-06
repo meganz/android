@@ -23,11 +23,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 
@@ -65,22 +65,22 @@ fun ReactionChip(
                 }
                 .border(
                     width = 1.dp,
-                    color = if (reaction.hasMe) MegaOriginalTheme.colors.border.strongSelected else MegaOriginalTheme.colors.border.disabled,
+                    color = if (reaction.hasMe) DSTokens.colors.border.strongSelected else DSTokens.colors.border.disabled,
                     shape = RoundedCornerShape(12.dp)
                 )
-                .background(color = MegaOriginalTheme.colors.background.surface2)
+                .background(color = DSTokens.colors.background.surface2)
                 .padding(bottom = 2.dp)
                 .testTag(TEST_TAG_CHAT_MESSAGE_REACTION_CHIP),
         ) {
             Text(
                 modifier = Modifier.padding(end = 2.dp),
                 text = reaction.reaction,
-                color = MegaOriginalTheme.colors.border.strongSelected,
+                color = DSTokens.colors.border.strongSelected,
                 fontSize = 14.sp,
             )
             Text(
                 text = "${reaction.userList.size}",
-                color = if (reaction.hasMe) MegaOriginalTheme.colors.border.strongSelected else MegaOriginalTheme.colors.text.secondary,
+                color = if (reaction.hasMe) DSTokens.colors.border.strongSelected else DSTokens.colors.text.secondary,
                 style = MaterialTheme.typography.subtitle2,
             )
         }

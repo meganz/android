@@ -9,9 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -32,7 +32,7 @@ fun AdsCloseIcon(
             .clickable(onClick = onClick)
             .padding(4.dp)
             .size(16.dp),
-        tint = MegaOriginalTheme.colors.button.primary
+        tint = DSTokens.colors.button.primary
     )
 }
 

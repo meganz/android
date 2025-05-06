@@ -35,7 +35,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 
@@ -74,8 +74,8 @@ fun NotificationItemView(
     Column(modifier = modifier
         .clickable { onClick() }
         .background(
-            color = if (isNew) MegaOriginalTheme.colors.background.pageBackground
-            else MegaOriginalTheme.colors.background.surface1
+            color = if (isNew) DSTokens.colors.background.pageBackground
+            else DSTokens.colors.background.surface1
         )
         .testTag(NOTIFICATION_TEST_TAG)
         .fillMaxWidth()

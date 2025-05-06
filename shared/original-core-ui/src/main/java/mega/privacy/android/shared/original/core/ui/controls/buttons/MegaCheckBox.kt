@@ -21,11 +21,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 /**
@@ -45,11 +45,11 @@ fun MegaCheckbox(
     rounded: Boolean = true,
 ) {
     val imageVector = ImageVector.vectorResource(R.drawable.check)
-    val tint = if (checked) MegaOriginalTheme.colors.icon.inverse else Color.Transparent
+    val tint = if (checked) DSTokens.colors.icon.inverse else Color.Transparent
     val background =
-        if (checked) MegaOriginalTheme.colors.components.selectionControl else Color.Transparent
+        if (checked) DSTokens.colors.components.selectionControl else Color.Transparent
     val borderColor =
-        if (enabled) MegaOriginalTheme.colors.icon.secondary else MegaOriginalTheme.colors.border.disabled
+        if (enabled) DSTokens.colors.icon.secondary else DSTokens.colors.border.disabled
     val shape = if (rounded) CircleShape else RoundedCornerShape(2.dp)
 
     IconButton(

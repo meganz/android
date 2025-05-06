@@ -15,10 +15,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.red_200
+import mega.privacy.android.shared.original.core.ui.theme.textColor
 import mega.privacy.android.shared.original.core.ui.utils.normalize
 
 /**
@@ -38,7 +39,7 @@ fun HighlightedText(
     highlightText: String,
     modifier: Modifier = Modifier,
     textColor: TextColor = TextColor.Primary,
-    highlightColor: Color = MegaOriginalTheme.colors.notifications.notificationSuccess,
+    highlightColor: Color = DSTokens.colors.notifications.notificationSuccess,
     highlightFontWeight: FontWeight = FontWeight.Normal,
     applyMarqueEffect: Boolean = true,
     maxLines: Int = 1,
@@ -76,7 +77,7 @@ fun HighlightedText(
     highlightText: String,
     modifier: Modifier = Modifier,
     textColor: TextColor = TextColor.Primary,
-    highlightColor: Color = MegaOriginalTheme.colors.notifications.notificationSuccess,
+    highlightColor: Color = DSTokens.colors.notifications.notificationSuccess,
     highlightFontWeight: FontWeight = FontWeight.Normal,
     applyMarqueEffect: Boolean = true,
     maxLines: Int = 1,
@@ -93,7 +94,7 @@ fun HighlightedText(
             maxLines = maxLines,
             overflow = overflow,
             style = style,
-            color = MegaOriginalTheme.textColor(textColor = textColor),
+            color = DSTokens.textColor(textColor = textColor),
         )
         return
     }
@@ -131,7 +132,7 @@ fun HighlightedText(
         maxLines = maxLines,
         overflow = overflow,
         style = style,
-        color = MegaOriginalTheme.textColor(textColor = textColor),
+        color = DSTokens.textColor(textColor = textColor),
         inlineContent = inlineContent,
     )
 }

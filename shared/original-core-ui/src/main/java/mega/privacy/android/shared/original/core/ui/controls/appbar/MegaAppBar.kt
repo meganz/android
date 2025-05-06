@@ -45,13 +45,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.menus.MenuActions
 import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.badge
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
@@ -93,9 +93,9 @@ fun MegaAppBar(
     isStatusBarColorEnabled: Boolean = true
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
-        iconsTintColor = MegaOriginalTheme.colors.icon.primary,
-        titleColor = MegaOriginalTheme.colors.text.primary,
-        subtitleColor = MegaOriginalTheme.colors.text.secondary,
+        iconsTintColor = DSTokens.colors.icon.primary,
+        titleColor = DSTokens.colors.text.primary,
+        subtitleColor = DSTokens.colors.text.secondary,
     )
 ) {
     BaseMegaAppBar(
@@ -148,9 +148,9 @@ fun MegaAppBar(
     isStatusBarColorEnabled: Boolean = true
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
-        iconsTintColor = MegaOriginalTheme.colors.icon.primary,
-        titleColor = MegaOriginalTheme.colors.text.primary,
-        subtitleColor = MegaOriginalTheme.colors.text.secondary,
+        iconsTintColor = DSTokens.colors.icon.primary,
+        titleColor = DSTokens.colors.text.primary,
+        subtitleColor = DSTokens.colors.text.secondary,
     )
 ) {
     BaseMegaAppBar(
@@ -208,9 +208,9 @@ fun MegaAppBar(
     windowInsets: WindowInsets = WindowInsets.statusBars,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
-        iconsTintColor = MegaOriginalTheme.colors.icon.primary,
-        titleColor = MegaOriginalTheme.colors.text.primary,
-        subtitleColor = MegaOriginalTheme.colors.text.secondary,
+        iconsTintColor = DSTokens.colors.icon.primary,
+        titleColor = DSTokens.colors.text.primary,
+        subtitleColor = DSTokens.colors.text.secondary,
     )
 ) {
     BaseMegaAppBar(
@@ -251,9 +251,9 @@ fun ProvideDefaultMegaAppBarColors(
     content: @Composable () -> Unit,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
-        iconsTintColor = MegaOriginalTheme.colors.icon.primary,
-        titleColor = MegaOriginalTheme.colors.text.primary,
-        subtitleColor = MegaOriginalTheme.colors.text.secondary,
+        iconsTintColor = DSTokens.colors.icon.primary,
+        titleColor = DSTokens.colors.text.primary,
+        subtitleColor = DSTokens.colors.text.secondary,
     ), content
 )
 
@@ -320,7 +320,7 @@ internal fun BaseMegaAppBar(
     isStatusBarColorEnabled: Boolean = true,
 ) {
     val backgroundColor by animateColorAsState(
-        targetValue = (if (elevation == 0.dp) MegaOriginalTheme.colors.background.pageBackground else MegaOriginalTheme.colors.background.surface1)
+        targetValue = (if (elevation == 0.dp) DSTokens.colors.background.pageBackground else DSTokens.colors.background.surface1)
             .copy(LocalMegaAppBarColors.current.backgroundAlpha),
         label = "elevation animation",
     )
@@ -359,12 +359,12 @@ internal fun BaseMegaAppBar(
                             .size(24.dp)
                             .padding(3.dp)
                             .background(
-                                color = MegaOriginalTheme.colors.indicator.pink,
+                                color = DSTokens.colors.indicator.pink,
                                 shape = CircleShape
                             )
                             .border(
                                 2.dp,
-                                MegaOriginalTheme.colors.background.pageBackground,
+                                DSTokens.colors.background.pageBackground,
                                 shape = CircleShape
                             )
                             .testTag(APP_BAR_BADGE)
@@ -373,7 +373,7 @@ internal fun BaseMegaAppBar(
                         Text(
                             text = it.toString(),
                             modifier = Modifier.align(Alignment.Center),
-                            color = MegaOriginalTheme.colors.text.inverse,
+                            color = DSTokens.colors.text.inverse,
                             style = MaterialTheme.typography.badge,
                             textAlign = TextAlign.Center,
                         )
@@ -419,7 +419,7 @@ internal fun MegaAppBarSubTitle(
 ) = Text(
     text = subtitle,
     modifier = modifier.testTag(TEST_TAG_MEGA_APP_BAR_SUBTITLE),
-    color = LocalMegaAppBarColors.current.subtitleColor.takeOrElse { MegaOriginalTheme.colors.text.secondary },
+    color = LocalMegaAppBarColors.current.subtitleColor.takeOrElse { DSTokens.colors.text.secondary },
     maxLines = maxLines,
     style = MaterialTheme.typography.body4
 )
@@ -431,7 +431,7 @@ internal fun MegaAppBarMarqueeSubTitle(
 ) = MarqueeText(
     text = subtitle,
     modifier = modifier.testTag(TEST_TAG_MEGA_APP_BAR_SUBTITLE),
-    color = LocalMegaAppBarColors.current.subtitleColor.takeOrElse { MegaOriginalTheme.colors.text.secondary },
+    color = LocalMegaAppBarColors.current.subtitleColor.takeOrElse { DSTokens.colors.text.secondary },
     style = MaterialTheme.typography.body4
 )
 
@@ -451,7 +451,7 @@ internal fun MegaAppBarTitleAndSubtitle(
                 title()
             }
             CompositionLocalProvider(
-                LocalContentColor provides MegaOriginalTheme.colors.icon.secondary,
+                LocalContentColor provides DSTokens.colors.icon.secondary,
                 LocalContentAlpha provides 1f,
             ) {
                 titleIcons?.let { it() }

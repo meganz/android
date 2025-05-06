@@ -13,10 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.meetings.CallChronometer
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import kotlin.time.Duration
 
 /**
@@ -34,13 +34,13 @@ fun ReturnToCallBanner(
 ) = Row(
     modifier = modifier
         .fillMaxWidth()
-        .background(MegaOriginalTheme.colors.button.primary)
+        .background(DSTokens.colors.button.primary)
         .clickable { onBannerClicked() },
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.Center,
 ) {
     val textStyle =
-        MaterialTheme.typography.body2.copy(color = MegaOriginalTheme.colors.text.inverse)
+        MaterialTheme.typography.body2.copy(color = DSTokens.colors.text.inverse)
     Text(
         text = text,
         style = textStyle,

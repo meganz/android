@@ -23,14 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.original.core.ui.controls.chip.HighlightChip
 import mega.privacy.android.shared.original.core.ui.controls.text.HighlightedText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.android.core.ui.theme.values.TextColor
 
 
 /**
@@ -107,7 +107,7 @@ private fun DescriptionTitleRow(
         ) {
             Box(modifier = Modifier.weight(1f)) {
                 CompositionLocalProvider(
-                    LocalContentColor provides MegaOriginalTheme.colors.text.secondary,
+                    LocalContentColor provides DSTokens.colors.text.secondary,
                     LocalTextStyle provides MaterialTheme.typography.subtitle2,
                 ) {
                     description()

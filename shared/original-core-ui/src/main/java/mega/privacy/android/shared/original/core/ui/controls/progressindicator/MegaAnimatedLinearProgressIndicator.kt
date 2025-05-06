@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -58,9 +58,9 @@ fun MegaAnimatedLinearProgressIndicator(
                 .height(height)
                 .clip(clip),
             progress = progressAnimation,
-            color = MegaOriginalTheme.colors.button.brand,
+            color = DSTokens.colors.button.brand,
             strokeCap = strokeCap,
-            backgroundColor = MegaOriginalTheme.colors.background.surface2
+            backgroundColor = DSTokens.colors.background.surface2
         )
 
         LaunchedEffect(indicatorProgress) {
@@ -72,9 +72,9 @@ fun MegaAnimatedLinearProgressIndicator(
                 .fillMaxWidth()
                 .height(height)
                 .clip(clip),
-            color = MegaOriginalTheme.colors.button.brand,
+            color = DSTokens.colors.button.brand,
             strokeCap = strokeCap,
-            backgroundColor = MegaOriginalTheme.colors.background.surface2
+            backgroundColor = DSTokens.colors.background.surface2
         )
     }
 }

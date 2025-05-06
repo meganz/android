@@ -23,7 +23,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -32,18 +35,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.icon.pack.R as iconPackR
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.unit.max
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -123,12 +123,12 @@ fun MegaMultiFloatingActionButton(
                 modifier = Modifier.testTag(tag = MULTI_FAB_MAIN_FAB_TEST_TAG),
                 style = if (isExpanded) mainButtonExpandedStyle else mainButtonCollapsedStyle,
                 enabled = enabled,
-                backgroundColor = if (isExpanded) MegaOriginalTheme.colors.button.secondary else MegaOriginalTheme.colors.button.primary
+                backgroundColor = if (isExpanded) DSTokens.colors.button.secondary else DSTokens.colors.button.primary
             ) {
                 Icon(
                     painter = icon,
                     contentDescription = null,
-                    tint = if (isExpanded) MegaOriginalTheme.colors.icon.primary else MegaOriginalTheme.colors.icon.inverse,
+                    tint = if (isExpanded) DSTokens.colors.icon.primary else DSTokens.colors.icon.inverse,
                     modifier = Modifier.rotate(rotation)
                 )
             }
@@ -161,7 +161,7 @@ private fun MultiFloatingActionButtonItem(
             ) {
                 Text(
                     text = item.label,
-                    color = MegaOriginalTheme.colors.text.primary,
+                    color = DSTokens.colors.text.primary,
                     style = MaterialTheme.typography.subtitle2
                 )
             }

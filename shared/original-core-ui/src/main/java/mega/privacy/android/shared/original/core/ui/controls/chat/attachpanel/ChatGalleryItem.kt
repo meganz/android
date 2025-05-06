@@ -14,10 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 /**
  * Chat gallery item
@@ -33,7 +33,7 @@ fun ChatGalleryItem(
     Box(
         modifier = modifier
             .background(
-                color = MegaOriginalTheme.colors.background.surface2,
+                color = DSTokens.colors.background.surface2,
                 shape = RoundedCornerShape(4.dp)
             )
             .clip(RoundedCornerShape(4.dp))
@@ -44,7 +44,7 @@ fun ChatGalleryItem(
                 .fillMaxSize()
                 .border(
                     width = 1.dp,
-                    color = MegaOriginalTheme.colors.border.strong,
+                    color = DSTokens.colors.border.strong,
                     shape = RoundedCornerShape(4.dp)
                 )
         )

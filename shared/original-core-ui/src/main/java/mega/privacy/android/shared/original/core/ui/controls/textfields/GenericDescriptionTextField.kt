@@ -37,12 +37,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.transformations.PrefixTransformation
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * TextField Generic Description
@@ -78,16 +78,16 @@ fun GenericDescriptionTextField(
 
     Column(modifier = modifier.testTag(GENERIC_DESCRIPTION_TEXT_FIELD_COLUMN)) {
         val textFieldColors = TextFieldDefaults.textFieldColors(
-            textColor = if (isFocused) MegaOriginalTheme.colors.text.primary else MegaOriginalTheme.colors.text.onColorDisabled,
-            backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
-            cursorColor = MegaOriginalTheme.colors.border.strongSelected,
-            errorCursorColor = MegaOriginalTheme.colors.text.error,
-            errorIndicatorColor = MegaOriginalTheme.colors.support.error,
-            focusedLabelColor = MegaOriginalTheme.colors.text.primary,
-            focusedIndicatorColor = if (showUnderline) MegaOriginalTheme.colors.text.accent else Color.Transparent,
-            unfocusedIndicatorColor = if (showUnderline) MegaOriginalTheme.colors.border.strong else Color.Transparent,
-            unfocusedLabelColor = MegaOriginalTheme.colors.text.onColorDisabled,
-            errorLabelColor = MegaOriginalTheme.colors.text.error,
+            textColor = if (isFocused) DSTokens.colors.text.primary else DSTokens.colors.text.onColorDisabled,
+            backgroundColor = DSTokens.colors.background.pageBackground,
+            cursorColor = DSTokens.colors.border.strongSelected,
+            errorCursorColor = DSTokens.colors.text.error,
+            errorIndicatorColor = DSTokens.colors.support.error,
+            focusedLabelColor = DSTokens.colors.text.primary,
+            focusedIndicatorColor = if (showUnderline) DSTokens.colors.text.accent else Color.Transparent,
+            unfocusedIndicatorColor = if (showUnderline) DSTokens.colors.border.strong else Color.Transparent,
+            unfocusedLabelColor = DSTokens.colors.text.onColorDisabled,
+            errorLabelColor = DSTokens.colors.text.error,
         )
 
         val customTextSelectionColors = customTextSelectionColors()
@@ -107,7 +107,7 @@ fun GenericDescriptionTextField(
                         .testTag(GENERIC_DESCRIPTION_TEXT_FIELD_TITLE_TEXT),
                     text = text,
                     style = MaterialTheme.typography.subtitle1.copy(
-                        color = MegaOriginalTheme.colors.text.primary,
+                        color = DSTokens.colors.text.primary,
                         textAlign = TextAlign.Start
                     )
                 )
@@ -145,7 +145,7 @@ fun GenericDescriptionTextField(
                     .testTag(GENERIC_DESCRIPTION_TEXT_FIELD_TEXT),
                 onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.subtitle2.copy(
-                    color = MegaOriginalTheme.colors.text.primary,
+                    color = DSTokens.colors.text.primary,
                     textAlign = TextAlign.Start
                 ),
                 visualTransformation = visualTransformation,
@@ -163,7 +163,7 @@ fun GenericDescriptionTextField(
                                 Text(
                                     text = text,
                                     style = MaterialTheme.typography.body1.copy(
-                                        color = if (isFocused) MegaOriginalTheme.colors.text.onColorDisabled else MegaOriginalTheme.colors.text.primary,
+                                        color = if (isFocused) DSTokens.colors.text.onColorDisabled else DSTokens.colors.text.primary,
                                         textAlign = TextAlign.Start
                                     ),
                                 )

@@ -35,11 +35,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.textfields.customTextSelectionColors
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 internal const val CHAT_TEXT_FIELD_TEXT_TAG = "chat_text_field"
@@ -75,11 +75,11 @@ fun ChatTextField(
     focusRequester: FocusRequester = remember { FocusRequester() },
 ) = Box(modifier = modifier) {
     val colors = TextFieldDefaults.textFieldColors(
-        textColor = MegaOriginalTheme.colors.text.placeholder,
-        backgroundColor = MegaOriginalTheme.colors.background.surface1,
-        cursorColor = MegaOriginalTheme.colors.border.strongSelected,
-        errorCursorColor = MegaOriginalTheme.colors.text.error,
-        errorIndicatorColor = MegaOriginalTheme.colors.text.error,
+        textColor = DSTokens.colors.text.placeholder,
+        backgroundColor = DSTokens.colors.background.surface1,
+        cursorColor = DSTokens.colors.border.strongSelected,
+        errorCursorColor = DSTokens.colors.text.error,
+        errorIndicatorColor = DSTokens.colors.text.error,
         focusedIndicatorColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
     )
@@ -99,7 +99,7 @@ fun ChatTextField(
                 )
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
-            textStyle = MaterialTheme.typography.body1.copy(color = MegaOriginalTheme.colors.text.primary),
+            textStyle = MaterialTheme.typography.body1.copy(color = DSTokens.colors.text.primary),
             cursorBrush = SolidColor(colors.cursorColor(false).value),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
@@ -150,7 +150,7 @@ fun ChatTextField(
             else R.drawable.ic_emoji_smile_medium_regular
         ),
         contentDescription = "Emoji Icon",
-        tint = MegaOriginalTheme.colors.icon.secondary
+        tint = DSTokens.colors.icon.secondary
     )
 }
 

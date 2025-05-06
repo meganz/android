@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.transfers
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.net.Uri
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -21,12 +20,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Core component for a in-progress transfer item.
@@ -56,7 +56,7 @@ fun InProgressTransferItem(
     Icon(
         painter = painterResource(id = iconPackR.drawable.ic_queue_line_small_regular_outline),
         contentDescription = "Reorder icon",
-        tint = MegaOriginalTheme.colors.icon.secondary,
+        tint = DSTokens.colors.icon.secondary,
         modifier = Modifier
             .padding(start = 8.dp)
             .testTag(TEST_TAG_QUEUE_ICON)
@@ -89,7 +89,7 @@ fun InProgressTransferItem(
                         .testTag(TEST_TAG_IN_PROGRESS_TRANSFER_QUEUED_ICON),
                     painter = painterResource(id = iconPackR.drawable.ic_circle_big_medium_regular_outline),
                     contentDescription = null,
-                    tint = MegaOriginalTheme.colors.support.warning,
+                    tint = DSTokens.colors.support.warning,
                 )
             } else {
                 MegaText(
@@ -127,7 +127,7 @@ fun InProgressTransferItem(
             ),
             contentDescription = if (isPaused) stringResource(id = R.string.action_play)
             else stringResource(id = R.string.action_pause),
-            tint = MegaOriginalTheme.colors.icon.secondary,
+            tint = DSTokens.colors.icon.secondary,
         )
     }
 }

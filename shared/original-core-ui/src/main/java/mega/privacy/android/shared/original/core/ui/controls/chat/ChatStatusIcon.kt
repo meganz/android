@@ -13,9 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 
 @Composable
 fun ChatStatusIcon(
@@ -25,26 +25,26 @@ fun ChatStatusIcon(
     when (status) {
         UiChatStatus.Online -> ChatStatusIcon(
             modifier = modifier,
-            background = MegaOriginalTheme.colors.indicator.green,
-            borderColor = MegaOriginalTheme.colors.background.pageBackground
+            background = DSTokens.colors.indicator.green,
+            borderColor = DSTokens.colors.background.pageBackground
         )
 
         UiChatStatus.Away -> ChatStatusIcon(
             modifier = modifier,
-            background = MegaOriginalTheme.colors.indicator.yellow,
-            borderColor = MegaOriginalTheme.colors.background.pageBackground
+            background = DSTokens.colors.indicator.yellow,
+            borderColor = DSTokens.colors.background.pageBackground
         )
 
         UiChatStatus.Busy -> ChatStatusIcon(
             modifier = modifier,
-            background = MegaOriginalTheme.colors.indicator.pink,
-            borderColor = MegaOriginalTheme.colors.background.pageBackground
+            background = DSTokens.colors.indicator.pink,
+            borderColor = DSTokens.colors.background.pageBackground
         )
 
         else -> ChatStatusIcon(
             modifier = modifier,
-            background = MegaOriginalTheme.colors.icon.secondary,
-            borderColor = MegaOriginalTheme.colors.background.pageBackground
+            background = DSTokens.colors.icon.secondary,
+            borderColor = DSTokens.colors.background.pageBackground
         )
     }
 }

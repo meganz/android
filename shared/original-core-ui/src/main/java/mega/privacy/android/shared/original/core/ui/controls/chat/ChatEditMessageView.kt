@@ -19,14 +19,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Chat edit message view
@@ -45,7 +45,7 @@ fun ChatEditMessageView(
             modifier = Modifier
                 .fillMaxHeight()
                 .width(2.dp)
-                .background(MegaOriginalTheme.colors.components.selectionControl)
+                .background(DSTokens.colors.components.selectionControl)
         )
 
         Column(
@@ -73,7 +73,7 @@ fun ChatEditMessageView(
                 .padding(start = 8.dp)
                 .size(16.dp).clickable(onClick = onCloseEditing),
             painter = painterResource(id = R.drawable.ic_universal_close),
-            tint = MegaOriginalTheme.colors.icon.secondary,
+            tint = DSTokens.colors.icon.secondary,
             contentDescription = "Icon close"
         )
     }

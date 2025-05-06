@@ -9,10 +9,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.radioColors
 
 /**
  * Radio Button following MEGA design system
@@ -26,7 +27,7 @@ fun MegaRadioButton(
     selected = selected,
     onClick = onClick,
     modifier = modifier,
-    colors = MegaOriginalTheme.colors.radioColors,
+    colors = DSTokens.colors.radioColors,
 )
 
 @CombinedThemePreviews

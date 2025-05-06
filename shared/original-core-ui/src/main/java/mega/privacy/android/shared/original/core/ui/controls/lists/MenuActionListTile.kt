@@ -33,7 +33,7 @@ import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.android.core.ui.theme.values.TextColor
@@ -114,9 +114,9 @@ fun MenuActionListTile(
                     painter = icon,
                     contentDescription = null,
                     tint = if (isDestructive) {
-                        MegaOriginalTheme.colors.support.error
+                        DSTokens.colors.support.error
                     } else {
-                        MegaOriginalTheme.colors.icon.secondary
+                        DSTokens.colors.icon.secondary
                     },
                 )
             }
@@ -200,7 +200,7 @@ private fun PreviewMegaMenuActionWithTextButton() {
             Text(
                 text = "Button",
                 style = MaterialTheme.typography.button,
-                color = MegaOriginalTheme.colors.text.accent,
+                color = DSTokens.colors.text.accent,
             )
         }
     }

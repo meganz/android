@@ -20,9 +20,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 
@@ -54,9 +54,9 @@ fun CellButton(
             .alpha(if (enabled) 1f else .3f)
             .background(
                 color = when (type) {
-                    CellButtonType.On -> MegaOriginalTheme.colors.button.secondary
-                    CellButtonType.Off -> MegaOriginalTheme.colors.background.inverse
-                    CellButtonType.Interactive -> MegaOriginalTheme.colors.components.interactive
+                    CellButtonType.On -> DSTokens.colors.button.secondary
+                    CellButtonType.Off -> DSTokens.colors.background.inverse
+                    CellButtonType.Interactive -> DSTokens.colors.components.interactive
                 },
                 shape = CircleShape
             )
@@ -69,8 +69,8 @@ fun CellButton(
                 .align(Alignment.Center)
                 .testTag(TEST_TAG_CELL_BUTTON_ICON),
             tint = when (type) {
-                CellButtonType.On, CellButtonType.Interactive -> MegaOriginalTheme.colors.icon.primary
-                CellButtonType.Off -> MegaOriginalTheme.colors.icon.inverse
+                CellButtonType.On, CellButtonType.Interactive -> DSTokens.colors.icon.primary
+                CellButtonType.Off -> DSTokens.colors.icon.inverse
             }
         )
     }
@@ -78,7 +78,7 @@ fun CellButton(
         text = itemName,
         style = MaterialTheme.typography.body4,
         modifier = Modifier.padding(top = 2.dp),
-        color = MegaOriginalTheme.colors.text.primary
+        color = DSTokens.colors.text.primary
     )
 }
 

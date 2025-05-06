@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -53,15 +52,16 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -242,7 +242,7 @@ fun VoiceClipRecorderView(
                             .fillMaxHeight()
                             .width(40.dp)
                             .clip(RoundedCornerShape(25.dp))
-                            .background(color = MegaOriginalTheme.colors.background.surface1),
+                            .background(color = DSTokens.colors.background.surface1),
                         contentAlignment = Alignment.TopCenter,
                     ) {
                         Icon(
@@ -250,7 +250,7 @@ fun VoiceClipRecorderView(
                                 .padding(top = 12.dp)
                                 .size(18.dp),
                             imageVector = ImageVector.vectorResource(R.drawable.ic_icon_lock_medium_regular_solid),
-                            tint = MegaOriginalTheme.colors.icon.secondary,
+                            tint = DSTokens.colors.icon.secondary,
                             contentDescription = null
                         )
                         Icon(
@@ -258,7 +258,7 @@ fun VoiceClipRecorderView(
                                 .padding(top = 34.dp)
                                 .size(18.dp),
                             imageVector = ImageVector.vectorResource(R.drawable.ic_icon_chevron_up_medium_regular_outline),
-                            tint = MegaOriginalTheme.colors.icon.disabled,
+                            tint = DSTokens.colors.icon.disabled,
                             contentDescription = null
                         )
                     }
@@ -274,7 +274,7 @@ fun VoiceClipRecorderView(
                         .fillMaxWidth()
                         .height(42.dp)
                         .clip(RoundedCornerShape(25.dp))
-                        .background(color = MegaOriginalTheme.colors.background.surface1),
+                        .background(color = DSTokens.colors.background.surface1),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     TimerWithIndicator(
@@ -411,7 +411,7 @@ private fun CancelButton(
             .padding(start = 8.dp)
             .clickable { onCancel() },
         text = stringResource(id = sharedR.string.general_dialog_cancel_button),
-        color = MegaOriginalTheme.colors.components.interactive,
+        color = DSTokens.colors.components.interactive,
         style = MaterialTheme.typography.subtitle2,
         fontWeight = FontWeight.Medium,
     )
@@ -423,7 +423,7 @@ private fun RecordingWave(modifier: Modifier = Modifier) {
         modifier = modifier,
         imageVector = ImageVector.vectorResource(R.drawable.ic_icon_audio_wave),
         contentDescription = null,
-        tint = MegaOriginalTheme.colors.icon.primary
+        tint = DSTokens.colors.icon.primary
     )
 }
 
@@ -433,7 +433,7 @@ private fun RecordIndicator(modifier: Modifier = Modifier) {
         modifier = modifier
             .clip(CircleShape)
             .size(12.dp)
-            .background(color = MegaOriginalTheme.colors.components.interactive),
+            .background(color = DSTokens.colors.components.interactive),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -451,14 +451,14 @@ private fun RecordScroller(modifier: Modifier = Modifier) {
         modifier = modifier
             .size(REC_SCROLLER_SIZE_IN_DP.dp)
             .clip(CircleShape)
-            .background(color = MegaOriginalTheme.colors.components.interactive),
+            .background(color = DSTokens.colors.components.interactive),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             modifier = Modifier.size(24.dp),
             imageVector = ImageVector.vectorResource(R.drawable.ic_icon_mic_medium_regular_solid),
             contentDescription = null,
-            tint = MegaOriginalTheme.colors.icon.onColor,
+            tint = DSTokens.colors.icon.onColor,
         )
     }
 }
@@ -472,7 +472,7 @@ private fun SlideToCancel(modifier: Modifier = Modifier) {
         Icon(
             imageVector = ImageVector.vectorResource(R.drawable.ic_icon_chevron_left_medium_regular_outline),
             contentDescription = null,
-            tint = MegaOriginalTheme.colors.icon.onColorDisabled
+            tint = DSTokens.colors.icon.onColorDisabled
         )
         MegaText(
             text = stringResource(id = R.string.slide_to_cancel),

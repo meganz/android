@@ -25,12 +25,12 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.DragDropListState
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * A list view that supports drag and drop reordering of items.
@@ -81,7 +81,7 @@ fun <T : Any> DragDropListView(
                         translationY = offsetOrNull ?: 0f
                     }
                     .shadow(elevation = if (isDraggingItem) elevation else 0.dp)
-                    .background(MegaOriginalTheme.colors.background.pageBackground)
+                    .background(DSTokens.colors.background.pageBackground)
             ) {
                 content(index, item)
             }

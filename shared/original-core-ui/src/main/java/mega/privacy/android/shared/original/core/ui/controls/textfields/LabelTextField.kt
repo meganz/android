@@ -37,10 +37,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldProvider
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldState
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.autofill
 
@@ -144,16 +144,16 @@ fun LabelTextField(
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isError = errorText != null
     val colors = TextFieldDefaults.textFieldColors(
-        textColor = MegaOriginalTheme.colors.text.primary,
-        backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
-        cursorColor = MegaOriginalTheme.colors.border.strongSelected,
-        errorCursorColor = MegaOriginalTheme.colors.text.error,
-        errorIndicatorColor = MegaOriginalTheme.colors.text.error,
-        focusedIndicatorColor = MegaOriginalTheme.colors.border.disabled,
-        unfocusedIndicatorColor = MegaOriginalTheme.colors.border.disabled,
-        focusedLabelColor = MegaOriginalTheme.colors.text.accent,
-        unfocusedLabelColor = MegaOriginalTheme.colors.text.placeholder,
-        errorLabelColor = MegaOriginalTheme.colors.text.error,
+        textColor = DSTokens.colors.text.primary,
+        backgroundColor = DSTokens.colors.background.pageBackground,
+        cursorColor = DSTokens.colors.border.strongSelected,
+        errorCursorColor = DSTokens.colors.text.error,
+        errorIndicatorColor = DSTokens.colors.text.error,
+        focusedIndicatorColor = DSTokens.colors.border.disabled,
+        unfocusedIndicatorColor = DSTokens.colors.border.disabled,
+        focusedLabelColor = DSTokens.colors.text.accent,
+        unfocusedLabelColor = DSTokens.colors.text.placeholder,
+        errorLabelColor = DSTokens.colors.text.error,
     )
     val focusRequester = remember { FocusRequester() }
     var isFocused by remember { mutableStateOf(false) }
@@ -173,7 +173,7 @@ fun LabelTextField(
                     autofillTypes = if (isEmail) listOf(AutofillType.EmailAddress) else emptyList(),
                     onAutoFilled = { onTextChange(value.copy(text = it)) }
                 ),
-            textStyle = MaterialTheme.typography.subtitle1.copy(color = MegaOriginalTheme.colors.text.primary),
+            textStyle = MaterialTheme.typography.subtitle1.copy(color = DSTokens.colors.text.primary),
             cursorBrush = SolidColor(colors.cursorColor(isError).value),
             keyboardOptions = KeyboardOptions(
                 keyboardType = if (isEmail) KeyboardType.Email else KeyboardType.Text,
@@ -198,31 +198,31 @@ fun LabelTextField(
                         style = when {
                             isError && isFocused -> {
                                 MaterialTheme.typography.caption.copy(
-                                    color = MegaOriginalTheme.colors.text.error
+                                    color = DSTokens.colors.text.error
                                 )
                             }
 
                             isError && value.text.isEmpty() -> {
                                 MaterialTheme.typography.body1.copy(
-                                    color = MegaOriginalTheme.colors.text.error
+                                    color = DSTokens.colors.text.error
                                 )
                             }
 
                             isFocused -> {
                                 MaterialTheme.typography.caption.copy(
-                                    color = MegaOriginalTheme.colors.text.accent
+                                    color = DSTokens.colors.text.accent
                                 )
                             }
 
                             value.text.isNotEmpty() -> {
                                 MaterialTheme.typography.caption.copy(
-                                    color = MegaOriginalTheme.colors.text.placeholder
+                                    color = DSTokens.colors.text.placeholder
                                 )
                             }
 
                             else -> {
                                 MaterialTheme.typography.body1.copy(
-                                    color = MegaOriginalTheme.colors.text.placeholder
+                                    color = DSTokens.colors.text.placeholder
                                 )
                             }
                         }

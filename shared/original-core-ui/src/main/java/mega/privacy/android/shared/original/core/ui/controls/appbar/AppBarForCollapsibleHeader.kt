@@ -8,12 +8,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.Dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.layouts.CollapsibleHeaderWithTitle
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalCollapsibleHeaderTitleTransition
 import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
 
@@ -78,8 +78,8 @@ private fun MegaAppBarForCollapsibleHeaderPreview() {
         //this component gets the colors from ScaffoldWithCollapsibleHeader, to preview it here we need to provide these colors
         CompositionLocalProvider(
             LocalMegaAppBarColors provides MegaAppBarColors(
-                iconsTintColor = MegaOriginalTheme.colors.icon.primary,
-                titleColor = MegaOriginalTheme.colors.text.primary,
+                iconsTintColor = DSTokens.colors.icon.primary,
+                titleColor = DSTokens.colors.text.primary,
                 backgroundAlpha = 1f,
             )
         ) {

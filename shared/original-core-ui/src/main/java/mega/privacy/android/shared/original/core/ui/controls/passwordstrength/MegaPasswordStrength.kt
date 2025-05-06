@@ -17,8 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 
 /**
@@ -31,11 +31,11 @@ fun MegaPasswordStrength(
     modifier: Modifier = Modifier,
 ) {
     val colors = mapOf(
-        0 to MegaOriginalTheme.colors.components.interactive, // Very Weak
-        1 to MegaOriginalTheme.colors.indicator.yellow, // Weak
-        2 to MegaOriginalTheme.colors.support.success, // Medium
-        3 to MegaOriginalTheme.colors.indicator.green, // Good
-        4 to MegaOriginalTheme.colors.indicator.blue  // Strong
+        0 to DSTokens.colors.components.interactive, // Very Weak
+        1 to DSTokens.colors.indicator.yellow, // Weak
+        2 to DSTokens.colors.support.success, // Medium
+        3 to DSTokens.colors.indicator.green, // Good
+        4 to DSTokens.colors.indicator.blue  // Strong
     )
 
     val validPasswordStrengthValue = passwordStrengthValue.coerceIn(0, colors.size - 1)
@@ -65,7 +65,7 @@ private fun PasswordStrengthLabel(
 ) {
     Text(
         text = passwordStrengthText,
-        color = colors[passwordStrengthValue] ?: MegaOriginalTheme.colors.text.primary,
+        color = colors[passwordStrengthValue] ?: DSTokens.colors.text.primary,
         style = MaterialTheme.typography.caption
     )
 }
@@ -84,7 +84,7 @@ private fun PasswordStrengthIndicator(
             StrengthSegment(
                 isActive = index <= passwordStrengthValue,
                 activeColor = colors[passwordStrengthValue]
-                    ?: MegaOriginalTheme.colors.border.strong,
+                    ?: DSTokens.colors.border.strong,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -101,7 +101,7 @@ private fun StrengthSegment(
         modifier = modifier
             .height(4.dp)
             .background(
-                color = if (isActive) activeColor else MegaOriginalTheme.colors.border.strong,
+                color = if (isActive) activeColor else DSTokens.colors.border.strong,
                 shape = RoundedCornerShape(2.dp)
             )
     )

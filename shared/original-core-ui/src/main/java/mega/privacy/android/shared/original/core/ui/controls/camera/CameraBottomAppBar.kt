@@ -31,12 +31,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.chip.RoundedChipStyle
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -64,7 +64,7 @@ fun CameraBottomAppBar(
         modifier = modifier
             .fillMaxWidth()
             .height(172.dp)
-            .background(color = MegaOriginalTheme.colors.background.pageBackground),
+            .background(color = DSTokens.colors.background.pageBackground),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Row(
@@ -193,7 +193,7 @@ private fun CaptureIcon(
             .size(56.dp)
             .clip(CircleShape)
             .clickable(onClick = onClick)
-            .border(2.dp, MegaOriginalTheme.colors.background.inverse, CircleShape)
+            .border(2.dp, DSTokens.colors.background.inverse, CircleShape)
     ) {
         if (isRecording) {
             Box(
@@ -201,7 +201,7 @@ private fun CaptureIcon(
                     .align(Alignment.Center)
                     .size(24.dp)
                     .background(
-                        color = MegaOriginalTheme.colors.components.interactive,
+                        color = DSTokens.colors.components.interactive,
                         shape = RoundedCornerShape(6.dp),
                     )
             )
@@ -211,7 +211,7 @@ private fun CaptureIcon(
                     .align(Alignment.Center)
                     .size(48.dp)
                     .background(
-                        color = MegaOriginalTheme.colors.background.inverse,
+                        color = DSTokens.colors.background.inverse,
                         shape = CircleShape
                     )
             ) {
@@ -221,7 +221,7 @@ private fun CaptureIcon(
                             .size(12.dp)
                             .align(Alignment.Center)
                             .background(
-                                color = MegaOriginalTheme.colors.components.interactive,
+                                color = DSTokens.colors.components.interactive,
                                 shape = CircleShape,
                             )
                     )
@@ -243,14 +243,14 @@ private fun CameraButton(
             .rotate(rotationDegree)
             .size(48.dp)
             .clip(CircleShape)
-            .background(color = MegaOriginalTheme.colors.background.surface2, shape = CircleShape)
+            .background(color = DSTokens.colors.background.surface2, shape = CircleShape)
             .clickable(onClick = onClick),
     ) {
         Icon(
             modifier = Modifier.align(Alignment.Center),
             painter = painterResource(id = iconResId),
             contentDescription = "Camera button",
-            tint = MegaOriginalTheme.colors.icon.onColor
+            tint = DSTokens.colors.icon.onColor
         )
     }
 }

@@ -27,10 +27,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 
 /**
@@ -103,7 +103,7 @@ private fun FastScrollLazyColumnPreview() {
             },
             modifier = Modifier
                 .size(300.dp, 600.dp)
-                .background(MegaOriginalTheme.colors.background.pageBackground),
+                .background(DSTokens.colors.background.pageBackground),
             totalItems = items.size,
         ) {
             itemsIndexed(items) { index, item ->
@@ -111,7 +111,7 @@ private fun FastScrollLazyColumnPreview() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
-                        .background(MegaOriginalTheme.colors.background.surface1)
+                        .background(DSTokens.colors.background.surface1)
                         .padding(8.dp),
                     text = "Text $item", textColor = TextColor.Primary
                 )
@@ -134,7 +134,7 @@ private fun FastScrollLazyColumnReversePreview() {
             },
             modifier = Modifier
                 .size(300.dp, 600.dp)
-                .background(MegaOriginalTheme.colors.background.pageBackground),
+                .background(DSTokens.colors.background.pageBackground),
             totalItems = items.size,
         ) {
             itemsIndexed(items) { index, item ->
