@@ -37,6 +37,7 @@ import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.shared.original.core.ui.controls.buttons.DebouncedButtonContainer
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
@@ -217,20 +218,23 @@ internal fun ImportDownloadView(
     onSaveToDeviceClicked: () -> Unit,
 ) {
     Row(modifier = modifier, horizontalArrangement = Arrangement.End) {
-        TextMegaButton(
-            modifier = Modifier
-                .padding(end = 16.dp)
-                .testTag(SAVE_BUTTON_TAG),
-            textId = R.string.general_save_to_device,
-            onClick = onSaveToDeviceClicked
-        )
+        DebouncedButtonContainer(onSaveToDeviceClicked) { isClickAllowed, debouncedOnClick ->
+            TextMegaButton(
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .testTag(SAVE_BUTTON_TAG),
+                textId = R.string.general_save_to_device,
+                onClick = debouncedOnClick,
+                enabled = isClickAllowed,
+            )
+        }
         if (hasDbCredentials) {
             TextMegaButton(
                 modifier = Modifier
                     .padding(end = 16.dp)
                     .testTag(IMPORT_BUTTON_TAG),
                 textId = R.string.add_to_cloud,
-                onClick = onImportClicked
+                onClick = onImportClicked,
             )
         }
     }
@@ -279,3 +283,4 @@ private fun PreviewFileLinkView() {
 
 private const val MAX_HEADER_HEIGHT = 96
 private const val APP_BAR_HEIGHT = 56
+internal const val DEBOUNCE_ACTION_MILLISECONDS = 800

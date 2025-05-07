@@ -51,12 +51,16 @@ class MonitorActiveAndPendingTransfersUseCaseTest {
     @EnumSource(TransferType::class)
     fun `test that ongoing active transfers are emitted`(transferType: TransferType) =
         runTest {
-            val expected = TransferProgressResult(mockMonitorOngoingActiveTransfersResult(true), true)
+            val expected = TransferProgressResult(
+                mockMonitorOngoingActiveTransfersResult(true),
+                pendingTransfers = false,
+                ongoingTransfers = true,
+            )
             whenever(monitorOngoingActiveTransfersUseCase(transferType)) doReturn
                     monitorOngoingActiveTransfersFlow(expected.monitorOngoingActiveTransfersResult)
             whenever(getPendingTransfersByTypeUseCase(transferType)) doReturn flowOf(emptyList())
 
-            underTest(transferType).test{
+            underTest(transferType).test {
                 assertThat(awaitItem()).isEqualTo(expected)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -64,7 +68,9 @@ class MonitorActiveAndPendingTransfersUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(TransferType::class)
-    fun `test that a new value is emitted with pending work set to true when there are ongoing transfers`(transferType: TransferType) =
+    fun `test that a new value is emitted with pending work set to true when there are ongoing transfers`(
+        transferType: TransferType,
+    ) =
         runTest {
             val expected = true
             val monitorOngoingActiveTransfersResult = mockMonitorOngoingActiveTransfersResult(true)
@@ -72,7 +78,7 @@ class MonitorActiveAndPendingTransfersUseCaseTest {
                     monitorOngoingActiveTransfersFlow(monitorOngoingActiveTransfersResult)
             whenever(getPendingTransfersByTypeUseCase(transferType)) doReturn flowOf(emptyList())
 
-            underTest(transferType).test{
+            underTest(transferType).test {
                 assertThat(awaitItem().pendingWork).isEqualTo(expected)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -80,7 +86,9 @@ class MonitorActiveAndPendingTransfersUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(TransferType::class)
-    fun `test that a new value is emitted with pending work set to false when there are no ongoing transfers`(transferType: TransferType) =
+    fun `test that a new value is emitted with pending work set to false when there are no ongoing transfers`(
+        transferType: TransferType,
+    ) =
         runTest {
             val expected = false
             val monitorOngoingActiveTransfersResult = mockMonitorOngoingActiveTransfersResult(false)
@@ -88,7 +96,7 @@ class MonitorActiveAndPendingTransfersUseCaseTest {
                     monitorOngoingActiveTransfersFlow(monitorOngoingActiveTransfersResult)
             whenever(getPendingTransfersByTypeUseCase(transferType)) doReturn flowOf(emptyList())
 
-            underTest(transferType).test{
+            underTest(transferType).test {
                 assertThat(awaitItem().pendingWork).isEqualTo(expected)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -96,7 +104,9 @@ class MonitorActiveAndPendingTransfersUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(TransferType::class)
-    fun `test that a new value is emitted with pending work set to true when there are no ongoing transfers but there are pending transfers`(transferType: TransferType) =
+    fun `test that a new value is emitted with pending work set to true when there are no ongoing transfers but there are pending transfers`(
+        transferType: TransferType,
+    ) =
         runTest {
             val expected = true
             val monitorOngoingActiveTransfersResult = mockMonitorOngoingActiveTransfersResult(false)
@@ -104,7 +114,7 @@ class MonitorActiveAndPendingTransfersUseCaseTest {
                     monitorOngoingActiveTransfersFlow(monitorOngoingActiveTransfersResult)
             whenever(getPendingTransfersByTypeUseCase(transferType)) doReturn flowOf(listOf(mock()))
 
-            underTest(transferType).test{
+            underTest(transferType).test {
                 assertThat(awaitItem().pendingWork).isEqualTo(expected)
                 cancelAndIgnoreRemainingEvents()
             }

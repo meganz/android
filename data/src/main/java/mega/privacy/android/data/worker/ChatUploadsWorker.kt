@@ -112,9 +112,11 @@ class ChatUploadsWorker @AssistedInject constructor(
             ),
             chatCompressionProgress,
         ) { monitorOngoingActiveTransfersResult, pendingMessages, _ ->
-            val pendingWork = pendingMessages.isNotEmpty()
-                    || monitorOngoingActiveTransfersResult.hasPendingWork(type)
-            TransferProgressResult(monitorOngoingActiveTransfersResult, pendingWork)
+            TransferProgressResult(
+                monitorOngoingActiveTransfersResult = monitorOngoingActiveTransfersResult,
+                pendingTransfers = pendingMessages.isNotEmpty(),
+                ongoingTransfers = monitorOngoingActiveTransfersResult.hasPendingWork(type)
+            )
         }
 
     override suspend fun onComplete() {

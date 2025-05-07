@@ -1,6 +1,7 @@
 package mega.privacy.android.data.worker
 
 import android.annotation.SuppressLint
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.content.Context
 import android.content.pm.ServiceInfo
@@ -109,15 +110,27 @@ abstract class AbstractTransfersWorker(
             // the pendingWork may not be updated, specifically after app restart. `skipUnstable` help to ensure we don't finish too soon.
             it.pendingWork
         }
-        .onFirst({ it.pendingWork }) {
-            // Signal to not kill the worker if the app is killed
+        .onFirst({ it.ongoingTransfers }) {
+            // Signal to not kill the worker if the app is killed when there are transfers in progress
             val foregroundInfo = getForegroundInfo(
                 it.monitorOngoingActiveTransfersResult.activeTransferTotals,
                 areTransfersPausedUseCase()
             )
             foregroundSetter?.setForeground(foregroundInfo) ?: run {
-                crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} start foreground")
-                setForeground(foregroundInfo)
+                val simpleName = this@AbstractTransfersWorker::class.java.simpleName
+                Timber.d("$simpleName start foreground")
+                crashReporter.log("$simpleName start foreground")
+                runCatching {
+                    setForeground(foregroundInfo)
+                }.onFailure { e ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException) {
+                        // this is expected: https://developer.android.com/develop/background-work/background-tasks/persistent/getting-started/define-work#backwards-compat
+                        Timber.d(e, "$simpleName foreground service not allowed")
+                    } else {
+                        crashReporter.report(e)
+                        Timber.e(e, "$simpleName failed to start foreground service")
+                    }
+                }
             }
         }
         .transformWhile {

@@ -27,8 +27,10 @@ class MonitorActiveAndPendingTransfersUseCase @Inject constructor(
             getPendingTransfersByTypeUseCase(transferType),
         ) { ongoingActiveTransfersResult, pendingTransfersNotSend ->
             //keep monitoring if and only if there are pending transfers or transfers in progress
-            val pendingWork =
-                pendingTransfersNotSend.isNotEmpty() || ongoingActiveTransfersResult.hasPendingWork(transferType)
-            TransferProgressResult(ongoingActiveTransfersResult, pendingWork)
+            TransferProgressResult(
+                monitorOngoingActiveTransfersResult = ongoingActiveTransfersResult,
+                pendingTransfers = pendingTransfersNotSend.isNotEmpty(),
+                ongoingTransfers = ongoingActiveTransfersResult.hasPendingWork(transferType),
+            )
         }
 }

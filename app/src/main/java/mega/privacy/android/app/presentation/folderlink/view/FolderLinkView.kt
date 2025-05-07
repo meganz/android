@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.folderlink.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.activity.compose.BackHandler
@@ -71,6 +70,8 @@ import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.original.core.ui.controls.buttons.DebouncedButtonContainer
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
@@ -447,16 +448,21 @@ internal fun ImportDownloadView(
                     .padding(end = 16.dp)
                     .testTag(IMPORT_BUTTON_TAG),
                 textId = R.string.add_to_cloud,
-                onClick = { onImportClicked(null) }
+                onClick = {
+                    onImportClicked(null)
+                },
             )
         }
-        TextMegaButton(
-            modifier = Modifier
-                .padding(end = 16.dp)
-                .testTag(SAVE_BUTTON_TAG),
-            textId = R.string.general_save_to_device,
-            onClick = onSaveToDeviceClicked
-        )
+        DebouncedButtonContainer(onSaveToDeviceClicked) { isClickAllowed, debouncedOnClick ->
+            TextMegaButton(
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .testTag(SAVE_BUTTON_TAG),
+                textId = R.string.general_save_to_device,
+                onClick = debouncedOnClick,
+                enabled = isClickAllowed,
+            )
+        }
     }
 }
 

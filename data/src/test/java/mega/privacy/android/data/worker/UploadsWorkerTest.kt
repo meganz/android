@@ -459,7 +459,8 @@ class UploadsWorkerTest {
                             transfersOverQuota = false,
                             storageOverQuota = false
                         ),
-                        !initialTransferTotals.hasCompleted(),
+                        pendingTransfers = false,
+                        ongoingTransfers = !initialTransferTotals.hasCompleted(),
                     )
                 )
                 transferTotals.forEach {
@@ -472,7 +473,8 @@ class UploadsWorkerTest {
                                 transfersOverQuota = false,
                                 storageOverQuota = storageOverQuota
                             ),
-                            !it.hasCompleted(),
+                            pendingTransfers = false,
+                            ongoingTransfers = !it.hasCompleted(),
                         )
                     )
                 }

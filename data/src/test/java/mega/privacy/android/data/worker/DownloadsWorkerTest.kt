@@ -35,8 +35,6 @@ import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.ON_TRA
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
-import mega.privacy.android.domain.entity.transfer.Transfer
-import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
@@ -412,8 +410,6 @@ class DownloadsWorkerTest {
         transferTotals: List<ActiveTransferTotals> = listOf(mockActiveTransferTotals(true)),
         transferOverQuota: Boolean = false,
     ) = runTest {
-        val transfer: Transfer = mock()
-        val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
         whenever(areTransfersPausedUseCase())
             .thenReturn(false)
         whenever(monitorActiveAndPendingTransfersUseCase(TransferType.DOWNLOAD))
@@ -426,8 +422,10 @@ class DownloadsWorkerTest {
                             transfersOverQuota = false,
                             storageOverQuota = false
                         ),
-                        !initialTransferTotals.hasCompleted(),
-                    )
+                        pendingTransfers = false,
+                        ongoingTransfers = !initialTransferTotals.hasCompleted(),
+
+                        )
                 )
                 transferTotals.forEach {
                     delay(ON_TRANSFER_UPDATE_REFRESH_MILLIS) // events are sampled in the worker
@@ -439,7 +437,8 @@ class DownloadsWorkerTest {
                                 transfersOverQuota = transferOverQuota,
                                 storageOverQuota = false
                             ),
-                            !it.hasCompleted(),
+                            pendingTransfers = false,
+                            ongoingTransfers = !it.hasCompleted(),
                         )
                     )
                 }
@@ -468,7 +467,8 @@ class DownloadsWorkerTest {
                 transfersOverQuota = false,
                 storageOverQuota = false
             ),
-            pendingWork = pendingWork,
+            pendingTransfers = false,
+            ongoingTransfers = pendingWork,
         )
     }
 }
