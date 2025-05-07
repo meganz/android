@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login.confirmemail
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -8,16 +7,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment.Companion.TEMPORARY_EMAIL_ARG
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailUiState
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.account.CancelCreateAccountUseCase
 import mega.privacy.android.domain.usecase.createaccount.MonitorAccountConfirmationUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.confirmemail.ResendSignUpLinkUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -39,20 +39,27 @@ class ConfirmEmailViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val generateSupportEmailBodyUseCase: GenerateSupportEmailBodyUseCase,
-    savedStateHandle: SavedStateHandle,
+    private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(
-        ConfirmEmailUiState(
-            registeredEmail = savedStateHandle[TEMPORARY_EMAIL_ARG]
-        )
-    )
+    private val _uiState = MutableStateFlow(ConfirmEmailUiState())
     val uiState: StateFlow<ConfirmEmailUiState> = _uiState
 
     init {
         viewModelScope.launch {
             monitorAccountConfirmationUseCase().collectLatest {
                 _uiState.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.Login) }
+            }
+        }
+
+        viewModelScope.launch {
+            monitorEphemeralCredentialsUseCase().filterNotNull().collectLatest {
+                _uiState.update { state ->
+                    state.copy(
+                        registeredEmail = it.email,
+                        firstName = it.firstName
+                    )
+                }
             }
         }
 
@@ -123,9 +130,8 @@ class ConfirmEmailViewModel @Inject constructor(
             Timber.d("Cancelling the registration process")
             _uiState.update { it.copy(isLoading = true) }
             runCatching { cancelCreateAccountUseCase() }
-                .onSuccess { email ->
-                    updateRegisteredEmail(email)
-                    showSuccessSnackBar()
+                .onSuccess {
+                    _uiState.update { it.copy(isCreatingAccountCancelled = true) }
                 }
                 .onFailure { error ->
                     Timber.e("Failed to cancel the registration process", error)
@@ -191,4 +197,11 @@ class ConfirmEmailViewModel @Inject constructor(
     }.onFailure { Timber.e(it) }
         .getOrNull()
         .orEmpty()
+
+    /**
+     * Handle the cancel account creation event
+     */
+    fun onHandleCancelCreateAccount() {
+        _uiState.update { it.copy(isCreatingAccountCancelled = false) }
+    }
 }

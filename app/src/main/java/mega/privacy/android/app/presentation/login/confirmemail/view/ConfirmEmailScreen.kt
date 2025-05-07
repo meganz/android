@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -59,14 +58,12 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as SharedResR
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun ConfirmEmailRoute(
     email: String,
     fullName: String?,
     onShowPendingFragment: (loginFragmentType: LoginFragmentType) -> Unit,
     onSetTemporalEmail: (email: String) -> Unit,
-    onCancelConfirmationAccount: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ConfirmEmailViewModel = hiltViewModel(),
 ) {
@@ -115,7 +112,6 @@ internal fun ConfirmEmailRoute(
             uiState = uiState,
             onCancelClick = {
                 viewModel.cancelCreateAccount()
-                onCancelConfirmationAccount()
             },
             onResendSignUpLink = {
                 viewModel.resendSignUpLink(email = it, fullName = fullName)

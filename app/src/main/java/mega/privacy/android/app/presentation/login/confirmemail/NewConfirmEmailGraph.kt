@@ -23,7 +23,6 @@ fun NewConfirmEmailGraph(
     uiState: ConfirmEmailUiState,
     onShowPendingFragment: (fragmentType: LoginFragmentType) -> Unit,
     onSetTemporalEmail: (email: String) -> Unit,
-    onCancelConfirmationAccount: () -> Unit,
     sendFeedbackEmail: (String) -> Unit,
 ) {
     val navController = rememberNavController()
@@ -37,7 +36,6 @@ fun NewConfirmEmailGraph(
             fullName = fullName,
             onShowPendingFragment = onShowPendingFragment,
             onSetTemporalEmail = onSetTemporalEmail,
-            onCancelConfirmationAccount = onCancelConfirmationAccount,
             viewModel = viewModel,
             sendFeedbackEmail = sendFeedbackEmail,
             onNavigateToChangeEmailAddress = {

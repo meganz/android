@@ -85,7 +85,6 @@ fun NavGraphBuilder.confirmEmail(
     fullName: String?,
     onShowPendingFragment: (loginFragmentType: LoginFragmentType) -> Unit,
     onSetTemporalEmail: (email: String) -> Unit,
-    onCancelConfirmationAccount: () -> Unit,
     onNavigateToChangeEmailAddress: () -> Unit,
     sendFeedbackEmail: (String) -> Unit,
     viewModel: ConfirmEmailViewModel,
@@ -95,7 +94,6 @@ fun NavGraphBuilder.confirmEmail(
             fullName = fullName,
             onShowPendingFragment = onShowPendingFragment,
             onSetTemporalEmail = onSetTemporalEmail,
-            onCancelConfirmationAccount = onCancelConfirmationAccount,
             onNavigateToChangeEmailAddress = onNavigateToChangeEmailAddress,
             sendFeedbackEmail = sendFeedbackEmail,
             viewModel = viewModel
@@ -108,7 +106,6 @@ private fun NewConfirmEmailRoute(
     fullName: String?,
     onShowPendingFragment: (loginFragmentType: LoginFragmentType) -> Unit,
     onSetTemporalEmail: (email: String) -> Unit,
-    onCancelConfirmationAccount: () -> Unit,
     onNavigateToChangeEmailAddress: () -> Unit,
     sendFeedbackEmail: (String) -> Unit,
     viewModel: ConfirmEmailViewModel = hiltViewModel(),
@@ -157,7 +154,6 @@ private fun NewConfirmEmailRoute(
         uiState = uiState,
         onCancelClick = {
             viewModel.cancelCreateAccount()
-            onCancelConfirmationAccount()
         },
         onResendSignUpLink = {
             viewModel.resendSignUpLink(email = it, fullName = fullName)

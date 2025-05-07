@@ -302,12 +302,9 @@ class LoginActivity : BaseActivity() {
             }
 
             Constants.CONFIRM_EMAIL_FRAGMENT -> {
-                val confirmEmailFragment =
-                    ConfirmEmailFragment.newInstance(emailTemp, firstNameTemp)
-
                 with(supportFragmentManager) {
                     beginTransaction()
-                        .replace(R.id.fragment_container_login, confirmEmailFragment)
+                        .replace(R.id.fragment_container_login, ConfirmEmailFragment())
                         .commitNowAllowingStateLoss()
                 }
             }

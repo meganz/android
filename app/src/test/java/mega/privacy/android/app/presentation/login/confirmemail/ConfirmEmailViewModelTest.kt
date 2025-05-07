@@ -1,15 +1,17 @@
 package mega.privacy.android.app.presentation.login.confirmemail
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.account.CancelCreateAccountUseCase
 import mega.privacy.android.domain.usecase.createaccount.MonitorAccountConfirmationUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.confirmemail.ResendSignUpLinkUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -25,7 +27,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -39,7 +40,7 @@ class ConfirmEmailViewModelTest {
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val generateSupportEmailBodyUseCase: GenerateSupportEmailBodyUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
-    private val savedStateHandle = SavedStateHandle()
+    private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase = mock()
 
     private lateinit var underTest: ConfirmEmailViewModel
 
@@ -49,6 +50,7 @@ class ConfirmEmailViewModelTest {
     fun setUp() = runTest {
         whenever(monitorAccountConfirmationUseCase()).thenReturn(flowOf(false))
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(false))
+        whenever(monitorEphemeralCredentialsUseCase()).thenReturn(emptyFlow())
 
         initializeUnderTest()
     }
@@ -62,7 +64,7 @@ class ConfirmEmailViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             generateSupportEmailBodyUseCase = generateSupportEmailBodyUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            savedStateHandle = savedStateHandle
+            monitorEphemeralCredentialsUseCase = monitorEphemeralCredentialsUseCase
         )
     }
 
@@ -139,27 +141,14 @@ class ConfirmEmailViewModelTest {
         }
 
     @Test
-    fun `test that the registered email is updated after successfully cancelling the registration process`() =
+    fun `test that isCreatingAccountCancelled is updated after successfully cancelling the registration process`() =
         runTest {
             whenever(cancelCreateAccountUseCase()) doReturn email
 
             underTest.cancelCreateAccount()
 
             underTest.uiState.test {
-                assertThat(expectMostRecentItem().registeredEmail).isEqualTo(email)
-            }
-            verify(saveLastRegisteredEmailUseCase).invoke(email)
-        }
-
-    @Test
-    fun `test that the success message is shown after successfully cancelling the registration process`() =
-        runTest {
-            whenever(cancelCreateAccountUseCase()) doReturn email
-
-            underTest.cancelCreateAccount()
-
-            underTest.uiState.test {
-                assertThat(expectMostRecentItem().shouldShowSuccessMessage).isTrue()
+                assertThat(expectMostRecentItem().isCreatingAccountCancelled).isEqualTo(true)
             }
         }
 
@@ -180,14 +169,14 @@ class ConfirmEmailViewModelTest {
         }
 
     @Test
-    fun `test that the success message visibility is reset after being displayed`() = runTest {
+    fun `test that isCreatingAccountCancelled is reset after being handled`() = runTest {
         whenever(cancelCreateAccountUseCase()) doReturn email
 
         underTest.cancelCreateAccount()
-        underTest.onSuccessMessageDisplayed()
+        underTest.onHandleCancelCreateAccount()
 
         underTest.uiState.test {
-            assertThat(expectMostRecentItem().shouldShowSuccessMessage).isFalse()
+            assertThat(expectMostRecentItem().isCreatingAccountCancelled).isFalse()
         }
     }
 
@@ -213,5 +202,27 @@ class ConfirmEmailViewModelTest {
         whenever(generateSupportEmailBodyUseCase()) doReturn body
 
         assertThat(underTest.generateSupportEmailBody()).isEqualTo(body)
+    }
+
+    @Test
+    fun `test that name and email update correctly`() = runTest {
+        val ephemeralCredentials = EphemeralCredentials(
+            email = "email",
+            password = "password",
+            session = "session",
+            firstName = "firstName",
+            lastName = "lastName"
+        )
+        whenever(monitorEphemeralCredentialsUseCase()).thenReturn(
+            flowOf(ephemeralCredentials)
+        )
+
+        initializeUnderTest()
+
+        underTest.uiState.test {
+            val uiState = expectMostRecentItem()
+            assertThat(uiState.firstName).isEqualTo(ephemeralCredentials.firstName)
+            assertThat(uiState.registeredEmail).isEqualTo(ephemeralCredentials.email)
+        }
     }
 }
