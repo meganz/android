@@ -18,10 +18,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -42,18 +44,21 @@ fun LoadingMessagesHeader(
     var componentHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
-    Box(modifier = modifier
-        .background(DSTokens.colors.background.pageBackground)
-        .onGloballyPositioned {
-            componentHeight = with(density) { it.size.height.toDp() }
-        }) {
+    Box(
+        modifier = modifier
+            .background(DSTokens.colors.background.pageBackground)
+            .onGloballyPositioned {
+                componentHeight = with(density) { it.size.height.toDp() }
+            }) {
         Image(
             painter = painterResource(id = R.drawable.ic_loading_messages),
             contentDescription = "loading messages view",
             modifier = modifier
                 .fillMaxWidth()
                 .testTag(TEST_TAG_LOADING_MESSAGES),
-            colorFilter = ColorFilter.tint(DSTokens.colors.background.surface2)
+            colorFilter = ColorFilter.tint(DSTokens.colors.background.surface2),
+            alignment = Alignment.TopCenter,
+            contentScale = ContentScale.FillWidth,
         )
         Spacer(
             modifier = Modifier
