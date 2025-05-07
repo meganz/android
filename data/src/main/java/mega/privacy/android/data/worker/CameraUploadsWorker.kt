@@ -1,5 +1,6 @@
 package mega.privacy.android.data.worker
 
+import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Context
 import android.os.Build
 import androidx.hilt.work.HiltWorker
@@ -322,7 +323,14 @@ class CameraUploadsWorker @AssistedInject constructor(
             Timber.d("Start CU Worker")
             crashReporter.log("${CameraUploadsWorker::class.java.simpleName} Started")
             // Signal to not kill the worker if the app is killed
-            setForegroundAsync(getForegroundInfo())
+            runCatching { setForeground(getForegroundInfo()) }.onFailure {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && it is ForegroundServiceStartNotAllowedException) {
+                    Timber.d("Foreground service start not allowed exception $it.")
+                } else {
+                    Timber.d("setForeground failed with exception: $it")
+                }
+                crashReporter.report(it)
+            }
 
             monitorConnectivityStatusJob = monitorConnectivityStatus()
             monitorBatteryLevelAndChargingStatusesJob = monitorBatteryLevelAndChargingStatusesJob()
