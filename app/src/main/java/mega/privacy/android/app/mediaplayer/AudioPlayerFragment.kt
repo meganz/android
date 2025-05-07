@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
@@ -34,6 +35,10 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIS
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChange1XEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChange2XEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeHalfXEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeOneAndHalfXEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -231,12 +236,24 @@ class AudioPlayerFragment : Fragment() {
                     callback = {
                         val currentPlaybackItem = mediaPlayerGateway.getCurrentSpeedPlaybackItem()
                         val nextItem = getNextSpeedPlaybackItem(currentPlaybackItem.speed)
+                        addAudioSpeedPlaybackEvent(nextItem)
                         mediaPlayerGateway.updatePlaybackSpeed(nextItem)
                         viewHolder.updateSpeedPlaybackIcon(nextItem)
                     }
                 )
             }
         }
+    }
+
+    private fun addAudioSpeedPlaybackEvent(item: SpeedPlaybackItem) {
+        Analytics.tracker.trackEvent(
+            when (item) {
+                SpeedPlaybackItem.PLAYBACK_SPEED_0_5_X -> AudioPlayerSpeedChangeHalfXEvent
+                SpeedPlaybackItem.PLAYBACK_SPEED_1_X -> AudioPlayerSpeedChange1XEvent
+                SpeedPlaybackItem.PLAYBACK_SPEED_1_5_X -> AudioPlayerSpeedChangeOneAndHalfXEvent
+                SpeedPlaybackItem.PLAYBACK_SPEED_2_X -> AudioPlayerSpeedChange2XEvent
+            }
+        )
     }
 
     private fun setupPlayerView(
