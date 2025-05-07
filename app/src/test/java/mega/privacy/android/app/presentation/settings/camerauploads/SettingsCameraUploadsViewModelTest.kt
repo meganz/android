@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.settings.camerauploads
 
-import mega.privacy.android.shared.resources.R as SharedR
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
@@ -80,6 +79,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
 import mega.privacy.mobile.analytics.event.MediaUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.MediaUploadsEnabledEvent
@@ -92,6 +92,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
@@ -103,6 +104,7 @@ import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
@@ -256,6 +258,7 @@ internal class SettingsCameraUploadsViewModelTest {
         shouldKeepUploadFileNames: Boolean = true,
         uploadOption: UploadOption = UploadOption.PHOTOS,
         videoQuality: VideoQuality = VideoQuality.ORIGINAL,
+        enableCameraUploadsStatus: EnableCameraUploadsStatus = EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS,
     ) {
         val cameraUploadsFolderNode = mock<TypedFolderNode> {
             on { id }.thenReturn(NodeId(123456L))
@@ -290,6 +293,9 @@ internal class SettingsCameraUploadsViewModelTest {
         )
         whenever(monitorCameraUploadsStatusInfoUseCase()).thenReturn(
             fakeMonitorCameraUploadsStatusInfoFlow
+        )
+        whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
+            enableCameraUploadsStatus
         )
 
         underTest = SettingsCameraUploadsViewModel(
@@ -399,7 +405,7 @@ internal class SettingsCameraUploadsViewModelTest {
         fun `test that disabling camera uploads stops and disables the ongoing camera uploads process`() =
             runTest {
                 whenever(isConnectedToInternetUseCase()).thenReturn(true)
-                initializeUnderTest()
+                initializeUnderTest(isCameraUploadsEnabled = false)
 
                 underTest.onCameraUploadsStateChanged(enabled = false)
 
@@ -460,9 +466,6 @@ internal class SettingsCameraUploadsViewModelTest {
         fun `test that enabling camera uploads will emit the proper event`() = runTest {
             initializeUnderTest(isCameraUploadsEnabled = false)
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
-            whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
-                EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
-            )
 
             underTest.onCameraUploadsStateChanged(enabled = true)
             underTest.onMediaPermissionsGranted()
@@ -531,10 +534,8 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that an error snackbar is shown when checking the camera uploads status throws an exception`() =
             runTest {
-                whenever(checkEnableCameraUploadsStatusUseCase()).thenThrow(
-                    RuntimeException()
-                )
                 initializeUnderTest()
+                whenever(checkEnableCameraUploadsStatusUseCase()).thenThrow(RuntimeException())
 
                 assertDoesNotThrow { underTest.onMediaPermissionsGranted() }
 
@@ -546,9 +547,6 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that an error snackbar is shown when there are no account issues and enabling camera uploads throws an exception`() =
             runTest {
-                whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
-                    EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
-                )
                 whenever(setupCameraUploadsSettingUseCase(any())).thenThrow(RuntimeException())
                 initializeUnderTest()
 
@@ -562,9 +560,6 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that camera uploads is immediately enabled when the user is on a regular or active business administrator account`() =
             runTest {
-                whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
-                    EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
-                )
                 initializeUnderTest()
 
                 underTest.onMediaPermissionsGranted()
@@ -583,9 +578,6 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that a snackbar is shown when enabling camera uploads and the user is on a regular or active business administrator account`() =
             runTest {
-                whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
-                    EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
-                )
                 initializeUnderTest()
 
                 underTest.onMediaPermissionsGranted()
@@ -601,10 +593,7 @@ internal class SettingsCameraUploadsViewModelTest {
         @Test
         fun `test that a business account prompt is shown when the business account sub user is active`() =
             runTest {
-                whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
-                    EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
-                )
-                initializeUnderTest()
+                initializeUnderTest(enableCameraUploadsStatus = EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT)
 
                 underTest.onMediaPermissionsGranted()
 
@@ -680,6 +669,48 @@ internal class SettingsCameraUploadsViewModelTest {
                 verify(startCameraUploadUseCase).invoke()
                 verify(listenToNewMediaUseCase).invoke(forceEnqueue = false)
             }
+
+        @ParameterizedTest(name = "when isCameraUploadsEnabledUseCase returns {0}, and checkEnableCameraUploadsStatusUseCase returns {1}")
+        @MethodSource("providerParamsToCheckEnableCameraUploadsStatus")
+        fun `test that isCameraUploadsEnabled is correctly `(
+            isCameraUploadsEnabled: Boolean,
+            checkEnableCameraUploadsStatus: EnableCameraUploadsStatus,
+        ) = runTest {
+            initializeUnderTest(
+                isCameraUploadsEnabled = isCameraUploadsEnabled,
+                enableCameraUploadsStatus = checkEnableCameraUploadsStatus
+            )
+
+            if (isCameraUploadsEnabled) {
+                verify(checkEnableCameraUploadsStatusUseCase).invoke()
+            } else {
+                verifyNoInteractions(checkEnableCameraUploadsStatusUseCase)
+            }
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                if (isCameraUploadsEnabled && checkEnableCameraUploadsStatus == EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS) {
+                    assertThat(state.isCameraUploadsEnabled).isTrue()
+                } else {
+                    assertThat(state.isCameraUploadsEnabled).isFalse()
+                }
+            }
+        }
+
+        private fun providerParamsToCheckEnableCameraUploadsStatus() = listOf(
+            Arguments.of(false, EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS),
+            Arguments.of(true, EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS),
+            Arguments.of(true, EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT),
+            Arguments.of(true, EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT),
+            Arguments.of(
+                true,
+                EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT
+            ),
+            Arguments.of(
+                true,
+                EnableCameraUploadsStatus.SHOW_SUSPENDED_PRO_FLEXI_BUSINESS_ACCOUNT_PROMPT
+            ),
+        )
     }
 
     /**

@@ -290,6 +290,10 @@ class SyncStatusMapperTest {
             CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET),
             SyncStatus.DISABLED
         ),
+        Arguments.of(
+            CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.BUSINESS_ACCOUNT_EXPIRED),
+            SyncStatus.DISABLED
+        ),
 
         Arguments.of(mock<CameraUploadsStatusInfo.Finished>(), SyncStatus.SYNCED),
     )

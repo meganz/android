@@ -67,6 +67,11 @@ enum class CameraUploadsFinishedReason {
     DEVICE_CHARGING_REQUIREMENT_NOT_MET,
 
     /**
+     * The business account has expired.
+     */
+    BUSINESS_ACCOUNT_EXPIRED,
+
+    /**
      * Unknown reason.
      */
     UNKNOWN,

@@ -54,12 +54,12 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
-import mega.privacy.android.domain.extension.collectChunked
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -75,6 +75,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.extension.collectChunked
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
@@ -84,6 +85,7 @@ import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckOrCreateCameraUploadsNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CreateCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
@@ -197,6 +199,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val handleTransferEventUseCase: HandleTransferEventUseCase,
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
+    private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -603,6 +606,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         !isDeviceAboveMinimumBatteryLevel() -> CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
         !isChargingConstraintSatisfied() -> CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
         isStorageQuotaExceeded() -> CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
+        !isBusinessAccountActive() -> CameraUploadsFinishedReason.BUSINESS_ACCOUNT_EXPIRED
         else -> {
             if (isMediaUploadsEnabledUseCase())
                 isLocalSecondaryFolderValid()
@@ -622,14 +626,15 @@ class CameraUploadsWorker @AssistedInject constructor(
             CameraUploadsFinishedReason.DISABLED,
             CameraUploadsFinishedReason.MEDIA_PERMISSION_NOT_GRANTED,
             CameraUploadsFinishedReason.LOCAL_PRIMARY_FOLDER_NOT_VALID,
-            -> CameraUploadsRestartMode.StopAndDisable
+            CameraUploadsFinishedReason.BUSINESS_ACCOUNT_EXPIRED,
+                -> CameraUploadsRestartMode.StopAndDisable
 
             // reschedule
             else -> CameraUploadsRestartMode.Reschedule
         }
         abortWork(reasonToAbort, restartMode)
         false
-    } ?: true
+    } != false
 
 
     /**
@@ -639,6 +644,14 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun isCameraUploadsEnabled(): Boolean = isCameraUploadsEnabledUseCase().also {
         if (!it) Timber.e("Camera Uploads disabled")
+    }
+
+    private suspend fun isBusinessAccountActive(): Boolean {
+        val status = checkEnableCameraUploadsStatusUseCase()
+        if (status != EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS) {
+            Timber.e("Business account expired")
+        }
+        return status == EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
     }
 
     /**
@@ -975,37 +988,37 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun processProgressEvent(progressEvent: CameraUploadsTransferProgress) {
         when (progressEvent) {
             is CameraUploadsTransferProgress.ToUpload,
-            -> processToUploadEvent(progressEvent)
+                -> processToUploadEvent(progressEvent)
 
             is CameraUploadsTransferProgress.ToCopy,
-            -> processToCopyEvent(progressEvent)
+                -> processToCopyEvent(progressEvent)
 
             is CameraUploadsTransferProgress.Copied,
-            -> processCopiedEvent(progressEvent)
+                -> processCopiedEvent(progressEvent)
 
             is CameraUploadsTransferProgress.UploadInProgress.TransferUpdate,
-            -> processUploadInProgressTransferUpdateEvent(progressEvent)
+                -> processUploadInProgressTransferUpdateEvent(progressEvent)
 
             is CameraUploadsTransferProgress.UploadInProgress.TransferTemporaryError,
-            -> processUploadInProgressTransferTemporaryErrorEvent(progressEvent)
+                -> processUploadInProgressTransferTemporaryErrorEvent(progressEvent)
 
             is CameraUploadsTransferProgress.Uploaded,
-            -> processUploadedEvent(progressEvent)
+                -> processUploadedEvent(progressEvent)
 
             is CameraUploadsTransferProgress.Compressing.Progress,
-            -> processCompressingProgress(progressEvent)
+                -> processCompressingProgress(progressEvent)
 
             is CameraUploadsTransferProgress.Compressing.InsufficientStorage,
-            -> processCompressingInsufficientStorage()
+                -> processCompressingInsufficientStorage()
 
             is CameraUploadsTransferProgress.Compressing.Cancel,
-            -> sendVideoCompressionErrorStatus()
+                -> sendVideoCompressionErrorStatus()
 
             is CameraUploadsTransferProgress.Compressing.Successful,
-            -> processCompressingSuccessful()
+                -> processCompressingSuccessful()
 
             is CameraUploadsTransferProgress.Error,
-            -> processError(progressEvent.error)
+                -> processError(progressEvent.error)
         }
     }
 

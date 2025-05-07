@@ -55,6 +55,7 @@ import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -77,6 +78,7 @@ import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckOrCreateCameraUploadsNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CreateCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
@@ -126,6 +128,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.kotlin.any
@@ -147,6 +150,7 @@ import java.util.concurrent.Executors
 /**
  * Test class of [CameraUploadsWorker]
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
@@ -227,7 +231,10 @@ internal class CameraUploadsWorkerTest {
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
     private val handleTransferEventUseCase: HandleTransferEventUseCase = mock()
     private val correctActiveTransfersUseCase = mock<CorrectActiveTransfersUseCase>()
-    private val clearActiveTransfersIfFinishedUseCase = mock<ClearActiveTransfersIfFinishedUseCase>()
+    private val clearActiveTransfersIfFinishedUseCase =
+        mock<ClearActiveTransfersIfFinishedUseCase>()
+    private val checkEnableCameraUploadsStatusUseCase =
+        mock<CheckEnableCameraUploadsStatusUseCase>()
 
     private val foregroundInfo = ForegroundInfo(1, mock())
     private val primaryNodeHandle = 1111L
@@ -323,6 +330,7 @@ internal class CameraUploadsWorkerTest {
                 handleTransferEventUseCase = handleTransferEventUseCase,
                 correctActiveTransfersUseCase = correctActiveTransfersUseCase,
                 clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
+                checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase
             )
         )
     }
@@ -369,6 +377,9 @@ internal class CameraUploadsWorkerTest {
         whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
             .thenReturn(secondaryNodeHandle)
         whenever(getPendingCameraUploadsRecordsUseCase()).thenReturn(emptyList())
+        whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
+            EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
+        )
     }
 
     /**
@@ -578,13 +589,13 @@ internal class CameraUploadsWorkerTest {
             val uploadedEvent = CameraUploadsTransferProgress.Uploaded(
                 record = record,
                 transferEvent =
-                TransferEvent.TransferFinishEvent(
-                    transfer = mock {
-                        on { isFinished }.thenReturn(true)
-                        on { transferredBytes }.thenReturn(size * 1024 * 1024)
-                    },
-                    error = null
-                ),
+                    TransferEvent.TransferFinishEvent(
+                        transfer = mock {
+                            on { isFinished }.thenReturn(true)
+                            on { transferredBytes }.thenReturn(size * 1024 * 1024)
+                        },
+                        error = null
+                    ),
                 nodeId = mock(),
             )
             val flow = flow {
@@ -660,10 +671,10 @@ internal class CameraUploadsWorkerTest {
                 CameraUploadsTransferProgress.UploadInProgress.TransferTemporaryError(
                     record = record,
                     transferEvent =
-                    TransferEvent.TransferTemporaryErrorEvent(
-                        transfer = mock {},
-                        error = mock<QuotaExceededMegaException>()
-                    ),
+                        TransferEvent.TransferTemporaryErrorEvent(
+                            transfer = mock {},
+                            error = mock<QuotaExceededMegaException>()
+                        ),
                 )
             val flow = flow {
                 emit(transferTemporaryErrorEvent)
@@ -700,13 +711,13 @@ internal class CameraUploadsWorkerTest {
             val uploadedEvent = CameraUploadsTransferProgress.Uploaded(
                 record = record,
                 transferEvent =
-                TransferEvent.TransferFinishEvent(
-                    transfer = mock {
-                        on { isFinished }.thenReturn(true)
-                        on { transferredBytes }.thenReturn(size * 1024 * 1024)
-                    },
-                    error = mock<QuotaExceededMegaException>()
-                ),
+                    TransferEvent.TransferFinishEvent(
+                        transfer = mock {
+                            on { isFinished }.thenReturn(true)
+                            on { transferredBytes }.thenReturn(size * 1024 * 1024)
+                        },
+                        error = mock<QuotaExceededMegaException>()
+                    ),
                 nodeId = mock(),
             )
             val flow = flow {
@@ -1509,6 +1520,82 @@ internal class CameraUploadsWorkerTest {
         )
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }
+
+    @Test
+    fun `test that worker returns failure when the camera uploads status is SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            whenever(checkEnableCameraUploadsStatusUseCase.invoke()).thenReturn(
+                EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
+            )
+
+            val result = underTest.doWork()
+
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.BUSINESS_ACCOUNT_EXPIRED.name
+                )
+            )
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
+
+    @Test
+    fun `test that worker returns failure when the camera uploads status is SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            whenever(checkEnableCameraUploadsStatusUseCase.invoke()).thenReturn(
+                EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
+            )
+
+            val result = underTest.doWork()
+
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.BUSINESS_ACCOUNT_EXPIRED.name
+                )
+            )
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
+
+    @Test
+    fun `test that worker returns failure when the camera uploads status is SHOW_SUSPENDED_PRO_FLEXI_BUSINESS_ACCOUNT_PROMPT`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            whenever(checkEnableCameraUploadsStatusUseCase.invoke()).thenReturn(
+                EnableCameraUploadsStatus.SHOW_SUSPENDED_PRO_FLEXI_BUSINESS_ACCOUNT_PROMPT
+            )
+
+            val result = underTest.doWork()
+
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.BUSINESS_ACCOUNT_EXPIRED.name
+                )
+            )
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
+
+    @Test
+    fun `test that worker returns failure when the camera uploads status is SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            whenever(checkEnableCameraUploadsStatusUseCase.invoke()).thenReturn(
+                EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT
+            )
+
+            val result = underTest.doWork()
+
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.BUSINESS_ACCOUNT_EXPIRED.name
+                )
+            )
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
 
     @Test
     fun `test that worker is rescheduled when quota is not enough`() =

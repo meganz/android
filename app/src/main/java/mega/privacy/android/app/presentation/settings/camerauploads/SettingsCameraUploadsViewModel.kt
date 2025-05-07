@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.settings.camerauploads
 
-import mega.privacy.android.shared.resources.R as SharedR
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -78,6 +77,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUse
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.CameraUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
 import mega.privacy.mobile.analytics.event.MediaUploadsDisabledEvent
@@ -234,9 +234,19 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 preparePrimaryFolderPathUseCase()
+                val isCameraUploadsEnabledDeferred = async {
+                    isCameraUploadsEnabledUseCase().takeIf { it }?.let {
+                        val status = checkEnableCameraUploadsStatusUseCase()
+                        if (status == EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS) {
+                            true
+                        } else {
+                            onCameraUploadsStateChanged(false)
+                            false
+                        }
+                    } == true
+                }
 
-                val isCameraUploadsEnabled = async { isCameraUploadsEnabledUseCase() }
-                val isMediaUploadsEnabled = async { isMediaUploadsEnabledUseCase() }
+                val isMediaUploadsEnabledDeferred = async { isMediaUploadsEnabledUseCase() }
                 val maximumNonChargingVideoCompressionSize =
                     async { getVideoCompressionSizeLimitUseCase() }
                 val primaryFolderNode = async { getPrimaryFolderNodeUseCase() }
@@ -253,10 +263,17 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 val uploadConnectionType = async { getUploadConnectionType() }
                 val videoQuality = async { getUploadVideoQualityUseCase() }
 
+                val isCameraUploadsEnabled = isCameraUploadsEnabledDeferred.await()
+                val isMediaUploadsEnabled = if (isCameraUploadsEnabled) {
+                    isMediaUploadsEnabledDeferred.await()
+                } else {
+                    false
+                }
+
                 _uiState.update {
                     it.copy(
-                        isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
-                        isMediaUploadsEnabled = isMediaUploadsEnabled.await(),
+                        isCameraUploadsEnabled = isCameraUploadsEnabled,
+                        isMediaUploadsEnabled = isMediaUploadsEnabled,
                         maximumNonChargingVideoCompressionSize = maximumNonChargingVideoCompressionSize.await(),
                         primaryFolderName = primaryFolderNode.await()?.name,
                         primaryFolderPath = primaryFolderPath.await(),

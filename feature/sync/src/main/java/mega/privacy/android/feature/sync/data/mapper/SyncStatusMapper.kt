@@ -74,6 +74,7 @@ internal class SyncStatusMapper @Inject constructor() {
                     CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET),
                     CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA),
                     CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET),
+                    CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.BUSINESS_ACCOUNT_EXPIRED),
                         -> SyncStatus.DISABLED
 
                     else -> SyncStatus.SYNCED
