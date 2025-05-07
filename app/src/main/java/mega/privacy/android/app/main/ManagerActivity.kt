@@ -2,7 +2,6 @@
 
 package mega.privacy.android.app.main
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -322,6 +321,7 @@ import mega.privacy.android.navigation.settings.arguments.TargetPreference
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.widgets.setTransfersWidgetContent
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ArchivedChatsMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatRoomDNDMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatRoomsBottomNavigationItemEvent
@@ -2379,10 +2379,42 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             Timber.d("Mobile only portrait mode")
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
+
+        lifecycleScope.launch {
+            if (hasMissingPermission()) {
+                val currentFragment =
+                    supportFragmentManager.findFragmentById(R.id.fragment_container)
+                if (currentFragment?.tag != FragmentTag.PERMISSIONS.tag) {
+                    deleteCurrentFragment()
+                }
+
+                if (permissionsFragment == null) {
+                    permissionsFragment = PermissionsFragment()
+                }
+
+                permissionsFragment?.let {
+                    replaceFragment(it, FragmentTag.PERMISSIONS.tag)
+                }
+
+                onAskingPermissionsFragment = true
+                setAppBarVisibility(false)
+                setTabsVisibility()
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                supportInvalidateOptionsMenu()
+                hideFabButton()
+                showHideBottomNavigationView(true)
+            }
+        }
+    }
+
+    private suspend fun hasMissingPermission(): Boolean {
+        val context = this@ManagerActivity
+        // Temporary: This will be removed later once the feature flag is removed. We cannot call this
+        // from the ViewModel because it creates a weird race condition. The "askForAccess" is called
+        // before the feature flag value is set.
+        val isOnboardingRevamp = getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp)
         val notificationsGranted = (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
-                || hasPermissions(this, Manifest.permission.POST_NOTIFICATIONS))
-        val writeStorageGranted: Boolean =
-            hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                || hasPermissions(context, Manifest.permission.POST_NOTIFICATIONS))
         val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             arrayOf(
                 PermissionUtils.getAudioPermissionByVersion(),
@@ -2396,31 +2428,29 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 PermissionUtils.getReadExternalStoragePermission()
             )
         }
-        val readStorageGranted: Boolean = hasPermissions(this, *permissions)
-        val cameraGranted: Boolean = hasPermissions(this, Manifest.permission.CAMERA)
-        val microphoneGranted: Boolean = hasPermissions(this, Manifest.permission.RECORD_AUDIO)
-        val bluetoothGranted = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S
-                || hasPermissions(this, Manifest.permission.BLUETOOTH_CONNECT))
-        if (!notificationsGranted || !writeStorageGranted || !readStorageGranted || !cameraGranted
-            || !microphoneGranted || !bluetoothGranted
-        ) {
-            val currentFragment =
-                supportFragmentManager.findFragmentById(R.id.fragment_container)
-            if (currentFragment?.tag != FragmentTag.PERMISSIONS.tag) {
-                deleteCurrentFragment()
-            }
-            if (permissionsFragment == null) {
-                permissionsFragment = PermissionsFragment()
-            }
-            permissionsFragment?.let { replaceFragment(it, FragmentTag.PERMISSIONS.tag) }
-            onAskingPermissionsFragment = true
-            setAppBarVisibility(false)
-            setTabsVisibility()
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-            supportInvalidateOptionsMenu()
-            hideFabButton()
-            showHideBottomNavigationView(true)
-        }
+        val readStorageGranted: Boolean = hasPermissions(context, *permissions)
+
+        // Check if any permission is missing. Onboarding revamp only requires notifications and read storage
+        // permissions, while the old onboarding requires all of them
+        return if (isOnboardingRevamp) {
+            listOf(notificationsGranted, readStorageGranted)
+        } else {
+            val writeStorageGranted: Boolean =
+                hasPermissions(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            val cameraGranted: Boolean = hasPermissions(context, Manifest.permission.CAMERA)
+            val microphoneGranted: Boolean =
+                hasPermissions(context, Manifest.permission.RECORD_AUDIO)
+            val bluetoothGranted = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+                    || hasPermissions(context, Manifest.permission.BLUETOOTH_CONNECT))
+            listOf(
+                notificationsGranted,
+                writeStorageGranted,
+                readStorageGranted,
+                cameraGranted,
+                microphoneGranted,
+                bluetoothGranted
+            )
+        }.any { it == false }
     }
 
     fun destroyPermissionsFragment() {
