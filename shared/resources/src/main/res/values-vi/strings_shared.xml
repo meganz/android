@@ -987,7 +987,7 @@
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
     <string name="general_sync_notification_generic_error_title">Đồng bộ hóa đã dừng lại</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Đi đến Trung Tâm Hướng Dẫn để hiểu lý do</string>
+    <string name="general_sync_notification_generic_error_text">Check your syncs in the app to resolve this.</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
     <string name="general_sync_notification_stalled_issues_title">Đã phát hiện các vấn đề đồng bộ hóa</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
