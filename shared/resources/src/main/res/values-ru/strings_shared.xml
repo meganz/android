@@ -1038,7 +1038,7 @@
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
     <string name="general_sync_notification_generic_error_title">Синхронизация остановлена</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Посмотрите возможные причины в Справочном центре</string>
+    <string name="general_sync_notification_generic_error_text">Check your syncs in the app to resolve this.</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
     <string name="general_sync_notification_stalled_issues_title">Обнаружены ошибки синхронизации</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->

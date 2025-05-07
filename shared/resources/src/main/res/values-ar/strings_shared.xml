@@ -1072,7 +1072,7 @@
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
     <string name="general_sync_notification_generic_error_title">تم إيقاف المزامنة</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">انتقل إلى مركز المساعدة لفهم السبب</string>
+    <string name="general_sync_notification_generic_error_text">Check your syncs in the app to resolve this.</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
     <string name="general_sync_notification_stalled_issues_title">تم اكتشاف مشاكل المزامنة</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->

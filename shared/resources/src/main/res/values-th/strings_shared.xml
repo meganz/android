@@ -987,7 +987,7 @@
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
     <string name="general_sync_notification_generic_error_title">การซิงค์หยุดทำงาน</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">ไปที่ศูนย์ความช่วยเหลือเพื่อดูสาเหตุ</string>
+    <string name="general_sync_notification_generic_error_text">Check your syncs in the app to resolve this.</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
     <string name="general_sync_notification_stalled_issues_title">ตรวจพบปัญหาการซิงค์</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
