@@ -9,9 +9,28 @@ import javax.inject.Inject
 /**
  * Remove share result mapper
  *
- * @property context
+ * @property successString
+ * @property errorString
  */
-class RemoveShareResultMapper @Inject constructor(@ApplicationContext private val context: Context) {
+class RemoveShareResultMapper(
+    private val successString: () -> String,
+    private val errorString: (Int) -> String,
+) {
+
+    @Inject
+    constructor(
+        @ApplicationContext context: Context,
+    ) : this(
+        successString = { context.getString(R.string.context_share_correctly_removed) },
+        errorString = { errorCount ->
+            context.resources.getQuantityString(
+                R.plurals.shared_items_outgoing_shares_snackbar_remove_contact_access_failed,
+                errorCount,
+                errorCount
+            )
+        }
+    )
+
     /**
      * Invoke
      *
@@ -19,10 +38,6 @@ class RemoveShareResultMapper @Inject constructor(@ApplicationContext private va
      * @return the string to show in the snackbar
      */
     operator fun invoke(result: ResultCount): String =
-        if (result.errorCount == 0) context.getString(R.string.context_share_correctly_removed)
-        else context.resources.getQuantityString(
-            R.plurals.shared_items_outgoing_shares_snackbar_remove_contact_access_failed,
-            result.errorCount,
-            result.errorCount
-        )
+        if (result.errorCount == 0) successString()
+        else errorString(result.errorCount)
 }
