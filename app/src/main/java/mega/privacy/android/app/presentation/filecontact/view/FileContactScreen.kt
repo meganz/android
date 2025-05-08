@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -26,7 +25,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.contract.AddContactsContract
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
 import mega.privacy.android.app.presentation.filecontact.model.SelectionState
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 
@@ -36,16 +34,16 @@ internal fun FileContactScreen(
     state: FileContactListState.Data,
     onBackPressed: () -> Unit,
     removeContacts: (List<ShareRecipient>) -> Unit,
-    shareFolder: (NodeId, List<String>, AccessPermission) -> Unit,
-    updatePermissions: (NodeId, List<String>, AccessPermission) -> Unit,
+    shareFolder: (List<String>, AccessPermission) -> Unit,
+    updatePermissions: (List<ShareRecipient>, AccessPermission) -> Unit,
     shareRemovedEventHandled: () -> Unit,
     shareCompletedEventHandled: () -> Unit,
     navigateToInfo: (ShareRecipient) -> Unit,
+    addContactsContract: AddContactsContract,
+    coroutineScope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
-    addContactsContract: AddContactsContract = AddContactsContract(),
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    ) {
+) {
     var newShareRecipients: List<String>? by remember { mutableStateOf(null) }
     val launcher = rememberLauncherForActivityResult(
         contract = addContactsContract
@@ -171,7 +169,6 @@ internal fun FileContactScreen(
                     shareWithPermission = { permission: AccessPermission ->
                         newShareRecipients?.let {
                             shareFolder(
-                                state.folderId,
                                 it,
                                 permission
                             )
@@ -189,8 +186,7 @@ internal fun FileContactScreen(
                     },
                     shareWithPermission = { permission: AccessPermission ->
                         updatePermissions(
-                            state.folderId,
-                            it.map { it.email },
+                            it,
                             permission
                         )
                     },

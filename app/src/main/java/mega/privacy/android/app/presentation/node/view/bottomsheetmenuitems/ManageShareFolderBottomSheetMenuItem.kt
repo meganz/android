@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
-import android.content.Intent
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -9,7 +8,6 @@ import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.presentation.node.model.menuaction.ManageShareFolderMenuAction
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -48,9 +46,11 @@ class ManageShareFolderBottomSheetMenuItem @Inject constructor(
         val context = navController.context
         parentCoroutineScope.launch {
             val intent = if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {
-                Intent(context, FileContactListComposeActivity::class.java).apply {
-                    putExtra(Constants.NAME, node.id.longValue)
-                }
+                FileContactListComposeActivity.newIntent(
+                    context = context,
+                    nodeHandle = node.id.longValue,
+                    nodeName = node.name
+                )
             } else {
                 FileContactListActivity.launchIntent(
                     context,

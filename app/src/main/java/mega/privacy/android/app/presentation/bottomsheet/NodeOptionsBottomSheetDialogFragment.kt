@@ -1677,10 +1677,14 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         node?.let {
             val nodeType = checkBackupNodeTypeByHandle(megaApi, node)
             if (isOutShare(it)) {
-                viewLifecycleOwner.lifecycleScope .launch {
+                viewLifecycleOwner.lifecycleScope.launch {
                     val intent =
                         if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {
-                            Intent(requireContext(), FileContactListComposeActivity::class.java)
+                            FileContactListComposeActivity.newIntent(
+                                context = requireContext(),
+                                nodeHandle = it.handle,
+                                nodeName = it.name
+                            )
                         } else {
                             Intent(requireContext(), FileContactListActivity::class.java)
                         }
