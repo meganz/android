@@ -65,12 +65,12 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.VideoPlayerPlayerViewBinding
-import mega.privacy.android.app.mediaplayer.AddSubtitleDialog
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
+import mega.privacy.android.app.presentation.videoplayer.view.AddSubtitlesDialog
 import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerTopBar
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
@@ -438,7 +438,7 @@ internal fun VideoPlayerScreen(
                     )
                 }
 
-                AddSubtitleDialog(
+                AddSubtitlesDialog(
                     isShown = uiState.showSubtitleDialog,
                     selectOptionState = uiState.subtitleSelectedStatus.id,
                     matchedSubtitleFileUpdate = {
@@ -456,7 +456,7 @@ internal fun VideoPlayerScreen(
                             viewModel.updateSnackBarMessage(
                                 context.getString(R.string.media_player_video_message_adding_subtitle_failed)
                             )
-                            return@AddSubtitleDialog
+                            return@AddSubtitlesDialog
                         }
                         Analytics.tracker.trackEvent(AutoMatchSubtitleOptionPressedEvent)
                         viewModel.updateSubtitleSelectedStatus(
@@ -464,12 +464,13 @@ internal fun VideoPlayerScreen(
                             info
                         )
                     },
+                    onDismissRequest = {
+                        viewModel.updateShowSubtitleDialog(false)
+                    },
                     onToSelectSubtitle = {
                         Analytics.tracker.trackEvent(AddSubtitlesOptionPressedEvent)
                         viewModel.navigateToSelectSubtitle()
-                    }) {
-                    viewModel.updateShowSubtitleDialog(false)
-                }
+                    })
             }
         }
     }

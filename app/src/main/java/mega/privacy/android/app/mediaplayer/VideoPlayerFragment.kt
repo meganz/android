@@ -58,7 +58,9 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoOptionItem
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.app.presentation.videoplayer.view.AddSubtitlesDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -68,9 +70,12 @@ import mega.privacy.android.app.utils.getScreenHeight
 import mega.privacy.android.app.utils.getScreenWidth
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
 import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
@@ -87,6 +92,9 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class VideoPlayerFragment : Fragment() {
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
     /**
      * Inject [GetFeatureFlagValueUseCase] to the Fragment
      */
@@ -748,42 +756,43 @@ class VideoPlayerFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val state by viewModel.uiState.collectAsStateWithLifecycle()
-                AddSubtitleDialog(
-                    isShown = state.subtitleDisplayState.isSubtitleDialogShown,
-                    selectOptionState = viewModel.selectOptionState,
-                    matchedSubtitleFileUpdate = {
-                        viewModel.getMatchedSubtitleFileInfoForPlayingItem()
-                    },
-                    subtitleFileName = viewModel.subtitleInfoByAddSubtitles?.name,
-                    onOffClicked = {
-                        viewModel.onOffItemClicked()
-                    },
-                    onAddedSubtitleClicked = {
-                        viewModel.onAddedSubtitleOptionClicked()
-                    },
-                    onAutoMatch = { info ->
-                        if (info.url == null) {
-                            showAddingSubtitleFailedMessage()
-                        }
-                        Analytics.tracker.trackEvent(AutoMatchSubtitleOptionPressedEvent)
-                        viewModel.onAutoMatchItemClicked(info)
-                    },
-                    onToSelectSubtitle = {
-                        Analytics.tracker.trackEvent(AddSubtitlesOptionPressedEvent)
-                        selectSubtitleFileActivityLauncher.launch(
-                            Intent(
-                                requireActivity(),
-                                SelectSubtitleFileActivity::class.java
-                            ).apply {
-                                putExtra(
-                                    INTENT_KEY_SUBTITLE_FILE_ID,
-                                    state.subtitleDisplayState.subtitleFileInfo?.id
-                                )
+                val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.Dark)
+                OriginalTheme(isDark = mode.isDarkMode()) {
+                    AddSubtitlesDialog(
+                        isShown = state.subtitleDisplayState.isSubtitleDialogShown,
+                        selectOptionState = viewModel.selectOptionState,
+                        matchedSubtitleFileUpdate = {
+                            viewModel.getMatchedSubtitleFileInfoForPlayingItem()
+                        },
+                        subtitleFileName = viewModel.subtitleInfoByAddSubtitles?.name,
+                        onOffClicked = {
+                            viewModel.onOffItemClicked()
+                        },
+                        onAddedSubtitleClicked = {
+                            viewModel.onAddedSubtitleOptionClicked()
+                        },
+                        onAutoMatch = { info ->
+                            if (info.url == null) {
+                                showAddingSubtitleFailedMessage()
                             }
-                        )
-                    }) {
-                    // onDismissRequest
-                    viewModel.onDismissRequest()
+                            Analytics.tracker.trackEvent(AutoMatchSubtitleOptionPressedEvent)
+                            viewModel.onAutoMatchItemClicked(info)
+                        },
+                        onDismissRequest = { viewModel.onDismissRequest() },
+                        onToSelectSubtitle = {
+                            Analytics.tracker.trackEvent(AddSubtitlesOptionPressedEvent)
+                            selectSubtitleFileActivityLauncher.launch(
+                                Intent(
+                                    requireActivity(),
+                                    SelectSubtitleFileActivity::class.java
+                                ).apply {
+                                    putExtra(
+                                        INTENT_KEY_SUBTITLE_FILE_ID,
+                                        state.subtitleDisplayState.subtitleFileInfo?.id
+                                    )
+                                }
+                            )
+                        })
                 }
             }
         }
