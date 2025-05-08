@@ -28,7 +28,7 @@ internal fun OriginalThemeForPreviews(
     content: @Composable () -> Unit,
 ) = OriginalTheme(
     isSystemInDarkTheme(),
-    content,
+    content = content,
 )
 
 /**
@@ -47,7 +47,10 @@ fun OriginalTheme(
     } else {
         LegacyLightColorPalette
     }
-    AndroidTheme(isDark) {
+    AndroidTheme(
+        isDark = isDark,
+        useLegacyStatusBarColor = false,
+    ) {
         //we need to keep `MaterialTheme` for now as not all the components are migrated to our Design System.
         MaterialTheme(
             colors = legacyColors,
