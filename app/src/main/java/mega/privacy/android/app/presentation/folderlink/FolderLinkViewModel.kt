@@ -22,8 +22,6 @@ import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.extensions.errorDialogContentId
-import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
@@ -184,7 +182,7 @@ class FolderLinkViewModel @Inject constructor(
                         it.copy(
                             isInitialState = false,
                             isLoginComplete = true,
-                            showErrorDialogEvent = consumed(),
+                            isUnavailable = false,
                         )
                     }
                     with(state.value) {
@@ -202,7 +200,7 @@ class FolderLinkViewModel @Inject constructor(
                             isInitialState = false,
                             isLoginComplete = false,
                             askForDecryptionKeyDialogEvent = triggered,
-                            showErrorDialogEvent = consumed()
+                            isUnavailable = false
                         )
                     }
                 }
@@ -213,9 +211,7 @@ class FolderLinkViewModel @Inject constructor(
                             isInitialState = false,
                             isLoginComplete = false,
                             askForDecryptionKeyDialogEvent = if (decryptionIntroduced) triggered else consumed,
-                            showErrorDialogEvent = if (decryptionIntroduced) consumed() else triggered(
-                                result.errorDialogTitleId to result.errorDialogContentId
-                            ),
+                            isUnavailable = !decryptionIntroduced,
                             snackBarMessage = if (decryptionIntroduced) -1 else result.snackBarMessageId
                         )
                     }
@@ -227,9 +223,7 @@ class FolderLinkViewModel @Inject constructor(
                             isInitialState = false,
                             isLoginComplete = false,
                             askForDecryptionKeyDialogEvent = consumed,
-                            showErrorDialogEvent = triggered(
-                                result.errorDialogTitleId to result.errorDialogContentId
-                            ),
+                            isUnavailable = true,
                             snackBarMessage = result.snackBarMessageId
                         )
                     }
@@ -468,19 +462,10 @@ class FolderLinkViewModel @Inject constructor(
                     }
                 }
                 .onFailure { throwable ->
-                    var errorTitle = FetchFolderNodesException.GenericError().errorDialogTitleId
-                    var errorContent = FetchFolderNodesException.GenericError().errorDialogContentId
-                    var snackBarContent = FetchFolderNodesException.GenericError().snackBarMessageId
-                    if (throwable is FetchFolderNodesException) {
-                        errorTitle = throwable.errorDialogTitleId
-                        errorContent = throwable.errorDialogContentId
-                        snackBarContent = throwable.snackBarMessageId
-                    }
                     _state.update {
                         it.copy(
                             isNodesFetched = true,
-                            showErrorDialogEvent = triggered(errorTitle to errorContent),
-                            snackBarMessage = snackBarContent
+                            isUnavailable = true,
                         )
                     }
                 }
@@ -1030,13 +1015,6 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun onFinishActivityEventConsumed() {
         _state.update { it.copy(finishActivityEvent = consumed) }
-    }
-
-    /**
-     * Reset showErrorDialogEvent when consumed
-     */
-    fun onShowErrorDialogEventConsumed() {
-        _state.update { it.copy(showErrorDialogEvent = consumed()) }
     }
 
     internal suspend fun getNodeContentUri(fileNode: TypedFileNode) =

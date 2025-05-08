@@ -1125,4 +1125,16 @@
     <string name="general_sync_warning_lost_wifi_title">Syncing paused due to lost connection.</string>
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
     <string name="general_sync_warning_lost_wifi_text">Reconnect to Wi-Fi to resume.</string>
+    <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
+    <string name="general_link_unavailable_subtitle">This could be due to the following reasons:</string>
+    <!-- Bullet point shown when link is unavailable due to invalid URL -->
+    <string name="general_link_unavailable_invalid_url">Invalid URL - the link you’re trying to access does not exist</string>
+    <!-- Bullet point shown when link is unavailable due to expiration -->
+    <string name="general_link_expired">Your link has expired</string>
+    <!-- Title shown when a folder link is unavailable (general case) -->
+    <string name="folder_link_unavailable_title">The folder link you’re trying to access is no longer available</string>
+    <!-- Bullet point shown when a folder link is unavailable because the link has been disabled -->
+    <string name="folder_link_unavailable_disabled">The folder link is disabled by the user</string>
+    <!-- Title shown when a folder link has expired -->
+    <string name="folder_link_expired_title">The folder cannot be accessed</string>
 </resources>

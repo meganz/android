@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.folderlink
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
@@ -11,7 +10,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -19,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.combine
@@ -27,7 +24,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -78,6 +74,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -300,13 +297,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
             ) { (resultText, throwable) ->
                 showCopyResult(copyResultText = resultText, throwable = throwable)
             }
-
-            EventEffect(
-                event = uiState.showErrorDialogEvent,
-                onConsumed = viewModel::onShowErrorDialogEventConsumed
-            ) { (errorDialogTitle, errorDialogContent) ->
-                showErrorDialog(title = errorDialogTitle, message = errorDialogContent)
-            }
         }
     }
 
@@ -515,28 +505,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
 
     override fun onDialogNegativeClick() {
         finish()
-    }
-
-    private fun showErrorDialog(@StringRes title: Int, @StringRes message: Int) {
-        val builder =
-            MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-        builder.apply {
-            setTitle(getString(title))
-            setMessage(getString(message))
-            setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                dialog.dismiss()
-                val closedChat = MegaApplication.isClosedChat
-                if (closedChat) {
-                    val backIntent = Intent(
-                        this@FolderLinkComposeActivity,
-                        ManagerActivity::class.java
-                    )
-                    startActivity(backIntent)
-                }
-                finish()
-            }
-        }
-        builder.create().show()
     }
 
     private fun getEmptyViewString(): String {

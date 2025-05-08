@@ -42,9 +42,9 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property openMoreOption             State to open more option bottom sheet
  * @property moreOptionNode             Node to show more options for
  * @property storageStatusDialogState   State of StorageStatusDialog
- * @property showErrorDialogEvent       Event to show error dialog with String id of title and content
  * @property snackBarMessage            String id of content for snack bar
  * @property shouldShowAdsForLink       Whether ads should be shown for the link
+ * @property isUnavailable              Whether the folder link is unavailable due to TOS violations, expiration etc
  */
 data class FolderLinkState(
     val isInitialState: Boolean = true,
@@ -71,9 +71,15 @@ data class FolderLinkState(
     val openMoreOption: StateEvent = consumed,
     val collisionsEvent: StateEventWithContent<List<NameCollision>> = consumed(),
     val copyResultEvent: StateEventWithContent<Pair<String?, Throwable?>> = consumed(),
-    val showErrorDialogEvent: StateEventWithContent<Pair<Int, Int>> = consumed(),
     val openFile: StateEventWithContent<Intent> = consumed(),
     val downloadEvent: StateEventWithContent<TransferTriggerEvent.DownloadTriggerEvent> = consumed(),
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
-    val shouldShowAdsForLink: Boolean = false
-)
+    val shouldShowAdsForLink: Boolean = false,
+    val isUnavailable: Boolean = false,
+) {
+    /**
+     * Whether to show toolbar and bottom bar actions
+     */
+    val showContentActions: Boolean
+        get() = !isUnavailable && isNodesFetched
+}

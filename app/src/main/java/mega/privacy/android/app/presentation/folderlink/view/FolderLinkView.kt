@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.AppBarDefaults
@@ -48,6 +50,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -55,15 +58,18 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ads.AdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.filelink.view.ImportDownloadView
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
 import mega.privacy.android.app.presentation.search.SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG
+import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
 import mega.privacy.android.app.presentation.view.NodesView
@@ -74,42 +80,18 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.buttons.DebouncedButtonContainer
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.lists.BulletListView
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
+import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
+import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 
-internal object Constants {
-
-    /**
-     * Test tag for save to device bottom sheet button
-     * @see FolderLinkBottomSheetView
-     */
-    const val BOTTOM_SHEET_SAVE = "bottom_sheet_save"
-
-    /**
-     * Test tag for import bottom sheet button
-     * @see FolderLinkBottomSheetView
-     */
-    const val BOTTOM_SHEET_IMPORT = "bottom_sheet_import"
-
-    /**
-     * Test tag for save to import button
-     */
-    const val IMPORT_BUTTON_TAG = "import_button_tag"
-
-    /**
-     * Test tag for save to device button
-     */
-    const val SAVE_BUTTON_TAG = "save_button_tag"
-
-    /**
-     * Test tag for app bar more option
-     */
-    const val APPBAR_MORE_OPTION_TAG = "appbar_more_option_tag"
-}
 
 /**
  * Main view of FolderLinkActivity
@@ -167,7 +149,7 @@ internal fun FolderLinkView(
         }
     }
     val title =
-        if (!state.isNodesFetched) "MEGA - ${stringResource(id = R.string.general_loading)}" else state.title
+        if (!state.isNodesFetched) "MEGA" else state.title
 
     BackHandler(enabled = modalSheetState.isVisible) {
         coroutineScope.launch { modalSheetState.hide() }
@@ -222,6 +204,7 @@ internal fun FolderLinkView(
                 } else {
                     FolderLinkTopAppBar(
                         title = title,
+                        showMenuActions = state.showContentActions,
                         elevation = !firstItemVisible,
                         onBackPressed = onBackPressed,
                         onShareClicked = onShareClicked,
@@ -239,15 +222,17 @@ internal fun FolderLinkView(
             },
             bottomBar = {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    ImportDownloadView(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                            .background(MaterialTheme.colors.grey_020_grey_700),
-                        hasDbCredentials = state.hasDbCredentials,
-                        onImportClicked = onImportClicked,
-                        onSaveToDeviceClicked = { onSaveToDeviceClicked(null) }
-                    )
+                    if (state.showContentActions) {
+                        ImportDownloadView(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .background(MaterialTheme.colors.grey_020_grey_700),
+                            hasDbCredentials = state.hasDbCredentials,
+                            onImportClicked = onImportClicked,
+                            onSaveToDeviceClicked = { onSaveToDeviceClicked(null) }
+                        )
+                    }
                     request?.let {
                         AdsContainer(
                             request = request,
@@ -260,6 +245,7 @@ internal fun FolderLinkView(
         ) { paddingValues ->
             ConstraintLayout(
                 modifier = Modifier
+                    .background(MaterialTheme.colors.background)
                     .padding(paddingValues)
                     .fillMaxSize()
             ) {
@@ -283,14 +269,17 @@ internal fun FolderLinkView(
                         }
                         .fillMaxWidth()
                 ) {
-                    if (state.nodesList.isEmpty()) {
+                    if (!state.isNodesFetched) {
+                        LoadingStateView(isList = true)
+                    } else if (state.isUnavailable) {
+                        UnavailableFolderLinkView()
+                    } else if (state.nodesList.isEmpty()) {
                         EmptyFolderLinkView(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .fillMaxHeight()
                                 .padding(horizontal = 8.dp),
                             emptyViewString = emptyViewString,
-                            state.isNodesFetched
                         )
                     } else {
                         NodesView(
@@ -334,6 +323,7 @@ internal fun FolderLinkView(
 @Composable
 internal fun FolderLinkTopAppBar(
     title: String,
+    showMenuActions: Boolean,
     elevation: Boolean,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,
@@ -357,23 +347,25 @@ internal fun FolderLinkTopAppBar(
             }
         },
         actions = {
-            IconButton(onClick = onShareClicked) {
-                Image(
-                    painter = painterResource(id = iconPackR.drawable.ic_share_network_medium_regular_outline),
-                    contentDescription = stringResource(id = R.string.general_share),
-                    colorFilter = ColorFilter.tint(if (MaterialTheme.colors.isLight) Color.Black else Color.White)
-                )
-            }
+            if (showMenuActions) {
+                IconButton(onClick = onShareClicked) {
+                    Image(
+                        painter = painterResource(id = iconPackR.drawable.ic_share_network_medium_regular_outline),
+                        contentDescription = stringResource(id = R.string.general_share),
+                        colorFilter = ColorFilter.tint(if (MaterialTheme.colors.isLight) Color.Black else Color.White)
+                    )
+                }
 
-            IconButton(
-                modifier = Modifier.testTag(APPBAR_MORE_OPTION_TAG),
-                onClick = onMoreClicked
-            ) {
-                Icon(
-                    Icons.Default.MoreVert,
-                    contentDescription = stringResource(id = R.string.label_more),
-                    tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
-                )
+                IconButton(
+                    modifier = Modifier.testTag(APPBAR_MORE_OPTION_TAG),
+                    onClick = onMoreClicked
+                ) {
+                    Icon(
+                        Icons.Default.MoreVert,
+                        contentDescription = stringResource(id = R.string.label_more),
+                        tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
+                    )
+                }
             }
         },
         backgroundColor = MaterialTheme.colors.surface,
@@ -470,22 +462,105 @@ internal fun ImportDownloadView(
 internal fun EmptyFolderLinkView(
     modifier: Modifier,
     emptyViewString: String,
-    isNodesFetched: Boolean,
 ) {
     val imageResource = iconPackR.drawable.ic_empty_folder_glass
-    if (isNodesFetched) {
-        Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(painter = painterResource(id = imageResource), contentDescription = "Folder")
-            Text(
-                text = emptyViewString,
-                style = MaterialTheme.typography.subtitle1,
-                color = if (MaterialTheme.colors.isLight) Color.Black else Color.White
-            )
-        }
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(painter = painterResource(id = imageResource), contentDescription = "Folder")
+        Text(
+            text = emptyViewString,
+            style = MaterialTheme.typography.subtitle1,
+            color = if (MaterialTheme.colors.isLight) Color.Black else Color.White
+        )
+    }
+}
+
+@Composable
+internal fun UnavailableFolderLinkView() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Image(
+            painter = painterResource(id = iconPackR.drawable.ic_alert_triangle_color),
+            contentDescription = "Error",
+            modifier = Modifier
+                .size(120.dp)
+                .align(Alignment.CenterHorizontally),
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        MegaText(
+            text = stringResource(sharedR.string.folder_link_unavailable_title),
+            textColor = TextColor.Primary,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.h6Medium,
+            modifier = Modifier.padding(horizontal = 6.dp)
+        )
+
+        Spacer(modifier = Modifier.height(56.dp))
+
+        MegaText(
+            text = stringResource(sharedR.string.general_link_unavailable_subtitle),
+            textColor = TextColor.Primary,
+            style = MaterialTheme.typography.subtitle1medium,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        BulletListView(
+            items = listOf(
+                stringResource(sharedR.string.general_link_unavailable_invalid_url),
+                stringResource(sharedR.string.folder_link_unavailable_disabled),
+                stringResource(R.string.folder_link_unavaible_ToS_violation),
+            ),
+            textStyle = MaterialTheme.typography.body1,
+            textColor = TextColor.Secondary,
+            spacing = 16.dp,
+        )
+    }
+}
+
+internal object Constants {
+
+    /**
+     * Test tag for save to device bottom sheet button
+     * @see FolderLinkBottomSheetView
+     */
+    const val BOTTOM_SHEET_SAVE = "bottom_sheet_save"
+
+    /**
+     * Test tag for import bottom sheet button
+     * @see FolderLinkBottomSheetView
+     */
+    const val BOTTOM_SHEET_IMPORT = "bottom_sheet_import"
+
+    /**
+     * Test tag for save to import button
+     */
+    const val IMPORT_BUTTON_TAG = "import_button_tag"
+
+    /**
+     * Test tag for save to device button
+     */
+    const val SAVE_BUTTON_TAG = "save_button_tag"
+
+    /**
+     * Test tag for app bar more option
+     */
+    const val APPBAR_MORE_OPTION_TAG = "appbar_more_option_tag"
+}
+
+@CombinedThemePreviews
+@Composable
+private fun UnavailableFolderLinkViewPreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        UnavailableFolderLinkView()
     }
 }
 
@@ -495,6 +570,7 @@ private fun FolderLinkTopAppBarPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         FolderLinkTopAppBar(
             title = "Folder Name",
+            showMenuActions = false,
             elevation = false,
             onBackPressed = {},
             onShareClicked = {},
@@ -526,7 +602,6 @@ private fun EmptyFolderLinkViewPreview() {
                     .fillMaxHeight()
                     .padding(horizontal = 8.dp),
                 emptyViewString = stringResource(id = R.string.file_browser_empty_folder),
-                isNodesFetched = true
             )
         }
     }

@@ -243,7 +243,7 @@ class FolderLinkViewModelTest {
             assertThat(initial.importNode).isNull()
             assertThat(initial.openFile).isInstanceOf(consumed().javaClass)
             assertThat(initial.selectImportLocation).isEqualTo(consumed)
-            assertThat(initial.showErrorDialogEvent).isEqualTo(consumed())
+            assertThat(initial.isUnavailable).isFalse()
             assertThat(initial.snackBarMessage).isEqualTo(-1)
         }
     }
@@ -266,7 +266,7 @@ class FolderLinkViewModelTest {
             val newValue = expectMostRecentItem()
             assertThat(newValue.isLoginComplete).isTrue()
             assertThat(newValue.isInitialState).isFalse()
-            assertThat(newValue.showErrorDialogEvent).isEqualTo(consumed())
+            assertThat(newValue.isUnavailable).isFalse()
         }
     }
 
@@ -281,7 +281,7 @@ class FolderLinkViewModelTest {
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
                 assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(triggered)
-                assertThat(newValue.showErrorDialogEvent).isEqualTo(consumed())
+                assertThat(newValue.isUnavailable).isFalse()
             }
         }
 
@@ -297,7 +297,7 @@ class FolderLinkViewModelTest {
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
                 assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(triggered)
-                assertThat(newValue.showErrorDialogEvent).isEqualTo(consumed())
+                assertThat(newValue.isUnavailable).isFalse()
                 assertThat(newValue.snackBarMessage).isEqualTo(-1)
             }
         }
