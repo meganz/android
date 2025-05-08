@@ -21,8 +21,8 @@ internal fun PasscodeContainer(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     Box {
-        if (state is PasscodeCheckState.Loading) {
-            (loading ?: content).invoke()
+        if (loading != null && state is PasscodeCheckState.Loading) {
+            loading()
         } else {
             content()
         }
