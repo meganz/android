@@ -1,11 +1,8 @@
 package mega.privacy.android.app.main
 
 import android.Manifest
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -43,13 +40,12 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.modalbottomsheet.OnFolderLeaveCallBack
+import mega.privacy.android.app.modalbottomsheet.OnSharedFolderUpdatedCallBack
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
@@ -120,7 +116,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerInterface,
     MegaRequestListenerInterface, UploadBottomSheetDialogActionListener, ActionNodeCallback,
-    OnFolderLeaveCallBack, SnackbarShower {
+    OnSharedFolderUpdatedCallBack, SnackbarShower {
 
     @Inject
     lateinit var getNodeByHandleUseCase: GetNodeByHandleUseCase
@@ -159,23 +155,14 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     private var aB: ActionBar? = null
     private var bottomSheetDialogFragment: BottomSheetDialogFragment? = null
     private var newTextFileDialog: AlertDialog? = null
-    private val manageShareReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent?) {
-            if (intent == null) return
-            contactFileListFragment?.takeIf { it.isVisible }?.let {
-                it.clearSelections()
-                it.hideMultipleSelect()
-            }
-            statusDialog?.dismiss()
-        }
-    }
 
-    override fun onFolderLeave() {
-        Timber.d("onFolderLeave")
+    override fun onSharedFolderUpdated() {
+        Timber.d("onSharedFolderUpdated")
         contactFileListFragment?.takeIf { it.isVisible }?.let {
             it.clearSelections()
             it.hideMultipleSelect()
         }
+        statusDialog?.dismiss()
     }
 
     override fun showLeaveFolderDialog(nodeIds: List<Long>) {
@@ -384,7 +371,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             setParentHandle(savedInstanceState.getLong(PARENT_HANDLE, -1))
         }
         megaApi.addGlobalListener(this)
-        registerReceiver(manageShareReceiver, IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE))
         val extras = intent.extras
         if (extras != null) {
             userEmail = extras.getString(Constants.NAME)
@@ -460,7 +446,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                     val state by viewModel.state.collectAsStateWithLifecycle()
                     state.leaveFolderNodeIds?.let {
                         LeaveShareDialog(handles = it, onDismiss = {
-                            onFolderLeave()
+                            onSharedFolderUpdated()
                             viewModel.clearLeaveFolderNodeIds()
                         })
                     }
@@ -650,7 +636,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         super.onDestroy()
         megaApi.removeGlobalListener(this)
         megaApi.removeRequestListener(this)
-        unregisterReceiver(manageShareReceiver)
         dismissAlertDialogIfExists(newFolderDialog)
     }
 

@@ -2,10 +2,7 @@ package mega.privacy.android.app.presentation.contactinfo
 
 import android.Manifest
 import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -58,7 +55,6 @@ import mega.privacy.android.app.activities.contract.SelectFolderToShareActivityC
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.components.twemoji.EmojiEditText
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
 import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -72,7 +68,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.modalbottomsheet.OnFolderLeaveCallBack
+import mega.privacy.android.app.modalbottomsheet.OnSharedFolderUpdatedCallBack
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.iconRes
@@ -134,7 +130,7 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListenerInterface,
-    OnFolderLeaveCallBack {
+    OnSharedFolderUpdatedCallBack {
 
     /**
      * object handles passcode lock behaviours
@@ -205,18 +201,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
         }
     }
-    private val manageShareReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            hideSelectMode()
-            statusDialog?.dismiss()
-        }
-    }
 
-    override fun onFolderLeave() {
-        if (sharedFoldersFragment?.isVisible == true) {
-            Timber.d("onFolderLeave")
-            hideSelectMode()
-        }
+    override fun onSharedFolderUpdated() {
+        Timber.d("onSharedFolderUpdated")
+        hideSelectMode()
+        statusDialog?.dismiss()
     }
 
     override fun showLeaveFolderDialog(nodeIds: List<Long>) {
@@ -386,7 +375,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             Timber.w("Extras is NULL")
         }
         collectFlows()
-        registerBroadcastReceivers()
     }
 
     private fun configureActivityLaunchers() {
@@ -467,13 +455,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     )
                 }
             }
-    }
-
-    private fun registerBroadcastReceivers() {
-        registerReceiver(
-            manageShareReceiver,
-            IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE)
-        )
     }
 
     private fun getContactData(extras: Bundle) {
@@ -560,7 +541,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     DenyEntryToCallDialog()
                     state.leaveFolderNodeIds?.let {
                         LeaveShareDialog(handles = it, onDismiss = {
-                            onFolderLeave()
+                            onSharedFolderUpdated()
                             viewModel.clearLeaveFolderNodeIds()
                         })
                     }
@@ -1344,7 +1325,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         drawableSend?.colorFilter = null
         drawableShare?.colorFilter = null
         megaApi.removeRequestListener(this)
-        unregisterReceiver(manageShareReceiver)
     }
 
     /**

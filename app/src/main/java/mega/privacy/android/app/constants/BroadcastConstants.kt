@@ -5,7 +5,6 @@ package mega.privacy.android.app.constants
  */
 object BroadcastConstants {
     //    Broadcasts' IntentFilter
-    const val BROADCAST_ACTION_INTENT_MANAGE_SHARE = "BROADCAST_ACTION_INTENT_MANAGE_SHARE"
     const val BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE = "INTENT_FILTER_CONTACT_UPDATE"
 
     //    Broadcasts' actions

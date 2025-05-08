@@ -1,10 +1,8 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
-import android.content.Intent
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.modalbottomsheet.OnSharedFolderUpdatedCallBack
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -66,7 +64,7 @@ class ShareListener(
                     getErrorMessage(typeShare)
                 }
                 Util.showSnackbar(context, message)
-                sendManageSharesBroadcast()
+                (context as? OnSharedFolderUpdatedCallBack)?.onSharedFolderUpdated()
             }
         }
     }
@@ -137,18 +135,6 @@ class ShareListener(
      */
     override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         // Do nothing
-    }
-
-    /**
-     * Function to send a broadcast manage share
-     */
-    private fun sendManageSharesBroadcast() {
-        Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE)
-            .apply {
-                putExtra(BroadcastConstants.TYPE_SHARE, typeShare)
-                setPackage(context.applicationContext.packageName)
-            }
-            .run { MegaApplication.getInstance().sendBroadcast(this) }
     }
 
     companion object {

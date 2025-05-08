@@ -39,6 +39,7 @@ import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
+import mega.privacy.android.app.modalbottomsheet.OnSharedFolderUpdatedCallBack
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
@@ -62,9 +63,13 @@ import timber.log.Timber
 import java.util.Stack
 import javax.inject.Inject
 
+/**
+ * Screen to show the list of contacts that the folder is shared with.
+ */
 @AndroidEntryPoint
 internal class FileContactListActivity : PasscodeActivity(), View.OnClickListener,
-    MegaGlobalListenerInterface, FileContactsListBottomSheetDialogListener {
+    MegaGlobalListenerInterface, FileContactsListBottomSheetDialogListener,
+    OnSharedFolderUpdatedCallBack {
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
@@ -107,22 +112,6 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     private var bottomSheetDialogFragment: FileContactsListBottomSheetDialogFragment? = null
 
     private var fileBackupManager: FileBackupManager? = null
-
-    private val manageShareReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-
-            if (adapter != null) {
-                if (adapter?.isMultipleSelect == true) {
-                    adapter?.clearSelections()
-                    hideMultipleSelect()
-                }
-                adapter?.setShareList(listContacts)
-            }
-
-            permissionsDialog?.dismiss()
-            statusDialog?.dismiss()
-        }
-    }
 
     private val contactUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -347,11 +336,6 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
 
         viewModel.getMegaShares(node)
 
-        registerSdkAppropriateReceiver(
-            broadcastReceiver = manageShareReceiver,
-            filter = IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE)
-        )
-
         val contactUpdateFilter =
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
         contactUpdateFilter.addAction(BroadcastConstants.ACTION_UPDATE_NICKNAME)
@@ -447,7 +431,6 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         megaApi.removeGlobalListener(this)
         handler?.removeCallbacksAndMessages(null)
 
-        unregisterReceiver(manageShareReceiver)
         unregisterReceiver(contactUpdateReceiver)
     }
 
@@ -915,6 +898,23 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         } ?: -1
 
         if (index != -1) adapter?.notifyItemChanged(index)
+    }
+
+    override fun onSharedFolderUpdated() {
+        if (adapter != null) {
+            if (adapter?.isMultipleSelect == true) {
+                adapter?.clearSelections()
+                hideMultipleSelect()
+            }
+            adapter?.setShareList(listContacts)
+        }
+
+        permissionsDialog?.dismiss()
+        statusDialog?.dismiss()
+    }
+
+    override fun showLeaveFolderDialog(nodeIds: List<Long>) {
+        // No implementation needed
     }
 
     companion object {

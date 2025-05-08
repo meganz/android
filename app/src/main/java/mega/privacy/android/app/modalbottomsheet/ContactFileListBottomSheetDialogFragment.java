@@ -233,8 +233,8 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             i.putExtra(NAME, node.getName());
             startActivity(i);
         } else if (id == R.id.leave_option) {
-            if (requireActivity() instanceof OnFolderLeaveCallBack) {
-                ((OnFolderLeaveCallBack) requireActivity()).showLeaveFolderDialog(List.of(node.getHandle()));
+            if (requireActivity() instanceof OnSharedFolderUpdatedCallBack) {
+                ((OnSharedFolderUpdatedCallBack) requireActivity()).showLeaveFolderDialog(List.of(node.getHandle()));
             } else {
                 Timber.w("The activity is not an instance of OnFolderLeaveCallBack");
             }
