@@ -2,8 +2,14 @@ package mega.privacy.android.data.repository
 
 import android.os.Build
 import android.os.Environment
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.PermissionGateway
+import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.domain.repository.PermissionRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -14,6 +20,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
@@ -21,12 +28,18 @@ import java.util.stream.Stream
 class PermissionRepositoryTest {
 
     private val permissionGateway: PermissionGateway = mock()
+    private val uiPreferencesGateway: UIPreferencesGateway = mock()
 
     private lateinit var permissionRepository: PermissionRepository
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeAll
     fun setUp() {
-        permissionRepository = PermissionRepositoryImpl(permissionGateway)
+        permissionRepository = PermissionRepositoryImpl(
+            permissionGateway,
+            uiPreferencesGateway,
+            UnconfinedTestDispatcher()
+        )
     }
 
     @BeforeEach
@@ -121,6 +134,26 @@ class PermissionRepositoryTest {
 
         val result = permissionRepository.isLocationPermissionGranted()
         assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test setNotificationPermissionShownTimestamp sets the timestamp`() = runTest {
+        val timestamp = System.currentTimeMillis()
+        permissionRepository.setNotificationPermissionShownTimestamp(timestamp)
+
+        verify(uiPreferencesGateway).setNotificationPermissionShownTimestamp(timestamp)
+    }
+
+    @Test
+    fun `test monitorNotificationPermissionShownTimestamp returns the correct flow`() = runTest {
+        val timestamp = System.currentTimeMillis()
+        whenever(uiPreferencesGateway.monitorNotificationPermissionShownTimestamp())
+            .thenReturn(flowOf(timestamp))
+
+        permissionRepository.monitorNotificationPermissionShownTimestamp().test {
+            assertThat(awaitItem()).isEqualTo(timestamp)
+            awaitComplete()
+        }
     }
 
     companion object {

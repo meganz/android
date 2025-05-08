@@ -29,6 +29,7 @@ private const val ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP =
     "ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP"
 private const val ADS_CLOSING_TIMESTAMP = "ADS_CLOSING_TIMESTAMP"
 private const val GEO_TAGGING = "GEO_TAGGING"
+private const val NOTIFICATION_SHOWN_TIMESTAMP = "NOTIFICATION_SHOWN_TIMESTAMP"
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = USER_INTERFACE_PREFERENCES,
     produceMigrations = {
@@ -56,6 +57,8 @@ internal class UIPreferencesDatastore @Inject constructor(
     private val almostFullStorageBannerClosingTimestampKey =
         longPreferencesKey(ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP)
     private val photosRecentQueriesKey = stringPreferencesKey(PHOTOS_RECENT_QUERIES)
+    private val notificationShownTimestampKey =
+        longPreferencesKey(NOTIFICATION_SHOWN_TIMESTAMP)
 
     override fun monitorPreferredStartScreen() =
         context.uiPreferenceDataStore.monitor(preferredStartScreenKey)
@@ -154,4 +157,13 @@ internal class UIPreferencesDatastore @Inject constructor(
             it[booleanPreferencesKey(GEO_TAGGING)] = value
         }
     }
+
+    override suspend fun setNotificationPermissionShownTimestamp(timestamp: Long) {
+        context.uiPreferenceDataStore.edit {
+            it[longPreferencesKey(NOTIFICATION_SHOWN_TIMESTAMP)] = timestamp
+        }
+    }
+
+    override fun monitorNotificationPermissionShownTimestamp(): Flow<Long?> =
+        context.uiPreferenceDataStore.monitor(longPreferencesKey(NOTIFICATION_SHOWN_TIMESTAMP))
 }

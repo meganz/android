@@ -2,13 +2,20 @@ package mega.privacy.android.data.repository
 
 import android.os.Build
 import android.os.Environment
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.PermissionGateway
+import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.PermissionRepository
 import timber.log.Timber
 import javax.inject.Inject
 
 internal class PermissionRepositoryImpl @Inject constructor(
     private val permissionGateway: PermissionGateway,
+    private val uiPreferencesGateway: UIPreferencesGateway,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : PermissionRepository {
 
     override fun hasMediaPermission(): Boolean {
@@ -43,4 +50,14 @@ internal class PermissionRepositoryImpl @Inject constructor(
         return permissionGateway.hasPermissions(android.Manifest.permission.ACCESS_FINE_LOCATION)
                 || permissionGateway.hasPermissions(android.Manifest.permission.ACCESS_COARSE_LOCATION)
     }
+
+    override suspend fun setNotificationPermissionShownTimestamp(timestamp: Long) =
+        withContext(ioDispatcher) {
+            uiPreferencesGateway.setNotificationPermissionShownTimestamp(timestamp)
+        }
+
+    override suspend fun monitorNotificationPermissionShownTimestamp() =
+        uiPreferencesGateway
+            .monitorNotificationPermissionShownTimestamp()
+            .flowOn(ioDispatcher)
 }

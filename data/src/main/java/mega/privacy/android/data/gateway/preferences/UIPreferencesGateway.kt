@@ -138,4 +138,18 @@ interface UIPreferencesGateway {
      * @param enabled
      */
     suspend fun enableGeoTagging(enabled: Boolean)
+
+    /**
+     * Set notification permission shown timestamp
+     *
+     * @param timestamp the timestamp to set
+     */
+    suspend fun setNotificationPermissionShownTimestamp(timestamp: Long)
+
+    /**
+     * Monitor notification permission shown timestamp
+     *
+     * @return notification permission shown timestamp
+     */
+    fun monitorNotificationPermissionShownTimestamp(): Flow<Long?>
 }
