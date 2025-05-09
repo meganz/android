@@ -10,7 +10,7 @@ import javax.inject.Inject
 /**
  * Use case to check backup node type
  */
-class CheckBackupNodeTypeByHandleUseCase @Inject constructor(
+class CheckBackupNodeTypeUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val backupRepository: BackupRepository,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,

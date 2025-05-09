@@ -20,7 +20,6 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
-import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
@@ -54,7 +53,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
-import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -89,7 +88,7 @@ class NodeActionsViewModelTest {
     private val moveRequestMessageMapper = mock<MoveRequestMessageMapper>()
     private val versionHistoryRemoveMessageMapper = mock<VersionHistoryRemoveMessageMapper>()
     private val snackBarHandler = mock<SnackBarHandler>()
-    private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase = mock()
+    private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase = mock()
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
     private val chatRequestMessageMapper: ChatRequestMessageMapper = mock()
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper = mock()
@@ -118,7 +117,7 @@ class NodeActionsViewModelTest {
             moveRequestMessageMapper = moveRequestMessageMapper,
             versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper,
             snackBarHandler = snackBarHandler,
-            checkBackupNodeTypeByHandleUseCase = checkBackupNodeTypeByHandleUseCase,
+            checkBackupNodeTypeUseCase = checkBackupNodeTypeUseCase,
             attachMultipleNodesUseCase = attachMultipleNodesUseCase,
             chatRequestMessageMapper = chatRequestMessageMapper,
             listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,

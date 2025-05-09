@@ -9,15 +9,15 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.search.navigation.searchFolderShareDialog
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -29,7 +29,7 @@ import javax.inject.Inject
 class ShareFolderBottomSheetMenuItem @Inject constructor(
     override val menuAction: ShareFolderMenuAction,
     private val createShareKeyUseCase: CreateShareKeyUseCase,
-    private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase,
+    private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase,
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
@@ -58,7 +58,7 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
                 if (node is TypedFolderNode) {
                     runCatching { createShareKeyUseCase(node) }.onFailure { Timber.e(it) }
                     val backupType =
-                        runCatching { checkBackupNodeTypeByHandleUseCase(node) }
+                        runCatching { checkBackupNodeTypeUseCase(node) }
                             .onFailure { Timber.e(it) }.getOrNull()
                     if (backupType != BackupNodeType.NonBackupNode) {
                         val handles = listOf(node.id.longValue)

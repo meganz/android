@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.node.dialogs.sharefolder.warning
 
-import mega.privacy.android.shared.resources.R as sharedR
 import com.google.common.truth.Truth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,7 +11,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -26,13 +26,13 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ShareFolderDialogViewModelTest {
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
-    private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase = mock()
+    private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase = mock()
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val underTest = ShareFolderDialogViewModel(
         applicationScope = applicationScope,
         getNodeByIdUseCase = getNodeByIdUseCase,
-        checkBackupNodeTypeByHandleUseCase = checkBackupNodeTypeByHandleUseCase
+        checkBackupNodeTypeUseCase = checkBackupNodeTypeUseCase
     )
 
     @Test
@@ -41,7 +41,7 @@ class ShareFolderDialogViewModelTest {
             val handle = 1234L
             val node: TypedFolderNode = mock()
             whenever(getNodeByIdUseCase(NodeId(handle))).thenReturn(node)
-            whenever(checkBackupNodeTypeByHandleUseCase(node)).thenReturn(BackupNodeType.FolderNode)
+            whenever(checkBackupNodeTypeUseCase(node)).thenReturn(BackupNodeType.FolderNode)
             underTest.getDialogContents(listOf(NodeId(handle)))
             val state = underTest.state.value
             Truth.assertThat(state.info).isEqualTo(R.string.backup_share_permission_text)
@@ -55,7 +55,7 @@ class ShareFolderDialogViewModelTest {
             val handle = 1234L
             val node: TypedFolderNode = mock()
             whenever(getNodeByIdUseCase(NodeId(handle))).thenReturn(node)
-            whenever(checkBackupNodeTypeByHandleUseCase(node)).thenReturn(BackupNodeType.RootNode)
+            whenever(checkBackupNodeTypeUseCase(node)).thenReturn(BackupNodeType.RootNode)
             underTest.getDialogContents(listOf(NodeId(handle), NodeId(2345L)))
             val state = underTest.state.value
             Truth.assertThat(state.info).isEqualTo(R.string.backup_multi_share_permission_text)
@@ -67,7 +67,7 @@ class ShareFolderDialogViewModelTest {
     fun resetMocks() {
         reset(
             getNodeByIdUseCase,
-            checkBackupNodeTypeByHandleUseCase,
+            checkBackupNodeTypeUseCase,
         )
     }
 }

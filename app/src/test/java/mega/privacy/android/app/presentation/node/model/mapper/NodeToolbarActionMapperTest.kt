@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.node.model.mapper
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.ClearSelectionMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.DisputeTakeDownMenuAction
@@ -72,7 +71,7 @@ class NodeToolbarActionMapperTest {
             getNodeToAttachUseCase = mock(),
         ),
         ShareFolderToolbarMenuItem(
-            checkBackupNodeTypeByHandleUseCase = mock(),
+            checkBackupNodeTypeUseCase = mock(),
             listToStringWithDelimitersMapper = mock(),
             menuAction = ShareFolderMenuAction()
         ),

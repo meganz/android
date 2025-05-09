@@ -53,7 +53,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
-import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import timber.log.Timber
 import java.io.File
@@ -71,7 +71,7 @@ import javax.inject.Inject
  * @property snackBarHandler
  * @property moveRequestMessageMapper
  * @property versionHistoryRemoveMessageMapper
- * @property checkBackupNodeTypeByHandleUseCase
+ * @property checkBackupNodeTypeUseCase
  * @property attachMultipleNodesUseCase
  * @property chatRequestMessageMapper
  * @property listToStringWithDelimitersMapper
@@ -90,7 +90,7 @@ class NodeActionsViewModel @Inject constructor(
     private val snackBarHandler: SnackBarHandler,
     private val moveRequestMessageMapper: MoveRequestMessageMapper,
     private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper,
-    private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase,
+    private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase,
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase,
     private val chatRequestMessageMapper: ChatRequestMessageMapper,
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
@@ -249,7 +249,7 @@ class NodeActionsViewModel @Inject constructor(
         viewModelScope.launch {
             val isFromBackups = state.value.selectedNodes.find {
                 runCatching {
-                    checkBackupNodeTypeByHandleUseCase(it) != BackupNodeType.NonBackupNode
+                    checkBackupNodeTypeUseCase(it) != BackupNodeType.NonBackupNode
                 }.getOrElse {
                     Timber.e(it)
                     false

@@ -6,7 +6,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMe
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import org.junit.jupiter.api.TestInstance
@@ -21,13 +21,13 @@ import java.util.stream.Stream
 class ShareFolderBottomSheetMenuItemTest {
 
     private val createShareKeyUseCase: CreateShareKeyUseCase = mock()
-    private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase = mock()
+    private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase = mock()
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper = mock()
 
     private val shareFolderBottomSheetMenuItem = ShareFolderBottomSheetMenuItem(
         menuAction = ShareFolderMenuAction(),
         createShareKeyUseCase = createShareKeyUseCase,
-        checkBackupNodeTypeByHandleUseCase = checkBackupNodeTypeByHandleUseCase,
+        checkBackupNodeTypeUseCase = checkBackupNodeTypeUseCase,
         listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
     )
 

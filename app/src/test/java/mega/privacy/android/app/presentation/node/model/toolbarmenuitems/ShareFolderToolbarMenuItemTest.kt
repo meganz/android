@@ -4,7 +4,6 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -19,7 +18,7 @@ import java.util.stream.Stream
 class ShareFolderToolbarMenuItemTest {
 
     private val underTest = ShareFolderToolbarMenuItem(
-        checkBackupNodeTypeByHandleUseCase = mock(),
+        checkBackupNodeTypeUseCase = mock(),
         listToStringWithDelimitersMapper = mock(),
         menuAction = ShareFolderMenuAction()
     )

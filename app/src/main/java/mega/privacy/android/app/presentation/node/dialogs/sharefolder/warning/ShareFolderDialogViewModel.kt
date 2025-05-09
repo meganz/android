@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.node.dialogs.sharefolder.warning
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -15,20 +14,21 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * View model for share folder dialog
  * @property getNodeByIdUseCase [GetNodeByIdUseCase]
- * @property checkBackupNodeTypeByHandleUseCase [CheckBackupNodeTypeByHandleUseCase]
+ * @property checkBackupNodeTypeUseCase [CheckBackupNodeTypeUseCase]
  */
 @HiltViewModel
 class ShareFolderDialogViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
-    private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase,
+    private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ShareFolderDialogState())
@@ -77,7 +77,7 @@ class ShareFolderDialogViewModel @Inject constructor(
     }
 
     private suspend fun getBackupNodeType(node: TypedNode) = runCatching {
-        checkBackupNodeTypeByHandleUseCase(node)
+        checkBackupNodeTypeUseCase(node)
     }.getOrElse {
         Timber.e(it)
         BackupNodeType.NonBackupNode

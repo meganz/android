@@ -21,12 +21,12 @@ import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class CheckBackupNodeTypeByHandleUseCaseTest {
+class CheckBackupNodeTypeUseCaseTest {
 
     private val nodeRepository: NodeRepository = mock()
     private val backupRepository: BackupRepository = mock()
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
-    private val underTest = CheckBackupNodeTypeByHandleUseCase(
+    private val underTest = CheckBackupNodeTypeUseCase(
         nodeRepository,
         backupRepository,
         isNodeInRubbishBinUseCase

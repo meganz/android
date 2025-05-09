@@ -7,13 +7,13 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.search.navigation.searchFolderShareDialog
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
-import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,7 +24,7 @@ import javax.inject.Inject
  */
 class ShareFolderToolbarMenuItem @Inject constructor(
     override val menuAction: ShareFolderMenuAction,
-    private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase,
+    private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase,
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
 ) : NodeToolbarMenuItem<MenuActionWithIcon> {
 
@@ -52,7 +52,7 @@ class ShareFolderToolbarMenuItem @Inject constructor(
             parentScope.launch {
                 val hasBackUpNodes = it.find { handle ->
                     runCatching {
-                        checkBackupNodeTypeByHandleUseCase(handle) != BackupNodeType.NonBackupNode
+                        checkBackupNodeTypeUseCase(handle) != BackupNodeType.NonBackupNode
                     }.getOrElse {
                         Timber.e(it)
                         false
