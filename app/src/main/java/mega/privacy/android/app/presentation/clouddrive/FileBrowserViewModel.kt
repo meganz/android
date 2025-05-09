@@ -277,7 +277,11 @@ class FileBrowserViewModel @Inject constructor(
      * @param handle The new File Browser Handle to be set
      * @param checkMediaDiscovery If true, checks if Media Discovery should be opened
      */
-    fun setFileBrowserHandle(handle: Long, checkMediaDiscovery: Boolean = false) =
+    fun setFileBrowserHandle(
+        handle: Long,
+        checkMediaDiscovery: Boolean = false,
+        highlightedNode: NodeId? = null,
+    ) =
         viewModelScope.launch {
             handleStack.push(handle)
             if (checkMediaDiscovery && shouldEnterMediaDiscoveryMode(
@@ -296,11 +300,11 @@ class FileBrowserViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         fileBrowserHandle = handle,
-                        updateToolbarTitleEvent = triggered
+                        updateToolbarTitleEvent = triggered,
                     )
                 }
             }
-            refreshNodesState()
+            refreshNodesState(highlightedNode)
         }
 
     /**
@@ -372,7 +376,7 @@ class FileBrowserViewModel @Inject constructor(
         }
     }
 
-    private suspend fun refreshNodesState() {
+    private suspend fun refreshNodesState(highlightedNode: NodeId? = null) {
         val fileBrowserHandle = _state.value.fileBrowserHandle
         val rootNode = getRootNodeUseCase()?.id?.longValue
         val isRootNode = fileBrowserHandle == rootNode
@@ -391,7 +395,9 @@ class FileBrowserViewModel @Inject constructor(
 
         val childrenNodes = getFileBrowserNodeChildrenUseCase(fileBrowserHandle)
         val showMediaDiscoveryIcon = !isRootNode && containsMediaItemUseCase(childrenNodes)
-        val sourceNodeUIItems = getNodeUiItems(childrenNodes)
+        val sourceNodeUIItems = getNodeUiItems(childrenNodes).map {
+            if (it.node.id == highlightedNode) it.copy(isHighlighted = true) else it
+        }
         val nodeUIItems = filterNonSensitiveNodes(sourceNodeUIItems)
         val sortOrder = getCloudSortOrder()
         val isFileBrowserEmpty = isRootNode || (fileBrowserHandle == MegaApiJava.INVALID_HANDLE)
@@ -404,7 +410,7 @@ class FileBrowserViewModel @Inject constructor(
                 isLoading = false,
                 sortOrder = sortOrder,
                 isFileBrowserEmpty = isFileBrowserEmpty,
-                isRootNode = isRootNode
+                isRootNode = isRootNode,
             )
         }
     }
@@ -419,11 +425,13 @@ class FileBrowserViewModel @Inject constructor(
             val fileDuration = if (node is FileNode) {
                 fileDurationMapper(node.type)?.let { durationInSecondsTextMapper(it) }
             } else null
+            val isHighlighted = existingNodeList.any { it.isHighlighted && it.node.id == node.id }
             NodeUIItem(
                 node = node,
                 isSelected = if (existingNodeList.size > index) isSelected else false,
                 isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false,
-                fileDuration = fileDuration
+                fileDuration = fileDuration,
+                isHighlighted = isHighlighted,
             )
         }
     }

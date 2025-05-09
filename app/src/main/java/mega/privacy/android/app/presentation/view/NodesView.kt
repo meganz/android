@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,6 +81,18 @@ fun <T : TypedNode> NodesView(
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val orientation = LocalConfiguration.current.orientation
     val span = if (orientation == Configuration.ORIENTATION_PORTRAIT) spanCount else 4
+    val highlightedIndex = remember(nodeUIItems) {
+        nodeUIItems.indexOfFirst { it.isHighlighted }
+            .takeIf { nodeUIItems.indices.contains(it) }
+    }
+    LaunchedEffect(highlightedIndex) {
+        highlightedIndex?.let {
+            listState.animateScrollToItem(
+                index = highlightedIndex.plus(2).coerceAtMost(nodeUIItems.lastIndex),
+                scrollOffset = -(listState.layoutInfo.viewportSize.height / 2)
+            )
+        }
+    }
     if (isListView) {
         NodeListView(
             modifier = modifier.background(MaterialTheme.colors.background),

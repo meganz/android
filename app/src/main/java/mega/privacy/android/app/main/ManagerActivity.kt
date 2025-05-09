@@ -6995,7 +6995,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         val rootParentNode = megaApi.getRootParentNode(node)
         viewInFolderNode = node
         if (rootParentNode.handle == megaApi.rootNode?.handle) {
-            fileBrowserViewModel.setFileBrowserHandle(node.parentHandle)
+            fileBrowserViewModel.setFileBrowserHandle(
+                node.parentHandle,
+                highlightedNode = NodeId(node.handle)
+            )
             refreshFragment(FragmentTag.CLOUD_DRIVE.tag)
             selectDrawerItem(DrawerItem.CLOUD_DRIVE)
         } else if (rootParentNode.handle == megaApi.rubbishNode?.handle) {

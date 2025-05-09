@@ -132,6 +132,7 @@ fun <T : TypedNode> NodeGridView(
                 showBlurEffect = (nodeUIItems[it].node as? FileNode)?.type?.let { fileTypeInfo ->
                     fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is PdfFileTypeInfo || fileTypeInfo is AudioFileTypeInfo
                 } ?: false,
+                isHighlighted = nodeUIItems[it].isHighlighted,
             )
         }
     }

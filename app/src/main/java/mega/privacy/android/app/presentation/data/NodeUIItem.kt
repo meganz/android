@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
  * @param isSelected Node is selected
  * @param isInvisible Node is invisible
  * @param fileDuration Duration of file
+ * @param isHighlighted Node is highlighted because it comes from "Locate" action in notification
  * @property uniqueKey Unique key of the node, to be used in Compose list
  * @constructor Create empty Node UI Item
  */
@@ -18,6 +19,7 @@ data class NodeUIItem<T : TypedNode>(
     var isSelected: Boolean,
     val isInvisible: Boolean = false,
     val fileDuration: String? = null,
+    val isHighlighted: Boolean = false,
 ) : Node by node {
     val uniqueKey =
         "${node.id.longValue}".plus(

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -57,7 +56,6 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
  * @param showChangeViewType whether to show change view type button
  * @param listContentPadding the content padding of the list/lazyColumn
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun <T : TypedNode> NodeListView(
     nodeUIItemList: List<NodeUIItem<T>>,
@@ -144,6 +142,7 @@ fun <T : TypedNode> NodeListView(
                 showBlurEffect = (nodeUiItem.node as? FileNode)?.type?.let { fileTypeInfo ->
                     fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is PdfFileTypeInfo || fileTypeInfo is AudioFileTypeInfo
                 } ?: false,
+                isHighlighted = nodeUiItem.isHighlighted,
             )
             MegaDivider(dividerType = DividerType.BigStartPadding)
         }
