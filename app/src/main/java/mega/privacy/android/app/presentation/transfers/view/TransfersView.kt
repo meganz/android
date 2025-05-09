@@ -23,6 +23,7 @@ import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
+import mega.privacy.android.app.presentation.transfers.view.completed.CompletedTransfersView
 import mega.privacy.android.app.presentation.transfers.view.inprogress.InProgressTransfersView
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -95,7 +96,11 @@ internal fun TransfersView(
                         addTextTab(
                             text = stringResource(id = R.string.title_tab_completed_transfers),
                             tag = TEST_TAG_COMPLETED_TAB,
-                        ) { CompletedTransfersView() }
+                        ) {
+                            CompletedTransfersView(
+                                completedTransfers = completedTransfers,
+                            )
+                        }
                     },
                     selectedTabIndex = selectedTab,
                     onTabSelected = {
@@ -111,22 +116,15 @@ internal fun TransfersView(
 
 private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
     buildList {
-        if (inProgressTransfers.isNotEmpty()) {
-            if (selectedTab == IN_PROGRESS_TAB_INDEX) {
-                if (areTransfersPaused) {
-                    add(TransferMenuAction.Resume)
-                } else {
-                    add(TransferMenuAction.Pause)
-                }
-                add(TransferMenuAction.More)
+        if (selectedTab == IN_PROGRESS_TAB_INDEX && inProgressTransfers.isNotEmpty()) {
+            if (areTransfersPaused) {
+                add(TransferMenuAction.Resume)
+            } else {
+                add(TransferMenuAction.Pause)
             }
+            add(TransferMenuAction.More)
         }
     }
-}
-
-@Composable
-internal fun CompletedTransfersView() {
-
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

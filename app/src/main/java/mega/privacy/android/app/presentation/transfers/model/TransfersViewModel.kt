@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
@@ -36,6 +37,7 @@ class TransfersViewModel @Inject constructor(
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
     private val cancelTransfersUseCase: CancelTransfersUseCase,
+    private val monitorCompletedTransfersUseCase: MonitorCompletedTransfersUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -50,6 +52,7 @@ class TransfersViewModel @Inject constructor(
         monitorStorageOverQuota()
         monitorTransferOverQuota()
         monitorPausedTransfers()
+        monitorCompletedTransfers()
     }
 
     private fun monitorInProgressTransfers() {
@@ -95,6 +98,19 @@ class TransfersViewModel @Inject constructor(
             monitorPausedTransfersUseCase().collectLatest { areTransfersPaused ->
                 _uiState.update { state ->
                     state.copy(areTransfersPaused = areTransfersPaused)
+                }
+            }
+        }
+    }
+
+    private fun monitorCompletedTransfers() {
+        viewModelScope.launch {
+            monitorCompletedTransfersUseCase().collectLatest { completedTransfers ->
+                _uiState.update { state ->
+                    state.copy(
+                        completedTransfers = completedTransfers
+                            .sortedByDescending { it.timestamp }.toImmutableList()
+                    )
                 }
             }
         }

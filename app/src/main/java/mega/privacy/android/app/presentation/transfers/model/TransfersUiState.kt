@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.transfers.model
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 
 /**
@@ -13,6 +14,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  * @property isStorageOverQuota Whether the storage is over quota.
  * @property isTransferOverQuota Whether the transfer is over quota.
  * @property areTransfersPaused Whether the transfers are paused.
+ * @property completedTransfers List of completed transfers.
  */
 data class TransfersUiState(
     val selectedTab: Int = IN_PROGRESS_TAB_INDEX,
@@ -20,6 +22,7 @@ data class TransfersUiState(
     val isStorageOverQuota: Boolean = false,
     val isTransferOverQuota: Boolean = false,
     val areTransfersPaused: Boolean = false,
+    val completedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
 ) {
 
     /**

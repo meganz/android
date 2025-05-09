@@ -16,10 +16,12 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
@@ -53,6 +55,7 @@ class TransfersViewModelTest {
     private val pauseTransferByTagUseCase = mock<PauseTransferByTagUseCase>()
     private val pauseTransfersQueueUseCase = mock<PauseTransfersQueueUseCase>()
     private val cancelTransfersUseCase = mock<CancelTransfersUseCase>()
+    private val monitorCompletedTransfersUseCase = mock<MonitorCompletedTransfersUseCase>()
 
     @BeforeEach
     fun resetMocks() {
@@ -66,6 +69,7 @@ class TransfersViewModelTest {
         )
         wheneverBlocking { monitorTransferOverQuotaUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorPausedTransfersUseCase() }.thenReturn(emptyFlow())
+        wheneverBlocking { monitorCompletedTransfersUseCase() }.thenReturn(emptyFlow())
     }
 
     private fun initTestClass() {
@@ -78,6 +82,7 @@ class TransfersViewModelTest {
             pauseTransferByTagUseCase = pauseTransferByTagUseCase,
             pauseTransfersQueueUseCase = pauseTransfersQueueUseCase,
             cancelTransfersUseCase = cancelTransfersUseCase,
+            monitorCompletedTransfersUseCase = monitorCompletedTransfersUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -256,6 +261,30 @@ class TransfersViewModelTest {
 
         verify(cancelTransfersUseCase).invoke()
     }
+
+    @Test
+    fun `test that MonitorCompletedTransfersUseCase updates state with completed transfers`() =
+        runTest {
+            val flow = MutableSharedFlow<List<CompletedTransfer>>()
+            val transfer1 = mock<CompletedTransfer> {
+                on { timestamp } doReturn 1L
+            }
+            val transfer2 = mock<CompletedTransfer> {
+                on { timestamp } doReturn 2L
+            }
+            val list = listOf(transfer1, transfer2)
+
+            whenever(monitorCompletedTransfersUseCase()).thenReturn(flow)
+
+            initTestClass()
+
+            underTest.uiState.map { it.completedTransfers }.test {
+                assertThat(awaitItem()).isEmpty()
+                flow.emit(list)
+                advanceUntilIdle()
+                assertThat(awaitItem()).containsExactly(transfer1, transfer2)
+            }
+        }
 
     companion object {
         private val testDispatcher = UnconfinedTestDispatcher()
