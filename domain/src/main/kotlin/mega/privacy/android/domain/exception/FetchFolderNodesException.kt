@@ -22,6 +22,11 @@ sealed class FetchFolderNodesException : RuntimeException("FetchFolderNodesExcep
     class InvalidDecryptionKey : FetchFolderNodesException()
 
     /**
+     * Expired
+     */
+    class Expired : FetchFolderNodesException()
+
+    /**
      * Generic error
      */
     class GenericError : FetchFolderNodesException()

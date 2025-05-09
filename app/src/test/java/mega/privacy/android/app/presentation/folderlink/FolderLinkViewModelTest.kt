@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.folderlink.model.FolderError
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.utils.Constants
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
@@ -243,7 +245,7 @@ class FolderLinkViewModelTest {
             assertThat(initial.importNode).isNull()
             assertThat(initial.openFile).isInstanceOf(consumed().javaClass)
             assertThat(initial.selectImportLocation).isEqualTo(consumed)
-            assertThat(initial.isUnavailable).isFalse()
+            assertThat(initial.errorState).isEqualTo(FolderError.NoError)
             assertThat(initial.snackBarMessage).isEqualTo(-1)
         }
     }
@@ -266,7 +268,37 @@ class FolderLinkViewModelTest {
             val newValue = expectMostRecentItem()
             assertThat(newValue.isLoginComplete).isTrue()
             assertThat(newValue.isInitialState).isFalse()
-            assertThat(newValue.isUnavailable).isFalse()
+            assertThat(newValue.errorState).isEqualTo(FolderError.NoError)
+        }
+    }
+
+    @Test
+    fun `test that errorState is updated correctly when link is expired`() = runTest {
+        val base64Handle = "1234"
+        whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+            FetchFolderNodesException.Expired()
+        )
+
+        underTest.state.test {
+            underTest.fetchNodes(base64Handle)
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.isNodesFetched).isTrue()
+            assertThat(newValue.errorState).isEqualTo(FolderError.Expired)
+        }
+    }
+
+    @Test
+    fun `test that errorState is updated correctly when link is unavailable`() = runTest {
+        val base64Handle = "1234"
+        whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+            FetchFolderNodesException.LinkRemoved()
+        )
+
+        underTest.state.test {
+            underTest.fetchNodes(base64Handle)
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.isNodesFetched).isTrue()
+            assertThat(newValue.errorState).isEqualTo(FolderError.Unavailable)
         }
     }
 
@@ -281,7 +313,7 @@ class FolderLinkViewModelTest {
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
                 assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(triggered)
-                assertThat(newValue.isUnavailable).isFalse()
+                assertThat(newValue.errorState).isEqualTo(FolderError.NoError)
             }
         }
 
@@ -297,7 +329,7 @@ class FolderLinkViewModelTest {
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
                 assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(triggered)
-                assertThat(newValue.isUnavailable).isFalse()
+                assertThat(newValue.errorState).isEqualTo(FolderError.NoError)
                 assertThat(newValue.snackBarMessage).isEqualTo(-1)
             }
         }

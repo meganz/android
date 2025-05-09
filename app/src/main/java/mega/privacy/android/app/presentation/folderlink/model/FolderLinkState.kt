@@ -44,7 +44,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property storageStatusDialogState   State of StorageStatusDialog
  * @property snackBarMessage            String id of content for snack bar
  * @property shouldShowAdsForLink       Whether ads should be shown for the link
- * @property isUnavailable              Whether the folder link is unavailable due to TOS violations, expiration etc
+ * @property errorState                 Error state of the folder link
  */
 data class FolderLinkState(
     val isInitialState: Boolean = true,
@@ -75,11 +75,24 @@ data class FolderLinkState(
     val downloadEvent: StateEventWithContent<TransferTriggerEvent.DownloadTriggerEvent> = consumed(),
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
     val shouldShowAdsForLink: Boolean = false,
-    val isUnavailable: Boolean = false,
+    val errorState: FolderError = FolderError.NoError,
 ) {
     /**
      * Whether to show toolbar and bottom bar actions
      */
     val showContentActions: Boolean
-        get() = !isUnavailable && isNodesFetched
+        get() = errorState == FolderError.NoError && isNodesFetched
+}
+
+/**
+ * Sealed class defining the error state of [FolderLinkState]
+ *
+ * @property NoError  No error
+ * @property Unavailable  Folder link is unavailable
+ * @property Expired  Folder link is expired
+ */
+sealed interface FolderError {
+    object NoError : FolderError
+    object Unavailable : FolderError
+    object Expired : FolderError
 }

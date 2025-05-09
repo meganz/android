@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.snackBarMessageId
+import mega.privacy.android.app.presentation.folderlink.model.FolderError
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
@@ -182,7 +183,7 @@ class FolderLinkViewModel @Inject constructor(
                         it.copy(
                             isInitialState = false,
                             isLoginComplete = true,
-                            isUnavailable = false,
+                            errorState = FolderError.NoError
                         )
                     }
                     with(state.value) {
@@ -200,7 +201,7 @@ class FolderLinkViewModel @Inject constructor(
                             isInitialState = false,
                             isLoginComplete = false,
                             askForDecryptionKeyDialogEvent = triggered,
-                            isUnavailable = false
+                            errorState = FolderError.NoError
                         )
                     }
                 }
@@ -211,7 +212,7 @@ class FolderLinkViewModel @Inject constructor(
                             isInitialState = false,
                             isLoginComplete = false,
                             askForDecryptionKeyDialogEvent = if (decryptionIntroduced) triggered else consumed,
-                            isUnavailable = !decryptionIntroduced,
+                            errorState = if (decryptionIntroduced) FolderError.NoError else FolderError.Unavailable,
                             snackBarMessage = if (decryptionIntroduced) -1 else result.snackBarMessageId
                         )
                     }
@@ -223,7 +224,7 @@ class FolderLinkViewModel @Inject constructor(
                             isInitialState = false,
                             isLoginComplete = false,
                             askForDecryptionKeyDialogEvent = consumed,
-                            isUnavailable = true,
+                            errorState = FolderError.Unavailable,
                             snackBarMessage = result.snackBarMessageId
                         )
                     }
@@ -465,7 +466,7 @@ class FolderLinkViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             isNodesFetched = true,
-                            isUnavailable = true,
+                            errorState = if (throwable is FetchFolderNodesException.Expired) FolderError.Expired else FolderError.Unavailable,
                         )
                     }
                 }

@@ -64,6 +64,7 @@ import mega.privacy.android.app.main.ads.AdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.filelink.view.ImportDownloadView
+import mega.privacy.android.app.presentation.folderlink.model.FolderError
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
@@ -269,41 +270,53 @@ internal fun FolderLinkView(
                         }
                         .fillMaxWidth()
                 ) {
-                    if (!state.isNodesFetched) {
-                        LoadingStateView(isList = true)
-                    } else if (state.isUnavailable) {
-                        UnavailableFolderLinkView()
-                    } else if (state.nodesList.isEmpty()) {
-                        EmptyFolderLinkView(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight()
-                                .padding(horizontal = 8.dp),
-                            emptyViewString = emptyViewString,
-                        )
-                    } else {
-                        NodesView(
-                            modifier = Modifier
-                                .padding(horizontal = 2.dp),
-                            nodeUIItems = state.nodesList,
-                            onMenuClick = { onMoreOptionClick(it) },
-                            onItemClicked = onItemClicked,
-                            onLongClick = onLongClick,
-                            sortOrder = "",
-                            isListView = state.currentViewType == ViewType.LIST,
-                            onSortOrderClick = onSortOrderClick,
-                            onChangeViewTypeClick = onChangeViewTypeClick,
-                            showSortOrder = false,
-                            listState = listState,
-                            gridState = gridState,
-                            onLinkClicked = onLinkClicked,
-                            onDisputeTakeDownClicked = onDisputeTakeDownClicked,
-                            showMediaDiscoveryButton = state.hasMediaItem,
-                            onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                            isPublicNode = true,
-                            fileTypeIconMapper = fileTypeIconMapper,
-                            inSelectionMode = state.selectedNodeCount > 0
-                        )
+                    when {
+                        !state.isNodesFetched -> {
+                            LoadingStateView(isList = true)
+                        }
+
+                        state.errorState == FolderError.Expired -> {
+                            ExpiredFolderLinkView()
+                        }
+
+                        state.errorState == FolderError.Unavailable -> {
+                            UnavailableFolderLinkView()
+                        }
+
+                        state.nodesList.isEmpty() -> {
+                            EmptyFolderLinkView(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight()
+                                    .padding(horizontal = 8.dp),
+                                emptyViewString = emptyViewString,
+                            )
+                        }
+
+                        else -> {
+                            NodesView(
+                                modifier = Modifier
+                                    .padding(horizontal = 2.dp),
+                                nodeUIItems = state.nodesList,
+                                onMenuClick = { onMoreOptionClick(it) },
+                                onItemClicked = onItemClicked,
+                                onLongClick = onLongClick,
+                                sortOrder = "",
+                                isListView = state.currentViewType == ViewType.LIST,
+                                onSortOrderClick = onSortOrderClick,
+                                onChangeViewTypeClick = onChangeViewTypeClick,
+                                showSortOrder = false,
+                                listState = listState,
+                                gridState = gridState,
+                                onLinkClicked = onLinkClicked,
+                                onDisputeTakeDownClicked = onDisputeTakeDownClicked,
+                                showMediaDiscoveryButton = state.hasMediaItem,
+                                onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+                                isPublicNode = true,
+                                fileTypeIconMapper = fileTypeIconMapper,
+                                inSelectionMode = state.selectedNodeCount > 0
+                            )
+                        }
                     }
 
                     if (state.storageStatusDialogState != null) {
@@ -478,6 +491,50 @@ internal fun EmptyFolderLinkView(
     }
 }
 
+
+@Composable
+internal fun ExpiredFolderLinkView() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Image(
+            painter = painterResource(id = iconPackR.drawable.ic_alert_triangle_color),
+            contentDescription = "Error",
+            modifier = Modifier
+                .size(120.dp)
+                .align(Alignment.CenterHorizontally),
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        MegaText(
+            text = stringResource(sharedR.string.folder_link_expired_title),
+            textColor = TextColor.Primary,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.h6Medium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 6.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        MegaText(
+            text = stringResource(sharedR.string.general_link_expired),
+            textColor = TextColor.Primary,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.body1,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(112.dp))
+    }
+}
+
 @Composable
 internal fun UnavailableFolderLinkView() {
     Column(
@@ -554,6 +611,15 @@ internal object Constants {
      * Test tag for app bar more option
      */
     const val APPBAR_MORE_OPTION_TAG = "appbar_more_option_tag"
+}
+
+
+@CombinedThemePreviews
+@Composable
+private fun ExpiredFolderLinkViewPreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        ExpiredFolderLinkView()
+    }
 }
 
 @CombinedThemePreviews

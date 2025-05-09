@@ -64,6 +64,11 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
                             )
                         }
 
+
+                        MegaError.API_EEXPIRED -> {
+                            continuation.resumeWith(Result.failure(FetchFolderNodesException.Expired()))
+                        }
+
                         MegaError.API_EBLOCKED -> {
                             continuation.resumeWith(Result.failure(FetchFolderNodesException.LinkRemoved()))
                         }
