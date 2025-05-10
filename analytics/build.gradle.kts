@@ -21,7 +21,8 @@ dependencies {
     implementation(project(":domain"))
 
     // Analytics
-    implementation(lib.mega.analytics)
+//    implementation(lib.mega.analytics)
+    implementation(project(":dependency"))
 
     // DI
     implementation(lib.javax.inject)

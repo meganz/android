@@ -29,7 +29,8 @@ dependencies {
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
     lintChecks(project(":lint"))
-    preBuiltSdkDependency(rootProject.extra)
+//    preBuiltSdkDependency(rootProject.extra)
+    implementation(files("../../dependency/sdk-20250425.090537-rel.aar"))
 
     implementation(project(":domain"))
     implementation(project(":data"))
@@ -43,7 +44,8 @@ dependencies {
 
     implementation(lib.kotlin.ktx)
     implementation(lib.logging.timber)
-    implementation(lib.mega.analytics)
+//    implementation(lib.mega.analytics)
+    implementation(project(":dependency"))
 
     implementation(google.gson)
     implementation(androidx.datastore.preferences)

@@ -20,7 +20,8 @@ android {
 }
 
 dependencies {
-    preBuiltSdkDependency(rootProject.extra)
+//    preBuiltSdkDependency(rootProject.extra)
+    implementation(files("../../dependency/sdk-20250425.090537-rel.aar"))
 
     implementation(project(":core:formatter"))
     lintChecks(project(":lint"))
@@ -38,7 +39,8 @@ dependencies {
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
 
-    implementation(lib.mega.analytics)
+//    implementation(lib.mega.analytics)
+    implementation(project(":dependency"))
     implementation(lib.kotlin.ktx)
     implementation(lib.logging.timber)
     implementation(androidx.appcompat)

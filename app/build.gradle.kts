@@ -206,7 +206,9 @@ dependencies {
     implementation(project(":feature:devicecenter"))
     implementation(project(":shared:resources"))
     implementation(project(":feature:chat"))
-    preBuiltSdkDependency(rootProject.extra)
+//    preBuiltSdkDependency(rootProject.extra)
+    implementation(files("../dependency/sdk-20250425.090537-rel.aar"))
+
 
     //Test Modules
     testImplementation(project(":core-test"))
@@ -260,7 +262,8 @@ dependencies {
     implementation(lib.coil.compose)
     implementation(androidx.paging.compose)
     implementation(lib.kotlinx.collections.immutable)
-    implementation(lib.mega.core.ui)
+//    implementation(lib.mega.core.ui)
+    implementation(project(":dependency"))
     implementation(androidx.material3)
     implementation(androidx.material3.adaptive)
     implementation(androidx.material3.adaptive.layout)
@@ -326,19 +329,27 @@ dependencies {
     implementation(lib.simplestorage)
     implementation(lib.compose.state.events)
     implementation(testlib.hamcrest)
-    implementation(lib.mega.analytics)
+//    implementation(lib.mega.analytics)
+    implementation(project(":dependency"))
     implementation(lib.kotlin.serialisation)
-    implementation(lib.zoomable.telephoto)
-    implementation(lib.zoomable.image.coil)
-    implementation(lib.zoomable.image.core)
-    implementation(lib.zoomable.image.subsampling.image)
-    implementation(lib.telephoto.flick)
+    implementation(project(":dependency"))
+//    implementation(lib.zoomable.telephoto)
+//    implementation(lib.zoomable.image.coil)
+//    implementation(lib.zoomable.image.core)
+//    implementation(lib.zoomable.image.subsampling.image)
+//    implementation(lib.telephoto.flick)
+    implementation("me.saket.telephoto:zoomable-image-coil:0.15.1")
+    implementation("me.saket.telephoto:zoomable:0.15.1")
+//    implementation("me.saket.telephoto:zoomable-image-core:0.15.1")
+//    implementation("me.saket.telephoto:sub-sampling-image:0.15.1")
+    implementation("me.saket.telephoto:flick:0.15.1")
+
     implementation(lib.commonmark.java)
     implementation(google.ump)
 
     // Debug
-    debugImplementation(lib.nocturn)
-    debugImplementation(lib.xray)
+//    debugImplementation(lib.nocturn)
+//    debugImplementation(lib.xray)
 
     if (!shouldUsePrebuiltSdk()) {
         implementation(files("../sdk/src/main/jni/megachat/webrtc/libwebrtc.jar"))

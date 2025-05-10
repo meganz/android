@@ -43,7 +43,8 @@ dependencies {
     //Test Modules
     testImplementation(project(":core-test"))
 
-    preBuiltSdkDependency(rootProject.extra)
+//    preBuiltSdkDependency(rootProject.extra)
+    implementation(files("../dependency/sdk-20250425.090537-rel.aar"))
 
     implementation(lib.coroutines.core)
     implementation(lib.kotlin.serialisation)

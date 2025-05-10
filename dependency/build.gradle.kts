@@ -1,0 +1,7 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file("analytics-annotations-android-20250506.075649.aar"))
+artifacts.add("default", file("analytics-core-android-20250506.075649.aar"))
+artifacts.add("default", file("analytics-events-android-20250506.075649.aar"))
+//artifacts.add("default", file("sdk-20250430.033435"))
+artifacts.add("default", file("ui-2.128.20250415022409.aar"))
+artifacts.add("default", file("ui-tokens-2.128.20250415022409.aar"))

@@ -4,23 +4,23 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
-        maven {
-            url =
-                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/megagradle")
-        }
+//        maven {
+//            url =
+//                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/megagradle")
+//        }
     }
-    resolutionStrategy {
-        eachPlugin {
-            when (requested.id.id) {
-                "mega.android.release",
-                "mega.android.cicd",
-                "mega.artifactory.publish.convention",
-                -> useModule("mega.privacy:megagradle:${requested.version}")
-
-                else -> {}
-            }
-        }
-    }
+//    resolutionStrategy {
+//        eachPlugin {
+//            when (requested.id.id) {
+//                "mega.android.release",
+//                "mega.android.cicd",
+//                "mega.artifactory.publish.convention",
+//                -> useModule("mega.privacy:megagradle:${requested.version}")
+//
+//                else -> {}
+//            }
+//        }
+//    }
 }
 
 dependencyResolutionManagement {
@@ -58,6 +58,7 @@ include(":shared:resources")
 include(":shared:sync")
 include(":android-database-sqlcipher")
 include(":feature:chat")
+include(":dependency")
 
 
 println("isServerBuild = ${isServerBuild()}")

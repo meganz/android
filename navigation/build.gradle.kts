@@ -12,7 +12,8 @@ dependencies {
     implementation(project(":domain"))
     implementation(androidx.appcompat)
     implementation(androidx.navigation.compose)
-    implementation(lib.mega.analytics)
+//    implementation(lib.mega.analytics)
+    implementation(project(":dependency"))
 
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)

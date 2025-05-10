@@ -19,5 +19,6 @@ dependencies {
     implementation(platform(testlib.junit5.bom))
     implementation(testlib.junit.test.ktx)
     implementation(testlib.junit.jupiter.api)
-    implementation(lib.mega.analytics)
+//    implementation(lib.mega.analytics)
+    implementation(project(":dependency"))
 }

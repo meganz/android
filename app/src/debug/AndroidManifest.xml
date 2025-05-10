@@ -15,9 +15,9 @@
             tools:node="merge"
             tools:replace="android:authorities">
 
-            <meta-data
-                android:name="mega.privacy.android.app.initializer.NocturnInitializer"
-                android:value="androidx.startup" />
+<!--            <meta-data-->
+<!--                android:name="mega.privacy.android.app.initializer.NocturnInitializer"-->
+<!--                android:value="androidx.startup" />-->
 
             <meta-data
                 android:name="mega.privacy.android.app.initializer.KarmaInitializer"
