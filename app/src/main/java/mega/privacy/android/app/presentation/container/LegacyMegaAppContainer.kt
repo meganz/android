@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContentView
@@ -27,6 +28,9 @@ internal fun LegacyMegaAppContainer(
     canLock: () -> Boolean,
 ) {
     val containers: List<(@Composable (@Composable () -> Unit) -> Unit)?> = listOf(
+        {
+            BusinessAccountContainer()
+        },
         {
             PsaContentView(
                 context = context,

@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.SetUseHttpsUseCase
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.ResetAccountDetailsTimeStampUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
+import mega.privacy.android.domain.usecase.account.SetUnverifiedBusinessAccountUseCase
 import mega.privacy.android.domain.usecase.backup.SetupDeviceNameUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
@@ -78,7 +79,8 @@ class BackgroundRequestListener @Inject constructor(
     private val setUseHttpsUseCase: SetUseHttpsUseCase,
     private val resetAccountDetailsTimeStampUseCase: ResetAccountDetailsTimeStampUseCase,
     private val broadcastSslVerificationFailedUseCase: BroadcastSslVerificationFailedUseCase,
-    private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase
+    private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase,
+    private val setIsUnverifiedBusinessAccountUseCase: SetUnverifiedBusinessAccountUseCase
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -105,6 +107,12 @@ class BackgroundRequestListener @Inject constructor(
         Timber.d("BackgroundRequestListener:onRequestFinish: ${request.requestString}____${e.errorCode}___${request.paramType}")
         if (e.errorCode == MegaError.API_EPAYWALL) {
             showOverDiskQuotaPaywallWarning()
+            return
+        }
+        if (e.errorCode == MegaError.API_ESUBUSERKEYMISSING) {
+            applicationScope.launch {
+                setIsUnverifiedBusinessAccountUseCase(true)
+            }
             return
         }
         if (e.errorCode == MegaError.API_EBUSINESSPASTDUE) {

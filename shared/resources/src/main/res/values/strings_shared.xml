@@ -1137,4 +1137,8 @@
     <string name="folder_link_unavailable_disabled">The folder link is disabled by the user</string>
     <!-- Title shown when a folder link has expired -->
     <string name="folder_link_expired_title">The folder cannot be accessed</string>
+    <!-- Title of the dialog shown when the user needs to verify administrator credentials -->
+    <string name="unverified_business_account_dialog_title">Verify administrator credentials to continue</string>
+    <!-- Description of the dialog explaining the need to verify administrator credentials -->
+    <string name="unverified_business_account_dialog_description">You need to verify your Business account administrator’s credentials in order to continue. Log in to your account in a desktop web browser and complete the credential verification.</string>
 </resources>

@@ -1451,6 +1451,14 @@ internal class DefaultAccountRepository @Inject constructor(
         return appEventGateway.monitorLoggedOutFromAnotherLocation()
     }
 
+    override suspend fun setIsUnverifiedBusinessAccount(isUnverified: Boolean) {
+        appEventGateway.setIsUnverifiedBusinessAccount(isUnverified)
+    }
+
+    override fun monitorIsUnverifiedBusinessAccount(): Flow<Boolean> {
+        return appEventGateway.monitorIsUnverifiedBusinessAccount()
+    }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"

@@ -2308,4 +2308,22 @@ class DefaultAccountRepositoryTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that setIsUnverifiedBusinessAccount is invoked when setIsUnverifiedBusinessAccount called`() =
+        runTest {
+            val isUnverified = true
+            underTest.setIsUnverifiedBusinessAccount(isUnverified)
+            verify(appEventGateway).setIsUnverifiedBusinessAccount(isUnverified)
+        }
+
+    @Test
+    fun `test that monitorIsUnverifiedBusinessAccount is invoked when monitorIsUnverifiedBusinessAccount called`() =
+        runTest {
+            whenever(appEventGateway.monitorIsUnverifiedBusinessAccount()).thenReturn(flowOf(true))
+            underTest.monitorIsUnverifiedBusinessAccount().test {
+                assertThat(awaitItem()).isEqualTo(true)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 }

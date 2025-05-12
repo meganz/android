@@ -28,6 +28,7 @@ import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSu
 import mega.privacy.android.domain.usecase.transfers.active.HandleChatTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleDownloadTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleUnverifiedBusinessAccountTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleUploadTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.IHandleTransferEventUseCase
 
@@ -119,6 +120,13 @@ abstract class TransfersModule {
     @Binds
     @IntoSet
     abstract fun provideChatTransferHandle(useCase: HandleChatTransferEventsUseCase): @JvmSuppressWildcards IHandleTransferEventUseCase
+
+    /**
+     * Binds [HandleUnverifiedBusinessAccountTransferEventUseCase] to [IHandleTransferEventUseCase] set
+     */
+    @Binds
+    @IntoSet
+    abstract fun provideUnverifiedBusinessAccountTransferHandle(useCase: HandleUnverifiedBusinessAccountTransferEventUseCase): @JvmSuppressWildcards IHandleTransferEventUseCase
 
     companion object {
 

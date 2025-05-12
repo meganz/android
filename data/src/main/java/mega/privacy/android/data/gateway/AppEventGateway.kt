@@ -432,4 +432,16 @@ internal interface AppEventGateway {
      * @return Flow of Boolean
      */
     fun monitorLoggedOutFromAnotherLocation(): Flow<Boolean>
+
+    /**
+     * Set the state indicating if the current account is an unverified business account.
+     */
+    suspend fun setIsUnverifiedBusinessAccount(isUnverified: Boolean)
+
+    /**
+     * Monitor the state indicating if the current account is an unverified business account.
+     *
+     * @return Flow of Boolean
+     */
+    fun monitorIsUnverifiedBusinessAccount(): Flow<Boolean>
 }

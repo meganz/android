@@ -5,6 +5,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.components.session.SessionContainer
+import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.MegaPsaContainer
@@ -32,6 +33,7 @@ internal fun MegaAppContainer(
     content: @Composable () -> Unit,
 ) {
     val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
+        { BusinessAccountContainer() },
         { PsaContainer(content = it) },
         {
             PasscodeContainer(

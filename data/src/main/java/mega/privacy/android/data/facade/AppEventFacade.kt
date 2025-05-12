@@ -59,6 +59,7 @@ internal class AppEventFacade @Inject constructor(
         MutableSharedFlow<CameraUploadsSettingsAction>()
     private val _businessAccountExpired = MutableSharedFlow<Unit>()
     private val _sessionLoggedOutFromAnotherLocation = MutableStateFlow(false)
+    private val _isUnverifiedBusinessAccount = MutableSharedFlow<Boolean>()
 
     override val monitorCookieSettings: Flow<Set<CookieType>> = _cookieSettings.asSharedFlow()
 
@@ -275,6 +276,13 @@ internal class AppEventFacade @Inject constructor(
     override fun monitorLoggedOutFromAnotherLocation(): Flow<Boolean> {
         return _sessionLoggedOutFromAnotherLocation.asStateFlow()
     }
+
+    override suspend fun setIsUnverifiedBusinessAccount(isUnverified: Boolean) {
+        _isUnverifiedBusinessAccount.emit(isUnverified)
+    }
+
+    override fun monitorIsUnverifiedBusinessAccount(): Flow<Boolean> =
+        _isUnverifiedBusinessAccount.asSharedFlow()
 }
 
 private fun <T> Flow<T>.toSharedFlow(
