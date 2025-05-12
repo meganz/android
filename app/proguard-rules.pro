@@ -181,3 +181,8 @@
 -keepnames class * implements android.os.Parcelable {
    public static final ** CREATOR;
 }
+
+ # Keep the qualifiedName for all classes annotated with @Serializable
+ -keepnames class ** {
+     @kotlinx.serialization.Serializable *;
+ }
