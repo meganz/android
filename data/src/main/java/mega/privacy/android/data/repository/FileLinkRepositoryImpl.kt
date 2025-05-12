@@ -122,6 +122,10 @@ internal class FileLinkRepositoryImpl @Inject constructor(
                             continuation.resumeWith(Result.failure(PublicNodeException.DecryptionKeyRequired()))
                         }
 
+                        MegaError.API_EEXPIRED -> {
+                            continuation.resumeWith(Result.failure(PublicNodeException.Expired()))
+                        }
+
                         else -> {
                             continuation.resumeWith(Result.failure(PublicNodeException.GenericError()))
                         }

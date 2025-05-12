@@ -168,7 +168,9 @@ class FileLinkViewModel @Inject constructor(
                     else -> {
                         _state.update {
                             it.copy(
-                                errorState = if (exception is PublicNodeException) {
+                                errorState = if (exception is PublicNodeException.Expired) {
+                                    LinkErrorState.Expired
+                                } else if (exception is PublicNodeException) {
                                     LinkErrorState.Unavailable
                                 } else {
                                     LinkErrorState.NoError

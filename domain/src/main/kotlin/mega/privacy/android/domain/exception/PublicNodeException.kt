@@ -28,6 +28,11 @@ sealed class PublicNodeException : RuntimeException("PublicNodeException") {
     class InvalidDecryptionKey : PublicNodeException()
 
     /**
+     * Expired
+     */
+    class Expired : PublicNodeException()
+
+    /**
      * Generic error
      */
     class GenericError : PublicNodeException()

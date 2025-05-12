@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.filelink.view
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -16,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -31,6 +33,8 @@ import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
 import mega.privacy.android.app.presentation.fileinfo.view.PreviewWithShadow
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
+import mega.privacy.android.app.presentation.folderlink.view.ExpiredLinkView
+import mega.privacy.android.app.presentation.folderlink.view.ImportDownloadView
 import mega.privacy.android.app.presentation.folderlink.view.UnavailableLinkView
 import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -57,6 +61,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal const val IMPORT_BUTTON_TAG = "file_link_view:button_import"
 internal const val SAVE_BUTTON_TAG = "file_link_view:button_save"
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 internal fun FileLinkView(
     viewState: FileLinkState,
@@ -152,10 +157,22 @@ internal fun FileLinkView(
                 )
             }
         },
-        headerSpacerHeight = if (viewState.iconResource != null) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp,
+        headerSpacerHeight = if (viewState.errorState == LinkErrorState.NoError) {
+            if (viewState.iconResource != null) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp
+        } else {
+            0.dp
+        },
         modifier = modifier,
     ) {
+        val screenHeight = (LocalConfiguration.current.screenHeightDp - (APP_BAR_HEIGHT * 2)).dp
         when {
+            viewState.errorState == LinkErrorState.Expired -> {
+                ExpiredLinkView(
+                    title = sharedR.string.file_link_expired_title,
+                    modifier = Modifier.height(screenHeight)
+                )
+            }
+
             viewState.errorState == LinkErrorState.Unavailable -> {
                 UnavailableLinkView(
                     title = sharedR.string.file_link_unavailable_title,
@@ -165,7 +182,8 @@ internal fun FileLinkView(
                         sharedR.string.file_link_unavailable_disabled,
                         sharedR.string.general_link_unavailable_invalid_url,
                         R.string.file_link_unavaible_ToS_violation
-                    )
+                    ),
+                    modifier = Modifier.height(screenHeight)
                 )
             }
 

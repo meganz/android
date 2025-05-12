@@ -10,13 +10,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.AppBarDefaults
@@ -50,7 +48,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -58,14 +55,13 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ads.AdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.filelink.view.ImportDownloadView
-import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
+import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
@@ -81,13 +77,11 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.buttons.DebouncedButtonContainer
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
-import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -274,7 +268,9 @@ internal fun FolderLinkView(
                         }
 
                         state.errorState == LinkErrorState.Expired -> {
-                            ExpiredFolderLinkView()
+                            ExpiredLinkView(
+                                title = sharedR.string.folder_link_expired_title
+                            )
                         }
 
                         state.errorState == LinkErrorState.Unavailable -> {
@@ -499,48 +495,6 @@ internal fun EmptyFolderLinkView(
 }
 
 
-@Composable
-internal fun ExpiredFolderLinkView() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Image(
-            painter = painterResource(id = iconPackR.drawable.ic_alert_triangle_color),
-            contentDescription = "Error",
-            modifier = Modifier
-                .size(120.dp)
-                .align(Alignment.CenterHorizontally),
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        MegaText(
-            text = stringResource(sharedR.string.folder_link_expired_title),
-            textColor = TextColor.Primary,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.h6Medium,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 6.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        MegaText(
-            text = stringResource(sharedR.string.general_link_expired),
-            textColor = TextColor.Primary,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.body1,
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(112.dp))
-    }
-}
 
 internal object Constants {
 
@@ -571,17 +525,6 @@ internal object Constants {
      */
     const val APPBAR_MORE_OPTION_TAG = "appbar_more_option_tag"
 }
-
-
-@CombinedThemePreviews
-@Composable
-private fun ExpiredFolderLinkViewPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
-        ExpiredFolderLinkView()
-    }
-}
-
-
 
 @CombinedThemePreviews
 @Composable

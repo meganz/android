@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,22 +20,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.lists.BulletListView
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
-import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.resources.R as sharedR
 
 
 @Composable
-internal fun UnavailableLinkView(
+internal fun ExpiredLinkView(
     @StringRes title: Int,
-    @StringRes subtitle: Int,
-    @StringRes bulletPoints: List<Int>,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -58,41 +54,33 @@ internal fun UnavailableLinkView(
             textColor = TextColor.Primary,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h6Medium,
-            modifier = Modifier.padding(horizontal = 6.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 6.dp)
         )
 
-        Spacer(modifier = Modifier.height(56.dp))
-
-        MegaText(
-            text = stringResource(subtitle),
-            textColor = TextColor.Primary,
-            style = MaterialTheme.typography.subtitle1medium,
-        )
         Spacer(modifier = Modifier.height(16.dp))
 
-        BulletListView(
-            items = bulletPoints.map { stringResource(it) },
-            textStyle = MaterialTheme.typography.body1,
-            textColor = TextColor.Secondary,
-            spacing = 16.dp,
+        MegaText(
+            text = stringResource(sharedR.string.general_link_expired),
+            textColor = TextColor.Primary,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.body1,
+            modifier = Modifier
+                .fillMaxWidth()
         )
+
+        Spacer(modifier = Modifier.height(112.dp))
     }
 }
 
 
 @CombinedThemePreviews
 @Composable
-private fun UnavailableFolderLinkViewPreview() {
+private fun ExpiredFolderLinkViewPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        UnavailableLinkView(
-            title = sharedR.string.folder_link_unavailable_title,
-            subtitle = sharedR.string.general_link_unavailable_subtitle,
-            bulletPoints = listOf(
-                sharedR.string.folder_link_unavailable_deleted,
-                sharedR.string.folder_link_unavailable_disabled,
-                sharedR.string.general_link_unavailable_invalid_url,
-                R.string.folder_link_unavaible_ToS_violation
-            )
+        ExpiredLinkView(
+            title = sharedR.string.folder_link_expired_title
         )
     }
 }
