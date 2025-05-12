@@ -32,6 +32,7 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import mega.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.isIsHeartBeatAlive
@@ -77,6 +78,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.LoginScreenEvent
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 import javax.inject.Inject
@@ -167,6 +169,9 @@ class LoginFragment : Fragment() {
 
         if (uiState.isLoginNewDesignEnabled == true) {
             AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
+                LaunchedEffect(Unit) {
+                    Analytics.tracker.trackEvent(LoginScreenEvent)
+                }
                 NewLoginView(
                     state = uiState,
                     onEmailChanged = viewModel::onEmailChanged,

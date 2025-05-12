@@ -1,6 +1,5 @@
 package mega.privacy.android.app.featuretoggle
 
-import mega.privacy.android.app.featuretoggle.AppFeatures.entries
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider

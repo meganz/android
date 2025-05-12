@@ -50,7 +50,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -118,6 +117,7 @@ import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ForgotPasswordButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LoginButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LoginHelpButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SignUpButtonOnLoginPagePressedEvent
@@ -137,7 +137,6 @@ import mega.privacy.mobile.analytics.event.SignUpButtonOnLoginPagePressedEvent
  * @param onBackPressed             Action when back is pressed.
  * @param modifier                  [Modifier]
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NewLoginView(
     state: LoginState,
@@ -168,6 +167,7 @@ fun NewLoginView(
         orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
     val requiredLoginScrollState = rememberScrollState()
     val twoFactorAuthScrollState = rememberScrollState()
+
     MegaScaffold(
         modifier = modifier
             .fillMaxSize()
@@ -486,7 +486,10 @@ private fun RequireLogin(
                     .padding(top = 16.dp)
                     .align(Alignment.CenterHorizontally),
                 text = stringResource(sharedR.string.login_page_forgot_password_text),
-                onClick = onForgotPassword,
+                onClick = {
+                    Analytics.tracker.trackEvent(ForgotPasswordButtonPressedEvent)
+                    onForgotPassword()
+                },
             )
 
             LinkSpannedText(

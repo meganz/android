@@ -71,6 +71,7 @@ import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
 import mega.privacy.android.app.utils.Constants.MAIL_SUPPORT
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ChangeEmailAddressButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ResendEmailConfirmationButtonPressedEvent
 
 /**
@@ -300,7 +301,10 @@ internal fun NewConfirmEmailScreen(
                             .height(height = spacing.x48)
                             .align(Alignment.CenterHorizontally),
                         text = stringResource(sharedR.string.general_change_email_address),
-                        onClick = onNavigateToChangeEmailAddress
+                        onClick = {
+                            Analytics.tracker.trackEvent(ChangeEmailAddressButtonPressedEvent)
+                            onNavigateToChangeEmailAddress()
+                        }
                     )
                 }
             }
