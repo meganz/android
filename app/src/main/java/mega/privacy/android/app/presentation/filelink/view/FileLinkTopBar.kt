@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.filelink.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -8,17 +7,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 internal const val SHARE_BUTTON_TAG = "file_link_top_bar:icon_share"
 
 @Composable
 internal fun FileLinkTopBar(
     title: String,
+    shouldShowMenuActions: Boolean,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,
     modifier: Modifier = Modifier,
@@ -27,7 +28,7 @@ internal fun FileLinkTopBar(
         appBarType = AppBarType.BACK_NAVIGATION,
         title = title,
         onNavigationPressed = onBackPressed,
-        actions = listOf(ShareMenuAction()),
+        actions = if (shouldShowMenuActions) listOf(ShareMenuAction()) else emptyList(),
         onActionPressed = {
             onShareClicked()
         },
@@ -52,6 +53,7 @@ private fun FileInfoTopBarPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         FileLinkTopBar(
             title = "Title",
+            shouldShowMenuActions = true,
             onBackPressed = {},
             onShareClicked = {},
         )

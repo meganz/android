@@ -9,7 +9,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
+import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
@@ -222,7 +222,7 @@ class FileLinkViewModelTest {
         }
 
     @Test
-    fun `test that on getting InvalidDecryptionKey exception when not fetching from decrypt dialog then error dialog value is set`() =
+    fun `test that that error state is set when InvalidDecryptionKey exception is returned but decryptionIntroduced is true`() =
         runTest {
             val url = "https://mega.co.nz/abc"
 
@@ -231,19 +231,19 @@ class FileLinkViewModelTest {
                 underTest.getPublicNode(url, false)
                 val result = expectMostRecentItem()
                 assertThat(result.askForDecryptionKeyDialogEvent).isEqualTo(consumed)
-                assertThat(result.fetchPublicNodeError).isNotNull()
+                assertThat(result.errorState).isEqualTo(LinkErrorState.Unavailable)
             }
         }
 
     @Test
-    fun `test that on getting GenericError exception error dialog values are set`() = runTest {
+    fun `test that error state is set when GenericError exception error is returned`() = runTest {
         val url = "https://mega.co.nz/abc"
 
         whenever(getPublicNodeUseCase(any())).thenThrow(PublicNodeException.GenericError())
         underTest.state.test {
             underTest.getPublicNode(url)
             val result = expectMostRecentItem()
-            assertThat(result.fetchPublicNodeError).isNotNull()
+            assertThat(result.errorState).isEqualTo(LinkErrorState.Unavailable)
         }
     }
 

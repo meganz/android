@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.folderlink.model.FolderError
+import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.utils.Constants
@@ -245,7 +245,7 @@ class FolderLinkViewModelTest {
             assertThat(initial.importNode).isNull()
             assertThat(initial.openFile).isInstanceOf(consumed().javaClass)
             assertThat(initial.selectImportLocation).isEqualTo(consumed)
-            assertThat(initial.errorState).isEqualTo(FolderError.NoError)
+            assertThat(initial.errorState).isEqualTo(LinkErrorState.NoError)
             assertThat(initial.snackBarMessage).isEqualTo(-1)
         }
     }
@@ -268,7 +268,7 @@ class FolderLinkViewModelTest {
             val newValue = expectMostRecentItem()
             assertThat(newValue.isLoginComplete).isTrue()
             assertThat(newValue.isInitialState).isFalse()
-            assertThat(newValue.errorState).isEqualTo(FolderError.NoError)
+            assertThat(newValue.errorState).isEqualTo(LinkErrorState.NoError)
         }
     }
 
@@ -283,7 +283,7 @@ class FolderLinkViewModelTest {
             underTest.fetchNodes(base64Handle)
             val newValue = expectMostRecentItem()
             assertThat(newValue.isNodesFetched).isTrue()
-            assertThat(newValue.errorState).isEqualTo(FolderError.Expired)
+            assertThat(newValue.errorState).isEqualTo(LinkErrorState.Expired)
         }
     }
 
@@ -298,7 +298,7 @@ class FolderLinkViewModelTest {
             underTest.fetchNodes(base64Handle)
             val newValue = expectMostRecentItem()
             assertThat(newValue.isNodesFetched).isTrue()
-            assertThat(newValue.errorState).isEqualTo(FolderError.Unavailable)
+            assertThat(newValue.errorState).isEqualTo(LinkErrorState.Unavailable)
         }
     }
 
@@ -313,7 +313,7 @@ class FolderLinkViewModelTest {
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
                 assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(triggered)
-                assertThat(newValue.errorState).isEqualTo(FolderError.NoError)
+                assertThat(newValue.errorState).isEqualTo(LinkErrorState.NoError)
             }
         }
 
@@ -329,7 +329,7 @@ class FolderLinkViewModelTest {
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
                 assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(triggered)
-                assertThat(newValue.errorState).isEqualTo(FolderError.NoError)
+                assertThat(newValue.errorState).isEqualTo(LinkErrorState.NoError)
                 assertThat(newValue.snackBarMessage).isEqualTo(-1)
             }
         }

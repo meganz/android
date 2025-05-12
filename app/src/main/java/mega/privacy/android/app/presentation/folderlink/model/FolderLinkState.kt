@@ -75,24 +75,11 @@ data class FolderLinkState(
     val downloadEvent: StateEventWithContent<TransferTriggerEvent.DownloadTriggerEvent> = consumed(),
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
     val shouldShowAdsForLink: Boolean = false,
-    val errorState: FolderError = FolderError.NoError,
+    val errorState: LinkErrorState = LinkErrorState.NoError,
 ) {
     /**
      * Whether to show toolbar and bottom bar actions
      */
     val showContentActions: Boolean
-        get() = errorState == FolderError.NoError && isNodesFetched
-}
-
-/**
- * Sealed class defining the error state of [FolderLinkState]
- *
- * @property NoError  No error
- * @property Unavailable  Folder link is unavailable
- * @property Expired  Folder link is expired
- */
-sealed interface FolderError {
-    object NoError : FolderError
-    object Unavailable : FolderError
-    object Expired : FolderError
+        get() = errorState == LinkErrorState.NoError && isNodesFetched
 }

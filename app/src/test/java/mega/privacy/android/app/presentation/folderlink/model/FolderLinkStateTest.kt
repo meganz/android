@@ -9,7 +9,7 @@ class FolderLinkStateTest {
     fun `test that showContentActions is true when nodes are fetched without errors`() {
         val folderLinkState = FolderLinkState(
             isNodesFetched = true,
-            errorState = FolderError.NoError
+            errorState = LinkErrorState.NoError
         )
         assertThat(folderLinkState.showContentActions).isTrue()
     }

@@ -1,9 +1,9 @@
 package mega.privacy.android.app.presentation.filelink.model
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.presentation.filelink.model.FileLinkState
+import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 
 class FileLinkStateTest {
@@ -41,5 +41,14 @@ class FileLinkStateTest {
         val result = underTest.copyWithTypedNode(fileNode, iconResource)
         assertThat(result.previewPath).isNull()
         assertThat(result.iconResource).isEqualTo(iconResource)
+    }
+
+    @Test
+    fun `test that showContentActions is true when nodes are fetched without errors`() {
+        val folderLinkState = FileLinkState(
+            jobInProgressState = null,
+            errorState = LinkErrorState.NoError
+        )
+        assertThat(folderLinkState.showContentActions).isTrue()
     }
 }

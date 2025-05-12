@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.filelink
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -35,7 +33,6 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
-import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filelink.view.FileLinkView
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -60,6 +57,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -173,7 +171,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
                     onSaveToDeviceClicked = viewModel::handleSaveFile,
                     onImportClicked = ::onImportClicked,
                     onTransferWidgetClick = ::onTransfersWidgetClick,
-                    onConfirmErrorDialogClick = ::onConfirmErrorDialogClick,
                     onErrorMessageConsumed = viewModel::resetErrorMessage,
                     onOverQuotaErrorConsumed = viewModel::resetOverQuotaError,
                     onForeignNodeErrorConsumed = viewModel::resetForeignNodeError,
@@ -247,13 +244,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
 
     private fun onShareClicked() {
         MegaNodeUtil.shareLink(this, viewModel.state.value.url, viewModel.state.value.title)
-    }
-
-    private fun onConfirmErrorDialogClick() {
-        if (isClosedChat) {
-            startActivity(Intent(this@FileLinkComposeActivity, ManagerActivity::class.java))
-        }
-        finish()
     }
 
     /**

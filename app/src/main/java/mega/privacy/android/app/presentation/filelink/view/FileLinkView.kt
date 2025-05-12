@@ -27,11 +27,11 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.ads.AdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.extensions.errorDialogContentId
-import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
 import mega.privacy.android.app.presentation.fileinfo.view.PreviewWithShadow
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
+import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
+import mega.privacy.android.app.presentation.folderlink.view.UnavailableLinkView
 import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -39,7 +39,6 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.shared.original.core.ui.controls.buttons.DebouncedButtonContainer
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
@@ -48,6 +47,8 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
+
 
 /**
  * View to render the File Link Screen, including toolbar, content, etc.
@@ -67,7 +68,6 @@ internal fun FileLinkView(
     onSaveToDeviceClicked: () -> Unit,
     onImportClicked: () -> Unit,
     onTransferWidgetClick: () -> Unit,
-    onConfirmErrorDialogClick: () -> Unit,
     onErrorMessageConsumed: () -> Unit,
     onOverQuotaErrorConsumed: () -> Unit,
     onForeignNodeErrorConsumed: () -> Unit,
@@ -97,6 +97,7 @@ internal fun FileLinkView(
         topBar = {
             FileLinkTopBar(
                 title = viewState.title,
+                shouldShowMenuActions = viewState.showContentActions,
                 onBackPressed = onBackPressed,
                 onShareClicked = onShareClicked,
             )
@@ -123,15 +124,17 @@ internal fun FileLinkView(
         },
         bottomBar = {
             Column {
-                ImportDownloadView(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .background(MaterialTheme.colors.grey_020_grey_700),
-                    hasDbCredentials = viewState.hasDbCredentials,
-                    onImportClicked = onImportClicked,
-                    onSaveToDeviceClicked = onSaveToDeviceClicked
-                )
+                if (viewState.showContentActions) {
+                    ImportDownloadView(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .background(MaterialTheme.colors.grey_020_grey_700),
+                        hasDbCredentials = viewState.hasDbCredentials,
+                        onImportClicked = onImportClicked,
+                        onSaveToDeviceClicked = onSaveToDeviceClicked
+                    )
+                }
                 request?.let { request ->
                     AdsContainer(
                         request = request,
@@ -152,27 +155,29 @@ internal fun FileLinkView(
         headerSpacerHeight = if (viewState.iconResource != null) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp,
         modifier = modifier,
     ) {
-        FileLinkContent(
-            viewState = viewState,
-            onPreviewClick = onPreviewClick,
-        )
+        when {
+            viewState.errorState == LinkErrorState.Unavailable -> {
+                UnavailableLinkView(
+                    title = sharedR.string.file_link_unavailable_title,
+                    subtitle = sharedR.string.general_link_unavailable_subtitle,
+                    bulletPoints = listOf(
+                        sharedR.string.file_link_unavailable_deleted,
+                        sharedR.string.file_link_unavailable_disabled,
+                        sharedR.string.general_link_unavailable_invalid_url,
+                        R.string.file_link_unavaible_ToS_violation
+                    )
+                )
+            }
+
+            else -> FileLinkContent(
+                viewState = viewState,
+                onPreviewClick = onPreviewClick,
+            )
+        }
     }
 
     viewState.jobInProgressState?.progressMessage?.let {
         LoadingDialog(text = stringResource(id = it))
-    }
-
-    viewState.fetchPublicNodeError?.let {
-        ConfirmationDialog(
-            title = stringResource(id = it.errorDialogTitleId),
-            text = stringResource(id = it.errorDialogContentId),
-            confirmButtonText = stringResource(id = android.R.string.ok),
-            cancelButtonText = null,
-            onConfirm = onConfirmErrorDialogClick,
-            onDismiss = {},
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false
-        )
     }
 
     showQuotaExceededDialog.value?.let {
@@ -272,7 +277,6 @@ private fun PreviewFileLinkView() {
             onSaveToDeviceClicked = {},
             onImportClicked = {},
             onTransferWidgetClick = {},
-            onConfirmErrorDialogClick = {},
             onErrorMessageConsumed = {},
             onOverQuotaErrorConsumed = {},
             onForeignNodeErrorConsumed = {},

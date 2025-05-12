@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.clouddrive
+package mega.privacy.android.app.presentation.filelink
 
 import android.content.Context
 import android.content.Intent
@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
+import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -155,7 +156,7 @@ class FileLinkViewModel @Inject constructor(
                             _state.update { it.copy(askForDecryptionKeyDialogEvent = triggered) }
                         } else {
                             _state.update {
-                                it.copy(fetchPublicNodeError = exception)
+                                it.copy(errorState = LinkErrorState.Unavailable)
                             }
                         }
                     }
@@ -166,7 +167,13 @@ class FileLinkViewModel @Inject constructor(
 
                     else -> {
                         _state.update {
-                            it.copy(fetchPublicNodeError = exception as? PublicNodeException)
+                            it.copy(
+                                errorState = if (exception is PublicNodeException) {
+                                    LinkErrorState.Unavailable
+                                } else {
+                                    LinkErrorState.NoError
+                                }
+                            )
                         }
                     }
                 }
