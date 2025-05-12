@@ -58,6 +58,7 @@ include(":shared:resources")
 include(":shared:sync")
 include(":android-database-sqlcipher")
 include(":feature:chat")
+include(":feature:transfers:ui-components")
 
 
 println("isServerBuild = ${isServerBuild()}")

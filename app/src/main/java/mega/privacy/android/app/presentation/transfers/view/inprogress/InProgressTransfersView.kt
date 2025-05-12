@@ -18,7 +18,7 @@ import mega.privacy.android.app.presentation.transfers.model.image.InProgressTra
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_IN_PROGRESS_TAB
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
-import mega.privacy.android.shared.original.core.ui.controls.transfers.InProgressTransferItem
+import mega.privacy.android.feature.transfers.components.InProgressTransferItem
 
 @Composable
 internal fun InProgressTransfersView(

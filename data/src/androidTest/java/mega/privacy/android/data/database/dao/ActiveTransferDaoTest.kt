@@ -37,7 +37,8 @@ class ActiveTransferDaoTest {
                 isAlreadyTransferred = false,
                 isCancelled = true,
                 appData = emptyList(),
-                fileName = "file$index.txt"
+                fileName = "file$index.txt",
+                localPath = "path",
             )
         }
     }
@@ -75,7 +76,8 @@ class ActiveTransferDaoTest {
                 TransferAppData.CameraUpload,
                 TransferAppData.OriginalUriPath(UriPath("content://uri")),
             ),
-            fileName = "fileName"
+            fileName = "fileName",
+            localPath = "path",
         )
         activeTransferDao.insertOrUpdateActiveTransfer(newEntity)
         val actual = activeTransferDao.getActiveTransferByUniqueId(newEntity.uniqueId)

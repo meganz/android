@@ -1,4 +1,4 @@
-package mega.privacy.android.shared.original.core.ui.controls.transfers
+package mega.privacy.android.feature.transfers.components
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule

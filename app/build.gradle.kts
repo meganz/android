@@ -206,6 +206,7 @@ dependencies {
     implementation(project(":feature:devicecenter"))
     implementation(project(":shared:resources"))
     implementation(project(":feature:chat"))
+    implementation(project(":feature:transfers:ui-components"))
     preBuiltSdkDependency(rootProject.extra)
 
     //Test Modules

@@ -1,16 +1,14 @@
-package mega.privacy.android.shared.original.core.ui.controls.transfers
+package mega.privacy.android.feature.transfers.components
+
 
 import android.net.Uri
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,13 +18,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
-import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.R
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Core component for a in-progress transfer item.
@@ -53,10 +54,10 @@ fun InProgressTransferItem(
         .fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically
 ) {
-    Icon(
+    MegaIcon(
         painter = painterResource(id = iconPackR.drawable.ic_queue_line_small_regular_outline),
         contentDescription = "Reorder icon",
-        tint = DSTokens.colors.icon.secondary,
+        tint = IconColor.Secondary,
         modifier = Modifier
             .padding(start = 8.dp)
             .testTag(TEST_TAG_QUEUE_ICON)
@@ -74,7 +75,7 @@ fun InProgressTransferItem(
     ) {
         MegaText(
             text = fileName,
-            style = MaterialTheme.typography.subtitle1,
+            style = AppTheme.typography.titleMedium,
             textColor = TextColor.Primary,
             modifier = Modifier.testTag(TEST_TAG_IN_PROGRESS_TRANSFER_NAME),
         )
@@ -83,18 +84,18 @@ fun InProgressTransferItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (isQueued && areTransfersPaused.not()) {
-                Icon(
+                MegaIcon(
                     modifier = Modifier
                         .size(16.dp)
                         .testTag(TEST_TAG_IN_PROGRESS_TRANSFER_QUEUED_ICON),
                     painter = painterResource(id = iconPackR.drawable.ic_circle_big_medium_regular_outline),
                     contentDescription = null,
-                    tint = DSTokens.colors.support.warning,
+                    supportTint = SupportColor.Warning,
                 )
             } else {
                 MegaText(
                     text = progress,
-                    style = MaterialTheme.typography.subtitle2,
+                    style = AppTheme.typography.titleSmall,
                     textColor = when {
                         isOverQuota -> TextColor.Warning
                         isDownload -> TextColor.Success
@@ -106,7 +107,7 @@ fun InProgressTransferItem(
             speed?.let {
                 MegaText(
                     text = speed,
-                    style = MaterialTheme.typography.subtitle2,
+                    style = AppTheme.typography.titleSmall,
                     textColor = TextColor.Secondary,
                     modifier = Modifier
                         .padding(start = 6.dp)
@@ -120,14 +121,14 @@ fun InProgressTransferItem(
             .padding(end = 16.dp)
             .testTag(if (isPaused) TEST_TAG_PLAY_ICON else TEST_TAG_PAUSE_ICON)
     ) {
-        Icon(
+        MegaIcon(
             painter = painterResource(
                 id = if (isPaused) iconPackR.drawable.ic_play_medium_regular_outline
                 else iconPackR.drawable.ic_pause_medium_regular_outline
             ),
-            contentDescription = if (isPaused) stringResource(id = R.string.action_play)
-            else stringResource(id = R.string.action_pause),
-            tint = DSTokens.colors.icon.secondary,
+            contentDescription = if (isPaused) stringResource(id = sharedR.string.transfers_section_action_play)
+            else stringResource(id = sharedR.string.transfers_section_action_pause),
+            tint = IconColor.Secondary,
         )
     }
 }
@@ -137,8 +138,7 @@ fun InProgressTransferItem(
 private fun InProgressTransferItemPreview(
     @PreviewParameter(InProgressTransferItemProvider::class) inProgressTransferUI: InProgressTransferUI,
 ) {
-    val isDark = isSystemInDarkTheme()
-    OriginalTheme(isDark = isDark) {
+    AndroidThemeForPreviews {
         with(inProgressTransferUI) {
             InProgressTransferItem(
                 tag = 1,

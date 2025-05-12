@@ -17,8 +17,8 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.feature.transfers.components.TEST_TAG_IN_PROGRESS_TRANSFER_ITEM
 import mega.privacy.android.icon.pack.R
-import mega.privacy.android.shared.original.core.ui.controls.transfers.TEST_TAG_IN_PROGRESS_TRANSFER_ITEM
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
