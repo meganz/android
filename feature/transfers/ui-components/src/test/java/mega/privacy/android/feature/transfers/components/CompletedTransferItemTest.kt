@@ -1,13 +1,13 @@
-package mega.privacy.android.shared.original.core.ui.controls.transfers
+package mega.privacy.android.feature.transfers.components
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -85,7 +85,9 @@ class CompletedTransferItemTest {
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_NAME).assertIsDisplayed()
             onNodeWithText(name).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_SUCCESS_ICON).assertDoesNotExist()
-            onNodeWithText(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.transfer_cancelled)).assertIsDisplayed()
+            onNodeWithText(
+                InstrumentationRegistry.getInstrumentation().targetContext.getString(sharedR.string.transfers_section_cancelled)
+            ).assertIsDisplayed()
         }
     }
 
@@ -151,7 +153,9 @@ class CompletedTransferItemTest {
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_NAME).assertIsDisplayed()
             onNodeWithText(name).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_SUCCESS_ICON).assertDoesNotExist()
-            onNodeWithText(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.transfer_cancelled)).assertIsDisplayed()
+            onNodeWithText(
+                InstrumentationRegistry.getInstrumentation().targetContext.getString(sharedR.string.transfers_section_cancelled)
+            ).assertIsDisplayed()
         }
     }
 

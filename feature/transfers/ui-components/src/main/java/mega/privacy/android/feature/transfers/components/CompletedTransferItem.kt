@@ -1,7 +1,6 @@
-package mega.privacy.android.shared.original.core.ui.controls.transfers
+package mega.privacy.android.feature.transfers.components
 
 import android.net.Uri
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,13 +17,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
-import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.R
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Core component for a completed transfer item.
@@ -62,7 +61,7 @@ fun CompletedTransferItem(
     ) {
         MegaText(
             text = fileName,
-            style = MaterialTheme.typography.subtitle1,
+            style = AppTheme.typography.titleMedium,
             textColor = TextColor.Primary,
             modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_NAME),
         )
@@ -72,18 +71,19 @@ fun CompletedTransferItem(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             location?.let {
-                Icon(
+                MegaIcon(
                     modifier = Modifier
                         .size(16.dp)
                         .testTag(TEST_TAG_COMPLETED_TRANSFER_SUCCESS_ICON),
                     painter = painterResource(id = iconPackR.drawable.ic_check_circle_medium_regular_outline),
                     contentDescription = null,
-                    tint = DSTokens.colors.support.success,
+                    supportTint = SupportColor.Success,
                 )
             }
             MegaText(
-                text = location ?: error ?: stringResource(id = R.string.transfer_cancelled),
-                style = MaterialTheme.typography.subtitle2,
+                text = location ?: error
+                ?: stringResource(id = sharedR.string.transfers_section_cancelled),
+                style = AppTheme.typography.titleSmall,
                 textColor = if (error != null) TextColor.Error else TextColor.Secondary,
                 modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_RESULT),
             )
@@ -96,8 +96,7 @@ fun CompletedTransferItem(
 private fun CompletedTransferItemPreview(
     @PreviewParameter(CompletedTransferItemProvider::class) completedTransferUI: CompletedTransferUI,
 ) {
-    val isDark = isSystemInDarkTheme()
-    OriginalTheme(isDark = isDark) {
+    AndroidThemeForPreviews {
         with(completedTransferUI) {
             CompletedTransferItem(
                 isDownload = isDownload,

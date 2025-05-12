@@ -1155,4 +1155,6 @@
     <string name="file_link_expired_title">The file cannot be accessed</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
     <string name="folder_link_unavailable_deleted">The folder was deleted</string>
+    <!-- Possible state of a transfer. When the transfer was cancelled -->
+    <string name="transfers_section_cancelled">Cancelled</string>
 </resources>

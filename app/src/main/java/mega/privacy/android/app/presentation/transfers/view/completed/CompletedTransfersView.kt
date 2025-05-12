@@ -14,7 +14,7 @@ import kotlinx.collections.immutable.ImmutableList
 import mega.privacy.android.app.presentation.transfers.model.image.CompletedTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_COMPLETED_TAB
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.shared.original.core.ui.controls.transfers.CompletedTransferItem
+import mega.privacy.android.feature.transfers.components.CompletedTransferItem
 
 @Composable
 internal fun CompletedTransfersView(
