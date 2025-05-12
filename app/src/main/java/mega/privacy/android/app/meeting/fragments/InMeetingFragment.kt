@@ -2839,22 +2839,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    /**
-     * Show participant bottom sheet when user click the three dots on participant item
-     *
-     * @param participant Participant of the meeting
-     */
-    override fun onParticipantOption(participant: Participant) {
-        val participantBottomSheet =
-            MeetingParticipantBottomSheetDialogFragment.newInstance(
-                inMeetingViewModel.amIAGuest(),
-                inMeetingViewModel.isModerator(),
-                inMeetingViewModel.state.value.callUIStatus == CallUIStatusType.SpeakerView,
-                participant
-            )
-        participantBottomSheet.show(childFragmentManager, participantBottomSheet.tag)
-    }
-
     companion object {
         const val ANIMATION_DURATION: Long = 500
 

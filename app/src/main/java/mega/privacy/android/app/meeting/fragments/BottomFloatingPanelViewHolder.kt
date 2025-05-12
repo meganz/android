@@ -15,10 +15,18 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.PopupWindow
+import androidx.activity.compose.BackHandler
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -29,7 +37,9 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPanelView
+import mega.privacy.android.app.presentation.meeting.view.sheet.CallParticipantBottomSheetView
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.CallUIMoreButtonPressedEvent
@@ -456,11 +466,63 @@ class BottomFloatingPanelViewHolder(
                             listener.onInviteParticipants()
                         },
                         onParticipantMoreOptionsClicked = { chatParticipant ->
-                            meetingViewModel.state.value.usersInCall.find { it.peerId == chatParticipant.handle }
-                                ?.let {
-                                    listener.onParticipantOption(it)
-                                }
+                            meetingViewModel.onParticipantMoreOptionsClick(chatParticipant)
+                        }
+                    )
+                }
+            }
+        }
+
+        binding.bottomFloatingPanel.participantOptionsComposeView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val uiState by meetingViewModel.state.collectAsStateWithLifecycle()
+
+                val coroutineScope = rememberCoroutineScope()
+                val modalSheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Hidden,
+                    skipHalfExpanded = true,
+                )
+                BackHandler(enabled = modalSheetState.isVisible) {
+                    coroutineScope.launch {
+                        modalSheetState.hide()
+                    }
+                }
+
+                EventEffect(
+                    uiState.selectParticipantEvent,
+                    meetingViewModel::onConsumeSelectParticipantEvent
+                ) {
+                    modalSheetState.show()
+                }
+
+                OriginalTheme(isDark = true) {
+                    CallParticipantBottomSheetView(
+                        modalSheetState = modalSheetState,
+                        coroutineScope = coroutineScope,
+                        state = uiState,
+                        onAddContactClick = meetingViewModel::onAddContactClick,
+                        onContactInfoClick = { email -> meetingViewModel.onContactInfoClicked(email) },
+                        onEditProfileClick = { meetingViewModel.onEditProfileClicked(shouldTriggered = true) },
+                        onSendMessageClick = meetingViewModel::sendMessageToChat,
+                        onMakeHostClick = {
+                            meetingViewModel.updateParticipantPermissions(
+                                ChatRoomPermission.Moderator
+                            )
                         },
+                        onRemoveAsHostClick = {
+                            meetingViewModel.updateParticipantPermissions(
+                                ChatRoomPermission.Standard
+                            )
+                        },
+                        onDisplayInMainViewClick = {
+                            meetingViewModel.onPinToSpeakerView(true)
+                            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
+                            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
+                            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
+                        },
+                        onMuteParticipantClick = meetingViewModel::muteParticipant,
+                        onRemoveParticipantClick = meetingViewModel::removeParticipantFromChat,
                     )
                 }
             }

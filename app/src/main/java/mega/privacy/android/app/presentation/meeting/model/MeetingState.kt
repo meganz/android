@@ -75,6 +75,8 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property isInPipMode                                True, if is in Picture in Picture mode. False, otherwise.
  * @property startedMeetingChatId                       Chat id of the meeting started
  * @property answerResult                               [AnswerCallResult]
+ * @property editProfileEvent                           Edit profile clicked
+ * @property emailContactToShowInfo                     Contact Info clicked
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -139,6 +141,8 @@ data class MeetingState(
     val camEnabled: Boolean = false,
     val speakerType: AudioDevice = AudioDevice.None,
     val answerResult: AnswerCallResult? = null,
+    val editProfileEvent: Boolean = false,
+    val emailContactToShowInfo: String? = null,
 ) {
 
     /**

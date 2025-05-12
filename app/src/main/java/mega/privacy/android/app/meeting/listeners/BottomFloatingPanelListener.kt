@@ -1,7 +1,5 @@
 package mega.privacy.android.app.meeting.listeners
 
-import mega.privacy.android.app.meeting.adapter.Participant
-
 interface BottomFloatingPanelListener {
     /**
      * Listener for button bar
@@ -15,9 +13,4 @@ interface BottomFloatingPanelListener {
      * Listener for invite button
      */
     fun onInviteParticipants()
-
-    /**
-     * Listener for participant item
-     */
-    fun onParticipantOption(participant: Participant)
 }

@@ -76,6 +76,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -325,6 +326,43 @@ class MeetingActivityViewModelTest {
         underTest.monitorChatConnectionStatus(chatId)
         underTest.state.map { it.chatConnectionStatus }.test {
             assertThat(awaitItem()).isNull()
+        }
+    }
+
+    @Test
+    fun `test that onEditProfileClicked updates state if invoked with true value`() = runTest {
+        initUnderTest()
+        underTest.onEditProfileClicked(true)
+        underTest.state.map { it.editProfileEvent }.test {
+            assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that onEditProfileClicked updates state if invoked with false value`() = runTest {
+        initUnderTest()
+        underTest.onEditProfileClicked(false)
+        underTest.state.map { it.editProfileEvent }.test {
+            assertThat(awaitItem()).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that onContactInfoClicked updates state if invoked with null value`() = runTest {
+        initUnderTest()
+        underTest.onContactInfoClicked(null)
+        underTest.state.map { it.emailContactToShowInfo }.test {
+            assertThat(awaitItem()).isNull()
+        }
+    }
+
+    @Test
+    fun `test that onContactInfoClicked updates state if invoked with value`() = runTest {
+        initUnderTest()
+        val email = "test@email.com"
+        underTest.onContactInfoClicked(email)
+        underTest.state.map { it.emailContactToShowInfo }.test {
+            assertThat(awaitItem()).isEqualTo(email)
         }
     }
 

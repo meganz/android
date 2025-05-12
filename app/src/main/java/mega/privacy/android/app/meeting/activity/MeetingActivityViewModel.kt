@@ -1953,6 +1953,28 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
+     * Edit profile button clicked
+     *
+     * @param shouldTriggered   True, if the event should be triggered. False, otherwise.
+     */
+    fun onEditProfileClicked(shouldTriggered: Boolean) = _state.update { state ->
+        state.copy(
+            editProfileEvent = shouldTriggered,
+        )
+    }
+
+    /**
+     * Contact info button clicked
+     *
+     * @param email   Email of the contact
+     */
+    fun onContactInfoClicked(email: String?) = _state.update { state ->
+        state.copy(
+            emailContactToShowInfo = email,
+        )
+    }
+
+    /**
      * Consume select participant event
      */
     fun onConsumeSelectParticipantEvent() =

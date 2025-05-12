@@ -22,6 +22,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -289,9 +291,7 @@ class MeetingActivity : PasscodeActivity() {
                     ParticipantsFullListView(
                         onScrollChange = { scrolled ->
                             binding.toolbar.elevation = if (scrolled) 4f else 0f
-                        },
-                        onEditProfileClicked = { editProfile() },
-                        onContactInfoClicked = { email -> openContactInfo(email) },
+                        }
                     )
                 }
             }
@@ -328,6 +328,21 @@ class MeetingActivity : PasscodeActivity() {
             }
         }
 
+        collectFlow(meetingViewModel.state.map { it.editProfileEvent }
+            .distinctUntilChanged()) {
+            if (it) {
+                meetingViewModel.onEditProfileClicked(shouldTriggered = false)
+                editProfile()
+            }
+        }
+
+        collectFlow(meetingViewModel.state.map { it.emailContactToShowInfo }
+            .distinctUntilChanged()) {
+            it?.let { email ->
+                meetingViewModel.onContactInfoClicked(email = null)
+                openContactInfo(email)
+            }
+        }
     }
 
     private fun collectFlows() {

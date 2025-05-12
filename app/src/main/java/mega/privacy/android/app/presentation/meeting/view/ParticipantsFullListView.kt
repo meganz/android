@@ -73,8 +73,6 @@ import mega.privacy.android.shared.resources.R as sharedR
  */
 @Composable
 fun ParticipantsFullListView(
-    onEditProfileClicked: () -> Unit,
-    onContactInfoClicked: (String) -> Unit,
     meetingViewModel: MeetingActivityViewModel = hiltViewModel(),
     waitingRoomManagementViewModel: WaitingRoomManagementViewModel = hiltViewModel(),
     onScrollChange: (Boolean) -> Unit,
@@ -92,7 +90,7 @@ fun ParticipantsFullListView(
             meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
         },
         onDenyParticipantClicked =
-        waitingRoomManagementViewModel::denyUsersClick,
+            waitingRoomManagementViewModel::denyUsersClick,
         onAdmitParticipantClicked = { participant ->
             waitingRoomManagementViewModel.admitUsersClick(
                 participant
@@ -118,8 +116,10 @@ fun ParticipantsFullListView(
             )
         },
         onAddContactClicked = meetingViewModel::onAddContactClick,
-        onEditProfileClicked = onEditProfileClicked,
-        onContactInfoClicked = onContactInfoClicked,
+        onEditProfileClicked = { meetingViewModel.onEditProfileClicked(shouldTriggered = true) },
+        onContactInfoClicked = { email ->
+            meetingViewModel.onContactInfoClicked(email)
+        },
         onMakeHostClicked = {
             meetingViewModel.updateParticipantPermissions(
                 ChatRoomPermission.Moderator
