@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
+import mega.privacy.android.app.presentation.filelink.model.FileLinkJobInProgressState
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
@@ -289,6 +290,11 @@ class FileLinkViewModel @Inject constructor(
             Timber.e("Invalid File node")
             resetJobInProgressState()
             return@launch
+        }
+        _state.update {
+            it.copy(
+                jobInProgressState = FileLinkJobInProgressState.Importing,
+            )
         }
         runCatching { copyPublicNodeUseCase(fileNode, NodeId(targetHandle), null) }
             .onSuccess {

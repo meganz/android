@@ -56,7 +56,7 @@ data class FileLinkState(
     val overQuotaError: StateEventWithContent<StorageState> = consumed(),
     val foreignNodeError: StateEvent = consumed,
     val shouldShowAdsForLink: Boolean = false,
-    val errorState: LinkErrorState = LinkErrorState.NoError
+    val errorState: LinkErrorState = LinkErrorState.NoError,
 ) {
     /**
      * Whether to show toolbar and bottom bar actions
@@ -76,4 +76,10 @@ data class FileLinkState(
         handle = typedNode.id.longValue,
         serializedData = typedNode.serializedData
     )
+
+    /**
+     * Whether link details is loading
+     */
+    val isLoading: Boolean
+        get() = jobInProgressState == FileLinkJobInProgressState.InitialLoading
 }

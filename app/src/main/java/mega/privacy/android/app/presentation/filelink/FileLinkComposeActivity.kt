@@ -205,7 +205,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
                     event = uiState.copySuccessEvent,
                     onConsumed = viewModel::resetCopySuccessEvent,
                 ) {
-                    launchManagerActivity()
+                    launchManagerActivityAfterCopy()
                 }
             }
         }
@@ -280,11 +280,16 @@ class FileLinkComposeActivity : PasscodeActivity(),
         selectImportFolderLauncher.launch(intent)
     }
 
-    private fun launchManagerActivity() {
-        startActivity(
-            Intent(this@FileLinkComposeActivity, ManagerActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        )
+    private fun launchManagerActivityAfterCopy() {
+        Intent(this, ManagerActivity::class.java).apply {
+            action = Constants.ACTION_SHOW_WARNING
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(
+                Constants.INTENT_EXTRA_WARNING_MESSAGE,
+                getString(R.string.context_correctly_copied)
+            )
+            startActivity(this)
+        }
         finish()
     }
 

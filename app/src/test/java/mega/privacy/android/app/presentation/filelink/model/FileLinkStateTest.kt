@@ -51,4 +51,13 @@ class FileLinkStateTest {
         )
         assertThat(folderLinkState.showContentActions).isTrue()
     }
+
+
+    @Test
+    fun `test that isLoading is true when jobInProgressState is InitialLoading`() {
+        val folderLinkState = FileLinkState(
+            jobInProgressState = FileLinkJobInProgressState.InitialLoading,
+        )
+        assertThat(folderLinkState.isLoading).isTrue()
+    }
 }

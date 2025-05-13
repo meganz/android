@@ -7,16 +7,22 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -24,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import de.palm.composestateevents.EventEffect
+import mega.android.core.ui.components.util.shimmerEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.ads.AdsContainer
@@ -31,6 +38,7 @@ import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogVie
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
 import mega.privacy.android.app.presentation.fileinfo.view.PreviewWithShadow
+import mega.privacy.android.app.presentation.filelink.model.FileLinkJobInProgressState
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.folderlink.view.ExpiredLinkView
@@ -157,7 +165,7 @@ internal fun FileLinkView(
                 )
             }
         },
-        headerSpacerHeight = if (viewState.errorState == LinkErrorState.NoError) {
+        headerSpacerHeight = if (viewState.errorState == LinkErrorState.NoError && !viewState.isLoading) {
             if (viewState.iconResource != null) (MAX_HEADER_HEIGHT + APP_BAR_HEIGHT).dp else MAX_HEADER_HEIGHT.dp
         } else {
             0.dp
@@ -166,6 +174,10 @@ internal fun FileLinkView(
     ) {
         val screenHeight = (LocalConfiguration.current.screenHeightDp - (APP_BAR_HEIGHT * 2)).dp
         when {
+            viewState.isLoading -> {
+                FileLinksLoadingView()
+            }
+
             viewState.errorState == LinkErrorState.Expired -> {
                 ExpiredLinkView(
                     title = sharedR.string.file_link_expired_title,
@@ -194,8 +206,10 @@ internal fun FileLinkView(
         }
     }
 
-    viewState.jobInProgressState?.progressMessage?.let {
-        LoadingDialog(text = stringResource(id = it))
+    viewState.jobInProgressState?.takeIf {
+        it != FileLinkJobInProgressState.InitialLoading
+    }?.progressMessage?.let { message ->
+        LoadingDialog(text = stringResource(id = message))
     }
 
     showQuotaExceededDialog.value?.let {
@@ -234,6 +248,63 @@ internal fun FileLinkView(
 }
 
 @Composable
+internal fun FileLinksLoadingView() {
+    Column {
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 72.dp)
+                .height(20.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .shimmerEffect()
+        )
+
+        Spacer(Modifier.height(28.dp))
+
+        Spacer(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .shimmerEffect()
+                .align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(Modifier.height(48.dp))
+
+        Spacer(
+            modifier = Modifier
+                .padding(horizontal = 72.dp)
+                .width(66.dp)
+                .height(20.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .shimmerEffect()
+        )
+
+        Spacer(Modifier.height(14.dp))
+
+        Spacer(
+            modifier = Modifier
+                .padding(horizontal = 72.dp)
+                .width(166.dp)
+                .height(20.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .shimmerEffect()
+        )
+
+        Spacer(Modifier.height(50.dp))
+
+        Spacer(
+            modifier = Modifier
+                .padding(horizontal = 72.dp)
+                .width(80.dp)
+                .height(45.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .shimmerEffect()
+        )
+    }
+}
+
+@Composable
 internal fun ImportDownloadView(
     modifier: Modifier,
     hasDbCredentials: Boolean,
@@ -260,6 +331,14 @@ internal fun ImportDownloadView(
                 onClick = onImportClicked,
             )
         }
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun PreviewFileLinksLoadingView() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        FileLinksLoadingView()
     }
 }
 
