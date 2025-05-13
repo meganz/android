@@ -106,18 +106,14 @@ class TransfersViewModel @Inject constructor(
 
     private fun monitorCompletedTransfers() {
         viewModelScope.launch {
-            monitorCompletedTransfersUseCase().collectLatest { transfers ->
-                val groupedTransfers = transfers
-                    .sortedByDescending { it.timestamp }
-                    .groupBy { it.state == MegaTransfer.STATE_COMPLETED }
-
-                val completedTransfers = groupedTransfers[true].orEmpty().toImmutableList()
-                val failedTransfers = groupedTransfers[false].orEmpty().toImmutableList()
-
+            monitorCompletedTransfersUseCase().collectLatest { completedTransfers ->
+                val (completed, failed) = completedTransfers.partition { it.state == MegaTransfer.STATE_COMPLETED }
                 _uiState.update { state ->
                     state.copy(
-                        completedTransfers = completedTransfers,
-                        failedTransfers = failedTransfers,
+                        completedTransfers = completed
+                            .sortedByDescending { it.timestamp }.toImmutableList(),
+                        failedTransfers = failed
+                            .sortedByDescending { it.timestamp }.toImmutableList(),
                     )
                 }
             }

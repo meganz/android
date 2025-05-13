@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.transfers.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -20,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import mega.android.core.ui.components.tabs.MegaScrollableTabRow
+import mega.android.core.ui.model.TabItems
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
@@ -29,10 +29,10 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
-import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
 internal fun TransfersView(
     bottomSheetNavigator: BottomSheetNavigator,
@@ -75,41 +75,43 @@ internal fun TransfersView(
                 )
             },
         ) { paddingValues ->
-            Column(
+            MegaScrollableTabRow(
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize(),
-            ) {
-                Tabs(
-                    cells = {
-                        addTextTab(
-                            text = stringResource(id = R.string.title_tab_in_progress_transfers),
-                            tag = TEST_TAG_IN_PROGRESS_TAB,
-                        ) {
-                            InProgressTransfersView(
-                                inProgressTransfers = inProgressTransfers,
-                                isOverQuota = isOverQuota,
-                                areTransfersPaused = areTransfersPaused,
-                                onPlayPauseClicked = onPlayPauseTransfer,
-                            )
-                        }
-                        addTextTab(
-                            text = stringResource(id = R.string.title_tab_completed_transfers),
-                            tag = TEST_TAG_COMPLETED_TAB,
-                        ) {
-                            CompletedTransfersView(
-                                completedTransfers = completedTransfers,
-                            )
-                        }
-                    },
-                    selectedTabIndex = selectedTab,
-                    onTabSelected = {
-                        onTabSelected(it)
-                        true
-                    },
-                    pagerEnabled = true,
-                )
-            }
+                beyondViewportPageCount = 1,
+                cells = {
+                    addTextTab(
+                        tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_active_transfers)),
+                    ) {
+                        InProgressTransfersView(
+                            inProgressTransfers = inProgressTransfers,
+                            isOverQuota = isOverQuota,
+                            areTransfersPaused = areTransfersPaused,
+                            onPlayPauseClicked = onPlayPauseTransfer,
+                        )
+                    }
+                    addTextTab(
+                        tabItem = TabItems(stringResource(id = R.string.title_tab_completed_transfers)),
+                    ) {
+                        CompletedTransfersView(
+                            completedTransfers = completedTransfers,
+                        )
+                    }
+                    addTextTab(
+                        tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_failed_transfers)),
+                    ) {
+                        CompletedTransfersView(
+                            completedTransfers = failedTransfers,
+                        )
+                    }
+                },
+                initialSelectedIndex = selectedTab,
+                onTabSelected = {
+                    onTabSelected(it)
+                    true
+                },
+            )
         }
     }
 }

@@ -1137,10 +1137,6 @@
     <string name="folder_link_unavailable_disabled">The folder link has been disabled by the owner</string>
     <!-- Title shown when a folder link has expired -->
     <string name="folder_link_expired_title">The folder link you’re trying to access is no longer available</string>
-    <!-- Tooltip description for transfer section play action -->
-    <string name="transfers_section_action_play">Play</string>
-    <!-- Tooltip description for transfer section play action -->
-    <string name="transfers_section_action_pause">Pause</string>
     <!-- Title of the dialog shown when the user needs to verify administrator credentials -->
     <string name="unverified_business_account_dialog_title">Verify administrator credentials to continue</string>
     <!-- Description of the dialog explaining the need to verify administrator credentials -->
@@ -1155,6 +1151,14 @@
     <string name="file_link_expired_title">The file cannot be accessed</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
     <string name="folder_link_unavailable_deleted">The folder was deleted</string>
+    <!-- Tooltip description for transfer section play action -->
+    <string name="transfers_section_action_play">Play</string>
+    <!-- Tooltip description for transfer section play action -->
+    <string name="transfers_section_action_pause">Pause</string>
     <!-- Possible state of a transfer. When the transfer was cancelled -->
     <string name="transfers_section_cancelled">Cancelled</string>
+    <!-- Title of the tab section for active transfers -->
+    <string name="transfers_section_tab_title_active_transfers">Active</string>
+    <!-- Title of the tab section for failed transfers -->
+    <string name="transfers_section_tab_title_failed_transfers">Failed</string>
 </resources>
