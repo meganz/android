@@ -75,7 +75,7 @@ interface CacheGateway {
     /**
      * Removes content of internal files directory
      */
-    suspend fun clearAppData()
+    suspend fun clearAppData(excludeFileNames: Set<String>)
 
     /**
      * clear sdk cache

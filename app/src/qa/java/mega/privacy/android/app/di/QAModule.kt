@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Vibrator
 import android.os.VibratorManager
+import androidx.datastore.preferences.preferencesDataStoreFile
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,6 +16,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.gateway.DistributionGateway
+import mega.privacy.android.app.data.gateway.FEATURE_FLAG_PREFERENCES
+import mega.privacy.android.app.data.gateway.FeatureFlagPreferencesDataStore
+import mega.privacy.android.app.data.gateway.FeatureFlagPreferencesGateway
 import mega.privacy.android.app.data.gateway.FirebaseDistributionGateway
 import mega.privacy.android.app.data.gateway.MotionSensorFacade
 import mega.privacy.android.app.data.gateway.MotionSensorGateway
@@ -38,13 +42,14 @@ import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
 import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagMapper
 import mega.privacy.android.app.presentation.featureflag.model.toFeatureFlag
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
-import mega.privacy.android.data.preferences.FeatureFlagPreferencesDataStore
+import mega.privacy.android.data.qualifier.ExcludeFileName
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
 import mega.privacy.android.navigation.settings.FeatureSettings
+import javax.inject.Singleton
 
 /**
  * Provides dependencies used in the QA module
@@ -52,7 +57,7 @@ import mega.privacy.android.navigation.settings.FeatureSettings
  */
 @Module
 @InstallIn(SingletonComponent::class)
-class QAModule {
+internal class QAModule {
     /**
      * QA only preferences
      *
@@ -165,10 +170,12 @@ class QAModule {
         vibrateDevice: VibrateDevice,
         detectShake: DetectShake,
     ): ShakeDetectorViewModel =
-        ShakeDetectorViewModel(coroutineScope,
+        ShakeDetectorViewModel(
+            coroutineScope,
             ioDispatcher,
             vibrateDevice,
-            detectShake)
+            detectShake
+        )
 
     /**
      * Provides device vibrator
@@ -229,4 +236,15 @@ class QAModule {
     @Provides
     @IntoSet
     fun provideQaEntryPoint(): @JvmSuppressWildcards FeatureSettingEntryPoint = qaSettingsEntryPoint
+
+    @Provides
+    @Singleton
+    fun bindFeatureFlagPreferencesGateway(implementation: FeatureFlagPreferencesDataStore): FeatureFlagPreferencesGateway =
+        implementation
+
+    @Provides
+    @IntoSet
+    @ExcludeFileName
+    fun provideFeatureFlagPreferencesFileName(@ApplicationContext context: Context): String =
+        context.preferencesDataStoreFile(FEATURE_FLAG_PREFERENCES).name
 }

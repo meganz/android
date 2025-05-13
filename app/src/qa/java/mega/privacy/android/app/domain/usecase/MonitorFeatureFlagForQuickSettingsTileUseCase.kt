@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.mapNotNull
-import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
+import mega.privacy.android.app.data.gateway.FeatureFlagPreferencesGateway
 import mega.privacy.android.domain.entity.Feature
 import javax.inject.Inject
 

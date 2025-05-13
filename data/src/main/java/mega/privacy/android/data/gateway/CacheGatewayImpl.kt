@@ -5,7 +5,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
-import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
 import java.io.File
@@ -77,11 +76,11 @@ internal class CacheGatewayImpl @Inject constructor(
     override suspend fun buildAvatarFile(fileName: String?) =
         fileName?.let { getCacheFile(CacheFolderConstant.AVATAR_FOLDER, it) }
 
-    override suspend fun clearAppData() {
+    override suspend fun clearAppData(excludeFileNames: Set<String>) {
         try {
             val dir = context.filesDir
             dir.list()?.asSequence()
-                ?.filter { it != MegaDatabaseConstant.PASSPHRASE_FILE_NAME }
+                ?.filter { !excludeFileNames.contains(it) }
                 ?.forEach {
                     deleteDir(File(dir, it))
                 }

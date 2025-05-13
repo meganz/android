@@ -181,6 +181,9 @@ class DefaultAccountRepositoryTest {
         currency = currencyMapper("EUR"),
     )
     private val mockEmail = "my@email.com"
+    private val excludeFileNames = setOf(
+        "test1.txt",
+    )
 
     @BeforeEach
     fun resetMocks() {
@@ -258,7 +261,8 @@ class DefaultAccountRepositoryTest {
             credentialsPreferencesGateway = { credentialsPreferencesGateway },
             userMapper = userMapper,
             storageStateMapper = storageStateMapper,
-            uiPreferencesGateway = uiPreferencesGateway
+            uiPreferencesGateway = uiPreferencesGateway,
+            excludeFileNames = excludeFileNames
         )
 
     }
@@ -1070,7 +1074,7 @@ class DefaultAccountRepositoryTest {
         runTest {
             underTest.clearAppDataAndCache()
             verify(cacheGateway).clearCacheDirectory()
-            verify(cacheGateway).clearAppData()
+            verify(cacheGateway).clearAppData(excludeFileNames)
             verify(cacheGateway).clearSdkCache()
         }
 

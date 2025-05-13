@@ -1,6 +1,6 @@
 package mega.privacy.android.app.domain.usecase
 
-import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
+import mega.privacy.android.app.data.gateway.FeatureFlagPreferencesGateway
 import mega.privacy.android.domain.entity.Feature
 import javax.inject.Inject
 

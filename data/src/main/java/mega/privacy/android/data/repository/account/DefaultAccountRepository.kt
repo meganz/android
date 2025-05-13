@@ -60,6 +60,7 @@ import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsIntMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.qualifier.ExcludeFileName
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
@@ -178,6 +179,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val userMapper: UserMapper,
     private val storageStateMapper: StorageStateMapper,
     private val uiPreferencesGateway: UIPreferencesGateway,
+    @ExcludeFileName val excludeFileNames: Set<String>,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -688,7 +690,7 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun clearAppDataAndCache() = withContext(ioDispatcher) {
         with(cacheGateway) {
             clearCacheDirectory()
-            clearAppData()
+            clearAppData(excludeFileNames)
             clearSdkCache()
         }
     }

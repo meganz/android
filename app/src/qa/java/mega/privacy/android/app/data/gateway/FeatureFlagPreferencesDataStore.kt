@@ -1,4 +1,4 @@
-package mega.privacy.android.data.preferences
+package mega.privacy.android.app.data.gateway
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -12,14 +12,18 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import java.io.IOException
 import javax.inject.Inject
 
-private val Context.featureFlagDataStore: DataStore<Preferences> by preferencesDataStore(name = "FEATURE_FLAG_PREFERENCES")
+/**
+ * Preferences DataStore name for feature flags
+ */
+const val FEATURE_FLAG_PREFERENCES = "FEATURE_FLAG_PREFERENCES"
+
+private val Context.featureFlagDataStore: DataStore<Preferences> by preferencesDataStore(name = FEATURE_FLAG_PREFERENCES)
 
 /**
  * Implementation of [FeatureFlagPreferencesGateway] for interaction with Preferences DataStore

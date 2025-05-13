@@ -1,4 +1,4 @@
-package mega.privacy.android.data.gateway.preferences
+package mega.privacy.android.app.data.gateway
 
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.flow.Flow
