@@ -376,7 +376,6 @@ internal fun NewCreateAccountScreen(
                     label = stringResource(id = sharedR.string.email_text),
                     keyboardType = KeyboardType.Email,
                     capitalization = KeyboardCapitalization.None,
-                    maxCharLimit = EMAIL_CHAR_LIMIT,
                     onValueChanged = {
                         email = it.trim().lowercase()
                         showAccountExistsMessage = false
