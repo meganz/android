@@ -167,8 +167,11 @@ class MonitorCallSoundsUseCase @Inject constructor(
                                     SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL
                                 )
                             )
-                            MegaApplication.getChatManagement()
-                                .startCounterToFinishCall(chatId)
+
+                            withContext(mainImmediateDispatcher) {
+                                MegaApplication.getChatManagement()
+                                    .startCounterToFinishCall(chatId)
+                            }
 
                             broadcastWaitingForOtherParticipantsHasEnded(
                                 chatId
