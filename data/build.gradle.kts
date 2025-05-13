@@ -23,6 +23,12 @@ android {
         // Adds exported schema location as test app assets.
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
     }
+    configurations {
+        implementation {
+            exclude(module = "protolite-well-known-types")
+            exclude(module = "protobuf-javalite")
+        }
+    }
     lint {
         abortOnError = true
         warningsAsErrors = true

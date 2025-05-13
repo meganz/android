@@ -268,7 +268,7 @@ class CacheGatewayImplTest {
         val passphraseFile = File(context.filesDir, MegaDatabaseConstant.PASSPHRASE_FILE_NAME)
         createFile(passphraseFile)
         assertThat(passphraseFile.exists()).isEqualTo(true)
-        underTest.clearAppData()
+        underTest.clearAppData(setOf(MegaDatabaseConstant.PASSPHRASE_FILE_NAME))
         assertThat(passphraseFile.exists()).isEqualTo(true)
     }
 }
