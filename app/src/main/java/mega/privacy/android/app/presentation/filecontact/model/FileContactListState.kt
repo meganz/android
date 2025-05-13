@@ -3,7 +3,9 @@ package mega.privacy.android.app.presentation.filecontact.model
 import androidx.compose.runtime.Immutable
 import de.palm.composestateevents.StateEventWithContent
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 
 internal sealed interface FileContactListState {
@@ -31,5 +33,6 @@ internal sealed interface FileContactListState {
         val shareRemovedEvent: StateEventWithContent<String>,
         val sharingInProgress: Boolean,
         val sharingCompletedEvent: StateEventWithContent<String>,
+        val accessPermissions: ImmutableSet<AccessPermission>,
     ) : FileContactListState
 }

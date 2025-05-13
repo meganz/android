@@ -162,36 +162,58 @@ internal fun FileContactScreen(
             )
 
             if (newShareRecipients != null) {
-                SetNewSharePermissionBottomSheet(
-                    onDismissSheet = {
-                        newShareRecipients = null
-                    },
-                    shareWithPermission = { permission: AccessPermission ->
+                val onDismiss = { newShareRecipients = null }
+                if (state.accessPermissions.all { it == AccessPermission.READ }) {
+                    val onPositiveButtonClicked: () -> Unit = {
                         newShareRecipients?.let {
                             shareFolder(
                                 it,
-                                permission
+                                AccessPermission.READ
                             )
                         }
-                    },
-                    coroutineScope = coroutineScope
-                )
+                        onDismiss()
+                    }
+                    BackupNodeShareWarningDialog(
+                        onPositiveButtonClicked = onPositiveButtonClicked,
+                        onDismiss = onDismiss
+                    )
+                } else {
+                    SetNewSharePermissionBottomSheet(
+                        onDismissSheet = onDismiss,
+                        shareWithPermission = { permission: AccessPermission ->
+                            newShareRecipients?.let {
+                                shareFolder(
+                                    it,
+                                    permission
+                                )
+                            }
+                        },
+                        coroutineScope = coroutineScope
+                    )
+                }
             }
 
             updatePermissions?.let {
-                SetNewSharePermissionBottomSheet(
-                    onDismissSheet = {
-                        updatePermissions = null
-                        selectedItems = emptyList()
-                    },
-                    shareWithPermission = { permission: AccessPermission ->
-                        updatePermissions(
-                            it,
-                            permission
-                        )
-                    },
-                    coroutineScope = coroutineScope
-                )
+                val onDismiss = {
+                    updatePermissions = null
+                    selectedItems = emptyList()
+                }
+                if (state.accessPermissions.all { it == AccessPermission.READ }) {
+                    BackupNodeShareWarningDialog(
+                        onDismiss = onDismiss
+                    )
+                } else {
+                    SetNewSharePermissionBottomSheet(
+                        onDismissSheet = onDismiss,
+                        shareWithPermission = { permission: AccessPermission ->
+                            updatePermissions(
+                                it,
+                                permission
+                            )
+                        },
+                        coroutineScope = coroutineScope
+                    )
+                }
             }
 
             displayOptionsRecipient?.let {

@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
+import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
 import org.junit.Before
 import org.junit.Test
@@ -40,6 +41,7 @@ class ShareRecipientsViewModelTest {
     private val monitorShareRecipientsUseCase = mock<MonitorShareRecipientsUseCase>()
     private val shareFolderUseCase = mock<ShareFolderUseCase>()
     private val shareFolderRequestMapper = mock<MoveRequestMessageMapper>()
+    private val getAllowedSharingPermissionsUseCase = mock<GetAllowedSharingPermissionsUseCase>()
 
     private val shareResultMapper = RemoveShareResultMapper(
         successString = { TestValues.SUCCESS_STRING },
@@ -51,6 +53,7 @@ class ShareRecipientsViewModelTest {
         reset(
             monitorShareRecipientsUseCase,
             shareFolderUseCase,
+            getAllowedSharingPermissionsUseCase,
         )
     }
 
@@ -66,6 +69,7 @@ class ShareRecipientsViewModelTest {
             shareFolderUseCase = shareFolderUseCase,
             removeShareResultMapper = shareResultMapper,
             moveRequestMessageMapper = shareFolderRequestMapper,
+            getAllowedSharingPermissionsUseCase = getAllowedSharingPermissionsUseCase
         )
     }
 
@@ -81,6 +85,9 @@ class ShareRecipientsViewModelTest {
 
     @Test
     fun `test that data state is emitted once use case returns`() = runTest {
+        getAllowedSharingPermissionsUseCase.stub {
+            onBlocking { invoke(any()) }.thenReturn(setOf(AccessPermission.READ))
+        }
         monitorShareRecipientsUseCase.stub {
             on { invoke(any()) }.thenReturn(
                 flow {
@@ -402,6 +409,41 @@ class ShareRecipientsViewModelTest {
                 accessPermission = newPermission
             )
         }
+
+    @Test
+    fun `test that ui data state contains the expected data`() = runTest {
+        val expectedPermissions = setOf(AccessPermission.FULL, AccessPermission.READ)
+        val expectedRecipients = listOf(
+            mock<ShareRecipient.Contact>(),
+            mock<ShareRecipient.NonContact>(),
+        )
+        getAllowedSharingPermissionsUseCase.stub {
+            onBlocking { invoke(any()) }.thenReturn(expectedPermissions)
+        }
+        monitorShareRecipientsUseCase.stub {
+            on { invoke(any()) }.thenReturn(
+                flow {
+                    emit(
+                        expectedRecipients
+                    )
+                    awaitCancellation()
+                }
+            )
+        }
+
+        initUnderTest()
+
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual).isInstanceOf(FileContactListState.Data::class.java)
+            assertThat((actual as FileContactListState.Data).recipients).isEqualTo(
+                expectedRecipients
+            )
+            assertThat(actual.accessPermissions).isEqualTo(expectedPermissions)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
 
     private data object TestValues {
         const val CONTACT_EMAIL = "contactEmail"

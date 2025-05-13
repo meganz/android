@@ -8,9 +8,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
@@ -22,6 +25,7 @@ import mega.privacy.android.domain.entity.node.ResultCount
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
+import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -33,9 +37,9 @@ internal class ShareRecipientsViewModel @Inject constructor(
     private val shareFolderUseCase: ShareFolderUseCase,
     private val removeShareResultMapper: RemoveShareResultMapper,
     private val moveRequestMessageMapper: MoveRequestMessageMapper,
+    private val getAllowedSharingPermissionsUseCase: GetAllowedSharingPermissionsUseCase,
 ) : ViewModel() {
     private val folderInfo = savedStateHandle.toRoute<FileContactInfo>()
-
     val state: StateFlow<FileContactListState>
         field: MutableStateFlow<FileContactListState> = MutableStateFlow(
             FileContactListState.Loading(
@@ -46,17 +50,23 @@ internal class ShareRecipientsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            monitorShareRecipientsUseCase(folderInfo.folderId)
-                .catch {
-                    Timber.e(it)
+            combine(
+                flow {
+                    emit(getAllowedSharingPermissionsUseCase(folderInfo.folderId))
+                },
+                monitorShareRecipientsUseCase(folderInfo.folderId),
+            ) { allowedPermissions: Set<AccessPermission>, recipients: List<ShareRecipient> ->
+                StateTransform {
+                    it.copy(
+                        recipients = recipients.toImmutableList(),
+                        accessPermissions = allowedPermissions.toImmutableSet(),
+                    )
                 }
-                .collect { recipients ->
-                    state.updateToData {
-                        it.copy(
-                            recipients = recipients.toImmutableList(),
-                        )
-                    }
-                }
+            }.catch { error ->
+                Timber.e(error)
+            }.collect { transformer: StateTransform ->
+                state.updateToData(transformer::invoke)
+            }
         }
     }
 
@@ -73,11 +83,13 @@ internal class ShareRecipientsViewModel @Inject constructor(
                         shareRemovedEvent = consumed(),
                         sharingInProgress = false,
                         sharingCompletedEvent = consumed(),
+                        accessPermissions = emptySet<AccessPermission>().toImmutableSet(),
                     )
                 )
             }
         }
     }
+
 
     fun removeShare(list: List<ShareRecipient>) {
         viewModelScope.launch {
@@ -171,4 +183,11 @@ internal class ShareRecipientsViewModel @Inject constructor(
             }
         }
     }
+
+}
+
+private fun interface StateTransform {
+    operator fun invoke(
+        state: FileContactListState.Data,
+    ): FileContactListState
 }
