@@ -14,7 +14,8 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  * @property isStorageOverQuota Whether the storage is over quota.
  * @property isTransferOverQuota Whether the transfer is over quota.
  * @property areTransfersPaused Whether the transfers are paused.
- * @property completedTransfers List of completed transfers.
+ * @property completedTransfers List of successfully completed transfers.
+ * @property failedTransfers List of cancelled or failed completed transfers.
  */
 data class TransfersUiState(
     val selectedTab: Int = IN_PROGRESS_TAB_INDEX,
@@ -23,6 +24,7 @@ data class TransfersUiState(
     val isTransferOverQuota: Boolean = false,
     val areTransfersPaused: Boolean = false,
     val completedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
+    val failedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
 ) {
 
     /**

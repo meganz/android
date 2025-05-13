@@ -20,6 +20,7 @@ import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOv
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -105,11 +106,18 @@ class TransfersViewModel @Inject constructor(
 
     private fun monitorCompletedTransfers() {
         viewModelScope.launch {
-            monitorCompletedTransfersUseCase().collectLatest { completedTransfers ->
+            monitorCompletedTransfersUseCase().collectLatest { transfers ->
+                val groupedTransfers = transfers
+                    .sortedByDescending { it.timestamp }
+                    .groupBy { it.state == MegaTransfer.STATE_COMPLETED }
+
+                val completedTransfers = groupedTransfers[true].orEmpty().toImmutableList()
+                val failedTransfers = groupedTransfers[false].orEmpty().toImmutableList()
+
                 _uiState.update { state ->
                     state.copy(
-                        completedTransfers = completedTransfers
-                            .sortedByDescending { it.timestamp }.toImmutableList()
+                        completedTransfers = completedTransfers,
+                        failedTransfers = failedTransfers,
                     )
                 }
             }

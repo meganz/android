@@ -26,6 +26,8 @@ import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOv
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import nz.mega.sdk.MegaTransfer
+import okhttp3.internal.immutableListOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -263,26 +265,104 @@ class TransfersViewModelTest {
     }
 
     @Test
-    fun `test that MonitorCompletedTransfersUseCase updates state with completed transfers`() =
+    fun `test that MonitorCompletedTransfersUseCase updates state with completed and failed transfers`() =
         runTest {
             val flow = MutableSharedFlow<List<CompletedTransfer>>()
             val transfer1 = mock<CompletedTransfer> {
+                on { state } doReturn MegaTransfer.STATE_COMPLETED
                 on { timestamp } doReturn 1L
             }
             val transfer2 = mock<CompletedTransfer> {
+                on { state } doReturn MegaTransfer.STATE_FAILED
                 on { timestamp } doReturn 2L
             }
-            val list = listOf(transfer1, transfer2)
+            val transfer3 = mock<CompletedTransfer> {
+                on { state } doReturn MegaTransfer.STATE_COMPLETED
+                on { timestamp } doReturn 3L
+            }
+            val transfer4 = mock<CompletedTransfer> {
+                on { state } doReturn MegaTransfer.STATE_CANCELLED
+                on { timestamp } doReturn 4L
+            }
+            val list = listOf(transfer1, transfer4, transfer3, transfer2)
+            val expectedCompleted = immutableListOf(transfer3, transfer1)
+            val expectedFailed = immutableListOf(transfer4, transfer2)
 
             whenever(monitorCompletedTransfersUseCase()).thenReturn(flow)
 
             initTestClass()
 
-            underTest.uiState.map { it.completedTransfers }.test {
-                assertThat(awaitItem()).isEmpty()
+            underTest.uiState.test {
+                var actual = awaitItem()
+                assertThat(actual.completedTransfers).isEmpty()
+                assertThat(actual.failedTransfers).isEmpty()
                 flow.emit(list)
                 advanceUntilIdle()
-                assertThat(awaitItem()).containsExactly(transfer1, transfer2)
+                actual = awaitItem()
+                assertThat(actual.completedTransfers).isEqualTo(expectedCompleted)
+                assertThat(actual.failedTransfers).isEqualTo(expectedFailed)
+            }
+        }
+
+    @Test
+    fun `test that MonitorCompletedTransfersUseCase updates state with completed but not failed transfers`() =
+        runTest {
+            val flow = MutableSharedFlow<List<CompletedTransfer>>()
+            val transfer1 = mock<CompletedTransfer> {
+                on { state } doReturn MegaTransfer.STATE_COMPLETED
+                on { timestamp } doReturn 1L
+            }
+            val transfer2 = mock<CompletedTransfer> {
+                on { state } doReturn MegaTransfer.STATE_COMPLETED
+                on { timestamp } doReturn 2L
+            }
+            val list = listOf(transfer1, transfer2)
+            val expectedCompleted = immutableListOf(transfer2, transfer1)
+
+            whenever(monitorCompletedTransfersUseCase()).thenReturn(flow)
+
+            initTestClass()
+
+            underTest.uiState.test {
+                var actual = awaitItem()
+                assertThat(actual.completedTransfers).isEmpty()
+                assertThat(actual.failedTransfers).isEmpty()
+                flow.emit(list)
+                advanceUntilIdle()
+                actual = awaitItem()
+                assertThat(actual.completedTransfers).isEqualTo(expectedCompleted)
+                assertThat(actual.failedTransfers).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that MonitorCompletedTransfersUseCase updates state with failed but not completed transfers`() =
+        runTest {
+            val flow = MutableSharedFlow<List<CompletedTransfer>>()
+            val transfer1 = mock<CompletedTransfer> {
+                on { state } doReturn MegaTransfer.STATE_CANCELLED
+                on { timestamp } doReturn 1L
+            }
+            val transfer2 = mock<CompletedTransfer> {
+                on { state } doReturn MegaTransfer.STATE_FAILED
+                on { timestamp } doReturn 2L
+            }
+            val list = listOf(transfer1, transfer2)
+            val expectedFailed = immutableListOf(transfer2, transfer1)
+
+            whenever(monitorCompletedTransfersUseCase()).thenReturn(flow)
+
+            initTestClass()
+
+            underTest.uiState.test {
+                var actual = awaitItem()
+                assertThat(actual.completedTransfers).isEmpty()
+                assertThat(actual.failedTransfers).isEmpty()
+                flow.emit(list)
+                advanceUntilIdle()
+                actual = awaitItem()
+                assertThat(actual.completedTransfers).isEmpty()
+                assertThat(actual.failedTransfers).isEqualTo(expectedFailed)
             }
         }
 
