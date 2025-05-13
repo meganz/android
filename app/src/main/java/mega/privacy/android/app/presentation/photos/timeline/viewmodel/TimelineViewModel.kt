@@ -431,6 +431,7 @@ class TimelineViewModel @Inject constructor(
     ) = viewModelScope.launch(defaultDispatcher) {
         val nonSensitivePhotos = filterNonSensitivePhotos(showingPhotos)
         val sortedPhotos = sortPhotos(nonSensitivePhotos)
+        val isCameraUploadsEnabled = isCameraUploadsEnabledUseCase()
 
         async {
             val items = handleAllPhotoItems(showingPhotos = sortedPhotos)
@@ -467,7 +468,7 @@ class TimelineViewModel @Inject constructor(
                 photos = sourcePhotos,
                 loadPhotosDone = true,
                 currentShowingPhotos = sortedPhotos,
-                enableCameraUploadPageShowing = sortedPhotos.isEmpty(),
+                enableCameraUploadPageShowing = sortedPhotos.isEmpty() && !isCameraUploadsEnabled,
             )
         }
         handleEnableZoomAndSortOptions()
