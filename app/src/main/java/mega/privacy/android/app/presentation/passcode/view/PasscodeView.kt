@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.passcode.view
 
-import android.app.Activity
 import android.content.Context
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.CryptoObject
@@ -85,10 +85,17 @@ internal fun PasscodeView(
         cryptObject: CryptoObject,
     ) -> Unit = ::biometricAuthPrompt,
 ) {
-    Timber.d("Passcode main UI composed")
+    LaunchedEffect(Unit) {
+        Timber.d("Passcode main UI composed")
+    }
+
     val uiState by passcodeUnlockViewModel.state.collectAsStateWithLifecycle()
 
-    val activity = (LocalContext.current as? Activity)
+    LaunchedEffect(uiState) {
+        Timber.d("Passcode state changed: $uiState")
+    }
+
+    val activity = LocalActivity.current
     BackHandler {
         activity?.finishAffinity()
     }

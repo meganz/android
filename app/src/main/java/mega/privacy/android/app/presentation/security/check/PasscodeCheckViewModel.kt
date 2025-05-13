@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeLockStateUseCase
@@ -25,9 +26,11 @@ internal class PasscodeCheckViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
+        Timber.d("PasscodeCheckViewModel initialized")
         viewModelScope.launch {
             try {
                 monitorPasscodeLockStateUseCase()
+                    .onEach { Timber.d("Passcode lock state changed: $it") }
                     .mapLatest { locked ->
                         if (locked) PasscodeCheckState.Locked else PasscodeCheckState.UnLocked
                     }.collectLatest {
