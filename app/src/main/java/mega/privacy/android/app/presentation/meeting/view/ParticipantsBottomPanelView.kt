@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHost
@@ -206,6 +208,7 @@ fun BottomPanelView(
                     .fillMaxWidth()
                     .weight(1f)
             ) {
+                val scrollState = rememberScrollState()
 
                 LazyColumn(
                     state = listState,
@@ -213,15 +216,16 @@ fun BottomPanelView(
                 ) {
                     item(key = "Chips") {
                         Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, end = 20.dp, bottom = 10.dp)
+                                .horizontalScroll(scrollState)
+                                .padding(start = 16.dp, end = 16.dp, bottom = 10.dp)
                         ) {
                             if (shouldWaitingRoomSectionBeShown() && usersInWaitingRoomIDs.isNotEmpty()) {
                                 CallTextButtonChip(
                                     modifier = Modifier
-                                        .padding(end = 8.dp)
-                                        .fillParentMaxWidth(0.29F),
+                                        .padding(end = 8.dp),
                                     text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
                                     onClick = onWaitingRoomClick,
                                     isChecked = participantsSection == ParticipantsSection.WaitingRoomSection
@@ -232,7 +236,6 @@ fun BottomPanelView(
                                 modifier = if (shouldWaitingRoomSectionBeShown()) {
                                     Modifier
                                         .padding(end = 8.dp)
-                                        .fillParentMaxWidth(0.29F)
                                 } else {
                                     Modifier.padding(end = 8.dp)
                                 },
@@ -242,11 +245,7 @@ fun BottomPanelView(
                             )
 
                             CallTextButtonChip(
-                                modifier = if (shouldWaitingRoomSectionBeShown()) {
-                                    Modifier.fillParentMaxWidth(0.29F)
-                                } else {
-                                    Modifier
-                                },
+                                modifier = Modifier,
                                 text = stringResource(id = R.string.meetings_bottom_panel_participants_not_in_call_button),
                                 onClick = onNotInCallClick,
                                 isChecked = participantsSection == ParticipantsSection.NotInCallSection
@@ -255,8 +254,7 @@ fun BottomPanelView(
                             if (shouldWaitingRoomSectionBeShown() && usersInWaitingRoomIDs.isEmpty()) {
                                 CallTextButtonChip(
                                     modifier = Modifier
-                                        .padding(start = 8.dp)
-                                        .fillParentMaxWidth(0.29F),
+                                        .padding(start = 8.dp),
                                     text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
                                     onClick = onWaitingRoomClick,
                                     isChecked = participantsSection == ParticipantsSection.WaitingRoomSection
