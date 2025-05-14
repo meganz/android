@@ -468,3 +468,5 @@ internal const val STALLED_ISSUES_CHIP_TEST_TAG = "sync_list:stalled_issues_chip
  * Solved Issues Chip test tag
  */
 internal const val SOLVED_ISSUES_CHIP_TEST_TAG = "sync_list:solved_issues_chip"
+
+internal const val BOTTOM_PADDING = 72

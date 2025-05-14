@@ -1,12 +1,12 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
-import mega.privacy.android.shared.resources.R as sharedResR
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -27,12 +27,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
+import mega.privacy.android.feature.sync.ui.synclist.BOTTOM_PADDING
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.CardExpanded
 import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.views.SyncTypePreviewProvider
@@ -43,7 +45,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
-import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
 import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
 
@@ -69,8 +71,9 @@ internal fun SyncFoldersScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         LazyColumn(
-            state = rememberLazyListState(), modifier = modifier
-                .fillMaxSize()
+            state = rememberLazyListState(),
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = if (syncUiItems.isEmpty()) 0.dp else BOTTOM_PADDING.dp),
         ) {
             if (isLoading) {
                 item {

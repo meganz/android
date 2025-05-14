@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.sync.ui.synclist.stalledissues
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,8 +18,10 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAct
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.model.StalledIssueDetailedInfo
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
+import mega.privacy.android.feature.sync.ui.synclist.BOTTOM_PADDING
 import mega.privacy.android.feature.sync.ui.views.StalledIssueCard
 import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
@@ -40,7 +42,11 @@ private fun StalledIssuesScreenContent(
     issueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
 ) {
-    LazyColumn(state = LazyListState(), modifier = modifier.fillMaxSize()) {
+    LazyColumn(
+        state = LazyListState(),
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = if (stalledIssues.isEmpty()) 0.dp else BOTTOM_PADDING.dp),
+    ) {
         if (stalledIssues.isEmpty()) {
             item {
                 SyncListNoItemsPlaceHolder(
