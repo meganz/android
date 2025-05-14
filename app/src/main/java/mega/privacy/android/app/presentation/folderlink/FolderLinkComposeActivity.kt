@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
@@ -296,6 +297,10 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 onConsumed = viewModel::resetShowCopyResult
             ) { (resultText, throwable) ->
                 showCopyResult(copyResultText = resultText, throwable = throwable)
+            }
+
+            BackHandler {
+                viewModel.handleBackPress()
             }
         }
     }
