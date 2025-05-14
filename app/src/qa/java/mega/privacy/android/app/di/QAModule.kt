@@ -247,4 +247,9 @@ internal class QAModule {
     @ExcludeFileName
     fun provideFeatureFlagPreferencesFileName(@ApplicationContext context: Context): String =
         context.preferencesDataStoreFile(FEATURE_FLAG_PREFERENCES).name
+
+    @Provides
+    @IntoSet
+    @ExcludeFileName
+    fun provideDatastoreFileName(): String = "datastore"
 }
