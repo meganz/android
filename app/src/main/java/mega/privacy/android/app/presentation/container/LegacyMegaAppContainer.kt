@@ -29,7 +29,7 @@ internal fun LegacyMegaAppContainer(
 ) {
     val containers: List<(@Composable (@Composable () -> Unit) -> Unit)?> = listOf(
         {
-            BusinessAccountContainer()
+            BusinessAccountContainer(content = it)
         },
         {
             PsaContentView(

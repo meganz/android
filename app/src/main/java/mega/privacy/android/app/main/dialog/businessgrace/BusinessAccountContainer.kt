@@ -18,6 +18,7 @@ import mega.privacy.android.shared.resources.R
 @Composable
 fun BusinessAccountContainer(
     viewModel: BusinessAccountViewModel = hiltViewModel(),
+    content: @Composable () -> Unit,
 ) {
     var showUnverifiedBusinessAccountDialog by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -27,7 +28,7 @@ fun BusinessAccountContainer(
             }
         }
     }
-
+    content()
     if (showUnverifiedBusinessAccountDialog) {
         BasicDialog(
             title = stringResource(R.string.unverified_business_account_dialog_title),

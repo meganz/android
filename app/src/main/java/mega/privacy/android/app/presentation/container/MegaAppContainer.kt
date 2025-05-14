@@ -33,7 +33,7 @@ internal fun MegaAppContainer(
     content: @Composable () -> Unit,
 ) {
     val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
-        { BusinessAccountContainer() },
+        { BusinessAccountContainer(content = it) },
         { PsaContainer(content = it) },
         {
             PasscodeContainer(
