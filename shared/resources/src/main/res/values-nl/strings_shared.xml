@@ -1004,7 +1004,7 @@
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
     <string name="general_sync_notification_generic_error_title">De synchronisatie is gestopt</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Check your syncs in the app to resolve this.</string>
+    <string name="general_sync_notification_generic_error_text">Controleer je synchronisaties in de applicatie om dit op te lossen.</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
     <string name="general_sync_notification_stalled_issues_title">Synchronisatieproblemen gedetecteerd</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
@@ -1125,4 +1125,48 @@
     <string name="general_sync_warning_lost_wifi_title">De synchronisatie is gepauzeerd vanwege een verbroken verbinding.</string>
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
     <string name="general_sync_warning_lost_wifi_text">Maak opnieuw verbinding met Wi-Fi om verder te gaan.</string>
+    <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
+    <string name="general_link_unavailable_subtitle">Dit kan de volgende redenen hebben:</string>
+    <!-- Bullet point shown when link is unavailable due to invalid URL -->
+    <string name="general_link_unavailable_invalid_url">Ongeldige URL - de link die u probeert te openen bestaat niet</string>
+    <!-- Bullet point shown when link is unavailable due to expiration -->
+    <string name="general_link_expired">De link is verlopen</string>
+    <!-- Title shown when a folder link is unavailable (general case) -->
+    <string name="folder_link_unavailable_title">De maplink die u probeert te openen is niet beschikbaar</string>
+    <!-- Bullet point shown when a folder link is unavailable because the link has been disabled -->
+    <string name="folder_link_unavailable_disabled">De maplink is door de eigenaar uitgeschakeld</string>
+    <!-- Title shown when a folder link has expired -->
+    <string name="folder_link_expired_title">De maplink die je probeert te openen is niet langer beschikbaar</string>
+    <!-- Title of the dialog shown when the user needs to verify administrator credentials -->
+    <string name="unverified_business_account_dialog_title">Controleer de referenties van de beheerder om door te gaan</string>
+    <!-- Description of the dialog explaining the need to verify administrator credentials -->
+    <string name="unverified_business_account_dialog_description">U moet de referenties van de beheerder van uw Zakelijke account verifiëren om door te kunnen gaan. Meld u aan bij uw account in een desktopwebbrowser en voltooi de verificatie van de gegevens.</string>
+    <!-- Title shown when a file link is unavailable (general case) -->
+    <string name="file_link_unavailable_title">The file link you’re trying to access is no longer available</string>
+    <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
+    <string name="file_link_unavailable_disabled">The file link has been disabled by the owner</string>
+    <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
+    <string name="file_link_unavailable_deleted">The file has been deleted</string>
+    <!-- Title shown when a file link has expired -->
+    <string name="file_link_expired_title">The file link you’re trying to access is not available</string>
+    <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
+    <string name="folder_link_unavailable_deleted">The folder has been deleted</string>
+    <!-- Tooltip description for transfer section play action -->
+    <string name="transfers_section_action_play">Afspelen</string>
+    <!-- Tooltip description for transfer section play action -->
+    <string name="transfers_section_action_pause">Pauzeren</string>
+    <!-- Possible state of a transfer. When the transfer was cancelled -->
+    <string name="transfers_section_cancelled">Geannuleerd</string>
+    <!-- Title of the tab section for active transfers -->
+    <string name="transfers_section_tab_title_active_transfers">Actief</string>
+    <!-- Title of the tab section for failed transfers -->
+    <string name="transfers_section_tab_title_failed_transfers">Mislukt</string>
+    <!--Text for showing the empty state when there are no transfers. The [A][/A] format marks are to put the text in a different color and style.-->
+    <string name="transfers_no_transfers_empty_text">Geen overdrachten</string>
+    <!--Text for showing the empty state when there are no active transfers. The [A][/A] format marks are to put the text in a different color and style.-->
+    <string name="transfers_no_active_transfers_empty_text">Geen actieve overdrachten</string>
+    <!--Text for showing the empty state when there are no completed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
+    <string name="transfers_no_completed_transfers_empty_text">Geen voltooide overdrachten</string>
+    <!--Text for showing the empty state when there are no failed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
+    <string name="transfers_no_failed_transfers_empty_text">[A]No failed transfers[/A]</string>
 </resources>

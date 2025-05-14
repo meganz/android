@@ -1092,7 +1092,7 @@
     <!-- Title of the tab section for transfers in progress -->
     <string name="title_tab_in_progress_transfers">Em andamento</string>
     <!-- Title of the tab section for completed transfers -->
-    <string name="title_tab_completed_transfers">Concluído</string>
+    <string name="title_tab_completed_transfers">Concluídas</string>
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
     <string name="transfer_paused">Pausado</string>
     <!-- Possible state of a transfer -->

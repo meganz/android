@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Label to show that an SDK operation has been complete successfully. -->
-    <string name="error_ok">No error</string>
+    <string name="error_ok">Hata yok</string>
     <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
-    <string name="error_args">Invalid argument</string>
+    <string name="error_args">Geçersiz argüman</string>
     <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-    <string name="error_access">Access denied</string>
+    <string name="error_access">Erişim reddedildi</string>
     <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
-    <string name="error_noent">Resource does not exist.</string>
+    <string name="error_noent">Kaynak mevcut değil.</string>
     <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->
-    <string name="error_exist">Resource already exists.</string>
+    <string name="error_exist">Kaynak zaten var.</string>
     <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-    <string name="error_unknown">Unknown error</string>
+    <string name="error_unknown">Bilinmeyen hata</string>
     <!-- Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation. -->
-    <string name="error_toomany">Too many uses for this resource.</string>
+    <string name="error_toomany">Bu kaynak için çok fazla kullanım.</string>
 </resources>

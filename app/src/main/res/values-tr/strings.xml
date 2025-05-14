@@ -61,9 +61,9 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Yükleme</string>
     <!-- Menu item -->
-    <string name="action_create_folder">New folder</string>
+    <string name="action_create_folder">Yeni klasör</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">New text file</string>
+    <string name="action_create_txt">Yeni metin dosyası</string>
     <!-- Menu item -->
     <string name="action_settings">Ayarlar</string>
     <!-- Search button -->
@@ -141,7 +141,7 @@
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">Şifreleme anahtarları oluşturma</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
-    <string name="login_connecting_to_server">Sunucuya bağlanma</string>
+    <string name="login_connecting_to_server">Sunucuyla bağlantı sağlanıyor</string>
     <!-- Status text when updating the file manager -->
     <string name="download_updating_filelist">Dosya listesi güncelleniyor</string>
     <!-- when the user clicks on the link sent by MEGA after creating the account, this message is shown -->
@@ -3539,11 +3539,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s haftalık</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Gallery view</string>
+    <string name="settings_media_discovery_view_title">Galeri görünümü</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
+    <string name="settings_media_discovery_view_context">Görsel ızgarada yalnızca resimler veya videolar içeren klasörleri açın. Medyaya küçük resimlere göre göz atın ve tarihe göre filtreleyin.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in gallery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Bu klasör yalnızca resimler ve videolar içerdiğinden, otomatik olarak galeri görünümünde açtık. Görsel içeriğinizin keyfini daha sürükleyici bir düzen ile çıkarabilirsiniz. Bunu Ayarlar\’da devre dışı bırakabilirsiniz.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Ayarlar</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4716,9 +4716,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Orijinal</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Gallery view in subfolders</string>
+    <string name="settings_media_discovery_sub_folder_title">Alt klasörlerde galeri görünümü</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in gallery view</string>
+    <string name="settings_media_discovery_sub_folder_context">Alt klasörlerdeki resimler ve videolar da galeri görünümüne dahil edilecektir</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Sonuç yok</string>
     <!-- Description text in empty search screen when images filter selected -->
