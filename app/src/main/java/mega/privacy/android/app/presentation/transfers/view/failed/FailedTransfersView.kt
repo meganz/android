@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.transfers.view.completed
+package mega.privacy.android.app.presentation.transfers.view.failed
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,44 +13,44 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
 import mega.privacy.android.app.presentation.transfers.model.image.CompletedTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
-import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_COMPLETED_TAB
+import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_FAILED_TAB
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.feature.transfers.components.CompletedTransferItem
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
-internal fun CompletedTransfersView(
-    completedTransfers: ImmutableList<CompletedTransfer>,
+internal fun FailedTransfersView(
+    failedTransfers: ImmutableList<CompletedTransfer>,
     modifier: Modifier = Modifier,
 ) {
-    if (completedTransfers.isEmpty()) {
+    if (failedTransfers.isEmpty()) {
         EmptyTransfersView(
-            emptyStringId = sharedR.string.transfers_no_completed_transfers_empty_text,
-            modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFERS_EMPTY_VIEW)
+            emptyStringId = sharedR.string.transfers_no_failed_transfers_empty_text,
+            modifier = Modifier.testTag(TEST_TAG_FAILED_TRANSFERS_EMPTY_VIEW)
         )
     } else {
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .testTag(TEST_TAG_COMPLETED_TRANSFERS_VIEW)
+                .testTag(TEST_TAG_FAILED_TRANSFERS_VIEW)
         ) {
-            items(items = completedTransfers, key = { it.id ?: 0 }) { item ->
-                CompletedTransferItem(completedTransfer = item)
+            items(items = failedTransfers, key = { it.id ?: 0 }) { item ->
+                FailedTransferItem(failedTransfer = item)
             }
         }
     }
 }
 
 @Composable
-internal fun CompletedTransferItem(
-    completedTransfer: CompletedTransfer,
+internal fun FailedTransferItem(
+    failedTransfer: CompletedTransfer,
     viewModel: CompletedTransferImageViewModel = hiltViewModel(),
-) = with(completedTransfer) {
+) = with(failedTransfer) {
     id?.let {
         val uiState by viewModel.getUiStateFlow(it).collectAsStateWithLifecycle()
 
         LaunchedEffect(key1 = id) {
-            viewModel.addTransfer(completedTransfer)
+            viewModel.addTransfer(failedTransfer)
         }
 
         CompletedTransferItem(
@@ -64,5 +64,5 @@ internal fun CompletedTransferItem(
     }
 }
 
-internal const val TEST_TAG_COMPLETED_TRANSFERS_VIEW = "$TEST_TAG_COMPLETED_TAB:view"
-internal const val TEST_TAG_COMPLETED_TRANSFERS_EMPTY_VIEW = "$TEST_TAG_COMPLETED_TAB:empty_view"
+internal const val TEST_TAG_FAILED_TRANSFERS_VIEW = "$TEST_TAG_FAILED_TAB:view"
+internal const val TEST_TAG_FAILED_TRANSFERS_EMPTY_VIEW = "$TEST_TAG_FAILED_TAB:empty_view"

@@ -15,10 +15,12 @@ import kotlinx.collections.immutable.ImmutableList
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressString
 import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
 import mega.privacy.android.app.presentation.transfers.model.image.InProgressTransferImageViewModel
-import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_IN_PROGRESS_TAB
+import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
+import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_ACTIVE_TAB
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.feature.transfers.components.InProgressTransferItem
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun InProgressTransfersView(
@@ -28,21 +30,28 @@ internal fun InProgressTransfersView(
     onPlayPauseClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .testTag(TEST_TAG_IN_PROGRESS_TRANSFERS_VIEW)
-    ) {
-        items(
-            items = inProgressTransfers,
-            key = { it.tag },
-        ) { item ->
-            InProgressTransferItem(
-                inProgressTransfer = item,
-                isOverQuota = isOverQuota,
-                areTransfersPaused = areTransfersPaused,
-                onPlayPauseClicked = onPlayPauseClicked,
-            )
+    if (inProgressTransfers.isEmpty()) {
+        EmptyTransfersView(
+            emptyStringId = sharedR.string.transfers_no_active_transfers_empty_text,
+            modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFERS_EMPTY_VIEW)
+        )
+    } else {
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .testTag(TEST_TAG_ACTIVE_TRANSFERS_VIEW)
+        ) {
+            items(
+                items = inProgressTransfers,
+                key = { it.tag },
+            ) { item ->
+                InProgressTransferItem(
+                    inProgressTransfer = item,
+                    isOverQuota = isOverQuota,
+                    areTransfersPaused = areTransfersPaused,
+                    onPlayPauseClicked = onPlayPauseClicked,
+                )
+            }
         }
     }
 }
@@ -77,4 +86,5 @@ internal fun InProgressTransferItem(
         onPlayPauseClicked = { onPlayPauseClicked(tag) })
 }
 
-internal const val TEST_TAG_IN_PROGRESS_TRANSFERS_VIEW = "$TEST_TAG_IN_PROGRESS_TAB:view"
+internal const val TEST_TAG_ACTIVE_TRANSFERS_VIEW = "$TEST_TAG_ACTIVE_TAB:view"
+internal const val TEST_TAG_ACTIVE_TRANSFERS_EMPTY_VIEW = "$TEST_TAG_ACTIVE_TAB:empty_view"

@@ -1,10 +1,12 @@
 package mega.privacy.android.app.presentation.transfers.view
 
+import androidx.activity.ComponentActivity
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
@@ -24,7 +26,8 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
-import mega.privacy.android.icon.pack.R
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,7 +41,7 @@ import java.math.BigInteger
 class TransfersViewTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private val onPlayPauseTransfer: (Int) -> Unit = mock()
     private val onResumeTransfers: () -> Unit = mock()
@@ -46,7 +49,8 @@ class TransfersViewTest {
     private val showInProgressModal: () -> Unit = mock()
     private val tag1 = 1
     private val tag2 = 2
-    private val state = TransferImageUiState(fileTypeResId = R.drawable.ic_text_medium_solid)
+    private val state =
+        TransferImageUiState(fileTypeResId = iconPackR.drawable.ic_text_medium_solid)
     private val viewModel = mock<InProgressTransferImageViewModel> {
         on { getUiStateFlow(tag1) } doReturn MutableStateFlow(state)
         on { getUiStateFlow(tag2) } doReturn MutableStateFlow(state)
@@ -61,6 +65,19 @@ class TransfersViewTest {
         getTransfer(tag = tag1),
         getTransfer(tag = tag2),
     ).toImmutableList()
+
+    @Test
+    fun `test that view is displayed correctly if there are no transfers`() {
+        initComposeTestRule(uiState = TransfersUiState())
+        with(composeTestRule) {
+            val emptyText = activity.getString(sharedR.string.transfers_no_transfers_empty_text)
+                .replace("[A]", "").replace("[/A]", "")
+
+            onNodeWithTag(TEST_TAG_TRANSFERS_VIEW).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_EMPTY_TRANSFERS_VIEW).assertIsDisplayed()
+            onNodeWithText(emptyText).assertIsDisplayed()
+        }
+    }
 
     @Test
     fun `test that pause TransferMenuAction is displayed if transfers are not already paused and click action invokes correctly`() {

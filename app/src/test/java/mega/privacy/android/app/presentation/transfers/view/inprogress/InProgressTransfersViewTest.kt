@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.transfers.view.inprogress
 
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -18,7 +20,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.feature.transfers.components.TEST_TAG_IN_PROGRESS_TRANSFER_ITEM
-import mega.privacy.android.icon.pack.R
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,12 +34,13 @@ import java.math.BigInteger
 class InProgressTransfersViewTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private val tag1 = 1
     private val tag2 = 2
 
-    private val state = TransferImageUiState(fileTypeResId = R.drawable.ic_text_medium_solid)
+    private val state =
+        TransferImageUiState(fileTypeResId = iconPackR.drawable.ic_text_medium_solid)
 
     private val viewModel = mock<InProgressTransferImageViewModel> {
         on { getUiStateFlow(tag1) } doReturn MutableStateFlow(state)
@@ -50,12 +54,16 @@ class InProgressTransfersViewTest {
     }
 
     @Test
-    fun `test that view is displayed correctly if no in progress transfers`() {
+    fun `test that view is displayed correctly if there are no active transfers`() {
         initComposeTestRule()
         with(composeTestRule) {
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFERS_VIEW).assertExists()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag1").assertDoesNotExist()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag2").assertDoesNotExist()
+            val emptyText =
+                activity.getString(sharedR.string.transfers_no_active_transfers_empty_text)
+                    .replace("[A]", "").replace("[/A]", "")
+
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFERS_VIEW).assertDoesNotExist()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFERS_EMPTY_VIEW).assertIsDisplayed()
+            onNodeWithText(emptyText).assertIsDisplayed()
         }
     }
 
@@ -65,7 +73,7 @@ class InProgressTransfersViewTest {
 
         initComposeTestRule(inProgressTransfers = inProgressTransfers)
         with(composeTestRule) {
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFERS_VIEW).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFERS_VIEW).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag1").assertIsDisplayed()
             onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag2").assertDoesNotExist()
         }
@@ -80,7 +88,7 @@ class InProgressTransfersViewTest {
 
         initComposeTestRule(inProgressTransfers = inProgressTransfers)
         with(composeTestRule) {
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFERS_VIEW).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFERS_VIEW).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag1").assertIsDisplayed()
             onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag2").assertIsDisplayed()
         }

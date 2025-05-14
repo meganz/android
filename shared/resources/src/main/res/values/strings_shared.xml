@@ -1161,4 +1161,12 @@
     <string name="transfers_section_tab_title_active_transfers">Active</string>
     <!-- Title of the tab section for failed transfers -->
     <string name="transfers_section_tab_title_failed_transfers">Failed</string>
+    <!--Text for showing the empty state when there are no transfers. The [A][/A] format marks are to put the text in a different color and style.-->
+    <string name="transfers_no_transfers_empty_text">[A]No transfers[/A]</string>
+    <!--Text for showing the empty state when there are no active transfers. The [A][/A] format marks are to put the text in a different color and style.-->
+    <string name="transfers_no_active_transfers_empty_text">[A]No active transfers[/A]</string>
+    <!--Text for showing the empty state when there are no completed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
+    <string name="transfers_no_completed_transfers_empty_text">[A]No completed transfers[/A]</string>
+    <!--Text for showing the empty state when there are no failed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
+    <string name="transfers_no_failed_transfers_empty_text">[A]No failed transfers[/A]</string>
 </resources>
