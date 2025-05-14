@@ -543,7 +543,7 @@ class ChatTabsFragment : Fragment() {
         if (viewModel.isMeetingTabShown()) {
             if (isFabClicked) {
                 Analytics.tracker.trackEvent(ChatTabFABPressedEvent)
-                MeetingBottomSheetDialogFragment.newInstance(true).apply {
+                MeetingBottomSheetDialogFragment.newInstance().apply {
                     onScheduleMeeting = ::onScheduleMeeting
                 }.show(
                     childFragmentManager,
