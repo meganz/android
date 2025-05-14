@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
@@ -42,6 +43,7 @@ class ShareRecipientsViewModelTest {
     private val shareFolderUseCase = mock<ShareFolderUseCase>()
     private val shareFolderRequestMapper = mock<MoveRequestMessageMapper>()
     private val getAllowedSharingPermissionsUseCase = mock<GetAllowedSharingPermissionsUseCase>()
+    private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
 
     private val shareResultMapper = RemoveShareResultMapper(
         successString = { TestValues.SUCCESS_STRING },
@@ -54,6 +56,7 @@ class ShareRecipientsViewModelTest {
             monitorShareRecipientsUseCase,
             shareFolderUseCase,
             getAllowedSharingPermissionsUseCase,
+            getContactVerificationWarningUseCase,
         )
     }
 
@@ -69,7 +72,8 @@ class ShareRecipientsViewModelTest {
             shareFolderUseCase = shareFolderUseCase,
             removeShareResultMapper = shareResultMapper,
             moveRequestMessageMapper = shareFolderRequestMapper,
-            getAllowedSharingPermissionsUseCase = getAllowedSharingPermissionsUseCase
+            getAllowedSharingPermissionsUseCase = getAllowedSharingPermissionsUseCase,
+            getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
         )
     }
 
@@ -443,6 +447,22 @@ class ShareRecipientsViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that show verified contact warning field is set to true if use case returns true`() =
+        runTest {
+            getContactVerificationWarningUseCase.stub {
+                onBlocking { invoke() }.thenReturn(true)
+            }
+
+            initUnderTest()
+
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat((actual as FileContactListState.Data).isContactVerificationWarningEnabled).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
 
     private data object TestValues {

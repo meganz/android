@@ -13,13 +13,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
+import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.button.PrimaryLargeIconButton
-import mega.android.core.ui.components.surface.BoxSurface
+import mega.android.core.ui.components.surface.ColumnSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.contract.AddContactsContract
@@ -146,12 +148,20 @@ internal fun FileContactScreen(
             )
         }
     ) { paddingValues ->
-        BoxSurface(
+        ColumnSurface(
             surfaceColor = SurfaceColor.PageBackground,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+
+            if (shouldDisplayVerificationBanner(state)) {
+                TopWarningBanner(
+                    modifier = Modifier,
+                    body = stringResource(id = R.string.contact_share_file_to_unverified_contact_warning_message),
+                    showCancelButton = false,
+                )
+            }
 
             ShareRecipientsListView(
                 items = state.recipients,
@@ -258,4 +268,7 @@ internal fun FileContactScreen(
     }
 
 }
+
+private fun shouldDisplayVerificationBanner(state: FileContactListState.Data) =
+    state.isContactVerificationWarningEnabled && state.recipients.any { it.isVerified.not() }
 

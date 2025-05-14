@@ -34,5 +34,6 @@ internal sealed interface FileContactListState {
         val sharingInProgress: Boolean,
         val sharingCompletedEvent: StateEventWithContent<String>,
         val accessPermissions: ImmutableSet<AccessPermission>,
+        val isContactVerificationWarningEnabled: Boolean,
     ) : FileContactListState
 }

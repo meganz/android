@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.ResultCount
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
@@ -38,6 +39,7 @@ internal class ShareRecipientsViewModel @Inject constructor(
     private val removeShareResultMapper: RemoveShareResultMapper,
     private val moveRequestMessageMapper: MoveRequestMessageMapper,
     private val getAllowedSharingPermissionsUseCase: GetAllowedSharingPermissionsUseCase,
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
 ) : ViewModel() {
     private val folderInfo = savedStateHandle.toRoute<FileContactInfo>()
     val state: StateFlow<FileContactListState>
@@ -68,6 +70,23 @@ internal class ShareRecipientsViewModel @Inject constructor(
                 state.updateToData(transformer::invoke)
             }
         }
+        checkVerificationWarning()
+    }
+
+    private fun checkVerificationWarning() {
+        viewModelScope.launch {
+            runCatching {
+                getContactVerificationWarningUseCase()
+            }.onSuccess { isEnabled ->
+                state.updateToData {
+                    it.copy(
+                        isContactVerificationWarningEnabled = isEnabled,
+                    )
+                }
+            }.onFailure { error ->
+                Timber.e(error)
+            }
+        }
     }
 
     private fun MutableStateFlow<FileContactListState>.updateToData(function: (FileContactListState.Data) -> FileContactListState) {
@@ -84,6 +103,7 @@ internal class ShareRecipientsViewModel @Inject constructor(
                         sharingInProgress = false,
                         sharingCompletedEvent = consumed(),
                         accessPermissions = emptySet<AccessPermission>().toImmutableSet(),
+                        isContactVerificationWarningEnabled = false,
                     )
                 )
             }

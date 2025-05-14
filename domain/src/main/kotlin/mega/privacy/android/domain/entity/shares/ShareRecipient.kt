@@ -10,6 +10,7 @@ sealed interface ShareRecipient {
     val email: String
     val permission: AccessPermission
     val isPending: Boolean
+    val isVerified: Boolean
 
     /**
      * Non contact
@@ -22,7 +23,9 @@ sealed interface ShareRecipient {
         override val email: String,
         override val permission: AccessPermission,
         override val isPending: Boolean,
-    ) : ShareRecipient
+    ) : ShareRecipient {
+        override val isVerified: Boolean = false
+    }
 
     /**
      * Contact
@@ -40,7 +43,7 @@ sealed interface ShareRecipient {
         val handle: Long,
         override val email: String,
         val contactData: ContactData,
-        val isVerified: Boolean,
+        override val isVerified: Boolean,
         override val permission: AccessPermission,
         override val isPending: Boolean,
         val status: UserChatStatus,
