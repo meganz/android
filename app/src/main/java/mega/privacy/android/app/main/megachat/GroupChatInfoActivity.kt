@@ -1,13 +1,8 @@
 package mega.privacy.android.app.main.megachat
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.InputFilter
@@ -26,7 +21,6 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -46,7 +40,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.twemoji.EmojiEditText
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityGroupChatPropertiesBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -86,10 +79,10 @@ import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
+import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
-import mega.privacy.android.domain.usecase.chat.participants.MonitorChatParticipantsUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -147,9 +140,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     @Inject
     lateinit var navigator: MegaNavigator
 
-    @Inject
-    lateinit var monitorChatParticipantsUseCase: MonitorChatParticipantsUseCase
-
     lateinit var binding: ActivityGroupChatPropertiesBinding
     private val viewModel by viewModels<GroupChatInfoViewModel>()
 
@@ -178,29 +168,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     private val pendingParticipantRequests = HashMap<Int, MegaChatParticipant>()
     private var bottomSheetDialogFragment: BottomSheetDialogFragment? = null
     private var countDownTimer: CountDownTimer? = null
-
-    /**
-     * Broadcast to update a contact in adapter due to a change.
-     * Currently the changes contemplated are: nickname and credentials.
-     */
-    private val contactUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent?) {
-            intent?.let {
-                it.action?.let { action ->
-                    if (action == BroadcastConstants.ACTION_UPDATE_CREDENTIALS
-                    ) {
-                        val userHandle = intent.getLongExtra(
-                            BroadcastConstants.EXTRA_USER_HANDLE,
-                            MegaApiJava.INVALID_HANDLE
-                        )
-                        if (userHandle != MegaApiJava.INVALID_HANDLE) {
-                            updateAdapter(userHandle)
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -277,12 +244,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             }
 
             megaChatApi.signalPresenceActivity()
-
-            val contactUpdateFilter =
-                IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
-            contactUpdateFilter.addAction(BroadcastConstants.ACTION_UPDATE_CREDENTIALS)
-            registerSdkAppropriateReceiver(contactUpdateReceiver, contactUpdateFilter)
-            monitorParticipants(chatHandle)
             setParticipants()
             updateAdapterHeader()
 
@@ -296,41 +257,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                     showEndCallForAllDialog()
                 }
             }
-        }
-    }
-
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
-    private fun registerSdkAppropriateReceiver(
-        broadcastReceiver: BroadcastReceiver,
-        filter: IntentFilter,
-    ) {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                ContextCompat.registerReceiver(
-                    this, broadcastReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED
-                )
-            } else {
-                super.registerReceiver(broadcastReceiver, filter)
-            }
-        } catch (e: IllegalStateException) {
-            Timber.e(e, "IllegalStateException registering receiver")
-        }
-    }
-
-    private fun monitorParticipants(chatId: Long) {
-        lifecycleScope.launch {
-            monitorChatParticipantsUseCase(chatId)
-                .collect {
-                    it.forEach { participant ->
-                        updateAdapter(participant.handle)
-                        if (bottomSheetDialogFragment is ParticipantBottomSheetDialogFragment
-                            && bottomSheetDialogFragment.isBottomSheetDialogShown()
-                            && selectedHandleParticipant == participant.handle
-                        ) {
-                            (bottomSheetDialogFragment as ParticipantBottomSheetDialogFragment).updateContactData()
-                        }
-                    }
-                }
         }
     }
 
@@ -372,6 +298,20 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         collectFlow(viewModel.state.map { it.retentionTime }.distinctUntilChanged()) {
             it?.let { adapter?.updateRetentionTimeUI(it) }
         }
+
+        collectFlow(viewModel.state.map { it.participantUpdated }.distinctUntilChanged()) {
+            it?.let { participant ->
+                if (participant.privilege != ChatRoomPermission.Removed) {
+                    updateAdapter(participant)
+                    if (bottomSheetDialogFragment is ParticipantBottomSheetDialogFragment
+                        && bottomSheetDialogFragment.isBottomSheetDialogShown()
+                        && selectedHandleParticipant == participant.handle
+                    ) {
+                        (bottomSheetDialogFragment as ParticipantBottomSheetDialogFragment).updateContactData()
+                    }
+                }
+            }
+        }
     }
 
     private fun updateParticipantsWarning() {
@@ -394,7 +334,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(contactUpdateReceiver)
     }
 
     private fun setParticipants() {
@@ -446,10 +385,10 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         }
     }
 
-    private fun updateAdapter(contactHandle: Long) {
+    private fun updateAdapter(participant: ChatParticipant) {
         chat = megaChatApi.getChatRoom(chatHandle)
 
-        if (contactHandle == megaChatApi.myUserHandle) {
+        if (participant.handle == megaChatApi.myUserHandle) {
             val pos = participants.size - 1
             participants[pos]?.fullName =
                 getString(
@@ -461,13 +400,11 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             return
         }
 
-        for (participant in participants) {
-            if (participant?.handle == contactHandle) {
-                val pos = participants.indexOf(participant)
-                participants[pos]?.fullName = chatC?.getParticipantFullName(contactHandle)
-                adapter?.updateParticipant(pos, participants)
-                break
-            }
+        participants.find { it?.handle == participant.handle }?.let {
+            val alias = participant.data.alias
+            participants[participants.indexOf(it)]?.fullName =
+                if (alias.isNullOrEmpty()) participant.data.fullName else alias
+            adapter?.updateParticipant(participants.indexOf(it), participants)
         }
     }
 

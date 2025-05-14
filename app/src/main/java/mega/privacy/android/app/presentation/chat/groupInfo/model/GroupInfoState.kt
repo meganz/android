@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.chat.groupInfo.model
 
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoom
 
 /**
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
  * @property retentionTime                              The retention time.
  * @property call                                       The chat call.
  * @property chatRoom                                   The chat room.
+ * @property participantUpdated                         [ChatParticipant].
  */
 data class GroupInfoState(
     val chatId: Long = -1L,
@@ -28,4 +30,5 @@ data class GroupInfoState(
     val showForceUpdateDialog: Boolean = false,
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
     val retentionTime: Long? = null,
+    val participantUpdated: ChatParticipant? = null,
 )

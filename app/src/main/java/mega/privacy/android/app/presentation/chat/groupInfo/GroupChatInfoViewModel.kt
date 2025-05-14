@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.chat.groupInfo
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -16,12 +17,15 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.groupInfo.model.GroupInfoState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState.Companion.FREE_PLAN_PARTICIPANTS_LIMIT
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.openMeetingWithAudioOrVideo
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
@@ -37,6 +41,7 @@ import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
+import mega.privacy.android.domain.usecase.chat.participants.MonitorChatParticipantsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -58,6 +63,7 @@ import javax.inject.Inject
  * @property broadcastChatArchivedUseCase                   [BroadcastChatArchivedUseCase]
  * @property broadcastLeaveChatUseCase                      [BroadcastLeaveChatUseCase]
  * @property get1On1ChatIdUseCase                           [Get1On1ChatIdUseCase]
+ * @property monitorChatParticipantsUseCase                 [MonitorChatParticipantsUseCase]
  * @property state                                          Current view state as [GroupInfoState]
  */
 @HiltViewModel
@@ -79,6 +85,7 @@ class GroupChatInfoViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
+    private val monitorChatParticipantsUseCase: MonitorChatParticipantsUseCase
 ) : ViewModel() {
 
     /**
@@ -88,6 +95,7 @@ class GroupChatInfoViewModel @Inject constructor(
 
     private var monitorChatRoomUpdatesJob: Job? = null
     private var monitorSFUServerUpgradeJob: Job? = null
+    private var monitorChatParticipantsUpdatesJob: Job? = null
     private var monitorChatCallJob: Job? = null
 
     /**
@@ -172,6 +180,7 @@ class GroupChatInfoViewModel @Inject constructor(
                 )
             }
             monitorCallInChat()
+            monitorChatParticipantsUpdates()
             monitorChatUpdates(newChatId)
         }
     }
@@ -259,6 +268,22 @@ class GroupChatInfoViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    /**
+     * Monitor participants updates
+     */
+    private fun monitorChatParticipantsUpdates() {
+        monitorChatParticipantsUpdatesJob?.cancel()
+        monitorChatParticipantsUpdatesJob = viewModelScope.launch {
+            monitorChatParticipantsUseCase(_state.value.chatId)
+                .catch { Timber.e(it) }
+                .collect {
+                    it.forEach { participant ->
+                        _state.update { it.copy(participantUpdated = participant) }
+                    }
+                }
         }
     }
 

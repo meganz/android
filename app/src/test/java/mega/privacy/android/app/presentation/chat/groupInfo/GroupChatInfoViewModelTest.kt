@@ -14,6 +14,7 @@ import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -26,6 +27,7 @@ import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
+import mega.privacy.android.domain.usecase.chat.participants.MonitorChatParticipantsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -64,6 +66,8 @@ class GroupChatInfoViewModelTest {
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorChatRoomUpdatesUseCase = mock<MonitorChatRoomUpdatesUseCase>()
+    private val monitorChatParticipantsUseCase = mock<MonitorChatParticipantsUseCase>()
+
     private val monitorCallInChatUseCase = mock<MonitorCallInChatUseCase>()
     private val getChatRoomUseCase = mock<GetChatRoomUseCase>()
 
@@ -71,6 +75,7 @@ class GroupChatInfoViewModelTest {
     private val updatePushNotificationSettings = MutableSharedFlow<Boolean>()
     private val chatCallUpdates = MutableSharedFlow<ChatCall>()
     private val chatRoomUpdates = MutableSharedFlow<ChatRoom>()
+    private val chatParticipantsUpdates = MutableSharedFlow<List<ChatParticipant>>()
 
     private val chatId = 123L
 
@@ -101,6 +106,7 @@ class GroupChatInfoViewModelTest {
         wheneverBlocking { monitorSFUServerUpgradeUseCase() } doReturn emptyFlow()
         wheneverBlocking { getFeatureFlagValueUseCase.invoke(any()) } doReturn false
         wheneverBlocking { monitorChatRoomUpdatesUseCase(chatId) } doReturn chatRoomUpdates
+        wheneverBlocking { monitorChatParticipantsUseCase(chatId) } doReturn chatParticipantsUpdates
         whenever(monitorCallInChatUseCase(any())) doReturn chatCallUpdates
     }
 
@@ -122,7 +128,8 @@ class GroupChatInfoViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorChatRoomUpdatesUseCase = monitorChatRoomUpdatesUseCase,
             monitorCallInChatUseCase = monitorCallInChatUseCase,
-            getChatRoomUseCase = getChatRoomUseCase
+            getChatRoomUseCase = getChatRoomUseCase,
+            monitorChatParticipantsUseCase = monitorChatParticipantsUseCase
         )
     }
 
@@ -255,6 +262,23 @@ class GroupChatInfoViewModelTest {
 
         underTest.state.map { it.chatRoom }.test {
             assertThat(awaitItem()).isEqualTo(chat)
+        }
+    }
+
+    @Test
+    fun `test that chat participants updates state correctly`() = runTest {
+        val participant1 = mock<ChatParticipant> {
+            on { handle } doReturn 1L
+        }
+
+        val list = listOf(participant1)
+
+        initializeViewModel()
+        whenever(monitorChatParticipantsUseCase(chatId)).thenReturn(flowOf(list))
+        underTest.setChatId(chatId)
+
+        underTest.state.map { it.participantUpdated }.test {
+            assertThat(awaitItem()).isEqualTo(participant1)
         }
     }
 
