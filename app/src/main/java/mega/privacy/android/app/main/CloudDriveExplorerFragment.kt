@@ -1,7 +1,5 @@
 package mega.privacy.android.app.main
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.text.Spanned
 import android.view.LayoutInflater
@@ -52,6 +50,8 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -600,7 +600,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
                     var lastFirstVisiblePosition = 0
                     if (sortByHeaderViewModel.isListView()) {
                         listLayoutManager?.let {
-                            lastFirstVisiblePosition = it.findLastCompletelyVisibleItemPosition()
+                            lastFirstVisiblePosition = it.findFirstCompletelyVisibleItemPosition()
                         } ?: let {
                             Timber.e("mLayoutManager is null")
                             listLayoutManager = LinearLayoutManager(requireContext())
@@ -609,7 +609,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
                     } else {
                         // For grid view, just add null check
                         lastFirstVisiblePosition =
-                            gridLayoutManager?.findLastCompletelyVisibleItemPosition() ?: 0
+                            gridLayoutManager?.findFirstCompletelyVisibleItemPosition() ?: 0
                     }
                     Timber.d("Push to stack $lastFirstVisiblePosition position")
                     lastPositionStack.push(lastFirstVisiblePosition)
