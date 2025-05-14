@@ -504,9 +504,9 @@ class FavouritesFragment : Fragment() {
     }
 
     private fun openFavourite(item: Favourite) {
-        if (item.typedNode.isTakenDown) {
+        if (item.typedNode.isTakenDown && item !is FavouriteFolder) {
             megaNodeUtilWrapper.showTakenDownDialog(
-                isFolder = item is FavouriteFolder,
+                isFolder = false,
                 context = requireContext(),
             )
         } else {

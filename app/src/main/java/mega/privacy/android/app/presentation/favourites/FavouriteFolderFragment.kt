@@ -128,9 +128,9 @@ class FavouriteFolderFragment : Fragment() {
     private fun setupAdapter() {
         adapter = FavouritesAdapter(
             onItemClicked = {
-                if (it.typedNode.isTakenDown) {
+                if (it.typedNode.isTakenDown && it !is FavouriteFolder) {
                     megaNodeUtilWrapper.showTakenDownDialog(
-                        isFolder = it is FavouriteFolder,
+                        isFolder = false,
                         context = requireContext(),
                     )
                 } else {
