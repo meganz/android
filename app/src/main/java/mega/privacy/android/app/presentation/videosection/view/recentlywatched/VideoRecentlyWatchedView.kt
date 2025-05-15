@@ -178,10 +178,6 @@ fun VideoRecentlyWatchedView(
                                     nodeAvailableOffline = videoItem.nodeAvailableOffline,
                                     onClick = { onClick(videoItem, it) },
                                     onMenuClick = { onMenuClick(videoItem) },
-                                    modifier = Modifier
-                                        .alpha(0.5f.takeIf {
-                                            shouldApplySensitiveMode && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited)
-                                        } ?: 1f),
                                     isSensitive = shouldApplySensitiveMode && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited),
                                 )
                             }

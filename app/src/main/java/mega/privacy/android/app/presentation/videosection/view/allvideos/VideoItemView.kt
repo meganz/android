@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -109,6 +110,7 @@ internal fun VideoItemView(
             icon = icon,
             modifier = Modifier
                 .align(Alignment.Top)
+                .alpha(0.5f.takeIf { isSensitive } ?: 1f)
                 .blur(16.dp.takeIf { isSensitive } ?: 0.dp),
             thumbnailData = thumbnailData,
             duration = durationInSecondsTextMapper(duration),
