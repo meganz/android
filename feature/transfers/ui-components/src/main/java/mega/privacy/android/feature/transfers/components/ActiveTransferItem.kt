@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.transfers.components
 
-
 import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,10 +33,10 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * Core component for a in-progress transfer item.
+ * Core component for a active transfer item.
  */
 @Composable
-fun InProgressTransferItem(
+fun ActiveTransferItem(
     tag: Int,
     isDownload: Boolean,
     fileTypeResId: Int?,
@@ -56,7 +55,7 @@ fun InProgressTransferItem(
     modifier = modifier
         .height(68.dp)
         .fillMaxWidth()
-        .testTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag")
+        .testTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag")
 ) {
     Row(
         modifier = Modifier
@@ -82,7 +81,7 @@ fun InProgressTransferItem(
             previewUri = previewUri,
             modifier = Modifier
                 .padding(start = 4.dp)
-                .testTag(TEST_TAG_IN_PROGRESS_TRANSFER_IMAGE),
+                .testTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE),
         )
         Column(
             Modifier
@@ -95,7 +94,7 @@ fun InProgressTransferItem(
                 overflow = TextOverflow.MiddleEllipsis,
                 style = AppTheme.typography.titleMedium,
                 textColor = TextColor.Primary,
-                modifier = Modifier.testTag(TEST_TAG_IN_PROGRESS_TRANSFER_NAME),
+                modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_NAME),
             )
             Row(
                 modifier = Modifier.padding(top = 2.dp),
@@ -104,7 +103,7 @@ fun InProgressTransferItem(
                 LeadingIndicator(
                     modifier = Modifier
                         .padding(end = 4.dp)
-                        .testTag(TEST_TAG_IN_PROGRESS_TRANSFER_TYPE_ICON),
+                        .testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
                     isDownload = isDownload,
                     isOverQuota = isOverQuota,
                 )
@@ -114,7 +113,7 @@ fun InProgressTransferItem(
                     overflow = TextOverflow.Ellipsis,
                     style = AppTheme.typography.bodySmall,
                     textColor = TextColor.Secondary,
-                    modifier = Modifier.testTag(TEST_TAG_IN_PROGRESS_TRANSFER_SUBTITLE),
+                    modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_SUBTITLE),
                 )
             }
         }
@@ -146,21 +145,21 @@ fun InProgressTransferItem(
 
 @CombinedThemePreviews
 @Composable
-private fun InProgressTransferItemPreview(
-    @PreviewParameter(InProgressTransferItemOrdinaryProvider::class) inProgressTransferUI: InProgressTransferUI,
-) = Preview(inProgressTransferUI)
+private fun ActiveTransferItemPreview(
+    @PreviewParameter(ActiveTransferItemOrdinaryProvider::class) activeTransferUI: ActiveTransferUI,
+) = Preview(activeTransferUI)
 
 @CombinedThemePreviews
 @Composable
-private fun InProgressTransferItemUnusualPreview(
-    @PreviewParameter(InProgressTransferItemUnusualProvider::class) inProgressTransferUI: InProgressTransferUI,
-) = Preview(inProgressTransferUI)
+private fun ActiveTransferItemUnusualPreview(
+    @PreviewParameter(ActiveTransferItemUnusualProvider::class) activeTransferUI: ActiveTransferUI,
+) = Preview(activeTransferUI)
 
 @Composable
-private fun Preview(inProgressTransferUI: InProgressTransferUI) {
+private fun Preview(activeTransferUI: ActiveTransferUI) {
     AndroidThemeForPreviews {
-        with(inProgressTransferUI) {
-            InProgressTransferItem(
+        with(activeTransferUI) {
+            ActiveTransferItem(
                 tag = 1,
                 isDownload = isDownload,
                 fileTypeResId = fileTypeResId,
@@ -179,7 +178,7 @@ private fun Preview(inProgressTransferUI: InProgressTransferUI) {
     }
 }
 
-internal data class InProgressTransferUI(
+internal data class ActiveTransferUI(
     val isDownload: Boolean,
     val fileTypeResId: Int?,
     val previewUri: Uri?,
@@ -200,12 +199,12 @@ private const val PROGRESS = 0.6f
 private const val SPEED = "4.2MB/s"
 private const val PAUSED = "Paused"
 
-private class InProgressTransferItemOrdinaryProvider :
-    PreviewParameterProvider<InProgressTransferUI> {
+private class ActiveTransferItemOrdinaryProvider :
+    PreviewParameterProvider<ActiveTransferUI> {
     override val values =
         listOf(false, true).flatMap { isPaused ->
             listOf(true, false).map { isDownload ->
-                InProgressTransferUI(
+                ActiveTransferUI(
                     isDownload = isDownload,
                     fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
                     previewUri = null,
@@ -222,11 +221,11 @@ private class InProgressTransferItemOrdinaryProvider :
         }.asSequence()
 }
 
-private class InProgressTransferItemUnusualProvider :
-    PreviewParameterProvider<InProgressTransferUI> {
+private class ActiveTransferItemUnusualProvider :
+    PreviewParameterProvider<ActiveTransferUI> {
     override val values = listOf(false, true).flatMap { isOverQuota ->
         listOf(false, true).map { areTransfersPaused ->
-            InProgressTransferUI(
+            ActiveTransferUI(
                 isDownload = false,
                 fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
                 previewUri = null,
@@ -244,46 +243,46 @@ private class InProgressTransferItemUnusualProvider :
 }
 
 /**
- * Tag for the in-progress transfer item.
+ * Tag for the active tab
  */
-const val TEST_TAG_IN_PROGRESS_TRANSFER_ITEM =
-    "transfers_view:tab_in_progress:transfer_item"
+private const val TEST_TAG_ACTIVE_TAB = "transfers_view:tab_active"
 
 /**
- * Tag for the in-progress transfer image.
+ * Tag for the active transfer item.
  */
-const val TEST_TAG_IN_PROGRESS_TRANSFER_IMAGE =
-    "transfers_view:tab_in_progress:transfer_image"
+const val TEST_TAG_ACTIVE_TRANSFER_ITEM = "$TEST_TAG_ACTIVE_TAB:transfer_item"
 
 /**
- * Tag for the in-progress transfer name.
+ * Tag for the active transfer image.
  */
-const val TEST_TAG_IN_PROGRESS_TRANSFER_NAME =
-    "transfers_view:tab_in_progress:transfer_name"
+const val TEST_TAG_ACTIVE_TRANSFER_IMAGE = "$TEST_TAG_ACTIVE_TAB:transfer_image"
 
 /**
- * Tag for the in-progress transfer progress.
+ * Tag for the active transfer name.
  */
-const val TEST_TAG_IN_PROGRESS_TRANSFER_SUBTITLE =
-    "transfers_view:tab_in_progress:transfer_subtitle"
+const val TEST_TAG_ACTIVE_TRANSFER_NAME = "$TEST_TAG_ACTIVE_TAB:transfer_name"
 
 /**
- * Tag for the in-progress transfer queued icon.
+ * Tag for the active transfer progress.
  */
-const val TEST_TAG_IN_PROGRESS_TRANSFER_TYPE_ICON =
-    "transfers_view:tab_in_progress:transfer_type_icon"
+const val TEST_TAG_ACTIVE_TRANSFER_SUBTITLE = "$TEST_TAG_ACTIVE_TAB:transfer_subtitle"
 
 /**
- * Tag for the in-progress transfer queue icon.
+ * Tag for the active transfer queued icon.
  */
-const val TEST_TAG_QUEUE_ICON = "transfers_view:tab_in_progress:transfer_item:queue_icon"
+const val TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON = "$TEST_TAG_ACTIVE_TAB:transfer_type_icon"
 
 /**
- * Tag for the in-progress transfer pause icon.
+ * Tag for the active transfer queue icon.
  */
-const val TEST_TAG_PAUSE_ICON = "transfers_view:tab_in_progress:transfer_item:pause_icon"
+const val TEST_TAG_QUEUE_ICON = "$TEST_TAG_ACTIVE_TAB:transfer_item:queue_icon"
 
 /**
- * Tag for the in-progress transfer play icon.
+ * Tag for the active transfer pause icon.
  */
-const val TEST_TAG_PLAY_ICON = "transfers_view:tab_in_progress:transfer_item:play_icon"
+const val TEST_TAG_PAUSE_ICON = "$TEST_TAG_ACTIVE_TAB:transfer_item:pause_icon"
+
+/**
+ * Tag for the active transfer play icon.
+ */
+const val TEST_TAG_PLAY_ICON = "$TEST_TAG_ACTIVE_TAB:transfer_item:play_icon"

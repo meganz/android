@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.notification
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -13,13 +12,14 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
-import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import javax.inject.Inject
 
 /**
@@ -36,7 +36,7 @@ class DefaultTransfersNotificationMapper @Inject constructor(
     ): Notification {
         val intent = if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
             Intent(context, TransfersActivity::class.java).apply {
-                putExtra(EXTRA_TAB, IN_PROGRESS_TAB_INDEX)
+                putExtra(EXTRA_TAB, ACTIVE_TAB_INDEX)
             }
         } else {
             Intent(context, ManagerActivity::class.java).apply {

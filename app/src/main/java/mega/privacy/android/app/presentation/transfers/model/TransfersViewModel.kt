@@ -49,19 +49,19 @@ class TransfersViewModel @Inject constructor(
 
     init {
         updateSelectedTab(transfersArgs.tabIndex)
-        monitorInProgressTransfers()
+        monitoractiveTransfers()
         monitorStorageOverQuota()
         monitorTransferOverQuota()
         monitorPausedTransfers()
         monitorCompletedTransfers()
     }
 
-    private fun monitorInProgressTransfers() {
+    private fun monitoractiveTransfers() {
         viewModelScope.launch {
-            monitorInProgressTransfersUseCase().collectLatest { inProgressTransfers ->
+            monitorInProgressTransfersUseCase().collectLatest { activeTransfers ->
                 _uiState.update { state ->
                     state.copy(
-                        inProgressTransfers = inProgressTransfers.values
+                        activeTransfers = activeTransfers.values
                             .sortedBy { it.priority }.toImmutableList(),
                     )
                 }
@@ -124,7 +124,7 @@ class TransfersViewModel @Inject constructor(
      * Pause or resume a transfer by tag.
      */
     fun playOrPauseTransfer(tag: Int) {
-        runCatching { uiState.value.inProgressTransfers.first { it.tag == tag }.isPaused }
+        runCatching { uiState.value.activeTransfers.first { it.tag == tag }.isPaused }
             .getOrNull()?.let { isPaused ->
                 viewModelScope.launch {
                     runCatching { pauseTransferByTagUseCase(tag, !isPaused) }

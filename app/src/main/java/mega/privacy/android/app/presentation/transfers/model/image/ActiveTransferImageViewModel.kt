@@ -11,7 +11,7 @@ import javax.inject.Inject
  *
  */
 @HiltViewModel
-class InProgressTransferImageViewModel @Inject constructor(
+class ActiveTransferImageViewModel @Inject constructor(
     getThumbnailUseCase: GetThumbnailUseCase,
     fileTypeIconMapper: FileTypeIconMapper,
 ) : AbstractTransferImageViewModel(

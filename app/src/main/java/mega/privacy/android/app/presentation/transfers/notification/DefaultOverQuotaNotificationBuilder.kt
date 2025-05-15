@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.notification
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -17,7 +15,7 @@ import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
-import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
@@ -28,6 +26,8 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaAccountDetails
 import javax.inject.Inject
 
@@ -74,7 +74,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
         )
         val clickIntent = if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
             Intent(context, TransfersActivity::class.java).apply {
-                putExtra(EXTRA_TAB, IN_PROGRESS_TAB_INDEX)
+                putExtra(EXTRA_TAB, ACTIVE_TAB_INDEX)
             }
         } else {
             Intent(context, ManagerActivity::class.java).apply {

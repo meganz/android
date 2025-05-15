@@ -20,7 +20,7 @@ import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_PAUSE_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_RESUME_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
-import mega.privacy.android.app.presentation.transfers.model.image.InProgressTransferImageViewModel
+import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
@@ -51,12 +51,12 @@ class TransfersViewTest {
     private val tag2 = 2
     private val state =
         TransferImageUiState(fileTypeResId = iconPackR.drawable.ic_text_medium_solid)
-    private val viewModel = mock<InProgressTransferImageViewModel> {
+    private val viewModel = mock<ActiveTransferImageViewModel> {
         on { getUiStateFlow(tag1) } doReturn MutableStateFlow(state)
         on { getUiStateFlow(tag2) } doReturn MutableStateFlow(state)
     }
     private val viewModelStore = mock<ViewModelStore> {
-        on { get(argThat<String> { contains(InProgressTransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn viewModel
+        on { get(argThat<String> { contains(ActiveTransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn viewModel
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore
@@ -83,7 +83,7 @@ class TransfersViewTest {
     fun `test that pause TransferMenuAction is displayed if transfers are not already paused and click action invokes correctly`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                inProgressTransfers = inProgressTransfers,
+                activeTransfers = inProgressTransfers,
                 areTransfersPaused = false
             )
         )
@@ -100,7 +100,7 @@ class TransfersViewTest {
     fun `test that resume TransferMenuAction is displayed if transfers are already paused and click action invokes correctly`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                inProgressTransfers = inProgressTransfers,
+                activeTransfers = inProgressTransfers,
                 areTransfersPaused = true,
             )
         )
@@ -115,7 +115,7 @@ class TransfersViewTest {
 
     @Test
     fun `test that cancel all transfers TransferMenuAction is displayed if transfers are already paused and click action invokes correctly`() {
-        initComposeTestRule(uiState = TransfersUiState(inProgressTransfers = inProgressTransfers))
+        initComposeTestRule(uiState = TransfersUiState(activeTransfers = inProgressTransfers))
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_MORE_ACTION).apply {
                 assertIsDisplayed()

@@ -29,9 +29,9 @@ import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class InProgressTransferImageViewModelTest {
+class ActiveTransferImageViewModelTest {
 
-    private lateinit var underTest: InProgressTransferImageViewModel
+    private lateinit var underTest: ActiveTransferImageViewModel
 
     private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
@@ -50,7 +50,7 @@ class InProgressTransferImageViewModelTest {
     }
 
     private fun initTestClass() {
-        underTest = InProgressTransferImageViewModel(
+        underTest = ActiveTransferImageViewModel(
             getThumbnailUseCase = getThumbnailUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
         )

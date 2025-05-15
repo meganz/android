@@ -10,7 +10,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 
 internal const val tabIndexArg = "tabIndex"
 internal const val transfersNavigationRoutePattern =
@@ -37,17 +37,17 @@ internal fun NavGraphBuilder.transfersViewNavigationGraph(
             bottomSheetNavigator = bottomSheetNavigator,
             scaffoldState = scaffoldState,
             onBackPress = onBackPress,
-            showInProgressModal = navHostController::navigateToInProgressActionsModal,
+            showInProgressModal = navHostController::navigateToActiveTransfersActionsModal,
         )
 
-        inProgressActionsModal(navHostController = navHostController)
+        activeTransfersActionsModal(navHostController = navHostController)
 
         cancelAllTransfersDialog(navHostController = navHostController)
     }
 }
 
 internal fun NavHostController.navigateToTransfersViewGraph(
-    tabIndex: Int = IN_PROGRESS_TAB_INDEX,
+    tabIndex: Int = ACTIVE_TAB_INDEX,
     navOptions: NavOptions? = null,
 ) {
     navigate(transfersNavigationRoutePattern(tabIndex), navOptions)

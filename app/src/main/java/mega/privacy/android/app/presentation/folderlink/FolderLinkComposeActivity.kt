@@ -53,7 +53,7 @@ import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
@@ -405,7 +405,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 return@launch
             }
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                megaNavigator.openTransfers(this@FolderLinkComposeActivity, IN_PROGRESS_TAB_INDEX)
+                megaNavigator.openTransfers(this@FolderLinkComposeActivity, ACTIVE_TAB_INDEX)
             } else {
                 startActivity(
                     Intent(this@FolderLinkComposeActivity, ManagerActivity::class.java)

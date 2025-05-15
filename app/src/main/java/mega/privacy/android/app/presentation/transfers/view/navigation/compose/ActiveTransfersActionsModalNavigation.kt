@@ -9,21 +9,21 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.sharedViewModel
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
-import mega.privacy.android.app.presentation.transfers.view.sheet.InProgressActionsBottomSheet
+import mega.privacy.android.app.presentation.transfers.view.sheet.ActiveTransfersActionsBottomSheet
 
-internal const val inProgressActionsModalRoute = "inProgressActionsModal"
+internal const val activeTransfersActionsModalRoute = "activeTransfersActionsModal"
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
-internal fun NavGraphBuilder.inProgressActionsModal(navHostController: NavHostController) {
-    bottomSheet(route = inProgressActionsModalRoute) { backStackEntry ->
+internal fun NavGraphBuilder.activeTransfersActionsModal(navHostController: NavHostController) {
+    bottomSheet(route = activeTransfersActionsModalRoute) { backStackEntry ->
         val viewModel =
             backStackEntry.sharedViewModel<TransfersViewModel>(navController = navHostController)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        if (uiState.inProgressTransfers.isEmpty()) {
+        if (uiState.activeTransfers.isEmpty()) {
             navHostController.popBackStack(transfersRoute, false)
         } else {
-            InProgressActionsBottomSheet(
+            ActiveTransfersActionsBottomSheet(
                 onCancelAllTransfers = {
                     navHostController.popBackStack(transfersRoute, false)
                     navHostController.navigateToCancelAllTransfersDialog()
@@ -33,8 +33,8 @@ internal fun NavGraphBuilder.inProgressActionsModal(navHostController: NavHostCo
     }
 }
 
-internal fun NavHostController.navigateToInProgressActionsModal(
+internal fun NavHostController.navigateToActiveTransfersActionsModal(
     navOptions: NavOptions? = null,
 ) {
-    navigate(inProgressActionsModalRoute, navOptions)
+    navigate(activeTransfersActionsModalRoute, navOptions)
 }

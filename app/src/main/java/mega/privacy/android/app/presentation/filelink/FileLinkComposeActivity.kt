@@ -44,7 +44,7 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
@@ -257,7 +257,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
                 return@launch
             }
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                navigator.openTransfers(this@FileLinkComposeActivity, IN_PROGRESS_TAB_INDEX)
+                navigator.openTransfers(this@FileLinkComposeActivity, ACTIVE_TAB_INDEX)
             } else {
                 startActivity(
                     Intent(this@FileLinkComposeActivity, ManagerActivity::class.java)

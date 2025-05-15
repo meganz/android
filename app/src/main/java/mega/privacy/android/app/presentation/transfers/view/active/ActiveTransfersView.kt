@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.transfers.view.inprogress
+package mega.privacy.android.app.presentation.transfers.view.active
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,22 +14,22 @@ import kotlinx.collections.immutable.ImmutableList
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressPercentString
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressSizeString
 import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
-import mega.privacy.android.app.presentation.transfers.model.image.InProgressTransferImageViewModel
+import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_ACTIVE_TAB
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
-import mega.privacy.android.feature.transfers.components.InProgressTransferItem
+import mega.privacy.android.feature.transfers.components.ActiveTransferItem
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
-internal fun InProgressTransfersView(
-    inProgressTransfers: ImmutableList<InProgressTransfer>,
+internal fun ActiveTransfersView(
+    activeTransfers: ImmutableList<InProgressTransfer>,
     isOverQuota: Boolean,
     areTransfersPaused: Boolean,
     onPlayPauseClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (inProgressTransfers.isEmpty()) {
+    if (activeTransfers.isEmpty()) {
         EmptyTransfersView(
             emptyStringId = sharedR.string.transfers_no_active_transfers_empty_text,
             modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFERS_EMPTY_VIEW)
@@ -41,11 +41,11 @@ internal fun InProgressTransfersView(
                 .testTag(TEST_TAG_ACTIVE_TRANSFERS_VIEW)
         ) {
             items(
-                items = inProgressTransfers,
+                items = activeTransfers,
                 key = { it.tag },
             ) { item ->
-                InProgressTransferItem(
-                    inProgressTransfer = item,
+                ActiveTransferItem(
+                    activeTransfer = item,
                     isOverQuota = isOverQuota,
                     areTransfersPaused = areTransfersPaused,
                     onPlayPauseClicked = onPlayPauseClicked,
@@ -56,22 +56,22 @@ internal fun InProgressTransfersView(
 }
 
 @Composable
-internal fun InProgressTransferItem(
-    inProgressTransfer: InProgressTransfer,
+internal fun ActiveTransferItem(
+    activeTransfer: InProgressTransfer,
     isOverQuota: Boolean,
     areTransfersPaused: Boolean,
     onPlayPauseClicked: (Int) -> Unit,
-    viewModel: InProgressTransferImageViewModel = hiltViewModel(),
-) = with(inProgressTransfer) {
+    viewModel: ActiveTransferImageViewModel = hiltViewModel(),
+) = with(activeTransfer) {
     val uiState by viewModel.getUiStateFlow(tag).collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = tag) {
-        viewModel.addTransfer(inProgressTransfer)
+        viewModel.addTransfer(activeTransfer)
     }
 
-    InProgressTransferItem(
+    ActiveTransferItem(
         tag = tag,
-        isDownload = inProgressTransfer is InProgressTransfer.Download,
+        isDownload = activeTransfer is InProgressTransfer.Download,
         fileTypeResId = uiState.fileTypeResId,
         previewUri = uiState.previewUri,
         fileName = fileName,

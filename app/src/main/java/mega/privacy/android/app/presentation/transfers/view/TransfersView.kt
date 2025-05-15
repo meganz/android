@@ -30,9 +30,9 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
+import mega.privacy.android.app.presentation.transfers.view.active.ActiveTransfersView
 import mega.privacy.android.app.presentation.transfers.view.completed.CompletedTransfersView
 import mega.privacy.android.app.presentation.transfers.view.failed.FailedTransfersView
-import mega.privacy.android.app.presentation.transfers.view.inprogress.InProgressTransfersView
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -87,7 +87,7 @@ internal fun TransfersView(
             },
         ) { paddingValues ->
             val noTransfers =
-                inProgressTransfers.isEmpty() && completedTransfers.isEmpty() && failedTransfers.isEmpty()
+                activeTransfers.isEmpty() && completedTransfers.isEmpty() && failedTransfers.isEmpty()
 
             if (noTransfers) {
                 EmptyTransfersView(
@@ -106,8 +106,8 @@ internal fun TransfersView(
                         addTextTab(
                             tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_active_transfers)),
                         ) {
-                            InProgressTransfersView(
-                                inProgressTransfers = inProgressTransfers,
+                            ActiveTransfersView(
+                                activeTransfers = activeTransfers,
                                 isOverQuota = isOverQuota,
                                 areTransfersPaused = areTransfersPaused,
                                 onPlayPauseClicked = onPlayPauseTransfer,
@@ -162,7 +162,7 @@ internal fun EmptyTransfersView(
 
 private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
     buildList {
-        if (selectedTab == IN_PROGRESS_TAB_INDEX && inProgressTransfers.isNotEmpty()) {
+        if (selectedTab == ACTIVE_TAB_INDEX && activeTransfers.isNotEmpty()) {
             if (areTransfersPaused) {
                 add(TransferMenuAction.Resume)
             } else {
@@ -197,14 +197,14 @@ const val TEST_TAG_TRANSFERS_VIEW = "transfers_view"
 const val TEST_TAG_EMPTY_TRANSFERS_VIEW = "$TEST_TAG_TRANSFERS_VIEW:empty"
 
 /**
- * Tag for the in progress tab
+ * Tag for the active tab
  */
 const val TEST_TAG_ACTIVE_TAB = "$TEST_TAG_TRANSFERS_VIEW:tab_active"
 
 /**
- * Index for the in progress tab
+ * Index for the active tab
  */
-const val IN_PROGRESS_TAB_INDEX = 0
+const val ACTIVE_TAB_INDEX = 0
 
 /**
  * Tag for the completed tab

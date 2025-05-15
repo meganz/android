@@ -74,7 +74,7 @@ import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
@@ -672,7 +672,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     private fun transfersWidgetClicked() {
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                megaNavigator.openTransfers(this@SearchActivity, IN_PROGRESS_TAB_INDEX)
+                megaNavigator.openTransfers(this@SearchActivity, ACTIVE_TAB_INDEX)
             } else {
                 startActivity(
                     Intent(this@SearchActivity, ManagerActivity::class.java)

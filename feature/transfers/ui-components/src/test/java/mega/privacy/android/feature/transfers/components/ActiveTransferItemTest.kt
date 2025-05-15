@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
-class InProgressTransferItemTest {
+class ActiveTransferItemTest {
 
     @get:Rule
     var composeRule = createComposeRule()
@@ -26,9 +26,9 @@ class InProgressTransferItemTest {
     private val tag = 1
 
     @Test
-    fun `test that non paused, in progress transfer shows correctly`() {
+    fun `test that non paused, active transfer shows correctly`() {
         initComposeRuleContent(
-            InProgressTransferUI(
+            ActiveTransferUI(
                 isDownload = true,
                 fileTypeResId = R.drawable.ic_pdf_medium_solid,
                 previewUri = null,
@@ -43,24 +43,24 @@ class InProgressTransferItemTest {
             )
         )
         with(composeRule) {
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag").assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag").assertIsDisplayed()
             onNodeWithTag(TEST_TAG_QUEUE_ICON).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_IMAGE).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE).assertIsDisplayed()
             onNodeWithText(name).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_NAME).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_NAME).assertIsDisplayed()
             onNodeWithText(progressSizeString, substring = true).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_SUBTITLE).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_SUBTITLE).assertIsDisplayed()
             onNodeWithText(speed, substring = true).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_PAUSE_ICON).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_TYPE_ICON).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_PLAY_ICON).assertDoesNotExist()
         }
     }
 
     @Test
-    fun `test that paused, in progress transfer shows correctly`() {
+    fun `test that paused, active transfer shows correctly`() {
         initComposeRuleContent(
-            InProgressTransferUI(
+            ActiveTransferUI(
                 isDownload = true,
                 fileTypeResId = R.drawable.ic_pdf_medium_solid,
                 previewUri = null,
@@ -75,31 +75,31 @@ class InProgressTransferItemTest {
             )
         )
         with(composeRule) {
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag").assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag").assertIsDisplayed()
             onNodeWithTag(TEST_TAG_QUEUE_ICON).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_IMAGE).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE).assertIsDisplayed()
             onNodeWithText(name).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_NAME).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_NAME).assertIsDisplayed()
             onNodeWithText(progressSizeString, substring = true).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_SUBTITLE).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_SUBTITLE).assertIsDisplayed()
             onNodeWithText(speed, substring = true).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_PLAY_ICON).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_TYPE_ICON).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_PAUSE_ICON).assertDoesNotExist()
         }
     }
 
-    private fun initComposeRuleContent(inProgressTransferUI: InProgressTransferUI) =
-        with(inProgressTransferUI) {
+    private fun initComposeRuleContent(activeTransferUI: ActiveTransferUI) =
+        with(activeTransferUI) {
             composeRule.setContent {
-                InProgressTransferItem(
+                ActiveTransferItem(
                     tag = tag,
                     isDownload,
                     fileTypeResId,
                     previewUri,
                     fileName,
-                    this@InProgressTransferItemTest.progressSizeString,
-                    this@InProgressTransferItemTest.progressSizeString,
+                    this@ActiveTransferItemTest.progressSizeString,
+                    this@ActiveTransferItemTest.progressSizeString,
                     progress,
                     speed,
                     isPaused,

@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.navigation.compose.navigateToTransfersViewGraph
 import mega.privacy.android.app.presentation.transfers.view.navigation.compose.transfersViewNavigationGraph
 import mega.privacy.android.domain.entity.ThemeMode
@@ -68,7 +68,7 @@ internal class TransfersFragment : Fragment() {
                                         rememberNavController(bottomSheetNavigator)
                                     val scaffoldState = rememberScaffoldState()
                                     val tabIndex =
-                                        arguments?.getInt(EXTRA_TAB) ?: IN_PROGRESS_TAB_INDEX
+                                        arguments?.getInt(EXTRA_TAB) ?: ACTIVE_TAB_INDEX
 
                                     NavHost(
                                         navController = navHostController,

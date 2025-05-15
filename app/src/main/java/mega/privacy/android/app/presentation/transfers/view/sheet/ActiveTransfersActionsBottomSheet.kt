@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.view.sheet
 
-import mega.privacy.android.icon.pack.R.drawable as iconPack
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +9,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.R.drawable as iconPack
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -18,7 +18,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
  * Bottom sheet for in progress transfers actions.
  */
 @Composable
-fun InProgressActionsBottomSheet(
+fun ActiveTransfersActionsBottomSheet(
     onCancelAllTransfers: () -> Unit,
     modifier: Modifier = Modifier,
 ) = Column(
@@ -39,7 +39,7 @@ fun InProgressActionsBottomSheet(
 @Composable
 private fun InProgressActionsBottomSheetPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        InProgressActionsBottomSheet(
+        ActiveTransfersActionsBottomSheet(
             onCancelAllTransfers = {},
         )
     }

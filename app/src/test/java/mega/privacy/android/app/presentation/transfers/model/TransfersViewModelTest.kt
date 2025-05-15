@@ -90,7 +90,7 @@ class TransfersViewModelTest {
     }
 
     @Test
-    fun `test that MonitorInProgressTransfersUseCase updates state with in progress transfers`() =
+    fun `test that MonitorInProgressTransfersUseCase updates state with active transfers`() =
         runTest {
             val flow = MutableSharedFlow<Map<Long, InProgressTransfer>>()
             val transfer1 = mock<InProgressTransfer.Upload> {
@@ -105,7 +105,7 @@ class TransfersViewModelTest {
 
             initTestClass()
 
-            underTest.uiState.map { it.inProgressTransfers }.test {
+            underTest.uiState.map { it.activeTransfers }.test {
                 assertThat(awaitItem()).isEmpty()
                 flow.emit(map)
                 advanceUntilIdle()

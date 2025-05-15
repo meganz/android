@@ -6,18 +6,15 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.transfers.view.sheet.InProgressActionsBottomSheet
-import mega.privacy.android.app.presentation.transfers.view.sheet.TEST_TAG_CANCEL_ALL_ACTION
-import mega.privacy.android.app.presentation.transfers.view.sheet.TEST_TAG_IN_PROGRESS_ACTIONS_PANEL
+import mega.privacy.android.app.onNodeWithText
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
-class InProgressActionsBottomSheetTest {
+class ActiveTransfersActionsBottomSheetTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -46,7 +43,7 @@ class InProgressActionsBottomSheetTest {
 
     private fun initComposeTestRule() {
         composeTestRule.setContent {
-            InProgressActionsBottomSheet(
+            ActiveTransfersActionsBottomSheet(
                 onCancelAllTransfers = onCancelAllTransfers,
             )
         }

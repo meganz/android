@@ -49,7 +49,7 @@ internal fun FailedTransferItem(
     id?.let {
         val uiState by viewModel.getUiStateFlow(it).collectAsStateWithLifecycle()
 
-        LaunchedEffect(key1 = id) {
+        LaunchedEffect(key1 = it) {
             viewModel.addTransfer(failedTransfer)
         }
 

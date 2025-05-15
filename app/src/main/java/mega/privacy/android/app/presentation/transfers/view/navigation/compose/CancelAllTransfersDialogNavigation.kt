@@ -18,7 +18,7 @@ internal fun NavGraphBuilder.cancelAllTransfersDialog(navHostController: NavHost
             backStackEntry.sharedViewModel<TransfersViewModel>(navController = navHostController)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        if (uiState.inProgressTransfers.isEmpty()) {
+        if (uiState.activeTransfers.isEmpty()) {
             navHostController.popBackStack()
         } else {
             CancelAllTransfersDialog(

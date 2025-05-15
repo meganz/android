@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.transfers.view.inprogress
+package mega.privacy.android.app.presentation.transfers.view.active
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.CompositionLocalProvider
@@ -13,13 +13,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
-import mega.privacy.android.app.presentation.transfers.model.image.InProgressTransferImageViewModel
+import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
-import mega.privacy.android.feature.transfers.components.TEST_TAG_IN_PROGRESS_TRANSFER_ITEM
+import mega.privacy.android.feature.transfers.components.TEST_TAG_ACTIVE_TRANSFER_ITEM
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
@@ -31,7 +31,7 @@ import org.mockito.kotlin.mock
 import java.math.BigInteger
 
 @RunWith(AndroidJUnit4::class)
-class InProgressTransfersViewTest {
+class ActiveTransfersViewTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
@@ -42,12 +42,12 @@ class InProgressTransfersViewTest {
     private val state =
         TransferImageUiState(fileTypeResId = iconPackR.drawable.ic_text_medium_solid)
 
-    private val viewModel = mock<InProgressTransferImageViewModel> {
+    private val viewModel = mock<ActiveTransferImageViewModel> {
         on { getUiStateFlow(tag1) } doReturn MutableStateFlow(state)
         on { getUiStateFlow(tag2) } doReturn MutableStateFlow(state)
     }
     private val viewModelStore = mock<ViewModelStore> {
-        on { get(argThat<String> { contains(InProgressTransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn viewModel
+        on { get(argThat<String> { contains(ActiveTransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn viewModel
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore
@@ -74,8 +74,8 @@ class InProgressTransfersViewTest {
         initComposeTestRule(inProgressTransfers = inProgressTransfers)
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_ACTIVE_TRANSFERS_VIEW).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag1").assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag2").assertDoesNotExist()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag1").assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag2").assertDoesNotExist()
         }
     }
 
@@ -89,8 +89,8 @@ class InProgressTransfersViewTest {
         initComposeTestRule(inProgressTransfers = inProgressTransfers)
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_ACTIVE_TRANSFERS_VIEW).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag1").assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag2").assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag1").assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag2").assertIsDisplayed()
         }
     }
 
@@ -101,8 +101,8 @@ class InProgressTransfersViewTest {
     ) {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
-                InProgressTransfersView(
-                    inProgressTransfers = inProgressTransfers,
+                ActiveTransfersView(
+                    activeTransfers = inProgressTransfers,
                     isOverQuota = isOverQuota,
                     areTransfersPaused = areTransfersPaused,
                     onPlayPauseClicked = {}

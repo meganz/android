@@ -54,7 +54,7 @@ import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
@@ -281,7 +281,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
     private fun openTransfersScreen() {
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                megaNavigator.openTransfers(this@PhotosSearchActivity, IN_PROGRESS_TAB_INDEX)
+                megaNavigator.openTransfers(this@PhotosSearchActivity, ACTIVE_TAB_INDEX)
             } else {
                 startActivity(
                     Intent(this@PhotosSearchActivity, ManagerActivity::class.java)
