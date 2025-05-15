@@ -1169,4 +1169,6 @@
     <string name="transfers_no_completed_transfers_empty_text">[A]No completed transfers[/A]</string>
     <!--Text for showing the empty state when there are no failed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
     <string name="transfers_no_failed_transfers_empty_text">[A]No failed transfers[/A]</string>
+    <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the current transferred size, the second one is to set the size of the file. Example 12.4MB of 33.3MB -->
+    <string name="transfers_completed_transfer_size_indicator">%1$s of %2$s</string>
 </resources>

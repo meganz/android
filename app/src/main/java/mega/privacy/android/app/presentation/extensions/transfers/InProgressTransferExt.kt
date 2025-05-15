@@ -1,125 +1,134 @@
 package mega.privacy.android.app.presentation.extensions.transfers
 
-import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.shared.resources.R as sharedR
 import java.text.DecimalFormat
 
 /**
  * Get the speed string for a given speed as Long.
  */
+@Composable
 internal fun InProgressTransfer.getSpeedString(
-    context: Context,
     areTransfersPaused: Boolean,
-): String = with(context) {
+): String {
     val df = DecimalFormat("#.##")
 
     return when {
         isPaused || areTransfersPaused -> {
-            getString(R.string.transfer_paused)
+            stringResource(R.string.transfer_paused)
         }
 
         state == TransferState.STATE_QUEUED -> {
-            getString(R.string.transfer_queued)
+            stringResource(R.string.transfer_queued)
         }
 
         state == TransferState.STATE_COMPLETING -> {
-            getString(R.string.transfer_completing)
+            stringResource(R.string.transfer_completing)
         }
 
         state == TransferState.STATE_RETRYING -> {
-            getString(R.string.transfer_retrying)
+            stringResource(R.string.transfer_retrying)
         }
 
         speed < KB -> {
-            getString(R.string.label_file_speed_byte, speed.toString())
+            stringResource(R.string.label_file_speed_byte, speed.toString())
         }
 
         speed < MB -> {
-            getString(R.string.label_file_speed_kilo_byte, df.format((speed / KB).toDouble()))
+            stringResource(R.string.label_file_speed_kilo_byte, df.format((speed / KB).toDouble()))
         }
 
         speed < GB -> {
-            getString(R.string.label_file_speed_mega_byte, df.format((speed / MB).toDouble()))
+            stringResource(R.string.label_file_speed_mega_byte, df.format((speed / MB).toDouble()))
         }
 
         speed < TB -> {
-            getString(R.string.label_file_speed_giga_byte, df.format((speed / GB).toDouble()))
+            stringResource(R.string.label_file_speed_giga_byte, df.format((speed / GB).toDouble()))
         }
 
         speed < PB -> {
-            getString(R.string.label_file_speed_tera_byte, df.format((speed / TB).toDouble()))
+            stringResource(R.string.label_file_speed_tera_byte, df.format((speed / TB).toDouble()))
         }
 
         speed < EB -> {
-            getString(R.string.label_file_size_peta_byte, df.format((speed / PB).toDouble()))
+            stringResource(R.string.label_file_size_peta_byte, df.format((speed / PB).toDouble()))
         }
 
         else -> {
-            getString(R.string.label_file_size_exa_byte, df.format((speed / EB).toDouble()))
+            stringResource(R.string.label_file_size_exa_byte, df.format((speed / EB).toDouble()))
         }
     }
 }
 
-internal fun InProgressTransfer.getProgressString(context: Context, isOverQuota: Boolean): String =
-    with(context) {
-        val isDownload = this@getProgressString is InProgressTransfer.Download
-        val totalSizeString = getTotalSizeString(context)
-        val progressString = getString(
-            R.string.progress_size_indicator,
-            progress.intValue,
-            totalSizeString
-        )
+@Composable
+internal fun InProgressTransfer.getProgressSizeString(): String {
+    val totalSizeString = getSizeString(this.totalBytes)
+    val transferredString = getSizeString((totalBytes * progress.floatValue).toLong())
+    return stringResource(
+        sharedR.string.transfers_completed_transfer_size_indicator,
+        transferredString,
+        totalSizeString
+    )
+}
 
-        return when {
-            isOverQuota && isDownload -> {
-                "$progressString ${getString(R.string.label_transfer_over_quota)}"
-            }
-
-            isOverQuota -> {
-                "$progressString ${getString(R.string.label_storage_over_quota)}"
-            }
-
-            else -> {
-                progressString
-            }
-        }
-    }
+internal fun InProgressTransfer.getProgressPercentString() = "${progress.intValue}%"
 
 /**
  * Get the size string for a given size as Long.
  */
-internal fun InProgressTransfer.getTotalSizeString(context: Context): String = with(context) {
+@Composable
+internal fun getSizeString(totalBytes: Long): String {
     val df = DecimalFormat("#.##")
 
     return when {
         totalBytes < KB -> {
-            getString(R.string.label_file_size_byte, totalBytes.toString())
+            stringResource(R.string.label_file_size_byte, totalBytes.toString())
         }
 
         totalBytes < MB -> {
-            getString(R.string.label_file_size_kilo_byte, df.format((totalBytes / KB).toDouble()))
+            stringResource(
+                R.string.label_file_size_kilo_byte,
+                df.format((totalBytes / KB).toDouble())
+            )
         }
 
         totalBytes < GB -> {
-            getString(R.string.label_file_size_mega_byte, df.format((totalBytes / MB).toDouble()))
+            stringResource(
+                R.string.label_file_size_mega_byte,
+                df.format((totalBytes / MB).toDouble())
+            )
         }
 
         totalBytes < TB -> {
-            getString(R.string.label_file_size_giga_byte, df.format((totalBytes / GB).toDouble()))
+            stringResource(
+                R.string.label_file_size_giga_byte,
+                df.format((totalBytes / GB).toDouble())
+            )
         }
 
         totalBytes < PB -> {
-            getString(R.string.label_file_size_tera_byte, df.format((totalBytes / TB).toDouble()))
+            stringResource(
+                R.string.label_file_size_tera_byte,
+                df.format((totalBytes / TB).toDouble())
+            )
         }
 
         totalBytes < EB -> {
-            getString(R.string.label_file_size_peta_byte, df.format((totalBytes / PB).toDouble()))
+            stringResource(
+                R.string.label_file_size_peta_byte,
+                df.format((totalBytes / PB).toDouble())
+            )
         }
 
         else -> {
-            getString(R.string.label_file_size_exa_byte, df.format((totalBytes / EB).toDouble()))
+            stringResource(
+                R.string.label_file_size_exa_byte,
+                df.format((totalBytes / EB).toDouble())
+            )
         }
     }
 }

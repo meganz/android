@@ -47,7 +47,6 @@ fun CompletedTransferItem(
     verticalAlignment = Alignment.CenterVertically
 ) {
     TransferImage(
-        isDownload = isDownload,
         fileTypeResId = fileTypeResId,
         previewUri = previewUri,
         modifier = Modifier

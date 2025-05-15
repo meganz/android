@@ -3,10 +3,8 @@ package mega.privacy.android.feature.transfers.components
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,26 +24,26 @@ import coil.request.ImageRequest
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.R
 
 
 @Composable
 internal fun TransferImage(
-    isDownload: Boolean,
     fileTypeResId: Int?,
     previewUri: Uri?,
     modifier: Modifier = Modifier,
-) = Column(
-    modifier = modifier.size(48.dp),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center
+) = Box(
+    modifier = modifier.size(32.dp),
+    contentAlignment = Alignment.Center,
 ) {
     val noThumbnailContent: @Composable () -> Unit = {
-        TransferFileType(isDownload = isDownload, fileTypeResId = fileTypeResId)
+        TransferFileType(fileTypeResId = fileTypeResId)
     }
     previewUri?.let {
         SubcomposeAsyncImage(
+            modifier = Modifier.testTag(TEST_TAG_FILE_THUMBNAIL),
             model = ImageRequest.Builder(LocalContext.current)
                 .crossfade(true)
                 .data(it)
@@ -55,26 +53,14 @@ internal fun TransferImage(
             loading = { noThumbnailContent() },
             error = { noThumbnailContent() },
             success = { result ->
-                Box(
-                    modifier = modifier
-                        .testTag(TEST_TAG_FILE_TYPE_ICON)
-                        .size(42.dp)
-                ) {
-                    Image(
-                        painter = result.painter,
-                        contentDescription = "Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .testTag(TEST_TAG_FILE_THUMBNAIL)
-                            .size(40.dp)
-                            .padding(start = 2.dp, top = 2.dp)
-                            .clip(RoundedCornerShape(4.dp)),
-                    )
-                    LeadingIndicator(
-                        isDownload = isDownload,
-                        modifier = Modifier.align(Alignment.TopEnd)
-                    )
-                }
+                Image(
+                    painter = result.painter,
+                    contentDescription = "Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(LocalSpacing.current.x4)),
+                )
             }
         )
     } ?: noThumbnailContent()
@@ -82,7 +68,6 @@ internal fun TransferImage(
 
 @Composable
 private fun TransferFileType(
-    isDownload: Boolean,
     fileTypeResId: Int?,
     modifier: Modifier = Modifier,
 ) = Box(modifier = modifier.testTag(TEST_TAG_FILE_TYPE_ICON)) {
@@ -92,21 +77,16 @@ private fun TransferFileType(
             contentDescription = null,
         )
     }
-    LeadingIndicator(
-        isDownload = isDownload,
-        modifier = Modifier
-            .align(Alignment.TopEnd)
-            .padding(top = 2.5.dp)
-    )
 }
 
 @Composable
-private fun LeadingIndicator(
+internal fun LeadingIndicator(
     isDownload: Boolean,
     modifier: Modifier = Modifier,
+    isOverQuota: Boolean = false,
 ) = Box(
     modifier = modifier
-        .size(19.dp)
+        .size(16.dp)
         .clip(CircleShape)
         .background(color = DSTokens.colors.background.pageBackground)
         .testTag(
@@ -119,12 +99,15 @@ private fun LeadingIndicator(
             .size(14.dp)
             .align(Alignment.Center),
         painter = painterResource(
-            id = if (isDownload) R.drawable.ic_arrow_down_circle_small_thin_solid
-            else R.drawable.ic_arrow_up_circle_small_thin_solid
+            id = if (isDownload) R.drawable.ic_arrow_down_circle_small_regular_outline
+            else R.drawable.ic_arrow_up_circle_small_regular_outline
         ),
         contentDescription = null,
-        tint = if (isDownload) DSTokens.colors.indicator.green
-        else DSTokens.colors.indicator.blue,
+        tint = when {
+            isOverQuota -> DSTokens.colors.indicator.yellow
+            isDownload -> DSTokens.colors.indicator.green
+            else -> DSTokens.colors.indicator.blue
+        },
     )
 }
 
@@ -135,7 +118,6 @@ private fun TransferFileTypePreview(
 ) {
     AndroidThemeForPreviews {
         TransferFileType(
-            isDownload = isDownload,
             fileTypeResId = R.drawable.ic_pdf_medium_solid,
         )
     }

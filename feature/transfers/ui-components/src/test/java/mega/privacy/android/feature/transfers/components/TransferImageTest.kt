@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.transfers.components
 
+import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -16,31 +17,26 @@ class TransferImageTest {
     var composeRule = createComposeRule()
 
     @Test
-    fun `test that download transfer image shows correctly`() {
-        initComposeRuleContent(true)
+    fun `test that type icon is shows when there's no uri`() {
+        initComposeRuleContent()
         with(composeRule) {
             onNodeWithTag(TEST_TAG_FILE_TYPE_ICON).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_UPLOAD_LEADING_INDICATOR).assertDoesNotExist()
-            onNodeWithTag(TEST_TAG_DOWNLOAD_LEADING_INDICATOR).assertIsDisplayed()
         }
     }
 
     @Test
-    fun `test that upload transfer image shows correctly`() {
-        initComposeRuleContent(false)
+    fun `test that thumbnail is shown when there's an uri`() {
+        initComposeRuleContent(Uri.parse("foo"))
         with(composeRule) {
-            onNodeWithTag(TEST_TAG_FILE_TYPE_ICON).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_UPLOAD_LEADING_INDICATOR).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_DOWNLOAD_LEADING_INDICATOR).assertDoesNotExist()
+            onNodeWithTag(TEST_TAG_FILE_THUMBNAIL).assertIsDisplayed()
         }
     }
 
-    private fun initComposeRuleContent(isDownload: Boolean) {
+    private fun initComposeRuleContent(previewUri: Uri? = null) {
         composeRule.setContent {
             TransferImage(
-                isDownload = isDownload,
                 fileTypeResId = R.drawable.ic_pdf_medium_solid,
-                previewUri = null,
+                previewUri = previewUri,
             )
         }
     }

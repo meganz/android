@@ -19,7 +19,9 @@ class InProgressTransferItemTest {
 
     private val onPlayPauseClicked = mock<() -> Unit>()
     private val name = "File name.pdf"
-    private val progress = "63% of 1MB"
+    private val progressSizeString = "6MB of 10MB"
+    private val progressPercentString = "60%"
+    private val progress = 0.6f
     private val speed = "4.2MB/s"
     private val tag = 1
 
@@ -31,10 +33,11 @@ class InProgressTransferItemTest {
                 fileTypeResId = R.drawable.ic_pdf_medium_solid,
                 previewUri = null,
                 fileName = name,
+                progressSizeString = progressSizeString,
+                progressPercentageString = progressPercentString,
                 progress = progress,
                 speed = speed,
                 isPaused = false,
-                isQueued = false,
                 isOverQuota = false,
                 areTransfersPaused = false,
             )
@@ -45,12 +48,11 @@ class InProgressTransferItemTest {
             onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_IMAGE).assertIsDisplayed()
             onNodeWithText(name).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_NAME).assertIsDisplayed()
-            onNodeWithText(progress).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_PROGRESS).assertIsDisplayed()
-            onNodeWithText(speed).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_SPEED).assertIsDisplayed()
+            onNodeWithText(progressSizeString, substring = true).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_SUBTITLE).assertIsDisplayed()
+            onNodeWithText(speed, substring = true).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_PAUSE_ICON).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_QUEUED_ICON).assertDoesNotExist()
+            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_TYPE_ICON).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_PLAY_ICON).assertDoesNotExist()
         }
     }
@@ -63,10 +65,11 @@ class InProgressTransferItemTest {
                 fileTypeResId = R.drawable.ic_pdf_medium_solid,
                 previewUri = null,
                 fileName = name,
+                progressSizeString = progressSizeString,
+                progressPercentageString = progressPercentString,
                 progress = progress,
                 speed = speed,
                 isPaused = true,
-                isQueued = false,
                 isOverQuota = false,
                 areTransfersPaused = false,
             )
@@ -77,45 +80,11 @@ class InProgressTransferItemTest {
             onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_IMAGE).assertIsDisplayed()
             onNodeWithText(name).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_NAME).assertIsDisplayed()
-            onNodeWithText(progress).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_PROGRESS).assertIsDisplayed()
-            onNodeWithText(speed).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_SPEED).assertIsDisplayed()
+            onNodeWithText(progressSizeString, substring = true).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_SUBTITLE).assertIsDisplayed()
+            onNodeWithText(speed, substring = true).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_PLAY_ICON).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_QUEUED_ICON).assertDoesNotExist()
-            onNodeWithTag(TEST_TAG_PAUSE_ICON).assertDoesNotExist()
-        }
-    }
-
-    @Test
-    fun `test that queued transfer shows correctly`() {
-        val queued = "Queued"
-        initComposeRuleContent(
-            InProgressTransferUI(
-                isDownload = true,
-                fileTypeResId = R.drawable.ic_pdf_medium_solid,
-                previewUri = null,
-                fileName = name,
-                progress = progress,
-                speed = queued,
-                isPaused = true,
-                isQueued = true,
-                isOverQuota = false,
-                areTransfersPaused = false,
-            )
-        )
-        with(composeRule) {
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag").assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_QUEUE_ICON).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_IMAGE).assertIsDisplayed()
-            onNodeWithText(name).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_NAME).assertIsDisplayed()
-            onNodeWithText(progress).assertDoesNotExist()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_PROGRESS).assertDoesNotExist()
-            onNodeWithText(queued).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_SPEED).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_PLAY_ICON).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_QUEUED_ICON).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_TYPE_ICON).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_PAUSE_ICON).assertDoesNotExist()
         }
     }
@@ -129,10 +98,11 @@ class InProgressTransferItemTest {
                     fileTypeResId,
                     previewUri,
                     fileName,
+                    this@InProgressTransferItemTest.progressSizeString,
+                    this@InProgressTransferItemTest.progressSizeString,
                     progress,
                     speed,
                     isPaused,
-                    isQueued,
                     isOverQuota,
                     areTransfersPaused,
                     onPlayPauseClicked,

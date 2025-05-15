@@ -7,18 +7,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
-import mega.privacy.android.app.presentation.extensions.transfers.getProgressString
+import mega.privacy.android.app.presentation.extensions.transfers.getProgressPercentString
+import mega.privacy.android.app.presentation.extensions.transfers.getProgressSizeString
 import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
 import mega.privacy.android.app.presentation.transfers.model.image.InProgressTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_ACTIVE_TAB
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
-import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.feature.transfers.components.InProgressTransferItem
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -64,7 +63,6 @@ internal fun InProgressTransferItem(
     onPlayPauseClicked: (Int) -> Unit,
     viewModel: InProgressTransferImageViewModel = hiltViewModel(),
 ) = with(inProgressTransfer) {
-    val context = LocalContext.current
     val uiState by viewModel.getUiStateFlow(tag).collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = tag) {
@@ -77,10 +75,11 @@ internal fun InProgressTransferItem(
         fileTypeResId = uiState.fileTypeResId,
         previewUri = uiState.previewUri,
         fileName = fileName,
-        progress = getProgressString(context, isOverQuota),
-        speed = getSpeedString(context, areTransfersPaused),
+        progressSizeString = getProgressSizeString(),
+        progressPercentageString = getProgressPercentString(),
+        progress = progress.floatValue,
+        speed = getSpeedString(areTransfersPaused),
         isPaused = isPaused,
-        isQueued = state == TransferState.STATE_QUEUED,
         isOverQuota = isOverQuota,
         areTransfersPaused = areTransfersPaused,
         onPlayPauseClicked = { onPlayPauseClicked(tag) })
