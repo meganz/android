@@ -25,7 +25,8 @@ fun NewPermissionsComposableScreen(
     uiState: PermissionsUIState,
     askNotificationPermission: () -> Unit = {},
     askCameraBackupPermission: () -> Unit = {},
-    setNextPermission: () -> Unit = {},
+    onSkipNotificationPermission: () -> Unit = {},
+    onSkipCameraBackupPermission: () -> Unit = {},
     closePermissionScreen: () -> Unit = {},
     resetFinishEvent: () -> Unit = {},
     onPermissionPageShown: () -> Unit = {},
@@ -66,7 +67,7 @@ fun NewPermissionsComposableScreen(
                         .testTag(NEW_PERMISSIONS_SCREEN_NOTIFICATION_PERMISSION)
                         .fillMaxSize(),
                     onEnablePermission = askNotificationPermission,
-                    onSkipPermission = setNextPermission
+                    onSkipPermission = onSkipNotificationPermission
                 )
             }
 
@@ -76,7 +77,7 @@ fun NewPermissionsComposableScreen(
                         .testTag(NEW_PERMISSIONS_SCREEN_CAMERA_BACKUP_PERMISSION)
                         .fillMaxSize(),
                     onEnablePermission = askCameraBackupPermission,
-                    onSkipPermission = setNextPermission
+                    onSkipPermission = onSkipCameraBackupPermission
                 )
             }
 

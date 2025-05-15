@@ -10,6 +10,7 @@ import android.provider.Settings.canDrawOverlays
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -43,8 +44,14 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternal
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.mobile.analytics.event.CameraBackupsCTAScreenEvent
+import mega.privacy.mobile.analytics.event.EnableCameraBackupsCTAButtonPressedEvent
+import mega.privacy.mobile.analytics.event.EnableNotificationsCTAButtonPressedEvent
+import mega.privacy.mobile.analytics.event.NotificationsCTAScreenEvent
 import mega.privacy.mobile.analytics.event.OnboardingInitialPageNotNowButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OnboardingInitialPageSetUpMegaButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SkipCameraBackupsCTAButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SkipNotificationsCTAButtonPressedEvent
 import timber.log.Timber
 
 /**
@@ -136,12 +143,39 @@ class PermissionsFragment : Fragment() {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val isDarkTheme = uiState.themeMode.isDarkMode()
 
+            LaunchedEffect(uiState.visiblePermission) {
+                when (uiState.visiblePermission) {
+                    NewPermissionScreen.Notification -> {
+                        Analytics.tracker.trackEvent(NotificationsCTAScreenEvent)
+                    }
+
+                    NewPermissionScreen.CameraBackup -> {
+                        Analytics.tracker.trackEvent(CameraBackupsCTAScreenEvent)
+                    }
+
+                    NewPermissionScreen.Loading -> {}
+                }
+            }
+
             AndroidTheme(isDarkTheme) {
                 NewPermissionsComposableScreen(
                     uiState = uiState,
-                    askNotificationPermission = ::askForNotificationsPermission,
-                    askCameraBackupPermission = ::askForReadPermission,
-                    setNextPermission = ::setNextPermission,
+                    askNotificationPermission = {
+                        Analytics.tracker.trackEvent(EnableNotificationsCTAButtonPressedEvent)
+                        askForNotificationsPermission()
+                    },
+                    askCameraBackupPermission = {
+                        Analytics.tracker.trackEvent(EnableCameraBackupsCTAButtonPressedEvent)
+                        askForReadPermission()
+                    },
+                    onSkipNotificationPermission = {
+                        Analytics.tracker.trackEvent(SkipNotificationsCTAButtonPressedEvent)
+                        setNextPermission()
+                    },
+                    onSkipCameraBackupPermission = {
+                        Analytics.tracker.trackEvent(SkipCameraBackupsCTAButtonPressedEvent)
+                        setNextPermission()
+                    },
                     closePermissionScreen = ::closePermissionScreen,
                     resetFinishEvent = viewModel::resetFinishEvent,
                     onPermissionPageShown = viewModel::setPermissionPageShown

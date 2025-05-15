@@ -67,7 +67,7 @@ class NewPermissionsComposableScreenViewTest {
                 uiState = PermissionsUIState(
                     visiblePermission = NewPermissionScreen.Notification
                 ),
-                setNextPermission = mockCallback
+                onSkipNotificationPermission = mockCallback
             )
         }
 
@@ -119,7 +119,7 @@ class NewPermissionsComposableScreenViewTest {
                 uiState = PermissionsUIState(
                     visiblePermission = NewPermissionScreen.CameraBackup
                 ),
-                setNextPermission = mockCallback
+                onSkipCameraBackupPermission = mockCallback
             )
         }
 
