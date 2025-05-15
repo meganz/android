@@ -172,7 +172,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Onboarding Revamp with new components",
         false,
     ),
-    ;
+
+    /**
+     *  Onboarding Pro Promo Revamp with new components
+     */
+    OnboardingProPromoRevamp(
+        "Onboarding Pro Promo Revamp with new components",
+        false,
+    );
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
