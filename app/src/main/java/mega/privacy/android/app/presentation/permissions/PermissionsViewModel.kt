@@ -26,6 +26,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.notifications.SetNotificationPermissionShownUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,6 +39,7 @@ class PermissionsViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getThemeModeUseCase: GetThemeMode,
+    private val setNotificationPermissionShownUseCase: SetNotificationPermissionShownUseCase,
 ) : ViewModel() {
     internal val uiState: StateFlow<PermissionsUIState>
         field = MutableStateFlow(PermissionsUIState())
@@ -190,6 +192,16 @@ class PermissionsViewModel @Inject constructor(
     fun updateFirstTimeLoginStatus() {
         viewModelScope.launch(ioDispatcher) {
             defaultAccountRepository.setUserHasLoggedIn()
+        }
+    }
+
+    fun setPermissionPageShown() {
+        viewModelScope.launch {
+            runCatching {
+                setNotificationPermissionShownUseCase()
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 

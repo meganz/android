@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.notifications.SetNotificationPermissionShownUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,6 +26,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -36,6 +38,8 @@ class PermissionsViewModelTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getThemeModeUseCase: GetThemeMode = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
+    private val setNotificationPermissionShownUseCase: SetNotificationPermissionShownUseCase =
+        mock()
 
     @BeforeEach
     fun setup() {
@@ -44,7 +48,11 @@ class PermissionsViewModelTest {
 
     @AfterEach
     fun resetMocks() {
-        reset(defaultAccountRepository, getFeatureFlagValueUseCase)
+        reset(
+            defaultAccountRepository,
+            getFeatureFlagValueUseCase,
+            setNotificationPermissionShownUseCase
+        )
         Dispatchers.resetMain()
     }
 
@@ -54,6 +62,7 @@ class PermissionsViewModelTest {
             ioDispatcher = testDispatcher,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getThemeModeUseCase = getThemeModeUseCase,
+            setNotificationPermissionShownUseCase = setNotificationPermissionShownUseCase,
         )
     }
 
@@ -146,4 +155,13 @@ class PermissionsViewModelTest {
                 assertThat(awaitItem().finishEvent).isEqualTo(triggered)
             }
         }
+
+    @Test
+    fun `test that on set permission shown should invoke use case`() = runTest {
+        init()
+
+        underTest.setPermissionPageShown()
+
+        verify(setNotificationPermissionShownUseCase).invoke()
+    }
 }

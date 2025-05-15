@@ -14,14 +14,14 @@ import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ShouldShowNotificationPermissionUseCaseTest {
-    private lateinit var underTest: ShouldShowNotificationPermissionUseCase
+    private lateinit var underTest: ShouldShowNotificationReminderUseCase
     private val permissionRepository: PermissionRepository = mock()
     private val currentTimeProvider: () -> Long = mock()
 
     @BeforeAll
     fun setup() {
         underTest =
-            ShouldShowNotificationPermissionUseCase(permissionRepository, currentTimeProvider)
+            ShouldShowNotificationReminderUseCase(permissionRepository, currentTimeProvider)
     }
 
     @AfterEach

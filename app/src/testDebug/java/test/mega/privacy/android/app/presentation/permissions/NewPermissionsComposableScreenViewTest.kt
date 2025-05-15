@@ -158,4 +158,18 @@ class NewPermissionsComposableScreenViewTest {
 
         verify(mockCallback).invoke()
     }
+
+    @Test
+    fun `test that on first load should trigger callback`() {
+        val mockCallback = mock<() -> Unit>()
+
+        composeTestRule.setContent {
+            NewPermissionsComposableScreen(
+                uiState = PermissionsUIState(),
+                onPermissionPageShown = mockCallback
+            )
+        }
+
+        verify(mockCallback).invoke()
+    }
 }

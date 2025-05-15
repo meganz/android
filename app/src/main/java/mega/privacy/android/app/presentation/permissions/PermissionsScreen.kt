@@ -28,11 +28,16 @@ fun NewPermissionsComposableScreen(
     setNextPermission: () -> Unit = {},
     closePermissionScreen: () -> Unit = {},
     resetFinishEvent: () -> Unit = {},
+    onPermissionPageShown: () -> Unit = {},
 ) {
     val pagerState = rememberPagerState(
         initialPage = uiState.visiblePermission.ordinal,
         pageCount = { NewPermissionScreen.entries.size }
     )
+
+    LaunchedEffect(Unit) {
+        onPermissionPageShown()
+    }
 
     LaunchedEffect(uiState.visiblePermission) {
         val targetPage = uiState.visiblePermission.ordinal

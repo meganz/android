@@ -5,7 +5,7 @@ import mega.privacy.android.domain.qualifier.SystemTime
 import mega.privacy.android.domain.repository.PermissionRepository
 import javax.inject.Inject
 
-class ShouldShowNotificationPermissionUseCase @Inject constructor(
+class ShouldShowNotificationReminderUseCase @Inject constructor(
     private val permissionRepository: PermissionRepository,
     @SystemTime private val currentTimeProvider: () -> Long
 ) {

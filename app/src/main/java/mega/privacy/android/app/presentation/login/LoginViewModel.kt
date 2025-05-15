@@ -91,6 +91,7 @@ import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationReminderUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
@@ -154,6 +155,7 @@ class LoginViewModel @Inject constructor(
     private val checkRecoveryKeyUseCase: CheckRecoveryKeyUseCase,
     monitorLoggedOutFromAnotherLocationUseCase: MonitorLoggedOutFromAnotherLocationUseCase,
     private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase,
+    private val shouldShowNotificationReminderUseCase: ShouldShowNotificationReminderUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -1183,6 +1185,12 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             setLoggedOutFromAnotherLocationUseCase(false)
         }
+    }
+
+    suspend fun shouldShowNotificationPermission(): Boolean {
+        return runCatching {
+            shouldShowNotificationReminderUseCase()
+        }.getOrDefault(false)
     }
 
     companion object {

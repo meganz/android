@@ -62,6 +62,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.Insets
 import androidx.core.net.toUri
+import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
 import androidx.core.view.ViewCompat
@@ -2382,28 +2383,45 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
 
         lifecycleScope.launch {
-            if (hasMissingPermission()) {
-                val currentFragment =
-                    supportFragmentManager.findFragmentById(R.id.fragment_container)
-                if (currentFragment?.tag != FragmentTag.PERMISSIONS.tag) {
-                    deleteCurrentFragment()
-                }
+            lifecycleScope.launch {
+                val shouldShowNotificationPermission =
+                    intent.getBooleanExtra(
+                        IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION,
+                        false
+                    )
 
-                if (permissionsFragment == null) {
-                    permissionsFragment = PermissionsFragment()
-                }
+                val needsToShowPermissions =
+                    (!isNotificationPermissionGranted() && shouldShowNotificationPermission) || hasMissingPermission()
 
-                permissionsFragment?.let {
-                    replaceFragment(it, FragmentTag.PERMISSIONS.tag)
-                }
+                if (needsToShowPermissions) {
+                    val currentFragment =
+                        supportFragmentManager.findFragmentById(R.id.fragment_container)
+                    if (currentFragment?.tag != FragmentTag.PERMISSIONS.tag) {
+                        deleteCurrentFragment()
+                    }
 
-                onAskingPermissionsFragment = true
-                setAppBarVisibility(false)
-                setTabsVisibility()
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                supportInvalidateOptionsMenu()
-                hideFabButton()
-                showHideBottomNavigationView(true)
+                    if (permissionsFragment == null) {
+                        permissionsFragment = PermissionsFragment().apply {
+                            if (shouldShowNotificationPermission) {
+                                arguments = bundleOf(
+                                    IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION to true
+                                )
+                            }
+                        }
+                    }
+
+                    permissionsFragment?.let {
+                        replaceFragment(it, FragmentTag.PERMISSIONS.tag)
+                    }
+
+                    onAskingPermissionsFragment = true
+                    setAppBarVisibility(false)
+                    setTabsVisibility()
+                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                    supportInvalidateOptionsMenu()
+                    hideFabButton()
+                    showHideBottomNavigationView(true)
+                }
             }
         }
     }
@@ -2414,8 +2432,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         // from the ViewModel because it creates a weird race condition. The "askForAccess" is called
         // before the feature flag value is set.
         val isOnboardingRevamp = getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp)
-        val notificationsGranted = (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
-                || hasPermissions(context, Manifest.permission.POST_NOTIFICATIONS))
         val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             arrayOf(
                 PermissionUtils.getAudioPermissionByVersion(),
@@ -2434,7 +2450,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         // Check if any permission is missing. Onboarding revamp only requires notifications and read storage
         // permissions, while the old onboarding requires all of them
         return if (isOnboardingRevamp) {
-            listOf(notificationsGranted, readStorageGranted)
+            listOf(isNotificationPermissionGranted(), readStorageGranted)
         } else {
             val writeStorageGranted: Boolean =
                 hasPermissions(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -2444,7 +2460,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             val bluetoothGranted = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S
                     || hasPermissions(context, Manifest.permission.BLUETOOTH_CONNECT))
             listOf(
-                notificationsGranted,
+                isNotificationPermissionGranted(),
                 writeStorageGranted,
                 readStorageGranted,
                 cameraGranted,
@@ -2453,6 +2469,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             )
         }.any { it == false }
     }
+
+    private fun isNotificationPermissionGranted(): Boolean =
+        (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+                || hasPermissions(this, Manifest.permission.POST_NOTIFICATIONS))
 
     fun destroyPermissionsFragment() {
         initialPermissionsAlreadyAsked = true

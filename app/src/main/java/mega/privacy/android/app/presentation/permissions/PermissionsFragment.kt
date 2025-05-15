@@ -20,11 +20,12 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.FragmentPermissionsBinding
 import mega.privacy.android.app.databinding.PermissionsImageLayoutBinding
 import mega.privacy.android.app.main.ManagerActivity
@@ -54,6 +55,7 @@ class PermissionsFragment : Fragment() {
     private val viewModel: PermissionsViewModel by viewModels()
     private lateinit var binding: FragmentPermissionsBinding
     private lateinit var permissionBinding: PermissionsImageLayoutBinding
+    private var onlyShowNotificationPermission: Boolean = false
 
     private val readPermissions =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -68,6 +70,14 @@ class PermissionsFragment : Fragment() {
                 getReadExternalStoragePermission()
             )
         }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            onlyShowNotificationPermission =
+                it.getBoolean(IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION, false)
+        }
+    }
 
     /**
      * onCreateView
@@ -99,7 +109,7 @@ class PermissionsFragment : Fragment() {
         collectFlow(
             viewModel
                 .uiState
-                .map { it.isOnboardingRevampEnabled }
+                .mapNotNull { it.isOnboardingRevampEnabled }
                 .distinctUntilChanged()
         ) { state ->
             setupView(state)
@@ -133,7 +143,8 @@ class PermissionsFragment : Fragment() {
                     askCameraBackupPermission = ::askForReadPermission,
                     setNextPermission = ::setNextPermission,
                     closePermissionScreen = ::closePermissionScreen,
-                    resetFinishEvent = viewModel::resetFinishEvent
+                    resetFinishEvent = viewModel::resetFinishEvent,
+                    onPermissionPageShown = viewModel::setPermissionPageShown
                 )
             }
         }
@@ -163,6 +174,9 @@ class PermissionsFragment : Fragment() {
                     )
                 )
             }
+
+            // Early exit if notification is the only permission needed to be shown
+            if (onlyShowNotificationPermission) return@apply
 
             add(
                 Pair(

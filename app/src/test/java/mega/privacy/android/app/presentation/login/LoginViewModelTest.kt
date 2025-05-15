@@ -65,6 +65,7 @@ import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationReminderUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
@@ -78,7 +79,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -145,6 +149,8 @@ internal class LoginViewModelTest {
     private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase =
         mock()
     private val savedStateHandle = mock<SavedStateHandle>()
+    private val shouldShowNotificationReminderUseCase =
+        mock<ShouldShowNotificationReminderUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -194,7 +200,8 @@ internal class LoginViewModelTest {
             checkRecoveryKeyUseCase = checkRecoveryKeyUseCase,
             monitorLoggedOutFromAnotherLocationUseCase = monitorLoggedOutFromAnotherLocationUseCase,
             setLoggedOutFromAnotherLocationUseCase = setLoggedOutFromAnotherLocationUseCase,
-            savedStateHandle = savedStateHandle
+            savedStateHandle = savedStateHandle,
+            shouldShowNotificationReminderUseCase = shouldShowNotificationReminderUseCase,
         )
     }
 
@@ -225,7 +232,8 @@ internal class LoginViewModelTest {
             resendVerificationEmailUseCase,
             checkRecoveryKeyUseCase,
             setLoggedOutFromAnotherLocationUseCase,
-            savedStateHandle
+            savedStateHandle,
+            shouldShowNotificationReminderUseCase
         )
     }
 
@@ -609,6 +617,23 @@ internal class LoginViewModelTest {
         advanceUntilIdle()
         verify(setLoggedOutFromAnotherLocationUseCase).invoke(false)
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that should show notification reminder returns correct value`(value: Boolean) =
+        runTest {
+            whenever(shouldShowNotificationReminderUseCase()) doReturn value
+
+            assertThat(underTest.shouldShowNotificationPermission()).isEqualTo(value)
+        }
+
+    @Test
+    fun `test that should show notification reminder returns false when use case throws exception`() =
+        runTest {
+            whenever(shouldShowNotificationReminderUseCase()).thenThrow(RuntimeException())
+
+            assertThat(underTest.shouldShowNotificationPermission()).isFalse()
+        }
 
     companion object {
         private val scheduler = TestCoroutineScheduler()

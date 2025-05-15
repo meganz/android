@@ -26,10 +26,12 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.Analytics
@@ -658,89 +660,109 @@ class LoginFragment : Fragment() {
                     loginActivity.setResult(Activity.RESULT_OK, intent)
                     loginActivity.finish()
                 } else {
-                    var intent: Intent?
-                    val refreshActivityIntent =
-                        requireActivity().intent.parcelable<Intent>(LAUNCH_INTENT)
-                    if (uiState.isAlreadyLoggedIn) {
-                        Timber.d("isAlreadyLoggedIn")
-                        intent = Intent(requireContext(), ManagerActivity::class.java)
-                        setStartScreenTimeStamp(requireContext())
-                        when (intentAction) {
-                            Constants.ACTION_EXPORT_MASTER_KEY -> {
-                                Timber.d("ACTION_EXPORT_MK")
-                                intent.action = Constants.ACTION_EXPORT_MASTER_KEY
-                            }
-
-                            Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
-                                if (intentDataString != null) {
-                                    intent.action = Constants.ACTION_JOIN_OPEN_CHAT_LINK
-                                    intent.data = Uri.parse(intentDataString)
-                                }
-                            }
-
-                            else -> intent =
-                                refreshActivityIntent ?: handleLinkNavigation(loginActivity)
-                        }
-                        if (uiState.isFirstTime) {
-                            Timber.d("First time")
-                            intent.putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
-                        }
-                    } else {
-                        var initialCam = false
-                        if (uiState.hasPreferences) {
-                            if (!uiState.hasCUSetting) {
-                                with(requireActivity()) {
-                                    setStartScreenTimeStamp(this)
-
-                                    Timber.d("First login")
-                                    startActivity(Intent(this, ManagerActivity::class.java).apply {
-                                        putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
-                                    })
-
-                                    finish()
-                                }
-                                initialCam = true
-                            }
-                        } else {
+                    lifecycleScope.launch {
+                        var intent: Intent?
+                        val refreshActivityIntent =
+                            requireActivity().intent.parcelable<Intent>(LAUNCH_INTENT)
+                        if (uiState.isAlreadyLoggedIn) {
+                            Timber.d("isAlreadyLoggedIn")
                             intent = Intent(requireContext(), ManagerActivity::class.java)
-                            intent.putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
-                            initialCam = true
                             setStartScreenTimeStamp(requireContext())
-                        }
-                        if (!initialCam) {
-                            Timber.d("NOT initialCam")
-                            intent = handleLinkNavigation(loginActivity)
-                        } else {
-                            Timber.d("initialCam YES")
-                            intent = Intent(requireContext(), ManagerActivity::class.java)
-                            Timber.d("The action is: %s", intentAction)
-                            intent.action = intentAction
-                            intentDataString?.let { intent.data = Uri.parse(it) }
-                        }
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    }
-                    if (intentAction == Constants.ACTION_REFRESH_API_SERVER
-                        || intentAction == Constants.ACTION_REFRESH_AFTER_BLOCKED
-                    ) {
-                        intent.action = intentAction
-                    }
+                            when (intentAction) {
+                                Constants.ACTION_EXPORT_MASTER_KEY -> {
+                                    Timber.d("ACTION_EXPORT_MK")
+                                    intent.action = Constants.ACTION_EXPORT_MASTER_KEY
+                                }
 
-                    if (viewModel.getStorageState() === StorageState.PayWall) {
-                        Timber.d("show Paywall warning")
-                        showOverDiskQuotaPaywallWarning(activity, true)
-                    } else {
-                        Timber.d("First launch")
-                        loginActivity.startActivity(
-                            intent.apply {
-                                putExtra(
-                                    IntentConstants.EXTRA_FIRST_LAUNCH,
-                                    uiState.isFirstTimeLaunch
-                                )
-                            },
-                        )
+                                Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
+                                    if (intentDataString != null) {
+                                        intent.action = Constants.ACTION_JOIN_OPEN_CHAT_LINK
+                                        intent.data = Uri.parse(intentDataString)
+                                    }
+                                }
+
+                                else -> intent =
+                                    refreshActivityIntent ?: handleLinkNavigation(loginActivity)
+                            }
+                            if (uiState.isFirstTime) {
+                                Timber.d("First time")
+                                intent.putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+                            }
+                        } else {
+                            var initialCam = false
+                            if (uiState.hasPreferences) {
+                                if (!uiState.hasCUSetting) {
+                                    with(requireActivity()) {
+                                        setStartScreenTimeStamp(this)
+
+                                        Timber.d("First login")
+                                        startActivity(
+                                            Intent(
+                                                this,
+                                                ManagerActivity::class.java
+                                            ).apply {
+                                                putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+                                            })
+
+                                        finish()
+                                    }
+                                    initialCam = true
+                                }
+                            } else {
+                                intent = Intent(requireContext(), ManagerActivity::class.java)
+                                intent.putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+                                initialCam = true
+                                setStartScreenTimeStamp(requireContext())
+                            }
+                            if (!initialCam) {
+                                Timber.d("NOT initialCam")
+                                intent = handleLinkNavigation(loginActivity)
+                            } else {
+                                Timber.d("initialCam YES")
+                                intent = Intent(requireContext(), ManagerActivity::class.java)
+                                Timber.d("The action is: %s", intentAction)
+                                intent.action = intentAction
+                                intentDataString?.let { intent.data = Uri.parse(it) }
+                            }
+                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        }
+                        if (intentAction == Constants.ACTION_REFRESH_API_SERVER
+                            || intentAction == Constants.ACTION_REFRESH_AFTER_BLOCKED
+                        ) {
+                            intent.action = intentAction
+                        }
+
+                        if (viewModel.getStorageState() === StorageState.PayWall) {
+                            Timber.d("show Paywall warning")
+                            showOverDiskQuotaPaywallWarning(activity, true)
+                        } else {
+                            Timber.d("First launch")
+                            val shouldShowNotificationPermission =
+                                viewModel.shouldShowNotificationPermission()
+
+                            loginActivity.startActivity(
+                                intent.apply {
+                                    putExtra(
+                                        IntentConstants.EXTRA_FIRST_LAUNCH,
+                                        uiState.isFirstTimeLaunch
+                                    )
+                                    if (shouldShowNotificationPermission) {
+                                        Timber.d("LoginFragment::shouldShowNotificationPermission")
+                                        putExtra(
+                                            IntentConstants.EXTRA_ASK_PERMISSIONS,
+                                            true
+                                        )
+                                        putExtra(
+                                            IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION,
+                                            true
+                                        )
+                                    }
+                                }
+                            )
+                        }
+                        Timber.d("LoginActivity finish")
+                        loginActivity.finish()
                     }
-                    Timber.d("LoginActivity finish")
-                    loginActivity.finish()
                 }
             }
         } else {
