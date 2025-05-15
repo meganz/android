@@ -33,11 +33,11 @@ class ShouldShowNotificationPermissionUseCaseTest {
     }
 
     @Test
-    fun `test that invoke returns true when timestamp is null`() = runTest {
+    fun `test that invoke returns false when timestamp is null`() = runTest {
         whenever(permissionRepository.monitorNotificationPermissionShownTimestamp())
             .thenReturn(flowOf(null))
 
-        assertThat(underTest()).isTrue()
+        assertThat(underTest()).isFalse()
     }
 
     @Test
