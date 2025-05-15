@@ -14,9 +14,11 @@ import kotlinx.collections.immutable.ImmutableList
 import mega.privacy.android.app.presentation.transfers.model.image.CompletedTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_COMPLETED_TAB
+import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.feature.transfers.components.CompletedTransferItem
 import mega.privacy.android.shared.resources.R as sharedR
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal fun CompletedTransfersView(
@@ -59,7 +61,8 @@ internal fun CompletedTransferItem(
             previewUri = uiState.previewUri,
             fileName = fileName,
             location = path,
-            error = error,
+            sizeString = size,
+            date = TimeUtils.formatLongDateTime(timestamp.milliseconds.inWholeSeconds)
         )
     }
 }

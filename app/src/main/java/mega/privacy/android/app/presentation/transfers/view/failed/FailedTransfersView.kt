@@ -15,8 +15,9 @@ import mega.privacy.android.app.presentation.transfers.model.image.CompletedTran
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_FAILED_TAB
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.feature.transfers.components.CompletedTransferItem
+import mega.privacy.android.feature.transfers.components.FailedTransferItem
 import mega.privacy.android.shared.resources.R as sharedR
+import nz.mega.sdk.MegaTransfer
 
 @Composable
 internal fun FailedTransfersView(
@@ -53,13 +54,12 @@ internal fun FailedTransferItem(
             viewModel.addTransfer(failedTransfer)
         }
 
-        CompletedTransferItem(
+        FailedTransferItem(
             isDownload = true,
             fileTypeResId = uiState.fileTypeResId,
             previewUri = uiState.previewUri,
             fileName = fileName,
-            location = path,
-            error = error,
+            error = error.takeIf { state != MegaTransfer.STATE_CANCELLED },
         )
     }
 }

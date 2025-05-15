@@ -5,9 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,6 +31,8 @@ class CompletedTransferItemTest {
                 fileName = name,
                 location = downloadLocation,
                 error = null,
+                sizeString = "10 MB",
+                date = "10 Aug 2024 19:09",
             )
         )
         with(composeRule) {
@@ -40,54 +40,7 @@ class CompletedTransferItemTest {
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_NAME).assertIsDisplayed()
             onNodeWithText(name).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_SUCCESS_ICON).assertIsDisplayed()
             onNodeWithText(downloadLocation).assertIsDisplayed()
-        }
-    }
-
-    @Test
-    fun `test that failed download shows correctly`() {
-        initComposeRuleContent(
-            CompletedTransferUI(
-                isDownload = true,
-                fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
-                previewUri = null,
-                fileName = name,
-                location = null,
-                error = error,
-            )
-        )
-        with(composeRule) {
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_ITEM).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_NAME).assertIsDisplayed()
-            onNodeWithText(name).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_SUCCESS_ICON).assertDoesNotExist()
-            onNodeWithText(error).assertIsDisplayed()
-        }
-    }
-
-    @Test
-    fun `test that cancelled download shows correctly`() {
-        initComposeRuleContent(
-            CompletedTransferUI(
-                isDownload = true,
-                fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
-                previewUri = null,
-                fileName = name,
-                location = null,
-                error = null,
-            )
-        )
-        with(composeRule) {
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_ITEM).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_NAME).assertIsDisplayed()
-            onNodeWithText(name).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_SUCCESS_ICON).assertDoesNotExist()
-            onNodeWithText(
-                InstrumentationRegistry.getInstrumentation().targetContext.getString(sharedR.string.transfers_section_cancelled)
-            ).assertIsDisplayed()
         }
     }
 
@@ -101,6 +54,8 @@ class CompletedTransferItemTest {
                 fileName = name,
                 location = uploadLocation,
                 error = null,
+                sizeString = "10 MB",
+                date = "10 Aug 2024 19:09",
             )
         )
         with(composeRule) {
@@ -108,54 +63,7 @@ class CompletedTransferItemTest {
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_NAME).assertIsDisplayed()
             onNodeWithText(name).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_SUCCESS_ICON).assertIsDisplayed()
             onNodeWithText(uploadLocation).assertIsDisplayed()
-        }
-    }
-
-    @Test
-    fun `test that failed upload shows correctly`() {
-        initComposeRuleContent(
-            CompletedTransferUI(
-                isDownload = false,
-                fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
-                previewUri = null,
-                fileName = name,
-                location = null,
-                error = error,
-            )
-        )
-        with(composeRule) {
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_ITEM).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_NAME).assertIsDisplayed()
-            onNodeWithText(name).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_SUCCESS_ICON).assertDoesNotExist()
-            onNodeWithText(error).assertIsDisplayed()
-        }
-    }
-
-    @Test
-    fun `test that cancelled upload shows correctly`() {
-        initComposeRuleContent(
-            CompletedTransferUI(
-                isDownload = false,
-                fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
-                previewUri = null,
-                fileName = name,
-                location = null,
-                error = null,
-            )
-        )
-        with(composeRule) {
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_ITEM).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_NAME).assertIsDisplayed()
-            onNodeWithText(name).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_SUCCESS_ICON).assertDoesNotExist()
-            onNodeWithText(
-                InstrumentationRegistry.getInstrumentation().targetContext.getString(sharedR.string.transfers_section_cancelled)
-            ).assertIsDisplayed()
         }
     }
 
@@ -163,12 +71,13 @@ class CompletedTransferItemTest {
         with(completedTransferUI) {
             composeRule.setContent {
                 CompletedTransferItem(
-                    isDownload,
-                    fileTypeResId,
-                    previewUri,
-                    fileName,
-                    location,
-                    error,
+                    isDownload = isDownload,
+                    fileTypeResId = fileTypeResId,
+                    previewUri = previewUri,
+                    fileName = fileName,
+                    location = location ?: "",
+                    sizeString = sizeString,
+                    date = date,
                 )
             }
         }

@@ -2,18 +2,21 @@ package mega.privacy.android.feature.transfers.components
 
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -22,7 +25,7 @@ import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
-import mega.android.core.ui.theme.values.SupportColor
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -36,55 +39,110 @@ fun CompletedTransferItem(
     fileTypeResId: Int?,
     previewUri: Uri?,
     fileName: String,
+    location: String,
+    sizeString: String?,
+    date: String?,
+    modifier: Modifier = Modifier,
+    onMoreClicked: () -> Unit = {},
+) = CompletedTransferItem(
+    isDownload = isDownload,
+    fileTypeResId = fileTypeResId,
+    previewUri = previewUri,
+    fileName = fileName,
+    location = location,
+    sizeString = sizeString,
+    date = date,
+    error = null,
+    modifier = modifier,
+    onMoreClicked = onMoreClicked
+)
+
+@Composable
+internal fun CompletedTransferItem(
+    isDownload: Boolean,
+    fileTypeResId: Int?,
+    previewUri: Uri?,
+    fileName: String,
     location: String?,
+    sizeString: String?,
+    date: String?,
     error: String?,
     modifier: Modifier = Modifier,
-) = Row(
-    modifier = modifier
-        .testTag(TEST_TAG_COMPLETED_TRANSFER_ITEM)
-        .height(72.dp)
-        .fillMaxWidth(),
-    verticalAlignment = Alignment.CenterVertically
-) {
-    TransferImage(
-        fileTypeResId = fileTypeResId,
-        previewUri = previewUri,
-        modifier = Modifier
-            .testTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE)
-            .padding(start = 12.dp),
-    )
-    Column(
-        Modifier
-            .padding(horizontal = 12.dp)
-            .weight(1f)
+    onMoreClicked: () -> Unit = {},
+) = Box {
+    Row(
+        modifier = modifier
+            .testTag(TEST_TAG_COMPLETED_TRANSFER_ITEM)
+            .heightIn(min = 68.dp)
+            .padding(vertical = 12.dp)
+            .padding(start = 12.dp, end = 16.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        MegaText(
-            text = fileName,
-            style = AppTheme.typography.titleMedium,
-            textColor = TextColor.Primary,
-            modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_NAME),
+        val details = if (location != null) {
+            listOf(sizeString, date).joinToString(" · ")
+        } else {
+            error ?: stringResource(id = sharedR.string.transfers_section_cancelled)
+        }
+        TransferImage(
+            fileTypeResId = fileTypeResId,
+            previewUri = previewUri,
+            modifier = Modifier
+                .testTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE)
+                .padding(start = 12.dp),
         )
-        Row(
-            modifier = Modifier.padding(top = 2.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        Column(
+            Modifier
+                .padding(horizontal = 8.dp)
+                .weight(1f)
         ) {
-            location?.let {
-                MegaIcon(
-                    modifier = Modifier
-                        .size(16.dp)
-                        .testTag(TEST_TAG_COMPLETED_TRANSFER_SUCCESS_ICON),
-                    painter = painterResource(id = iconPackR.drawable.ic_check_circle_medium_regular_outline),
-                    contentDescription = null,
-                    supportTint = SupportColor.Success,
+            MegaText(
+                text = fileName,
+                maxLines = 1,
+                overflow = TextOverflow.MiddleEllipsis,
+                style = AppTheme.typography.titleMedium,
+                textColor = TextColor.Primary,
+                modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_NAME),
+            )
+            if (location != null) {
+                MegaText(
+                    text = location,
+                    style = AppTheme.typography.bodyMedium,
+                    maxLines = 2,
+                    overflow = TextOverflow.StartEllipsis,
+                    textColor = if (error != null) TextColor.Error else TextColor.Secondary,
+                    modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_RESULT),
                 )
             }
-            MegaText(
-                text = location ?: error
-                ?: stringResource(id = sharedR.string.transfers_section_cancelled),
-                style = AppTheme.typography.titleSmall,
-                textColor = if (error != null) TextColor.Error else TextColor.Secondary,
-                modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_RESULT),
+            Row(
+                modifier = Modifier.padding(top = 2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                LeadingIndicator(
+                    modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
+                    isDownload = isDownload,
+                )
+                MegaText(
+                    text = details,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = AppTheme.typography.bodySmall,
+                    textColor = if (error != null) TextColor.Error else TextColor.Secondary,
+                    modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_RESULT),
+                )
+            }
+        }
+        IconButton(
+            onClick = onMoreClicked,
+            modifier = Modifier.size(24.dp)
+        ) {
+            MegaIcon(
+                painter = painterResource(
+                    id = iconPackR.drawable.ic_more_vertical_medium_regular_outline
+                ),
+                contentDescription = "",
+                tint = IconColor.Secondary,
             )
         }
     }
@@ -102,8 +160,9 @@ private fun CompletedTransferItemPreview(
                 fileTypeResId = fileTypeResId,
                 previewUri = previewUri,
                 fileName = fileName,
-                location = location,
-                error = error,
+                location = location ?: "Cloud Drive",
+                sizeString = sizeString,
+                date = date,
             )
         }
     }
@@ -116,11 +175,14 @@ internal data class CompletedTransferUI(
     val fileName: String,
     val location: String?,
     val error: String?,
+    val sizeString: String?,
+    val date: String?,
 )
 
 private class CompletedTransferItemProvider : PreviewParameterProvider<CompletedTransferUI> {
     private val name = "File name.pdf"
-    private val error = "Failed"
+    private val sizeString = "7 MB"
+    private val date = "10 Aug 2024 19:09"
 
     override val values = listOf(
         CompletedTransferUI(
@@ -130,22 +192,8 @@ private class CompletedTransferItemProvider : PreviewParameterProvider<Completed
             fileName = name,
             location = "/storage/emulated/0/Downloads",
             error = null,
-        ),
-        CompletedTransferUI(
-            isDownload = true,
-            fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
-            previewUri = null,
-            fileName = name,
-            location = null,
-            error = error,
-        ),
-        CompletedTransferUI(
-            isDownload = true,
-            fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
-            previewUri = null,
-            fileName = name,
-            location = null,
-            error = null,
+            sizeString = sizeString,
+            date = date,
         ),
         CompletedTransferUI(
             isDownload = true,
@@ -154,23 +202,9 @@ private class CompletedTransferItemProvider : PreviewParameterProvider<Completed
             fileName = name,
             location = "Cloud Drive",
             error = null,
+            sizeString = sizeString,
+            date = date,
         ),
-        CompletedTransferUI(
-            isDownload = true,
-            fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
-            previewUri = null,
-            fileName = name,
-            location = null,
-            error = error,
-        ),
-        CompletedTransferUI(
-            isDownload = false,
-            fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
-            previewUri = null,
-            fileName = name,
-            location = null,
-            error = null,
-        )
     ).asSequence()
 }
 
@@ -197,9 +231,3 @@ const val TEST_TAG_COMPLETED_TRANSFER_NAME =
  */
 const val TEST_TAG_COMPLETED_TRANSFER_RESULT =
     "transfers_view:tab_completed:transfer_result"
-
-/**
- * Tag for the completed transfer queued icon.
- */
-const val TEST_TAG_COMPLETED_TRANSFER_SUCCESS_ICON =
-    "transfers_view:tab_completed:transfer_success_icon"

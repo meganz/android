@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.transfers.components
 
 import android.net.Uri
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -98,12 +99,11 @@ fun ActiveTransferItem(
             )
             Row(
                 modifier = Modifier.padding(top = 2.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 LeadingIndicator(
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                        .testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
+                    modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
                     isDownload = isDownload,
                     isOverQuota = isOverQuota,
                 )
