@@ -1,13 +1,13 @@
 package mega.privacy.android.app.presentation.videosection.view.allvideos
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberModalBottomSheetState
@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
@@ -34,12 +33,14 @@ import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadi
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DurationFilterAllDurationsClickedEvent
 import mega.privacy.mobile.analytics.event.DurationFilterBetween10and60SecondsClickedEvent
 import mega.privacy.mobile.analytics.event.DurationFilterBetween1and4MinutesClickedEvent
@@ -138,7 +139,10 @@ internal fun AllVideosView(
             stringResource(id = sharedR.string.video_section_videos_location_filter_title)
         val durationTitle =
             stringResource(id = sharedR.string.video_section_videos_duration_filter_title)
-        Column {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colors.background)
+        ) {
             val isAllLocations = selectedLocationFilterOption == LocationFilterOption.AllLocations
             val isAllDurations = selectedDurationFilterOption == DurationFilterOption.AllDurations
 

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.videosection.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Tab
 import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
@@ -26,12 +26,12 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun VideoSectionBodyView(
@@ -130,7 +130,7 @@ internal fun VideoSectionTabs(
                     color = colorResource(id = R.color.red_600_red_300)
                 )
             },
-            backgroundColor = Color.Transparent
+            backgroundColor = MaterialTheme.colors.background
         ) {
             tabs.forEachIndexed { index, tab ->
                 Tab(
