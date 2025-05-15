@@ -3,11 +3,11 @@ package mega.privacy.android.app.presentation.myaccount.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
-import java.io.File
 
 /**
  * My account home fragment ui state
@@ -15,8 +15,6 @@ import java.io.File
  * @property email
  * @property verifiedPhoneNumber
  * @property canVerifyPhoneNumber
- * @property avatar
- * @property avatarColor
  * @property accountType
  * @property isBusinessAccount
  * @property isMasterBusinessAccount
@@ -25,7 +23,6 @@ import java.io.File
  * @property businessProFlexiStatus          shows account status for Business or Pro Flexi
  * @property visibleContacts
  * @property accountDetail
- * @property avatarFileLastModified
  * @property hasRenewableSubscription
  * @property hasExpireAbleSubscription
  * @property lastSession
@@ -42,15 +39,13 @@ import java.io.File
  * @property navigateToAchievements
  * @property userMessage
  * @property accountTypeNameResource
+ * @property avatarContent
  */
 data class MyAccountHomeUIState(
     val name: String? = null,
     val email: String? = null,
     val verifiedPhoneNumber: String? = null,
     val canVerifyPhoneNumber: Boolean = false,
-    val avatar: File? = null,
-    val avatarFileLastModified: Long = 0L,
-    val avatarColor: Int? = null,
     val accountType: AccountType? = null,
     val isBusinessAccount: Boolean = false,
     val isMasterBusinessAccount: Boolean = false,
@@ -75,5 +70,5 @@ data class MyAccountHomeUIState(
     val navigateToAchievements: StateEvent = consumed,
     val userMessage: StateEventWithContent<Int> = consumed(),
     val accountTypeNameResource: Int,
-) {
-}
+    val avatarContent: AvatarContent? = null,
+)

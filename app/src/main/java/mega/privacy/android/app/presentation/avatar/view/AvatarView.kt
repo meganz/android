@@ -58,6 +58,7 @@ fun Avatar(
                 textSize = content.textSize
             )
         }
+
         is EmojiAvatarContent -> {
             EmojiAvatar(
                 modifier = modifier,
@@ -66,6 +67,7 @@ fun Avatar(
                 showBorder = content.showBorder
             )
         }
+
         is PhotoAvatarContent -> {
             PhotoAvatar(
                 modifier = modifier,
@@ -133,7 +135,7 @@ fun EmojiAvatar(
             painter = painterResource(id = resId),
             contentDescription = "avatar emoji",
             modifier = Modifier
-                .padding(15.dp)
+                .padding(8.dp)
                 .fillMaxSize()
                 .testTag("EmojiAvatar")
         )
@@ -202,7 +204,7 @@ private fun borderColor() = white.takeIf { MaterialTheme.colors.isLight } ?: dar
 fun PreviewEmojiAvatar() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         EmojiAvatar(
-            modifier = Modifier.size(66.dp),
+            modifier = Modifier.size(30.dp),
             avatarBgColor = Color.Blue.toArgb(),
             resId = R.drawable.emoji_twitter_1f604,
             showBorder = true

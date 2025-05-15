@@ -62,7 +62,7 @@ internal class UserInfoViewModel @Inject constructor(
                         UserChanges.Email -> handleEmailChange()
                         UserChanges.Firstname,
                         UserChanges.Lastname,
-                        -> {
+                            -> {
                             getUserFullName(true)
                             getUserAvatarOrDefault(isForceRefresh = false)
                         }
@@ -84,12 +84,6 @@ internal class UserInfoViewModel @Inject constructor(
                 .collect {
                     getUserAvatarOrDefault(isForceRefresh = false)
                 }
-        }
-        // Load from the cache first, in case offline mode
-        viewModelScope.launch {
-            getMyEmail(false)
-            getUserFullName(false)
-            getUserAvatarOrDefault(false)
         }
     }
 
@@ -125,11 +119,13 @@ internal class UserInfoViewModel @Inject constructor(
      * Get user info from sdk
      *
      */
-    fun getUserInfo() {
+    fun getUserInfo(isOnline: Boolean = true) {
         viewModelScope.launch {
-            getMyEmail(true)
-            getUserFullName(true)
-            getUserAvatarOrDefault(true)
+            runCatching {
+                getMyEmail(isOnline)
+                getUserFullName(isOnline)
+                getUserAvatarOrDefault(isOnline)
+            }
         }
     }
 

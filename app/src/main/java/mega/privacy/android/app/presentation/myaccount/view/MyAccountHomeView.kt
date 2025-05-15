@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.myaccount.view
 
-import mega.privacy.android.shared.resources.R as sharedR
-import android.graphics.BitmapFactory
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -34,7 +32,6 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -70,9 +68,12 @@ import androidx.navigation.NavController
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.BackgroundColor
+import mega.android.core.ui.theme.values.SupportColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
-import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
+import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.presentation.changepassword.view.Constants
@@ -94,12 +95,11 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.EXPIRED_BU
 import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_LEFT_MARGIN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_RIGHT_MARGIN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_TOP_PADDING
-import mega.privacy.android.app.presentation.myaccount.view.Constants.IMAGE_AVATAR
+import mega.privacy.android.app.presentation.myaccount.view.Constants.AVATAR
 import mega.privacy.android.app.presentation.myaccount.view.Constants.LAST_SESSION
 import mega.privacy.android.app.presentation.myaccount.view.Constants.NAME_TEXT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.PAYMENT_ALERT_INFO
 import mega.privacy.android.app.presentation.myaccount.view.Constants.PHONE_NUMBER_TEXT
-import mega.privacy.android.app.presentation.myaccount.view.Constants.TEXT_AVATAR
 import mega.privacy.android.app.presentation.myaccount.view.Constants.TIME_TO_SHOW_PAYMENT_INFO_IN_SECONDS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.TOOLBAR_HEIGHT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.UPGRADE_BUTTON
@@ -138,12 +138,9 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2me
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_grey_800
-import mega.android.core.ui.theme.values.BackgroundColor
-import mega.android.core.ui.theme.values.SupportColor
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import java.io.File
+import mega.privacy.android.shared.resources.R as sharedR
 
 internal object Constants {
     const val AVATAR_SIZE = 60
@@ -158,8 +155,7 @@ internal object Constants {
     val HEADER_RIGHT_MARGIN = 40.dp
 
     // Test Tags
-    const val IMAGE_AVATAR = "my_account_home_view:image_avatar"
-    const val TEXT_AVATAR = "my_account_home_view:text_avatar"
+    const val AVATAR = "my_account_home_view:avatar"
     const val NAME_TEXT = "my_account_home_view:name_text"
     const val EMAIL_TEXT = "my_account_home_view:email_text"
     const val PHONE_NUMBER_TEXT = "my_account_home_view:phone_number_text"
@@ -236,26 +232,23 @@ fun MyAccountHomeView(
                 .background(MaterialTheme.colors.grey_020_black)
                 .verticalScroll(scrollState)
         ) {
-            key(uiState.avatarFileLastModified) {
-                MyAccountHeader(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            top = HEADER_TOP_PADDING,
-                            bottom = 30.dp
-                        )
-                        .onGloballyPositioned { c ->
-                            headerHeight = with(density) { c.size.height.toDp() }
-                        },
-                    avatar = uiState.avatar,
-                    avatarColor = uiState.avatarColor,
-                    name = uiState.name,
-                    email = uiState.email,
-                    verifiedPhoneNumber = uiState.verifiedPhoneNumber,
-                    onClickUserAvatar = uiActions::onClickUserAvatar,
-                    onEditProfile = uiActions::onEditProfile
-                )
-            }
+            MyAccountHeader(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = HEADER_TOP_PADDING,
+                        bottom = 30.dp
+                    )
+                    .onGloballyPositioned { c ->
+                        headerHeight = with(density) { c.size.height.toDp() }
+                    },
+                avatarContent = uiState.avatarContent,
+                name = uiState.name,
+                email = uiState.email,
+                verifiedPhoneNumber = uiState.verifiedPhoneNumber,
+                onClickUserAvatar = uiActions::onClickUserAvatar,
+                onEditProfile = uiActions::onEditProfile
+            )
 
             val accountTypeInfoHeight =
                 screenHeight.dp - headerHeight - accountTypeHeight - TOOLBAR_HEIGHT - HEADER_TOP_PADDING - ACCOUNT_TYPE_TOP_PADDING
@@ -273,8 +266,7 @@ fun MyAccountHomeView(
 
 @Composable
 internal fun MyAccountHeader(
-    avatar: File?,
-    avatarColor: Int?,
+    avatarContent: AvatarContent?,
     name: String?,
     email: String?,
     verifiedPhoneNumber: String?,
@@ -292,24 +284,12 @@ internal fun MyAccountHeader(
                 bottom.linkTo(parent.bottom)
                 start.linkTo(parent.start, CONTAINER_LEFT_MARGIN)
             }
-        avatar
-            ?.takeIf { BitmapFactory.decodeFile(it.absolutePath, BitmapFactory.Options()) != null }
-            ?.let {
-                Avatar(
-                    modifier = avatarModifier.testTag(IMAGE_AVATAR),
-                    content = PhotoAvatarContent(it.absolutePath, AVATAR_SIZE.toLong(), false)
-                )
-            }
-            ?: run {
-                Avatar(
-                    modifier = avatarModifier.testTag(TEXT_AVATAR),
-                    content = TextAvatarContent(
-                        avatarText = name?.take(1).orEmpty(),
-                        backgroundColor = avatarColor ?: -1,
-                        showBorder = false
-                    )
-                )
-            }
+        avatarContent?.let {
+            Avatar(
+                modifier = avatarModifier.testTag(AVATAR),
+                content = it
+            )
+        }
 
         Image(
             modifier = Modifier
@@ -992,7 +972,6 @@ internal fun MyAccountHomePreview(
                 name = "QWERTY UIOP",
                 email = "qwerty@uiop.com",
                 verifiedPhoneNumber = null,
-                avatarColor = R.color.dark_grey,
                 accountType = AccountType.BUSINESS,
                 isBusinessAccount = isBusinessAccount,
                 isMasterBusinessAccount = true,
@@ -1008,7 +987,13 @@ internal fun MyAccountHomePreview(
                 totalTransfer = 1000,
                 subscriptionRenewTime = 1000000,
                 proExpirationTime = 150000,
-                accountTypeNameResource = 0
+                accountTypeNameResource = 0,
+                avatarContent = TextAvatarContent(
+                    avatarText = "A",
+                    backgroundColor = colorResource(id = R.color.red_300_red_200).toArgb(),
+                    showBorder = true,
+                    textSize = 36.sp,
+                )
             ),
             uiActions = object : MyAccountHomeViewActions {
                 override val isPhoneNumberDialogShown: Boolean

@@ -863,6 +863,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 drawerItem = DrawerItem.HOMEPAGE
             }
             selectDrawerItem(drawerItem)
+            userInfoViewModel.getUserInfo(false)
             showOfflineMode()
             credentials?.let {
                 val gSession = it.session

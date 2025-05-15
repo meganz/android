@@ -2,6 +2,7 @@
 
 package mega.privacy.android.app.presentation.myaccount
 
+import androidx.compose.ui.unit.sp
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -10,6 +11,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TEST_USER_ACCOUNT
+import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
+import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
@@ -90,11 +93,14 @@ class MyAccountHomeViewModelTest {
         onBlocking { invoke() }.thenReturn(emptyList())
     }
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
-    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
+    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock {
+        onBlocking { invoke() }.thenReturn(1)
+    }
     private val getInSharesUseCase: GetInSharesUseCase = mock()
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
     private val getUserFullNameUseCase: GetUserFullNameUseCase = mock()
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
+    private val avatarContentMapper: AvatarContentMapper = mock()
 
     @BeforeEach
     fun setup() {
@@ -104,6 +110,10 @@ class MyAccountHomeViewModelTest {
     private fun initViewModel(accountDetailsValue: UserAccount = TEST_USER_ACCOUNT) {
         getAccountDetailsUseCase.stub {
             onBlocking { invoke(any()) }.thenReturn(accountDetailsValue)
+        }
+
+        getUserFullNameUseCase.stub {
+            onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT.fullName)
         }
 
         underTest = MyAccountHomeViewModel(
@@ -122,6 +132,7 @@ class MyAccountHomeViewModelTest {
             getMyAvatarFileUseCase,
             getUsedTransferStatusUseCase,
             accountNameMapper = AccountNameMapper(),
+            avatarContentMapper
         )
     }
 
@@ -172,13 +183,24 @@ class MyAccountHomeViewModelTest {
     @Test
     fun `test that avatar should be updated when monitorMyAvatarFile emits avatar file`() =
         runTest {
-            val expected = mock<File>()
-            myAvatarFileFlow.emit(expected)
+            val file = mock<File>()
+            val expected = mock<TextAvatarContent>()
+            whenever(getMyAvatarFileUseCase(any())).thenReturn(file)
+            myAvatarFileFlow.emit(file)
+            whenever(
+                avatarContentMapper(
+                    fullName = TEST_USER_ACCOUNT.fullName,
+                    localFile = file,
+                    backgroundColor = 1,
+                    showBorder = false,
+                    textSize = 36.sp
+                )
+            ).thenReturn(expected)
 
             advanceUntilIdle()
 
             underTest.uiState.test {
-                assertThat(awaitItem().avatar).isEqualTo(expected)
+                assertThat(awaitItem().avatarContent).isEqualTo(expected)
             }
         }
 

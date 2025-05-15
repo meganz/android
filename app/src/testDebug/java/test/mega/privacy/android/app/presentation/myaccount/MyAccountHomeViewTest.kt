@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.myaccount
 
-import mega.privacy.android.shared.resources.R as sharedR
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -10,6 +11,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.width
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
@@ -20,12 +22,14 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fromId
 import mega.privacy.android.app.fromPluralId
+import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.app.presentation.myaccount.view.AccountTypeSection
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACCOUNT_TYPE_SECTION
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACHIEVEMENTS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ADD_PHONE_NUMBER
+import mega.privacy.android.app.presentation.myaccount.view.Constants.AVATAR
 import mega.privacy.android.app.presentation.myaccount.view.Constants.AVATAR_SIZE
 import mega.privacy.android.app.presentation.myaccount.view.Constants.BACKUP_RECOVERY_KEY
 import mega.privacy.android.app.presentation.myaccount.view.Constants.CONTACTS
@@ -35,12 +39,10 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.EXPIRED_BU
 import mega.privacy.android.app.presentation.myaccount.view.Constants.EXPIRED_BUSINESS_BANNER_TEXT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_LEFT_MARGIN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_RIGHT_MARGIN
-import mega.privacy.android.app.presentation.myaccount.view.Constants.IMAGE_AVATAR
 import mega.privacy.android.app.presentation.myaccount.view.Constants.LAST_SESSION
 import mega.privacy.android.app.presentation.myaccount.view.Constants.NAME_TEXT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.PAYMENT_ALERT_INFO
 import mega.privacy.android.app.presentation.myaccount.view.Constants.PHONE_NUMBER_TEXT
-import mega.privacy.android.app.presentation.myaccount.view.Constants.TEXT_AVATAR
 import mega.privacy.android.app.presentation.myaccount.view.Constants.UPGRADE_BUTTON
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_METER_BUSINESS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_STORAGE_PROGRESS
@@ -61,6 +63,7 @@ import mega.privacy.android.domain.entity.AccountType.PRO_LITE
 import mega.privacy.android.domain.entity.AccountType.STARTER
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -107,8 +110,12 @@ class MyAccountHomeViewTest {
     fun `test that my account header section should render with correct attributes`() {
         composeTestRule.setContent {
             MyAccountHeader(
-                avatar = null,
-                avatarColor = R.color.dark_grey,
+                avatarContent = TextAvatarContent(
+                    avatarText = "A",
+                    backgroundColor = colorResource(id = R.color.red_300_red_200).toArgb(),
+                    showBorder = true,
+                    textSize = 36.sp,
+                ),
                 name = "Mega",
                 email = "asd@mega.co.nz",
                 verifiedPhoneNumber = "123456789",
@@ -117,10 +124,8 @@ class MyAccountHomeViewTest {
             )
         }
 
-        composeTestRule.onNodeWithTag(IMAGE_AVATAR).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(TEXT_AVATAR)
-            .assertIsDisplayed()
-            .assert(hasText("M"))
+        composeTestRule.onNodeWithTag(AVATAR).assertExists()
+            .assert(hasText("A"))
         composeTestRule.onNodeWithTag(NAME_TEXT)
             .assertIsDisplayed()
             .assert(hasText("Mega"))

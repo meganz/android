@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.myaccount
 
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,12 +10,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.domain.entity.AccountType
@@ -62,6 +67,7 @@ class MyAccountHomeViewModel @Inject constructor(
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase,
     private val accountNameMapper: AccountNameMapper,
+    private val avatarContentMapper: AvatarContentMapper,
 ) : ViewModel() {
     private val _uiState =
         MutableStateFlow(MyAccountHomeUIState(accountTypeNameResource = accountNameMapper(null)))
@@ -74,7 +80,6 @@ class MyAccountHomeViewModel @Inject constructor(
 
     init {
         refreshAccountInfo()
-        getDefaultAvatarColor()
         refreshUserName(false)
         refreshCurrentUserEmail()
         getVisibleContacts()
@@ -102,16 +107,24 @@ class MyAccountHomeViewModel @Inject constructor(
                     }
                 }
         }
-        viewModelScope.launch {
-            flow {
-                emit(getMyAvatarFileUseCase(isForceRefresh = false))
-                emitAll(monitorMyAvatarFile())
-            }.collectLatest { file ->
-                _uiState.update {
-                    it.copy(avatar = file, avatarFileLastModified = file?.lastModified() ?: 0L)
+        combine(
+            uiState.map { it.name }.distinctUntilChanged(),
+            monitorMyAvatarFile().onStart { emit(getMyAvatarFileUseCase(isForceRefresh = false)) },
+            transform = { name, file ->
+                if (!name.isNullOrEmpty()) {
+                    val avatarContent = avatarContentMapper(
+                        fullName = name,
+                        localFile = file,
+                        backgroundColor = getMyAvatarColorUseCase(),
+                        showBorder = false,
+                        textSize = 36.sp
+                    )
+                    _uiState.update {
+                        it.copy(avatarContent = avatarContent)
+                    }
                 }
             }
-        }
+        ).launchIn(viewModelScope)
         viewModelScope.launch {
             monitorVerificationStatus()
                 .collectLatest { status ->
@@ -154,12 +167,6 @@ class MyAccountHomeViewModel @Inject constructor(
                         )
                     }
                 }
-        }
-    }
-
-    private fun getDefaultAvatarColor() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(avatarColor = getMyAvatarColorUseCase()) }
         }
     }
 
