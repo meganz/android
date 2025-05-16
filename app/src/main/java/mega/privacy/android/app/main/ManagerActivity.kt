@@ -2383,45 +2383,43 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
 
         lifecycleScope.launch {
-            lifecycleScope.launch {
-                val shouldShowNotificationPermission =
-                    intent.getBooleanExtra(
-                        IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION,
-                        false
-                    )
+            val shouldShowNotificationPermission =
+                intent?.getBooleanExtra(
+                    IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION,
+                    false
+                ) == true
 
-                val needsToShowPermissions =
-                    (!isNotificationPermissionGranted() && shouldShowNotificationPermission) || hasMissingPermission()
+            val needsToShowPermissions =
+                (!isNotificationPermissionGranted() && shouldShowNotificationPermission) || hasMissingPermission()
 
-                if (needsToShowPermissions) {
-                    val currentFragment =
-                        supportFragmentManager.findFragmentById(R.id.fragment_container)
-                    if (currentFragment?.tag != FragmentTag.PERMISSIONS.tag) {
-                        deleteCurrentFragment()
-                    }
+            if (needsToShowPermissions) {
+                val currentFragment =
+                    supportFragmentManager.findFragmentById(R.id.fragment_container)
+                if (currentFragment?.tag != FragmentTag.PERMISSIONS.tag) {
+                    deleteCurrentFragment()
+                }
 
-                    if (permissionsFragment == null) {
-                        permissionsFragment = PermissionsFragment().apply {
-                            if (shouldShowNotificationPermission) {
-                                arguments = bundleOf(
-                                    IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION to true
-                                )
-                            }
+                if (permissionsFragment == null) {
+                    permissionsFragment = PermissionsFragment().apply {
+                        if (shouldShowNotificationPermission) {
+                            arguments = bundleOf(
+                                IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION to true
+                            )
                         }
                     }
-
-                    permissionsFragment?.let {
-                        replaceFragment(it, FragmentTag.PERMISSIONS.tag)
-                    }
-
-                    onAskingPermissionsFragment = true
-                    setAppBarVisibility(false)
-                    setTabsVisibility()
-                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                    supportInvalidateOptionsMenu()
-                    hideFabButton()
-                    showHideBottomNavigationView(true)
                 }
+
+                permissionsFragment?.let {
+                    replaceFragment(it, FragmentTag.PERMISSIONS.tag)
+                }
+
+                onAskingPermissionsFragment = true
+                setAppBarVisibility(false)
+                setTabsVisibility()
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                supportInvalidateOptionsMenu()
+                hideFabButton()
+                showHideBottomNavigationView(true)
             }
         }
     }
