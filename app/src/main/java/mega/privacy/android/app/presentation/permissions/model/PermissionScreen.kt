@@ -25,6 +25,11 @@ enum class PermissionScreen {
     Camera,
 
     /**
+     * Camera backup permission.
+     */
+    CameraBackup,
+
+    /**
      * Calls permission.
      */
     Calls;

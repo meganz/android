@@ -1,10 +1,10 @@
 package mega.privacy.android.app.presentation.extensions
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Build
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 
 internal val PermissionScreen.title: Int
     get() = when (this) {
@@ -18,6 +18,7 @@ internal val PermissionScreen.title: Int
 
         PermissionScreen.Camera -> R.string.allow_acces_camera_title
         PermissionScreen.Calls -> R.string.allow_acces_calls_title
+        else -> -1
     }
 
 internal val PermissionScreen.description: Int
@@ -27,6 +28,7 @@ internal val PermissionScreen.description: Int
         PermissionScreen.Media -> R.string.allow_acces_media_subtitle
         PermissionScreen.Camera -> R.string.allow_acces_camera_subtitle
         PermissionScreen.Calls -> R.string.allow_acces_calls_subtitle_microphone
+        else -> -1
     }
 
 internal val PermissionScreen.image: Int
@@ -36,6 +38,7 @@ internal val PermissionScreen.image: Int
         PermissionScreen.Media -> iconPackR.drawable.ic_image_glass
         PermissionScreen.Camera -> iconPackR.drawable.ic_video_glass
         PermissionScreen.Calls -> iconPackR.drawable.ic_message_call_glass
+        else -> -1
     }
 
 internal val PermissionScreen.positiveButton: Int

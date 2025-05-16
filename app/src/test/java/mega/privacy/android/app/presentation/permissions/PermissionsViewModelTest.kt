@@ -103,7 +103,7 @@ class PermissionsViewModelTest {
 
             underTest.setData(
                 permissions = listOf(
-                    Permission.Read to false
+                    Permission.CameraBackup to false
                 )
             )
 
@@ -122,7 +122,7 @@ class PermissionsViewModelTest {
 
             underTest.setData(
                 permissions = listOf(
-                    Permission.Read to false,
+                    Permission.CameraBackup to false,
                     Permission.Notifications to false
                 )
             )
@@ -144,7 +144,7 @@ class PermissionsViewModelTest {
 
             underTest.setData(
                 permissions = listOf(
-                    Permission.Read to false,
+                    Permission.CameraBackup to false,
                     Permission.Bluetooth to false
                 )
             )

@@ -111,13 +111,18 @@ class PermissionsViewModel @Inject constructor(
                 missingPermissions
                     // Filter out permissions that are not needed for the onboarding revamp. On the new
                     // onboarding flow, we only need Media (Read and Write) and Notifications permissions.
-                    .filter { it == Permission.Read || it == Permission.Notifications }
+                    .filter { it == Permission.CameraBackup || it == Permission.Notifications }
                     .apply { permissionScreens = toPermissionScreen() }
                     .also { updateCurrentPermissionRevamp() }
             } else {
-                missingPermissions.apply {
-                    permissionScreens = toPermissionScreen()
-                }
+                // CameraBackup permission is not needed for the old onboarding flow, so we filter it out.
+                // We want to preserve legacy code for the old onboarding flow to avoid regression bugs,
+                // this will all be remove once we cleanup the old onboarding flow.
+                missingPermissions
+                    .filterNot { it == Permission.CameraBackup }
+                    .apply {
+                        permissionScreens = toPermissionScreen()
+                    }
 
                 if (permissionScreens.isNotEmpty()) {
                     showInitialSetupScreen.value = true
@@ -153,7 +158,7 @@ class PermissionsViewModel @Inject constructor(
     private fun PermissionScreen.toNewPermissionScreen() =
         when (this) {
             PermissionScreen.Notifications -> NewPermissionScreen.Notification
-            PermissionScreen.Media -> NewPermissionScreen.CameraBackup
+            PermissionScreen.CameraBackup -> NewPermissionScreen.CameraBackup
             else -> NewPermissionScreen.Loading
         }
 

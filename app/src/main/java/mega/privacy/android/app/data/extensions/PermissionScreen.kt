@@ -23,6 +23,7 @@ fun PermissionScreen.toPermissionType(missingPermissions: List<Permission>): Per
         }
 
         PermissionScreen.Camera -> PermissionType.Camera
+        PermissionScreen.CameraBackup -> PermissionType.CameraBackup
         PermissionScreen.Calls -> when {
             missingPermissions.contains(Permission.Microphone)
                     && missingPermissions.contains(Permission.Bluetooth) -> PermissionType.MicrophoneAndBluetooth

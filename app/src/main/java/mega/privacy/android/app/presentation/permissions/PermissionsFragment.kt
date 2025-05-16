@@ -1,6 +1,11 @@
 package mega.privacy.android.app.presentation.permissions
 
 import android.Manifest
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_MEDIA_IMAGES
+import android.Manifest.permission.READ_MEDIA_VIDEO
+import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -67,7 +72,8 @@ class PermissionsFragment : Fragment() {
     private val readPermissions =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             arrayOf(
-                getAudioPermissionByVersion(), getReadExternalStoragePermission()
+                getAudioPermissionByVersion(),
+                getReadExternalStoragePermission()
             )
         } else {
             arrayOf(
@@ -77,6 +83,23 @@ class PermissionsFragment : Fragment() {
                 getReadExternalStoragePermission()
             )
         }
+
+    private fun getCameraUploadsPermissions(): List<String> = buildList {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            // Only request the generic External Storage Permission on Devices below API 33
+            add(READ_EXTERNAL_STORAGE)
+        } else {
+            // Request Granular Media and Notifications Permissions beginning on API 33
+            add(READ_MEDIA_IMAGES)
+            add(READ_MEDIA_VIDEO)
+            add(POST_NOTIFICATIONS)
+        }.apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                // Request Partial Media Permissions beginning on API 34
+                add(READ_MEDIA_VISUAL_USER_SELECTED)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -166,7 +189,7 @@ class PermissionsFragment : Fragment() {
                     },
                     askCameraBackupPermission = {
                         Analytics.tracker.trackEvent(EnableCameraBackupsCTAButtonPressedEvent)
-                        askForReadPermission()
+                        askForCameraBackupPermission()
                     },
                     onSkipNotificationPermission = {
                         Analytics.tracker.trackEvent(SkipNotificationsCTAButtonPressedEvent)
@@ -230,6 +253,16 @@ class PermissionsFragment : Fragment() {
                 Pair(
                     Permission.Write,
                     hasPermissions(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                )
+            )
+
+            add(
+                Pair(
+                    Permission.CameraBackup,
+                    hasPermissions(
+                        requireActivity(),
+                        *getCameraUploadsPermissions().toTypedArray()
+                    )
                 )
             )
 
@@ -314,6 +347,7 @@ class PermissionsFragment : Fragment() {
             PermissionType.MicrophoneAndBluetooth -> askForMicrophoneAndBluetoothPermissions()
             PermissionType.Microphone -> askForMicrophonePermission()
             PermissionType.Bluetooth -> askForBluetoothPermission()
+            PermissionType.CameraBackup -> askForCameraBackupPermission()
         }
     }
 
@@ -382,6 +416,18 @@ class PermissionsFragment : Fragment() {
     private fun askForCameraPermission() {
         Timber.d("CAMERA")
         requestPermission(requireActivity(), PERMISSIONS_FRAGMENT, Manifest.permission.CAMERA)
+    }
+
+    /**
+     * Asks for camera backup permission.
+     */
+    private fun askForCameraBackupPermission() {
+        Timber.d("CAMERA_BACKUP")
+        requestPermission(
+            requireActivity(),
+            PERMISSIONS_FRAGMENT,
+            *getCameraUploadsPermissions().toTypedArray()
+        )
     }
 
     /**

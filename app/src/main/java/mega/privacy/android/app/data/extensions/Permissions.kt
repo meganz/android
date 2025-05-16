@@ -31,6 +31,8 @@ fun List<Permission>.toPermissionScreen(): MutableList<PermissionScreen> =
                 Permission.Microphone -> add(PermissionScreen.Calls)
                 Permission.Bluetooth -> if (!contains(PermissionScreen.Calls))
                     add(PermissionScreen.Calls)
+
+                Permission.CameraBackup -> add(PermissionScreen.CameraBackup)
             }
         }
     }

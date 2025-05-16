@@ -39,4 +39,9 @@ enum class Permission {
      * Bluetooth permission.
      */
     Bluetooth,
+
+    /*
+    * Camera Backup permission
+    */
+    CameraBackup,
 }
