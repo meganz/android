@@ -1201,4 +1201,8 @@
     <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager.</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Recommended</string>
+    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
+    <string name="transfers_over_quota_banner_title">Get more transfer quota</string>
+    <!-- Text for the upgrade banner action -->
+    <string name="transfers_over_quota_banner_action_button">Upgrade now</string>
 </resources>

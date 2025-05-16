@@ -4851,8 +4851,6 @@
         <item quantity="one">couldn’t share %1$d folder</item>
         <item quantity="other">couldn’t share %1$d folders</item>
     </plurals>
-    <!-- Button text to mute a participant in the info of participant in call screen-->
-    <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Mute</string>
     <!-- Button text to mute all participant in the call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_all_participants_button">Mute all</string>
     <!-- Label text indicating that all participants are muted -->
