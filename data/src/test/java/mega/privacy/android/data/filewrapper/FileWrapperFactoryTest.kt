@@ -143,6 +143,19 @@ class FileWrapperFactoryTest {
         assertThat(actual).isEqualTo(expected)
     }
 
+    @Test
+    fun `test that child file is returned when the name matches`() =
+        Mockito.mockStatic(Uri::class.java).useNoResult {
+            val (uriPath, _) = commonStub(
+                "content://folder",
+                documentMetadata = DocumentMetadata("parent", true)
+            )
+            val childName = "foo"
+            whenever(fileGateway.getChildByName(uriPath, childName)) doReturn uriPath
+            val actual = underTest(uriPath)?.getChildByName(childName)
+            assertThat(actual).isEqualTo(uriPath.value)
+        }
+
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
     fun `test that child is correctly created from gateway child`(

@@ -17,6 +17,7 @@ class FileWrapper(
     private val getChildrenUrisFunction: () -> List<String>,
     private val getDetachedFileDescriptorFunction: (write: Boolean) -> Int?,
     private val childFileExistsFunction: (name: String) -> Boolean,
+    private val getChildByNameFunction: (name: String) -> String?,
     private val createChildFileFunction: (name: String, asFolder: Boolean) -> FileWrapper?,
     private val getParentUriFunction: () -> FileWrapper?,
     private val getPathFunction: () -> String?,
@@ -102,6 +103,16 @@ class FileWrapper(
      */
     @Keep
     fun rename(newName: String): FileWrapper? = renameFunction(newName)
+
+
+    /**
+     * Get a child file by name.
+     * @param name the name of the child file
+     * @return the URI of the child file or null if the operation failed
+     */
+    @Keep
+    fun getChildByName(name: String): String? =
+        getChildByNameFunction(name)
 
 
     companion object {

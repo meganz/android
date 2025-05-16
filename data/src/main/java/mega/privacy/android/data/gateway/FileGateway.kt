@@ -517,6 +517,14 @@ interface FileGateway {
      */
     fun childFileExistsSync(parentFolder: UriPath, childName: String): Boolean
 
+
+    /**
+     * Get Child File by name
+     * @param parentFolder the parent folder
+     * @param name the name of the child file
+     */
+    fun getChildByName(parentFolder: UriPath, name: String): UriPath?
+
     /**
      * Creates a file as a child of a specific folder
      * @param parentFolder the folder where the child will be created

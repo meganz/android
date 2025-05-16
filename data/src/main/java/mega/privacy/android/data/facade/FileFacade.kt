@@ -903,6 +903,19 @@ internal class FileFacade @Inject constructor(
             ?.any { it.name == childName } == true
     }
 
+    /**
+     * Get Child File by name
+     * @param parentFolder Parent folder
+     * @param name Child file name
+     */
+    override fun getChildByName(parentFolder: UriPath, name: String): UriPath? {
+        val parentDocumentFile = getDocumentFileFromUri(parentFolder.toUri())
+        return parentDocumentFile
+            ?.listFiles()
+            ?.firstOrNull { it.name == name }
+            ?.let { UriPath(it.uri.toString()) }
+    }
+
     override fun createChildFileSync(
         parentFolder: UriPath,
         childName: String,

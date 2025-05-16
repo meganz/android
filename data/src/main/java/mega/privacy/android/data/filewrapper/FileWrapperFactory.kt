@@ -53,7 +53,10 @@ internal class FileWrapperFactory(private val fileGateway: FileGateway) {
                         fileGateway.renameFileSync(uriPath, it)?.let {
                             invoke(it)
                         }
-                    }
+                    },
+                    getChildByNameFunction = { name ->
+                        fileGateway.getChildByName(uriPath, name)?.value
+                    },
                 )
             }
 }

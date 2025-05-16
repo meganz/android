@@ -816,6 +816,39 @@ internal class FileFacadeTest {
         }
     }
 
+    @Test
+    fun `test that child file is returned when the name matches`(
+    ) = mockStatic(Uri::class.java).use {
+        val uriValue = "content://foo"
+        val uri1 = mock<Uri> {
+            on { this.scheme } doReturn "content"
+            on { toString() } doReturn uriValue
+        }
+        val childName1 = "child.txt"
+        val childName2 = "another"
+        val childDoc1 = mock<DocumentFile> {
+            on { this.name } doReturn childName1
+            on { uri } doReturn uri1
+        }
+        val childDoc2 = mock<DocumentFile> {
+            on { this.name } doReturn childName2
+        }
+        val doc = mock<DocumentFile> {
+            on { this.name } doReturn "foo"
+            on { this.isDirectory } doReturn true
+            on { this.listFiles() } doReturn arrayOf(childDoc1, childDoc2)
+        }
+        val uri = stubGetDocumentFileFromUri(doc)
+        val uriPath = UriPath(uriValue)
+        whenever(Uri.parse(uriPath.value)) doReturn uri
+        whenever(documentFileWrapper.fromUri(uri)) doReturn doc
+
+
+        val actual = underTest.getChildByName(uriPath, childName1)
+
+        assertThat(actual?.value).isEqualTo(uriPath.value)
+    }
+
 
     private fun stubGetDocumentFileFromUri(documentFile: DocumentFile): Uri {
         val uri = mock<Uri> {
