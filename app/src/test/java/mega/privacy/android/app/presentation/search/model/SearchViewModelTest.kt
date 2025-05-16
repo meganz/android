@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.search.model
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -357,6 +359,72 @@ class SearchViewModelTest {
                 assertThat(state.searchItemList.size).isEqualTo(nodeList.size)
             }
         }
+
+    @Test
+    fun `test resetScrollEvent is triggered when updateSearchQuery is called`() = runTest {
+        underTest.updateSearchQuery("test")
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.resetScrollEvent).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test resetScrollEvent is triggered when setTypeSelectedFilterOption is called`() =
+        runTest {
+            val type = TypeFilterWithName(
+                TypeFilterOption.Images,
+                R.string.search_dropdown_chip_filter_type_file_type_images
+            )
+            underTest.setTypeSelectedFilterOption(type)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.resetScrollEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test resetScrollEvent is triggered when setDateModifiedSelectedFilterOption is called`() =
+        runTest {
+            val type = DateFilterWithName(
+                DateFilterOption.Today,
+                R.string.search_dropdown_chip_filter_type_date_today
+            )
+            underTest.setDateModifiedSelectedFilterOption(type)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.resetScrollEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test resetScrollEvent is triggered when setDateAddedSelectedFilterOption is called`() =
+        runTest {
+            val type = DateFilterWithName(
+                DateFilterOption.LastYear,
+                R.string.search_dropdown_chip_filter_type_date_last_year
+            )
+            underTest.setDateAddedSelectedFilterOption(type)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.resetScrollEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test resetScrollEvent is reset when onResetScrollEventConsumed is called`() = runTest {
+        val type = DateFilterWithName(
+            DateFilterOption.LastYear,
+            R.string.search_dropdown_chip_filter_type_date_last_year
+        )
+        underTest.setDateAddedSelectedFilterOption(type)
+        underTest.state.test {
+            awaitItem()
+            underTest.onResetScrollEventConsumed()
+            val state = awaitItem()
+            assertThat(state.resetScrollEvent).isEqualTo(consumed)
+        }
+    }
 
     @Test
     fun `test that the error message id is updated when show error message is called`() =

@@ -5,6 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -310,7 +312,12 @@ class SearchViewModel @Inject constructor(
      */
     fun updateSearchQuery(query: String) {
         if (state.value.searchQuery == query) return
-        _state.update { it.copy(searchQuery = query, resetScroll = state.value.resetScroll.not()) }
+        _state.update {
+            it.copy(
+                searchQuery = query,
+                resetScrollEvent = triggered
+            )
+        }
         viewModelScope.launch { performSearch() }
     }
 
@@ -405,7 +412,7 @@ class SearchViewModel @Inject constructor(
         _state.update {
             it.copy(
                 typeSelectedFilterOption = typeFilterOption,
-                resetScroll = state.value.resetScroll.not()
+                resetScrollEvent = triggered
             )
         }
         viewModelScope.launch { performSearch() }
@@ -418,7 +425,7 @@ class SearchViewModel @Inject constructor(
         _state.update {
             it.copy(
                 dateModifiedSelectedFilterOption = dateFilterOption,
-                resetScroll = state.value.resetScroll.not()
+                resetScrollEvent = triggered
             )
         }
         viewModelScope.launch { performSearch() }
@@ -431,10 +438,14 @@ class SearchViewModel @Inject constructor(
         _state.update {
             it.copy(
                 dateAddedSelectedFilterOption = dateFilterOption,
-                resetScroll = state.value.resetScroll.not()
+                resetScrollEvent = triggered
             )
         }
         viewModelScope.launch { performSearch() }
+    }
+
+    fun onResetScrollEventConsumed() {
+        _state.update { it.copy(resetScrollEvent = consumed) }
     }
 
     /**

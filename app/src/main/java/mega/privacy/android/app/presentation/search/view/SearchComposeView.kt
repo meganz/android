@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.search.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
@@ -28,6 +30,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -75,6 +78,7 @@ fun SearchComposeView(
     updateSearchQuery: (String) -> Unit,
     onFilterClicked: (String) -> Unit,
     onBackPressed: () -> Unit,
+    onResetScrollEventConsumed: () -> Unit,
     navHostController: NavHostController,
     nodeActionHandler: NodeActionHandler,
     clearSelection: () -> Unit,
@@ -86,13 +90,6 @@ fun SearchComposeView(
     val gridState = rememberLazyGridState()
     val scaffoldState = rememberScaffoldState()
     var topBarPadding by remember { mutableStateOf(0.dp) }
-
-    LaunchedEffect(key1 = state.resetScroll) {
-        listState.scrollToItem(0)
-    }
-    LaunchedEffect(key1 = state.resetScroll) {
-        gridState.scrollToItem(0)
-    }
 
     var searchQuery by rememberSaveable {
         mutableStateOf(state.searchQuery)
@@ -145,7 +142,11 @@ fun SearchComposeView(
         },
         scaffoldState = scaffoldState,
     ) { padding ->
-        Column(modifier = Modifier.padding(top = topBarPadding)) {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colors.background)
+                .padding(top = topBarPadding)
+        ) {
             if ((state.nodeSourceType == NodeSourceType.CLOUD_DRIVE || state.nodeSourceType == NodeSourceType.HOME) && state.navigationLevel.isEmpty()) {
                 FilterChipsView(
                     state = state,
@@ -193,6 +194,14 @@ fun SearchComposeView(
             }
         }
     }
+
+    EventEffect(state.resetScrollEvent, onResetScrollEventConsumed) {
+        if (state.currentViewType == ViewType.LIST) {
+            listState.scrollToItem(0)
+        } else {
+            gridState.scrollToItem(0)
+        }
+    }
 }
 
 @Composable
@@ -232,6 +241,7 @@ private fun PreviewSearchComposeView() {
         updateSearchQuery = {},
         onFilterClicked = {},
         onBackPressed = {},
+        onResetScrollEventConsumed = {},
         navHostController = NavHostController(LocalContext.current),
         modifier = Modifier,
         nodeActionHandler = NodeActionHandler(

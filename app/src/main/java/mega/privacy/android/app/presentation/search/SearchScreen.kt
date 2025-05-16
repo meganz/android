@@ -100,6 +100,7 @@ fun SearchScreen(
         },
         clearSelection = searchViewModel::clearSelection,
         onBackPressed = onBackPressed,
+        onResetScrollEventConsumed = searchViewModel::onResetScrollEventConsumed,
         navHostController = navHostController,
         nodeActionHandler = nodeActionHandler,
         fileTypeIconMapper = fileTypeIconMapper,
