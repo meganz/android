@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -116,6 +115,7 @@ import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
+import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ForgotPasswordButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LoginButtonPressedEvent
@@ -172,8 +172,9 @@ fun NewLoginView(
         modifier = modifier
             .fillMaxSize()
             .imePadding()
-            .statusBarsPadding()
-            .navigationBarsPadding()
+            .conditional(!showLoginInProgress) {
+                statusBarsPadding()
+            }
             .semantics { testTagsAsResourceId = true },
         snackbarHost = {
             MegaSnackbar(snackbarHostState)
@@ -645,7 +646,7 @@ private fun LoginInProgress(
                 // White-space to prevent jumping when visibility animates
                 MegaText(
                     text = " ",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     textColor = TextColor.Primary,
                     minLines = 2
                 )
@@ -680,7 +681,7 @@ private fun LoginInProgressText(
             } else {
                 stringResource(id = currentTextId)
             },
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium,
             modifier = modifier,
             textAlign = TextAlign.Center,
             textColor = TextColor.Primary,
