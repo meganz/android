@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.folderlink.view
 
+import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -7,13 +8,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -37,9 +42,14 @@ internal fun UnavailableLinkView(
     @StringRes bulletPoints: List<Int>,
     modifier: Modifier = Modifier,
 ) {
+    val isInLandscapeMode =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(
+                rememberScrollState()
+            )
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.Center,
     ) {
@@ -58,16 +68,22 @@ internal fun UnavailableLinkView(
             textColor = TextColor.Primary,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h6Medium,
-            modifier = Modifier.padding(horizontal = 6.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 6.dp)
         )
 
-        Spacer(modifier = Modifier.height(56.dp))
+        Spacer(
+            modifier = Modifier
+                .height(if (isInLandscapeMode) 36.dp else 56.dp)
+        )
 
         MegaText(
             text = stringResource(subtitle),
             textColor = TextColor.Primary,
             style = MaterialTheme.typography.subtitle1medium,
         )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         BulletListView(
@@ -76,6 +92,10 @@ internal fun UnavailableLinkView(
             textColor = TextColor.Secondary,
             spacing = 16.dp,
         )
+
+        if (isInLandscapeMode) {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
     }
 }
 
