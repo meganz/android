@@ -172,6 +172,7 @@ fun NewLoginView(
         modifier = modifier
             .fillMaxSize()
             .imePadding()
+            .statusBarsPadding()
             .navigationBarsPadding()
             .semantics { testTagsAsResourceId = true },
         snackbarHost = {
@@ -185,7 +186,6 @@ fun NewLoginView(
                     exit = slideOutVertically(targetOffsetY = { -it }),
                 ) {
                     MegaTopAppBar(
-                        modifier = Modifier.statusBarsPadding(),
                         navigationType = AppBarNavigationType.Back(onBackPressed),
                         title = stringResource(sharedR.string.settings_2fa),
                     )
@@ -197,7 +197,6 @@ fun NewLoginView(
                     exit = slideOutVertically(targetOffsetY = { -it }),
                 ) {
                     MegaTopAppBar(
-                        modifier = Modifier.statusBarsPadding(),
                         title = "",
                         navigationType = AppBarNavigationType.Back(onBackPressed),
                         trailingIcons = {
