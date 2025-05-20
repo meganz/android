@@ -22,6 +22,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.view.ShareContactOptionsContent
+import mega.privacy.android.app.presentation.fileinfo.view.ShareNonContactOptionsContent
+import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.domain.entity.ThemeMode
@@ -119,6 +121,15 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
             }
         }
 
+        val isNonContact = nonContactEmail != null
+        val columnModifier = if (isNonContact) {
+            Modifier.fillMaxWidth()
+        } else {
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = 260.dp)
+        }
+
         contentView = ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
@@ -133,16 +144,13 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
                         )
                     } ?: run {
                         Timber.Forest.e("Contact item not found ${contact?.handle}")
-                        dismissAllowingStateLoss()
                     }
                 }
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 OriginalTheme(isDark = themeMode.isDarkMode()) {
                     Column(
-                        modifier = Modifier.Companion
-                            .fillMaxWidth()
-                            .heightIn(min = 260.dp)
+                        modifier = columnModifier
                     ) {
                         contactPermission?.let { contactPermission ->
                             ShareContactOptionsContent(
@@ -154,6 +162,20 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
                                     }
                                     dismissAllowingStateLoss()
                                 },
+                                onChangePermissionClicked = {
+                                    email()?.let { listener?.changePermissions(it) }
+                                    dismissAllowingStateLoss()
+                                },
+                                onRemoveClicked = {
+                                    email()?.let { listener?.removeFileContactShare(it) }
+                                    dismissAllowingStateLoss()
+                                })
+                        } ?: nonContactEmail?.let {
+                            ShareNonContactOptionsContent(
+                                nonContactEmail = it,
+                                accessPermission = getAccessPermission(share?.access),
+                                avatarColor = AvatarUtil.getSpecificAvatarColor(Constants.AVATAR_PRIMARY_COLOR),
+                                allowChangePermission = node == null || !megaApi.isInVault(node),
                                 onChangePermissionClicked = {
                                     email()?.let { listener?.changePermissions(it) }
                                     dismissAllowingStateLoss()
