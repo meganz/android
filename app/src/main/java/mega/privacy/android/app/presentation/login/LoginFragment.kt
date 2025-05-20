@@ -142,9 +142,21 @@ class LoginFragment : Fragment() {
             }
         }
 
-        with(uiState) {
-            intentState?.apply {
-                when (this) {
+        LaunchedEffect(uiState.isLoginRequired) {
+            if (uiState.isLoginRequired) {
+                confirmLogoutDialog?.dismiss()
+            }
+        }
+
+        LaunchedEffect(uiState.ongoingTransfersExist) {
+            if (uiState.ongoingTransfersExist == true) {
+                showCancelTransfersDialog()
+            }
+        }
+
+        LaunchedEffect(uiState.intentState) {
+            uiState.intentState?.let {
+                when (it) {
                     LoginIntentState.ReadyForInitialSetup -> {
                         Timber.d("Ready to initial setup")
                         finishSetupIntent(uiState)
@@ -161,10 +173,6 @@ class LoginFragment : Fragment() {
                     }
                 }
             }
-
-            if (isLoginRequired) confirmLogoutDialog?.dismiss()
-
-            if (ongoingTransfersExist == true) showCancelTransfersDialog()
         }
 
         if (uiState.isLoginNewDesignEnabled == true) {
@@ -605,9 +613,11 @@ class LoginFragment : Fragment() {
         confirmLogoutDialog?.dismiss()
         val loginActivity = requireActivity() as LoginActivity
 
-        if (loginActivity.intent.getStringExtra(Constants.EXTRA_CONFIRMATION) == null
-            && !uiState.isAccountConfirmed
-        ) {
+        val isLoggedInToConfirmedAccount =
+            !loginActivity.intent.getStringExtra(Constants.EXTRA_CONFIRMATION).isNullOrEmpty()
+                    && uiState.isAccountConfirmed
+                    && uiState.accountSession?.email == uiState.temporalEmail
+        if (!isLoggedInToConfirmedAccount) {
             if (getChatManagement().isPendingJoinLink()) {
                 LoginActivity.isBackFromLoginPage = false
                 getChatManagement().pendingJoinLink = null

@@ -198,6 +198,7 @@ class LoginViewModel @Inject constructor(
             .onSuccess { ephemeral ->
                 if (ephemeral != null && !ephemeral.session.isNullOrEmpty()) {
                     setPendingFragmentToShow(LoginFragmentType.ConfirmEmail)
+                    _state.update { it.copy(temporalEmail = ephemeral.email) }
                     resumeCreateAccount(ephemeral.session.orEmpty())
                     return@launch
                 }
@@ -474,7 +475,9 @@ class LoginViewModel @Inject constructor(
      */
     fun checkSignupLink(link: String) {
         // avoid rotating the screen calling this method again
-        if (_state.value.intentState != null) return
+        if (state.value.intentState == LoginIntentState.AlreadySet
+            || state.value.isCheckingSignupLink
+        ) return
         _state.update { state ->
             state.copy(
                 isLoginRequired = false,
@@ -502,6 +505,7 @@ class LoginViewModel @Inject constructor(
                 state.copy(
                     isLoginRequired = true,
                     isLoginInProgress = false,
+                    temporalEmail = newAccountSession?.email,
                     accountSession = newAccountSession,
                     isAccountConfirmed = isAccountConfirmed,
                     intentState = LoginIntentState.AlreadySet,

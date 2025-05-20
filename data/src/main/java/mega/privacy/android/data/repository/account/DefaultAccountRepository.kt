@@ -565,7 +565,7 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun saveAccountCredentials() = withContext(ioDispatcher) {
         var myUserHandle: Long? = null
         var email: String? = null
-
+        getUserData()
         megaApiGateway.myUser?.let { myUser ->
             email = myUser.email
             myUserHandle = myUser.handle
