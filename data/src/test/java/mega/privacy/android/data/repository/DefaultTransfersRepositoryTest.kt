@@ -984,13 +984,30 @@ class DefaultTransfersRepositoryTest {
     @Test
     fun `test that deleteCompletedTransfersByState room gateway is called when deleteFailedOrCanceledTransfers is called`() =
         runTest {
-            underTest.deleteFailedOrCanceledTransfers()
+            underTest.deleteFailedOrCancelledTransfers()
             verify(megaLocalRoomGateway).deleteCompletedTransfersByState(
                 listOf(
                     MegaTransfer.STATE_FAILED,
                     MegaTransfer.STATE_CANCELLED
                 )
             )
+        }
+
+    @Test
+    fun `test that deleteCompletedTransfersByState room gateway is called when deleteCompletedTransfers is called`() =
+        runTest {
+            underTest.deleteCompletedTransfers()
+            verify(megaLocalRoomGateway).deleteCompletedTransfersByState(
+                listOf(MegaTransfer.STATE_COMPLETED)
+            )
+        }
+
+    @Test
+    fun `test that deleteCompletedTransfersById room gateway is called when deleteCompletedTransfersById is called`() =
+        runTest {
+            val ids = listOf(1, 2, 3)
+            underTest.deleteCompletedTransfersById(ids)
+            verify(megaLocalRoomGateway).deleteCompletedTransfersById(ids)
         }
 
     @Test

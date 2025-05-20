@@ -431,11 +431,23 @@ interface TransferRepository {
     suspend fun getFailedOrCanceledTransfers(): List<CompletedTransfer>
 
     /**
-     * Delete failed or canceled transfers
+     * Delete completed transfers with MegaTransfer.STATE_FAILED or MegaTransfer.STATE_CANCELLED state.
      *
-     * @return the failed or cancelled transfer list was deleted
+     * @return the failed or cancelled transfer list that was deleted
      */
-    suspend fun deleteFailedOrCanceledTransfers(): List<CompletedTransfer>
+    suspend fun deleteFailedOrCancelledTransfers(): List<CompletedTransfer>
+
+    /**
+     * Delete completed transfers with MegaTransfer.STATE_COMPLETED state.
+     */
+    suspend fun deleteCompletedTransfers()
+
+    /**
+     * Delete completed transfers by id.
+     *
+     * @param ids
+     */
+    suspend fun deleteCompletedTransfersById(ids: List<Int>)
 
     /**
      * Delete completed transfer

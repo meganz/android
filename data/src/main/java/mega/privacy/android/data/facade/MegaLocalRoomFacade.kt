@@ -214,6 +214,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
         return entities.map { entity -> completedTransferModelMapper(entity) }
     }
 
+    override suspend fun deleteCompletedTransfersById(ids: List<Int>) {
+        deleteCompletedTransferBatch(ids)
+    }
+
     override suspend fun deleteCompletedTransfer(completedTransfer: CompletedTransfer) {
         completedTransferDao.get().deleteCompletedTransferByIds(
             listOf(completedTransfer.id ?: return)

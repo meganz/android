@@ -692,7 +692,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             )
         }
 
-    override suspend fun deleteFailedOrCanceledTransfers(): List<CompletedTransfer> =
+    override suspend fun deleteFailedOrCancelledTransfers(): List<CompletedTransfer> =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.deleteCompletedTransfersByState(
                 listOf(
@@ -701,6 +701,20 @@ internal class DefaultTransfersRepository @Inject constructor(
                 )
             )
         }
+
+    override suspend fun deleteCompletedTransfers() {
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.deleteCompletedTransfersByState(
+                listOf(MegaTransfer.STATE_COMPLETED)
+            )
+        }
+    }
+
+    override suspend fun deleteCompletedTransfersById(ids: List<Int>) {
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.deleteCompletedTransfersById(ids)
+        }
+    }
 
     override suspend fun deleteCompletedTransfer(
         transfer: CompletedTransfer,

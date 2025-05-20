@@ -419,6 +419,15 @@ internal class MegaLocalRoomFacadeTest {
         }
 
     @Test
+    fun `test that deleteCompletedTransfersById invokes correctly`() =
+        runTest {
+            val ids = listOf(1, 2, 3)
+
+            underTest.deleteCompletedTransfersById(ids)
+            verify(completedTransferDao).deleteCompletedTransferByIds(ids, MAX_INSERT_LIST_SIZE)
+        }
+
+    @Test
     fun `test that delete entities correctly when deleteOldestCompletedTransfers is called`() =
         runTest {
             val completedTransfers = (1..110).map { id ->

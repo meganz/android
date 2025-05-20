@@ -12,8 +12,8 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.DeleteFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteAllCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import timber.log.Timber
@@ -25,7 +25,7 @@ internal class TransferPageViewModel @Inject constructor(
     private val cancelTransfersUseCase: CancelTransfersUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val deleteAllCompletedTransfersUseCase: DeleteAllCompletedTransfersUseCase,
-    private val deleteFailedOrCanceledTransfersUseCase: DeleteFailedOrCanceledTransfersUseCase,
+    private val deleteFailedOrCancelledTransfersUseCase: DeleteFailedOrCancelledTransfersUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferPageUiState())
 
@@ -110,7 +110,7 @@ internal class TransferPageViewModel @Inject constructor(
      */
     fun deleteFailedOrCancelledTransfers() {
         viewModelScope.launch {
-            val result = runCatching { deleteFailedOrCanceledTransfersUseCase() }
+            val result = runCatching { deleteFailedOrCancelledTransfersUseCase() }
             _state.update { state -> state.copy(deleteFailedOrCancelledTransfersResult = result) }
         }
     }

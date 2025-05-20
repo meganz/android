@@ -177,6 +177,13 @@ interface MegaLocalRoomGateway {
     suspend fun deleteCompletedTransfersByState(states: List<Int>): List<CompletedTransfer>
 
     /**
+     * Delete completed transfers by id
+     *
+     * @param ids
+     */
+    suspend fun deleteCompletedTransfersById(ids: List<Int>)
+
+    /**
      * Delete completed transfer
      *
      * @param completedTransfer

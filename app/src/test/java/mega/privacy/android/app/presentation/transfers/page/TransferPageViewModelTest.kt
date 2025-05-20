@@ -3,13 +3,12 @@ package mega.privacy.android.app.presentation.transfers.page
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.DeleteFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteAllCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -31,7 +30,7 @@ internal class TransferPageViewModelTest {
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase = mock()
     private val cancelTransfersUseCase: CancelTransfersUseCase = mock()
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase = mock()
-    private val deleteFailedOrCanceledTransfersUseCase: DeleteFailedOrCanceledTransfersUseCase =
+    private val deleteFailedOrCancelledTransfersUseCase: DeleteFailedOrCancelledTransfersUseCase =
         mock()
     private val deleteAllCompletedTransfersUseCase: DeleteAllCompletedTransfersUseCase = mock()
     private lateinit var underTest: TransferPageViewModel
@@ -47,7 +46,7 @@ internal class TransferPageViewModelTest {
             pauseTransfersQueueUseCase,
             cancelTransfersUseCase,
             stopCameraUploadsUseCase,
-            deleteFailedOrCanceledTransfersUseCase,
+            deleteFailedOrCancelledTransfersUseCase,
             deleteAllCompletedTransfersUseCase,
         )
     }
@@ -58,7 +57,7 @@ internal class TransferPageViewModelTest {
             cancelTransfersUseCase = cancelTransfersUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             deleteAllCompletedTransfersUseCase = deleteAllCompletedTransfersUseCase,
-            deleteFailedOrCanceledTransfersUseCase = deleteFailedOrCanceledTransfersUseCase,
+            deleteFailedOrCancelledTransfersUseCase = deleteFailedOrCancelledTransfersUseCase,
         )
     }
 
@@ -129,7 +128,7 @@ internal class TransferPageViewModelTest {
     fun `test that deleteFailedOrCancelledTransfersResult update correctly when call deleteFailedOrCancelledTransfers successfully`() =
         runTest {
             val transfer = mock<CompletedTransfer>()
-            whenever(deleteFailedOrCanceledTransfersUseCase()).thenReturn(listOf(transfer))
+            whenever(deleteFailedOrCancelledTransfersUseCase()).thenReturn(listOf(transfer))
             underTest.deleteFailedOrCancelledTransfers()
             underTest.state.test {
                 val result = awaitItem().deleteFailedOrCancelledTransfersResult
@@ -141,7 +140,7 @@ internal class TransferPageViewModelTest {
     @Test
     fun `test that deleteFailedOrCancelledTransfersResult update correctly when call deleteFailedOrCancelledTransfers failed`() =
         runTest {
-            whenever(deleteFailedOrCanceledTransfersUseCase()).thenThrow(RuntimeException::class.java)
+            whenever(deleteFailedOrCancelledTransfersUseCase()).thenThrow(RuntimeException::class.java)
             underTest.deleteFailedOrCancelledTransfers()
             underTest.state.test {
                 val result = awaitItem().deleteFailedOrCancelledTransfersResult
