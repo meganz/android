@@ -963,7 +963,7 @@
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_download">Não foi possível cancelar o download.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Neste momento, você receberá uma cobrança no valor de %1$s, mas a sua assinatura não será renovada automaticamente após 12 meses devido às regulamentações governamentais. Será sua responsabilidade renovar a sua assinatura depois que ela expirar. Você pode gerenciar ou cancelar a sua assinatura a qualquer momento por meio das Assinaturas na [A]Google&#160;Play Store[/A]. Ao fazer o upgrade, você concorda com os [B]Termos de serviço[/B] e a [C]Política de privacidade e de dados[/C] do MEGA.</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Neste momento, você receberá uma cobrança no valor de %1$s, mas a sua assinatura não será renovada automaticamente após 12 meses devido a regulamentações governamentais. Será sua responsabilidade renovar a sua assinatura depois que ela expirar. Você pode gerenciar ou cancelar a sua assinatura a qualquer momento por meio das Assinaturas na [A]Google&#160;Play Store[/A]. Ao fazer o upgrade, você concorda com os [B]Termos de serviço[/B] e a [C]Política de privacidade [/C] do MEGA.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Enviando&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -1186,4 +1186,40 @@
     <string name="transfers_no_completed_transfers_empty_text">Não há transferências concluídas</string>
     <!--Text for showing the empty state when there are no failed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
     <string name="transfers_no_failed_transfers_empty_text">[A]Não há transferência canceladas[/A]</string>
+    <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the current transferred size, the second one is to set the size of the file. Example 12.4MB of 33.3MB -->
+    <string name="transfers_completed_transfer_size_indicator">%1$s de %2$s</string>
+    <!-- Title for the Free Plan card -->
+    <string name="free_plan_card_title">Começar usando o nosso plano gratuito</string>
+    <!-- Description for the Free Plan card -->
+    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our Free plan offers generous amount of storage and transfer quota.</string>
+    <!-- Feature text for Free Plan storage -->
+    <string name="free_plan_card_storage_feature">20 GB de armazenamento gratuito</string>
+    <!-- Feature text for Free Plan transfer quota -->
+    <string name="free_plan_card_transfer_feature">Transferências limitadas</string>
+    <!-- Button text for Free Plan card -->
+    <string name="free_plan_card_button">Cadastre-se de forma gratuita</string>
+    <!-- Section title for the features list -->
+    <string name="pro_plan_features_section_title">Você vai obter:</string>
+    <!-- Title for generous storage feature -->
+    <string name="pro_plan_feature_storage_title">Amplo espaço de armazenamento</string>
+    <!-- Description for generous storage feature -->
+    <string name="pro_plan_feature_storage_desc">Store unlimited data up to 16 TB of storage</string>
+    <!-- Title for transfer sharing feature -->
+    <string name="pro_plan_feature_transfer_title">Compartilhamento de transferência</string>
+    <!-- Description for transfer sharing feature -->
+    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files.</string>
+    <!-- Title for MEGA VPN feature -->
+    <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
+    <!-- Description for MEGA VPN feature -->
+    <string name="pro_plan_feature_vpn_desc">Keep your online life safe, fast, and easy with our high-speed VPN.</string>
+    <!-- Title for MEGA Pass feature -->
+    <string name="pro_plan_feature_pass_title">MEGA Pass</string>
+    <!-- Description for MEGA Pass feature -->
+    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager.</string>
+    <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
+    <string name="account_upgrade_account_pro_plan_info_recommended_label">Recomendado</string>
+    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
+    <string name="transfers_over_quota_banner_title">Obter mais cota de transferência</string>
+    <!-- Text for the upgrade banner action -->
+    <string name="transfers_over_quota_banner_action_button">Fazer upgrade</string>
 </resources>

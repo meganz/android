@@ -607,7 +607,7 @@
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">대하여</string>
     <!-- Preference screen item action button -->
-    <string name="settings_about_privacy_policy">개인정보 및 데이터 처리 방침</string>
+    <string name="settings_about_privacy_policy">개인정보 처리 방침</string>
     <!--  -->
     <string name="settings_about_terms_of_service">이용 약관</string>
     <!-- App means “Application” -->
@@ -3453,9 +3453,9 @@
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">갤러리 보기</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
+    <string name="settings_media_discovery_view_context">비주얼 그리드에서 이미지 또는 동영상만 있는 폴더를 엽니다. 썸네일로 미디어를 탐색하고 날짜로 필터합니다.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in gallery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">이 폴더가 이미지와 동영상만 담고 있으므로, 자동으로 갤러리 보기에서 열었습니다. 시각 콘텐츠를 더욱 몰입되는 레이아웃에서 즐길 수 있습니다. 이것을 설정에서 비활성화 할 수 있습니다.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">설정</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4499,9 +4499,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">원본</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Gallery view in subfolders</string>
+    <string name="settings_media_discovery_sub_folder_title">하위 폴더에서 갤러리 보기</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in gallery view</string>
+    <string name="settings_media_discovery_sub_folder_context">하위 폴더의 이미지와 동영상도 갤러리 보기에 포함합니다</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">결과 없음</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4624,8 +4624,6 @@
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
         <item quantity="other">%1$d개의 폴더를 공유할 수 없었습니다</item>
     </plurals>
-    <!-- Button text to mute a participant in the info of participant in call screen-->
-    <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">조용히</string>
     <!-- Button text to mute all participant in the call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_all_participants_button">모두 음소거</string>
     <!-- Label text indicating that all participants are muted -->
@@ -4693,13 +4691,13 @@
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]무료 요금제는 회의에 60분 제한이 있습니다. Pro 이용자는 무제한 통화와 최대 1,000명의 참여자가 가능합니다.[/A] [B]지금 업그레이드.[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">즉시 %1$s이/가 청구될 것이며 구독은 1개월 후 자동으로 매월 %2$s으로 갱신됩니다. 당신의 Google&#160;Play 계정은 매 결제 주기 말일로부터 24시간 내에 청구될 것입니다. 구독을 취소하려면 [A]Google&#160;Play[/A]의 구독을 통해 결제 주기 말일의 24시간 전에 MEGA&#160;Pro 구독의 자동 갱신을 비활성화해야 합니다.\n계정을 업그레이드 함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 및 데이터 정책[/C]에 동의하는 것입니다.</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">즉시 %1$s이/가 청구될 것이며 구독은 1개월 후 자동으로 매월 %2$s으로 갱신됩니다. 당신의 Google&#160;Play 계정은 매 결제 주기 말일로부터 24시간 내에 청구될 것입니다. 구독을 취소하려면 [A]Google&#160;Play[/A]의 구독을 통해 결제 주기 말일의 24시간 전에 MEGA&#160;Pro 구독의 자동 갱신을 비활성화해야 합니다.\n계정을 업그레이드 함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 처리 방침[/C]에 동의하는 것입니다.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">즉시 %1$s이/가 청구될 것이며 구독은 12개월 후 자동으로 매년 %2$s으로 갱신됩니다. 당신의 Google&#160;Play 계정은 매 결제 주기 말일로부터 24시간 내에 청구될 것입니다. 구독을 취소하려면 [A]Google&#160;Play[/A]의 구독을 통해 결제 주기 말일의 24시간 전에 MEGA&#160;Pro 구독의 자동 갱신을 비활성화해야 합니다.\n계정을 업그레이드 함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 및 데이터 정책[/C]에 동의하는 것입니다.</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">즉시 %1$s이/가 청구될 것이며 구독은 12개월 후 자동으로 매년 %2$s으로 갱신됩니다. 당신의 Google&#160;Play 계정은 매 결제 주기 말일로부터 24시간 내에 청구될 것입니다. 구독을 취소하려면 [A]Google&#160;Play[/A]의 구독을 통해 결제 주기 말일의 24시간 전에 MEGA&#160;Pro 구독의 자동 갱신을 비활성화해야 합니다.\n계정을 업그레이드 함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 처리 방침[/C]에 동의하는 것입니다.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">요금이 즉시 청구될 것이며 구독은 1개월 후 자동으로 갱신됩니다. 당신의 Google&#160;Play 계정은 매 결제 주기 말일로부터 24시간 내에 청구될 것입니다. 구독을 취소하려면 [A]Google&#160;Play[/A]의 구독을 통해 결제 주기 말일의 24시간 전에 MEGA&#160;Pro 구독의 자동 갱신을 비활성화해야 합니다.\n계정을 업그레이드 함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 및 데이터 정책[/C]에 동의하는 것입니다.</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">요금이 즉시 청구될 것이며 구독은 1개월 후 자동으로 갱신됩니다. 당신의 Google&#160;Play 계정은 매 결제 주기 말일로부터 24시간 내에 청구될 것입니다. 구독을 취소하려면 [A]Google&#160;Play[/A]의 구독을 통해 결제 주기 말일의 24시간 전에 MEGA&#160;Pro 구독의 자동 갱신을 비활성화해야 합니다.\n계정을 업그레이드 함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 처리 방침[/C]에 동의하는 것입니다.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">요금이 즉시 청구될 것이며 구독은 12개월 후 자동으로 갱신됩니다. 당신의 Google&#160;Play 계정은 매 결제 주기 말일로부터 24시간 내에 청구될 것입니다. 구독을 취소하려면 [A]Google&#160;Play[/A]의 구독을 통해 결제 주기 말일의 24시간 전에 MEGA&#160;Pro 구독의 자동 갱신을 비활성화해야 합니다.\n계정을 업그레이드 함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 및 데이터 정책[/C]에 동의하는 것입니다.</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">요금이 즉시 청구될 것이며 구독은 12개월 후 자동으로 갱신됩니다. 당신의 Google&#160;Play 계정은 매 결제 주기 말일로부터 24시간 내에 청구될 것입니다. 구독을 취소하려면 [A]Google&#160;Play[/A]의 구독을 통해 결제 주기 말일의 24시간 전에 MEGA&#160;Pro 구독의 자동 갱신을 비활성화해야 합니다.\n계정을 업그레이드 함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 처리 방침[/C]에 동의하는 것입니다.</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">비즈니스 계정이 비활성화됨</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->

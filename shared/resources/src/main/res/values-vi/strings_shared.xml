@@ -929,7 +929,7 @@
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_download">Có gì đó đã xảy ra. Phiên tải xuống đã không bị hủy.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Bạn sẽ bị tính phí %1$s ngay lập tức nhưng gói đăng ký của bạn sẽ không tự động gia hạn sau 12 tháng do các quy định của chính phủ. Bạn sẽ có trách nhiệm tự gia hạn gói đăng ký của mình sau khi hết hạn. Bạn có thể quản lý hoặc hủy gói đăng ký của mình bất cứ lúc nào tại phần Gói thuê&#160;bao trong cửa&#160;hàng  [A]Google&#160;Play[/A]. Với việc nâng cấp tài khoản của mình, bạn đồng ý với [B]Điều&#160;Khoản Dịch&#160;Vụ[/B] và [C]Chính&#160;Sách Dữ&#160;Liệu và Riêng&#160;Tư[/C] của MEGA.</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Đang tải lên\u2026</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -1152,4 +1152,40 @@
     <string name="transfers_no_completed_transfers_empty_text">Chưa có phiên truyền tải nào đã hoàn tất</string>
     <!--Text for showing the empty state when there are no failed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
     <string name="transfers_no_failed_transfers_empty_text">[A]No failed transfers[/A]</string>
+    <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the current transferred size, the second one is to set the size of the file. Example 12.4MB of 33.3MB -->
+    <string name="transfers_completed_transfer_size_indicator">%1$s of %2$s</string>
+    <!-- Title for the Free Plan card -->
+    <string name="free_plan_card_title">Khởi&#160;đầu với gói Miễn&#160;phí của chúng&#160;tôi</string>
+    <!-- Description for the Free Plan card -->
+    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our Free plan offers generous amount of storage and transfer quota.</string>
+    <!-- Feature text for Free Plan storage -->
+    <string name="free_plan_card_storage_feature">Free 20 GB of storage</string>
+    <!-- Feature text for Free Plan transfer quota -->
+    <string name="free_plan_card_transfer_feature">Limited transfers</string>
+    <!-- Button text for Free Plan card -->
+    <string name="free_plan_card_button">Bắt&#160;đầu sử&#160;dụng miễn&#160;phí</string>
+    <!-- Section title for the features list -->
+    <string name="pro_plan_features_section_title">Bạn nhận được:</string>
+    <!-- Title for generous storage feature -->
+    <string name="pro_plan_feature_storage_title">Không gian hào phóng</string>
+    <!-- Description for generous storage feature -->
+    <string name="pro_plan_feature_storage_desc">Store unlimited data up to 16 TB of storage</string>
+    <!-- Title for transfer sharing feature -->
+    <string name="pro_plan_feature_transfer_title">Chia&#160;sẻ lượng truyền&#160;tải</string>
+    <!-- Description for transfer sharing feature -->
+    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files.</string>
+    <!-- Title for MEGA VPN feature -->
+    <string name="pro_plan_feature_vpn_title">MEGA VPN</string>
+    <!-- Description for MEGA VPN feature -->
+    <string name="pro_plan_feature_vpn_desc">Keep your online life safe, fast, and easy with our high-speed VPN.</string>
+    <!-- Title for MEGA Pass feature -->
+    <string name="pro_plan_feature_pass_title">MEGA Pass</string>
+    <!-- Description for MEGA Pass feature -->
+    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager.</string>
+    <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
+    <string name="account_upgrade_account_pro_plan_info_recommended_label">Khuyên dùng</string>
+    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
+    <string name="transfers_over_quota_banner_title">Tăng hạn mức truyền tải</string>
+    <!-- Text for the upgrade banner action -->
+    <string name="transfers_over_quota_banner_action_button">Nâng&#160;cấp ngay</string>
 </resources>
