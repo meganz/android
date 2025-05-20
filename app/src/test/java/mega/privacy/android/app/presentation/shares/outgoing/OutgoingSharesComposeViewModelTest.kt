@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -87,6 +88,7 @@ class OutgoingSharesComposeViewModelTest {
     private val monitorContactUpdatesUseCase = mock<MonitorContactUpdates>()
     private val getOthersSortOrder = mock<GetOthersSortOrder>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -114,7 +116,8 @@ class OutgoingSharesComposeViewModelTest {
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             monitorContactUpdatesUseCase = monitorContactUpdatesUseCase,
             getOthersSortOrder = getOthersSortOrder,
-            getNodeByIdUseCase = getNodeByIdUseCase
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            getContactVerificationWarningUseCase = getContactVerificationWarningUseCase
         )
     }
 

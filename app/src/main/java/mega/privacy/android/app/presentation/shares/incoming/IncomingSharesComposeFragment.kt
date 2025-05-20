@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.shares.incoming
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -72,9 +70,11 @@ import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -211,7 +211,10 @@ class IncomingSharesComposeFragment : Fragment() {
                         },
                         onMenuClick = {
                             if (uiState.isConnected) {
-                                showOptionsMenuForItem(it)
+                                showOptionsMenuForItem(
+                                    nodeUIItem = it,
+                                    isContactVerificationOn = uiState.isContactVerificationOn
+                                )
                             } else {
                                 coroutineScope.launch {
                                     snackbarHostState.showAutoDurationSnackbar(
@@ -416,10 +419,16 @@ class IncomingSharesComposeFragment : Fragment() {
     /**
      * Shows Options menu for item clicked
      */
-    private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem<ShareNode>) {
+    private fun showOptionsMenuForItem(
+        nodeUIItem: NodeUIItem<ShareNode>,
+        isContactVerificationOn: Boolean,
+    ) {
         // shareData.count = 0 means it's a distinct unverified share
-        val shareData =
-            if (nodeUIItem.node.shareData?.count == 0) nodeUIItem.node.shareData else null
+        val shareData = if (isContactVerificationOn && nodeUIItem.node.shareData?.count == 0) {
+            nodeUIItem.node.shareData
+        } else {
+            null
+        }
         (requireActivity() as ManagerActivity).showNodeOptionsPanel(
             nodeId = nodeUIItem.id,
             mode = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,

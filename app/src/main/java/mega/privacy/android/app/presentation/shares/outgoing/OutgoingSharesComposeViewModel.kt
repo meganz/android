@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -85,6 +86,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OutgoingSharesState())
@@ -100,6 +102,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     private val handleStack = Stack<Long>()
 
     init {
+        checkContactVerificationWarning()
         refreshNodes()
         monitorChildrenNodes()
         monitorContactUpdates()
@@ -107,6 +110,20 @@ class OutgoingSharesComposeViewModel @Inject constructor(
         monitorRefreshSession()
         monitorOfflineNodes()
         monitorConnectivity()
+    }
+
+    private fun checkContactVerificationWarning() {
+        viewModelScope.launch {
+            runCatching {
+                getContactVerificationWarningUseCase()
+            }.onSuccess { enabled ->
+                _state.update {
+                    it.copy(isContactVerificationOn = enabled)
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     private fun monitorContactUpdates() {

@@ -8,17 +8,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -92,6 +89,7 @@ import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorDevicePowerConnectionStateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -281,6 +279,7 @@ class ManagerViewModel @Inject constructor(
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val legacyState: LegacyPsaGlobalState,
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     @ApplicationScope private val appScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -366,23 +365,13 @@ class ManagerViewModel @Inject constructor(
         initialiseNoteToSelfChat()
 
         viewModelScope.launch {
-            val order = getCloudSortOrder()
-            combine(
-                isFirstLogin,
-                flowOf(getUnverifiedIncomingShares(order) + getUnverifiedOutgoingShares(order))
-                    .map { it.size },
-            ) { firstLogin: Boolean, pendingShares: Int ->
-                { state: ManagerState ->
-                    state.copy(
-                        isFirstLogin = firstLogin,
-                        pendingActionsCount = state.pendingActionsCount + pendingShares,
-                    )
-                }
-            }.collectLatest {
-                _state.update(it)
+            isFirstLogin.collect { isFirstLogin ->
+                _state.update { it.copy(isFirstLogin = isFirstLogin) }
             }
         }
-
+        viewModelScope.launch {
+            checkUnverifiedSharesCount()
+        }
         viewModelScope.launch {
             monitorNodeUpdatesUseCase().collect {
                 onReceiveNodeUpdate(true)
@@ -658,10 +647,18 @@ class ManagerViewModel @Inject constructor(
      *  Get the unverified shares count and set state
      */
     private suspend fun checkUnverifiedSharesCount() {
-        val sortOrder = getCloudSortOrder()
-        val unverifiedIncomingShares = getUnverifiedIncomingShares(sortOrder).size
-        val unverifiedOutgoingShares = getUnverifiedOutgoingShares(sortOrder).size
-        _state.update { it.copy(pendingActionsCount = unverifiedIncomingShares + unverifiedOutgoingShares) }
+        runCatching {
+            if (getContactVerificationWarningUseCase()) {
+                val sortOrder = getCloudSortOrder()
+                val unverifiedIncomingShares = getUnverifiedIncomingShares(sortOrder).size
+                val unverifiedOutgoingShares = getUnverifiedOutgoingShares(sortOrder).size
+                unverifiedIncomingShares + unverifiedOutgoingShares
+            } else 0
+        }.onSuccess { totalCount ->
+            _state.update { it.copy(pendingActionsCount = totalCount) }
+        }.onFailure {
+            Timber.e(it)
+        }
     }
 
     /**

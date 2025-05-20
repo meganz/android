@@ -20,14 +20,14 @@ import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.node.shares.ShareNode
+import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.utils.ListGridStateMap
 import mega.privacy.android.shared.original.core.ui.utils.getState
 import mega.privacy.android.shared.original.core.ui.utils.sync
-import mega.privacy.android.domain.entity.node.shares.ShareNode
-import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 
 /**
  * Composable view for Outgoing Shares
@@ -107,6 +107,7 @@ fun OutgoingSharesView(
                 onEnterMediaDiscoveryClick = { },
                 listContentPadding = PaddingValues(top = 18.dp),
                 fileTypeIconMapper = fileTypeIconMapper,
+                isContactVerificationOn = uiState.isContactVerificationOn,
                 inSelectionMode = uiState.isInSelection
             )
         } else {

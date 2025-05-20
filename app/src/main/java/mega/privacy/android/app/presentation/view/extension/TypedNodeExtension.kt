@@ -67,9 +67,11 @@ internal fun TypedNode.getNodeItemThumbnail(
 }
 
 @Composable
-internal fun ShareFolderNode?.getSharesIcon(): Int? =
+internal fun ShareFolderNode?.getSharesIcon(
+    isContactVerificationOn: Boolean,
+): Int? =
     this?.shareData?.let { shareData ->
-        if (shareData.isUnverifiedDistinctNode) {
+        if (isContactVerificationOn && shareData.isUnverifiedDistinctNode) {
             mega.privacy.android.core.R.drawable.ic_alert_triangle
         } else if (this.node.isIncomingShare) {
             when (shareData.access) {

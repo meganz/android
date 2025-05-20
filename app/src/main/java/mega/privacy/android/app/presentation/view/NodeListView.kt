@@ -55,6 +55,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
  * @param modifier
  * @param showChangeViewType whether to show change view type button
  * @param listContentPadding the content padding of the list/lazyColumn
+ * @param isContactVerificationOn whether contact verification is enabled
  */
 @Composable
 fun <T : TypedNode> NodeListView(
@@ -79,6 +80,7 @@ fun <T : TypedNode> NodeListView(
     showPublicLinkCreationTime: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     inSelectionMode: Boolean = false,
+    isContactVerificationOn: Boolean = false,
     nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
     FastScrollLazyColumn(
@@ -126,13 +128,14 @@ fun <T : TypedNode> NodeListView(
                 onMoreClicked = { onMenuClick(nodeUiItem) }.takeUnless { _ -> inSelectionMode },
                 onItemClicked = { onItemClicked(nodeUiItem) },
                 onLongClick = { onLongClick(nodeUiItem) },
-                accessPermissionIcon = (nodeUiItem.node as? ShareFolderNode).getSharesIcon(),
+                accessPermissionIcon = (nodeUiItem.node as? ShareFolderNode)
+                    .getSharesIcon(isContactVerificationOn),
                 labelColor = nodeUiItem.node.getNodeLabel(),
                 highlightText = highlightText,
                 showOffline = nodeUiItem.isAvailableOffline,
                 showLink = showLinkIcon && nodeUiItem.exportedData != null,
                 showFavourite = nodeUiItem.isFavourite && nodeUiItem.isIncomingShare.not(),
-                showIsVerified = nodeUiItem.isIncomingShare && (nodeUiItem.node as? ShareFolderNode)?.shareData?.isContactCredentialsVerified == true,
+                showIsVerified = isContactVerificationOn && nodeUiItem.isIncomingShare && (nodeUiItem.node as? ShareFolderNode)?.shareData?.isContactCredentialsVerified == true,
                 showVersion = nodeUiItem.hasVersion,
                 isTakenDown = nodeUiItem.isTakenDown,
                 isSensitive = nodeSourceType != NodeSourceType.INCOMING_SHARES

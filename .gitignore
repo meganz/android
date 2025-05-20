@@ -15,6 +15,7 @@
 .idea/appInsightsSettings.xml
 .idea/other.xml
 .idea/AndroidProjectSystem.xml
+.idea/codeStyles/Project.xml
 
 # User-specific stuff:
 .idea/workspace.xml

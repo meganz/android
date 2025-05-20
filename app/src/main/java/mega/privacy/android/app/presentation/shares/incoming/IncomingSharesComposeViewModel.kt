@@ -192,9 +192,14 @@ class IncomingSharesComposeViewModel @Inject constructor(
 
     private fun checkContactVerification() {
         viewModelScope.launch {
-            val isContactVerificationOn = getContactVerificationWarningUseCase()
-            _state.update {
-                it.copy(isContactVerificationOn = isContactVerificationOn)
+            runCatching {
+                getContactVerificationWarningUseCase()
+            }.onSuccess { enabled ->
+                _state.update {
+                    it.copy(isContactVerificationOn = enabled)
+                }
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }

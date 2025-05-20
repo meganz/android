@@ -104,6 +104,7 @@ import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
@@ -341,6 +342,8 @@ class ManagerViewModelTest {
     private val fakeCallUpdatesFlow = MutableSharedFlow<ChatCall>()
     private var monitorDevicePowerConnectionFakeFlow =
         MutableSharedFlow<DevicePowerConnectionState>()
+    private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
+
 
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock {
         onBlocking { invoke() }.thenReturn(fakeCallUpdatesFlow)
@@ -452,6 +455,7 @@ class ManagerViewModelTest {
             versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper,
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
+            getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
             legacyState = legacyState,
             appScope = appScope,
         )
@@ -523,6 +527,7 @@ class ManagerViewModelTest {
         wheneverBlocking { getNumUnreadPromoNotificationsUseCase() }.thenReturn(0)
         wheneverBlocking { getIncomingContactRequestUseCase() }.thenReturn(emptyList())
         whenever(monitorContactRequestUpdatesUseCase()).thenReturn(emptyFlow())
+        wheneverBlocking { getContactVerificationWarningUseCase() }.thenReturn(true)
         monitorNodeUpdatesFakeFlow = MutableSharedFlow()
         monitorSyncsUseCaseFakeFlow = MutableSharedFlow()
         monitorMyAccountUpdateFakeFlow = MutableSharedFlow()

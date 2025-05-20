@@ -50,6 +50,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.TEST_TAG_APP
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import java.text.NumberFormat
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -69,7 +70,7 @@ internal fun SharesScreen(
     val pagerState = rememberPagerState(initialPage = uiState.currentTab.position) { 3 }
     val unverifiedIncoming =
         incomingUiState.nodesList.count { it.node.shareData?.isUnverifiedDistinctNode == true }
-    val unVerifiedOutgoing =
+    val unverifiedOutgoing =
         outgoingUiState.nodesList.count { it.node.shareData?.isUnverifiedDistinctNode == true }
     val elevationState by remember { mutableStateOf(BooleanArray(3)) }
     var isScrolled by remember { mutableStateOf(false) }
@@ -170,6 +171,7 @@ internal fun SharesScreen(
                             }
                         }
                     )
+
                     Tabs(
                         modifier = Modifier.testTag(TAB_ROW_TEST_TAG),
                         shouldTabsShown = isTabShown,
@@ -177,18 +179,16 @@ internal fun SharesScreen(
                     ) {
                         SharesTab.entries.filter { it != SharesTab.NONE }
                             .forEachIndexed { page, item ->
+                                val badgeCount = when {
+                                    !incomingUiState.isContactVerificationOn -> null
+                                    item == SharesTab.INCOMING_TAB && unverifiedIncoming > 0 -> unverifiedIncoming
+                                    item == SharesTab.OUTGOING_TAB && unverifiedOutgoing > 0 -> unverifiedOutgoing
+                                    else -> null
+                                }
                                 addTextTab(
                                     text = stringResource(item.stringRes),
-                                    badge = when {
-                                        item == SharesTab.INCOMING_TAB && unverifiedIncoming > 0 -> {
-                                            "$unverifiedIncoming"
-                                        }
-
-                                        item == SharesTab.OUTGOING_TAB && unVerifiedOutgoing > 0 -> {
-                                            "$unVerifiedOutgoing"
-                                        }
-
-                                        else -> null
+                                    badge = badgeCount?.let {
+                                        NumberFormat.getInstance().format(it)
                                     },
                                     tag = item.name,
                                 )

@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param showMediaDiscoveryButton whether to show media discovery button
  * @param onEnterMediaDiscoveryClick callback for enter media discovery click
  * @param listContentPadding the content padding of the list/lazyColumn
+ * @param isContactVerificationOn whether contact verification is enabled
  */
 @Composable
 fun <T : TypedNode> NodesView(
@@ -73,6 +74,7 @@ fun <T : TypedNode> NodesView(
     showMediaDiscoveryButton: Boolean = false,
     showPublicLinkCreationTime: Boolean = false,
     isPublicNode: Boolean = false,
+    isContactVerificationOn: Boolean = false,
     inSelectionMode: Boolean = false,
     onEnterMediaDiscoveryClick: () -> Unit = {},
     listContentPadding: PaddingValues = PaddingValues(0.dp),
@@ -122,6 +124,7 @@ fun <T : TypedNode> NodesView(
             fileTypeIconMapper = fileTypeIconMapper,
             inSelectionMode = inSelectionMode,
             shouldApplySensitiveMode = shouldApplySensitiveMode,
+            isContactVerificationOn = isContactVerificationOn,
             nodeSourceType = nodeSourceType,
         )
     } else {
