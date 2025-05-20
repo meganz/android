@@ -39,6 +39,7 @@ import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.onboarding.TourScreen
 import mega.privacy.android.app.presentation.login.onboarding.openTourScreen
 import mega.privacy.android.app.presentation.login.onboarding.tourScreen
+import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
@@ -56,6 +57,19 @@ class LoginActivity : BaseActivity() {
 
     @Inject
     lateinit var chatRequestHandler: MegaChatRequestHandler
+
+    private val disabledPasscodeCheck = object : PasscodeCheck {
+        override fun disablePasscode() {
+//            no-op
+        }
+
+        override fun enablePassCode() {
+//            no-op
+        }
+
+        override fun canLock() = false
+
+    }
 
     private val viewModel by viewModels<LoginViewModel>()
 
@@ -89,7 +103,7 @@ class LoginActivity : BaseActivity() {
             keepShowingSplashScreen
         }
         super.onCreate(savedInstanceState)
-
+        appContainerWrapper.setPasscodeCheck(disabledPasscodeCheck)
         if (intent.action == Intent.ACTION_MAIN
             && intent.hasCategory(Intent.CATEGORY_LAUNCHER)
             && !viewModel.isConnected

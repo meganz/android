@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.passcode.view.PasscodeLoadingView
 import mega.privacy.android.app.presentation.passcode.view.PasscodeView
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import timber.log.Timber
@@ -17,7 +18,7 @@ internal fun PasscodeContainer(
     passcodeUI: @Composable () -> Unit = { PasscodeView(cryptObjectFactory = passcodeCryptObjectFactory) },
     viewModel: PasscodeCheckViewModel = viewModel(),
     canLock: () -> Boolean = { true },
-    loading: @Composable (() -> Unit)? = null,
+    loading: @Composable (() -> Unit) = { PasscodeLoadingView() },
     content: @Composable () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -27,14 +28,25 @@ internal fun PasscodeContainer(
     }
 
     Box {
-        if (loading != null && state is PasscodeCheckState.Loading) {
-            loading()
-        } else {
-            content()
-        }
+        when (state) {
+            is PasscodeCheckState.Locked -> {
+                if (canLock()) {
+                    Timber.d("PasscodeContainer: canLock() == true, showing lock screen.")
+                    passcodeUI()
+                } else {
+                    Timber.d("PasscodeContainer: canLock() == false, showing content")
+                    content()
+                }
+            }
 
-        if (state is PasscodeCheckState.Locked && canLock()) {
-            passcodeUI()
+            is PasscodeCheckState.Loading -> {
+                Timber.d("PasscodeContainer: unlocked")
+                loading()
+            }
+
+            PasscodeCheckState.UnLocked -> {
+                content()
+            }
         }
     }
 }

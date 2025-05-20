@@ -101,7 +101,7 @@ class PasscodeContainerTest {
     }
 
     @Test
-    fun `test that content is displayed while loading if no loading defined`() {
+    fun `test that nothing is displayed while loading if no loading defined`() {
         passcodeCheckViewModel.stub {
             on { state }.thenReturn(MutableStateFlow(PasscodeCheckState.Loading))
         }
@@ -116,6 +116,6 @@ class PasscodeContainerTest {
             )
         }
 
-        composeTestRule.onNodeWithText(expected).assertIsDisplayed()
+        composeTestRule.onNodeWithText(expected).assertDoesNotExist()
     }
 }

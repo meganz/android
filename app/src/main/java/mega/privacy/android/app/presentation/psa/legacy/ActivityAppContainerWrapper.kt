@@ -24,6 +24,7 @@ import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.usecase.GetThemeMode
+import timber.log.Timber
 import java.security.InvalidParameterException
 import javax.inject.Inject
 
@@ -70,6 +71,9 @@ class ActivityAppContainerWrapper @Inject constructor(
                 .apply {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
                     setContent {
+                        LaunchedEffect(Unit) {
+                            Timber.d("LegacyMegaAppContainer view added for activity $activity")
+                        }
                         val themeMode by getThemeMode()
                             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                         val viewModel: PsaViewModel = hiltViewModel()
@@ -117,7 +121,7 @@ class ActivityAppContainerWrapper @Inject constructor(
                             },
                             themeMode = themeMode,
                             passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                            canLock = { passcodeCheck?.canLock() ?: true },
+                            canLock = { passcodeCheck?.canLock() != false },
                         )
                     }
                 }.apply {
