@@ -22,7 +22,7 @@ fun ClearAllTransfersDialog(
     modifier: Modifier = Modifier,
 ) = ConfirmationDialog(
     modifier = modifier.testTag(TEST_TAG_CLEAR_ALL_TRANSFERS_DIALOG),
-    text = stringResource(id = R.string.option_to_clear_transfers),
+    title = stringResource(id = R.string.option_to_clear_transfers),
     confirmButtonText = stringResource(id = R.string.general_clear),
     onDismiss = onDismiss,
     cancelButtonText = stringResource(id = R.string.general_dismiss),

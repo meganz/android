@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.view
 
 import androidx.activity.ComponentActivity
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -13,7 +12,6 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_MORE_ACTION
@@ -21,13 +19,16 @@ import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_RESUME_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
+import mega.privacy.android.app.presentation.transfers.model.image.CompletedTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import nz.mega.sdk.MegaTransfer
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,24 +47,34 @@ class TransfersViewTest {
     private val onPlayPauseTransfer: (Int) -> Unit = mock()
     private val onResumeTransfers: () -> Unit = mock()
     private val onPauseTransfers: () -> Unit = mock()
-    private val showInProgressModal: () -> Unit = mock()
     private val tag1 = 1
     private val tag2 = 2
     private val state =
         TransferImageUiState(fileTypeResId = iconPackR.drawable.ic_text_medium_solid)
-    private val viewModel = mock<ActiveTransferImageViewModel> {
+    private val activeTransferViewModel = mock<ActiveTransferImageViewModel> {
+        on { getUiStateFlow(tag1) } doReturn MutableStateFlow(state)
+        on { getUiStateFlow(tag2) } doReturn MutableStateFlow(state)
+    }
+    private val completedTransferImageViewModel = mock<CompletedTransferImageViewModel> {
         on { getUiStateFlow(tag1) } doReturn MutableStateFlow(state)
         on { getUiStateFlow(tag2) } doReturn MutableStateFlow(state)
     }
     private val viewModelStore = mock<ViewModelStore> {
-        on { get(argThat<String> { contains(ActiveTransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn viewModel
+        on { get(argThat<String> { contains(ActiveTransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn activeTransferViewModel
+        on { get(argThat<String> { contains(CompletedTransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn completedTransferImageViewModel
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore
     }
     private val inProgressTransfers = listOf(
-        getTransfer(tag = tag1),
-        getTransfer(tag = tag2),
+        getActiveTransfer(tag = tag1),
+        getActiveTransfer(tag = tag2),
+    ).toImmutableList()
+    private val completedTransfers = listOf(
+        getCompletedTransfer(tag1, MegaTransfer.STATE_COMPLETED),
+    ).toImmutableList()
+    private val failedTransfers = listOf(
+        getCompletedTransfer(tag2, MegaTransfer.STATE_FAILED),
     ).toImmutableList()
 
     @Test
@@ -76,6 +87,21 @@ class TransfersViewTest {
             onNodeWithTag(TEST_TAG_TRANSFERS_VIEW).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_EMPTY_TRANSFERS_VIEW).assertIsDisplayed()
             onNodeWithText(emptyText).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that no TransferMenuAction is displayed if it is in the active tab but there are no active transfers`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = ACTIVE_TAB_INDEX,
+                activeTransfers = emptyList<InProgressTransfer>().toImmutableList(),
+            )
+        )
+        with(composeTestRule) {
+            onNodeWithTag(TEST_TAG_MORE_ACTION).assertDoesNotExist()
+            onNodeWithTag(TEST_TAG_PAUSE_ACTION).assertDoesNotExist()
+            onNodeWithTag(TEST_TAG_RESUME_ACTION).assertDoesNotExist()
         }
     }
 
@@ -97,7 +123,7 @@ class TransfersViewTest {
     }
 
     @Test
-    fun `test that resume TransferMenuAction is displayed if transfers are already paused and click action invokes correctly`() {
+    fun `test that resume TransferMenuAction is displayed if it is in the active tab, are transfers already paused and click action invokes correctly`() {
         initComposeTestRule(
             uiState = TransfersUiState(
                 activeTransfers = inProgressTransfers,
@@ -114,15 +140,69 @@ class TransfersViewTest {
     }
 
     @Test
-    fun `test that cancel all transfers TransferMenuAction is displayed if transfers are already paused and click action invokes correctly`() {
-        initComposeTestRule(uiState = TransfersUiState(activeTransfers = inProgressTransfers))
+    fun `test that more TransferMenuAction is displayed if it is the active tab, there are active transfers`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = ACTIVE_TAB_INDEX,
+                activeTransfers = inProgressTransfers
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that no TransferMenuAction is displayed if it is in the completed tab but there are no completed transfers`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = COMPLETED_TAB_INDEX,
+                completedTransfers = emptyList<CompletedTransfer>().toImmutableList(),
+            )
+        )
         with(composeTestRule) {
-            onNodeWithTag(TEST_TAG_MORE_ACTION).apply {
-                assertIsDisplayed()
-                performClick()
-                verify(showInProgressModal).invoke()
-            }
+            onNodeWithTag(TEST_TAG_MORE_ACTION).assertDoesNotExist()
+            onNodeWithTag(TEST_TAG_PAUSE_ACTION).assertDoesNotExist()
+            onNodeWithTag(TEST_TAG_RESUME_ACTION).assertDoesNotExist()
         }
+    }
+
+    @Test
+    fun `test that more TransferMenuAction is displayed if it is the completed tab, there are completed transfers`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = COMPLETED_TAB_INDEX,
+                completedTransfers = completedTransfers,
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that no TransferMenuAction is displayed if it is in the failed tab but there are no failed transfers`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = FAILED_TAB_INDEX,
+                failedTransfers = emptyList<CompletedTransfer>().toImmutableList(),
+            )
+        )
+        with(composeTestRule) {
+            onNodeWithTag(TEST_TAG_MORE_ACTION).assertDoesNotExist()
+            onNodeWithTag(TEST_TAG_PAUSE_ACTION).assertDoesNotExist()
+            onNodeWithTag(TEST_TAG_RESUME_ACTION).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun `test that more TransferMenuAction is displayed if it is the failed tab, there are failed transfers`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = FAILED_TAB_INDEX,
+                failedTransfers = failedTransfers,
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).assertIsDisplayed()
     }
 
     @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -130,21 +210,22 @@ class TransfersViewTest {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
                 TransfersView(
-                    bottomSheetNavigator = rememberBottomSheetNavigator(),
-                    scaffoldState = rememberScaffoldState(),
                     onBackPress = {},
                     uiState = uiState,
                     onTabSelected = {},
                     onPlayPauseTransfer = onPlayPauseTransfer,
                     onResumeTransfers = onResumeTransfers,
                     onPauseTransfers = onPauseTransfers,
-                    onMoreInProgressActions = showInProgressModal,
+                    onRetryFailedTransfers = {},
+                    onCancelAllFailedTransfers = {},
+                    onClearAllFailedTransfers = {},
+                    onClearAllCompletedTransfers = {},
                 )
             }
         }
     }
 
-    private fun getTransfer(tag: Int) = InProgressTransfer.Download(
+    private fun getActiveTransfer(tag: Int) = InProgressTransfer.Download(
         uniqueId = tag.toLong(),
         tag = tag,
         totalBytes = 100,
@@ -155,5 +236,21 @@ class TransfersViewTest {
         priority = BigInteger.ONE,
         progress = Progress(0.5F),
         nodeId = NodeId(1),
+    )
+
+    private fun getCompletedTransfer(id: Int, state: Int) = CompletedTransfer(
+        id = id,
+        fileName = "$id-fileName",
+        type = 1,
+        state = state,
+        size = "3.57 MB",
+        handle = 27169983390750L,
+        path = "Cloud drive",
+        isOffline = false,
+        timestamp = 1684228012974L,
+        error = "Error",
+        originalPath = "/data/user/0/mega.privacy.android.app/DCIM/Camera/$id-fileName",
+        parentHandle = 11622336899311L,
+        appData = "appData",
     )
 }

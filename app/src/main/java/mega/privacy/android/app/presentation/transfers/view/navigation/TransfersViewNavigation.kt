@@ -1,44 +1,42 @@
-package mega.privacy.android.app.presentation.transfers.view.navigation.compose
+package mega.privacy.android.app.presentation.transfers.view.navigation
 
-import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.sharedViewModel
+import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
+import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
 
 internal const val transfersRoute = "transfers"
 
+@Serializable
+class TransfersInfo(
+    val tabIndex: Int = ACTIVE_TAB_INDEX,
+)
+
 @OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.transfersScreen(
-    navHostController: NavHostController,
-    bottomSheetNavigator: BottomSheetNavigator,
-    scaffoldState: ScaffoldState,
     onBackPress: () -> Unit,
-    showInProgressModal: () -> Unit,
 ) {
-    composable(
-        route = transfersRoute
-    ) { backStackEntry ->
-        val viewModel =
-            backStackEntry.sharedViewModel<TransfersViewModel>(navController = navHostController)
+    composable<TransfersInfo> { backStackEntry ->
+        val viewModel = hiltViewModel<TransfersViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         TransfersView(
-            bottomSheetNavigator = bottomSheetNavigator,
-            scaffoldState = scaffoldState,
             onBackPress = onBackPress,
             uiState = uiState,
             onTabSelected = viewModel::updateSelectedTab,
             onPlayPauseTransfer = viewModel::playOrPauseTransfer,
             onResumeTransfers = viewModel::resumeTransfersQueue,
             onPauseTransfers = viewModel::pauseTransfersQueue,
-            onMoreInProgressActions = showInProgressModal,
+            onRetryFailedTransfers = viewModel::retryAllFailedTransfers,
+            onCancelAllFailedTransfers = viewModel::cancelAllTransfers,
+            onClearAllFailedTransfers = viewModel::clearAllFailedTransfers,
+            onClearAllCompletedTransfers = viewModel::clearAllCompletedTransfers,
         )
     }
 }

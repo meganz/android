@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.transfers.view.navigation.compose.tabIndexArg
+import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
@@ -75,7 +75,7 @@ class TransfersViewModelTest {
     }
 
     private fun initTestClass() {
-        val savedStateHandle = SavedStateHandle(mapOf(tabIndexArg to 0.toString()))
+        val savedStateHandle = SavedStateHandle(mapOf(EXTRA_TAB to 0))
         underTest = TransfersViewModel(
             monitorInProgressTransfersUseCase = monitorInProgressTransfersUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,

@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.transfers.model
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.transfers.view.navigation.compose.TransfersArgs
+import mega.privacy.android.app.presentation.transfers.view.navigation.TransfersInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
@@ -45,18 +46,18 @@ class TransfersViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TransfersUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val transfersArgs = TransfersArgs(savedStateHandle)
+    private val transfersInfo = savedStateHandle.toRoute<TransfersInfo>()
 
     init {
-        updateSelectedTab(transfersArgs.tabIndex)
-        monitoractiveTransfers()
+        updateSelectedTab(transfersInfo.tabIndex)
+        monitorActiveTransfers()
         monitorStorageOverQuota()
         monitorTransferOverQuota()
         monitorPausedTransfers()
         monitorCompletedTransfers()
     }
 
-    private fun monitoractiveTransfers() {
+    private fun monitorActiveTransfers() {
         viewModelScope.launch {
             monitorInProgressTransfersUseCase().collectLatest { activeTransfers ->
                 _uiState.update { state ->
@@ -176,6 +177,39 @@ class TransfersViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching { cancelTransfersUseCase() }
                 .onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Retry all failed transfers.
+     */
+    fun retryAllFailedTransfers() {
+        viewModelScope.launch {
+            runCatching {
+
+            }.onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Clear all failed transfers.
+     */
+    fun clearAllFailedTransfers() {
+        viewModelScope.launch {
+            runCatching {
+
+            }.onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Clear all completed transfers.
+     */
+    fun clearAllCompletedTransfers() {
+        viewModelScope.launch {
+            runCatching {
+
+            }.onFailure { Timber.e(it) }
         }
     }
 }

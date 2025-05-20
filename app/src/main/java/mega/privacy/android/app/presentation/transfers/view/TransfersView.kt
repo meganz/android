@@ -6,9 +6,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -16,9 +20,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.model.MegaSpanStyle
@@ -32,109 +34,161 @@ import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
 import mega.privacy.android.app.presentation.transfers.view.active.ActiveTransfersView
 import mega.privacy.android.app.presentation.transfers.view.completed.CompletedTransfersView
+import mega.privacy.android.app.presentation.transfers.view.dialog.CancelAllTransfersDialog
+import mega.privacy.android.app.presentation.transfers.view.dialog.ClearAllTransfersDialog
 import mega.privacy.android.app.presentation.transfers.view.failed.FailedTransfersView
+import mega.privacy.android.app.presentation.transfers.view.sheet.ActiveTransfersActionsBottomSheet
+import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTransfersActionsBottomSheet
+import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfersActionsBottomSheet
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun TransfersView(
-    bottomSheetNavigator: BottomSheetNavigator,
-    scaffoldState: ScaffoldState,
     onBackPress: () -> Unit,
     uiState: TransfersUiState,
     onTabSelected: (Int) -> Unit,
     onPlayPauseTransfer: (Int) -> Unit,
     onResumeTransfers: () -> Unit,
     onPauseTransfers: () -> Unit,
-    onMoreInProgressActions: () -> Unit,
+    onRetryFailedTransfers: () -> Unit,
+    onCancelAllFailedTransfers: () -> Unit,
+    onClearAllCompletedTransfers: () -> Unit,
+    onClearAllFailedTransfers: () -> Unit,
 ) = with(uiState) {
-    MegaBottomSheetLayout(
-        modifier = Modifier.semantics {
-            testTagsAsResourceId = true
-        },
-        bottomSheetNavigator = bottomSheetNavigator
-    ) {
-        MegaScaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding()
-                .imePadding()
-                .semantics { testTagsAsResourceId = true }
-                .testTag(TEST_TAG_TRANSFERS_VIEW),
-            scaffoldState = scaffoldState,
-            topBar = {
-                MegaAppBar(
-                    appBarType = AppBarType.BACK_NAVIGATION,
-                    title = stringResource(id = R.string.section_transfers),
-                    onNavigationPressed = onBackPress,
-                    actions = getTransferActions(uiState),
-                    onActionPressed = { action ->
-                        when (action) {
-                            TransferMenuAction.Pause -> onPauseTransfers()
-                            TransferMenuAction.Resume -> onResumeTransfers()
-                            TransferMenuAction.More -> onMoreInProgressActions()
-                        }
-                    },
-                    elevation = 0.dp,
-                )
-            },
-        ) { paddingValues ->
-            val noTransfers =
-                activeTransfers.isEmpty() && completedTransfers.isEmpty() && failedTransfers.isEmpty()
+    var showActiveTransfersModal by rememberSaveable { mutableStateOf(false) }
+    var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
+    var showFailedTransfersModal by rememberSaveable { mutableStateOf(false) }
+    var showCancelAllTransfersDialog by rememberSaveable { mutableStateOf(false) }
+    var showClearAllTransfersDialog by rememberSaveable { mutableStateOf(false) }
 
-            if (noTransfers) {
-                EmptyTransfersView(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .testTag(TEST_TAG_EMPTY_TRANSFERS_VIEW),
-                    emptyStringId = sharedR.string.transfers_no_transfers_empty_text,
-                )
-            } else {
-                MegaScrollableTabRow(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .fillMaxSize(),
-                    beyondViewportPageCount = 1,
-                    cells = {
-                        addTextTab(
-                            tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_active_transfers)),
-                        ) {
-                            ActiveTransfersView(
-                                activeTransfers = activeTransfers,
-                                isOverQuota = isOverQuota,
-                                areTransfersPaused = areTransfersPaused,
-                                onPlayPauseClicked = onPlayPauseTransfer,
-                            )
+    MegaScaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+            .imePadding()
+            .semantics { testTagsAsResourceId = true }
+            .testTag(TEST_TAG_TRANSFERS_VIEW),
+        scaffoldState = rememberScaffoldState(),
+        topBar = {
+            MegaAppBar(
+                appBarType = AppBarType.BACK_NAVIGATION,
+                title = stringResource(id = R.string.section_transfers),
+                onNavigationPressed = onBackPress,
+                actions = getTransferActions(uiState),
+                onActionPressed = { action ->
+                    when (action) {
+                        TransferMenuAction.Pause -> onPauseTransfers()
+                        TransferMenuAction.Resume -> onResumeTransfers()
+                        TransferMenuAction.More -> {
+                            when (selectedTab) {
+                                ACTIVE_TAB_INDEX -> showActiveTransfersModal = true
+                                COMPLETED_TAB_INDEX -> showCompletedTransfersModal = true
+                                FAILED_TAB_INDEX -> showFailedTransfersModal = true
+                            }
                         }
-                        addTextTab(
-                            tabItem = TabItems(stringResource(id = R.string.title_tab_completed_transfers)),
-                        ) {
-                            CompletedTransfersView(
-                                completedTransfers = completedTransfers,
-                            )
-                        }
-                        addTextTab(
-                            tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_failed_transfers)),
-                        ) {
-                            FailedTransfersView(
-                                failedTransfers = failedTransfers,
-                            )
-                        }
-                    },
-                    initialSelectedIndex = selectedTab,
-                    onTabSelected = {
-                        onTabSelected(it)
-                        true
-                    },
-                )
-            }
+                    }
+                },
+                elevation = 0.dp,
+            )
+        },
+    ) { paddingValues ->
+        val noTransfers =
+            activeTransfers.isEmpty() && completedTransfers.isEmpty() && failedTransfers.isEmpty()
+
+        if (noTransfers) {
+            EmptyTransfersView(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .testTag(TEST_TAG_EMPTY_TRANSFERS_VIEW),
+                emptyStringId = sharedR.string.transfers_no_transfers_empty_text,
+            )
+        } else {
+            MegaScrollableTabRow(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
+                beyondViewportPageCount = 1,
+                cells = {
+                    addTextTab(
+                        tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_active_transfers)),
+                    ) {
+                        ActiveTransfersView(
+                            activeTransfers = activeTransfers,
+                            isOverQuota = isOverQuota,
+                            areTransfersPaused = areTransfersPaused,
+                            onPlayPauseClicked = onPlayPauseTransfer,
+                        )
+                    }
+                    addTextTab(
+                        tabItem = TabItems(stringResource(id = R.string.title_tab_completed_transfers)),
+                    ) {
+                        CompletedTransfersView(
+                            completedTransfers = completedTransfers,
+                        )
+                    }
+                    addTextTab(
+                        tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_failed_transfers)),
+                    ) {
+                        FailedTransfersView(
+                            failedTransfers = failedTransfers,
+                        )
+                    }
+                },
+                initialSelectedIndex = selectedTab,
+                onTabSelected = {
+                    onTabSelected(it)
+                    true
+                },
+            )
+        }
+
+        if (showActiveTransfersModal) {
+            ActiveTransfersActionsBottomSheet(
+                onSelectTransfers = {},
+                onCancelAllTransfers = { showCancelAllTransfersDialog = true },
+                onDismissSheet = { showActiveTransfersModal = false },
+            )
+        }
+
+        if (showCompletedTransfersModal) {
+            CompletedTransfersActionsBottomSheet(
+                onClearAllTransfers = { showClearAllTransfersDialog = true },
+                onDismissSheet = { showCompletedTransfersModal = false },
+            )
+        }
+
+        if (showFailedTransfersModal) {
+            FailedTransfersActionsBottomSheet(
+                onRetryAllTransfers = onRetryFailedTransfers,
+                onClearAllTransfers = { showClearAllTransfersDialog = true },
+                onDismissSheet = { showFailedTransfersModal = false },
+            )
+        }
+
+        if (showCancelAllTransfersDialog) {
+            CancelAllTransfersDialog(
+                onCancelAllTransfers = onCancelAllFailedTransfers,
+                onDismiss = { showCancelAllTransfersDialog = false },
+            )
+        }
+
+        if (showClearAllTransfersDialog) {
+            ClearAllTransfersDialog(
+                onClearAllTransfers = {
+                    when (selectedTab) {
+                        COMPLETED_TAB_INDEX -> onClearAllCompletedTransfers()
+                        FAILED_TAB_INDEX -> onClearAllFailedTransfers()
+                    }
+                },
+                onDismiss = { showClearAllTransfersDialog = false },
+            )
         }
     }
 }
@@ -162,13 +216,23 @@ internal fun EmptyTransfersView(
 
 private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
     buildList {
-        if (selectedTab == ACTIVE_TAB_INDEX && activeTransfers.isNotEmpty()) {
-            if (areTransfersPaused) {
-                add(TransferMenuAction.Resume)
-            } else {
-                add(TransferMenuAction.Pause)
+        when {
+            selectedTab == ACTIVE_TAB_INDEX && activeTransfers.isNotEmpty() -> {
+                if (areTransfersPaused) {
+                    add(TransferMenuAction.Resume)
+                } else {
+                    add(TransferMenuAction.Pause)
+                }
+                add(TransferMenuAction.More)
             }
-            add(TransferMenuAction.More)
+
+            selectedTab == COMPLETED_TAB_INDEX && completedTransfers.isNotEmpty() -> {
+                add(TransferMenuAction.More)
+            }
+
+            selectedTab == FAILED_TAB_INDEX && failedTransfers.isNotEmpty() -> {
+                add(TransferMenuAction.More)
+            }
         }
     }
 }
@@ -179,15 +243,16 @@ private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
 private fun TransfersViewPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         TransfersView(
-            bottomSheetNavigator = rememberBottomSheetNavigator(),
-            scaffoldState = rememberScaffoldState(),
             onBackPress = {},
             uiState = TransfersUiState(),
             onTabSelected = {},
             onPlayPauseTransfer = {},
             onResumeTransfers = {},
             onPauseTransfers = {},
-            onMoreInProgressActions = {},
+            onRetryFailedTransfers = {},
+            onCancelAllFailedTransfers = {},
+            onClearAllCompletedTransfers = {},
+            onClearAllFailedTransfers = {},
         )
     }
 }
