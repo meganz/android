@@ -2662,7 +2662,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         setAppBarColor(ContextCompat.getColor(this, R.color.teal_500_teal_400))
     }
 
-    private fun actionOpenFolder(handleIntent: Long) {
+    private fun actionOpenFolder(handleIntent: Long, highlightedNames: List<String>? = null) {
         if (handleIntent == INVALID_HANDLE) {
             Timber.w("handleIntent is not valid")
             return
@@ -2685,7 +2685,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 backupsFragment?.updateBackupsHandle(handleIntent)
                 DrawerItem.BACKUPS
             } else {
-                fileBrowserViewModel.setFileBrowserHandle(handleIntent)
+                fileBrowserViewModel.setFileBrowserHandle(
+                    handleIntent,
+                    highlightedNames = highlightedNames
+                )
                 DrawerItem.CLOUD_DRIVE
             }
         }
@@ -2886,6 +2889,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     Timber.d("Open after LauncherFileExplorerActivity ")
                     val handleIntent: Long =
                         intent.getLongExtra(Constants.INTENT_EXTRA_KEY_PARENT_HANDLE, -1)
+                    val highlightedNames = intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES)
                     if (intent.getBooleanExtra(Constants.SHOW_MESSAGE_UPLOAD_STARTED, false)) {
                         val numberUploads: Int =
                             intent.getIntExtra(Constants.NUMBER_UPLOADS, 1)
@@ -2906,7 +2910,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             MEGACHAT_INVALID_HANDLE
                         )
                     }
-                    actionOpenFolder(handleIntent)
+                    actionOpenFolder(handleIntent, highlightedNames)
                     selectDrawerItem(drawerItem)
                 }
 

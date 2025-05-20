@@ -289,6 +289,10 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                     Constants.INTENT_EXTRA_KEY_PARENT_HANDLE,
                     actionGroup.pendingTransferNodeId?.nodeId?.longValue
                 )
+                putStringArrayListExtra(
+                    FileStorageActivity.EXTRA_FILE_NAMES,
+                    ArrayList(actionGroup.fileNames)
+                )
             }
         }
     }
