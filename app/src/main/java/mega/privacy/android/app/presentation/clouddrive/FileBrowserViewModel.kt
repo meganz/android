@@ -276,36 +276,38 @@ class FileBrowserViewModel @Inject constructor(
      *
      * @param handle The new File Browser Handle to be set
      * @param checkMediaDiscovery If true, checks if Media Discovery should be opened
+     * @param highlightedNode the NodeId of the node we want to highlight
+     * @param highlightedNames the list of names of the nodes we want to highlight
      */
     fun setFileBrowserHandle(
         handle: Long,
         checkMediaDiscovery: Boolean = false,
         highlightedNode: NodeId? = null,
-    ) =
-        viewModelScope.launch {
-            handleStack.push(handle)
-            if (checkMediaDiscovery && shouldEnterMediaDiscoveryMode(
-                    folderHandle = handle,
-                    mediaDiscoveryViewSettings = state.value.mediaDiscoveryViewSettings
+        highlightedNames: List<String>? = null,
+    ) = viewModelScope.launch {
+        handleStack.push(handle)
+        if (checkMediaDiscovery && shouldEnterMediaDiscoveryMode(
+                folderHandle = handle,
+                mediaDiscoveryViewSettings = state.value.mediaDiscoveryViewSettings
+            )
+        ) {
+            _state.update {
+                it.copy(
+                    fileBrowserHandle = handle,
+                    isMediaDiscoveryOpen = true,
+                    isMediaDiscoveryOpenedByIconClick = false,
                 )
-            ) {
-                _state.update {
-                    it.copy(
-                        fileBrowserHandle = handle,
-                        isMediaDiscoveryOpen = true,
-                        isMediaDiscoveryOpenedByIconClick = false,
-                    )
-                }
-            } else {
-                _state.update {
-                    it.copy(
-                        fileBrowserHandle = handle,
-                        updateToolbarTitleEvent = triggered,
-                    )
-                }
             }
-            refreshNodesState(highlightedNode)
+        } else {
+            _state.update {
+                it.copy(
+                    fileBrowserHandle = handle,
+                    updateToolbarTitleEvent = triggered,
+                )
+            }
         }
+        refreshNodesState(highlightedNode, highlightedNames)
+    }
 
     /**
      * Immediately opens a Node in order to display its contents
@@ -376,7 +378,10 @@ class FileBrowserViewModel @Inject constructor(
         }
     }
 
-    private suspend fun refreshNodesState(highlightedNode: NodeId? = null) {
+    private suspend fun refreshNodesState(
+        highlightedNode: NodeId? = null,
+        highlightedNames: List<String>? = null,
+    ) {
         val fileBrowserHandle = _state.value.fileBrowserHandle
         val rootNode = getRootNodeUseCase()?.id?.longValue
         val isRootNode = fileBrowserHandle == rootNode
@@ -396,7 +401,11 @@ class FileBrowserViewModel @Inject constructor(
         val childrenNodes = getFileBrowserNodeChildrenUseCase(fileBrowserHandle)
         val showMediaDiscoveryIcon = !isRootNode && containsMediaItemUseCase(childrenNodes)
         val sourceNodeUIItems = getNodeUiItems(childrenNodes).map {
-            if (it.node.id == highlightedNode) it.copy(isHighlighted = true) else it
+            if (it.node.id == highlightedNode || highlightedNames?.contains(it.node.name) == true) {
+                it.copy(isHighlighted = true)
+            } else {
+                it
+            }
         }
         val nodeUIItems = filterNonSensitiveNodes(sourceNodeUIItems)
         val sortOrder = getCloudSortOrder()
