@@ -9,7 +9,6 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
-import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,13 +16,13 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
-class ActiveTransfersActionsBottomSheetTest {
+class FailedTransfersActionsBottomSheetTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val onSelectTransfers = mock<() -> Unit>()
-    private val onCancelAllTransfers = mock<() -> Unit>()
+    private val onRetryAllTransfers = mock<() -> Unit>()
+    private val onClearAllTransfers = mock<() -> Unit>()
     private val onDismissSheet = mock<() -> Unit>()
 
     @Test
@@ -31,43 +30,42 @@ class ActiveTransfersActionsBottomSheetTest {
         initComposeTestRule()
 
         with(composeTestRule) {
-            onNodeWithTag(TEST_TAG_ACTIVE_ACTIONS_PANEL).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_SELECT_ACTION).assertIsDisplayed()
-            onNodeWithText(sharedR.string.general_select).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_CANCEL_ALL_ACTION).assertIsDisplayed()
-            onNodeWithText(R.string.menu_cancel_all_transfers).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_FAILED_ACTIONS_PANEL).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_RETRY_ALL_ACTION).assertIsDisplayed()
+            onNodeWithText(R.string.option_to_retry_transfers).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_CLEAR_ALL_FAILED_ACTION).assertIsDisplayed()
+            onNodeWithText(R.string.option_to_clear_transfers).assertIsDisplayed()
         }
     }
 
     @Test
-    fun `test that clicking on select transfers option invokes onSelectTransfers and onDismissSheet`() {
+    fun `test that clicking on retry all transfers option invokes onRetryAllTransfers and onDismissSheet`() {
         initComposeTestRule()
 
-        composeTestRule.onNodeWithTag(TEST_TAG_SELECT_ACTION)
+        composeTestRule.onNodeWithTag(TEST_TAG_RETRY_ALL_ACTION)
             .performSemanticsAction(SemanticsActions.OnClick)
 
-        verify(onSelectTransfers).invoke()
+        verify(onRetryAllTransfers).invoke()
         verify(onDismissSheet).invoke()
     }
 
-
     @Test
-    fun `test that clicking on cancel all transfers option invokes onCancelAllTransfers and onDismissSheet`() {
+    fun `test that clicking on clear all transfers option invokes onClearAllTransfers and onDismissSheet`() {
         initComposeTestRule()
 
-        composeTestRule.onNodeWithTag(TEST_TAG_CANCEL_ALL_ACTION)
+        composeTestRule.onNodeWithTag(TEST_TAG_CLEAR_ALL_FAILED_ACTION)
             .performSemanticsAction(SemanticsActions.OnClick)
 
-        verify(onCancelAllTransfers).invoke()
+        verify(onClearAllTransfers).invoke()
         verify(onDismissSheet).invoke()
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     private fun initComposeTestRule() {
         composeTestRule.setContent {
-            ActiveTransfersActionsBottomSheet(
-                onSelectTransfers = onSelectTransfers,
-                onCancelAllTransfers = onCancelAllTransfers,
+            FailedTransfersActionsBottomSheet(
+                onRetryAllTransfers = onRetryAllTransfers,
+                onClearAllTransfers = onClearAllTransfers,
                 onDismissSheet = onDismissSheet,
             )
         }

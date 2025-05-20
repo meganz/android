@@ -13,19 +13,17 @@ import mega.android.core.ui.components.list.OneLineListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_ACTIVE_TAB
+import mega.privacy.android.app.presentation.transfers.view.completed.TEST_TAG_COMPLETED_TRANSFERS_VIEW
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * Bottom sheet for active transfers actions.
+ * Bottom sheet for completed transfers actions.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActiveTransfersActionsBottomSheet(
-    onSelectTransfers: () -> Unit,
-    onCancelAllTransfers: () -> Unit,
+fun CompletedTransfersActionsBottomSheet(
+    onClearAllTransfers: () -> Unit,
     onDismissSheet: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
@@ -34,22 +32,14 @@ fun ActiveTransfersActionsBottomSheet(
     onDismissRequest = onDismissSheet,
     modifier = modifier
         .fillMaxWidth()
-        .testTag(TEST_TAG_ACTIVE_ACTIONS_PANEL),
+        .testTag(TEST_TAG_COMPLETED_ACTIONS_PANEL),
     sheetState = sheetState,
 ) {
     OneLineListItem(
-        modifier = Modifier.testTag(TEST_TAG_SELECT_ACTION),
-        text = stringResource(id = sharedR.string.general_select),
+        modifier = Modifier.testTag(TEST_TAG_CLEAR_ALL_COMPLETED_ACTION),
+        text = stringResource(id = R.string.option_to_clear_transfers),
         onClickListener = {
-            onSelectTransfers()
-            onDismissSheet()
-        },
-    )
-    OneLineListItem(
-        modifier = Modifier.testTag(TEST_TAG_CANCEL_ALL_ACTION),
-        text = stringResource(id = R.string.menu_cancel_all_transfers),
-        onClickListener = {
-            onCancelAllTransfers()
+            onClearAllTransfers()
             onDismissSheet()
         },
     )
@@ -58,16 +48,16 @@ fun ActiveTransfersActionsBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @CombinedThemePreviews
 @Composable
-private fun InProgressActionsBottomSheetPreview() {
+private fun CompletedTransfersActionsBottomSheetPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        ActiveTransfersActionsBottomSheet(
-            onSelectTransfers = {},
-            onCancelAllTransfers = {},
+        CompletedTransfersActionsBottomSheet(
+            onClearAllTransfers = {},
             onDismissSheet = {},
         )
     }
 }
 
-internal const val TEST_TAG_ACTIVE_ACTIONS_PANEL = "$TEST_TAG_ACTIVE_TAB:actions_panel"
-internal const val TEST_TAG_CANCEL_ALL_ACTION = "$TEST_TAG_ACTIVE_ACTIONS_PANEL:cancel_all_action"
-internal const val TEST_TAG_SELECT_ACTION = "$TEST_TAG_ACTIVE_ACTIONS_PANEL:select_all_action"
+internal const val TEST_TAG_COMPLETED_ACTIONS_PANEL =
+    "$TEST_TAG_COMPLETED_TRANSFERS_VIEW:actions_panel"
+internal const val TEST_TAG_CLEAR_ALL_COMPLETED_ACTION =
+    "$TEST_TAG_COMPLETED_ACTIONS_PANEL:clear_all_action"

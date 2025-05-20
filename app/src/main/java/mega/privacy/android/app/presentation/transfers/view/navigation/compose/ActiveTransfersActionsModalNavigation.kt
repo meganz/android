@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.view.navigation.compose
 
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -13,7 +14,7 @@ import mega.privacy.android.app.presentation.transfers.view.sheet.ActiveTransfer
 
 internal const val activeTransfersActionsModalRoute = "activeTransfersActionsModal"
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterial3Api::class)
 internal fun NavGraphBuilder.activeTransfersActionsModal(navHostController: NavHostController) {
     bottomSheet(route = activeTransfersActionsModalRoute) { backStackEntry ->
         val viewModel =
@@ -24,10 +25,13 @@ internal fun NavGraphBuilder.activeTransfersActionsModal(navHostController: NavH
             navHostController.popBackStack(transfersRoute, false)
         } else {
             ActiveTransfersActionsBottomSheet(
+                onSelectTransfers = {},
                 onCancelAllTransfers = {
-                    navHostController.popBackStack(transfersRoute, false)
                     navHostController.navigateToCancelAllTransfersDialog()
-                }
+                },
+                onDismissSheet = {
+                    navHostController.popBackStack(transfersRoute, false)
+                },
             )
         }
     }
