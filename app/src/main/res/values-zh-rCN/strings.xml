@@ -607,7 +607,7 @@
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">关于</string>
     <!-- Preference screen item action button -->
-    <string name="settings_about_privacy_policy">隐私与数据政策</string>
+    <string name="settings_about_privacy_policy">隐私政策</string>
     <!--  -->
     <string name="settings_about_terms_of_service">服务条款</string>
     <!-- App means “Application” -->
@@ -4624,8 +4624,6 @@
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
         <item quantity="other">无法共享%1$d个文件夹</item>
     </plurals>
-    <!-- Button text to mute a participant in the info of participant in call screen-->
-    <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">静音</string>
     <!-- Button text to mute all participant in the call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_all_participants_button">全部静音</string>
     <!-- Label text indicating that all participants are muted -->
@@ -4693,13 +4691,13 @@
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]您的免费方案有60分钟的会议时间限制。Pro会员用户具有无限通话时间，并且最多可达1000名参与者。[/A][B]立即升级。[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">您将被立即收取%1$s的费用，并且您的订阅将在1个月后自动以每月%2$s续订。您的Google&#160;Play帐户将在每个计费周期结束后的24小时内被收取续订费用。若要取消订阅，您必须在计费周期结束前至少24小时通过[A]Google&#160;Play[/A]中的订阅停用MEGA&#160;Pro订阅的自动续订。\n升级您的帐户即表示您同意MEGA的[B]服务条款[/B]和[C]隐私与数据政策[/C]。</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">您将被立即收取%1$s的费用，并且您的订阅将在1&#160;个月后自动以每月%2$s续订。您的Google&#160;Play帐户将在每个计费周期结束后的24&#160;小时内被收取续订费用。若要取消订阅，您必须在计费周期结束前至少24&#160;小时通过[A]Google&#160;Play[/A]中的订阅停用MEGA&#160;Pro订阅的自动续订。\n升级您的帐户即表示您同意MEGA的[B]服务条款[/B]和[C]隐私政策[/C]。</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">您将被立即收取%1$s的费用，并且您的订阅将在12个月后自动以每年%2$s续订。您的Google&#160;Play帐户将在每个计费周期结束后的24小时内被收取续订费用。若要取消订阅，您必须在计费周期结束前至少24小时通过[A]Google&#160;Play[/A]中的订阅停用MEGA&#160;Pro订阅的自动续订。\n升级您的帐户即表示您同意MEGA的[B]服务条款[/B]和[C]隐私与数据政策[/C]。</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">您将被立即收取%1$s的费用，并且您的订阅将在12&#160;个月后自动以每年%2$s续订。您的Google&#160;Play帐户将在每个计费周期结束后的24&#160;小时内被收取续订费用。若要取消订阅，您必须在计费周期结束前至少24&#160;小时通过[A]Google&#160;Play[/A]中的订阅停用MEGA&#160;Pro订阅的自动续订。\n升级您的帐户即表示您同意MEGA的[B]服务条款[/B]和[C]隐私政策[/C]。</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">您将立即被收取费用，并且您的订阅将在1个月后自动续订。您的Google&#160;Play帐户将在每个计费周期结束后的24小时内被收取续订费用。若要取消订阅，您必须在计费周期结束前至少24小时通过[A]Google&#160;Play[/A]中的订阅停用MEGA&#160;Pro订阅的自动续订。\n升级您的帐户即表示您同意MEGA的[B]服务条款[/B]和[C]隐私与数据政策[/C]。</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">您将立即被收取费用，并且您的订阅将在1&#160;个月后自动续订。您的Google&#160;Play帐户将在每个计费周期结束后的24&#160;小时内被收取续订费用。若要取消订阅，您必须在计费周期结束前至少24&#160;小时通过[A]Google&#160;Play[/A]中的订阅停用MEGA&#160;Pro订阅的自动续订。\n升级您的帐户即表示您同意MEGA的[B]服务条款[/B]和[C]隐私政策[/C]。</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">您将立即被收取费用，并且您的订阅将在12&#160;个月后自动续订。您的Google&#160;Play帐户将在每个计费周期结束后的24&#160;小时内被收取续订费用。若要取消订阅，您必须在计费周期结束前至少24&#160;小时通过[A]Google&#160;Play[/A]中的订阅停用MEGA&#160;Pro订阅的自动续订。\n升级您的帐户即表示您同意MEGA的[B]服务条款[/B]和[C]隐私与数据政策[/C]。</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">您将立即被收取费用，并且您的订阅将在12&#160;个月后自动续订。您的Google&#160;Play帐户将在每个计费周期结束后的24&#160;小时内被收取续订费用。若要取消订阅，您必须在计费周期结束前至少24&#160;小时通过[A]Google&#160;Play[/A]中的订阅停用MEGA&#160;Pro订阅的自动续订。\n升级您的帐户即表示您同意MEGA的[B]服务条款[/B]和[C]隐私政策[/C]。</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">企业帐户已停用</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->

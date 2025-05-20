@@ -345,7 +345,7 @@
     <!-- Top bar title of the page that adds the video to the video playlist -->
     <string name="video_to_playlist_top_bar_title">재생목록에 추가</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_new_playlist_text">새 재생 목록</string>
+    <string name="video_to_playlist_new_playlist_text">새 재생목록</string>
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">이러한 기능들을 잃게 됩니다</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
@@ -671,7 +671,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">즐겨찾기</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No syncs or backups have been set up yet</string>
+    <string name="device_center_sync_backup_list_empty_state_title">아직 설정된 동기화 또는 백업이 없습니다</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">장치의 폴더를 MEGA의 폴더와 동기화 또는 백업하세요.</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -929,7 +929,7 @@
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_download">무언가 잘못 되었습니다. 다운로드가 취소되지 않았습니다.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">즉시 %1$s가/이 청구되지만 정부 규제로 인하여 당신의 구독은 12개월 후 자동으로 갱신되지 않습니다. 기간이 만료된 이후 구독을 갱신하는 것은 당신의 책임입니다. [A]Google&#160;Play[/A]의 구독을 통하여 당신의 구독을 언제든지 관리하거나 취소할 수 있습니다. 당신의 계정을 업그레이드함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 및 데이터 정책[/C]에 동의하는 것입니다.</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">즉시 %1$s가/이 청구되지만 정부 규제로 인하여 당신의 구독은 12개월 후 자동으로 갱신되지 않습니다. 기간이 만료된 이후 구독을 갱신하는 것은 당신의 책임입니다. [A]Google&#160;Play[/A]의 구독을 통하여 당신의 구독을 언제든지 관리하거나 취소할 수 있습니다. 당신의 계정을 업그레이드함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 처리 방침[/C]에 동의하는 것입니다.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">업로드 중...</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -977,21 +977,21 @@
     <!-- First message header paragraph in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header_paragraph">사진, 중요한 정보, 큰 아이디어를 위한 비공개 공간입니다. 항상 동기화 되고, 영지식 암호화로 보호됩니다.</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <string name="general_sync_notification_low_battery_title">배터리가 부족하여 동기화를 멈추었습니다</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <string name="general_sync_notification_low_battery_text">재개하려면 전원을 연결하세요</string>
     <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <string name="general_sync_notification_lost_wifi_title">연결되지 않아서 동기화를 멈추었습니다</string>
     <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <string name="general_sync_notification_lost_wifi_text">재개하려면 Wi-Fi에 다시 연결하세요</string>
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <string name="general_sync_notification_generic_error_title">동기화 멈춤</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Check your syncs in the app to resolve this.</string>
+    <string name="general_sync_notification_generic_error_text">이 문제를 해결하려면 앱에서 동기화를 확인하세요.</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <string name="general_sync_notification_stalled_issues_title">동기화 문제가 감지됨</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <string name="general_sync_notification_stalled_issues_text">문제를 확인하고 해결하세요</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
     <string name="device_center_list_view_item_status_error">오류</string>
     <!-- Hint shown in the field to write a message in the note to self chat screen -->
@@ -1007,7 +1007,7 @@
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">이메일 주소가 변경되었습니다</string>
     <!-- Snackbar text to inform the user that download started -->
-    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <string name="transfers_download_started_snackbar">다운로드가 시작되었습니다. 자세한 내용은 알림을 보세요.</string>
     <!--Sign Up page text field input first name error message when empty-->
     <string name="sign_up_first_name_text_field_error_message">이름을 입력하세요</string>
     <!--Sign Up page text field input last name error message when empty-->
@@ -1033,43 +1033,43 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">이미 MEGA 계정이 있나요? [A]로그인[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Loading file&#8230;</string>
+    <string name="transfers_fake_preview_text">파일 불러오는 중...</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_title">Cancel preview?</string>
+    <string name="transfers_cancel_preview_download_warning_title">미리 보기를 취소할까요?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_text">You will no longer be able to preview this file</string>
+    <string name="transfers_cancel_preview_download_warning_text">더 이상 이 파일을 미리 볼 수 없습니다</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again.</string>
+    <string name="transfers_fake_preview_screen_general_error">미리 보기를 불러오지 못 했습니다, 다시 시도하세요.</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_preview_download">Something went wrong. Preview was not cancelled. See notification for details.</string>
+    <string name="transfers_error_cancelling_preview_download">무언가 잘못 되었습니다. 미리 보기가 취소되었습니다. 자세한 내용은 알림을 보세요.</string>
     <!-- Title of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_title">Backup name already exists</string>
+    <string name="sync_rename_and_create_backup_dialog_title">백업 이름이 이미 존재합니다</string>
     <!-- Text of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_text">A folder with the same name already exists in your Backups. Rename the new folder to continue with the backup. Folder name will not change on your device.</string>
+    <string name="sync_rename_and_create_backup_dialog_text">같은 이름을 가진 폴더가 백업에 존재합니다. 백업을 진행하려면 새 폴더의 이름을 변경하세요. 장치에서는 폴더 이름이 바뀌지 않습니다.</string>
     <!-- Rename and Create Backup Dialog hint text (input field description) -->
-    <string name="sync_rename_and_create_backup_dialog_hint_text">Backup name</string>
+    <string name="sync_rename_and_create_backup_dialog_hint_text">백업 이름</string>
     <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_positive_button">이름 바꾸기</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">백업 이름을 입력하세요.</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">A backup with this name already exists. Enter a different name.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">이 이름을 가진 백업이 이미 존재합니다. 다른 이름을 입력하세요.</string>
     <!-- USP Carousel page 1 title-->
     <string name="carousel_page_title_slide_1">당신이 열쇠를 갖습니다</string>
     <!-- USP Carousel page 1 description-->
-    <string name="carousel_page_description_slide_1">User controlled, zero-knowledge encryption means no one can see your data unless you want them to - not even us!</string>
+    <string name="carousel_page_description_slide_1">이용자 제어, 영지식 암호화는 당신이 원하지 않는 그 누구도 당신의 데이터를 볼 수 없다는 것입니다 - 심지어 저희도요!</string>
     <!-- USP Carousel page 2 title-->
-    <string name="carousel_page_title_slide_2">Keep every moment safe</string>
+    <string name="carousel_page_title_slide_2">모든 순간을 안전하게 보관</string>
     <!-- USP Carousel page 2 description-->
-    <string name="carousel_page_description_slide_2">With automatic camera uploads to MEGA Cloud, and generous storage, you’ll never lose a precious memory</string>
+    <string name="carousel_page_description_slide_2">MEGA Cloud 자동 카메라 업로드 기능과 넉넉한 용량으로 절대 소중한 추억을 잃지 않습니다.</string>
     <!-- USP Carousel page 3 title-->
-    <string name="carousel_page_title_slide_3">Your data. Your space.</string>
+    <string name="carousel_page_title_slide_3">당신의 데이터. 당신의 공간.</string>
     <!-- USP Carousel page 3 description-->
-    <string name="carousel_page_description_slide_3">Ample storage and easy ways to transfer, share, and organise your files means you can safely use MEGA for whatever you choose</string>
+    <string name="carousel_page_description_slide_3">충분한 저장소와 간편한 파일 전송, 공유, 정리 방법을 통해 어떤 용도로든 MEGA를 안전하게 사용할 수 있습니다.</string>
     <!-- USP Carousel page 4 title-->
     <string name="carousel_page_title_slide_4">비공개로 말하기</string>
     <!-- USP Carousel page 4 description-->
-    <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
+    <string name="carousel_page_description_slide_4">친구와 가족들과 대화하고, 사진이나 민감한 정보를 공유하고, 영상 통화를 하고, 회의를 예약하세요. 안전과 프라이버시가 보장됩니다.</string>
     <!-- Create account label-->
     <string name="general_label_create_account">MEGA 계정 생성</string>
     <!-- The new feature hidden nodes feature -->
@@ -1081,59 +1081,59 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">가시성을 쉽게 제어</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” -&gt; “User interface” in your app settings.</string>
+    <string name="hidden_nodes_description_control_visibility">숨겨진 파일을 나타내려면, 앱 설정의 “파일 관리” -&gt; “이용자 인터페이스”에서 “숨겨진 항목 보기”를 켜세요.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">공유된 파일은 보이는 상태로 유지됩니다</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <string name="hidden_nodes_description_visible_shared_files">연락처 또는 공개 링크로 공유한 파일과 폴더는 숨김 처리를 해도 접근 가능하고 보이게 됩니다</string>
     <!--Camera backup permission screen title-->
-    <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
+    <string name="camera_backup_permission_screen_title">항상 사진을 안전하게 보관</string>
     <!--Camera backup permission screen description-->
-    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <string name="camera_backup_permission_screen_description">당신의 추억은 중요합니다.\n\n카메라 업로드가 당신의 사진과 동영상을 자동으로 MEGA 클라우드 드라이브로 백업하여, 당신은 추억을 잃을 걱정을 하지 않아도 됩니다.</string>
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
-    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <string name="camera_backup_permission_banner_info_description">카메라 업로드는 장치의 사진 라이브러리에 대해 [A]전체 접근[/A]이 필요합니다.</string>
     <!--Button text to request camera backup permission-->
     <string name="camera_backup_permission_enable_button_text">카메라 업로드 활성화</string>
     <!--Permission screen skip requesting permission button text-->
-    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <string name="permission_screen_skip_permission_request_button_text">지금은 건너뛰기</string>
     <!--Notification permission screen title-->
-    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <string name="notification_permission_screen_title">중요한 업데이트를 놓치지 마세요</string>
     <!--Notification permission screen description-->
-    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <string name="notification_permission_screen_description">중요한 실시간 업데이트를 통해 최신 정보를 받아보세요. 공유 폴더 활동, 보안 업데이트, 독점 혜택 등에 대한 알림을 받아서, 중요한 것을 절대 놓치지 마세요.\n\n알림 설정은 언제든지 장치 설정에서 관리할 수 있습니다.</string>
     <!--Button text to request Notification permission-->
     <string name="notification_permission_enable_button_text">알림 활성화</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
-    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
+    <string name="transfers_notification_title_single_upload">“%1$s” 업로드함</string>
     <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_warning_lost_wifi_title">Syncing paused due to lost connection.</string>
+    <string name="general_sync_warning_lost_wifi_title">연결되지 않아서 동기화를 멈추었습니다.</string>
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_warning_lost_wifi_text">Reconnect to Wi-Fi to resume.</string>
+    <string name="general_sync_warning_lost_wifi_text">재개하려면 Wi-Fi에 다시 연결하세요.</string>
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
     <string name="general_link_unavailable_subtitle">이러한 사항은 다음과 같은 이유로 발생할 수 있습니다:</string>
     <!-- Bullet point shown when link is unavailable due to invalid URL -->
-    <string name="general_link_unavailable_invalid_url">Invalid URL - the link you’re trying to access does not exist</string>
+    <string name="general_link_unavailable_invalid_url">잘못된 URL - 당신이 접근하려던 링크는 존재하지 않습니다</string>
     <!-- Bullet point shown when link is unavailable due to expiration -->
-    <string name="general_link_expired">The link has expired</string>
+    <string name="general_link_expired">링크가 만료되었습니다</string>
     <!-- Title shown when a folder link is unavailable (general case) -->
-    <string name="folder_link_unavailable_title">The folder link you’re trying to access is not available</string>
+    <string name="folder_link_unavailable_title">접근하려는 폴더 링크가 이용 불가합니다</string>
     <!-- Bullet point shown when a folder link is unavailable because the link has been disabled -->
-    <string name="folder_link_unavailable_disabled">The folder link has been disabled by the owner</string>
+    <string name="folder_link_unavailable_disabled">폴더 링크가 소유자에 의해 비활성화 되었습니다</string>
     <!-- Title shown when a folder link has expired -->
-    <string name="folder_link_expired_title">The folder link you’re trying to access is no longer available</string>
+    <string name="folder_link_expired_title">접근하려는 폴더 링크가 더 이상 이용 가능하지 않습니다</string>
     <!-- Title of the dialog shown when the user needs to verify administrator credentials -->
-    <string name="unverified_business_account_dialog_title">Verify administrator credentials to continue</string>
+    <string name="unverified_business_account_dialog_title">계속 하려면 관리자 자격증명을 인증하세요</string>
     <!-- Description of the dialog explaining the need to verify administrator credentials -->
-    <string name="unverified_business_account_dialog_description">You need to verify your Business account administrator’s credentials in order to continue. Log in to your account in a desktop web browser and complete the credential verification.</string>
+    <string name="unverified_business_account_dialog_description">계속 하려면 당신의 비즈니스 계정 관리자의 자격증명을 인증해야 합니다. 데스크톱 웹 브라우저에서 계정에 로그인하고 자격증명 인증을 완료하세요.</string>
     <!-- Title shown when a file link is unavailable (general case) -->
-    <string name="file_link_unavailable_title">The file link you’re trying to access is no longer available</string>
+    <string name="file_link_unavailable_title">접근하려는 파일 링크가 더 이상 이용 가능하지 않습니다</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="file_link_unavailable_disabled">The file link has been disabled by the owner</string>
+    <string name="file_link_unavailable_disabled">파일 링크가 소유자에 의해 비활성화 되었습니다</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="file_link_unavailable_deleted">The file has been deleted</string>
+    <string name="file_link_unavailable_deleted">파일이 삭제되었습니다</string>
     <!-- Title shown when a file link has expired -->
-    <string name="file_link_expired_title">The file link you’re trying to access is not available</string>
+    <string name="file_link_expired_title">접근하려는 파일 링크가 이용 불가합니다</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="folder_link_unavailable_deleted">The folder has been deleted</string>
+    <string name="folder_link_unavailable_deleted">폴더가 삭제되었습니다</string>
     <!-- Tooltip description for transfer section play action -->
     <string name="transfers_section_action_play">재생</string>
     <!-- Tooltip description for transfer section play action -->
@@ -1151,5 +1151,41 @@
     <!--Text for showing the empty state when there are no completed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
     <string name="transfers_no_completed_transfers_empty_text">완료된 전송 없음</string>
     <!--Text for showing the empty state when there are no failed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
-    <string name="transfers_no_failed_transfers_empty_text">[A]No failed transfers[/A]</string>
+    <string name="transfers_no_failed_transfers_empty_text">[A]실패한 전송 없음[/A]</string>
+    <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the current transferred size, the second one is to set the size of the file. Example 12.4MB of 33.3MB -->
+    <string name="transfers_completed_transfer_size_indicator">%2$s 중 %1$s</string>
+    <!-- Title for the Free Plan card -->
+    <string name="free_plan_card_title">무료 요금제로 시작하세요</string>
+    <!-- Description for the Free Plan card -->
+    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our Free plan offers generous amount of storage and transfer quota.</string>
+    <!-- Feature text for Free Plan storage -->
+    <string name="free_plan_card_storage_feature">Free 20 GB of storage</string>
+    <!-- Feature text for Free Plan transfer quota -->
+    <string name="free_plan_card_transfer_feature">Limited transfers</string>
+    <!-- Button text for Free Plan card -->
+    <string name="free_plan_card_button">무료로 시작하세요</string>
+    <!-- Section title for the features list -->
+    <string name="pro_plan_features_section_title">다음을 얻게 됩니다:</string>
+    <!-- Title for generous storage feature -->
+    <string name="pro_plan_feature_storage_title">넉넉한 저장소</string>
+    <!-- Description for generous storage feature -->
+    <string name="pro_plan_feature_storage_desc">Store unlimited data up to 16 TB of storage</string>
+    <!-- Title for transfer sharing feature -->
+    <string name="pro_plan_feature_transfer_title">전송 공유</string>
+    <!-- Description for transfer sharing feature -->
+    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files.</string>
+    <!-- Title for MEGA VPN feature -->
+    <string name="pro_plan_feature_vpn_title">MEGA VPN</string>
+    <!-- Description for MEGA VPN feature -->
+    <string name="pro_plan_feature_vpn_desc">Keep your online life safe, fast, and easy with our high-speed VPN.</string>
+    <!-- Title for MEGA Pass feature -->
+    <string name="pro_plan_feature_pass_title">MEGA Pass</string>
+    <!-- Description for MEGA Pass feature -->
+    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager.</string>
+    <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
+    <string name="account_upgrade_account_pro_plan_info_recommended_label">권고됨</string>
+    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
+    <string name="transfers_over_quota_banner_title">더 많은 전송 할당량 받기</string>
+    <!-- Text for the upgrade banner action -->
+    <string name="transfers_over_quota_banner_action_button">지금 업그레이드</string>
 </resources>
