@@ -870,6 +870,7 @@ class DefaultAccountRepositoryTest {
     @Test
     fun `test that MegaApiGateway is invoked for getting current user and session while saving credentials`() =
         runTest {
+            mockGetUserDataSuccess()
             underTest.saveAccountCredentials()
             verify(megaApiGateway).myUser
             verify(megaApiGateway).dumpSession
@@ -880,18 +881,34 @@ class DefaultAccountRepositoryTest {
         runTest {
             val credentials =
                 userCredentialsMapper("test@mega.nz", "AFasdffW456sdfg", null, null, "1536456")
-
+            mockGetUserDataSuccess()
             underTest.saveAccountCredentials()
             verify(credentialsPreferencesGateway).save(credentials)
             verify(ephemeralCredentialsGateway).clear()
         }
+
+    private fun mockGetUserDataSuccess() {
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        whenever(
+            megaApiGateway.getUserData(listener = any())
+        ).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                megaError,
+            )
+        }
+    }
 
     @Test
     fun `test that account session is returned while saving credentials`() = runTest {
         val email = "test@mega.nz"
         val session = "AFasdffW456sdfg"
         val handle = 1536456L
-
+        mockGetUserDataSuccess()
         assertThat(underTest.saveAccountCredentials())
             .isEqualTo(accountSessionMapper(email, session, handle))
     }
