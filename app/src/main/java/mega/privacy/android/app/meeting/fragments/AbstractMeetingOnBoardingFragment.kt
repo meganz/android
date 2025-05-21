@@ -203,6 +203,18 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     private fun initBinding() {
         binding = MeetingOnBoardingFragmentBinding.inflate(layoutInflater)
+        binding.onOffFab.fabMic.setOnSingleClickListener {
+            sharedModel.onMicrophoneClicked()
+        }
+
+        binding.onOffFab.fabCam.setOnSingleClickListener {
+            sharedModel.onCameraClicked()
+        }
+
+        binding.onOffFab.fabSpeaker.setOnSingleClickListener {
+            sharedModel.clickSpeaker()
+        }
+
         binding.btnStartJoinMeeting.setOnSingleClickListener {
             Analytics.tracker.trackEvent(ScheduledMeetingJoinGuestButtonEvent)
             permissionsRequester = permissionsBuilder(
