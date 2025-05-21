@@ -64,8 +64,7 @@ fun NewPermissionsComposableScreen(
             NewPermissionScreen.Notification.ordinal -> {
                 NotificationPermissionScreen(
                     modifier = Modifier
-                        .testTag(NEW_PERMISSIONS_SCREEN_NOTIFICATION_PERMISSION)
-                        .fillMaxSize(),
+                        .testTag(NEW_PERMISSIONS_SCREEN_NOTIFICATION_PERMISSION),
                     onEnablePermission = askNotificationPermission,
                     onSkipPermission = onSkipNotificationPermission
                 )
@@ -74,8 +73,7 @@ fun NewPermissionsComposableScreen(
             NewPermissionScreen.CameraBackup.ordinal -> {
                 CameraBackupPermissionsScreen(
                     modifier = Modifier
-                        .testTag(NEW_PERMISSIONS_SCREEN_CAMERA_BACKUP_PERMISSION)
-                        .fillMaxSize(),
+                        .testTag(NEW_PERMISSIONS_SCREEN_CAMERA_BACKUP_PERMISSION),
                     onEnablePermission = askCameraBackupPermission,
                     onSkipPermission = onSkipCameraBackupPermission
                 )

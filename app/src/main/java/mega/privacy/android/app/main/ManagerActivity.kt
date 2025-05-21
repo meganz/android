@@ -2276,7 +2276,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     dbH.setFirstTime(false)
                 }
                 if (!initialPermissionsAlreadyAsked && !onAskingPermissionsFragment) {
-                    drawerItem = DrawerItem.ASK_PERMISSIONS
                     askForAccess()
                 }
             }
@@ -2374,13 +2373,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun askForAccess() {
+        drawerItem = DrawerItem.ASK_PERMISSIONS
         askPermissions = false
         showStorageAlertWithDelay = true
-        //If mobile device, only portrait mode is allowed
-        if (isTablet().not()) {
-            Timber.d("Mobile only portrait mode")
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        }
 
         lifecycleScope.launch {
             val shouldShowNotificationPermission =
@@ -2414,13 +2409,18 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 }
 
                 onAskingPermissionsFragment = true
-                setAppBarVisibility(false)
-                setTabsVisibility()
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                supportInvalidateOptionsMenu()
-                hideFabButton()
-                showHideBottomNavigationView(true)
+                selectDrawerItem(drawerItem)
             }
+        }
+    }
+
+    private fun restrictUiWhileRequestingPermissions() {
+        if (onAskingPermissionsFragment && permissionsFragment != null) {
+            setAppBarVisibility(false)
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+            supportInvalidateOptionsMenu()
+            hideFabButton()
+            showHideBottomNavigationView(true)
         }
     }
 
@@ -4036,6 +4036,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 changeAppBarElevation(false)
                 Analytics.tracker.trackEvent(ChatRoomsBottomNavigationItemEvent)
             }
+
+            DrawerItem.ASK_PERMISSIONS -> restrictUiWhileRequestingPermissions()
 
             else -> {}
         }
