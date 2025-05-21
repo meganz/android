@@ -856,25 +856,16 @@
         <item quantity="one">This file already exists in “%1$s” and cannot be added again</item>
         <item quantity="other">These files already exist in “%1$s” and cannot be added again</item>
     </plurals>
-    <!-- Add to album partial added message -->
-    <plurals name="album_add_to_partial_added_message">
-        <item quantity="one">1 file added to “%1$s”. Some files already exist, and can’t be added again.</item>
-        <item quantity="other">%2$d files added to “%1$s”. Some files already exist, and can’t be added again.</item>
-    </plurals>
     <!--Content on the Multi-Factor Authentication Login page -->
     <string name="multi_factor_auth_login_verification_content">Enter the 6-digit code from your authenticator app.</string>
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">Incorrect verification code</string>
-    <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
-    <string name="transfers_preview_slow_snackbar">Preparing file for preview. See notification for details.</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview">Preparing %1$s for preview</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
     <string name="audio_queue_single_item_removed_message">‟%1$s” was removed</string>
-    <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
-    <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="one">“%1$s” was removed from the queue</item>
@@ -1172,11 +1163,11 @@
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the current transferred size, the second one is to set the size of the file. Example 12.4MB of 33.3MB -->
     <string name="transfers_completed_transfer_size_indicator">%1$s of %2$s</string>
     <!-- Title for the Free Plan card -->
-    <string name="free_plan_card_title">Get started with our Free plan</string>
+    <string name="free_plan_card_title">Get started with our free plan</string>
     <!-- Description for the Free Plan card -->
-    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our Free plan offers generous amount of storage and transfer quota.</string>
+    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our free plan offers generous amounts of storage and transfer quota</string>
     <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">Free 20 GB of storage</string>
+    <string name="free_plan_card_storage_feature">20 GB of storage</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">Limited transfers</string>
     <!-- Button text for Free Plan card -->
@@ -1186,23 +1177,41 @@
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Generous storage</string>
     <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Store unlimited data up to 16 TB of storage</string>
+    <string name="pro_plan_feature_storage_desc">Store up to 16 TB of data</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Transfer sharing</string>
     <!-- Description for transfer sharing feature -->
-    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files.</string>
+    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files</string>
     <!-- Title for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_title">MEGA VPN</string>
+    <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_desc">Keep your online life safe, fast, and easy with our high-speed VPN.</string>
+    <string name="pro_plan_feature_vpn_desc">Stay safe online with our high-speed VPN that’s both fast and simple to use</string>
     <!-- Title for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_title">MEGA Pass</string>
+    <string name="pro_plan_feature_pass_title">MEGA&#160;Pass</string>
     <!-- Description for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager.</string>
+    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Recommended</string>
     <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
     <string name="transfers_over_quota_banner_title">Get more transfer quota</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">Upgrade now</string>
+    <!-- Section title for additional benefits of Pro plans -->
+    <string name="pro_plan_additional_benefits_section_title">Additional benefits of Pro plans</string>
+    <!-- Benefit: Password-protected links -->
+    <string name="pro_plan_benefit_password_protected_links">Password-protected links</string>
+    <!-- Benefit: Links with expiry dates -->
+    <string name="pro_plan_benefit_links_with_expiry_dates">Links with expiry dates</string>
+    <!-- Benefit: Transfer quota sharing -->
+    <string name="pro_plan_benefit_transfer_quota_sharing">Transfer quota sharing</string>
+    <!-- Benefit: Automatically sync the folders on your mobile device -->
+    <string name="pro_plan_benefit_auto_sync_mobile">Automatically sync the folders on your mobile device</string>
+    <!-- Benefit: Rewind up to 180 days of deleted data -->
+    <string name="pro_plan_benefit_rewind_180_days">Rewind up to 180 days of deleted data</string>
+    <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
+    <string name="pro_plan_benefit_host_calls_unlimited">Host calls and meetings with unlimited participants and no time restrictions</string>
+    <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Schedule rubbish bin clearing between 7 days and 10 years</string>
+    <!-- Benefit: Priority support -->
+    <string name="pro_plan_benefit_priority_support">Priority support</string>
 </resources>
