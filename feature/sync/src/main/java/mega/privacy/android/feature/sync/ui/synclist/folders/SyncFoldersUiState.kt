@@ -10,6 +10,7 @@ internal data class SyncFoldersUiState(
     val isStorageOverQuota: Boolean = false,
     val isLoading: Boolean = false,
     val showConfirmRemoveSyncFolderDialog: Boolean = false,
+    val isDisableBatteryOptimizationEnabled: Boolean = false,
     val syncUiItemToRemove: SyncUiItem? = null,
     @StringRes val snackbarMessage: Int? = null,
 ) {

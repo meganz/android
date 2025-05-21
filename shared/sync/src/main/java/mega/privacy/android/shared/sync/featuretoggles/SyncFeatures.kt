@@ -26,6 +26,14 @@ enum class SyncFeatures(
     SyncFrequencySettings(
         "Enable the Sync Frequency in settings",
         false
+    ),
+
+    /**
+     *  Disable Battery Optimization
+     */
+    DisableBatteryOptimization(
+        "Add Warning for Disable Battery Optimization",
+        false,
     );
 
     companion object : FeatureFlagValueProvider {

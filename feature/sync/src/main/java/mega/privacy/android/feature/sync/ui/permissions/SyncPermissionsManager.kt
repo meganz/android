@@ -35,11 +35,7 @@ class SyncPermissionsManager @Inject constructor(@ApplicationContext private val
     fun isDisableBatteryOptimizationGranted(): Boolean {
         val powerManager =
             context.getSystemService(AppCompatActivity.POWER_SERVICE) as PowerManager
-        return if (!isSDKAboveOrEqualTo14()) {
-            powerManager.isIgnoringBatteryOptimizations(context.packageName)
-        } else {
-            true
-        }
+        return powerManager.isIgnoringBatteryOptimizations(context.packageName)
     }
 
     /**
@@ -126,4 +122,3 @@ class SyncPermissionsManager @Inject constructor(@ApplicationContext private val
         }
     }
 }
-

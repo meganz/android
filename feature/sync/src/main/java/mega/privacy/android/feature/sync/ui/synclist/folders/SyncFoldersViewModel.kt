@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
-import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +39,7 @@ import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSet
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.environment.GetBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
@@ -56,6 +56,8 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPause
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.StopBackupOption
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
+import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -92,6 +94,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncFoldersUiState(emptyList()))
@@ -148,6 +151,17 @@ internal class SyncFoldersViewModel @Inject constructor(
                 .collect {
                     onSyncRefresh()
                 }
+        }
+
+        viewModelScope.launch {
+            runCatching {
+                val value = getFeatureFlagValueUseCase(SyncFeatures.DisableBatteryOptimization)
+                _uiState.update { state ->
+                    state.copy(
+                        isDisableBatteryOptimizationEnabled = value
+                    )
+                }
+            }
         }
     }
 

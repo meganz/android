@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.sync.ui.views
 
 import android.Manifest
-import android.os.Environment
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,13 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
+import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
-import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 
 /**
  * Permission banner shown on top of sync screens
@@ -27,19 +27,16 @@ import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 @Composable
 internal fun SyncPermissionWarningBanner(
     syncPermissionsManager: SyncPermissionsManager,
+    isDisableBatteryOptimizationEnabled: Boolean,
 ) {
-    val storagePermission =
+    val storagePermission: PermissionState =
         rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
     var allFileAccess: Boolean? by rememberSaveable { mutableStateOf(null) }
     var hasUnrestrictedBatteryUsage: Boolean? by rememberSaveable { mutableStateOf(null) }
 
     ComposableLifecycle { event ->
         if (event == Lifecycle.Event.ON_RESUME) {
-            allFileAccess = if (syncPermissionsManager.isSDKAboveOrEqualToR()) {
-                Environment.isExternalStorageManager()
-            } else {
-                storagePermission.status.isGranted
-            }
+            allFileAccess = syncPermissionsManager.isManageExternalStoragePermissionGranted()
             hasUnrestrictedBatteryUsage =
                 syncPermissionsManager.isDisableBatteryOptimizationGranted()
         }
@@ -63,7 +60,7 @@ internal fun SyncPermissionWarningBanner(
             )
         }
 
-        if (allFileAccessValue) {
+        if (allFileAccessValue && isDisableBatteryOptimizationEnabled) {
             hasUnrestrictedBatteryUsage?.let { hasUnrestrictedBatteryUsageValue ->
                 if (hasUnrestrictedBatteryUsageValue.not()) {
                     WarningBanner(

@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.R
@@ -265,7 +266,7 @@ internal fun SyncListScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
 @Composable
 private fun SyncListScreenContent(
     modifier: Modifier,
@@ -302,7 +303,8 @@ private fun SyncListScreenContent(
 
     Column(modifier) {
         SyncPermissionWarningBanner(
-            syncPermissionsManager = syncPermissionsManager
+            syncPermissionsManager = syncPermissionsManager,
+            isDisableBatteryOptimizationEnabled = syncFoldersUiState.isDisableBatteryOptimizationEnabled
         )
         SyncNotificationWarningBanner(
             issueNotificationState,
