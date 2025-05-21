@@ -342,7 +342,7 @@ class GetChatsUseCase @Inject constructor(
             if (
                 (chatRoomType == ChatRoomType.ARCHIVED_CHATS && !chatListItem.isArchived) ||
                 (chatRoomType != ChatRoomType.ARCHIVED_CHATS && chatListItem.isArchived) ||
-                chatListItem.isDeleted ||
+                chatListItem.isDeleted || chatListItem.isPreview ||
                 chatListItem.changes == ChatListItemChanges.Deleted ||
                 chatListItem.changes == ChatListItemChanges.Closed
             ) {
