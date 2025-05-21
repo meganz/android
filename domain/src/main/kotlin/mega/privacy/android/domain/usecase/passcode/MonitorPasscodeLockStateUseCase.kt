@@ -20,5 +20,5 @@ class MonitorPasscodeLockStateUseCase @Inject constructor(
      * @return flow of locked state
      */
     operator fun invoke() = passcodeRepository.monitorLockState()
-        .map { it != false }
+        .map { it == true }
 }

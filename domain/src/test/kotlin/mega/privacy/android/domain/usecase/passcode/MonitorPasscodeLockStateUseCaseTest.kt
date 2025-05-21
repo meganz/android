@@ -33,10 +33,10 @@ internal class MonitorPasscodeLockStateUseCaseTest {
     }
 
     @Test
-    internal fun `test that null values return a default of true`() = runTest {
+    internal fun `test that null values return a default of false`() = runTest {
         passcodeRepository.stub { on { monitorLockState() }.thenReturn(flowOf(null)) }
         underTest().test {
-            assertThat(awaitItem()).isEqualTo(true)
+            assertThat(awaitItem()).isEqualTo(false)
             cancelAndIgnoreRemainingEvents()
         }
     }
