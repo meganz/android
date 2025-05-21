@@ -109,10 +109,15 @@ class ChooseAccountFragment : Fragment() {
                 NewChooseAccountScreen(
                     uiState = uiState,
                     onFreePlanClick = {
-
+                        callContinueButtonAnalytics(AccountType.FREE)
+                        chooseAccountActivity.onFreeClick()
                     },
                     onBuyPlanClick = { accountType, isMonthly ->
-
+                        callContinueButtonAnalytics(accountType)
+                        billingViewModel.startPurchase(
+                            chooseAccountActivity,
+                            getProductId(isMonthly, accountType),
+                        )
                     }
                 )
             }
