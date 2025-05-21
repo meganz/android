@@ -32,7 +32,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 configureKotlinAndroid(this)
 
                 buildFeatures {
-                    dataBinding = true
                     viewBinding = true
                     buildConfig = true
                 }

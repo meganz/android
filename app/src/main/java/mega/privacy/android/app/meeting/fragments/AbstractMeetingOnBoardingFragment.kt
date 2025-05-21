@@ -1,6 +1,5 @@
 package mega.privacy.android.app.meeting.fragments
 
-import mega.privacy.android.icon.pack.R as IconR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -26,7 +25,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
-import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.utils.ChatUtil
@@ -39,6 +37,7 @@ import mega.privacy.android.app.utils.OnSingleClickListener.Companion.setOnSingl
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import mega.privacy.android.domain.entity.call.AudioDevice
+import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.mobile.analytics.event.ScheduledMeetingJoinGuestButtonEvent
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -204,7 +203,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     private fun initBinding() {
         binding = MeetingOnBoardingFragmentBinding.inflate(layoutInflater)
-        binding.lifecycleOwner = this
         binding.btnStartJoinMeeting.setOnSingleClickListener {
             Analytics.tracker.trackEvent(ScheduledMeetingJoinGuestButtonEvent)
             permissionsRequester = permissionsBuilder(
