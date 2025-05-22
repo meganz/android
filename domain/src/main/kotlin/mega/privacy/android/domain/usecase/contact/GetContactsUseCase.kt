@@ -1,8 +1,12 @@
 package mega.privacy.android.domain.usecase.contact
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
@@ -11,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -39,6 +44,13 @@ class GetContactsUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
 ) {
 
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val userUpdateFlow = accountsRepository.monitorUserUpdates()
+        .shareIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            replay = 0,
+        )
 
     /**
      * Gets contacts.
@@ -47,16 +59,17 @@ class GetContactsUseCase @Inject constructor(
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(): Flow<List<ContactItem>> =
-        listChangedFlow().flatMapLatest { initialContacts ->
-            merge(
-                chatOnlineStatusChangeFlow(),
-                lastGreenChangeFlow(),
-                chatConnectionStateChangeFlow(),
-                userUpdatesChangeFlow(),
-            ).scan(initialContacts) { contacts, change: suspend (List<ContactItem>) -> List<ContactItem> ->
-                change(contacts)
-            }
-        }.distinctUntilChanged()
+        listChangedFlow()
+            .flatMapLatest { initialContacts ->
+                merge(
+                    chatOnlineStatusChangeFlow(),
+                    lastGreenChangeFlow(),
+                    chatConnectionStateChangeFlow(),
+                    userUpdatesChangeFlow(),
+                ).scan(initialContacts) { contacts, change: suspend (List<ContactItem>) -> List<ContactItem> ->
+                    change(contacts)
+                }
+            }.distinctUntilChanged()
 
     private fun lastGreenChangeFlow(): Flow<suspend (List<ContactItem>) -> List<ContactItem>> =
         contactsRepository.monitorChatPresenceLastGreenUpdates().map { event ->
@@ -123,7 +136,7 @@ class GetContactsUseCase @Inject constructor(
         val contacts = contactsRepository.getVisibleContacts()
         emit(contacts)
         emitAll(
-            accountsRepository.monitorUserUpdates()
+            userUpdateFlow
                 .map { userUpdate ->
                     userUpdate.changes
                         .mapNotNull { (key, value) ->
@@ -167,15 +180,16 @@ class GetContactsUseCase @Inject constructor(
         acc.any { visibilityChanges[it.handle]?.let { visibility -> visibility != it.visibility } == true }
 
     private fun userUpdatesChangeFlow(): Flow<suspend (List<ContactItem>) -> List<ContactItem>> =
-        accountsRepository.monitorUserUpdates().map {
-            it.changes.mapKeys { (key, _) ->
-                key.id
-            }.mapValues { (_, list) ->
-                list.filter { change -> change !is UserChanges.Visibility }
+        userUpdateFlow
+            .map {
+                it.changes.mapKeys { (key, _) ->
+                    key.id
+                }.mapValues { (_, list) ->
+                    list.filter { change -> change !is UserChanges.Visibility }
+                }
+            }.map { userUpdate ->
+                applyUserUpdates(userUpdate)
             }
-        }.map { userUpdate ->
-            applyUserUpdates(userUpdate)
-        }
 
     private fun applyUserUpdates(userUpdate: Map<Long, List<UserChanges>>): suspend (List<ContactItem>) -> List<ContactItem> =
         { contacts: List<ContactItem> ->
@@ -191,10 +205,11 @@ class GetContactsUseCase @Inject constructor(
     private fun Map<Long, List<UserChanges>>.hasContactDataChangesForUser(
         contact: ContactItem,
     ) = this[contact.handle]?.any {
-        it is UserChanges.Avatar || it is UserChanges.Firstname || it is UserChanges.Lastname
+        it is UserChanges.Avatar ||
+                it is UserChanges.Firstname
+                || it is UserChanges.Lastname
     } == true
 
     private fun Map<Long, List<UserChanges>>.hasAliasChange() =
         this.values.any { it.any { change -> change is UserChanges.Alias } }
-
 }

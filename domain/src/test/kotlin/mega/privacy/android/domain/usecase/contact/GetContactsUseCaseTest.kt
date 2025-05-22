@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.contact
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
@@ -52,14 +52,14 @@ class GetContactsUseCaseTest {
         )
 
         accountRepository.stub {
-            on { monitorUserUpdates() } doReturn emptyFlow()
+            on { monitorUserUpdates() } doReturn flow { awaitCancellation() }
         }
 
         contactsRepository.stub {
             onBlocking { getVisibleContacts() } doReturn emptyList()
-            on { monitorChatPresenceLastGreenUpdates() } doReturn emptyFlow()
-            on { monitorChatOnlineStatusUpdates() } doReturn emptyFlow()
-            on { monitorChatConnectionStateUpdates() } doReturn emptyFlow()
+            on { monitorChatPresenceLastGreenUpdates() } doReturn flow { awaitCancellation() }
+            on { monitorChatOnlineStatusUpdates() } doReturn flow { awaitCancellation() }
+            on { monitorChatConnectionStateUpdates() } doReturn flow { awaitCancellation() }
         }
     }
 
@@ -203,7 +203,6 @@ class GetContactsUseCaseTest {
             fullName = "Expected", alias = "alias", avatarUri = newUri,
             userVisibility = UserVisibility.Unknown,
         )
-        val changes = listOf(UserChanges.Firstname)
 
         stubContact(
             userHandle = userHandle,
@@ -211,17 +210,33 @@ class GetContactsUseCaseTest {
             fullName = initial.fullName,
             alias = initial.alias!!,
         )
-        stubGlobalUpdate(userEmail, userHandle, changes)
 
+        val changes = listOf(UserChanges.Avatar)
+        val updatesFlow = MutableStateFlow<UserUpdate>(
+            UserUpdate(
+                changes = emptyMap(),
+                emailMap = emptyMap(),
+            )
+        )
+        accountRepository.stub {
+            on { monitorUserUpdates() } doReturn updatesFlow
+        }
         contactsRepository.stub {
-            onBlocking { getContactData(any()) } doReturn expected
+            onBlocking { getContactData(any()) }.doReturn(expected)
         }
 
         initUnderTest()
 
         underTest().test {
             assertThat(awaitItem().first().contactData.avatarUri).isEqualTo(null)
+            updatesFlow.emit(
+                UserUpdate(
+                    changes = mapOf(UserId(userHandle) to changes),
+                    emailMap = mapOf(UserId(userHandle) to userEmail)
+                )
+            )
             assertThat(awaitItem().first().contactData.avatarUri).isEqualTo(newUri)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -355,22 +370,39 @@ class GetContactsUseCaseTest {
         }
         stubContactsList(listOf(contactItem), listOf(contactItem))
 
-        stubGlobalUpdate(
-            userEmail = userEmail,
-            userHandle = userHandle,
-            changes = listOf(UserChanges.AuthenticationInformation),
+        val changes = listOf(UserChanges.AuthenticationInformation)
+        val updatesFlow = MutableStateFlow<UserUpdate>(
+            UserUpdate(
+                changes = emptyMap(),
+                emailMap = emptyMap(),
+            )
         )
+        accountRepository.stub {
+            on { monitorUserUpdates() } doReturn updatesFlow
+        }
 
         initUnderTest()
 
         verifyNoInteractions(contactsRepository)
 
-        underTest().test { cancelAndIgnoreRemainingEvents() }
+        underTest().test {
+            awaitItem()
+            updatesFlow.emit(
+                UserUpdate(
+                    changes = mapOf(UserId(userHandle) to changes),
+                    emailMap = mapOf(UserId(userHandle) to userEmail)
+                )
+            )
+            cancelAndConsumeRemainingEvents()
+        }
 
         verifyBlocking(contactsRepository, times(2)) { getVisibleContacts() }
     }
 
-    private fun stubChatConnectionUpdate(expectedChatId: Long, expectedState: ChatConnectionStatus) {
+    private fun stubChatConnectionUpdate(
+        expectedChatId: Long,
+        expectedState: ChatConnectionStatus,
+    ) {
         contactsRepository.stub {
             on { monitorChatConnectionStateUpdates() } doReturn flow {
                 emit(

@@ -53,6 +53,7 @@ import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -227,6 +228,7 @@ internal class MegaApiFacade @Inject constructor(
                 api: MegaApiJava,
                 users: ArrayList<MegaUser>?,
             ) {
+                Timber.d("Global update onUsersUpdate")
                 trySend(GlobalUpdate.OnUsersUpdate(users))
             }
 
@@ -234,6 +236,7 @@ internal class MegaApiFacade @Inject constructor(
                 api: MegaApiJava,
                 userAlerts: ArrayList<MegaUserAlert>?,
             ) {
+                Timber.d("Global update onUserAlertsUpdate")
                 trySend(GlobalUpdate.OnUserAlertsUpdate(userAlerts))
             }
 
@@ -241,10 +244,12 @@ internal class MegaApiFacade @Inject constructor(
                 api: MegaApiJava,
                 nodeList: ArrayList<MegaNode>?,
             ) {
+                Timber.d("Global update onNodesUpdate")
                 trySend(GlobalUpdate.OnNodesUpdate(nodeList))
             }
 
             override fun onAccountUpdate(api: MegaApiJava) {
+                Timber.d("Global update onAccountUpdate")
                 trySend(GlobalUpdate.OnAccountUpdate)
             }
 
@@ -252,10 +257,12 @@ internal class MegaApiFacade @Inject constructor(
                 api: MegaApiJava,
                 requests: ArrayList<MegaContactRequest>?,
             ) {
+                Timber.d("Global update onContactRequestsUpdate")
                 trySend(GlobalUpdate.OnContactRequestsUpdate(requests))
             }
 
             override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
+                Timber.d("Global update onEvent")
                 if (event?.type == MegaEvent.EVENT_RELOADING) {
                     trySend(GlobalUpdate.OnReloadNeeded)
                 }
@@ -263,6 +270,7 @@ internal class MegaApiFacade @Inject constructor(
             }
 
             override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {
+                Timber.d("Global update onSetsUpdate")
                 trySend(GlobalUpdate.OnSetsUpdate(sets))
             }
 
@@ -270,10 +278,12 @@ internal class MegaApiFacade @Inject constructor(
                 api: MegaApiJava,
                 elements: ArrayList<MegaSetElement>?,
             ) {
+                Timber.d("Global update onSetElementsUpdate")
                 trySend(GlobalUpdate.OnSetElementsUpdate(elements))
             }
 
             override fun onGlobalSyncStateChanged(api: MegaApiJava) {
+                Timber.d("Global update onGlobalSyncStateChanged")
                 trySend(GlobalUpdate.OnGlobalSyncStateChanged)
             }
         }

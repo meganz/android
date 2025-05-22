@@ -7,8 +7,6 @@ import coil.load
 import coil.transform.CircleCropTransformation
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.ItemContactDataBinding
-import mega.privacy.android.domain.entity.user.ContactAvatar
-import mega.privacy.android.domain.entity.user.UserId
 
 /**
  * RecyclerView's ViewHolder to show ContactItem Data info.
@@ -26,7 +24,7 @@ class ContactListDataViewHolder(
         binding.chipNew.isVisible = item.isNew
         binding.verifiedIcon.isVisible = item.isVerified
         binding.imgThumbnail.load(
-            data = ContactAvatar(id = UserId(item.handle))
+            data = item.avatarUri ?: item.placeholder
         ) {
             transformations(CircleCropTransformation())
             placeholder(item.placeholder)
