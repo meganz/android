@@ -2287,6 +2287,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 // Set this value to false after successfully logging in for the first time
                 if (firstTimeAfterInstallation) {
                     firstTimeAfterInstallation = false
+                    requestNotificationsPermissionFirstLogin = false
                     dbH.setFirstTime(false)
                 }
                 if (!initialPermissionsAlreadyAsked && !onAskingPermissionsFragment) {
@@ -2392,6 +2393,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         showStorageAlertWithDelay = true
 
         lifecycleScope.launch {
+            val isOnboardingRevamp = getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp)
+            //If mobile device and not onboarding revamp, only portrait mode is allowed
+            if (isTablet().not() && !isOnboardingRevamp) {
+                Timber.d("Mobile only portrait mode")
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
             val shouldShowNotificationPermission =
                 intent?.getBooleanExtra(
                     IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION,
