@@ -15,12 +15,16 @@ import android.provider.Settings.canDrawOverlays
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -165,6 +169,7 @@ class PermissionsFragment : Fragment() {
         binding.newPermissionsLayout.setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val isDarkTheme = uiState.themeMode.isDarkMode()
+            val lifecycleOwner = LocalLifecycleOwner.current
 
             LaunchedEffect(uiState.visiblePermission) {
                 when (uiState.visiblePermission) {
@@ -178,6 +183,16 @@ class PermissionsFragment : Fragment() {
 
                     NewPermissionScreen.Loading -> {}
                 }
+            }
+
+            DisposableEffect(lifecycleOwner) {
+                val observer = LifecycleEventObserver { _, event ->
+                    if (event == Lifecycle.Event.ON_DESTROY && uiState.isCameraUploadsEnabled) {
+                        viewModel.startCameraUploadIfGranted()
+                    }
+                }
+                lifecycleOwner.lifecycle.addObserver(observer)
+                onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
             }
 
             AndroidTheme(isDarkTheme) {
@@ -210,7 +225,8 @@ class PermissionsFragment : Fragment() {
     private fun setupLegacyView() {
         binding.notNowButton.setOnClickListener {
             Analytics.tracker.trackEvent(OnboardingInitialPageNotNowButtonPressedEvent)
-            (requireActivity() as ManagerActivity).destroyPermissionsFragment()
+            (requireActivity() as ManagerActivity)
+                .destroyPermissionsFragment(isCameraUploadsEnabled = false)
         }
         binding.setupButton.setOnClickListener {
             Analytics.tracker.trackEvent(OnboardingInitialPageSetUpMegaButtonPressedEvent)
@@ -306,8 +322,36 @@ class PermissionsFragment : Fragment() {
         viewModel.nextPermission()
     }
 
+    fun onMediaPermissionResult(results: Map<String, Boolean>) {
+        if (results.areMediaPermissionsGranted()) {
+            viewModel.onMediaPermissionsGranted()
+        } else {
+            viewModel.nextPermission()
+        }
+    }
+
+    /**
+     * Checks if the User has granted the Media Permissions necessary to enable Camera Uploads. The
+     * number of Permissions being checked will depend on the Device OS
+     *
+     * @return true if the Media Permissions are granted
+     */
+    private fun Map<String, Boolean>.areMediaPermissionsGranted() =
+        when {
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> this.getOrElse(READ_EXTERNAL_STORAGE) { false }
+            // Media Permissions are still granted if at least the Partial Media Permission is granted
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                (this.getOrElse(READ_MEDIA_IMAGES) { false } && this.getOrElse(READ_MEDIA_VIDEO) { false })
+                        || this.getOrElse(READ_MEDIA_VISUAL_USER_SELECTED) { false }
+            }
+
+            else -> this.getOrElse(READ_MEDIA_IMAGES) { false } && this.getOrElse(READ_MEDIA_VIDEO) { false }
+        }
+
     private fun closePermissionScreen() {
-        (requireActivity() as ManagerActivity).destroyPermissionsFragment()
+        val isCameraUploadsEnabled = viewModel.uiState.value.isCameraUploadsEnabled
+        (requireActivity() as ManagerActivity)
+            .destroyPermissionsFragment(isCameraUploadsEnabled)
     }
 
     /**
@@ -425,7 +469,7 @@ class PermissionsFragment : Fragment() {
         Timber.d("CAMERA_BACKUP")
         requestPermission(
             requireActivity(),
-            PERMISSIONS_FRAGMENT,
+            PERMISSIONS_FRAGMENT_MEDIA_PERMISSION,
             *getCameraUploadsPermissions().toTypedArray()
         )
     }
@@ -477,6 +521,11 @@ class PermissionsFragment : Fragment() {
          * Permissions fragment identifier.
          */
         const val PERMISSIONS_FRAGMENT = 666
+
+        /**
+         * Permissions fragment identifier for media permission.
+         */
+        const val PERMISSIONS_FRAGMENT_MEDIA_PERMISSION = 667
 
         /**
          * Creates a new instance of [PermissionsFragment].

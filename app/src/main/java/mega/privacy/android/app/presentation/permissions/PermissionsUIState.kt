@@ -8,7 +8,8 @@ data class PermissionsUIState(
     val isOnboardingRevampEnabled: Boolean? = null,
     val themeMode: ThemeMode = ThemeMode.System,
     val visiblePermission: NewPermissionScreen = NewPermissionScreen.Loading,
-    val finishEvent: StateEvent = consumed
+    val finishEvent: StateEvent = consumed,
+    val isCameraUploadsEnabled: Boolean = false,
 )
 
 enum class NewPermissionScreen {

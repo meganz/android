@@ -706,6 +706,20 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     permissionsFragment?.setNextPermission()
                 }
             }
+
+            PermissionsFragment.PERMISSIONS_FRAGMENT_MEDIA_PERMISSION -> {
+                if (getPermissionsFragment() != null) {
+                    val permissionResults = permissions
+                        .mapIndexed { index, permission ->
+                            val granted =
+                                grantResults.getOrNull(index) == PackageManager.PERMISSION_GRANTED
+                            permission to granted
+                        }
+                        .toMap()
+
+                    permissionsFragment?.onMediaPermissionResult(permissionResults)
+                }
+            }
         }
     }
 
@@ -2472,7 +2486,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
                 || hasPermissions(this, Manifest.permission.POST_NOTIFICATIONS))
 
-    fun destroyPermissionsFragment() {
+    fun destroyPermissionsFragment(isCameraUploadsEnabled: Boolean) {
         initialPermissionsAlreadyAsked = true
         //In mobile, allow all orientation after permission screen
         if (isTablet().not()) {
@@ -2486,13 +2500,28 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         permissionsFragment = null
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         supportInvalidateOptionsMenu()
-        drawerItem = if (viewModel.getStorageState() === StorageState.PayWall) {
-            DrawerItem.CLOUD_DRIVE
-        } else {
-            viewModel.setIsFirstLogin(true)
-            DrawerItem.HOMEPAGE
+        drawerItem = when {
+            viewModel.getStorageState() === StorageState.PayWall -> {
+                DrawerItem.CLOUD_DRIVE
+            }
+
+            isCameraUploadsEnabled -> {
+                DrawerItem.CLOUD_DRIVE
+            }
+
+            else -> {
+                viewModel.setIsFirstLogin(true)
+                DrawerItem.HOMEPAGE
+            }
         }
         selectDrawerItem(drawerItem)
+        if (isCameraUploadsEnabled) {
+            showSnackbar(
+                SNACKBAR_TYPE,
+                getString(R.string.onboarding_camera_upload_permission_enabled_success_message),
+                -1
+            )
+        }
     }
 
     /**
@@ -2889,7 +2918,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     Timber.d("Open after LauncherFileExplorerActivity ")
                     val handleIntent: Long =
                         intent.getLongExtra(Constants.INTENT_EXTRA_KEY_PARENT_HANDLE, -1)
-                    val highlightedNames = intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES)
+                    val highlightedNames =
+                        intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES)
                     if (intent.getBooleanExtra(Constants.SHOW_MESSAGE_UPLOAD_STARTED, false)) {
                         val numberUploads: Int =
                             intent.getIntExtra(Constants.NUMBER_UPLOADS, 1)
