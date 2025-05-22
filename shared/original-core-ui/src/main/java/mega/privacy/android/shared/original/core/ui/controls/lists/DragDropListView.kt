@@ -42,6 +42,11 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
  * @param elevation The elevation of the dragging item, if you don't want elevation, set it to 0.dp
  * @param content the UI of the item, please note that don't add the view that includes the LongPress event, it will cause the event conflict
  */
+@Deprecated(
+    message = "This list is deprecated in favor of MegaReorderableLazyColumn in core-ui shared library",
+    replaceWith = ReplaceWith("MegaReorderableLazyColumn"),
+    level = DeprecationLevel.WARNING,
+)
 @Composable
 fun <T : Any> DragDropListView(
     items: List<T>,

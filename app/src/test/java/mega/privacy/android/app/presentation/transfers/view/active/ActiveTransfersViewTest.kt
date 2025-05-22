@@ -2,10 +2,12 @@ package mega.privacy.android.app.presentation.transfers.view.active
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTouchInput
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -25,9 +27,13 @@ import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 import java.math.BigInteger
 
 @RunWith(AndroidJUnit4::class)
@@ -94,10 +100,65 @@ class ActiveTransfersViewTest {
         }
     }
 
+    @Test
+    fun `test that on reorder preview is called when an item is dragged`() {
+        val inProgressTransfers = (1..10).map {
+            whenever(viewModel.getUiStateFlow(it)) doReturn MutableStateFlow(state)
+            getTransfer(tag = it)
+        }.toImmutableList()
+        val index = 2
+        val transferToDrag = inProgressTransfers[index]
+        val dragPositions = 3
+        val onReorderPreview = mock<(from: Int, to: Int) -> Unit>()
+        val onReorderConfirmed = mock<(InProgressTransfer) -> Unit>()
+        initComposeTestRule(
+            inProgressTransfers = inProgressTransfers,
+            onReorderPreview = onReorderPreview,
+            onReorderConfirmed = onReorderConfirmed
+        )
+        composeTestRule.onNodeWithTag("${TEST_TAG_ACTIVE_TRANSFER_ITEM}_${transferToDrag.tag}")
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(0f, height * dragPositions.toFloat()))
+            }
+
+        verify(onReorderPreview).invoke(index, index + dragPositions)
+        verifyNoInteractions(onReorderConfirmed)
+    }
+
+    @Test
+    fun `test that on reorder confirmed is called when a drag is finished`() {
+        val inProgressTransfers = (1..10).map {
+            whenever(viewModel.getUiStateFlow(it)) doReturn MutableStateFlow(state)
+            getTransfer(tag = it)
+        }.toImmutableList()
+        val transferToDrag = inProgressTransfers[2]
+        val onReorderPreview = mock<(from: Int, to: Int) -> Unit>()
+        val onReorderConfirmed = mock<(InProgressTransfer) -> Unit>()
+        initComposeTestRule(
+            inProgressTransfers = inProgressTransfers,
+            onReorderPreview = onReorderPreview,
+            onReorderConfirmed = onReorderConfirmed
+        )
+        composeTestRule.onNodeWithTag("${TEST_TAG_ACTIVE_TRANSFER_ITEM}_${transferToDrag.tag}")
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(0f, height * 2f))
+                up()
+            }
+
+        verify(onReorderPreview).invoke(any(), any())
+        verify(onReorderConfirmed).invoke(transferToDrag)
+    }
+
     private fun initComposeTestRule(
         inProgressTransfers: ImmutableList<InProgressTransfer> = emptyList<InProgressTransfer>().toImmutableList(),
         isOverQuota: Boolean = false,
         areTransfersPaused: Boolean = false,
+        onReorderPreview: (from: Int, to: Int) -> Unit = { _, _ -> },
+        onReorderConfirmed: (InProgressTransfer) -> Unit = {},
     ) {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
@@ -105,7 +166,9 @@ class ActiveTransfersViewTest {
                     activeTransfers = inProgressTransfers,
                     isOverQuota = isOverQuota,
                     areTransfersPaused = areTransfersPaused,
-                    onPlayPauseClicked = {}
+                    onPlayPauseClicked = {},
+                    onReorderPreview = onReorderPreview,
+                    onReorderConfirmed = onReorderConfirmed,
                 )
             }
         }

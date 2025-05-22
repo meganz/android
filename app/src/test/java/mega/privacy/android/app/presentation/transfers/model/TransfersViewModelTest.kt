@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.extensions.asHotFlow
+import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.EventType
@@ -20,6 +22,9 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
@@ -58,12 +63,18 @@ class TransfersViewModelTest {
     private val pauseTransfersQueueUseCase = mock<PauseTransfersQueueUseCase>()
     private val cancelTransfersUseCase = mock<CancelTransfersUseCase>()
     private val monitorCompletedTransfersUseCase = mock<MonitorCompletedTransfersUseCase>()
+    private val moveTransferBeforeByTagUseCase = mock<MoveTransferBeforeByTagUseCase>()
+    private val moveTransferToFirstByTagUseCase = mock<MoveTransferToFirstByTagUseCase>()
+    private val moveTransferToLastByTagUseCase = mock<MoveTransferToLastByTagUseCase>()
 
     @BeforeEach
     fun resetMocks() {
         reset(
             pauseTransferByTagUseCase,
             pauseTransfersQueueUseCase,
+            moveTransferBeforeByTagUseCase,
+            moveTransferToFirstByTagUseCase,
+            moveTransferToLastByTagUseCase,
         )
         wheneverBlocking { monitorInProgressTransfersUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
@@ -85,6 +96,9 @@ class TransfersViewModelTest {
             pauseTransfersQueueUseCase = pauseTransfersQueueUseCase,
             cancelTransfersUseCase = cancelTransfersUseCase,
             monitorCompletedTransfersUseCase = monitorCompletedTransfersUseCase,
+            moveTransferBeforeByTagUseCase = moveTransferBeforeByTagUseCase,
+            moveTransferToFirstByTagUseCase = moveTransferToFirstByTagUseCase,
+            moveTransferToLastByTagUseCase = moveTransferToLastByTagUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -364,6 +378,140 @@ class TransfersViewModelTest {
                 assertThat(actual.completedTransfers).isEmpty()
                 assertThat(actual.failedTransfers).isEqualTo(expectedFailed)
             }
+        }
+
+    @Test
+    fun `test that active transfers in ui state are reordered but not with use cases when onActiveTransfersReorderPreview is invoked`() =
+        runTest {
+            val initialActiveTransfers = (1..10).map { index ->
+                mock<InProgressTransfer.Download> {
+                    on { this.priority } doReturn index.toBigInteger()
+                    on { this.tag } doReturn index
+                }
+            }
+            val doubleChange = Triple(0, 1, 5)
+            val expected = initialActiveTransfers.toMutableList()
+                .moveElement(doubleChange.first, doubleChange.third)
+            val map = initialActiveTransfers.associateBy { it.tag.toLong() }
+            whenever(monitorInProgressTransfersUseCase()).thenReturn(
+                map.asHotFlow()
+            )
+            initTestClass()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onActiveTransfersReorderPreview(doubleChange.first, doubleChange.second)
+                underTest.onActiveTransfersReorderPreview(doubleChange.second, doubleChange.third)
+                val actual = awaitItem().activeTransfers
+                assertThat(actual).containsExactlyElementsIn(expected)
+                cancelAndIgnoreRemainingEvents()
+            }
+            verifyNoInteractions(
+                moveTransferBeforeByTagUseCase,
+                moveTransferToFirstByTagUseCase,
+                moveTransferToLastByTagUseCase,
+            )
+        }
+
+    @Test
+    fun `test that moveTransferBeforeByTagUseCase is invoked when preview reorder is confirmed`() =
+        runTest {
+            val initialActiveTransfers = (1..10).map { index ->
+                mock<InProgressTransfer.Download> {
+                    on { this.priority } doReturn index.toBigInteger()
+                    on { this.tag } doReturn index
+                }
+            }
+            val doubleChange = Triple(0, 1, 5)
+            val map = initialActiveTransfers.associateBy { it.tag.toLong() }
+            whenever(monitorInProgressTransfersUseCase()).thenReturn(
+                map.asHotFlow()
+            )
+            initTestClass()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onActiveTransfersReorderPreview(doubleChange.first, doubleChange.second)
+                underTest.onActiveTransfersReorderPreview(doubleChange.second, doubleChange.third)
+                underTest.onActiveTransfersReorderConfirmed(initialActiveTransfers[doubleChange.first])
+                cancelAndIgnoreRemainingEvents()
+            }
+            val expectedTag = initialActiveTransfers[doubleChange.first].tag
+            val expectedDest = initialActiveTransfers[doubleChange.third + 1].tag
+            verify(moveTransferBeforeByTagUseCase).invoke(
+                expectedTag,
+                expectedDest
+            )
+            verifyNoInteractions(
+                moveTransferToFirstByTagUseCase,
+                moveTransferToLastByTagUseCase,
+            )
+        }
+
+    @Test
+    fun `test that moveTransferToFirstByTagUseCase is invoked when preview reorder to first is confirmed`() =
+        runTest {
+            val initialActiveTransfers = (1..10).map { index ->
+                mock<InProgressTransfer.Download> {
+                    on { this.priority } doReturn index.toBigInteger()
+                    on { this.tag } doReturn index
+                }
+            }
+            val doubleChange = Triple(2, 1, 0)
+            val map = initialActiveTransfers.associateBy { it.tag.toLong() }
+            whenever(monitorInProgressTransfersUseCase()).thenReturn(
+                map.asHotFlow()
+            )
+            initTestClass()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onActiveTransfersReorderPreview(doubleChange.first, doubleChange.second)
+                underTest.onActiveTransfersReorderPreview(doubleChange.second, doubleChange.third)
+                underTest.onActiveTransfersReorderConfirmed(initialActiveTransfers[doubleChange.first])
+                cancelAndIgnoreRemainingEvents()
+            }
+            val expectedTag = initialActiveTransfers[doubleChange.first].tag
+            verify(moveTransferToFirstByTagUseCase).invoke(expectedTag)
+            verifyNoInteractions(
+                moveTransferBeforeByTagUseCase,
+                moveTransferToLastByTagUseCase,
+            )
+        }
+
+    @Test
+    fun `test that moveTransferToLastByTagUseCase is invoked when preview reorder to last is confirmed`() =
+        runTest {
+            val initialActiveTransfers = (1..10).map { index ->
+                mock<InProgressTransfer.Download> {
+                    on { this.priority } doReturn index.toBigInteger()
+                    on { this.tag } doReturn index
+                }
+            }
+            val doubleChange = Triple(
+                initialActiveTransfers.lastIndex - 2,
+                initialActiveTransfers.lastIndex - 1,
+                initialActiveTransfers.lastIndex
+            )
+            val map = initialActiveTransfers.associateBy { it.tag.toLong() }
+            whenever(monitorInProgressTransfersUseCase()).thenReturn(
+                map.asHotFlow()
+            )
+            initTestClass()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onActiveTransfersReorderPreview(doubleChange.first, doubleChange.second)
+                underTest.onActiveTransfersReorderPreview(doubleChange.second, doubleChange.third)
+                underTest.onActiveTransfersReorderConfirmed(initialActiveTransfers[doubleChange.first])
+                cancelAndIgnoreRemainingEvents()
+            }
+            val expectedTag = initialActiveTransfers[doubleChange.first].tag
+            verify(moveTransferToLastByTagUseCase).invoke(expectedTag)
+            verifyNoInteractions(
+                moveTransferBeforeByTagUseCase,
+                moveTransferToFirstByTagUseCase,
+            )
         }
 
     companion object {

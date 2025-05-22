@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.transfers.components
 
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -56,6 +58,7 @@ fun ActiveTransferItem(
     modifier = modifier
         .height(68.dp)
         .fillMaxWidth()
+        .background(DSTokens.colors.background.pageBackground)
         .testTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag")
 ) {
     Row(

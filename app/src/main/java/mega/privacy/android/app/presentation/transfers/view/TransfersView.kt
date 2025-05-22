@@ -20,7 +20,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.model.MegaSpanStyle
@@ -40,6 +39,7 @@ import mega.privacy.android.app.presentation.transfers.view.failed.FailedTransfe
 import mega.privacy.android.app.presentation.transfers.view.sheet.ActiveTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfersActionsBottomSheet
+import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -48,7 +48,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 
-@OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TransfersView(
     onBackPress: () -> Unit,
@@ -61,6 +61,8 @@ internal fun TransfersView(
     onCancelAllFailedTransfers: () -> Unit,
     onClearAllCompletedTransfers: () -> Unit,
     onClearAllFailedTransfers: () -> Unit,
+    onActiveTransfersReorderPreview: suspend (from: Int, to: Int) -> Unit,
+    onActiveTransfersReorderConfirmed: (InProgressTransfer) -> Unit,
 ) = with(uiState) {
     var showActiveTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
@@ -124,6 +126,8 @@ internal fun TransfersView(
                             isOverQuota = isOverQuota,
                             areTransfersPaused = areTransfersPaused,
                             onPlayPauseClicked = onPlayPauseTransfer,
+                            onReorderPreview = onActiveTransfersReorderPreview,
+                            onReorderConfirmed = onActiveTransfersReorderConfirmed,
                         )
                     }
                     addTextTab(
@@ -237,7 +241,6 @@ private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
     }
 }
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 @CombinedThemePreviews
 @Composable
 private fun TransfersViewPreview() {
@@ -253,13 +256,15 @@ private fun TransfersViewPreview() {
             onCancelAllFailedTransfers = {},
             onClearAllCompletedTransfers = {},
             onClearAllFailedTransfers = {},
+            onActiveTransfersReorderPreview = { _, _ -> },
+            onActiveTransfersReorderConfirmed = {},
         )
     }
 }
 
-const val TEST_TAG_TRANSFERS_VIEW = "transfers_view"
+internal const val TEST_TAG_TRANSFERS_VIEW = "transfers_view"
 
-const val TEST_TAG_EMPTY_TRANSFERS_VIEW = "$TEST_TAG_TRANSFERS_VIEW:empty"
+internal const val TEST_TAG_EMPTY_TRANSFERS_VIEW = "$TEST_TAG_TRANSFERS_VIEW:empty"
 
 /**
  * Tag for the active tab

@@ -5,7 +5,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
@@ -18,7 +17,6 @@ class TransfersInfo(
     val tabIndex: Int = ACTIVE_TAB_INDEX,
 )
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.transfersScreen(
     onBackPress: () -> Unit,
 ) {
@@ -37,6 +35,8 @@ internal fun NavGraphBuilder.transfersScreen(
             onCancelAllFailedTransfers = viewModel::cancelAllTransfers,
             onClearAllFailedTransfers = viewModel::clearAllFailedTransfers,
             onClearAllCompletedTransfers = viewModel::clearAllCompletedTransfers,
+            onActiveTransfersReorderPreview = viewModel::onActiveTransfersReorderPreview,
+            onActiveTransfersReorderConfirmed = viewModel::onActiveTransfersReorderConfirmed,
         )
     }
 }

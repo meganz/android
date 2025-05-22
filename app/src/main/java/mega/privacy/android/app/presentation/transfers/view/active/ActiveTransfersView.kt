@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.view.active
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,6 +9,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
+import mega.android.core.ui.components.list.MegaReorderableLazyColumn
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressPercentString
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressSizeString
 import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
@@ -27,6 +26,8 @@ internal fun ActiveTransfersView(
     isOverQuota: Boolean,
     areTransfersPaused: Boolean,
     onPlayPauseClicked: (Int) -> Unit,
+    onReorderPreview: suspend (from: Int, to: Int) -> Unit,
+    onReorderConfirmed: (InProgressTransfer) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (activeTransfers.isEmpty()) {
@@ -35,22 +36,21 @@ internal fun ActiveTransfersView(
             modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFERS_EMPTY_VIEW)
         )
     } else {
-        LazyColumn(
+        MegaReorderableLazyColumn(
+            items = activeTransfers,
+            key = { it.tag },
             modifier = modifier
                 .fillMaxSize()
-                .testTag(TEST_TAG_ACTIVE_TRANSFERS_VIEW)
-        ) {
-            items(
-                items = activeTransfers,
-                key = { it.tag },
-            ) { item ->
-                ActiveTransferItem(
-                    activeTransfer = item,
-                    isOverQuota = isOverQuota,
-                    areTransfersPaused = areTransfersPaused,
-                    onPlayPauseClicked = onPlayPauseClicked,
-                )
-            }
+                .testTag(TEST_TAG_ACTIVE_TRANSFERS_VIEW),
+            onMove = { from, to -> onReorderPreview(from.index, to.index) },
+            onDragStopped = { onReorderConfirmed(it) }
+        ) { item ->
+            ActiveTransferItem(
+                activeTransfer = item,
+                isOverQuota = isOverQuota,
+                areTransfersPaused = areTransfersPaused,
+                onPlayPauseClicked = onPlayPauseClicked,
+            )
         }
     }
 }
@@ -61,6 +61,7 @@ internal fun ActiveTransferItem(
     isOverQuota: Boolean,
     areTransfersPaused: Boolean,
     onPlayPauseClicked: (Int) -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: ActiveTransferImageViewModel = hiltViewModel(),
 ) = with(activeTransfer) {
     val uiState by viewModel.getUiStateFlow(tag).collectAsStateWithLifecycle()
@@ -82,7 +83,9 @@ internal fun ActiveTransferItem(
         isPaused = isPaused,
         isOverQuota = isOverQuota,
         areTransfersPaused = areTransfersPaused,
-        onPlayPauseClicked = { onPlayPauseClicked(tag) })
+        onPlayPauseClicked = { onPlayPauseClicked(tag) },
+        modifier = modifier,
+    )
 }
 
 internal const val TEST_TAG_ACTIVE_TRANSFERS_VIEW = "$TEST_TAG_ACTIVE_TAB:view"

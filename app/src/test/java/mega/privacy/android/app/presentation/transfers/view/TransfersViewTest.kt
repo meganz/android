@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_MORE_ACTION
@@ -205,7 +204,6 @@ class TransfersViewTest {
         composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).assertIsDisplayed()
     }
 
-    @OptIn(ExperimentalMaterialNavigationApi::class)
     private fun initComposeTestRule(uiState: TransfersUiState) {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
@@ -220,6 +218,8 @@ class TransfersViewTest {
                     onCancelAllFailedTransfers = {},
                     onClearAllFailedTransfers = {},
                     onClearAllCompletedTransfers = {},
+                    onActiveTransfersReorderPreview = { _, _ -> },
+                    onActiveTransfersReorderConfirmed = {},
                 )
             }
         }

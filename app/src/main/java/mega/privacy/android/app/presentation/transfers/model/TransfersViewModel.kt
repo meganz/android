@@ -11,10 +11,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.extensions.matchOrderWithNewAtEnd
+import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.view.navigation.TransfersInfo
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
@@ -40,6 +46,9 @@ class TransfersViewModel @Inject constructor(
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
     private val cancelTransfersUseCase: CancelTransfersUseCase,
     private val monitorCompletedTransfersUseCase: MonitorCompletedTransfersUseCase,
+    private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase,
+    private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase,
+    private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -59,14 +68,24 @@ class TransfersViewModel @Inject constructor(
 
     private fun monitorActiveTransfers() {
         viewModelScope.launch {
-            monitorInProgressTransfersUseCase().collectLatest { activeTransfers ->
-                _uiState.update { state ->
-                    state.copy(
-                        activeTransfers = activeTransfers.values
-                            .sortedBy { it.priority }.toImmutableList(),
-                    )
-                }
+            monitorInProgressTransfersUseCase().collectLatest { activeTransfersMap ->
+                val sortedTransfers = activeTransfersMap.values.sortedBy { it.priority }
+                setTransfers(
+                    if (reordering) {
+                        sortedTransfers.matchOrderWithNewAtEnd(uiState.value.activeTransfers) { it.tag }
+                    } else {
+                        sortedTransfers
+                    }
+                )
             }
+        }
+    }
+
+    private fun setTransfers(activeTransfers: Collection<InProgressTransfer>) {
+        _uiState.update { state ->
+            state.copy(
+                activeTransfers = activeTransfers.toImmutableList(),
+            )
         }
     }
 
@@ -212,4 +231,54 @@ class TransfersViewModel @Inject constructor(
             }.onFailure { Timber.e(it) }
         }
     }
+
+    /**
+     * Active transfers are being actively reordered, but still not confirmed.
+     * Transfers are reordered in the ui-state but not in the SDK
+     * @param fromIndex the index of the transfers that has been moved
+     * @param toIndex the index that the transfer should be moved to
+     */
+    fun onActiveTransfersReorderPreview(fromIndex: Int, toIndex: Int) {
+        if (fromIndex !in uiState.value.activeTransfers.indices || toIndex !in uiState.value.activeTransfers.indices) {
+            Timber.e(IndexOutOfBoundsException("Reordering indices are not correct: $fromIndex to $toIndex should be in ${uiState.value.activeTransfers.indices}"))
+            return
+        }
+        reordering = true
+        setTransfers(
+            uiState.value.activeTransfers.toMutableList().moveElement(fromIndex, toIndex)
+        )
+    }
+
+    /**
+     * Active transfers reorder is confirmed. The change will be send to the SDK
+     * @param transfer the transfer that has been confirmed, uiState position of this transfer will be send to the SDK
+     */
+    fun onActiveTransfersReorderConfirmed(transfer: InProgressTransfer) {
+        reordering = false
+        uiState.value.activeTransfers.indexOf(transfer).takeIf { it >= 0 }
+            ?.let { destinationIndex ->
+                viewModelScope.launch {
+                    runCatching {
+                        if (destinationIndex == 0) {
+                            moveTransferToFirstByTagUseCase(transfer.tag)
+                        } else if (destinationIndex >= uiState.value.activeTransfers.lastIndex) {
+                            moveTransferToLastByTagUseCase(transfer.tag)
+                        } else {
+                            uiState.value.activeTransfers.getOrNull(destinationIndex + 1)?.tag?.let { prevTag ->
+                                moveTransferBeforeByTagUseCase(
+                                    tag = transfer.tag,
+                                    prevTag = prevTag
+                                )
+                            }
+                        }
+                    }.onFailure {
+                        Timber.d(it, "Error reordering active transfers")
+                    }
+                    reordering = false
+                }
+            }
+    }
+
+    //internal value to preserve previous priority while dragged changes are not send to SDK yet
+    private var reordering = false
 }
