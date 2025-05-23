@@ -12,6 +12,7 @@ import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
@@ -116,6 +117,13 @@ class MediaDiscoveryActionModeCallback(
 
             R.id.cab_menu_unhide -> {
                 fragment.mediaDiscoveryViewModel.hideOrUnhideNodes(hide = false)
+                val size = fragment.mediaDiscoveryViewModel.getSelectedIds().size
+                val message = fragment.resources.getQuantityString(
+                    sharedR.plurals.unhidden_nodes_result_message,
+                    size,
+                    size,
+                )
+                Util.showSnackbar(fragment.requireActivity(), message)
                 fragment.destroyActionMode()
             }
 

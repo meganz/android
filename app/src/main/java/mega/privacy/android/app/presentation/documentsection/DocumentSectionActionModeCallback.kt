@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.shared.resources.R as sharedR
 
 internal class DocumentSectionActionModeCallback(
@@ -110,7 +111,7 @@ internal class DocumentSectionActionModeCallback(
 
                 R.id.cab_menu_share_link,
                 R.id.cab_menu_edit_link,
-                -> managerActivity.showGetLinkActivity(
+                    -> managerActivity.showGetLinkActivity(
                     documentSectionViewModel.getSelectedMegaNode()
                 )
 
@@ -146,10 +147,19 @@ internal class DocumentSectionActionModeCallback(
 
                 R.id.cab_menu_hide -> fragment.handleHideNodeClick()
 
-                R.id.cab_menu_unhide -> documentSectionViewModel.hideOrUnhideNodes(
-                    nodeIds = documentSectionViewModel.getSelectedNodes().map { it.id },
-                    hide = false,
-                )
+                R.id.cab_menu_unhide -> {
+                    val nodeIds = documentSectionViewModel.getSelectedNodes().map { it.id }
+                    documentSectionViewModel.hideOrUnhideNodes(
+                        nodeIds = nodeIds,
+                        hide = false,
+                    )
+                    val message = fragment.resources.getQuantityString(
+                        sharedR.plurals.unhidden_nodes_result_message,
+                        nodeIds.size,
+                        nodeIds.size,
+                    )
+                    Util.showSnackbar(managerActivity, message)
+                }
 
                 R.id.cab_menu_copy ->
                     NodeController(managerActivity).chooseLocationToCopyNodes(selectedHandles)

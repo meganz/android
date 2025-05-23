@@ -1214,6 +1214,11 @@
     <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Schedule rubbish bin clearing between 7 days and 10 years</string>
     <!-- Benefit: Priority support -->
     <string name="pro_plan_benefit_priority_support">Priority support</string>
+    <!-- The snackbar message of unhidden nodes operation -->
+    <plurals name="unhidden_nodes_result_message">
+        <item quantity="one">%1$d item unhidden</item>
+        <item quantity="other">%1$d items unhidden</item>
+    </plurals>
     <!-- Subscription page information section title at the bottom of the page-->
     <string name="choose_account_screen_subscription_information_title">Subscription details</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->

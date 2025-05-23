@@ -81,6 +81,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.PhotoPreviewSaveToDeviceMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
 import mega.privacy.mobile.analytics.event.PlaySlideshowMenuToolbarEvent
@@ -401,6 +402,8 @@ class ImagePreviewActivity : BaseActivity() {
             overridePendingTransition(0, 0)
         } else if (isHiddenNodesOnboarded == true) {
             viewModel.hideNode(nodeId = imageNode.id)
+            val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
+            viewModel.setResultMessage(message)
         } else {
             tempNodeId = imageNode.id
             showHiddenNodesOnboarding()
@@ -420,6 +423,9 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun unhideNode(imageNode: ImageNode) {
         viewModel.unhideNode(nodeId = imageNode.id)
+        val message =
+            resources.getQuantityString(sharedR.plurals.unhidden_nodes_result_message, 1, 1)
+        viewModel.setResultMessage(message)
     }
 
     private fun moveNode(imageNode: ImageNode) {

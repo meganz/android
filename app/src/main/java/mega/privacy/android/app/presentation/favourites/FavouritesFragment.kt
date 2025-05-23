@@ -592,6 +592,12 @@ class FavouritesFragment : Fragment() {
             activity?.overridePendingTransition(0, 0)
         } else if (isHiddenNodesOnboarded) {
             viewModel.hideOrUnhideNodes(nodeIds, true)
+            val message = resources.getQuantityString(
+                R.plurals.hidden_nodes_result_message,
+                nodeIds.size,
+                nodeIds.size,
+            )
+            Util.showSnackbar(requireActivity(), message)
         } else {
             this.tempNodeIds = nodeIds
             showHiddenNodesOnboarding()

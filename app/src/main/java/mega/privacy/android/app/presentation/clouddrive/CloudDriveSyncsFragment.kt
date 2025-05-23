@@ -874,10 +874,18 @@ class CloudDriveSyncsFragment : Fragment() {
                 }
 
                 OptionItems.UNHIDE_CLICKED -> {
+                    val nodeIds = it.selectedMegaNode.map { node -> NodeId(node.handle) }
                     fileBrowserViewModel.hideOrUnhideNodes(
-                        nodeIds = it.selectedMegaNode.map { node -> NodeId(node.handle) },
+                        nodeIds = nodeIds,
                         hide = false
                     )
+                    val message =
+                        resources.getQuantityString(
+                            sharedR.plurals.unhidden_nodes_result_message,
+                            nodeIds.size,
+                            nodeIds.size,
+                        )
+                    Util.showSnackbar(requireActivity(), message)
                     disableSelectMode()
                 }
 
@@ -957,6 +965,13 @@ class CloudDriveSyncsFragment : Fragment() {
                 nodeIds = nodeIds,
                 hide = true,
             )
+            val message =
+                resources.getQuantityString(
+                    R.plurals.hidden_nodes_result_message,
+                    nodeIds.size,
+                    nodeIds.size,
+                )
+            Util.showSnackbar(requireActivity(), message)
         } else {
             tempNodeIds = nodeIds
             showHiddenNodesOnboarding()

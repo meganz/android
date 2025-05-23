@@ -17,6 +17,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.isGif
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
@@ -174,6 +175,12 @@ class RecentActionBucketActionModeCallback constructor(
 
             R.id.cab_menu_unhide -> {
                 viewModel.hideOrUnhideNodes(nodeIds = nodeIds, false)
+                val message = recentActionBucketFragment.resources.getQuantityString(
+                    R.plurals.hidden_nodes_result_message,
+                    nodeIds.size,
+                    nodeIds.size
+                )
+                Util.showSnackbar(recentActionBucketFragment.requireActivity(), message)
                 viewModel.clearSelection()
             }
 

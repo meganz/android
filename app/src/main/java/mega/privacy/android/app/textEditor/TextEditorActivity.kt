@@ -405,6 +405,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     nodeId = NodeId(viewModel.getNode()?.handle ?: 0),
                     hide = false,
                 )
+                val message =
+                    resources.getQuantityString(sharedR.plurals.unhidden_nodes_result_message, 1, 1)
+                Util.showSnackbar(this, message)
             }
 
             R.id.action_move -> {
@@ -1299,6 +1302,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 nodeId = NodeId(handle),
                 hide = true,
             )
+            val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
+            Util.showSnackbar(this, message)
         } else {
             tempNodeId = NodeId(longValue = handle)
             showHiddenNodesOnboarding()

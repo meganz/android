@@ -11,6 +11,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.PhotosFragment
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
@@ -115,10 +116,17 @@ class TimelineActionModeCallback(
             }
 
             R.id.cab_menu_unhide -> {
+                val handles = fragment.timelineViewModel.selectedPhotosIds.toList()
                 fragment.timelineViewModel.hideOrUnhideNodes(
                     hide = false,
-                    handles = fragment.timelineViewModel.selectedPhotosIds.toList(),
+                    handles = handles,
                 )
+                val message = fragment.resources.getQuantityString(
+                    sharedR.plurals.unhidden_nodes_result_message,
+                    handles.size,
+                    handles.size
+                )
+                Util.showSnackbar(fragment.requireActivity(), message)
                 fragment.destroyActionMode()
             }
 

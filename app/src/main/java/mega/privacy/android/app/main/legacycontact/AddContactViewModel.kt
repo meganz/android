@@ -161,24 +161,15 @@ class AddContactViewModel @Inject constructor(
 
             for (handle in handles) {
                 val nodeId = NodeId(handle)
-                val node = getNodeByIdUseCase(nodeId)
+                val node = getNodeByIdUseCase(nodeId) ?: continue
 
-                if (node == null || node.isOutShare() || node !is FolderNode) continue
+                if (node !is FolderNode || node.isOutShare()) continue
 
-                if (node.isMarkedSensitive || node.isSensitiveInherited) {
-                    sensitiveType = 1
+                if (node.isMarkedSensitive || node.isSensitiveInherited || hasSensitiveDescendantUseCase(nodeId)) {
+                    sensitiveType = if (handles.size == 1) 3 else 4
                     break
                 }
-
-                if (hasSensitiveDescendantUseCase(nodeId)) {
-                    sensitiveType = 2
-                }
             }
-
-            if (sensitiveType == 1 && handles.size == 1) sensitiveType = 1
-            else if (sensitiveType == 1 && handles.size > 1) sensitiveType = 2
-            else if (sensitiveType == 2 && handles.size == 1) sensitiveType = 3
-            else if (sensitiveType == 2 && handles.size > 1) sensitiveType = 4
 
             _sensitiveItemsCount.value = sensitiveType
         } else {

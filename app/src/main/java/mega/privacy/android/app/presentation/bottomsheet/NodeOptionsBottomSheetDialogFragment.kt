@@ -69,6 +69,7 @@ import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.app.utils.BlurTransformation
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -943,25 +944,44 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (nodeDeviceCenterInformation != null) {
             setImageResource(nodeDeviceCenterInformation.icon)
         } else {
+            val parentNode = megaApi.getParentNode(megaNode)
+            val isSensitiveInherited = parentNode?.let { megaApi.isSensitiveInherited(it) } == true
+
             if (megaNode.isFolder) {
                 drawerItem?.let { nonNullDrawerItem ->
-                    setImageResource(
+                    load(
                         getFolderIcon(
                             node = megaNode,
                             drawerItem = nonNullDrawerItem,
                         )
-                    )
+                    ) {
+                        if (megaNode.isMarkedSensitive || isSensitiveInherited) {
+                            transformations(
+                                BlurTransformation(
+                                    requireContext(),
+                                    radius = 16f,
+                                )
+                            )
+                        }
+                    }
                 }
             } else {
                 val thumbnailParams = layoutParams as? ConstraintLayout.LayoutParams
                 thumbnailParams?.let {
                     load(ThumbnailRequest(NodeId(megaNode.handle))) {
                         size(Util.dp2px(Constants.THUMB_SIZE_DP.toFloat()))
-                        transformations(
-                            RoundedCornersTransformation(
-                                Util.dp2px(Constants.THUMB_CORNER_RADIUS_DP).toFloat()
+
+                        transformations(buildList {
+                            if (megaNode.isMarkedSensitive || isSensitiveInherited) {
+                                add(BlurTransformation(requireContext(), radius = 16f))
+                            }
+                            add(
+                                RoundedCornersTransformation(
+                                    Util.dp2px(Constants.THUMB_CORNER_RADIUS_DP).toFloat()
+                                )
                             )
-                        )
+                        })
+
                         listener(
                             onSuccess = { _, _ ->
                                 thumbnailParams.width =
@@ -1417,6 +1437,16 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 handle = node.handle,
                 hidden = !node.isMarkedSensitive,
             )
+
+            val message = resources.getQuantityString(
+                if (!node.isMarkedSensitive) {
+                    R.plurals.hidden_nodes_result_message
+                } else {
+                    sharedR.plurals.unhidden_nodes_result_message
+                }, 1, 1
+            )
+            Util.showSnackbar(requireActivity(), message)
+
             setStateBottomSheetBehaviorHidden()
         } else {
             tempNodeId = nodeOptionsViewModel.state.value.node?.handle?.let { NodeId(it) }

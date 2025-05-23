@@ -893,6 +893,10 @@ class PhotosFragment : Fragment() {
                 hide = true,
                 handles = timelineViewModel.selectedPhotosIds.toList(),
             )
+            val size = timelineViewModel.selectedPhotosIds.size
+            val message =
+                resources.getQuantityString(R.plurals.hidden_nodes_result_message, size, size)
+            Util.showSnackbar(requireActivity(), message)
         } else {
             showHiddenNodesOnboarding()
         }

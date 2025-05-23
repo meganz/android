@@ -375,6 +375,15 @@ class MediaDiscoveryFragment : Fragment() {
             mediaDiscoveryViewModel.hideOrUnhideNodes(
                 hide = true,
             )
+
+            val size = mediaDiscoveryViewModel.getSelectedIds().size
+            val message =
+                resources.getQuantityString(
+                    R.plurals.hidden_nodes_result_message,
+                    size,
+                    size,
+                )
+            Util.showSnackbar(requireActivity(), message)
         } else {
             showHiddenNodesOnboarding()
         }

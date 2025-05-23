@@ -327,10 +327,18 @@ class DocumentSectionFragment : Fragment() {
             hiddenNodesOnboardingLauncher.launch(intent)
             activity?.overridePendingTransition(0, 0)
         } else if (isHiddenNodesOnboarded) {
+            val nodes = documentSectionViewModel.getSelectedNodes()
             documentSectionViewModel.hideOrUnhideNodes(
-                nodeIds = documentSectionViewModel.getSelectedNodes().map { it.id },
+                nodeIds = nodes.map { it.id },
                 hide = true,
             )
+            val message =
+                resources.getQuantityString(
+                    R.plurals.hidden_nodes_result_message,
+                    nodes.size,
+                    nodes.size,
+                )
+            Util.showSnackbar(requireActivity(), message)
         } else {
             tempNodeIds = documentSectionViewModel.getSelectedNodes().map { it.id }
             showHiddenNodesOnboarding()

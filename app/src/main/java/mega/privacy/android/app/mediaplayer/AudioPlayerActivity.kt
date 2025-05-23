@@ -1083,6 +1083,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 playingHandle = playingHandle,
                 hide = true,
             )
+            val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
+            mega.privacy.android.app.utils.Util.showSnackbar(this, message)
         } else {
             tempNodeId = NodeId(longValue = playingHandle)
             showHiddenNodesOnboarding()
@@ -1130,6 +1132,14 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 hide,
                 OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
                     if (error.errorCode == MegaError.API_OK) {
+                        if (!hide) {
+                            val message = resources.getQuantityString(
+                                sharedR.plurals.unhidden_nodes_result_message,
+                                1,
+                                1
+                            )
+                            mega.privacy.android.app.utils.Util.showSnackbar(this, message)
+                        }
                         // Some times checking node.isMarkedSensitive immediately will still
                         // get true, so let's add some delay here.
                         RunOnUIThreadUtils.runDelay(500L) {

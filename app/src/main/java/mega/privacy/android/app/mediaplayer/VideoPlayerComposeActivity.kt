@@ -649,6 +649,8 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                 nodeIds = listOf(NodeId(playingHandle)),
                 hide = true,
             )
+            val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
+            videoPlayerViewModel.updateSnackBarMessage(message)
         } else {
             showHiddenNodesOnboarding()
         }
@@ -670,6 +672,9 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
             nodeIds = listOf(NodeId(playingHandle)),
             hide = false,
         )
+        val message =
+            resources.getQuantityString(sharedR.plurals.unhidden_nodes_result_message, 1, 1)
+        videoPlayerViewModel.updateSnackBarMessage(message)
     }
 
     private fun handleMoveAction(playingHandle: Long) {

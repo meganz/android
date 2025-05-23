@@ -12,8 +12,10 @@ import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AlbumContentHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.AlbumContentRemoveItemsEvent
 
@@ -80,6 +82,13 @@ class AlbumContentActionModeCallback(
                     fragment.activity?.overridePendingTransition(0, 0)
                 } else if (isHiddenNodesOnboarded) {
                     fragment.albumContentViewModel.hideOrUnhideNodes(true)
+                    val count = fragment.albumContentViewModel.state.value.selectedPhotos.size
+                    val message = fragment.resources.getQuantityString(
+                        R.plurals.hidden_nodes_result_message,
+                        count,
+                        count,
+                    )
+                    Util.showSnackbar(fragment.requireActivity(), message)
                     clearSelection()
                 } else {
                     fragment.albumContentViewModel.setHiddenNodesOnboarded()
@@ -95,6 +104,13 @@ class AlbumContentActionModeCallback(
 
             R.id.cab_menu_unhide -> {
                 fragment.albumContentViewModel.hideOrUnhideNodes(false)
+                val size = fragment.albumContentViewModel.state.value.selectedPhotos.size
+                val message = fragment.resources.getQuantityString(
+                    sharedR.plurals.unhidden_nodes_result_message,
+                    size,
+                    size,
+                )
+                Util.showSnackbar(fragment.requireActivity(), message)
                 clearSelection()
             }
 

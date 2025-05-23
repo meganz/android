@@ -64,6 +64,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AllVideosTabEvent
 import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
 import mega.privacy.mobile.analytics.event.PlaylistsTabEvent
@@ -256,7 +257,16 @@ class VideoSectionFragment : Fragment() {
 
                     is VideoSectionMenuAction.VideoSectionHideAction -> handleHideNodeClick()
 
-                    is VideoSectionMenuAction.VideoSectionUnhideAction -> videoSectionViewModel.unhideNodes()
+                    is VideoSectionMenuAction.VideoSectionUnhideAction -> {
+                        videoSectionViewModel.unhideNodes()
+                        val size = videoSectionViewModel.getSelectedNodes().size
+                        val message = resources.getQuantityString(
+                            sharedR.plurals.unhidden_nodes_result_message,
+                            size,
+                            size,
+                        )
+                        Util.showSnackbar(requireActivity(), message)
+                    }
 
                     is VideoSectionMenuAction.VideoSectionCopyAction ->
                         NodeController(managerActivity).chooseLocationToCopyNodes(selectedVideos)
@@ -371,11 +381,11 @@ class VideoSectionFragment : Fragment() {
                     },
                     isFolderLink = false,
                     searchedItems =
-                    if (uiState.currentDestinationRoute == videoSectionRoute && isSearchMode) {
-                        uiState.allVideos.map { it.id.longValue }
-                    } else {
-                        null
-                    },
+                        if (uiState.currentDestinationRoute == videoSectionRoute && isSearchMode) {
+                            uiState.allVideos.map { it.id.longValue }
+                        } else {
+                            null
+                        },
                 )
                 videoSectionViewModel.updateClickedItem(null)
             }.onFailure {
@@ -440,10 +450,18 @@ class VideoSectionFragment : Fragment() {
             hiddenNodesOnboardingLauncher.launch(intent)
             activity?.overridePendingTransition(0, 0)
         } else if (isHiddenNodesOnboarded) {
+            val nodes = videoSectionViewModel.getSelectedNodes()
             videoSectionViewModel.hideOrUnhideNodes(
-                nodeIds = videoSectionViewModel.getSelectedNodes().map { it.id },
+                nodeIds = nodes.map { it.id },
                 hide = true,
             )
+            val message =
+                resources.getQuantityString(
+                    R.plurals.hidden_nodes_result_message,
+                    nodes.size,
+                    nodes.size,
+                )
+            Util.showSnackbar(requireActivity(), message)
         } else {
             tempNodeIds = videoSectionViewModel.getSelectedNodes().map { it.id }
             showHiddenNodesOnboarding()

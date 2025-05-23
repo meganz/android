@@ -1320,6 +1320,9 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     nodeId = NodeId(handle),
                     hide = false,
                 )
+                val message =
+                    resources.getQuantityString(sharedR.plurals.unhidden_nodes_result_message, 1, 1)
+                Util.showSnackbar(this, message)
 
                 RunOnUIThreadUtils.runDelay(500L) {
                     item.isVisible = false
@@ -1388,7 +1391,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
         builder.setMessage(R.string.confirmation_delete_one_attachment)
         builder.setPositiveButton(R.string.context_remove, dialogClickListener)
-            .setNegativeButton(sharedR.string.general_dialog_cancel_button, dialogClickListener).show()
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, dialogClickListener)
+            .show()
         isDeleteDialogShow = true
         builder.setOnDismissListener { isDeleteDialogShow = false }
     }
@@ -1806,6 +1810,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 nodeId = NodeId(playingHandle),
                 hide = true,
             )
+            val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
+            Util.showSnackbar(this, message)
         } else {
             tempNodeId = NodeId(longValue = playingHandle)
             showHiddenNodesOnboarding()

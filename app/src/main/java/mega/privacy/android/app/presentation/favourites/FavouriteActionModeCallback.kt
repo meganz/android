@@ -17,6 +17,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.NodeId
 import timber.log.Timber
 
@@ -158,10 +159,19 @@ class FavouriteActionModeCallback(
                     )
                 }
 
-                R.id.cab_menu_unhide -> viewModel.hideOrUnhideNodes(
-                    nodeIds = nodeHandles.map { NodeId(longValue = it) },
-                    hide = false,
-                )
+                R.id.cab_menu_unhide -> {
+                    val nodeIds = nodeHandles.map { NodeId(longValue = it) }
+                    viewModel.hideOrUnhideNodes(
+                        nodeIds = nodeIds,
+                        hide = false,
+                    )
+                    val message = fragment.resources.getQuantityString(
+                        sharedR.plurals.unhidden_nodes_result_message,
+                        nodeIds.size,
+                        nodeIds.size,
+                    )
+                    Util.showSnackbar(mainActivity, message)
+                }
 
                 R.id.cab_menu_remove_favourites -> {
                     viewModel.favouritesRemoved(nodeHandles)

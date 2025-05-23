@@ -252,10 +252,18 @@ class AudioSectionFragment : Fragment() {
             hiddenNodesOnboardingLauncher.launch(intent)
             activity?.overridePendingTransition(0, 0)
         } else if (isHiddenNodesOnboarded) {
+            val nodes = audioSectionViewModel.getSelectedNodes()
             audioSectionViewModel.hideOrUnhideNodes(
-                nodeIds = audioSectionViewModel.getSelectedNodes().map { it.id },
+                nodeIds = nodes.map { it.id },
                 hide = true,
             )
+            val message =
+                resources.getQuantityString(
+                    R.plurals.hidden_nodes_result_message,
+                    nodes.size,
+                    nodes.size,
+                )
+            Util.showSnackbar(requireActivity(), message)
         } else {
             tempNodeIds = audioSectionViewModel.getSelectedNodes().map { it.id }
             showHiddenNodesOnboarding()

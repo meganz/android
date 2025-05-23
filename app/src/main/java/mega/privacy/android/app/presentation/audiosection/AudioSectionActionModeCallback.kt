@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.shared.resources.R as sharedR
 
 internal class AudioSectionActionModeCallback(
@@ -108,7 +109,7 @@ internal class AudioSectionActionModeCallback(
 
                 R.id.cab_menu_share_link,
                 R.id.cab_menu_edit_link,
-                -> managerActivity.showGetLinkActivity(audioSectionViewModel.getSelectedMegaNode())
+                    -> managerActivity.showGetLinkActivity(audioSectionViewModel.getSelectedMegaNode())
 
                 R.id.cab_menu_remove_link ->
                     RemovePublicLinkDialogFragment.newInstance(
@@ -140,10 +141,19 @@ internal class AudioSectionActionModeCallback(
 
                 R.id.cab_menu_hide -> fragment.handleHideNodeClick()
 
-                R.id.cab_menu_unhide -> audioSectionViewModel.hideOrUnhideNodes(
-                    nodeIds = audioSectionViewModel.getSelectedNodes().map { it.id },
-                    hide = false,
-                )
+                R.id.cab_menu_unhide -> {
+                    val nodes = audioSectionViewModel.getSelectedNodes()
+                    audioSectionViewModel.hideOrUnhideNodes(
+                        nodeIds = nodes.map { it.id },
+                        hide = false,
+                    )
+                    val message = fragment.resources.getQuantityString(
+                        sharedR.plurals.unhidden_nodes_result_message,
+                        nodes.size,
+                        nodes.size,
+                    )
+                    Util.showSnackbar(managerActivity, message)
+                }
 
                 R.id.cab_menu_copy ->
                     NodeController(managerActivity).chooseLocationToCopyNodes(selectedAudios)
