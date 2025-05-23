@@ -363,7 +363,7 @@ private fun RequireLogin(
                 modifier = Modifier
                     .size(80.dp)
                     .align(Alignment.CenterHorizontally),
-                painter = painterResource(id = R.drawable.ic_mega),
+                painter = painterResource(id = R.drawable.ic_mega_login),
                 contentDescription = "Login Icon"
             )
 
