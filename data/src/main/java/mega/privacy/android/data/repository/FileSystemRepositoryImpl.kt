@@ -516,4 +516,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun doesUriPathExist(uriPath: UriPath) = withContext(ioDispatcher) {
         fileGateway.doesUriPathExist(uriPath)
     }
+
+    override suspend fun removePersistentPermission(uriPath: UriPath) {
+        fileGateway.removePersistentPermission(uriPath)
+    }
 }

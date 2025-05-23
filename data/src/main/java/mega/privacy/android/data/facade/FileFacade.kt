@@ -1088,6 +1088,38 @@ internal class FileFacade @Inject constructor(
     override suspend fun doesUriPathExist(uriPath: UriPath): Boolean =
         getDocumentFileFromUri(uriPath.toUri())?.exists() == true
 
+    override suspend fun removePersistentPermission(uriPath: UriPath) {
+        runCatching {
+            val uri = getTreeUriFromDocumentUri(uriPath.value.toUri())
+            uri?.let {
+                context.contentResolver.releasePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                Timber.d("Removed persisted permission for uriPath $uriPath and uri $uri")
+            }
+        }.onFailure {
+            Timber.e("Failed to remove persisted permission for $uriPath $it")
+        }
+    }
+
+    private fun getTreeUriFromDocumentUri(documentUri: Uri): Uri? {
+        // "content://com.android.externalstorage.documents/tree/primary%3ADocuments/document/primary%3ADocuments"
+        // needs to be converted to content://com.android.externalstorage.documents/tree/primary%3ADocuments
+        if (DocumentsContract.isDocumentUri(context, documentUri)
+            && DocumentsContract.isTreeUri(documentUri)
+        ) {
+            val treeDocumentId = DocumentsContract.getTreeDocumentId(documentUri)
+            val authority = documentUri.authority
+            if (authority != null && treeDocumentId != null) {
+                return DocumentsContract.buildTreeDocumentUri(authority, treeDocumentId)
+            }
+        }
+        // If it's not a document URI within a tree, or if components are missing,
+        // return the original URI.
+        return documentUri
+    }
+
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val PHOTO_DIR = "MEGA Photos"

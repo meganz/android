@@ -2,6 +2,7 @@ package mega.privacy.android.data.facade
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -9,6 +10,7 @@ import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.os.storage.StorageManager
 import android.os.storage.StorageVolume
+import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.documentfile.provider.DocumentFile
@@ -35,9 +37,11 @@ import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mockStatic
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -848,6 +852,51 @@ internal class FileFacadeTest {
 
         assertThat(actual?.value).isEqualTo(uriPath.value)
     }
+
+    @Test
+    fun `test that removePersistentPermission does not release permission if uri is not a document uri`() =
+        runTest {
+            mockStatic(DocumentsContract::class.java).use { documentsContractMock ->
+                whenever(DocumentsContract.isDocumentUri(any(), any())).doReturn(false)
+
+                val uriPath = UriPath("content://com.example.invalid")
+                underTest.removePersistentPermission(uriPath)
+                val contentResolver = mock<ContentResolver>()
+                whenever(context.contentResolver).thenReturn(contentResolver)
+
+                verify(contentResolver, never()).releasePersistableUriPermission(
+                    any(),
+                    any()
+                )
+            }
+        }
+
+    @Test
+    fun `test that removePersistentPermission releases permission if uri is a document uri`() =
+        runTest {
+            mockStatic(DocumentsContract::class.java).use { documentsContractMock ->
+                mockStatic(Uri::class.java).use { uriMock ->
+                    val mockUri = mock<Uri>()
+                    val uriPath =
+                        UriPath("content://com.android.externalstorage.documents/tree/primary%3ADocuments")
+                    whenever(Uri.parse("content://com.android.externalstorage.documents/tree/primary%3ADocuments"))
+                        .thenReturn(mockUri)
+
+                    whenever(DocumentsContract.isDocumentUri(any(), any())).doReturn(true)
+                    whenever(DocumentsContract.isTreeUri(any())).doReturn(true)
+                    whenever(DocumentsContract.getTreeDocumentId(any())).doReturn("primary:Documents")
+                    val contentResolver = mock<ContentResolver>()
+                    whenever(context.contentResolver).thenReturn(contentResolver)
+
+                    underTest.removePersistentPermission(uriPath)
+
+                    verify(context.contentResolver).releasePersistableUriPermission(
+                        mockUri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                }
+            }
+        }
 
 
     private fun stubGetDocumentFileFromUri(documentFile: DocumentFile): Uri {

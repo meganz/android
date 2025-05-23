@@ -549,4 +549,11 @@ interface FileSystemRepository {
      * @return true if the UriPath exists, false otherwise
      */
     suspend fun doesUriPathExist(uriPath: UriPath): Boolean
+
+    /**
+     * Remove persistent permission for the given uri
+     *
+     * @param uriPath the [UriPath] to check
+     */
+    suspend fun removePersistentPermission(uriPath: UriPath)
 }
