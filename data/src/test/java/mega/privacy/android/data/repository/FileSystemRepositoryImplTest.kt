@@ -619,4 +619,39 @@ internal class FileSystemRepositoryImplTest {
 
         assertThat(underTest.doesUriPathExist(uriPath)).isEqualTo(expected)
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that hasPersistedPermission returns the gateway value`(
+        expected: Boolean,
+    ) = runTest {
+        mockStatic(Uri::class.java).use {
+            val uriPath = UriPath("content://test/file/path")
+            val uri = mock<Uri> {
+                on { scheme } doReturn "content"
+            }
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+            whenever(fileGateway.hasPersistedPermission(uri, true)) doReturn expected
+
+            assertThat(underTest.hasPersistedPermission(uriPath, true)).isEqualTo(expected)
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that takePersistedPermission calls the gateway method`(
+        writePermission: Boolean,
+    ) = runTest {
+        mockStatic(Uri::class.java).use {
+            val uriPath = UriPath("content://test/file/path")
+            val uri = mock<Uri> {
+                on { scheme } doReturn "content"
+            }
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+
+            underTest.takePersistablePermission(uriPath, writePermission)
+
+            verify(fileGateway).takePersistablePermission(uri, writePermission)
+        }
+    }
 }

@@ -3,7 +3,9 @@ package mega.privacy.android.domain.usecase.transfers.downloads
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.featuretoggle.DomainFeatures
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -14,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -24,6 +27,7 @@ class ShouldAskDownloadDestinationUseCaseTest {
     private val settingsRepository = mock<SettingsRepository>()
     private val transferRepository = mock<TransferRepository>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val fileSystemRepository = mock<FileSystemRepository>()
 
     @BeforeAll
     fun setup() {
@@ -31,6 +35,7 @@ class ShouldAskDownloadDestinationUseCaseTest {
         underTest = ShouldAskDownloadDestinationUseCase(
             settingsRepository,
             transferRepository,
+            fileSystemRepository,
             getFeatureFlagValueUseCase,
         )
     }
@@ -40,6 +45,7 @@ class ShouldAskDownloadDestinationUseCaseTest {
         reset(
             settingsRepository,
             transferRepository,
+            fileSystemRepository,
             getFeatureFlagValueUseCase,
         )
 
@@ -107,9 +113,48 @@ class ShouldAskDownloadDestinationUseCaseTest {
         runTest {
             whenever(getFeatureFlagValueUseCase(DomainFeatures.AllowToChooseDownloadDestination))
                 .thenReturn(false)
-            whenever(settingsRepository.getStorageDownloadLocation()).thenReturn("destination")
+            val destination = "destination"
+            whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(destination)
             whenever(transferRepository.allowUserToSetDownloadDestination()).thenReturn(userAllowed)
             whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
+            whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
+                .thenReturn(true)
             assertThat(underTest()).isFalse()
         }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that destination permission is not considered as valid when it doesn't have persisted write permission`(
+        expected: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(DomainFeatures.AllowToChooseDownloadDestination))
+            .thenReturn(false)
+        val destination = "destination"
+        whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(destination)
+        whenever(transferRepository.allowUserToSetDownloadDestination()).thenReturn(true)
+        whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
+        whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
+            .thenReturn(!expected)
+        assertThat(underTest()).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that persisted write permission is taken again when is valid`(
+        expected: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(DomainFeatures.AllowToChooseDownloadDestination))
+            .thenReturn(false)
+        val destination = "destination"
+        whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(destination)
+        whenever(transferRepository.allowUserToSetDownloadDestination()).thenReturn(true)
+        whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
+        whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
+            .thenReturn(true)
+
+        underTest()
+
+        verify(fileSystemRepository).takePersistablePermission(UriPath(destination), true)
+    }
+
 }

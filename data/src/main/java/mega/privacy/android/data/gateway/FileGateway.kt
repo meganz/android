@@ -583,4 +583,17 @@ interface FileGateway {
      * @param uriPath the [UriPath] to check
      */
     suspend fun removePersistentPermission(uriPath: UriPath)
+
+    /**
+     * Checks if the uri has persisted permission
+     *
+     * @param uri
+     * @param writePermission If true write permission will be checked as well, only read permission otherwise
+     */
+    fun hasPersistedPermission(uri: Uri, writePermission: Boolean): Boolean
+
+    /**
+     * Takes persisted permission of the given Uri, this may throw security exception if the permission has not been granted or it's outdated
+     */
+    fun takePersistablePermission(uri: Uri, writePermission: Boolean)
 }

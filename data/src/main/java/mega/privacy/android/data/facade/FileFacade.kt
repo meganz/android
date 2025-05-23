@@ -1120,6 +1120,18 @@ internal class FileFacade @Inject constructor(
         return documentUri
     }
 
+    override fun hasPersistedPermission(uri: Uri, writePermission: Boolean) =
+        context.contentResolver.persistedUriPermissions.any {
+            it.uri == uri && (if (writePermission) it.isWritePermission else it.isReadPermission)
+        }
+
+    override fun takePersistablePermission(uri: Uri, writePermission: Boolean) {
+        context.contentResolver.takePersistableUriPermission(
+            uri,
+            if (writePermission) Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION else Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
+    }
+
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val PHOTO_DIR = "MEGA Photos"

@@ -556,4 +556,17 @@ interface FileSystemRepository {
      * @param uriPath the [UriPath] to check
      */
     suspend fun removePersistentPermission(uriPath: UriPath)
+
+    /**
+     * Checks if the uri has persisted permission
+     *
+     * @param uri
+     * @param writePermission If true write permission will be checked as well, only read permission otherwise
+     */
+    suspend fun hasPersistedPermission(uriPath: UriPath, writePermission: Boolean): Boolean
+
+    /**
+     * Takes persisted permission of the given Uri, this may throw security exception if the permission has not been granted or it's outdated
+     */
+    suspend fun takePersistablePermission(uriPath: UriPath, writePermission: Boolean)
 }

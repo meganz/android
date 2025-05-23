@@ -3,6 +3,7 @@ package mega.privacy.android.data.facade
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.content.UriPermission
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -819,6 +820,40 @@ internal class FileFacadeTest {
             assertThat(actual).isEqualTo(expected)
         }
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that hasPersistedPermission returns value from contentResolver`(expected: Boolean) =
+        runTest {
+            val uri = mock<Uri>()
+            val contentResolver = mock<ContentResolver>()
+            val uriPermission = mock<UriPermission> {
+                on { this.uri } doReturn uri
+                on { this.isReadPermission } doReturn expected
+                on { this.isWritePermission } doReturn expected
+            }
+            whenever(context.contentResolver) doReturn contentResolver
+            whenever(contentResolver.persistedUriPermissions) doReturn listOf(uriPermission)
+
+            val actual = underTest.hasPersistedPermission(uri, true)
+
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that takePersistedPermission correctly calls contentResolver method`(writePermission: Boolean) =
+        runTest {
+            val uri = mock<Uri>()
+            val contentResolver = mock<ContentResolver>()
+            whenever(context.contentResolver) doReturn contentResolver
+            underTest.takePersistablePermission(uri, writePermission)
+
+            verify(contentResolver).takePersistableUriPermission(
+                uri,
+                if (writePermission) Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION else Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        }
 
     @Test
     fun `test that child file is returned when the name matches`(

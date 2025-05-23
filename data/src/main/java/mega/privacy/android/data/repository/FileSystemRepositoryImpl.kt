@@ -520,4 +520,15 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun removePersistentPermission(uriPath: UriPath) {
         fileGateway.removePersistentPermission(uriPath)
     }
+
+    override suspend fun hasPersistedPermission(uriPath: UriPath, writePermission: Boolean) =
+        withContext(ioDispatcher) {
+            fileGateway.hasPersistedPermission(uriPath.toUri(), writePermission)
+        }
+
+    override suspend fun takePersistablePermission(uriPath: UriPath, writePermission: Boolean) {
+        withContext(ioDispatcher) {
+            fileGateway.takePersistablePermission(uriPath.toUri(), writePermission)
+        }
+    }
 }
