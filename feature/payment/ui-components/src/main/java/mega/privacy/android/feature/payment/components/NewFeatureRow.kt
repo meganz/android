@@ -26,14 +26,15 @@ import mega.privacy.android.icon.pack.R as IconPackR
  * Composable UI for new ui revamped feature description
  */
 @Composable
-internal fun NewFeatureRow(
+fun NewFeatureRow(
+    modifier: Modifier = Modifier,
     painter: Painter,
     title: String,
     description: String,
     testTag: String,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .testTag(testTag),

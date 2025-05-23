@@ -31,6 +31,11 @@ data class LocalisedSubscription(
     val localisedPriceCurrencyCode: LocalisedPriceCurrencyCodeStringMapper,
     val formattedSize: FormattedSizeMapper,
 ) {
+    private val yearlyAmountPerMonth = CurrencyAmount(
+        yearlyAmount.value / 12,
+        yearlyAmount.currency,
+    )
+
     /**
      * method to call LocalisedPriceStringMapper to return string containing localised price and currency sign
      *
@@ -52,6 +57,11 @@ data class LocalisedSubscription(
             false -> localisedPriceCurrencyCode(yearlyAmount, locale)
         }
 
+    /**
+     * product price of the yearly amount per month
+     */
+    fun localisePriceOfYearlyAmountPerMonth(locale: Locale): LocalisedProductPrice =
+        localisedPriceCurrencyCode(yearlyAmountPerMonth, locale)
 
     /**
      * method to call FormattedSizeMapper to return pair of int and string containing correctly formatted size for storage

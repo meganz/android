@@ -206,6 +206,7 @@ dependencies {
     implementation(project(":shared:resources"))
     implementation(project(":feature:chat"))
     implementation(project(":feature:transfers:ui-components"))
+    implementation(project(":feature:payment:ui-components"))
     preBuiltSdkDependency(rootProject.extra)
 
     //Test Modules

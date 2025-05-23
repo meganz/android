@@ -2,6 +2,7 @@ package mega.privacy.android.feature.payment.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ fun ProPlanCard(
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(horizontal = 16.dp)
+            .clickable(onClick = onSelected)
             .fillMaxWidth()
             .testTag(TEST_TAG_PRO_PLAN_CARD),
     ) {
@@ -72,7 +74,7 @@ fun ProPlanCard(
                             color = DSTokens.colors.notifications.notificationInfo,
                             shape = RoundedCornerShape(6.dp)
                         )
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
                         .testTag(TEST_TAG_PRO_PLAN_CARD_RECOMMENDED),
                     text = stringResource(shareR.string.account_upgrade_account_pro_plan_info_recommended_label),
                     style = MaterialTheme.typography.bodySmall,
