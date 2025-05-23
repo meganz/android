@@ -707,6 +707,15 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 }
             }
 
+            PermissionsFragment.PERMISSIONS_FRAGMENT_NOTIFICATION_PERMISSION -> {
+                if (getPermissionsFragment() != null) {
+                    val isPermissionGranted =
+                        grantResults.getOrNull(0) == PackageManager.PERMISSION_GRANTED
+                    permissionsFragment?.onNotificationPermissionResult(isPermissionGranted)
+                    permissionsFragment?.setNextPermission()
+                }
+            }
+
             PermissionsFragment.PERMISSIONS_FRAGMENT_MEDIA_PERMISSION -> {
                 if (getPermissionsFragment() != null) {
                     val permissionResults = permissions

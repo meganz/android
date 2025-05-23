@@ -53,9 +53,14 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternal
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.mobile.analytics.event.AllowNotificationsCTAButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CameraBackupsCTAScreenEvent
+import mega.privacy.mobile.analytics.event.DontAllowCameraBackupsCTAButtonPressedEvent
+import mega.privacy.mobile.analytics.event.DontAllowNotificationsCTAButtonPressedEvent
 import mega.privacy.mobile.analytics.event.EnableCameraBackupsCTAButtonPressedEvent
 import mega.privacy.mobile.analytics.event.EnableNotificationsCTAButtonPressedEvent
+import mega.privacy.mobile.analytics.event.FullAccessCameraBackupsCTAButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LimitedAccessCameraBackupsCTAButtonPressedEvent
 import mega.privacy.mobile.analytics.event.NotificationsCTAScreenEvent
 import mega.privacy.mobile.analytics.event.OnboardingInitialPageNotNowButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OnboardingInitialPageSetUpMegaButtonPressedEvent
@@ -200,7 +205,7 @@ class PermissionsFragment : Fragment() {
                     uiState = uiState,
                     askNotificationPermission = {
                         Analytics.tracker.trackEvent(EnableNotificationsCTAButtonPressedEvent)
-                        askForNotificationsPermission()
+                        askForNotificationsPermission(PERMISSIONS_FRAGMENT_NOTIFICATION_PERMISSION)
                     },
                     askCameraBackupPermission = {
                         Analytics.tracker.trackEvent(EnableCameraBackupsCTAButtonPressedEvent)
@@ -322,11 +327,30 @@ class PermissionsFragment : Fragment() {
         viewModel.nextPermission()
     }
 
-    fun onMediaPermissionResult(results: Map<String, Boolean>) {
-        if (results.areMediaPermissionsGranted()) {
-            viewModel.onMediaPermissionsGranted()
+    fun onNotificationPermissionResult(permissionGranted: Boolean) {
+        if (permissionGranted) {
+            Analytics.tracker.trackEvent(AllowNotificationsCTAButtonPressedEvent)
         } else {
-            viewModel.nextPermission()
+            Analytics.tracker.trackEvent(DontAllowNotificationsCTAButtonPressedEvent)
+        }
+    }
+
+    fun onMediaPermissionResult(results: Map<String, Boolean>) {
+        when {
+            results.areMediaPermissionsPartiallyGranted() -> {
+                Analytics.tracker.trackEvent(LimitedAccessCameraBackupsCTAButtonPressedEvent)
+                viewModel.onMediaPermissionsGranted()
+            }
+
+            results.areMediaPermissionsGranted() -> {
+                Analytics.tracker.trackEvent(FullAccessCameraBackupsCTAButtonPressedEvent)
+                viewModel.onMediaPermissionsGranted()
+            }
+
+            else -> {
+                Analytics.tracker.trackEvent(DontAllowCameraBackupsCTAButtonPressedEvent)
+                viewModel.nextPermission()
+            }
         }
     }
 
@@ -338,7 +362,9 @@ class PermissionsFragment : Fragment() {
      */
     private fun Map<String, Boolean>.areMediaPermissionsGranted() =
         when {
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> this.getOrElse(READ_EXTERNAL_STORAGE) { false }
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> this.getOrElse(
+                READ_EXTERNAL_STORAGE
+            ) { false }
             // Media Permissions are still granted if at least the Partial Media Permission is granted
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
                 (this.getOrElse(READ_MEDIA_IMAGES) { false } && this.getOrElse(READ_MEDIA_VIDEO) { false })
@@ -347,6 +373,16 @@ class PermissionsFragment : Fragment() {
 
             else -> this.getOrElse(READ_MEDIA_IMAGES) { false } && this.getOrElse(READ_MEDIA_VIDEO) { false }
         }
+
+    private fun Map<String, Boolean>.areMediaPermissionsPartiallyGranted(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return false
+
+        val mediaImagesGranted = getOrElse(READ_MEDIA_IMAGES) { false }
+        val mediaVideoGranted = getOrElse(READ_MEDIA_VIDEO) { false }
+        val partialMediaGranted = getOrElse(READ_MEDIA_VISUAL_USER_SELECTED) { false }
+
+        return partialMediaGranted && !(mediaImagesGranted && mediaVideoGranted)
+    }
 
     private fun closePermissionScreen() {
         val isCameraUploadsEnabled = viewModel.uiState.value.isCameraUploadsEnabled
@@ -382,7 +418,7 @@ class PermissionsFragment : Fragment() {
      */
     private fun askForPermission(permissionType: PermissionType) {
         when (permissionType) {
-            PermissionType.Notifications -> askForNotificationsPermission()
+            PermissionType.Notifications -> askForNotificationsPermission(PERMISSIONS_FRAGMENT)
             PermissionType.DisplayOverOtherApps -> askForDisplayOverOtherAppsPermission()
             PermissionType.ReadAndWrite -> askForReadAndWritePermissions()
             PermissionType.Write -> askForWritePermission()
@@ -398,10 +434,10 @@ class PermissionsFragment : Fragment() {
     /**
      * Asks for notifications permission.
      */
-    private fun askForNotificationsPermission() {
+    private fun askForNotificationsPermission(requestCode: Int) {
         requestPermission(
             requireActivity(),
-            PERMISSIONS_FRAGMENT,
+            requestCode,
             Manifest.permission.POST_NOTIFICATIONS
         )
     }
@@ -523,9 +559,14 @@ class PermissionsFragment : Fragment() {
         const val PERMISSIONS_FRAGMENT = 666
 
         /**
-         * Permissions fragment identifier for media permission.
+         * Permissions fragment identifier for media permission - Design Revamp
          */
         const val PERMISSIONS_FRAGMENT_MEDIA_PERMISSION = 667
+
+        /**
+         * Permissions fragment identifier for notification permission - Design Revamp
+         */
+        const val PERMISSIONS_FRAGMENT_NOTIFICATION_PERMISSION = 668
 
         /**
          * Creates a new instance of [PermissionsFragment].
