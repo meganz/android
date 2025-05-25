@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -45,11 +46,6 @@ class GetContactsUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        reset(
-            chatRepository,
-            accountRepository,
-            contactsRepository,
-        )
 
         accountRepository.stub {
             on { monitorUserUpdates() } doReturn flow { awaitCancellation() }
@@ -61,6 +57,15 @@ class GetContactsUseCaseTest {
             on { monitorChatOnlineStatusUpdates() } doReturn flow { awaitCancellation() }
             on { monitorChatConnectionStateUpdates() } doReturn flow { awaitCancellation() }
         }
+    }
+
+    @AfterEach
+    fun tearDown() {
+        reset(
+            chatRepository,
+            accountRepository,
+            contactsRepository,
+        )
     }
 
 
