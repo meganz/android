@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.domain.entity.AccountType
@@ -92,6 +93,17 @@ internal class ChooseAccountViewModel @Inject constructor(
                     }
                 )
             }
+        }
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.OnboardingProPromoRevamp)
+            }.onSuccess { isProPromoRevampEnabled ->
+                _state.update {
+                    it.copy(
+                        isProPromoRevampEnabled = isProPromoRevampEnabled
+                    )
+                }
+            }.onFailure { Timber.e("Failed to fetch feature flags with error: ${it.message}") }
         }
         viewModelScope.launch {
             runCatching {

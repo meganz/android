@@ -110,30 +110,40 @@ class NewChooseAccountScreenTest {
     @Test
     fun `test that additional benefits section is shown correctly`() {
         setContent()
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(TEST_TAG_ADDITIONAL_BENEFITS))
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_ADDITIONAL_BENEFITS))
             .assertExists()
     }
 
     @Test
     fun `test that free plan features are shown correctly`() {
         setContent()
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(TEST_TAG_FREE_PLAN_CARD))
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_FREE_PLAN_CARD))
             .assertExists()
     }
 
     @Test
     fun `test that subscription info and terms are shown correctly`() {
         setContent()
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(TEST_TAG_SUBSCRIPTION_INFO_TITLE))
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_SUBSCRIPTION_INFO_TITLE))
             .assertExists()
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(TEST_TAG_SUBSCRIPTION_INFO_DESC))
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_SUBSCRIPTION_INFO_DESC))
             .assertExists()
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(TEST_TAG_TERMS_AND_POLICIES))
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_TERMS_AND_POLICIES))
             .assertExists()
     }
 
-    private fun setContent() = composeRule.setContent {
+    private fun setContent(
+        onBuyPlanClick: (AccountType, Boolean) -> Unit = { _, _ -> },
+        onFreePlanClick: () -> Unit = {},
+    ) = composeRule.setContent {
         NewChooseAccountScreen(
+            onBuyPlanClick = onBuyPlanClick,
+            onFreePlanClick = onFreePlanClick,
             uiState = ChooseAccountState(
                 localisedSubscriptionsList = expectedLocalisedSubscriptionsList
             )

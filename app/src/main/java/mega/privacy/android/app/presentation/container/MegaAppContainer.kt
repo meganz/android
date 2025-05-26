@@ -71,6 +71,7 @@ internal fun MegaAppContainer(
 internal fun SharedAppContainer(
     themeMode: ThemeMode,
     passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
+    useLegacyStatusBarColor: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
@@ -86,7 +87,11 @@ internal fun SharedAppContainer(
             CompositionLocalProvider(
                 LocalIsDarkTheme provides darkMode
             ) {
-                AndroidTheme(isDark = darkMode, content = it)
+                AndroidTheme(
+                    isDark = darkMode,
+                    content = it,
+                    useLegacyStatusBarColor = useLegacyStatusBarColor
+                )
             }
         },
         { SessionContainer(content = it) },

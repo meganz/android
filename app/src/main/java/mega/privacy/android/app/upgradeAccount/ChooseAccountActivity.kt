@@ -16,10 +16,9 @@ import mega.privacy.android.domain.entity.AccountType
 open class ChooseAccountActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-
+        enableEdgeToEdge()
         setContentView(R.layout.activity_choose_account)
 
         if (savedInstanceState == null) {

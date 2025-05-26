@@ -1,31 +1,34 @@
 package mega.privacy.android.app.upgradeAccount
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -40,7 +43,6 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.badge.Badge
 import mega.android.core.ui.components.badge.BadgeType
 import mega.android.core.ui.components.chip.MegaChip
-import mega.android.core.ui.components.text.SecondaryTopNavigationButton
 import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.model.SpanStyleWithAnnotation
@@ -58,6 +60,7 @@ import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
 import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
+import mega.privacy.android.feature.payment.components.ChooseAccountScreenTopBar
 import mega.privacy.android.feature.payment.components.FreePlanCard
 import mega.privacy.android.feature.payment.components.NewFeatureRow
 import mega.privacy.android.feature.payment.components.ProPlanCard
@@ -68,10 +71,22 @@ import java.util.Locale
 @Composable
 internal fun NewChooseAccountScreen(
     uiState: ChooseAccountState = ChooseAccountState(),
+    onBuyPlanClick: (AccountType, Boolean) -> Unit,
+    onFreePlanClick: () -> Unit,
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
     var isMonthly by remember { mutableStateOf(true) }
     val context = LocalContext.current
+
+    val lazyListState = rememberLazyListState()
+    val topBarHeightPx =
+        with(LocalDensity.current) { 56.dp.roundToPx() + WindowInsets.statusBars.getTop(this) }
+    val headerHeightPx = with(LocalDensity.current) { 180.dp.roundToPx() }
+    val position by remember { derivedStateOf { lazyListState.firstVisibleItemIndex } }
+    val itemOffset by remember { derivedStateOf { lazyListState.firstVisibleItemScrollOffset } }
+    val currentHeaderHeightPx = headerHeightPx - itemOffset
+    val transparent = position == 0 && currentHeaderHeightPx > topBarHeightPx
+    val alpha by animateFloatAsState(targetValue = if (transparent) 0f else 1f)
 
     val proFeatures = remember {
         listOf(
@@ -105,27 +120,17 @@ internal fun NewChooseAccountScreen(
     MegaScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
         topBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
-            ) {
-                SecondaryTopNavigationButton(
-                    modifier = Modifier.align(
-                        Alignment.CenterEnd
-                    ),
-                    text = stringResource(sharedR.string.choose_account_screen_maybe_later_button_text),
-                    onClick = {},
-                )
-            }
+            ChooseAccountScreenTopBar(
+                alpha = alpha,
+                onClick = onFreePlanClick
+            )
         },
         bottomBar = {
             chosenPlan?.let {
                 BuyPlanBottomBar(
                     modifier = Modifier,
                     text = stringResource(it.toUIAccountType().textBuyButtonValue),
-                    onClick = { /* TODO: Handle buy button click */ }
+                    onClick = { onBuyPlanClick(it, isMonthly) },
                 )
             }
         }
@@ -135,11 +140,13 @@ internal fun NewChooseAccountScreen(
                 .testTag(TEST_TAG_LAZY_COLUMN)
                 .navigationBarsPadding()
                 .fillMaxSize(),
+            state = lazyListState,
         ) {
             item("image_header") {
                 Image(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .height(180.dp)
                         .testTag(TEST_TAG_IMAGE_HEADER),
                     painter = painterResource(IconPackR.drawable.choose_account_type_header),
                     contentDescription = "Header Image",
@@ -152,14 +159,16 @@ internal fun NewChooseAccountScreen(
                     text = "Get more with Pro plan",
                     style = MaterialTheme.typography.headlineSmall,
                     textColor = TextColor.Primary,
-                    modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
+                    modifier = Modifier
+                        .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
                         .testTag(TEST_TAG_TITLE)
                 )
                 MegaText(
                     text = stringResource(id = sharedR.string.pro_plan_features_section_title),
                     style = MaterialTheme.typography.titleMedium,
                     textColor = TextColor.Primary,
-                    modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
+                    modifier = Modifier
+                        .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
                         .testTag(TEST_TAG_FEATURES_SECTION_TITLE)
                 )
             }
@@ -205,7 +214,8 @@ internal fun NewChooseAccountScreen(
                 Badge(
                     badgeType = BadgeType.Mega,
                     text = stringResource(id = sharedR.string.account_upgrade_account_label_save_up_to),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                         .testTag(TEST_TAG_SAVE_UP_TO_BADGE)
                 )
             }
@@ -267,7 +277,8 @@ internal fun NewChooseAccountScreen(
                 }
 
                 ProPlanCard(
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp)
                         .testTag("$TEST_TAG_PRO_PLAN_CARD$index"),
                     planName = stringResource(id = uiAccountType.textValue),
                     isRecommended = isRecommended,
@@ -309,25 +320,30 @@ internal fun NewChooseAccountScreen(
 
             item("free_plan_card") {
                 FreePlanCard(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier
+                        .padding(16.dp)
                         .testTag(TEST_TAG_FREE_PLAN_CARD),
-                    onContinue = { /* TODO: Handle free plan click */ })
+                    onContinue = onFreePlanClick,
+                )
             }
 
             item("subscription_info") {
                 MegaText(
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
                         .testTag(TEST_TAG_SUBSCRIPTION_INFO_TITLE),
                     text = stringResource(id = sharedR.string.choose_account_screen_subscription_information_title),
                     textColor = TextColor.Primary,
                     style = AppTheme.typography.titleSmall
                 )
                 LinkSpannedText(
-                    modifier = Modifier.padding(
-                        top = LocalSpacing.current.x8,
-                        start = LocalSpacing.current.x16,
-                        end = LocalSpacing.current.x16
-                    ).testTag(TEST_TAG_SUBSCRIPTION_INFO_DESC),
+                    modifier = Modifier
+                        .padding(
+                            top = LocalSpacing.current.x8,
+                            start = LocalSpacing.current.x16,
+                            end = LocalSpacing.current.x16
+                        )
+                        .testTag(TEST_TAG_SUBSCRIPTION_INFO_DESC),
                     value = stringResource(id = sharedR.string.choose_account_screen_subscription_information_description),
                     spanStyles = mapOf(
                         SpanIndicator('A') to SpanStyleWithAnnotation(
@@ -352,7 +368,8 @@ internal fun NewChooseAccountScreen(
                             start = LocalSpacing.current.x16,
                             end = LocalSpacing.current.x16,
                             bottom = LocalSpacing.current.x48
-                        ).testTag(TEST_TAG_TERMS_AND_POLICIES),
+                        )
+                        .testTag(TEST_TAG_TERMS_AND_POLICIES),
                     value = stringResource(id = sharedR.string.choose_account_screen_terms_and_policies_link_text),
                     spanStyles = mapOf(
                         SpanIndicator('A') to SpanStyleWithAnnotation(
@@ -381,7 +398,9 @@ internal fun NewChooseAccountScreenPreview(
 ) {
     AndroidTheme(isSystemInDarkTheme()) {
         NewChooseAccountScreen(
-            uiState = state
+            uiState = state,
+            onBuyPlanClick = { _, _ -> },
+            onFreePlanClick = {}
         )
     }
 }
@@ -439,7 +458,8 @@ internal const val TEST_TAG_FREE_PLAN_CARD = "choose_account_screen:free_plan_ca
 /**
  * Test tag for the subscription info title
  */
-internal const val TEST_TAG_SUBSCRIPTION_INFO_TITLE = "choose_account_screen:subscription_info_title"
+internal const val TEST_TAG_SUBSCRIPTION_INFO_TITLE =
+    "choose_account_screen:subscription_info_title"
 
 /**
  * Test tag for the subscription info description
