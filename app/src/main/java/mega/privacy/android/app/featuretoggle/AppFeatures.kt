@@ -170,7 +170,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     OnboardingRevamp(
         "Onboarding Revamp with new components",
-        false,
+        true,
     ),
 
     /**
