@@ -1,10 +1,13 @@
 package mega.privacy.android.data.repository.security
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.security.PasscodeStoreGateway
 import mega.privacy.android.data.mapper.security.PasscodeTimeoutMapper
@@ -12,6 +15,7 @@ import mega.privacy.android.data.mapper.security.PasscodeTypeMapper
 import mega.privacy.android.data.mapper.security.PasscodeTypeStringMapper
 import mega.privacy.android.domain.entity.passcode.PasscodeTimeout
 import mega.privacy.android.domain.entity.passcode.PasscodeType
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.security.PasscodeRepository
 import javax.inject.Inject
@@ -22,7 +26,12 @@ internal class PasscodeRepositoryImpl @Inject constructor(
     private val passcodeTimeoutMapper: PasscodeTimeoutMapper,
     private val passcodeTypeMapper: PasscodeTypeMapper,
     private val passcodeTypeStringMapper: PasscodeTypeStringMapper,
+    @ApplicationScope applicationScope: CoroutineScope,
 ) : PasscodeRepository {
+    private val lockState = passcodeStoreGateway.monitorLockState()
+        .flowOn(ioDispatcher)
+        .stateIn(applicationScope, SharingStarted.Eagerly, null)
+
     override fun monitorFailedAttempts() = passcodeStoreGateway.monitorFailedAttempts()
         .flowOn(ioDispatcher)
 
@@ -42,8 +51,7 @@ internal class PasscodeRepositoryImpl @Inject constructor(
         passcodeStoreGateway.setLockedState(locked)
     }
 
-    override fun monitorLockState() = passcodeStoreGateway.monitorLockState()
-        .flowOn(ioDispatcher)
+    override fun monitorLockState() = lockState
 
     override suspend fun setLastPausedTime(lastPausedUTCTimestamp: Long?) =
         withContext(ioDispatcher) {

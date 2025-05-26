@@ -296,6 +296,7 @@ internal abstract class RepositoryModule {
     abstract fun bindFileLinkRepository(implementation: FileLinkRepositoryImpl): FileLinkRepository
 
     @Binds
+    @Singleton
     abstract fun bindPasscodeRepository(implementation: PasscodeRepositoryImpl): PasscodeRepository
 
     @Binds
