@@ -327,9 +327,9 @@ class CameraUploadsWorker @AssistedInject constructor(
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && it is ForegroundServiceStartNotAllowedException) {
                     Timber.d("Foreground service start not allowed exception $it.")
                 } else {
+                    crashReporter.report(it)
                     Timber.d("setForeground failed with exception: $it")
                 }
-                crashReporter.report(it)
             }
 
             monitorConnectivityStatusJob = monitorConnectivityStatus()
@@ -1480,12 +1480,14 @@ class CameraUploadsWorker @AssistedInject constructor(
                 val progressPercent = totalProgress
 
                 Timber.d(
-                    "Total to upload: $totalToUpload " +
-                            "Total uploaded: $totalUploaded " +
-                            "Pending uploads: $pendingToUpload " +
-                            "bytes to upload: $totalUploadBytes " +
-                            "bytes uploaded: $totalUploadedBytes " +
-                            "progress: $progressPercent"
+                    buildString {
+                        append("Total to upload: $totalToUpload ")
+                        append("Total uploaded: $totalUploaded ")
+                        append("Pending uploads: $pendingToUpload ")
+                        append("bytes to upload: $totalUploadBytes ")
+                        append("bytes uploaded: $totalUploadedBytes ")
+                        append("progress: $progressPercent")
+                    }
                 )
                 if (totalToUpload > 0) {
                     showUploadProgress(
