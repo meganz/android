@@ -98,10 +98,9 @@ class PermissionsFragment : Fragment() {
             // Only request the generic External Storage Permission on Devices below API 33
             add(READ_EXTERNAL_STORAGE)
         } else {
-            // Request Granular Media and Notifications Permissions beginning on API 33
+            // Request Granular Media Permissions beginning on API 33
             add(READ_MEDIA_IMAGES)
             add(READ_MEDIA_VIDEO)
-            add(POST_NOTIFICATIONS)
         }.apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 // Request Partial Media Permissions beginning on API 34
