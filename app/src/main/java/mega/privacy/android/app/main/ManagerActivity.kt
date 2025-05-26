@@ -2522,7 +2522,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
 
             isCameraUploadsEnabled -> {
-                DrawerItem.CLOUD_DRIVE
+                DrawerItem.PHOTOS
             }
 
             else -> {
