@@ -62,9 +62,12 @@ import me.saket.telephoto.zoomable.rememberZoomableState
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R.drawable
 import mega.privacy.android.app.R.string
+import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowSecureTutorialRoute
+import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowSettingsRoute
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowViewModel
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.ImageResultStatus
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction.SettingOptionsMenuAction
+import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction.SettingTutorialMenuAction
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -79,8 +82,8 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun SlideshowScreen(
-    onClickSettingMenu: () -> Unit,
     onClickBack: () -> Unit,
+    onNavigate: (String) -> Unit,
     viewModel: SlideshowViewModel = hiltViewModel(),
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
@@ -90,6 +93,12 @@ fun SlideshowScreen(
     if (viewState.isInitialized && imageNodes.isEmpty()) {
         LaunchedEffect(Unit) {
             onClickBack()
+        }
+    }
+
+    LaunchedEffect(viewState.isSecureSlideshowTutorialShown) {
+        if (viewState.isSecureSlideshowTutorialShown == false) {
+            onNavigate(SlideshowSecureTutorialRoute)
         }
     }
 
@@ -137,7 +146,10 @@ fun SlideshowScreen(
                     if (!isPlaying) {
                         SlideshowTopBar(
                             onClickBack = onClickBack,
-                            onClickSettingMenu = onClickSettingMenu,
+                            onClickSettingMenu = { onNavigate(SlideshowSettingsRoute) },
+                            onClickTutorialMenu = {
+                                onNavigate(SlideshowSecureTutorialRoute)
+                            }
                         )
                     }
                 },
@@ -236,6 +248,7 @@ fun SlideshowScreen(
     }
 }
 
+
 @Composable
 private fun SlideshowBottomBar(
     onPlayOrPauseSlideshow: () -> Unit,
@@ -246,7 +259,7 @@ private fun SlideshowBottomBar(
         BottomAppBar(
             backgroundColor = Color.Transparent,
             elevation = 0.dp,
-            modifier =Modifier.windowInsetsPadding(WindowInsets.navigationBars),
+            modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -268,6 +281,7 @@ private fun SlideshowBottomBar(
 private fun SlideshowTopBar(
     onClickBack: () -> Unit,
     onClickSettingMenu: () -> Unit,
+    onClickTutorialMenu: () -> Unit,
 ) {
     MegaAppBar(
         title = stringResource(string.action_slideshow),
@@ -277,10 +291,14 @@ private fun SlideshowTopBar(
             onClickBack()
         },
         actions = listOf(
-            SettingOptionsMenuAction
+            SettingOptionsMenuAction,
+            SettingTutorialMenuAction
         ),
         onActionPressed = {
-            onClickSettingMenu()
+            when (it) {
+                SettingOptionsMenuAction -> onClickSettingMenu()
+                SettingTutorialMenuAction -> onClickTutorialMenu()
+            }
         }
     )
 }

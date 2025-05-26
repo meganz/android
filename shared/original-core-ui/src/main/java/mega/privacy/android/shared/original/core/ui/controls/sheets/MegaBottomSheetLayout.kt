@@ -1,7 +1,9 @@
 package mega.privacy.android.shared.original.core.ui.controls.sheets
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
@@ -18,11 +20,13 @@ import mega.android.core.ui.tokens.theme.DSTokens
 fun MegaBottomSheetLayout(
     bottomSheetNavigator: BottomSheetNavigator,
     modifier: Modifier = Modifier,
+    sheetShape: Shape = MaterialTheme.shapes.large,
     content: @Composable () -> Unit,
 ) {
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
         modifier = modifier,
+        sheetShape = sheetShape,
         sheetBackgroundColor = DSTokens.colors.background.surface1,
         scrimColor = DSTokens.colors.background.blur,
         content = content

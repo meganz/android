@@ -25,6 +25,7 @@ data class SlideshowState(
     val speed: SlideshowSpeed? = null,
     val repeat: Boolean = false,
     val isPlaying: Boolean = false,
+    val isSecureSlideshowTutorialShown: Boolean? = null,
 )
 
 internal data class ImageResultStatus(

@@ -17,7 +17,16 @@ sealed interface SlideshowMenuAction : MenuAction {
         override val orderInCategory = 100
     }
 
+    object SettingTutorialMenuAction : MenuActionString(
+        iconRes = R.drawable.ic_shield_info,
+        descriptionRes = mega.privacy.android.shared.resources.R.string.slideshow_tutorial_title,
+        testTag = TEST_TAG_SETTING_TUTORIAL_INFO_ACTION,
+    ), SlideshowMenuAction {
+        override val orderInCategory = 99
+    }
+
     companion object {
         const val TEST_TAG_SETTING_OPTIONS_ACTION = "slideshow_view:action_setting_options"
+        const val TEST_TAG_SETTING_TUTORIAL_INFO_ACTION = "slideshow_view:action_tutorial_options"
     }
 }

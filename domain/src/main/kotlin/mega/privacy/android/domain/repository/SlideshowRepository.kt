@@ -40,4 +40,14 @@ interface SlideshowRepository {
      * Save slideshow repeat setting into local preference
      */
     suspend fun saveRepeatSetting(isRepeat: Boolean)
+
+    /**
+     * Monitor in local preference if the secure slideshow mode tutorial has been shown
+     */
+    fun monitorSecureSlideshowTutorialShown(): Flow<Boolean>
+
+    /**
+     * Marks the secure slideshow mode tutorial as shown into local preference
+     */
+    suspend fun setSecureSlideshowTutorialShown()
 }

@@ -29,4 +29,10 @@ internal class SlideshowRepositoryImpl @Inject constructor(
 
     override suspend fun saveRepeatSetting(isRepeat: Boolean) =
         slideshowPreferencesGateway.saveRepeatSetting(megaApiGateway.myUserHandle, isRepeat)
+
+    override fun monitorSecureSlideshowTutorialShown() =
+        slideshowPreferencesGateway.monitorSecureSlideshowTutorialShown()
+
+    override suspend fun setSecureSlideshowTutorialShown() =
+        slideshowPreferencesGateway.setSecureSlideshowTutorialShown()
 }

@@ -38,6 +38,8 @@ import mega.privacy.android.domain.usecase.imagepreview.ClearImageResultUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
+import mega.privacy.android.domain.usecase.slideshow.MonitorSecureSlideshowTutorialShownUseCase
+import mega.privacy.android.domain.usecase.slideshow.SetSecureSlideshowTutorialShownUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -52,8 +54,9 @@ class SlideshowViewModel @Inject constructor(
     private val monitorSlideshowOrderSettingUseCase: MonitorSlideshowOrderSettingUseCase,
     private val monitorSlideshowSpeedSettingUseCase: MonitorSlideshowSpeedSettingUseCase,
     private val monitorSlideshowRepeatSettingUseCase: MonitorSlideshowRepeatSettingUseCase,
+    private val monitorSecureSlideshowTutorialShownUseCase: MonitorSecureSlideshowTutorialShownUseCase,
+    private val setSecureSlideshowTutorialShownUseCase: SetSecureSlideshowTutorialShownUseCase,
     private val checkUri: CheckFileUriUseCase,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val clearImageResultUseCase: ClearImageResultUseCase,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
@@ -76,6 +79,30 @@ class SlideshowViewModel @Inject constructor(
         monitorSpeedSetting()
         monitorRepeatSetting()
         monitorSlideshowSettings()
+        monitorSecureSlideshowTutorialShown()
+    }
+
+    private fun monitorSecureSlideshowTutorialShown() {
+        viewModelScope.launch {
+            monitorSecureSlideshowTutorialShownUseCase()
+                .catch { Timber.e(it) }
+                .collect { isShown ->
+                    _state.update { it.copy(isSecureSlideshowTutorialShown = isShown) }
+                }
+        }
+    }
+
+    /**
+     * Set after secure slideshow tutorial is shown for the first time
+     */
+    fun setSecureSlideshowTutorialShown() {
+        viewModelScope.launch {
+            runCatching {
+                setSecureSlideshowTutorialShownUseCase()
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     private fun monitorSlideshowSettings() {
