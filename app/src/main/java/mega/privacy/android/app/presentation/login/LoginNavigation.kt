@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login
 
+import androidx.activity.compose.BackHandler
 import androidx.fragment.compose.AndroidFragment
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -11,8 +12,11 @@ import kotlinx.serialization.Serializable
 data object LoginScreen
 
 
-internal fun NavGraphBuilder.loginScreen() {
+internal fun NavGraphBuilder.loginScreen(
+    onBackPressed: () -> Unit,
+) {
     composable<LoginScreen> {
+        BackHandler(onBack = onBackPressed)
         AndroidFragment(LoginFragment::class.java)
     }
 }

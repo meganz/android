@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.LaunchedEffect
@@ -60,10 +59,6 @@ class ConfirmEmailFragment : Fragment() {
                     onCancelConfirmationAccount()
                     viewModel.onHandleCancelCreateAccount()
                 }
-            }
-
-            BackHandler {
-                activity?.finish()
             }
 
             if (uiState.isNewRegistrationUiEnabled == true) {

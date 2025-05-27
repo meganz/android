@@ -1189,6 +1189,20 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Trigger on back pressed event
+     */
+    fun triggerOnBackPressedEvent() {
+        _state.update { it.copy(onBackPressedEvent = triggered) }
+    }
+
+    /**
+     * Consumed on back pressed event
+     */
+    fun consumedOnBackPressedEvent() {
+        _state.update { it.copy(onBackPressedEvent = consumed) }
+    }
+
     companion object {
         /**
          * Intent action for showing the login fetching nodes.

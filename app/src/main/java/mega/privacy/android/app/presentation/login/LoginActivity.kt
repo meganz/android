@@ -153,10 +153,26 @@ class LoginActivity : BaseActivity() {
                 composable("start") {
                     // no-op, we checking start destination in the view model
                 }
-                loginScreen()
-                createAccountScreen()
-                tourScreen()
-                confirmationEmailScreen()
+                loginScreen(
+                    onBackPressed = {
+                        viewModel.triggerOnBackPressedEvent()
+                    }
+                )
+                createAccountScreen(
+                    onBackPressed = {
+                        viewModel.setPendingFragmentToShow(LoginFragmentType.Tour)
+                    }
+                )
+                tourScreen(
+                    onBackPressed = {
+                        finish()
+                    }
+                )
+                confirmationEmailScreen(
+                    onBackPressed = {
+                        finish()
+                    }
+                )
             }
         }
         setupSplashExitAnimation(splashScreen)

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.login.createaccount.view
 
 import android.content.res.Configuration
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -245,10 +244,6 @@ internal fun NewCreateAccountScreen(
                 }
             }
         }
-    }
-
-    BackHandler(enabled = true) {
-        onBackIconPressed()
     }
 
     MegaScaffold(

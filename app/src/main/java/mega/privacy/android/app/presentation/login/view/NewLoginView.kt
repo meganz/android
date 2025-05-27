@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.login.view
 
 import android.content.res.Configuration
-import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -255,8 +254,6 @@ fun NewLoginView(
                 )
             }
         }
-
-        BackHandler { onBackPressed() }
 
         val context = LocalContext.current
 
