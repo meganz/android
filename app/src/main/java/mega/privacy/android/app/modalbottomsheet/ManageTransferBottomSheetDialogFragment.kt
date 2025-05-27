@@ -2,6 +2,7 @@ package mega.privacy.android.app.modalbottomsheet
 
 import android.content.Intent
 import android.graphics.PorterDuff
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,9 +29,11 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
+import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaTransfer
@@ -232,29 +235,45 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
     }
 
     private fun openFileWith() {
-        val localFile = File(transfer?.originalPath ?: return)
-        if (FileUtil.isFileAvailable(localFile)) {
+        var uriPath = UriPath(transfer?.originalPath ?: return)
+        val fileName = transfer?.fileName ?: return
+        var uri: Uri? = null
+
+        if (uriPath.isPath()) {
+            val localFile = File(uriPath.value)
+            if (FileUtil.isFileAvailable(localFile)) {
+                try {
+                    FileProvider.getUriForFile(
+                        requireActivity(),
+                        Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                        localFile
+                    )?.let { uri = it }
+                } catch (e: Exception) {
+                    Timber.e(e)
+                }
+            } else {
+                showSnackbar(requireActivity(), getString(R.string.corrupt_video_dialog_text))
+                return
+            }
+        } else {
+            uri = uriPath.toUri()
+        }
+
+        uri?.let {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             try {
-                FileProvider.getUriForFile(
-                    requireActivity(),
-                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                    localFile
-                )?.let { uri ->
-                    intent.setDataAndType(uri, typeForName(localFile.name).type)
-                    if (MegaApiUtils.isIntentAvailable(requireActivity(), intent)) {
-                        startActivity(intent)
-                        return
-                    }
+                intent.setDataAndType(uri, typeForName(fileName).type)
+                if (MegaApiUtils.isIntentAvailable(requireActivity(), intent)) {
+                    startActivity(intent)
+                    return
                 }
             } catch (e: Exception) {
                 Timber.e(e)
             }
-            showSnackbar(requireContext(), getString(R.string.intent_not_available))
-        } else {
-            showSnackbar(requireContext(), getString(R.string.corrupt_video_dialog_text))
         }
+
+        showSnackbar(requireActivity(), getString(R.string.intent_not_available))
     }
 
     companion object {
