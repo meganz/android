@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -58,10 +57,6 @@ class TourFragment : Fragment() {
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-            BackHandler {
-                activity?.finish()
-            }
 
             if (uiState.isNewRegistrationUiEnabled == true) {
                 AndroidTheme(isDark = themeMode.isDarkMode()) {

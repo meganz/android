@@ -144,6 +144,10 @@ class LoginFragment : Fragment() {
             }
         }
 
+        EventEffect(uiState.onBackPressedEvent, viewModel::consumedOnBackPressedEvent) {
+            onBackPressed(uiState)
+        }
+
         LaunchedEffect(uiState.isLoginRequired) {
             if (uiState.isLoginRequired) {
                 confirmLogoutDialog?.dismiss()

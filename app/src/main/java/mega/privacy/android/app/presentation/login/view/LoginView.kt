@@ -185,8 +185,6 @@ fun LoginView(
             }
         }
 
-        BackHandler { onBackPressed() }
-
         val context = LocalContext.current
 
         EventEffect(
