@@ -2,10 +2,12 @@ package mega.privacy.android.domain.usecase.contact
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
@@ -37,6 +39,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class GetContactsUseCaseTest {
     private lateinit var underTest: GetContactsUseCase
 
@@ -131,10 +134,8 @@ class GetContactsUseCaseTest {
     fun `test that first name is updated when changed`() = runTest {
         val userHandle = 1L
         val userEmail = "email"
-        val initial = ContactData(
-            fullName = "Initial", alias = "alias", avatarUri = null,
-            userVisibility = UserVisibility.Unknown,
-        )
+        val initialFullName = "initialFullName"
+        val initialAlias = "InitialAlias"
         val expected = ContactData(
             fullName = "Expected", alias = "alias", avatarUri = null,
             userVisibility = UserVisibility.Unknown,
@@ -144,10 +145,18 @@ class GetContactsUseCaseTest {
         stubContact(
             userHandle = userHandle,
             userEmail = userEmail,
-            fullName = initial.fullName,
-            alias = initial.alias!!,
+            fullName = initialFullName,
+            alias = initialAlias,
         )
-        stubGlobalUpdate(userEmail, userHandle, changes)
+        val updatesFlow = MutableStateFlow<UserUpdate>(
+            UserUpdate(
+                changes = emptyMap(),
+                emailMap = emptyMap(),
+            )
+        )
+        accountRepository.stub {
+            on { monitorUserUpdates() } doReturn updatesFlow
+        }
 
         contactsRepository.stub {
             onBlocking { getContactData(any()) } doReturn expected
@@ -156,7 +165,14 @@ class GetContactsUseCaseTest {
         initUnderTest()
 
         underTest().map { it.first().contactData.fullName.orEmpty() }.test {
-            assertThat(awaitItem()).isEqualTo(initial.fullName)
+            assertThat(awaitItem()).isEqualTo(initialFullName)
+            updatesFlow.emit(
+                UserUpdate(
+                    changes = mapOf(UserId(userHandle) to changes),
+                    emailMap = mapOf(UserId(userHandle) to userEmail)
+                )
+            )
+            advanceUntilIdle()
             assertThat(awaitItem()).isEqualTo(expected.fullName)
         }
     }
@@ -181,7 +197,15 @@ class GetContactsUseCaseTest {
             fullName = initial.fullName,
             alias = initial.alias!!,
         )
-        stubGlobalUpdate(userEmail, userHandle, changes)
+        val updatesFlow = MutableStateFlow<UserUpdate>(
+            UserUpdate(
+                changes = emptyMap(),
+                emailMap = emptyMap(),
+            )
+        )
+        accountRepository.stub {
+            on { monitorUserUpdates() } doReturn updatesFlow
+        }
 
         contactsRepository.stub {
             onBlocking { getContactData(any()) } doReturn expected
@@ -191,6 +215,13 @@ class GetContactsUseCaseTest {
 
         underTest().map { it.first().contactData.fullName.orEmpty() }.test {
             assertThat(awaitItem()).isEqualTo(initial.fullName)
+            updatesFlow.emit(
+                UserUpdate(
+                    changes = mapOf(UserId(userHandle) to changes),
+                    emailMap = mapOf(UserId(userHandle) to userEmail)
+                )
+            )
+            advanceUntilIdle()
             assertThat(awaitItem()).isEqualTo(expected.fullName)
         }
     }
@@ -241,7 +272,6 @@ class GetContactsUseCaseTest {
                 )
             )
             assertThat(awaitItem().first().contactData.avatarUri).isEqualTo(newUri)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -259,8 +289,15 @@ class GetContactsUseCaseTest {
         stubContact(
             userHandle = userHandle, userEmail = userEmail, alias = oldAlias.alias.orEmpty()
         )
-        stubGlobalUpdate(notUserEmail, notUserHandle, listOf(UserChanges.Alias))
-
+        val updatesFlow = MutableStateFlow<UserUpdate>(
+            UserUpdate(
+                changes = emptyMap(),
+                emailMap = emptyMap(),
+            )
+        )
+        accountRepository.stub {
+            on { monitorUserUpdates() } doReturn updatesFlow
+        }
         val newAlias = ContactData(
             fullName = "name", alias = "newAlias", avatarUri = null,
             userVisibility = UserVisibility.Unknown,
@@ -272,6 +309,12 @@ class GetContactsUseCaseTest {
 
         underTest().test {
             assertThat(awaitItem().first().contactData.alias).isEqualTo(oldAlias.alias)
+            updatesFlow.emit(
+                UserUpdate(
+                    changes = mapOf(UserId(notUserHandle) to listOf(UserChanges.Alias)),
+                    emailMap = mapOf(UserId(notUserHandle) to notUserEmail)
+                )
+            )
             assertThat(awaitItem().first().contactData.alias).isEqualTo(newAlias.alias)
         }
     }
@@ -299,7 +342,6 @@ class GetContactsUseCaseTest {
             underTest().test {
                 assertThat(awaitItem()).isEmpty()
                 assertThat(awaitItem()).isNotEmpty()
-                cancelAndIgnoreRemainingEvents()
             }
         }
 
@@ -367,13 +409,29 @@ class GetContactsUseCaseTest {
     fun `test that authentication update fetches the contacts again`() = runTest {
         val userHandle = 1L
         val userEmail = "email"
-        val contactItem = mock<ContactItem> {
-            on { handle } doReturn userHandle
-            on { email } doReturn userEmail
-            on { areCredentialsVerified }.doReturn(false, true)
-            on { visibility } doReturn UserVisibility.Visible
-        }
-        stubContactsList(listOf(contactItem), listOf(contactItem))
+
+        val initialContactItem = ContactItem(
+            handle = userHandle,
+            email = userEmail,
+            contactData = ContactData(
+                fullName = "name",
+                alias = "alias",
+                avatarUri = null,
+                userVisibility = UserVisibility.Unknown,
+            ),
+            defaultAvatarColor = null,
+            visibility = UserVisibility.Visible,
+            lastSeen = null,
+            timestamp = 0L,
+            status = UserChatStatus.Offline,
+            areCredentialsVerified = false,
+            chatroomId = null,
+        )
+
+        val subsequentContactItem = initialContactItem.copy(
+            areCredentialsVerified = true
+        )
+        stubContactsList(listOf(initialContactItem), listOf(subsequentContactItem))
 
         val changes = listOf(UserChanges.AuthenticationInformation)
         val updatesFlow = MutableStateFlow<UserUpdate>(
@@ -398,7 +456,8 @@ class GetContactsUseCaseTest {
                     emailMap = mapOf(UserId(userHandle) to userEmail)
                 )
             )
-            cancelAndConsumeRemainingEvents()
+            advanceUntilIdle()
+            awaitItem()
         }
 
         verifyBlocking(contactsRepository, times(2)) { getVisibleContacts() }
