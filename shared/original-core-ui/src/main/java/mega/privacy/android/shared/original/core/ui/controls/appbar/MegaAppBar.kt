@@ -90,12 +90,14 @@ fun MegaAppBar(
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
     windowInsets: WindowInsets = WindowInsets.statusBars,
-    isStatusBarColorEnabled: Boolean = true
+    isStatusBarColorEnabled: Boolean = true,
+    backgroundAlpha: Float = 1f,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
         iconsTintColor = DSTokens.colors.icon.primary,
         titleColor = DSTokens.colors.text.primary,
         subtitleColor = DSTokens.colors.text.secondary,
+        backgroundAlpha = backgroundAlpha,
     )
 ) {
     BaseMegaAppBar(

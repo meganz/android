@@ -3,20 +3,19 @@ package mega.privacy.android.app.presentation.imagepreview.slideshow
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -25,11 +24,9 @@ import com.google.accompanist.navigation.material.bottomSheet
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SecureSlideshowTutorialBottomSheet
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SlideshowScreen
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SlideshowSettingScreen
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.navigation.rememberExtendedBottomSheetNavigator
@@ -60,9 +57,7 @@ class SlideshowActivity : BaseActivity() {
             val bottomSheetNavigator = rememberExtendedBottomSheetNavigator()
             val navController = rememberNavController(bottomSheetNavigator)
             val systemUiController = rememberSystemUiController()
-
-            val theme by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            val isDarkMode = theme.isDarkMode()
+            val isDarkMode = true
 
             LaunchedEffect(systemUiController, isDarkMode) {
                 systemUiController.setSystemBarsColor(
@@ -78,18 +73,16 @@ class SlideshowActivity : BaseActivity() {
                 ) {
                     NavHost(navController, startDestination = SlideshowRoute) {
                         composable(SlideshowRoute) {
-                            val state by slideshowViewModel.state.collectAsStateWithLifecycle()
-                            LaunchedEffect(state.isPlaying) {
-                                if (state.isPlaying) {
-                                    insetsController.hide(WindowInsetsCompat.Type.systemBars())
-                                } else {
-                                    insetsController.show(WindowInsetsCompat.Type.systemBars())
-                                }
-                            }
-
                             SlideshowScreen(
                                 viewModel = slideshowViewModel,
                                 onNavigate = navController::navigate,
+                                onFullScreenModeChanged = { inFullScreenMode ->
+                                    if (inFullScreenMode) {
+                                        insetsController.hide(WindowInsetsCompat.Type.systemBars())
+                                    } else {
+                                        insetsController.show(WindowInsetsCompat.Type.systemBars())
+                                    }
+                                },
                                 onClickBack = ::finish,
                             )
                         }
@@ -146,6 +139,8 @@ class SlideshowActivity : BaseActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.attributes.layoutInDisplayCutoutMode = LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+            // No scrim behind transparent navigation bar.
+            window.setFlags(FLAG_LAYOUT_NO_LIMITS, FLAG_LAYOUT_NO_LIMITS)
         }
     }
 

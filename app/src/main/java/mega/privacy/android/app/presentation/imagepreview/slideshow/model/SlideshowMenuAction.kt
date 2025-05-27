@@ -10,7 +10,7 @@ import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 sealed interface SlideshowMenuAction : MenuAction {
 
     object SettingOptionsMenuAction : MenuActionString(
-        iconRes = R.drawable.ic_options,
+        iconRes = mega.privacy.android.icon.pack.R.drawable.ic_gear_six_medium_regular_outline,
         descriptionRes = R.string.slideshow_settings_page_title,
         testTag = TEST_TAG_SETTING_OPTIONS_ACTION,
     ), SlideshowMenuAction {

@@ -31,13 +31,15 @@ import mega.privacy.android.shared.resources.R as sharedResR
  * Secure Slideshow Tutorial Bottom Sheet
  * This bottom sheet provides a tutorial on how to securely play a slideshow on MEGA.
  * @param onDismiss Callback to be invoked when the bottom sheet is dismissed.
+ * @param modifier [Modifier] to be applied to the bottom sheet.
  */
 @Composable
 fun SecureSlideshowTutorialBottomSheet(
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 20.dp)
             .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally

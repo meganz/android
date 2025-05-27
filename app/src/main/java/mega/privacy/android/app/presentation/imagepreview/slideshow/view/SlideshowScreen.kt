@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -31,6 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,7 +63,6 @@ import me.saket.telephoto.zoomable.coil.ZoomableAsyncImage
 import me.saket.telephoto.zoomable.rememberZoomableImageState
 import me.saket.telephoto.zoomable.rememberZoomableState
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.R.drawable
 import mega.privacy.android.app.R.string
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowSecureTutorialRoute
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowSettingsRoute
@@ -68,10 +70,12 @@ import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowVie
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.ImageResultStatus
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction.SettingOptionsMenuAction
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction.SettingTutorialMenuAction
+import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowState
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
+import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -84,11 +88,13 @@ import kotlin.math.absoluteValue
 fun SlideshowScreen(
     onClickBack: () -> Unit,
     onNavigate: (String) -> Unit,
+    onFullScreenModeChanged: (Boolean) -> Unit,
     viewModel: SlideshowViewModel = hiltViewModel(),
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val imageNodes = viewState.imageNodes
+    var inFullScreenMode by rememberSaveable { mutableStateOf(true) }
 
     if (viewState.isInitialized && imageNodes.isEmpty()) {
         LaunchedEffect(Unit) {
@@ -96,8 +102,14 @@ fun SlideshowScreen(
         }
     }
 
+    LaunchedEffect(inFullScreenMode) {
+        onFullScreenModeChanged(inFullScreenMode)
+    }
+
     LaunchedEffect(viewState.isSecureSlideshowTutorialShown) {
         if (viewState.isSecureSlideshowTutorialShown == false) {
+            inFullScreenMode = false
+            viewModel.updateIsPlaying(false)
             onNavigate(SlideshowSecureTutorialRoute)
         }
     }
@@ -115,6 +127,7 @@ fun SlideshowScreen(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+
 
     val currentImageNodeIndex = viewState.currentImageNodeIndex
     val currentImageNode = viewState.currentImageNode
@@ -143,28 +156,44 @@ fun SlideshowScreen(
                     .background(Color.Black)
                     .padding(paddingValues),
                 topBar = {
-                    if (!isPlaying) {
+                    if (!inFullScreenMode) {
                         SlideshowTopBar(
                             onClickBack = onClickBack,
-                            onClickSettingMenu = { onNavigate(SlideshowSettingsRoute) },
+                            onClickSettingMenu = {
+                                onNavigate(SlideshowSettingsRoute)
+                                coroutineScope.launch {
+                                    resetZoom(
+                                        pagerState = pagerState,
+                                        viewState = viewState,
+                                        zoomableStateMap = zoomableStateMap
+                                    )
+                                }
+                            },
                             onClickTutorialMenu = {
                                 onNavigate(SlideshowSecureTutorialRoute)
-                            }
+                            },
+                            modifier = Modifier
+                                .windowInsetsPadding(WindowInsets.statusBars)
                         )
                     }
                 },
                 bottomBar = {
-                    if (!isPlaying) {
+                    if (!inFullScreenMode) {
                         SlideshowBottomBar(
+                            isPlaying = viewState.isPlaying,
                             onPlayOrPauseSlideshow = {
-                                coroutineScope.launch {
-                                    val page = pagerState.currentPage
-                                    for (candidatePage in page - 1..page + 1) {
-                                        viewState.imageNodes.getOrNull(candidatePage)?.let { node ->
-                                            zoomableStateMap[node.id]?.resetZoom()
-                                        }
+                                if (viewState.isPlaying) {
+                                    viewModel.updateIsPlaying(isPlaying = false)
+                                } else {
+                                    inFullScreenMode = true
+                                    coroutineScope.launch {
+                                        resetZoom(
+                                            pagerState = pagerState,
+                                            viewState = viewState,
+                                            zoomableStateMap = zoomableStateMap
+                                        )
+                                        viewModel.updateIsPlaying(isPlaying = true)
                                     }
-                                    viewModel.updateIsPlaying(isPlaying = true)
                                 }
                             },
                         )
@@ -176,7 +205,9 @@ fun SlideshowScreen(
                 downloadImage = viewModel::monitorImageResult,
                 getImagePath = viewModel::getHighestResolutionImagePath,
                 getErrorImagePath = viewModel::getFallbackImagePath,
-                onTapImage = { viewModel.updateIsPlaying(false) },
+                onTapImage = {
+                    inFullScreenMode = !inFullScreenMode
+                },
                 onImageZooming = { viewModel.updateIsPlaying(false) },
                 onCacheImageState = { node, zoomState ->
                     zoomableStateMap[node.id] = zoomState
@@ -248,9 +279,30 @@ fun SlideshowScreen(
     }
 }
 
+/**
+ * Reset zoom for the current image
+ *
+ * @param pagerState The state of the pager.
+ * @param viewState The current slideshow state.
+ * @param zoomableStateMap A map of NodeId to ZoomableState.
+ */
+private suspend fun resetZoom(
+    pagerState: PagerState,
+    viewState: SlideshowState,
+    zoomableStateMap: Map<NodeId, ZoomableState?>,
+) {
+    val page = pagerState.currentPage
+    for (candidatePage in page - 1..page + 1) {
+        viewState.imageNodes.getOrNull(candidatePage)
+            ?.let { node ->
+                zoomableStateMap[node.id]?.resetZoom()
+            }
+    }
+}
 
 @Composable
 private fun SlideshowBottomBar(
+    isPlaying: Boolean,
     onPlayOrPauseSlideshow: () -> Unit,
 ) {
     Box(
@@ -267,9 +319,10 @@ private fun SlideshowBottomBar(
             ) {
                 IconButton(onClick = onPlayOrPauseSlideshow) {
                     Icon(
-                        painter = painterResource(id = drawable.ic_play_video_recorded),
+                        painter = painterResource(id = if (isPlaying) R.drawable.ic_pause_medium_regular_outline else R.drawable.ic_play_medium_regular_outline),
                         contentDescription = null,
                         tint = MaterialTheme.colors.black_white,
+                        modifier = Modifier.size(26.dp)
                     )
                 }
             }
@@ -282,25 +335,32 @@ private fun SlideshowTopBar(
     onClickBack: () -> Unit,
     onClickSettingMenu: () -> Unit,
     onClickTutorialMenu: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    MegaAppBar(
-        title = stringResource(string.action_slideshow),
-        appBarType = AppBarType.BACK_NAVIGATION,
-        elevation = 0.dp,
-        onNavigationPressed = {
-            onClickBack()
-        },
-        actions = listOf(
-            SettingOptionsMenuAction,
-            SettingTutorialMenuAction
-        ),
-        onActionPressed = {
-            when (it) {
-                SettingOptionsMenuAction -> onClickSettingMenu()
-                SettingTutorialMenuAction -> onClickTutorialMenu()
-            }
-        }
-    )
+    Box(
+        modifier = Modifier.background(MaterialTheme.colors.white_alpha_070_grey_alpha_070),
+    ) {
+        MegaAppBar(
+            title = stringResource(string.action_slideshow),
+            appBarType = AppBarType.BACK_NAVIGATION,
+            elevation = 0.dp,
+            backgroundAlpha = 0f,
+            onNavigationPressed = {
+                onClickBack()
+            },
+            actions = listOf(
+                SettingOptionsMenuAction,
+                SettingTutorialMenuAction
+            ),
+            onActionPressed = {
+                when (it) {
+                    SettingOptionsMenuAction -> onClickSettingMenu()
+                    SettingTutorialMenuAction -> onClickTutorialMenu()
+                }
+            },
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
