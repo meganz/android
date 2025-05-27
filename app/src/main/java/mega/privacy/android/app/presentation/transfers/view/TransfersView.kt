@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,13 +18,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.model.TabItems
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
@@ -41,11 +44,6 @@ import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTrans
 import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfersActionsBottomSheet
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,12 +75,10 @@ internal fun TransfersView(
             .imePadding()
             .semantics { testTagsAsResourceId = true }
             .testTag(TEST_TAG_TRANSFERS_VIEW),
-        scaffoldState = rememberScaffoldState(),
         topBar = {
-            MegaAppBar(
-                appBarType = AppBarType.BACK_NAVIGATION,
+            MegaTopAppBar(
+                navigationType = AppBarNavigationType.Back(onBackPress),
                 title = stringResource(id = R.string.section_transfers),
-                onNavigationPressed = onBackPress,
                 actions = getTransferActions(uiState),
                 onActionPressed = { action ->
                     when (action) {
@@ -97,7 +93,6 @@ internal fun TransfersView(
                         }
                     }
                 },
-                elevation = 0.dp,
             )
         },
     ) { paddingValues ->
@@ -244,7 +239,7 @@ private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
 @CombinedThemePreviews
 @Composable
 private fun TransfersViewPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         TransfersView(
             onBackPress = {},
             uiState = TransfersUiState(),

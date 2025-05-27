@@ -1,21 +1,20 @@
 package mega.privacy.android.app.presentation.transfers.model
 
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.android.core.ui.model.TopAppBarAction
+import mega.android.core.ui.model.TopAppBarActionString
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionDropDown
-import mega.privacy.android.shared.original.core.ui.model.MenuActionString
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * Transfer menu action.
  * All the actions which may be available in normal mode should be defined here.
  */
-sealed interface TransferMenuAction : MenuAction {
+sealed interface TransferMenuAction : TopAppBarAction {
 
     /**
      * Resume transfers
      */
-    data object Resume : MenuActionString(
+    data object Resume : TopAppBarActionString(
         iconRes = iconPackR.drawable.ic_play_medium_regular_outline,
         descriptionRes = R.string.action_play,
         testTag = TEST_TAG_RESUME_ACTION,
@@ -24,7 +23,7 @@ sealed interface TransferMenuAction : MenuAction {
     /**
      * Pause transfers
      */
-    data object Pause : MenuActionString(
+    data object Pause : TopAppBarActionString(
         iconRes = iconPackR.drawable.ic_pause_medium_regular_outline,
         descriptionRes = R.string.action_pause,
         testTag = TEST_TAG_PAUSE_ACTION,
@@ -33,7 +32,9 @@ sealed interface TransferMenuAction : MenuAction {
     /**
      * More
      */
-    data object More : MenuActionDropDown(
+    data object More : TopAppBarActionString(
+        iconRes = iconPackR.drawable.ic_more_vertical_medium_regular_outline,
+        descriptionRes = mega.privacy.android.core.R.string.label_more,
         testTag = TEST_TAG_MORE_ACTION,
     ), TransferMenuAction
 
