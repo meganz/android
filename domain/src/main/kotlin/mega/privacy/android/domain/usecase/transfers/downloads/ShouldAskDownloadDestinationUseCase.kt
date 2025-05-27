@@ -28,6 +28,7 @@ class ShouldAskDownloadDestinationUseCase @Inject constructor(
             else -> settingsRepository.getStorageDownloadLocation()?.let { UriPath(it) }
                 ?.takeIf {
                     fileSystemRepository.hasPersistedPermission(it, true)
+                            && fileSystemRepository.doesUriPathExist(it)
                 }
                 ?.also {
                     // Take again the permission to ensure it's updated in persistedUriPermissions list so it's more unlikely that permission is lost

@@ -119,6 +119,7 @@ class ShouldAskDownloadDestinationUseCaseTest {
             whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
             whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
                 .thenReturn(true)
+            whenever(fileSystemRepository.doesUriPathExist(UriPath(destination))).thenReturn(true)
             assertThat(underTest()).isFalse()
         }
 
@@ -135,6 +136,24 @@ class ShouldAskDownloadDestinationUseCaseTest {
         whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
         whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
             .thenReturn(!expected)
+        whenever(fileSystemRepository.doesUriPathExist(UriPath(destination))).thenReturn(true)
+        assertThat(underTest()).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that destination is not considered as valid when it doesn't exist`(
+        expected: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(DomainFeatures.AllowToChooseDownloadDestination))
+            .thenReturn(false)
+        val destination = "destination"
+        whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(destination)
+        whenever(transferRepository.allowUserToSetDownloadDestination()).thenReturn(true)
+        whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
+        whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
+            .thenReturn(true)
+        whenever(fileSystemRepository.doesUriPathExist(UriPath(destination))).thenReturn(!expected)
         assertThat(underTest()).isEqualTo(expected)
     }
 
@@ -151,6 +170,7 @@ class ShouldAskDownloadDestinationUseCaseTest {
         whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
         whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
             .thenReturn(true)
+        whenever(fileSystemRepository.doesUriPathExist(UriPath(destination))).thenReturn(true)
 
         underTest()
 
