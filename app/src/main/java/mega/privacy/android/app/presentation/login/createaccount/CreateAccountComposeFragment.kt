@@ -56,6 +56,7 @@ class CreateAccountComposeFragment : Fragment() {
                 NewCreateAccountRoute(
                     uiState = uiState,
                     onNavigateToLogin = ::navigateToLogin,
+                    onBackIconPressed = ::navigateToTourScreen,
                     openLink = context::launchUrl,
                     setTemporalDataForAccountCreation = ::setTemporalDataForAccountCreation,
                     modifier = Modifier.fillMaxSize(),
@@ -85,5 +86,9 @@ class CreateAccountComposeFragment : Fragment() {
 
     private fun navigateToLogin() {
         (requireActivity() as LoginActivity).showFragment(LoginFragmentType.Login)
+    }
+
+    private fun navigateToTourScreen() {
+        (requireActivity() as LoginActivity).showFragment(LoginFragmentType.Tour)
     }
 }

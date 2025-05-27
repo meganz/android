@@ -105,6 +105,7 @@ import timber.log.Timber
 internal fun NewCreateAccountRoute(
     uiState: CreateAccountUIState,
     onNavigateToLogin: () -> Unit,
+    onBackIconPressed: () -> Unit,
     openLink: (String) -> Unit,
     setTemporalDataForAccountCreation: (EphemeralCredentials) -> Unit,
     modifier: Modifier = Modifier,
@@ -129,7 +130,7 @@ internal fun NewCreateAccountRoute(
             setTemporalDataForAccountCreation(it)
             viewModel.onCreateAccountSuccess(it)
         },
-        onBackIconPressed = onNavigateToLogin,
+        onBackIconPressed = onBackIconPressed,
         onNetworkWarningShown = viewModel::networkWarningShown,
         modifier = modifier.fillMaxSize()
     )
