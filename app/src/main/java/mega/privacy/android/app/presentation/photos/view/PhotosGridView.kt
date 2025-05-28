@@ -2,7 +2,6 @@
 
 package mega.privacy.android.app.presentation.photos.view
 
-import mega.privacy.android.core.R as CoreUiR
 import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -45,15 +44,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.photos.model.MediaListItem
+import mega.privacy.android.app.presentation.photos.model.MediaListMedia
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.view.PhotoImageView
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_DAY
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH_WITH_DAY
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_YEAR_WITH_MONTH
-import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 import mega.privacy.android.shared.original.core.ui.theme.white
@@ -67,7 +67,7 @@ import java.util.Locale
 internal fun PhotosGridView(
     photoDownland: PhotoDownload,
     selectedPhotoIds: Set<Long>,
-    uiPhotoList: List<UIPhoto>,
+    mediaListItemList: List<MediaListItem>,
     shouldApplySensitiveMode: Boolean,
     modifier: Modifier = Modifier,
     currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
@@ -92,16 +92,17 @@ internal fun PhotosGridView(
     val context = LocalContext.current
 
     FastScrollLazyVerticalGrid(
-        totalItems = uiPhotoList.size + 1,
+        totalItems = mediaListItemList.size + 1,
         columns = GridCells.Fixed(spanCount),
         modifier = modifier.fillMaxSize(),
         state = lazyGridState,
         tooltipText = { index ->
-            val item = uiPhotoList.getOrNull(index)
+            val item = mediaListItemList.getOrNull(index)
             item?.let {
                 val modificationTime = when (it) {
-                    is UIPhoto.Separator -> it.modificationTime
-                    is UIPhoto.PhotoItem -> it.photo.modificationTime
+                    is MediaListItem.Separator -> it.modificationTime
+                    is MediaListItem.PhotoItem -> it.photo.modificationTime
+                    is MediaListItem.VideoItem -> it.video.modificationTime
                 }
                 dateText(
                     modificationTime = modificationTime,
@@ -112,19 +113,19 @@ internal fun PhotosGridView(
         },
     ) {
         this.itemsIndexed(
-            items = uiPhotoList,
+            items = mediaListItemList,
             key = { _, item ->
                 item.key
             },
             span = { _, item ->
-                if (item is UIPhoto.Separator)
+                if (item is MediaListItem.Separator)
                     GridItemSpan(maxLineSpan)
                 else GridItemSpan(1)
             },
         ) { index, item ->
 
             when (item) {
-                is UIPhoto.Separator -> {
+                is MediaListItem.Separator -> {
                     Separator(
                         currentZoomLevel = currentZoomLevel,
                         modificationTime = item.modificationTime,
@@ -133,10 +134,10 @@ internal fun PhotosGridView(
                     )
                 }
 
-                is UIPhoto.PhotoItem -> {
-                    val isSelected = item.photo.id in selectedPhotoIds
+                is MediaListItem.PhotoItem -> {
+                    val isSelected = item.mediaId in selectedPhotoIds
                     PhotoViewContainer(
-                        photo = item.photo,
+                        media = item,
                         isSelected = isSelected,
                         currentZoomLevel = currentZoomLevel,
                         modifier = Modifier
@@ -151,7 +152,31 @@ internal fun PhotosGridView(
                                 downloadPhoto = photoDownland,
                                 alpha = if (isBlurUnselectItem && !isSelected) 0.4f else 1.0f,
                                 shouldApplySensitiveMode = shouldApplySensitiveMode,
-                                showOverlayOnSuccess = item.photo is Photo.Video
+                                showOverlayOnSuccess = false
+                            )
+                        }
+                    )
+                }
+
+                is MediaListItem.VideoItem -> {
+                    val isSelected = item.mediaId in selectedPhotoIds
+                    PhotoViewContainer(
+                        media = item,
+                        isSelected = isSelected,
+                        currentZoomLevel = currentZoomLevel,
+                        modifier = Modifier
+                            .combinedClickable(
+                                onClick = { onClick(item.video) },
+                                onLongClick = { onLongPress(item.video) }
+                            ),
+                        photoView = {
+                            PhotoImageView(
+                                photo = item.video,
+                                isPreview = isDownloadPreview(configuration, currentZoomLevel),
+                                downloadPhoto = photoDownland,
+                                alpha = if (isBlurUnselectItem && !isSelected) 0.4f else 1.0f,
+                                shouldApplySensitiveMode = shouldApplySensitiveMode,
+                                showOverlayOnSuccess = true
                             )
                         }
                     )
@@ -169,7 +194,7 @@ internal fun PhotosGridView(
 
 @Composable
 internal fun PhotoViewContainer(
-    photo: Photo,
+    media: MediaListMedia,
     isSelected: Boolean,
     currentZoomLevel: ZoomLevel,
     modifier: Modifier = Modifier,
@@ -193,8 +218,8 @@ internal fun PhotoViewContainer(
 
         photoView()
 
-        if (photo.isFavourite) {
-            if (photo is Photo.Image) {
+        if (media.isFavourite) {
+            if (media.duration == null) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_overlay),
                     contentScale = ContentScale.FillBounds,
@@ -212,9 +237,9 @@ internal fun PhotoViewContainer(
                 tint = Color.Unspecified
             )
         }
-        if (photo is Photo.Video) {
+        media.duration?.let {
             Text(
-                text = TimeUtils.getVideoDuration(photo.fileTypeInfo.duration.inWholeSeconds.toInt()),
+                text = it,
                 color = white,
                 modifier = Modifier
                     .wrapContentSize()

@@ -7,9 +7,9 @@ import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCa
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
+import mega.privacy.android.app.presentation.photos.model.MediaListItem
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.AccountType
@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  *
  * @property currentFolderId current folder id
  * @property sourcePhotos the photos from sdk
- * @property uiPhotoList photo list
+ * @property mediaListItemList photo list
  * @property currentZoomLevel current zoom level
  * @property selectedPhotoIds selected photo ids
  * @property currentSort current sort
@@ -54,7 +54,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 data class MediaDiscoveryViewState(
     val currentFolderId: Long? = null,
     val sourcePhotos: List<Photo> = emptyList(),
-    val uiPhotoList: List<UIPhoto> = emptyList(),
+    val mediaListItemList: List<MediaListItem> = emptyList(),
     val currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     val selectedPhotoIds: Set<Long> = emptySet(),
     val currentSort: Sort = Sort.NEWEST,

@@ -23,6 +23,7 @@ import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
@@ -180,7 +181,8 @@ class MediaDiscoveryViewModelTest {
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             setAlmostFullStorageBannerClosingTimestampUseCase = setAlmostFullStorageBannerClosingTimestampUseCase,
             monitorAlmostFullStorageBannerClosingTimestampUseCase = monitorAlmostFullStorageBannerClosingTimestampUseCase,
-            storageCapacityMapper = storageCapacityMapper
+            storageCapacityMapper = storageCapacityMapper,
+            durationInSecondsTextMapper = DurationInSecondsTextMapper(),
         )
     }
 

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,10 +37,10 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscover
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryViewModel
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
+import mega.privacy.android.app.presentation.photos.model.MediaListItem
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.view.PhotosSkeletonView
 import mega.privacy.android.app.presentation.photos.view.CardListView
@@ -53,10 +52,11 @@ import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
-import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -109,7 +109,7 @@ fun MediaDiscoveryScreen(
                 screenTitle = screenTitle,
                 currentZoomLevel = uiState.currentZoomLevel,
                 selectedTimeBarTab = uiState.selectedTimeBarTab,
-                uiPhotos = uiState.uiPhotoList,
+                mediaListItems = uiState.mediaListItemList,
                 numSelectedPhotos = uiState.selectedPhotoIds.size,
                 showMoreMenu = showMoreMenu,
                 showImportMenu = uiState.hasDbCredentials,
@@ -161,10 +161,10 @@ fun MediaDiscoveryScreen(
         scaffoldState = scaffoldState,
         content = {
             if (uiState.loadPhotosDone) {
-                if (uiState.uiPhotoList.isNotEmpty()) {
+                if (uiState.mediaListItemList.isNotEmpty()) {
                     MediaDiscoveryContent(
                         lazyGridState = lazyGridState,
-                        uiPhotos = uiState.uiPhotoList,
+                        mediaListItems = uiState.mediaListItemList,
                         yearsCardList = uiState.yearsCardList,
                         monthsCardList = uiState.monthsCardList,
                         daysCardList = uiState.daysCardList,
@@ -205,7 +205,7 @@ fun MediaDiscoveryScreen(
 
 @Composable
 private fun MDHeader(
-    uiPhotos: List<UIPhoto>,
+    mediaListItems: List<MediaListItem>,
     numSelectedPhotos: Int,
     showMoreMenu: Boolean,
     showImportMenu: Boolean,
@@ -262,7 +262,7 @@ private fun MDHeader(
         actions = {
             if (selectedTimeBarTab == TimeBarTab.All) {
                 if (numSelectedPhotos == 0) {
-                    if (uiPhotos.isNotEmpty()) {
+                    if (mediaListItems.isNotEmpty()) {
                         IconButton(onClick = onZoomOutClicked) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_zoom_out),
@@ -339,22 +339,22 @@ private fun MDHeader(
                     }
                     DropdownMenuItem(
                         onClick = onSaveToDeviceClicked,
-                        enabled = uiPhotos.isNotEmpty()
+                        enabled = mediaListItems.isNotEmpty()
                     ) {
                         Text(
                             text = stringResource(id = R.string.general_save_to_device),
-                            modifier = if (uiPhotos.isEmpty())
+                            modifier = if (mediaListItems.isEmpty())
                                 Modifier.alpha(0.5f)
                             else Modifier.alpha(1.0f),
                         )
                     }
                     DropdownMenuItem(
                         onClick = onSortByClicked,
-                        enabled = uiPhotos.isNotEmpty()
+                        enabled = mediaListItems.isNotEmpty()
                     ) {
                         Text(
                             text = stringResource(id = R.string.action_sort_by),
-                            modifier = if (uiPhotos.isEmpty())
+                            modifier = if (mediaListItems.isEmpty())
                                 Modifier.alpha(0.5f)
                             else Modifier.alpha(1.0f),
                         )
@@ -391,7 +391,7 @@ internal fun isZoomOutValid(currentZoomLevel: ZoomLevel) =
 @Composable
 private fun MediaDiscoveryContent(
     lazyGridState: LazyGridState,
-    uiPhotos: List<UIPhoto>,
+    mediaListItems: List<MediaListItem>,
     shouldApplySensitiveMode: Boolean,
     selectedPhotoIds: Set<Long>,
     onPhotoDownload: PhotoDownload,
@@ -425,7 +425,7 @@ private fun MediaDiscoveryContent(
                     onClick = onPhotoClicked,
                     onLongPress = onPhotoLongPressed,
                     selectedPhotoIds = selectedPhotoIds,
-                    uiPhotoList = uiPhotos,
+                    mediaListItemList = mediaListItems,
                     shouldApplySensitiveMode = shouldApplySensitiveMode,
                 )
             } else {

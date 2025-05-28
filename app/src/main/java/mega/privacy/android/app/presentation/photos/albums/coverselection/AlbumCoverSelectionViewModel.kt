@@ -20,11 +20,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
-import mega.privacy.android.app.presentation.photos.model.UIPhoto
-import mega.privacy.android.app.presentation.photos.model.UIPhoto.PhotoItem
-import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.app.presentation.photos.model.MediaListItem
+import mega.privacy.android.app.presentation.photos.model.MediaListItem.PhotoItem
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -56,6 +55,7 @@ class AlbumCoverSelectionViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumCoverSelectionState())
     val state: StateFlow<AlbumCoverSelectionState> = _state
@@ -148,7 +148,7 @@ class AlbumCoverSelectionViewModel @Inject constructor(
         _state.update { state ->
             state.copy(
                 photos = sortedPhotos,
-                uiPhotos = uiPhotos,
+                mediaListItems = uiPhotos,
                 selectedPhoto = state.selectedPhoto ?: nonSensitivePhotos.firstOrNull(),
             )
         }
@@ -170,9 +170,17 @@ class AlbumCoverSelectionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun List<Photo>.toUIPhotos(): List<UIPhoto> =
+    private suspend fun List<Photo>.toUIPhotos(): List<MediaListItem> =
         withContext(defaultDispatcher) {
-            this@toUIPhotos.map { PhotoItem(it) }
+            this@toUIPhotos.map {
+                when (it) {
+                    is Photo.Image -> PhotoItem(it)
+                    is Photo.Video -> MediaListItem.VideoItem(
+                        it,
+                        durationInSecondsTextMapper(it.fileTypeInfo.duration)
+                    )
+                }
+            }
         }
 
     suspend fun downloadPhoto(

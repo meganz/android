@@ -11,10 +11,10 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
-import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionViewModel
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.ALL_PHOTOS
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
@@ -196,6 +196,7 @@ class AlbumPhotosSelectionViewModelTest {
         monitorShowHiddenItemsUseCase = mock(),
         monitorAccountDetailUseCase = mock(),
         getBusinessStatusUseCase = getBusinessStatusUseCase,
+        durationInSecondsTextMapper = DurationInSecondsTextMapper(),
     )
 
     private fun createUserAlbum(

@@ -35,15 +35,18 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscover
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
+import mega.privacy.android.app.presentation.photos.model.MediaListItem
+import mega.privacy.android.app.presentation.photos.model.MediaListItem.PhotoItem
+import mega.privacy.android.app.presentation.photos.model.MediaListMedia
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.util.createDaysCardList
 import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
 import mega.privacy.android.app.presentation.photos.util.createYearsCardList
 import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.app.utils.FileUtil
@@ -128,6 +131,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
     private val monitorAlmostFullStorageBannerClosingTimestampUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
     @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -177,7 +181,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         val result = runCatching {
             getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
         }
-        return result.getOrNull() ?: false
+        return result.getOrNull() == true
     }
 
     private fun handleHiddenNodes() = viewModelScope.launch {
@@ -367,7 +371,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         val monthsCardList = createMonthsCardList(dayPhotos = dayPhotos)
         val daysCardList = createDaysCardList(dayPhotos = dayPhotos)
         val currentZoomLevel = _state.value.currentZoomLevel
-        val uiPhotoList = mutableListOf<UIPhoto>()
+        val mediaListItemList = mutableListOf<MediaListItem>()
 
         sortedPhotos.forEachIndexed { index, photo ->
             val shouldShowDate = if (index == 0)
@@ -379,15 +383,22 @@ class MediaDiscoveryViewModel @Inject constructor(
                     currentZoomLevel = currentZoomLevel
                 )
             if (shouldShowDate) {
-                uiPhotoList.add(UIPhoto.Separator(photo.modificationTime))
+                mediaListItemList.add(MediaListItem.Separator(photo.modificationTime))
             }
-            uiPhotoList.add(UIPhoto.PhotoItem(photo))
+            val item = when (photo) {
+                is Photo.Image -> PhotoItem(photo)
+                is Photo.Video -> MediaListItem.VideoItem(
+                    photo,
+                    durationInSecondsTextMapper(photo.fileTypeInfo.duration)
+                )
+            }
+            mediaListItemList.add(item)
         }
         if (sourcePhotos == null) {
             _state.update {
                 it.copy(
                     loadPhotosDone = true,
-                    uiPhotoList = uiPhotoList,
+                    mediaListItemList = mediaListItemList,
                     yearsCardList = yearsCardList,
                     monthsCardList = monthsCardList,
                     daysCardList = daysCardList,
@@ -398,7 +409,7 @@ class MediaDiscoveryViewModel @Inject constructor(
                 it.copy(
                     loadPhotosDone = true,
                     sourcePhotos = sourcePhotos,
-                    uiPhotoList = uiPhotoList,
+                    mediaListItemList = mediaListItemList,
                     yearsCardList = yearsCardList,
                     monthsCardList = monthsCardList,
                     daysCardList = daysCardList,
@@ -459,11 +470,9 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
-    fun getAllPhotoIds() = _state.value.uiPhotoList
-        .filterIsInstance<UIPhoto.PhotoItem>()
-        .map { (photo) ->
-            photo.id
-        }
+    fun getAllPhotoIds() = _state.value.mediaListItemList
+        .filterIsInstance<MediaListMedia>()
+        .map { it.mediaId }
 
     suspend fun getAllPhotoNodes() = getNodesByIds(getAllPhotoIds())
 
@@ -518,14 +527,16 @@ class MediaDiscoveryViewModel @Inject constructor(
     fun onCardClick(dateCard: DateCard) {
         when (dateCard) {
             is DateCard.YearsCard -> {
-                updateSelectedTimeBarState(TimeBarTab.Months,
+                updateSelectedTimeBarState(
+                    TimeBarTab.Months,
                     _state.value.monthsCardList.indexOfFirst {
                         it.photo.modificationTime == dateCard.photo.modificationTime
                     })
             }
 
             is DateCard.MonthsCard -> {
-                updateSelectedTimeBarState(TimeBarTab.Days,
+                updateSelectedTimeBarState(
+                    TimeBarTab.Days,
                     _state.value.daysCardList.indexOfFirst {
                         it.photo.modificationTime == dateCard.photo.modificationTime
                     })
@@ -534,7 +545,7 @@ class MediaDiscoveryViewModel @Inject constructor(
             is DateCard.DaysCard -> {
                 updateSelectedTimeBarState(
                     TimeBarTab.All,
-                    _state.value.uiPhotoList.indexOfFirst {
+                    _state.value.mediaListItemList.indexOfFirst {
                         it.key == dateCard.photo.id.toString()
                     },
                 )

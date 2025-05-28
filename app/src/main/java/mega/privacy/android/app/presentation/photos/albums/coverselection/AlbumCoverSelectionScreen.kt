@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.photos.albums.coverselection
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,18 +33,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.model.UIPhoto
+import mega.privacy.android.app.presentation.photos.model.MediaListItem
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
-import mega.privacy.android.shared.original.core.ui.theme.accent_050
 import mega.privacy.android.shared.original.core.ui.theme.teal_200_alpha_038
-import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.teal_300_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.resources.R as sharedR
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -75,7 +75,7 @@ fun AlbumCoverSelectionScreen(
             Box {
                 AlbumCoverSelectionContent(
                     lazyGridState = lazyGridState,
-                    uiPhotos = state.uiPhotos,
+                    mediaListItems = state.mediaListItems,
                     selectedPhoto = state.selectedPhoto,
                     shouldApplySensitiveMode = state.hiddenNodeEnabled
                             && state.accountType?.isPaid == true
@@ -133,7 +133,7 @@ private fun AlbumCoverSelectionHeader(
 @Composable
 private fun AlbumCoverSelectionContent(
     lazyGridState: LazyGridState,
-    uiPhotos: List<UIPhoto>,
+    mediaListItems: List<MediaListItem>,
     selectedPhoto: Photo?,
     shouldApplySensitiveMode: Boolean,
     onPhotoDownload: PhotoDownload,
@@ -149,7 +149,7 @@ private fun AlbumCoverSelectionContent(
         onClick = onPhotoSelection,
         onLongPress = onPhotoSelection,
         selectedPhotoIds = setOfNotNull(selectedPhoto?.id),
-        uiPhotoList = uiPhotos,
+        mediaListItemList = mediaListItems,
         shouldApplySensitiveMode = shouldApplySensitiveMode,
     )
 }

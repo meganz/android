@@ -2,7 +2,6 @@
 
 package mega.privacy.android.app.presentation.photos.mediadiscovery.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.annotation.DrawableRes
@@ -80,6 +79,7 @@ import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
@@ -108,7 +108,7 @@ fun MediaDiscoveryView(
 
     ) {
     val mediaDiscoveryViewState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
-    val hasUIPhoto = mediaDiscoveryViewState.uiPhotoList.isNotEmpty()
+    val hasUIPhoto = mediaDiscoveryViewState.mediaListItemList.isNotEmpty()
     val shouldShowFabButton = mediaDiscoveryViewState.selectedTimeBarTab == TimeBarTab.All
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
@@ -182,7 +182,7 @@ fun MediaDiscoveryView(
             )
         }
         if (mediaDiscoveryViewState.loadPhotosDone) {
-            if (mediaDiscoveryViewState.uiPhotoList.isNotEmpty()) {
+            if (mediaDiscoveryViewState.mediaListItemList.isNotEmpty()) {
                 MDView(
                     mediaDiscoveryViewState = mediaDiscoveryViewState,
                     onOKButtonClicked = onOKButtonClicked,
@@ -479,7 +479,7 @@ private fun MDView(
                     onClick = onPhotoClicked,
                     onLongPress = onPhotoLongPressed,
                     selectedPhotoIds = mediaDiscoveryViewState.selectedPhotoIds,
-                    uiPhotoList = mediaDiscoveryViewState.uiPhotoList,
+                    mediaListItemList = mediaDiscoveryViewState.mediaListItemList,
                     showSeparatorRightView = { index -> index == 0 },
                     separatorRightPlaceHolderView = {
                         ListViewIconButton(

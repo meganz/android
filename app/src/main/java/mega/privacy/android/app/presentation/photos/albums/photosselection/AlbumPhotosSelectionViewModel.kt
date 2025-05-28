@@ -19,16 +19,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_FLOW
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
-import mega.privacy.android.app.presentation.photos.model.UIPhoto
-import mega.privacy.android.app.presentation.photos.model.UIPhoto.PhotoItem
-import mega.privacy.android.app.presentation.photos.model.UIPhoto.Separator
+import mega.privacy.android.app.presentation.photos.model.MediaListItem
+import mega.privacy.android.app.presentation.photos.model.MediaListItem.PhotoItem
+import mega.privacy.android.app.presentation.photos.model.MediaListItem.Separator
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.ALL_PHOTOS
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -66,6 +66,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumPhotosSelectionState())
     val state: StateFlow<AlbumPhotosSelectionState> = _state
@@ -90,7 +91,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         val result = runCatching {
             getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
         }
-        return result.getOrNull() ?: false
+        return result.getOrNull() == true
     }
 
     private fun extractAlbumFlow() = savedStateHandle.getStateFlow(ALBUM_FLOW, 0)
@@ -100,7 +101,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
 
     private fun updateAlbumFlow(type: Int) {
         _state.update {
-            it.copy(albumFlow = AlbumFlow.values()[type])
+            it.copy(albumFlow = AlbumFlow.entries[type])
         }
     }
 
@@ -216,7 +217,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
 
         val uiPhotos = filteredPhotos.toUIPhotos()
         _state.update {
-            it.copy(uiPhotos = uiPhotos)
+            it.copy(mediaListItems = uiPhotos)
         }
     }
 
@@ -261,7 +262,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun List<Photo>.toUIPhotos(): List<UIPhoto> =
+    private suspend fun List<Photo>.toUIPhotos(): List<MediaListItem> =
         withContext(defaultDispatcher) {
             flatMapIndexed { index, photo ->
                 val comparePeriods = {
@@ -273,7 +274,13 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
 
                 listOfNotNull(
                     Separator(photo.modificationTime).takeIf { showDateSeparator },
-                    PhotoItem(photo),
+                    when (photo) {
+                        is Photo.Image -> PhotoItem(photo)
+                        is Photo.Video -> MediaListItem.VideoItem(
+                            photo,
+                            durationInSecondsTextMapper(photo.fileTypeInfo.duration)
+                        )
+                    },
                 )
             }
         }
@@ -291,7 +298,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     fun selectAllPhotos() = viewModelScope.launch {
         _state.update {
             val selectedPhotoIds = withContext(defaultDispatcher) {
-                val photoIds = it.uiPhotos
+                val photoIds = it.mediaListItems
                     .filterIsInstance<PhotoItem>()
                     .map { item -> item.photo.id }
                 it.selectedPhotoIds + photoIds

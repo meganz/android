@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.photosselection
 
-import mega.privacy.android.app.presentation.photos.model.UIPhoto
+import mega.privacy.android.app.presentation.photos.model.MediaListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album
@@ -14,7 +14,7 @@ data class AlbumPhotosSelectionState(
     val sourcePhotos: List<Photo> = listOf(),
     val photos: List<Photo> = listOf(),
     val filteredPhotoIds: Set<Long> = setOf(),
-    val uiPhotos: List<UIPhoto> = listOf(),
+    val mediaListItems: List<MediaListItem> = listOf(),
     val selectedPhotoIds: Set<Long> = setOf(),
     val selectedLocation: TimelinePhotosSource = TimelinePhotosSource.ALL_PHOTOS,
     val isLocationDetermined: Boolean = false,

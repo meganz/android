@@ -436,7 +436,7 @@ public class TimeUtils implements Comparator<Calendar> {
             int seconds = duration % 60;
 
             if (hours > 0) {
-                return String.format(getUserLocale(), "%d:%d:%02d", hours, minutes, seconds);
+                return String.format(getUserLocale(), "%d:%02d:%02d", hours, minutes, seconds);
             } else {
                 return String.format(getUserLocale(), "%d:%02d", minutes, seconds);
             }

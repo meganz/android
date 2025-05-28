@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.photos.albums.photosselection
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -57,7 +55,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionViewModel.Companion.MAX_SELECTION_NUM
-import mega.privacy.android.app.presentation.photos.model.UIPhoto
+import mega.privacy.android.app.presentation.photos.model.MediaListItem
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.ALL_PHOTOS
@@ -67,15 +65,17 @@ import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AddItemsToExistingAlbumFABEvent
 import mega.privacy.mobile.analytics.event.AddItemsToNewAlbumFABEvent
 import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionAllLocationsButtonEvent
@@ -213,7 +213,7 @@ fun AlbumPhotosSelectionScreen(
             } else {
                 AlbumPhotosSelectionContent(
                     lazyGridState = lazyGridState,
-                    uiPhotos = state.uiPhotos,
+                    mediaListItems = state.mediaListItems,
                     selectedPhotoIds = state.selectedPhotoIds,
                     shouldApplySensitiveMode = state.hiddenNodeEnabled
                             && state.accountType?.isPaid == true
@@ -338,7 +338,7 @@ private fun AlbumPhotosSelectionHeader(
 @Composable
 private fun AlbumPhotosSelectionContent(
     lazyGridState: LazyGridState,
-    uiPhotos: List<UIPhoto>,
+    mediaListItems: List<MediaListItem>,
     shouldApplySensitiveMode: Boolean,
     selectedPhotoIds: Set<Long>,
     onPhotoDownload: PhotoDownload,
@@ -353,7 +353,7 @@ private fun AlbumPhotosSelectionContent(
         onClick = onPhotoSelection,
         onLongPress = onPhotoSelection,
         selectedPhotoIds = selectedPhotoIds,
-        uiPhotoList = uiPhotos,
+        mediaListItemList = mediaListItems,
         isBlurUnselectItem = selectedPhotoIds.size >= MAX_SELECTION_NUM,
         shouldApplySensitiveMode = shouldApplySensitiveMode,
     )
