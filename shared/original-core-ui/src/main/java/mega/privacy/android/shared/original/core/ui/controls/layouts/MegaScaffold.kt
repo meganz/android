@@ -118,7 +118,7 @@ fun MegaScaffold(
         }
     }
     CompositionLocalProvider(
-        LocalSnackBarHostState provides scaffoldState.snackbarHostState,
+        LocalSnackBarHostStateOriginal provides scaffoldState.snackbarHostState,
         LocalMegaAppBarElevation provides if (isScrolled) AppBarDefaults.TopAppBarElevation else 0.dp,
     ) {
         if (hideFloatingActionButtonOnScrollUp) {
@@ -193,7 +193,7 @@ private fun MegaScaffold(
     shouldAddSnackBarPadding: Boolean = true,
     content: @Composable (PaddingValues) -> Unit,
 ) {
-    CompositionLocalProvider(LocalSnackBarHostState provides scaffoldState.snackbarHostState) {
+    CompositionLocalProvider(LocalSnackBarHostStateOriginal provides scaffoldState.snackbarHostState) {
         Scaffold(
             modifier = modifier,
             scaffoldState = scaffoldState,
@@ -315,7 +315,7 @@ private fun ScrollableState.getApproximateScrollOffset(): Int? =
  * Provides SnackbarHostState to be used to show a snackBar from any view inside this scaffold.
  * This is a convenient accessor to [ScaffoldState.snackbarHostState] without the need to send it to all the view hierarchy
  */
-val LocalSnackBarHostState = compositionLocalOf<SnackbarHostState?> { null }
+val LocalSnackBarHostStateOriginal = compositionLocalOf<SnackbarHostState?> { null }
 
 private const val animationScale = 0.2f
 private const val animationDuration = 300

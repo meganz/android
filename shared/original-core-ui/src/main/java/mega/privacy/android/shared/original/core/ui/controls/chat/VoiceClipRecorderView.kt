@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -157,7 +157,7 @@ fun VoiceClipRecorderView(
     val showTapAndHoldTooltip = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    val snackbarHostState = LocalSnackBarHostState.current
+    val snackbarHostState = LocalSnackBarHostStateOriginal.current
     val recordAudioPermissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->

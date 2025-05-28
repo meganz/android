@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.voiceclip
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.CoreVoiceClipMessageView
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
@@ -46,7 +46,7 @@ class VoiceClipUiMessage(
 
             val coroutineScope = rememberCoroutineScope()
             val context = LocalContext.current
-            val snackbarHostState = LocalSnackBarHostState.current
+            val snackbarHostState = LocalSnackBarHostStateOriginal.current
 
             val onClick: () -> Unit = {
                 if (exists) {

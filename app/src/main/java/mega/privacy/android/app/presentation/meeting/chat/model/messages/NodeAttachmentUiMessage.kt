@@ -34,7 +34,7 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import java.io.File
@@ -63,7 +63,7 @@ data class NodeAttachmentUiMessage(
         val uiState by viewModel.updateAndGetUiStateFlow(message).collectAsStateWithLifecycle()
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
-        val snackbarHostState = LocalSnackBarHostState.current
+        val snackbarHostState = LocalSnackBarHostStateOriginal.current
         val onClick: () -> Unit = {
             coroutineScope.launch {
                 if (!message.exists) {

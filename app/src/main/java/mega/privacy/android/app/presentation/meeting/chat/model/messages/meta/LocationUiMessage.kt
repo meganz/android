@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.Chat
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openLocationActivity
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
@@ -33,7 +33,7 @@ class LocationUiMessage(
         navHostController: NavHostController,
     ) {
         val context = LocalContext.current
-        val snackbarHostState = LocalSnackBarHostState.current
+        val snackbarHostState = LocalSnackBarHostStateOriginal.current
         val coroutineScope = rememberCoroutineScope()
         ChatLocationMessageView(
             message = message,

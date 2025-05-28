@@ -17,7 +17,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.attachmen
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openSentRequests
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuItemEvent
@@ -39,7 +39,7 @@ class InviteMessageAction(
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
         val viewModel = hiltViewModel<ContactAttachmentMessageViewModel>()
-        val snackBarHostState = LocalSnackBarHostState.current
+        val snackBarHostState = LocalSnackBarHostStateOriginal.current
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             launch {

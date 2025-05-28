@@ -30,7 +30,7 @@ import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.shared.original.core.ui.controls.chat.UiChatStatus
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
@@ -56,7 +56,7 @@ data class ContactAttachmentUiMessage(
         var userName by remember { mutableStateOf(message.contactUserName) }
         val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
-        val snackbarHostState = LocalSnackBarHostState.current
+        val snackbarHostState = LocalSnackBarHostStateOriginal.current
         val onClick = {
             onUserClick(
                 handle = message.contactHandle,

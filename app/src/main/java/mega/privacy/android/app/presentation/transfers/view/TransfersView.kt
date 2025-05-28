@@ -45,7 +45,6 @@ import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTrans
 import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfersActionsBottomSheet
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -193,15 +192,11 @@ internal fun TransfersView(
                 onDismiss = { showClearAllTransfersDialog = false },
             )
         }
-
-        LocalSnackBarHostState.current?.let { snackBarHostState ->
-            StartTransferComponent(
-                event = uiState.startEvent,
-                onConsumeEvent = onConsumeStartEvent,
-                snackBarHostState = snackBarHostState,
-                navigateToStorageSettings = onNavigateToStorageSettings,
-            )
-        }
+        StartTransferComponent(
+            event = uiState.startEvent,
+            onConsumeEvent = onConsumeStartEvent,
+            navigateToStorageSettings = onNavigateToStorageSettings,
+        )
     }
 }
 

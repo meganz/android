@@ -22,6 +22,8 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
+import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
+import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
@@ -31,7 +33,6 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import java.io.File
 
@@ -49,6 +50,35 @@ import java.io.File
 fun HandleNodeAction(
     typedFileNode: TypedFileNode,
     snackBarHostState: SnackbarHostState,
+    onActionHandled: () -> Unit,
+    coroutineScope: CoroutineScope,
+    nodeSourceType: Int? = null,
+    nodeActionsViewModel: NodeActionsViewModel = hiltViewModel(),
+    sortOrder: SortOrder = SortOrder.ORDER_NONE,
+) = HandleNodeAction(
+    typedFileNode = typedFileNode,
+    snackBarHostStateWrapper = SnackbarHostStateWrapper(snackBarHostState),
+    onActionHandled = onActionHandled,
+    coroutineScope = coroutineScope,
+    nodeSourceType = nodeSourceType,
+    nodeActionsViewModel = nodeActionsViewModel,
+    sortOrder = sortOrder
+)
+
+/**
+ * Handle node action click
+ *
+ * @param typedFileNode [TypedFileNode]
+ * @param nodeSourceType from where item click is performed
+ * @param nodeActionsViewModel [NodeActionsViewModel]
+ * @param sortOrder [SortOrder]
+ * @param snackBarHostStateWrapper [SnackbarHostStateWrapper]
+ * @param onActionHandled callback after file clicked
+ */
+@Composable
+fun HandleNodeAction(
+    typedFileNode: TypedFileNode,
+    snackBarHostStateWrapper: SnackbarHostStateWrapper,
     onActionHandled: () -> Unit,
     coroutineScope: CoroutineScope,
     nodeSourceType: Int? = null,
@@ -89,7 +119,7 @@ fun HandleNodeAction(
                         context = context,
                         content = content.uri,
                         fileNode = typedFileNode,
-                        snackBarHostState = snackBarHostState,
+                        snackBarHostState = snackBarHostStateWrapper,
                         sortOrder = sortOrder,
                         viewType = nodeSourceType ?: Constants.FILE_BROWSER_ADAPTER,
                         coroutineScope = coroutineScope,
@@ -102,7 +132,7 @@ fun HandleNodeAction(
 
                 is FileNodeContent.UrlContent -> {
                     openUrlFile(
-                        context = context, content = content, snackBarHostState = snackBarHostState
+                        context = context, content = content, snackBarHostState = snackBarHostStateWrapper
                     )
                 }
 
@@ -114,7 +144,7 @@ fun HandleNodeAction(
                             isOpenWith = false,
                             fileTypeInfo = typedFileNode.type,
                             nodeActionsViewModel = nodeActionsViewModel,
-                            snackBarHostState = snackBarHostState,
+                            snackBarHostState = snackBarHostStateWrapper,
                             coroutineScope = coroutineScope,
                             context = context,
                         )
@@ -139,7 +169,7 @@ fun HandleNodeAction(
 fun HandleFileAction(
     file: File,
     isOpenWith: Boolean,
-    snackBarHostState: SnackbarHostState,
+    snackBarHostState: SnackbarHostStateWrapper?,
     onActionHandled: () -> Unit,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     nodeActionsViewModel: NodeActionsViewModel = hiltViewModel(),
@@ -264,7 +294,7 @@ private suspend fun openVideoOrAudioFile(
     context: Context,
     fileNode: TypedFileNode,
     content: NodeContentUri,
-    snackBarHostState: SnackbarHostState?,
+    snackBarHostState: SnackbarHostStateWrapper?,
     sortOrder: SortOrder,
     viewType: Int,
     coroutineScope: CoroutineScope,
@@ -291,7 +321,7 @@ private suspend fun openVideoOrAudioFile(
 private suspend fun openUrlFile(
     context: Context,
     content: FileNodeContent.UrlContent,
-    snackBarHostState: SnackbarHostState?,
+    snackBarHostState: SnackbarHostStateWrapper?,
 ) {
     content.path?.let {
         val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -310,7 +340,7 @@ private suspend fun openUrlFile(
 private suspend fun safeLaunchActivity(
     context: Context,
     intent: Intent,
-    snackBarHostState: SnackbarHostState?,
+    snackBarHostState: SnackbarHostStateWrapper?,
 ) {
     runCatching {
         context.startActivity(intent)
@@ -322,7 +352,7 @@ private suspend fun safeLaunchActivity(
 
 private suspend fun Intent.openShareIntent(
     context: Context,
-    snackBarHostState: SnackbarHostState?,
+    snackBarHostState: SnackbarHostStateWrapper?,
 ) {
     if (resolveActivity(context.packageManager) == null) {
         action = Intent.ACTION_SEND
@@ -340,7 +370,7 @@ private suspend fun openOtherFile(
     isOpenWith: Boolean,
     fileTypeInfo: FileTypeInfo,
     nodeActionsViewModel: NodeActionsViewModel,
-    snackBarHostState: SnackbarHostState,
+    snackBarHostState: SnackbarHostStateWrapper?,
     coroutineScope: CoroutineScope,
     context: Context,
 ) {
@@ -367,7 +397,7 @@ private fun openZipFile(
     context: Context,
     localFile: File,
     fileNode: TypedFileNode?,
-    snackBarHostState: SnackbarHostState?,
+    snackBarHostState: SnackbarHostStateWrapper?,
     coroutineScope: CoroutineScope,
 ) {
     Timber.d("The file is zip, open in-app.")
@@ -389,7 +419,7 @@ private suspend fun handleOtherFiles(
     context: Context,
     localFile: File,
     mimeType: String,
-    snackBarHostState: SnackbarHostState?,
+    snackBarHostState: SnackbarHostStateWrapper?,
     nodeActionsViewModel: NodeActionsViewModel,
 ) {
     Intent(Intent.ACTION_VIEW).apply {

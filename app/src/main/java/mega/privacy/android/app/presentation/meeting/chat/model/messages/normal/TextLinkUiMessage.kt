@@ -18,12 +18,12 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.C
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatLinksMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatLinksMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.LinkContent
+import mega.privacy.android.domain.entity.RegexPatternType
+import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
-import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 
 /**
  * Contact link ui message
@@ -45,7 +45,7 @@ data class TextLinkUiMessage(
         val contactViewModel: ContactMessageViewModel = hiltViewModel()
         val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
-        val snackbarHostState = LocalSnackBarHostState.current
+        val snackbarHostState = LocalSnackBarHostStateOriginal.current
         var contentLinks by remember {
             mutableStateOf(listOf<LinkContent>())
         }

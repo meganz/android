@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openNa
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuItemEvent
@@ -44,7 +44,7 @@ internal class ImportMessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
-        val snackbarHostState = LocalSnackBarHostState.current
+        val snackbarHostState = LocalSnackBarHostStateOriginal.current
         val error = stringResource(id = R.string.import_success_error)
         var handleWhereToImport by rememberSaveable { mutableStateOf<Long?>(null) }
         var collisionsResult by rememberSaveable { mutableStateOf<String?>(null) }

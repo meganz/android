@@ -20,6 +20,8 @@ import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.CompletedTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -58,9 +60,13 @@ class TransfersViewTest {
         on { getUiStateFlow(tag1) } doReturn MutableStateFlow(state)
         on { getUiStateFlow(tag2) } doReturn MutableStateFlow(state)
     }
+    private val startTransfersComponentViewModel = mock<StartTransfersComponentViewModel> {
+        on { uiState } doReturn MutableStateFlow(StartTransferViewState())
+    }
     private val viewModelStore = mock<ViewModelStore> {
         on { get(argThat<String> { contains(ActiveTransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn activeTransferViewModel
         on { get(argThat<String> { contains(CompletedTransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn completedTransferImageViewModel
+        on { get(argThat<String> { contains(StartTransfersComponentViewModel::class.java.canonicalName.orEmpty()) }) } doReturn startTransfersComponentViewModel
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore

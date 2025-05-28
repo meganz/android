@@ -40,6 +40,7 @@ import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -48,6 +49,8 @@ import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.node.action.HandleFileAction
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
+import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
+import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewActivity
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_ERROR
@@ -72,9 +75,9 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
@@ -82,13 +85,14 @@ import java.io.File
 /**
  * Helper compose view to show UI related to starting a download transfer
  * (scanning in progress dialog, not enough space snackbar, start download snackbar, quota exceeded, etc.)
+ * @param snackBarHostState optional snackbar to show messages, typically null because it should be injected via LocalSnackBarHostState or LocalSnackBarHostStateM2
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun StartTransferComponent(
     event: StateEventWithContent<TransferTriggerEvent>,
     onConsumeEvent: () -> Unit,
-    snackBarHostState: SnackbarHostState,
+    snackBarHostState: SnackbarHostState? = null,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
     viewModel: StartTransfersComponentViewModel = hiltViewModel(),
     onCancelNotEnoughSpaceForUploadDialog: () -> Unit = {},
@@ -189,7 +193,7 @@ internal fun StartTransferComponent(
         onDoNotPromptToSaveDestinationAgain = viewModel::doNotPromptToSaveDestinationAgain,
         onResumeTransfers = viewModel::resumeTransfers,
         onAskedResumeTransfers = viewModel::setAskedResumeTransfers,
-        snackBarHostState = snackBarHostState,
+        snackBarHostState = snackBarHostState.orProvided(),
         onScanningFinished = onScanningFinished,
         navigateToStorageSettings = navigateToStorageSettings,
         onPreviewFile = viewModel::previewFile,
@@ -248,7 +252,7 @@ private fun StartTransferComponent(
     onDoNotPromptToSaveDestinationAgain: () -> Unit,
     onResumeTransfers: () -> Unit,
     onAskedResumeTransfers: () -> Unit,
-    snackBarHostState: SnackbarHostState,
+    snackBarHostState: SnackbarHostStateWrapper?,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
     navigateToStorageSettings: () -> Unit,
     onPreviewFile: (File) -> Unit,
@@ -537,7 +541,7 @@ private val storageStateSaver = Saver<StorageState?, Int>(
 
 private suspend fun onFinishProcessing(
     event: StartTransferEvent.FinishDownloadProcessing,
-    snackBarHostState: SnackbarHostState,
+    snackBarHostState: SnackbarHostStateWrapper?,
     showQuotaExceededDialog: MutableState<StorageState?>,
     context: Context,
 ) {
@@ -568,7 +572,7 @@ private suspend fun onFinishProcessing(
 
 private suspend fun consumeMessage(
     event: StartTransferEvent.Message,
-    snackBarHostState: SnackbarHostState,
+    snackBarHostState: SnackbarHostStateWrapper?,
     context: Context,
     navigateToStorageSettings: () -> Unit,
 ) {
@@ -590,3 +594,11 @@ private fun consumeMessageAction(
         navigateToStorageSettings()
     }
 }
+
+@Composable
+private fun SnackbarHostState?.orProvided() =
+    (this ?: LocalSnackBarHostStateOriginal.current)?.let {
+        SnackbarHostStateWrapper(it)
+    } ?: LocalSnackBarHostState.current?.let {
+        SnackbarHostStateWrapper(it)
+    }

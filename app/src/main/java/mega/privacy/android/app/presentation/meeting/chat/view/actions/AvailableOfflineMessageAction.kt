@@ -22,7 +22,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.attachmen
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -78,7 +78,7 @@ internal class AvailableOfflineMessageAction(
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
         Analytics.tracker.trackEvent(ChatConversationAvailableOfflineActionMenuItemEvent)
-        val snackbarHostState = LocalSnackBarHostState.current
+        val snackbarHostState = LocalSnackBarHostStateOriginal.current
         val removeMessage = stringResource(id = R.string.file_removed_offline)
         val viewModel = hiltViewModel<NodeAttachmentMessageViewModel>()
         LaunchedEffect(messages.size) {

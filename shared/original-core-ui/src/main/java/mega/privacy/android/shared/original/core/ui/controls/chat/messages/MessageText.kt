@@ -30,16 +30,16 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.format.Format
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.format.FormatTag
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.format.FormatType
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.controls.text.megaSpanStyle
-import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.robotoMono
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.textColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
@@ -518,7 +518,7 @@ fun OpenMessageLink(link: String) {
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState = LocalSnackBarHostState.current
+    val snackbarHostState = LocalSnackBarHostStateOriginal.current
 
     runCatching {
         uriHandler.openUri(link.completeURLProtocol())
