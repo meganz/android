@@ -58,8 +58,8 @@ internal fun AchievementRoute(
     onNavigateToInviteFriends: (Long) -> Unit,
     onNavigateToInfoAchievements: (achievementType: AchievementType) -> Unit,
     onNavigateToReferralBonuses: () -> Unit,
-    onNavigateToMegaVPNFreeTrial: (Boolean) -> Unit,
-    onNavigateToMegaPassFreeTrial: (Boolean) -> Unit,
+    onNavigateToMegaVPNFreeTrial: (Boolean, Long, Long) -> Unit,
+    onNavigateToMegaPassFreeTrial: (Boolean, Long, Long) -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -122,8 +122,8 @@ internal fun AchievementView(
     isAchievementEnabled: Boolean = false,
     onShowInfoAchievementsClicked: (achievementType: AchievementType) -> Unit = {},
     onReferBonusesClicked: () -> Unit = {},
-    onMegaVPNFreeTrialClicked: (Boolean) -> Unit = {},
-    onMegaPassFreeTrialClicked: (Boolean) -> Unit = {},
+    onMegaVPNFreeTrialClicked: (Boolean, Long, Long) -> Unit = { _, _, _ -> },
+    onMegaPassFreeTrialClicked: (Boolean, Long, Long) -> Unit = { _, _, _ -> },
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val scrollState = rememberScrollState()
@@ -296,7 +296,9 @@ internal fun AchievementView(
                                     .testTag(AchievementViewTestTags.START_MEGA_VPN_FREE_TRIAL_SECTION)
                                     .clickable {
                                         onMegaVPNFreeTrialClicked(
-                                            megaVPNTrialAwardStorage > 0
+                                            megaVPNTrialAwardStorage > 0,
+                                            megaVPNTrialStorage ?: 0,
+                                            megaVPNTrialAwardStorage
                                         )
                                     }
                             ) {
@@ -305,7 +307,10 @@ internal fun AchievementView(
                                     titleId = sharedR.string.title_start_mega_vpn_free_trial,
                                     zeroFiguresTitle = if (megaVPNTrialAwardStorage <= 0) {
                                         megaVPNTrialStorage?.let {
-                                            stringResource(sharedR.string.text_start_mega_pass_free_trial)
+                                            stringResource(
+                                                sharedR.string.text_start_mega_pass_free_trial,
+                                                it.toUnitString(LocalContext.current)
+                                            )
                                         }
                                     } else null,
                                     hasFiguresTitle = if (megaVPNTrialAwardStorage > 0) {
@@ -327,7 +332,9 @@ internal fun AchievementView(
                                     .testTag(AchievementViewTestTags.START_MEGA_PASS_FREE_TRIAL_SECTION)
                                     .clickable {
                                         onMegaPassFreeTrialClicked(
-                                            megaPassTrialAwardStorage > 0
+                                            megaPassTrialAwardStorage > 0,
+                                            megaPassTrialStorage ?: 0,
+                                            megaPassTrialAwardStorage
                                         )
                                     }
                             ) {
@@ -336,7 +343,10 @@ internal fun AchievementView(
                                     titleId = sharedR.string.title_start_mega_pass_free_trial,
                                     zeroFiguresTitle = if (megaPassTrialAwardStorage <= 0) {
                                         megaPassTrialStorage?.let {
-                                            stringResource(sharedR.string.text_start_mega_vpn_free_trial)
+                                            stringResource(
+                                                sharedR.string.text_start_mega_vpn_free_trial,
+                                                it.toUnitString(LocalContext.current)
+                                            )
                                         }
                                     } else null,
                                     hasFiguresTitle = if (megaPassTrialAwardStorage > 0) {

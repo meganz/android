@@ -22,8 +22,8 @@ fun NavGraphBuilder.achievementScreen(
     onNavigateToInviteFriends: (Long) -> Unit,
     onNavigateToInfoAchievements: (achievementType: AchievementType) -> Unit,
     onNavigateToReferralBonuses: () -> Unit,
-    onNavigateToMegaVPNFreeTrial: (Boolean) -> Unit,
-    onNavigateToMegaPassFreeTrial: (Boolean) -> Unit,
+    onNavigateToMegaVPNFreeTrial: (Boolean, Long, Long) -> Unit,
+    onNavigateToMegaPassFreeTrial: (Boolean, Long, Long) -> Unit,
 ) {
     composable<AchievementMain> {
         AchievementRoute(

@@ -51,8 +51,8 @@ internal class AchievementScreenTest {
         isAchievementEnabled: Boolean = false,
         onShowInfoAchievementsClicked: (achievementType: AchievementType) -> Unit = {},
         onReferBonusesClicked: () -> Unit = {},
-        onMegaVPNFreeTrialClicked: (Boolean) -> Unit = {},
-        onMegaPassFreeTrialClicked: (Boolean) -> Unit = {},
+        onMegaVPNFreeTrialClicked: (Boolean, Long, Long) -> Unit = {_, _, _ ->},
+        onMegaPassFreeTrialClicked: (Boolean, Long, Long) -> Unit = {_, _, _ ->},
     ) {
         composeTestRule.setContent {
             AchievementView(
@@ -155,7 +155,7 @@ internal class AchievementScreenTest {
 
     @Test
     fun `test that mega vpn trial reward is visible`() {
-        val onMegaVPNFreeTrialClicked = mock<(Boolean) -> Unit>()
+        val onMegaVPNFreeTrialClicked = mock<(Boolean, Long, Long) -> Unit>()
         setComposeContent(
             isAchievementEnabled = true,
             hasMegaVPNTrial = true,
@@ -168,12 +168,12 @@ internal class AchievementScreenTest {
                 performClick()
             }
 
-        verify(onMegaVPNFreeTrialClicked).invoke(false)
+        verify(onMegaVPNFreeTrialClicked).invoke(false, 0, 0)
     }
 
     @Test
     fun `test that mega pass trial reward is visible`() {
-        val onMegaPassFreeTrialClicked = mock<(Boolean) -> Unit>()
+        val onMegaPassFreeTrialClicked = mock<(Boolean, Long, Long) -> Unit>()
         setComposeContent(
             isAchievementEnabled = true,
             hasMegaPassTrial = true,
@@ -186,6 +186,6 @@ internal class AchievementScreenTest {
                 performClick()
             }
 
-        verify(onMegaPassFreeTrialClicked).invoke(false)
+        verify(onMegaPassFreeTrialClicked).invoke(false, 0, 0)
     }
 }

@@ -42,9 +42,9 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 internal fun FreeTrialView(
     @DrawableRes icon: Int,
-    @StringRes freeTrialText: Int,
+    freeTrialText: String,
     @StringRes installButtonText: Int,
-    @StringRes howItWorksText: Int,
+    howItWorksText: String,
     modifier: Modifier = Modifier,
     isReceivedAward: Boolean = false,
     installButtonClicked: () -> Unit = {},
@@ -108,7 +108,7 @@ internal fun FreeTrialView(
                         .testTag(FreeTrialViewTestTags.DESCRIPTION)
                         .padding(top = 30.dp, start = 24.dp, end = 24.dp)
                         .align(Alignment.CenterHorizontally),
-                    text = stringResource(id = freeTrialText),
+                    text = freeTrialText,
                     color = MaterialTheme.colors.textColorSecondary,
                     textAlign = TextAlign.Center
                 )
@@ -154,7 +154,7 @@ internal fun FreeTrialView(
                         letterSpacing = 0.sp
                     ),
                     color = MaterialTheme.colors.textColorSecondary,
-                    text = stringResource(id = howItWorksText)
+                    text = howItWorksText
                 )
             }
         }
@@ -179,9 +179,9 @@ fun FreeTrialViewPreview() {
     OriginalTheme(isSystemInDarkTheme()) {
         FreeTrialView(
             icon = iconPackR.drawable.ic_mega_vpn_free_trial,
-            freeTrialText = sharedR.string.text_start_mega_vpn_free_trial,
+            freeTrialText = stringResource(sharedR.string.text_start_mega_vpn_free_trial, "5 GB"),
             installButtonText = sharedR.string.button_text_install_mega_vpn,
-            howItWorksText = sharedR.string.text_how_it_works_mega_vpn_free_trial
+            howItWorksText = stringResource(sharedR.string.text_how_it_works_mega_vpn_free_trial)
         )
     }
 }
@@ -192,9 +192,12 @@ fun FreeTrialViewDisableButtonPreview() {
     OriginalTheme(isSystemInDarkTheme()) {
         FreeTrialView(
             icon = iconPackR.drawable.ic_mega_vpn_free_trial,
-            freeTrialText = sharedR.string.text_start_mega_vpn_free_trial,
+            freeTrialText = stringResource(sharedR.string.text_start_mega_vpn_free_trial, "5 GB"),
             installButtonText = sharedR.string.button_text_install_mega_vpn,
-            howItWorksText = sharedR.string.text_how_it_works_mega_vpn_free_trial,
+            howItWorksText = stringResource(
+                sharedR.string.text_how_it_works_mega_vpn_free_trial,
+                "5 GB"
+            ),
             isReceivedAward = true
         )
     }

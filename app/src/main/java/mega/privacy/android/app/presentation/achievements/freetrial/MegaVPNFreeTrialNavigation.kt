@@ -12,6 +12,8 @@ import mega.privacy.android.app.presentation.achievements.freetrial.view.MegaVPN
 @Serializable
 data class MegaVPNFreeTrial(
     val isReceivedAward: Boolean,
+    val storageAmount: Long,
+    val awardStorageAmount: Long,
 )
 
 /**
@@ -23,6 +25,8 @@ fun NavGraphBuilder.megaVPNFreeTrialScreen() {
         val megaVPNFreeTrial = backStackEntry.toRoute<MegaVPNFreeTrial>()
         MegaVPNFreeTrialScreen(
             isReceivedAward = megaVPNFreeTrial.isReceivedAward,
+            storageAmount = megaVPNFreeTrial.storageAmount,
+            awardStorageAmount = megaVPNFreeTrial.awardStorageAmount,
             onInstallButtonClicked = {
                 openInSpecificApp(context, MEGA_VPN_PACKAGE_NAME)
             }
@@ -34,10 +38,15 @@ fun NavGraphBuilder.megaVPNFreeTrialScreen() {
  * Navigation for [MegaVPNFreeTrial]
  */
 fun NavController.navigateToMegaVPNFreeTrial(
-    isReceivedAward: Boolean = true,
+    isReceivedAward: Boolean,
+    storageAmount: Long,
+    awardStorageAmount: Long,
     navOptions: NavOptions? = null,
 ) {
-    this.navigate(route = MegaVPNFreeTrial(isReceivedAward), navOptions = navOptions)
+    this.navigate(
+        route = MegaVPNFreeTrial(isReceivedAward, storageAmount, awardStorageAmount),
+        navOptions = navOptions
+    )
 }
 
 internal const val MEGA_VPN_PACKAGE_NAME = "mega.vpn.android.app"

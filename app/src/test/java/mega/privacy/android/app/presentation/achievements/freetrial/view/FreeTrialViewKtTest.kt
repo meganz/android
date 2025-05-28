@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.achievements.freetrial.view
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -27,9 +28,15 @@ class FreeTrialViewKtTest {
         composeTestRule.setContent {
             FreeTrialView(
                 icon = iconPackR.drawable.ic_mega_vpn_free_trial,
-                freeTrialText = sharedR.string.text_start_mega_vpn_free_trial,
+                freeTrialText = stringResource(
+                    sharedR.string.text_start_mega_vpn_free_trial,
+                    "5 GB"
+                ),
                 installButtonText = sharedR.string.button_text_install_mega_vpn,
-                howItWorksText = sharedR.string.text_how_it_works_mega_vpn_free_trial,
+                howItWorksText = stringResource(
+                    sharedR.string.text_how_it_works_mega_vpn_free_trial,
+                    "5 GB"
+                ),
                 isReceivedAward = isReceivedAward,
                 installButtonClicked = installButtonClicked
             )

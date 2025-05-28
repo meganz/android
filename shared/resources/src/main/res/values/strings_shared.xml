@@ -1258,25 +1258,25 @@
     <!-- State to indicate an achievement has applied -->
     <string name="applied_label">Applied</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
-    <string name="title_start_mega_vpn_free_trial">Start MEGA VPN free trial</string>
+    <string name="title_start_mega_vpn_free_trial">Start MEGA&#160;VPN free trial</string>
     <!-- Text of the section for start mega vpn free trial in achivements section -->
-    <string name="text_start_mega_vpn_free_trial">5 GB of storage. Valid permanently.</string>
+    <string name="text_start_mega_vpn_free_trial">%1$s of storage. Valid permanently.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
-    <string name="title_start_mega_pass_free_trial">Start MEGA Pass free trial</string>
+    <string name="title_start_mega_pass_free_trial">Start MEGA&#160;Pass free trial</string>
     <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">5 GB of storage. Valid permanently.</string>
+    <string name="text_start_mega_pass_free_trial">%1$s of storage. Valid permanently.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
-    <string name="button_text_install_mega_vpn">Install MEGA VPN</string>
+    <string name="button_text_install_mega_vpn">Install MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
-    <string name="button_text_install_mega_pass">Install MEGA Pass</string>
+    <string name="button_text_install_mega_pass">Install MEGA&#160;Pass</string>
     <!-- title of how it works for mega vpn free trial in achivements section -->
     <string name="title_how_it_works_free_trial">How it works</string>
     <!-- text of how it works for mega vpn free trial in achivements section -->
-    <string name="text_how_it_works_mega_vpn_free_trial">Install the MEGA VPN app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
+    <string name="text_how_it_works_mega_vpn_free_trial">Install the MEGA&#160;VPN app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
     <!-- text of how it works for mega pass free trial in achivements section -->
-    <string name="text_how_it_works_mega_pass_free_trial">Install the MEGA Pass app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
+    <string name="text_how_it_works_mega_pass_free_trial">Install the MEGA&#160;Pass app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">You have received 5 GB storage space for starting a MEGA VPN free trial.</string>
+    <string name="text_received_mega_vpn_free_trial">You have received %1$s storage space for starting a MEGA&#160;VPN free trial</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">You have received 5 GB storage space for starting a MEGA Pass free trial.</string>
+    <string name="text_received_mega_pass_free_trial">You have received %1$s storage space for starting a MEGA&#160;Pass free trial</string>
 </resources>
