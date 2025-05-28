@@ -1,9 +1,11 @@
 package mega.privacy.android.app.modalbottomsheet
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +14,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.viewModels
 import coil.load
 import coil.transform.RoundedCornersTransformation
@@ -29,7 +33,6 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
-import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -237,7 +240,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
     private fun openFileWith() {
         var uriPath = UriPath(transfer?.originalPath ?: return)
         val fileName = transfer?.fileName ?: return
-        var uri: Uri? = null
+        var uri: Uri = uriPath.value.toUri()
 
         if (uriPath.isPath()) {
             val localFile = File(uriPath.value)
@@ -256,14 +259,28 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
                 return
             }
         } else {
-            uri = uriPath.toUri()
+            if (DocumentsContract.isTreeUri(uri)) {
+                DocumentFile.fromTreeUri(context as Context, uri)
+            } else {
+                null
+            }?.let { documentFile ->
+                uri = if (documentFile.isDirectory) {
+                    documentFile.findFile(fileName)?.uri ?: uri
+                } else {
+                    documentFile.uri
+                }
+            }
         }
 
-        uri?.let {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        Intent(Intent.ACTION_VIEW).apply {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             try {
-                intent.setDataAndType(uri, typeForName(fileName).type)
+                setDataAndType(uri, typeForName(fileName).type)
+                val chooserTitle = resources.getString(
+                    sharedR.string.open_with_os_dialog_title,
+                    fileName
+                )
+                val intent = Intent.createChooser(this, chooserTitle)
                 if (MegaApiUtils.isIntentAvailable(requireActivity(), intent)) {
                     startActivity(intent)
                     return

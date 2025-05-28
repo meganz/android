@@ -6981,36 +6981,24 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     fun openTransferLocation(transfer: CompletedTransfer) {
         when (transfer.type) {
             MegaTransfer.TYPE_DOWNLOAD -> {
+                val fileNames = arrayListOf(transfer.fileName)
                 when (transfer.isOffline) {
                     true -> {
                         selectDrawerItem(DrawerItem.HOMEPAGE)
-                        // Removes the "Offline" root parent of a path.
-                        // Used to open the location of an offline node in the app.
-                        val path = transfer.path.replace(
+                        val offlinePath = transfer.path.replace(
                             getString(R.string.section_saved_for_offline_new),
                             ""
                         ) + Constants.SEPARATOR
-                        openFullscreenOfflineFragment(path)
+                        openFullscreenOfflineFragment(offlinePath, fileNames)
                     }
 
                     false -> {
-                        val file = getFileFromUri(transfer.path)
-                        if (file?.exists() != true) {
-                            showSnackbar(
-                                SNACKBAR_TYPE,
-                                getString(R.string.location_not_exist),
-                                MEGACHAT_INVALID_HANDLE
-                            )
-                            return
+                        Intent(this, FileStorageActivity::class.java).apply {
+                            action = FileStorageActivity.Mode.BROWSE_FILES.action
+                            putExtra(FileStorageActivity.EXTRA_PATH, transfer.path)
+                            putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, fileNames)
+                            startActivity(this)
                         }
-                        val intent = Intent(this, FileStorageActivity::class.java)
-                        intent.action = FileStorageActivity.Mode.BROWSE_FILES.action
-                        intent.putExtra(FileStorageActivity.EXTRA_PATH, file.path)
-                        intent.putStringArrayListExtra(
-                            FileStorageActivity.EXTRA_FILE_NAMES,
-                            arrayListOf(transfer.fileName)
-                        )
-                        startActivity(intent)
                     }
 
                     null -> {
