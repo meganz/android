@@ -1,7 +1,10 @@
 package mega.privacy.android.app.presentation.transfers.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
@@ -16,6 +19,8 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  * @property areTransfersPaused Whether the transfers are paused.
  * @property completedTransfers List of successfully completed transfers.
  * @property failedTransfers List of cancelled or failed completed transfers.
+ * @property startEvent event to start a new transfer
+ * @property readRetryError Null if there is no error, read retry error count otherwise
  */
 data class TransfersUiState(
     val selectedTab: Int = ACTIVE_TAB_INDEX,
@@ -25,6 +30,8 @@ data class TransfersUiState(
     val areTransfersPaused: Boolean = false,
     val completedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
     val failedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
+    val startEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
+    val readRetryError: Int? = null,
 ) {
 
     /**

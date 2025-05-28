@@ -34,6 +34,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.transfers.view.active.ActiveTransfersView
 import mega.privacy.android.app.presentation.transfers.view.completed.CompletedTransfersView
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelAllTransfersDialog
@@ -44,6 +45,7 @@ import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTrans
 import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfersActionsBottomSheet
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,6 +63,8 @@ internal fun TransfersView(
     onClearAllFailedTransfers: () -> Unit,
     onActiveTransfersReorderPreview: suspend (from: Int, to: Int) -> Unit,
     onActiveTransfersReorderConfirmed: (InProgressTransfer) -> Unit,
+    onConsumeStartEvent: () -> Unit,
+    onNavigateToStorageSettings: () -> Unit,
 ) = with(uiState) {
     var showActiveTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
@@ -189,6 +193,15 @@ internal fun TransfersView(
                 onDismiss = { showClearAllTransfersDialog = false },
             )
         }
+
+        LocalSnackBarHostState.current?.let { snackBarHostState ->
+            StartTransferComponent(
+                event = uiState.startEvent,
+                onConsumeEvent = onConsumeStartEvent,
+                snackBarHostState = snackBarHostState,
+                navigateToStorageSettings = onNavigateToStorageSettings,
+            )
+        }
     }
 }
 
@@ -253,6 +266,8 @@ private fun TransfersViewPreview() {
             onClearAllFailedTransfers = {},
             onActiveTransfersReorderPreview = { _, _ -> },
             onActiveTransfersReorderConfirmed = {},
+            onConsumeStartEvent = {},
+            onNavigateToStorageSettings = {},
         )
     }
 }

@@ -10,8 +10,6 @@ import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
 
-internal const val transfersRoute = "transfers"
-
 @Serializable
 class TransfersInfo(
     val tabIndex: Int = ACTIVE_TAB_INDEX,
@@ -19,6 +17,7 @@ class TransfersInfo(
 
 internal fun NavGraphBuilder.transfersScreen(
     onBackPress: () -> Unit,
+    onNavigateToStorageSettings: () -> Unit,
 ) {
     composable<TransfersInfo> { backStackEntry ->
         val viewModel = hiltViewModel<TransfersViewModel>()
@@ -37,6 +36,8 @@ internal fun NavGraphBuilder.transfersScreen(
             onClearAllCompletedTransfers = viewModel::clearAllCompletedTransfers,
             onActiveTransfersReorderPreview = viewModel::onActiveTransfersReorderPreview,
             onActiveTransfersReorderConfirmed = viewModel::onActiveTransfersReorderConfirmed,
+            onConsumeStartEvent = viewModel::consumeStartEvent,
+            onNavigateToStorageSettings = onNavigateToStorageSettings,
         )
     }
 }

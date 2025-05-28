@@ -262,6 +262,18 @@ sealed interface TransferTriggerEvent {
     }
 
     /**
+     * Event to retry a list of transfers that were cancelled or failed.
+     *
+     * @property idsAndEvents Map of completed transfer ids and the corresponding [CloudTransfer] to be retried.
+     */
+    data class RetryTransfers(
+        val idsAndEvents: Map<Int, CloudTransfer>,
+    ) : TransferTriggerEvent {
+        override val type = TransferType.NONE
+        override val waitNotificationPermissionResponseToStart = false
+    }
+
+    /**
      * Specify the need to check if transfers are paused when the [TransferTriggerEvent] is emitted
      */
     enum class CheckPausedTransfersType {

@@ -3,12 +3,10 @@ package mega.privacy.android.domain.usecase.chat.message.pendingmessages
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
-import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
-import mega.privacy.android.domain.usecase.chat.message.CreatePendingAttachmentMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -29,8 +27,6 @@ class RetryChatUploadUseCaseTest {
     private lateinit var underTest: RetryChatUploadUseCase
 
     private val getPendingMessageUseCase = mock<GetPendingMessageUseCase>()
-    private val createPendingAttachmentMessageUseCase =
-        mock<CreatePendingAttachmentMessageUseCase>()
     private val startChatUploadsWithWorkerUseCase = mock<StartChatUploadsWithWorkerUseCase>()
     private val getOrCreateMyChatsFilesFolderIdUseCase =
         mock<GetOrCreateMyChatsFilesFolderIdUseCase>()
@@ -39,8 +35,7 @@ class RetryChatUploadUseCaseTest {
     private val id = NodeId(1)
     private val uriPath = UriPath("foo")
     private val chatUploadAppData = listOf(TransferAppData.ChatUpload(pendingMessageId))
-    private val pendingMessage = mock<PendingMessage>()
-    private val pendingAttachmentMessage = mock<PendingFileAttachmentMessage> {
+    private val pendingMessage = mock<PendingMessage> {
         on { this.uriPath } doReturn uriPath
     }
 
@@ -48,7 +43,6 @@ class RetryChatUploadUseCaseTest {
     fun setup() {
         underTest = RetryChatUploadUseCase(
             getPendingMessageUseCase = getPendingMessageUseCase,
-            createPendingAttachmentMessageUseCase = createPendingAttachmentMessageUseCase,
             startChatUploadsWithWorkerUseCase = startChatUploadsWithWorkerUseCase,
             getOrCreateMyChatsFilesFolderIdUseCase = getOrCreateMyChatsFilesFolderIdUseCase,
         )
@@ -58,7 +52,6 @@ class RetryChatUploadUseCaseTest {
     fun resetMocks() {
         reset(
             getPendingMessageUseCase,
-            createPendingAttachmentMessageUseCase,
             startChatUploadsWithWorkerUseCase,
             getOrCreateMyChatsFilesFolderIdUseCase,
         )
@@ -71,21 +64,19 @@ class RetryChatUploadUseCaseTest {
         }
 
     @Test
-    fun `test that when GetPendingMessageUseCase returns null, use case does not invoke CreatePendingAttachmentMessageUseCase and throws ChatUploadNotRetriedException`() =
+    fun `test that when GetPendingMessageUseCase returns null, use case does not invoke StartChatUploadsWithWorkerUseCase and throws ChatUploadNotRetriedException`() =
         runTest {
             whenever(getPendingMessageUseCase(pendingMessageId)).thenReturn(null)
 
             assertThrows<ChatUploadNotRetriedException> { underTest(chatUploadAppData) }
 
-            verifyNoInteractions(createPendingAttachmentMessageUseCase)
+            verifyNoInteractions(startChatUploadsWithWorkerUseCase)
         }
 
     @Test
     fun `test that when GetPendingMessageUseCase returns a pending message, use case invokes StartChatUploadsWithWorkerUseCase`() =
         runTest {
             whenever(getPendingMessageUseCase(pendingMessageId)).thenReturn(pendingMessage)
-            whenever(createPendingAttachmentMessageUseCase(pendingMessage))
-                .thenReturn(pendingAttachmentMessage)
             whenever(getOrCreateMyChatsFilesFolderIdUseCase()).thenReturn(id)
             whenever(startChatUploadsWithWorkerUseCase(uriPath, id, pendingMessageId))
                 .thenReturn(emptyFlow())

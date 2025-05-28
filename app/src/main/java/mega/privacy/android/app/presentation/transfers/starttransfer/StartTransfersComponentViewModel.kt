@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.takeWhile
@@ -30,7 +32,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferStage
@@ -58,6 +59,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.SetAskedResumeTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.ShouldAskForResumeTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
@@ -131,6 +133,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val getTransferByTagUseCase: GetTransferByTagUseCase,
     private val monitorTransferTagToCancelUseCase: MonitorTransferTagToCancelUseCase,
     private val broadcastTransferTagToCancelUseCase: BroadcastTransferTagToCancelUseCase,
+    private val deleteCompletedTransfersByIdUseCase: DeleteCompletedTransfersByIdUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -183,14 +186,113 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     if (checkAndHandleDeviceIsNotConnected()) {
                         return@launch
                     }
-                    startUploads(
-                        pathsAndNames = transferTriggerEvent.pathsAndNames,
-                        destinationId = transferTriggerEvent.destinationId,
-                        transferTriggerEvent = transferTriggerEvent,
-                    )
+                    startUploads(transferTriggerEvent = transferTriggerEvent)
+                }
+
+                is TransferTriggerEvent.RetryTransfers -> {
+                    if (checkAndHandleDeviceIsNotConnected()) {
+                        return@launch
+                    }
+                    retryTransfers(transferTriggerEvent = transferTriggerEvent)
                 }
             }
             checkAndHandleTransfersPaused(transferTriggerEvent)
+        }
+    }
+
+    private suspend fun retryTransfers(transferTriggerEvent: TransferTriggerEvent.RetryTransfers) {
+        var retryUploads = false
+        var retryDownloads = false
+
+        runCatching { clearActiveTransfersIfFinishedUseCase() }
+            .onFailure { Timber.e(it) }
+
+        buildList {
+            for ((id, event) in transferTriggerEvent.idsAndEvents) {
+                when (event) {
+                    is TransferTriggerEvent.DownloadTriggerEvent -> {
+                        if (event is TransferTriggerEvent.StartDownloadForOffline) {
+                            if (event.node == null) {
+                                Timber.e("Node in $event must exist")
+                                null
+                            } else {
+                                runCatching { getOfflinePathForNodeUseCase(event.node) }
+                                    .onFailure { Timber.e(it) }
+                                    .getOrNull()
+                            }
+                        } else {
+                            if (event.nodes.firstOrNull() == null) {
+                                Timber.e("Node in $event must exist")
+                                null
+                            } else {
+                                runCatching { getOrCreateStorageDownloadLocationUseCase() }
+                                    .onFailure { Timber.e(it) }
+                                    .getOrNull()
+                            }
+                        }?.let { location ->
+                            retryDownloads = true
+                            add(id)
+                            insertPendingDownloadsForNodesUseCase(
+                                event.nodes,
+                                UriPath(location),
+                                event.isHighPriority,
+                                event.appData
+                            )
+                        }
+                    }
+
+                    is TransferTriggerEvent.StartUpload -> {
+                        if (event.pathsAndNames.isEmpty()) {
+                            Timber.e("Paths in $event must exist")
+                        } else {
+                            retryUploads = true
+                            add(id)
+                            viewModelScope.launch {
+                                insertPendingUploadsForFilesUseCase(
+                                    pathsAndNames = event.pathsAndNames,
+                                    parentFolderId = event.destinationId,
+                                    isHighPriority = event.isHighPriority
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }.let { retriedTransferIds ->
+            if (retriedTransferIds.isNotEmpty()) {
+                viewModelScope.launch {
+                    when {
+                        retryUploads && retryDownloads -> combine(
+                            monitorPendingTransfersUntilResolvedUseCase(TransferType.GENERAL_UPLOAD),
+                            monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)
+                        ) { uploads, downloads -> uploads + downloads }
+
+                        retryUploads -> monitorPendingTransfersUntilResolvedUseCase(TransferType.GENERAL_UPLOAD)
+
+                        retryDownloads -> monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)
+
+                        else -> emptyFlow()
+                    }.onEach { Timber.d("Pending transfers to process: ${it.size}") }
+                        .catch { Timber.e(it) }
+                        .collect() //just wait until finishes
+
+                    Timber.d("Scanning finished")
+
+                    invalidateCancelTokenUseCase()
+                    deleteAllPendingTransfersUseCase()
+                    deleteCompletedTransfersByIdUseCase(retriedTransferIds)
+                }
+
+                if (retryUploads) {
+                    startUploadsWorkerAndWaitUntilIsStartedUseCase()
+                    checkUploadRating()
+                }
+
+                if (retryDownloads) {
+                    startDownloadsWorkerAndWaitUntilIsStartedUseCase()
+                    checkDownloadRating()
+                }
+            }
         }
     }
 
@@ -805,10 +907,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     }
 
     private suspend fun startUploads(
-        pathsAndNames: Map<String, String?>,
-        destinationId: NodeId,
         transferTriggerEvent: TransferTriggerEvent.StartUpload,
-    ) {
+    ) = with(transferTriggerEvent) {
         runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
 

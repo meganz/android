@@ -1,10 +1,8 @@
 package mega.privacy.android.domain.usecase.chat.message.pendingmessages
 
 import kotlinx.coroutines.flow.collect
-import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
-import mega.privacy.android.domain.usecase.chat.message.CreatePendingAttachmentMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWithWorkerUseCase
 import javax.inject.Inject
@@ -14,7 +12,6 @@ import javax.inject.Inject
  */
 class RetryChatUploadUseCase @Inject constructor(
     private val getPendingMessageUseCase: GetPendingMessageUseCase,
-    private val createPendingAttachmentMessageUseCase: CreatePendingAttachmentMessageUseCase,
     private val startChatUploadsWithWorkerUseCase: StartChatUploadsWithWorkerUseCase,
     private val getOrCreateMyChatsFilesFolderIdUseCase: GetOrCreateMyChatsFilesFolderIdUseCase,
 ) {
@@ -34,14 +31,12 @@ class RetryChatUploadUseCase @Inject constructor(
             throw ChatUploadNotRetriedException()
         }
 
-        createPendingAttachmentMessageUseCase(pendingMessages.first()).let { pendingMessage ->
-            (pendingMessage as PendingFileAttachmentMessage).uriPath.let { uriPath ->
-                startChatUploadsWithWorkerUseCase(
-                    uriPath = uriPath,
-                    chatFilesFolderId = getOrCreateMyChatsFilesFolderIdUseCase(),
-                    *chatUploadAppData.map { it.pendingMessageId }.toLongArray()
-                ).collect()
-            }
+        pendingMessages.first().let { pendingMessage ->
+            startChatUploadsWithWorkerUseCase(
+                uriPath = pendingMessage.uriPath,
+                chatFilesFolderId = getOrCreateMyChatsFilesFolderIdUseCase(),
+                *chatUploadAppData.map { it.pendingMessageId }.toLongArray()
+            ).collect()
         }
     }
 }

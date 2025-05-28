@@ -220,6 +220,8 @@ class TransfersViewTest {
                     onClearAllCompletedTransfers = {},
                     onActiveTransfersReorderPreview = { _, _ -> },
                     onActiveTransfersReorderConfirmed = {},
+                    onConsumeStartEvent = {},
+                    onNavigateToStorageSettings = {},
                 )
             }
         }

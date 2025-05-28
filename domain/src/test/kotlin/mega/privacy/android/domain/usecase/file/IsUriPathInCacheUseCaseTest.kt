@@ -54,6 +54,20 @@ class IsUriPathInCacheUseCaseTest {
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
+    fun `test that use case gets the result from cache repository when get is a path is not null`(
+        expected: Boolean,
+    ) = runTest {
+        val uri = UriPath("/foo")
+        val file = File(uri.value)
+        whenever(cacheRepository.isFileInCacheDirectory(file)) doReturn expected
+
+        val actual = underTest(uri)
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
     fun `test that use case gets the result from cache repository when get path from repository is not null`(
         expected: Boolean,
     ) = runTest {

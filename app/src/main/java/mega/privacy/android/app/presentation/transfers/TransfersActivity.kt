@@ -17,11 +17,13 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.navigation.TransfersInfo
 import mega.privacy.android.app.presentation.transfers.view.navigation.transfersScreen
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -43,6 +45,9 @@ class TransfersActivity : AppCompatActivity() {
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -63,7 +68,15 @@ class TransfersActivity : AppCompatActivity() {
                                         startDestination = TransfersInfo(tabIndex = tabIndex),
                                         modifier = Modifier.navigationBarsPadding()
                                     ) {
-                                        transfersScreen(onBackPress = { supportFinishAfterTransition() })
+                                        transfersScreen(
+                                            onBackPress = { supportFinishAfterTransition() },
+                                            onNavigateToStorageSettings = {
+                                                megaNavigator.openSettings(
+                                                    this@TransfersActivity,
+                                                    StorageTargetPreference
+                                                )
+                                            }
+                                        )
                                     }
                                 }
                             }

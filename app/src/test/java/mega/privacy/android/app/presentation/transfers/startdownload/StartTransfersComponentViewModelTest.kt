@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.SetAskedResumeTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.ShouldAskForResumeTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
@@ -87,6 +88,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -157,12 +159,17 @@ class StartTransfersComponentViewModelTest {
         on { invoke() } doReturn emptyFlow()
     }
     private val broadcastTransferTagToCancelUseCase = mock<BroadcastTransferTagToCancelUseCase>()
+    private val deleteCompletedTransfersByIdUseCase = mock<DeleteCompletedTransfersByIdUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
     private val parentNode: TypedFolderNode = mock()
     private val startDownloadEvent = TransferTriggerEvent.StartDownloadNode(
         nodes = nodes,
+        withStartMessage = false,
+    )
+    private val startOfflineDownloadEvent = TransferTriggerEvent.StartDownloadForOffline(
+        node = nodes.first(),
         withStartMessage = false,
     )
     private val startUploadFilesEvent =
@@ -226,6 +233,7 @@ class StartTransfersComponentViewModelTest {
             getTransferByTagUseCase = getTransferByTagUseCase,
             monitorTransferTagToCancelUseCase = monitorTransferTagToCancelUseCase,
             broadcastTransferTagToCancelUseCase = broadcastTransferTagToCancelUseCase,
+            deleteCompletedTransfersByIdUseCase = deleteCompletedTransfersByIdUseCase,
         )
     }
 
@@ -273,6 +281,7 @@ class StartTransfersComponentViewModelTest {
             deleteCacheFilesUseCase,
             getTransferByTagUseCase,
             broadcastTransferTagToCancelUseCase,
+            deleteCompletedTransfersByIdUseCase,
         )
         initialStub()
     }
@@ -991,6 +1000,188 @@ class StartTransfersComponentViewModelTest {
                 underTest.startTransfer(startUploadEvent)
 
                 verify(deleteAllPendingTransfersUseCase)()
+            }
+    }
+
+    @Nested
+    inner class RetryTransfers {
+        val firstId = 1
+        val secondId = 2
+        val retriedTransferIds = listOf(firstId, secondId)
+        val retryUploadsEvent = TransferTriggerEvent.RetryTransfers(
+            mapOf(firstId to startUploadFilesEvent, secondId to startUploadFilesEvent)
+        )
+        val retryDownloadsEvent = TransferTriggerEvent.RetryTransfers(
+            mapOf(firstId to startDownloadEvent, secondId to startOfflineDownloadEvent)
+        )
+        val retryUploadAndDownloadEvent = TransferTriggerEvent.RetryTransfers(
+            mapOf(firstId to startDownloadEvent, secondId to startUploadFilesEvent)
+        )
+
+        @Test
+        fun `test that startUploadsWorkerAndWaitUntilIsStartedUseCase is invoked when different uploads start`() =
+            runTest {
+                commonStub()
+
+                underTest.startTransfer(retryUploadsEvent)
+
+                verify(startUploadsWorkerAndWaitUntilIsStartedUseCase)()
+                verifyNoInteractions(startDownloadsWorkerAndWaitUntilIsStartedUseCase)
+            }
+
+        @Test
+        fun `test that startDownloadsWorkerAndWaitUntilIsStartedUseCase is invoked when different downloads start`() =
+            runTest {
+                commonStub()
+
+                underTest.startTransfer(retryDownloadsEvent)
+
+                verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase)()
+                verifyNoInteractions(startUploadsWorkerAndWaitUntilIsStartedUseCase)
+            }
+
+        @Test
+        fun `test that startDownloadsWorkerAndWaitUntilIsStartedUseCase and startUploadsWorkerAndWaitUntilIsStartedUseCase are invoked when different transfers start`() =
+            runTest {
+                commonStub()
+
+                underTest.startTransfer(retryUploadAndDownloadEvent)
+
+                verify(startUploadsWorkerAndWaitUntilIsStartedUseCase)()
+                verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase)()
+            }
+
+        @Test
+        fun `test that deleteAllPendingTransfersUseCase and invalidateCancelTokenUseCase are invoked when monitorPendingTransfersUntilResolvedUseCase finishes for uploads`() =
+            runTest {
+                val pendingTransfer = mock<PendingTransfer> {
+                    val scanningFoldersData = PendingTransfer.ScanningFoldersData(
+                        TransferStage.STAGE_TRANSFERRING_FILES,
+                    )
+                    on { this.scanningFoldersData } doReturn scanningFoldersData
+                }
+
+                commonStub()
+
+                whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.GENERAL_UPLOAD)) doReturn
+                        flowOf(listOf(pendingTransfer))
+
+                underTest.startTransfer(retryUploadsEvent)
+
+                verify(invalidateCancelTokenUseCase)()
+                verify(deleteAllPendingTransfersUseCase)()
+            }
+
+        @Test
+        fun `test that invalidateCancelTokenUseCase and invalidateCancelTokenUseCase are invoked when monitorPendingTransfersUntilResolvedUseCase finishes for downloads`() =
+            runTest {
+                val pendingTransfer = mock<PendingTransfer> {
+                    val scanningFoldersData = PendingTransfer.ScanningFoldersData(
+                        TransferStage.STAGE_TRANSFERRING_FILES,
+                    )
+                    on { this.scanningFoldersData } doReturn scanningFoldersData
+                }
+
+                commonStub()
+
+                whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn
+                        flowOf(listOf(pendingTransfer))
+
+                underTest.startTransfer(retryDownloadsEvent)
+
+                verify(invalidateCancelTokenUseCase)()
+                verify(deleteAllPendingTransfersUseCase)()
+            }
+
+        @Test
+        fun `test that deleteAllPendingTransfersUseCase and invalidateCancelTokenUseCase are invoked when monitorPendingTransfersUntilResolvedUseCase finishes for uploads and downloads`() =
+            runTest {
+                val pendingTransfer = mock<PendingTransfer> {
+                    val scanningFoldersData = PendingTransfer.ScanningFoldersData(
+                        TransferStage.STAGE_TRANSFERRING_FILES,
+                    )
+                    on { this.scanningFoldersData } doReturn scanningFoldersData
+                }
+
+                commonStub()
+
+                whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.GENERAL_UPLOAD)) doReturn
+                        flowOf(listOf(pendingTransfer))
+                whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn
+                        flowOf(listOf(pendingTransfer))
+
+                underTest.startTransfer(retryUploadAndDownloadEvent)
+
+                verify(invalidateCancelTokenUseCase)()
+                verify(deleteAllPendingTransfersUseCase)()
+            }
+
+        @Test
+        fun `test that insertPendingDownloadsForNodesUseCase and deleteCompletedTransfersByIdUseCase are invoked with correct parameters for downloads`() =
+            runTest {
+                commonStub()
+
+                whenever(getOfflinePathForNodeUseCase(any())) doReturn DESTINATION
+                whenever(getOrCreateStorageDownloadLocationUseCase()) doReturn DESTINATION
+
+                underTest.startTransfer(retryDownloadsEvent)
+
+                verify(insertPendingDownloadsForNodesUseCase)(
+                    startDownloadEvent.nodes,
+                    UriPath(DESTINATION),
+                    startDownloadEvent.isHighPriority,
+                    startDownloadEvent.appData,
+                )
+
+                verify(insertPendingDownloadsForNodesUseCase)(
+                    startOfflineDownloadEvent.nodes,
+                    UriPath(DESTINATION),
+                    startOfflineDownloadEvent.isHighPriority,
+                    startOfflineDownloadEvent.appData,
+                )
+
+                verify(deleteCompletedTransfersByIdUseCase)(retriedTransferIds)
+            }
+
+        @Test
+        fun `test that insertPendingUploadsForFilesUseCase and deleteCompletedTransfersByIdUseCase are invoked with correct parameters for uploads`() =
+            runTest {
+                commonStub()
+
+                underTest.startTransfer(retryUploadsEvent)
+
+                verify(insertPendingUploadsForFilesUseCase, times(2)).invoke(
+                    startUploadFilesEvent.pathsAndNames,
+                    startUploadFilesEvent.destinationId,
+                    startUploadFilesEvent.isHighPriority,
+                )
+
+                verify(deleteCompletedTransfersByIdUseCase)(retriedTransferIds)
+            }
+
+        @Test
+        fun `test that insertPendingDownloadsForNodesUseCase, insertPendingUploadsForFilesUseCase anddeleteCompletedTransfersByIdUseCase are invoked with correct parameters for uploads and downloads`() =
+            runTest {
+                commonStub()
+
+                whenever(getOrCreateStorageDownloadLocationUseCase()) doReturn DESTINATION
+
+                underTest.startTransfer(retryUploadAndDownloadEvent)
+
+                verify(insertPendingDownloadsForNodesUseCase)(
+                    startDownloadEvent.nodes,
+                    UriPath(DESTINATION),
+                    startDownloadEvent.isHighPriority,
+                    startDownloadEvent.appData,
+                )
+
+                verify(insertPendingUploadsForFilesUseCase)(
+                    startUploadFilesEvent.pathsAndNames,
+                    startUploadFilesEvent.destinationId,
+                    startUploadFilesEvent.isHighPriority,
+                )
+
+                verify(deleteCompletedTransfersByIdUseCase)(retriedTransferIds)
             }
     }
 

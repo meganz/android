@@ -18,9 +18,11 @@ class IsUriPathInCacheUseCase @Inject constructor(
     /**
      * Invoke
      */
-    suspend operator fun invoke(uriPath: UriPath): Boolean {
-        return fileSystemRepository.getAbsolutePathByContentUri(uriPath.value)?.let {
-            cacheRepository.isFileInCacheDirectory(File(it))
-        } ?: false // we always can get path from cache uri
-    }
+    suspend operator fun invoke(uriPath: UriPath) =
+        (if (uriPath.isPath()) {
+            uriPath.value
+        } else {
+            // we always can get path from cache uri
+            fileSystemRepository.getAbsolutePathByContentUri(uriPath.value)
+        })?.let { cacheRepository.isFileInCacheDirectory(File(it)) } == true
 }
