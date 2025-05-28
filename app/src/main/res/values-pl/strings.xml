@@ -5519,4 +5519,6 @@
     <string name="filestorage_menu_option_open_in_file_manager">Otwórz w menedżerze plik</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
     <string name="filestorage_snackbar_file_manager_is_not_available">Odpowiednia aplikacja do zarządzania plikami nie jest dostępna na tym urządzeniu</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_success_message">Przesyłanie z kamery odblokowane</string>
 </resources>

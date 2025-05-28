@@ -870,26 +870,16 @@
         <item quantity="many">Estes arquivos já existem em “%1$s” e não podem ser adicionados novamente</item>
         <item quantity="other">Estes arquivos já existem em “%1$s” e não podem ser adicionados novamente</item>
     </plurals>
-    <!-- Add to album partial added message -->
-    <plurals name="album_add_to_partial_added_message">
-        <item quantity="one">1 arquivos foi adicionado a “%1$s”. Alguns arquivos já existem e não podem ser adicionados novamente.</item>
-        <item quantity="many">%2$d de arquivos foram adicionados a “%1$s”. Alguns arquivos já existem e não podem ser adicionados novamente.</item>
-        <item quantity="other">%2$d arquivos foram adicionados a “%1$s”. Alguns arquivos já existem e não podem ser adicionados novamente.</item>
-    </plurals>
     <!--Content on the Multi-Factor Authentication Login page -->
     <string name="multi_factor_auth_login_verification_content">Digite o código de seis dígitos do seu aplicativo de autenticação.</string>
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">Código de verificação incorreto</string>
-    <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
-    <string name="transfers_preview_slow_snackbar">Preparando o arquivo para visualização. Consulte a notificação para mais informações.</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview">Preparando %1$s para ser visualizado</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">Preparando %1$s para visualização (em pausa)</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
     <string name="audio_queue_single_item_removed_message">‟%1$s” foi removido</string>
-    <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
-    <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="one">“%1$s” foi removido da lista</item>
@@ -1073,7 +1063,7 @@
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_text">Você já não poderá visualizar este arquivo</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">Não foi possível carregar a visualização, tente novamente.</string>
+    <string name="transfers_fake_preview_screen_general_error">Não foi possível carregar a visualização, tente novamente</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_preview_download">Não foi possível cancelar a visualização. Consulte a notificação para mais informações.</string>
     <!-- Title of the Rename and Create Backup Dialog -->
@@ -1085,7 +1075,7 @@
     <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_positive_button">Renomear</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Digite o nome do backup.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Digite o nome do backup</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
     <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">Já existe um backup com este nome. Digite outro nome.</string>
     <!-- USP Carousel page 1 title-->
@@ -1191,9 +1181,9 @@
     <!-- Title for the Free Plan card -->
     <string name="free_plan_card_title">Começar usando o nosso plano gratuito</string>
     <!-- Description for the Free Plan card -->
-    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our Free plan offers generous amount of storage and transfer quota.</string>
+    <string name="free_plan_card_description">Você ainda não precisa se comprometer com um plano pago: o nosso plano gratuito oferece um amplo espaço de armazenamento e cota de transferência</string>
     <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">20 GB de armazenamento gratuito</string>
+    <string name="free_plan_card_storage_feature">20 GB de armazenamento</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">Transferências limitadas</string>
     <!-- Button text for Free Plan card -->
@@ -1203,23 +1193,107 @@
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Amplo espaço de armazenamento</string>
     <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Store unlimited data up to 16 TB of storage</string>
+    <string name="pro_plan_feature_storage_desc">Armazene até 16&#160;TB de dados</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Compartilhamento de transferência</string>
     <!-- Description for transfer sharing feature -->
-    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files.</string>
+    <string name="pro_plan_feature_transfer_desc">As pessoas com as quais você compartilhar itens podem usar a sua cota para fazer download e streaming de arquivos.</string>
     <!-- Title for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
+    <string name="pro_plan_feature_vpn_title">Acesso à MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_desc">Keep your online life safe, fast, and easy with our high-speed VPN.</string>
+    <string name="pro_plan_feature_vpn_desc">Fique seguro online com a nossa VPN de alta velocidade, que é rápida e simples de usar</string>
     <!-- Title for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_title">MEGA Pass</string>
+    <string name="pro_plan_feature_pass_title">MEGA&#160;Pass</string>
     <!-- Description for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager.</string>
+    <string name="pro_plan_feature_pass_desc">Organize todas as suas senhas e mantenha-as seguras com o nosso gerenciador de senhas</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Recomendado</string>
     <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
     <string name="transfers_over_quota_banner_title">Obter mais cota de transferência</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">Fazer upgrade</string>
+    <!-- Section title for additional benefits of Pro plans -->
+    <string name="pro_plan_additional_benefits_section_title">Outras vantagens dos planos Pro</string>
+    <!-- Benefit: Password-protected links -->
+    <string name="pro_plan_benefit_password_protected_links">Links protegidos por senha</string>
+    <!-- Benefit: Links with expiry dates -->
+    <string name="pro_plan_benefit_links_with_expiry_dates">Links com data de validade</string>
+    <!-- Benefit: Transfer quota sharing -->
+    <string name="pro_plan_benefit_transfer_quota_sharing">Compartilhamento de cota de transferência</string>
+    <!-- Benefit: Automatically sync the folders on your mobile device -->
+    <string name="pro_plan_benefit_auto_sync_mobile">Sincronização automática das pastas no seu dispositivo móvel</string>
+    <!-- Benefit: Rewind up to 180 days of deleted data -->
+    <string name="pro_plan_benefit_rewind_180_days">Retroceder até 180 dias de dados deletados</string>
+    <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
+    <string name="pro_plan_benefit_host_calls_unlimited">Organizar chamadas e reuniões com um número ilimitado de participantes e sem restrições de tempo</string>
+    <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Programação da limpeza da lixeira entre 7 dias e 10 anos</string>
+    <!-- Benefit: Priority support -->
+    <string name="pro_plan_benefit_priority_support">Suporte prioritário</string>
+    <!-- Subscription page information section title at the bottom of the page-->
+    <string name="choose_account_screen_subscription_information_title">Informações da assinatura</string>
+    <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
+    <string name="choose_account_screen_subscription_information_description">As assinaturas serão renovadas automaticamente por períodos sucessivos com a mesma duração e pelo mesmo preço do período inicial. \n\nVocê pode cancelar a sua assinatura até 24 horas antes do próximo pagamento. [A]Saiba como gerenciar a sua assinatura nas configurações[/A].</string>
+    <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]Termos de serviço e Política de privacidade[/A]</string>
+    <!-- Get more with Pro plan title in choose account screen-->
+    <string name="choose_account_screen_get_more_with_pro_plan_title">Obtenha mais com um plano Pro</string>
+    <!-- Maybe later button text in the choose account screen-->
+    <string name="choose_account_screen_maybe_later_button_text">Talvez mais tarde</string>
+    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_monthly">Mensal</string>
+    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_yearly">Anual</string>
+    <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_label_save_up_to">Economize até 16% ao adquirir um plano anual</string>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
+    <string name="choose_account_screen_storage_label">%1$s de armazenamento</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
+    <string name="choose_account_screen_transfer_quota_label">%1$s de transferência</string>
+    <!-- General month label -->
+    <string name="general_month">mês</string>
+    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
+    <string name="choose_account_screen_currency_per_month">%1$s por mês</string>
+    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
+    <string name="choose_account_screen_billed_yearly">Pagamento anual de %1$s</string>
+    <!-- The snackbar message of unhidden nodes operation -->
+    <plurals name="unhidden_nodes_result_message">
+        <item quantity="one">%1$d item já não está oculto</item>
+        <item quantity="many">%1$d de itens já não estão ocultos</item>
+        <item quantity="other">%1$d itens já não estão ocultos</item>
+    </plurals>
+    <!-- Title for secure slideshow mode tutorial -->
+    <string name="slideshow_tutorial_title">Acesse apresentações de slides com segurança</string>
+    <!-- Step 1 for slideshow secure mode tutorial -->
+    <string name="slideshow_tutorial_step1">Pressione o botão liga/desliga para bloquear a tela.</string>
+    <!-- Step 2 for slideshow secure mode tutorial -->
+    <string name="slideshow_tutorial_step2">Espere 2 segundos.</string>
+    <!-- Step 3 for slideshow secure mode tutorial -->
+    <string name="slideshow_tutorial_step3">Pressione o botão liga/desliga novamente para ligar a tela.</string>
+    <!-- Note indicating the slideshow plays securely while locked -->
+    <string name="slideshow_tutorial_note">A apresentação de slides será reproduzida enquanto o seu dispositivo permanece bloqueado com segurança.</string>
+    <!-- State to indicate an achievement has applied -->
+    <string name="applied_label">Cadastrado</string>
+    <!-- title of the section for start mega vpn free trial in achivements section -->
+    <string name="title_start_mega_vpn_free_trial">Inicie o teste gratuito da MEGA&#160;VPN</string>
+    <!-- Text of the section for start mega vpn free trial in achivements section -->
+    <string name="text_start_mega_vpn_free_trial">%1$s de armazenamento. Válido permanentemente.</string>
+    <!-- title of the section for start mega pass free trial in achivements section -->
+    <string name="title_start_mega_pass_free_trial">Inicie o teste gratuito do MEGA&#160;Pass</string>
+    <!-- Text of the section for start mega pass free trial in achivements section -->
+    <string name="text_start_mega_pass_free_trial">%1$s de armazenamento. Válido permanentemente.</string>
+    <!-- Text of the button for install mega vpn in achivements section -->
+    <string name="button_text_install_mega_vpn">Instalar a MEGA&#160;VPN</string>
+    <!-- Text of the button for install mega pass in achivements section -->
+    <string name="button_text_install_mega_pass">Instalar o MEGA&#160;Pass</string>
+    <!-- title of how it works for mega vpn free trial in achivements section -->
+    <string name="title_how_it_works_free_trial">Como funciona</string>
+    <!-- text of how it works for mega vpn free trial in achivements section -->
+    <string name="text_how_it_works_mega_vpn_free_trial">Instale o aplicativo da MEGA&#160;VPN, faça login com sua conta do MEGA e inicie o seu teste gratuito. O bônus de armazenamento será adicionado automaticamente após o início do teste gratuito.</string>
+    <!-- text of how it works for mega pass free trial in achivements section -->
+    <string name="text_how_it_works_mega_pass_free_trial">Instale o aplicativo do MEGA&#160;Pass, faça login com sua conta do MEGA e inicie o seu teste gratuito. O bônus de armazenamento será adicionado automaticamente após o início do teste gratuito.</string>
+    <!-- text of received for mega vpn free trial in achivements section -->
+    <string name="text_received_mega_vpn_free_trial">Você recebeu %1$s de espaço de armazenamento adicional por iniciar o teste gratuito da MEGA&#160;VPN</string>
+    <!-- text of received mega pass free trial in achivements section -->
+    <string name="text_received_mega_pass_free_trial">Você recebeu %1$s de espaço de armazenamento adicional por iniciar o teste gratuito do MEGA&#160;Pass</string>
 </resources>

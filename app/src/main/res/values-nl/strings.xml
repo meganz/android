@@ -5065,4 +5065,6 @@
     <string name="filestorage_menu_option_open_in_file_manager">Openen in bestandsbeheer</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
     <string name="filestorage_snackbar_file_manager_is_not_available">Een geschikte applicatie voor bestandsbeheer is niet beschikbaar op dit apparaat</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_success_message">Camera Uploads ingeschakeld</string>
 </resources>

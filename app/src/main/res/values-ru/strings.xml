@@ -5376,7 +5376,7 @@
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">Понятно</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
-    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Проводите звонки и встречи с безлимитным количеством участников и без ограничений по времени</string>
+    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Проводите звонки и встречи без ограничений по количеству участников и времени</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
     <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;Онлайн-конфиденциальность со скоростным VPN</string>
     <!-- The body of the Dialog shown to upgrade meeting from the free version -->
@@ -5519,4 +5519,6 @@
     <string name="filestorage_menu_option_open_in_file_manager">Открыть в файловом менеджере</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
     <string name="filestorage_snackbar_file_manager_is_not_available">Подходящее приложение для управления файлами недоступно на этом устройстве</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_success_message">Загрузки из камеры включены</string>
 </resources>

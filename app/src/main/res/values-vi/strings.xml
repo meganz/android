@@ -607,7 +607,7 @@
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">Thông Tin</string>
     <!-- Preference screen item action button -->
-    <string name="settings_about_privacy_policy">Chính&#160;Sách Riêng&#160;Tư</string>
+    <string name="settings_about_privacy_policy">Chính&#160;Sách Quyền Riêng&#160;Tư</string>
     <!--  -->
     <string name="settings_about_terms_of_service">Điều&#160;Khoản Dịch&#160;Vụ</string>
     <!-- App means “Application” -->
@@ -2669,7 +2669,7 @@
     <!-- Title of the song info screen -->
     <string name="audio_track_info">Thông tin</string>
     <!-- Preferences screen item title for Cookie Policy -->
-    <string name="settings_about_cookie_policy">Chính Sách Cookie</string>
+    <string name="settings_about_cookie_policy">Chính&#160;Sách Cookie</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Cài đặt cookie</string>
     <!-- Title for Cookie dialog, visible for new users. -->
@@ -2929,7 +2929,7 @@
     <!-- Guest leave call-->
     <string name="more_than_meeting">Không đơn thuần chỉ là họp mặt</string>
     <!-- the title of join without account on left meeting page-->
-    <string name="left_meeting_join_title">Mức độ an ninh là điều quan trọng</string>
+    <string name="left_meeting_join_title">Quyền riêng&#160;tư là quan&#160;trọng nhất</string>
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Tham gia vào dịch vụ lưu trữ điện toán đám mây lớn và an ninh nhất với nền tảng cộng tác toàn cầu.</string>
     <!-- the bonus content of join without account on left meeting page-->
@@ -4838,4 +4838,6 @@
     <string name="filestorage_menu_option_open_in_file_manager">Mở trong trình quản&#160;lý tệp&#160;tin</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
     <string name="filestorage_snackbar_file_manager_is_not_available">Không có ứng&#160;dụng quản&#160;lý tệp&#160;tin nào phù&#160;hợp khả&#160;dụng trong thiết&#160;bị này</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_success_message">Đăng tải camêra đang được bật</string>
 </resources>

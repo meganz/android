@@ -1713,7 +1713,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Attiva le anteprime dei link che invii</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generates a preview of the links you send in chat. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">Genera un\’anteprima dei link che invii in chat. Nota che il recupero di queste anteprime non è protetto dalla criptazione a conoscenza zero.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Per favore, inserisci una password più resistente</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -3627,7 +3627,7 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s settimanale</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Gallery view</string>
+    <string name="settings_media_discovery_view_title">Visualizzazione a galleria</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
@@ -5292,4 +5292,6 @@
     <string name="filestorage_menu_option_open_in_file_manager">Apri nel gestore di file</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
     <string name="filestorage_snackbar_file_manager_is_not_available">Un\’app di gestione file adatta non è disponibile su questo dispositivo</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_success_message">Caricamenti da fotocamera attivati</string>
 </resources>

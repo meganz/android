@@ -41,7 +41,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Yükleniyor</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Eklemek...</string>
+    <string name="general_importing">Ekleniyor...</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Yönlendirme</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
@@ -57,13 +57,13 @@
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-KURTARMA-ANAHTARI</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Günlük&#160;dışarı</string>
+    <string name="action_logout">Çıkış&#160;yap</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="action_add">Yükleme</string>
+    <string name="action_add">Yükle</string>
     <!-- Menu item -->
-    <string name="action_create_folder">Yeni klasör</string>
+    <string name="action_create_folder">Yeni klasör oluştur</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Yeni metin dosyası</string>
+    <string name="action_create_txt">Yeni metin dosyası oluştur</string>
     <!-- Menu item -->
     <string name="action_settings">Ayarlar</string>
     <!-- Search button -->
@@ -71,13 +71,13 @@
     <!-- Select country page title -->
     <string name="action_search_country">Bölgenizi seçin</string>
     <!-- Alternative text or description text for the “Play” button -->
-    <string name="action_play">Oyna</string>
+    <string name="action_play">Oynat</string>
     <!-- Search button -->
     <string name="action_pause">Duraklat</string>
     <!-- Menu item -->
     <string name="action_refresh">Yenile</string>
     <!-- Menu item -->
-    <string name="action_sort_by">Şuna göre sırala</string>
+    <string name="action_sort_by">Sıralama</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">Hesabı yükselt</string>
     <!-- Menu item to select all the elements of a list -->
@@ -1509,19 +1509,19 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s&#160;KİLO BAR</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s&#160;BÜYÜK BRİTANYA</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s&#160;B/sn</string>
+    <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s&#160;MB/sn</string>
+    <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -3302,11 +3302,11 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KİLO BAR</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;BÜYÜK BRİTANYA</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -4914,13 +4914,13 @@
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Ücretsiz planınızın toplantılarda 60 dakikalık bir sınırı vardır. Profesyonel kullanıcılar sınırsız çağrıya ve 1000\’e kadar katılımcıya sahiptir.[/A] [B]Şimdi yükseltin.[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 1 month for %2$s per month. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Ücretlendirileceksiniz %1$s hemen ve aboneliğiniz 1 ay sonra otomatik olarak yenilenecektir %2$s Aylık. Google\’ınız&#160;Play hesabından her fatura döneminin bitiminden sonraki 24 saat içinde yenileme ücreti alınacaktır. Aboneliğinizi iptal etmek için MEGA\’nızın otomatik yenilenmesini devre dışı bırakmalısınız&#160;Pro aboneliği, faturalandırma döneminizin bitiminden en az 24 saat önce Abonelikler aracılığıyla [A]Google&#160;Oynayın[/A].\nHesabınızı yükselterek, MEGA\’yı kabul etmiş olursunuz [B]Hizmet Şartları[/B] ve [C]Gizlilik Politikası[/C].</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 12 months for %2$s per year. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Ücretlendirileceksiniz %1$s hemen ve aboneliğiniz 12 ay sonra otomatik olarak yenilenecektir %2$s yıllık başına. Google\’ınız&#160;Play hesabından her fatura döneminin bitiminden sonraki 24 saat içinde yenileme ücreti alınacaktır. Aboneliğinizi iptal etmek için MEGA\’nızın otomatik yenilenmesini devre dışı bırakmalısınız&#160;Pro aboneliği, faturalandırma döneminizin bitiminden en az 24 saat önce Abonelikler aracılığıyla [A]Google&#160;Oyna[/A].\nHesabınızı yükselterek, MEGA\’yı kabul etmiş olursunuz [B]Hizmet Şartları[/B] ve [C]Gizlilik Politikası[/C].</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">You will be charged immediately and your subscription will automatically renew after 1 month. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">Hemen ücretlendirileceksiniz ve aboneliğiniz 1 ay sonra otomatik olarak yenilenecektir. Google\’ınız&#160;Play hesabından her fatura döneminin bitiminden sonraki 24 saat içinde yenileme ücreti alınacaktır. Aboneliğinizi iptal etmek için MEGA\’nızın otomatik yenilenmesini devre dışı bırakmalısınız&#160;Pro aboneliği, faturalandırma döneminizin bitiminden en az 24 saat önce Abonelikler aracılığıyla [A]Google&#160;Oynayın[/A].\nHesabınızı yükselterek, MEGA\’yı kabul etmiş olursunuz [B]Hizmet Şartları[/B] ve [C]Gizlilik Politikası[/C].</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">You will be charged immediately and your subscription will automatically renew after 12&#160;months. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">Hemen ücretlendirileceksiniz ve aboneliğiniz 12\’den sonra otomatik olarak yenilenecektir&#160;aylar. Google\’ınız&#160;Play hesabından 24 saat içinde yenileme ücreti alınacaktır&#160;Her faturalandırma döneminin bitimindeki saatler. Aboneliğinizi iptal etmek için MEGA\’nızın otomatik yenilenmesini devre dışı bırakmalısınız&#160;Profesyonel abonelik en az 24&#160;Abonelikler aracılığıyla fatura döneminizin bitiminden saatler önce [A]Google&#160;Oynayın[/A].\nHesabınızı yükselterek, MEGA\’yı kabul etmiş olursunuz [B]Hizmet Şartları[/B] ve [C]Gizlilik Politikası[/C].</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">İşletme hesabı devre dışı bırakıldı</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
@@ -5065,4 +5065,6 @@
     <string name="filestorage_menu_option_open_in_file_manager">Dosya yöneticisinde aç</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
     <string name="filestorage_snackbar_file_manager_is_not_available">Bu cihazda uygun bir dosya yöneticisi uygulaması mevcut değil</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_success_message">Camera uploads enabled</string>
 </resources>

@@ -243,7 +243,7 @@
         <item quantity="other">Partajați link-uri</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
-    <string name="transfers_dialog_save_download_location_title">Save all your downloaded files to “%1$s”?</string>
+    <string name="transfers_dialog_save_download_location_title">Salvați toate fișierele descărcate în ”%1$s„?</string>
     <!-- Option to use the selected location as default location for next downloads-->
     <string name="transfers_dialog_save_download_location_always_here_option">Întotdeauna descărcați aici</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
@@ -611,7 +611,7 @@
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sincronizați folderele</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">Back up folders</string>
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Faceți o copie de rezervă a folderelor</string>
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">Opțiuni de sincronizare actualizate</string>
     <!-- Title of the Contact Permission Explanation -->
@@ -693,7 +693,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favorite</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No syncs or backups have been set up yet</string>
+    <string name="device_center_sync_backup_list_empty_state_title">Nu au fost configurate încă sincronizări sau copii de rezervă</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Sincronizați sau faceți o copie de rezervă a unui folder de pe dispozitiv cu un folder de pe MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -870,36 +870,28 @@
         <item quantity="few">Aceste fișiere există deja în „%1$s” și nu poate fi adăugat din nou</item>
         <item quantity="other">Aceste fișiere există deja în „%1$s” și nu poate fi adăugat din nou</item>
     </plurals>
-    <!-- Add to album partial added message -->
-    <plurals name="album_add_to_partial_added_message">
-        <item quantity="one">1 file added to “%1$s”. Some files already exist, and can’t be added again.</item>
-        <item quantity="other">%2$d files added to “%1$s”. Some files already exist, and can’t be added again.</item>
-    </plurals>
     <!--Content on the Multi-Factor Authentication Login page -->
     <string name="multi_factor_auth_login_verification_content">Introduceți codul din șase cifre din aplicația dvs. de autentificare.</string>
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">Cod de verificare incorect</string>
-    <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
-    <string name="transfers_preview_slow_snackbar">Preparing file for preview. See notification for details.</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview">Preparing %1$s for preview</string>
+    <string name="transfers_notification_downloading_preview">Pregătirea %1$s pentru previzualizare</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
+    <string name="transfers_notification_downloading_preview_paused">Pregătirea %1$s pentru previzualizare (întrerupt)</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
     <string name="audio_queue_single_item_removed_message">‟%1$s” was removed</string>
-    <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
-    <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
-        <item quantity="one">“%1$s” was removed from the queue</item>
-        <item quantity="other">Removed %2$d items from the queue</item>
+        <item quantity="one">„%1$s” a fost eliminat din coadă</item>
+        <item quantity="few">Eliminat %2$d elemente din coada de așteptare</item>
+        <item quantity="other">Eliminat %2$d elemente din coada de așteptare</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_title">Transfers are paused</string>
+    <string name="transfers_preview_paused_dialog_title">Transferurile sunt întrerupte</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to resume paused transfers</string>
+    <string name="transfers_preview_paused_dialog_text">Pentru a previzualiza „%1$s” va trebui să reluați transferurile întrerupte</string>
     <!--SD Card text shown as title in FileStorage screen -->
-    <string name="general_sd_card">SD card</string>
+    <string name="general_sd_card">Cardul SD</string>
     <!--The title of the Login page-->
     <string name="login_page_title">Conectați-vă la contul MEGA</string>
     <!--Message to be shown to the user when they entered an invalid email-->
@@ -935,13 +927,13 @@
     <!-- Ad settings label in the cookie settings page -->
     <string name="settings_cookie_settings_label_ad_settings">Setări anunţuri</string>
     <!-- Ads personalization label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ads_personalization">Ads personalisation</string>
+    <string name="settings_cookie_settings_label_ads_personalization">Personalizarea anunțurilor</string>
     <!-- Cookie settings title in the cookie settings page -->
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Setări cookie și anunțuri</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
-    <string name="sync_promotion_bottom_sheet_body_text">Sync or back up a folder on your device with a folder on MEGA. [U]Learn more[/U]</string>
+    <string name="sync_promotion_bottom_sheet_body_text">Sincronizați sau faceți o copie de rezervă a unui folder de pe dispozitiv cu un folder de pe MEGA. [U] Aflați mai multe [/U]</string>
     <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="transfers_cancel_download_warning_title">Cancel download?</string>
+    <string name="transfers_cancel_download_warning_title">Anulați descărcarea?</string>
     <!-- Confirmation message informing a download was successfully cancelled -->
     <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
@@ -949,22 +941,23 @@
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">Păstrează-l pentru tine</string>
     <!-- First message description in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_description">Send yourself sensitive information, pics and videos, or ideas for your next big venture. Synced across all your devices, and protected with zero-knowledge encryption.</string>
+    <string name="chat_note_to_self_chat_first_message_description">Trimite-ți informații sensibile, poze și videoclipuri sau idei pentru următoarea ta afacere mare. Sincronizat pe toate dispozitivele dvs. și protejat cu criptarea tip zero cunoștințe.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
-        <item quantity="one">1 file added to “%1$s”. Duplicate files cannot be added again.</item>
-        <item quantity="other">%2$d files added to “%1$s”. Duplicate files cannot be added again.</item>
+        <item quantity="one">1 fișier adăugat la „%1$s”. Fișierele duplicate nu pot fi adăugate din nou.</item>
+        <item quantity="few">%2$d fișiere adăugate la „%1$s”. Fișierele duplicate nu pot fi adăugate din nou.</item>
+        <item quantity="other">%2$d fișiere adăugate la „%1$s”. Fișierele duplicate nu pot fi adăugate din nou.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
+    <string name="transfers_start_upload_profile_qr_code_message">Economisirea %1$s către Unitatea cloud...</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_download">Something went wrong. Download was not cancelled.</string>
+    <string name="transfers_error_cancelling_download">Ceva nu a mers bine. Descărcarea nu a fost anulată.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Veți fi taxat %1$s imediat, dar abonamentul dvs. nu se va reînnoi automat după 12 luni din cauza reglementărilor guvernamentale. Va fi responsabilitatea dvs. să vă reînnoiți abonamentul după expirarea acestuia. Vă puteți gestiona sau anula abonamentul oricând prin Abonamente în [A]Google&#160;Play[/A]. Prin actualizarea contului dvs., sunteți de acord cu MEGA [B]Termenii de utilizare a serviciului[/B] și [C]Politica de Confidențialitate[/C].</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Se încarcă...</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploading&#8230;</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% încărcare&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Inactiv</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
@@ -1008,25 +1001,25 @@
     <!-- First message header paragraph in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header_paragraph">Un spațiu privat pentru imagini, informații importante sau idei mari. Întotdeauna sincronizat și protejat cu criptarea tip zero cunoștințe.</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <string name="general_sync_notification_low_battery_title">Sincronizarea întreruptă din cauza bateriei descărcate</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <string name="general_sync_notification_low_battery_text">Conectați-vă la sursa de alimentare pentru a relua</string>
     <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <string name="general_sync_notification_lost_wifi_title">Sincronizarea întreruptă din cauza pierderii conexiunii</string>
     <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <string name="general_sync_notification_lost_wifi_text">Reconectați-vă la Wi-Fi pentru a relua</string>
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <string name="general_sync_notification_generic_error_title">Sincronizarea s-a oprit</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Check your syncs in the app to resolve this.</string>
+    <string name="general_sync_notification_generic_error_text">Verificați sincronizările în aplicație pentru a rezolva această problemă.</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <string name="general_sync_notification_stalled_issues_title">Probleme de sincronizare detectate</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <string name="general_sync_notification_stalled_issues_text">Vizualizați și rezolvați problemele</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
     <string name="device_center_list_view_item_status_error">Eroare</string>
     <!-- Hint shown in the field to write a message in the note to self chat screen -->
-    <string name="chat_note_to_self_chat_message_hint">Write a message to yourself</string>
+    <string name="chat_note_to_self_chat_message_hint">Scrie-ți un mesaj</string>
     <!--The title of the Change Email Address page-->
     <string name="change_email_address_title">Schimbați adresa de e-mail</string>
     <!--Change Email Address page content text to ask user to enter a new email address -->
@@ -1038,7 +1031,7 @@
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">Adresa de e-mail a fost actualizată</string>
     <!-- Snackbar text to inform the user that download started -->
-    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <string name="transfers_download_started_snackbar">Descărcarea a început. Consultați notificarea pentru detalii.</string>
     <!--Sign Up page text field input first name error message when empty-->
     <string name="sign_up_first_name_text_field_error_message">Introduceți un prenume</string>
     <!--Sign Up page text field input last name error message when empty-->
@@ -1064,27 +1057,27 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Aveți deja un cont MEGA? [A]Conectați-vă[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Loading file&#8230;</string>
+    <string name="transfers_fake_preview_text">Se încarcă fișierul&#8230;</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_title">Cancel preview?</string>
+    <string name="transfers_cancel_preview_download_warning_title">Anulați previzualizarea?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_text">You will no longer be able to preview this file</string>
+    <string name="transfers_cancel_preview_download_warning_text">Nu veți mai putea previzualiza acest fișier</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again.</string>
+    <string name="transfers_fake_preview_screen_general_error">Previzualizarea nu a reușit să se încarce, încercați din nou</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_preview_download">Something went wrong. Preview was not cancelled. See notification for details.</string>
+    <string name="transfers_error_cancelling_preview_download">Ceva nu a mers bine. Previzualizarea nu a fost anulată. Consultați notificarea pentru detalii.</string>
     <!-- Title of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_title">Backup name already exists</string>
+    <string name="sync_rename_and_create_backup_dialog_title">Numele de rezervă există deja</string>
     <!-- Text of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_text">A folder with the same name already exists in your Backups. Rename the new folder to continue with the backup. Folder name will not change on your device.</string>
+    <string name="sync_rename_and_create_backup_dialog_text">Un folder cu același nume există deja în Backups. Redenumiți noul folder pentru a continua cu copia de rezervă. Numele folderului nu se va schimba pe dispozitiv.</string>
     <!-- Rename and Create Backup Dialog hint text (input field description) -->
-    <string name="sync_rename_and_create_backup_dialog_hint_text">Backup name</string>
+    <string name="sync_rename_and_create_backup_dialog_hint_text">Nume de rezervă</string>
     <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_positive_button">Redenumește</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Introduceți un nume de rezervă</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">A backup with this name already exists. Enter a different name.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">Există deja o copie de rezervă cu acest nume. Introduceți un alt nume.</string>
     <!-- USP Carousel page 1 title-->
     <string name="carousel_page_title_slide_1">Tu deții cheile</string>
     <!-- USP Carousel page 1 description-->
@@ -1100,7 +1093,7 @@
     <!-- USP Carousel page 4 title-->
     <string name="carousel_page_title_slide_4">Spune-o în privat</string>
     <!-- USP Carousel page 4 description-->
-    <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
+    <string name="carousel_page_description_slide_4">Discutați cu prietenii și familia, partajați fotografii sau informații sensibile, apelați video și programați întâlniri. Siguranța și confidențialitatea garantate.</string>
     <!-- Create account label-->
     <string name="general_label_create_account">Înscrieți-vă</string>
     <!-- The new feature hidden nodes feature -->
@@ -1112,17 +1105,17 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Controlați vizibilitatea cu ușurință</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Pentru a afișa fișiere ascunse, activați setarea „Afișați elemente ascunse” sub „Gestionare fișiere” -&gt; „Interfață utilizator” din setările aplicației.</string>
+    <string name="hidden_nodes_description_control_visibility">Pentru a afișa fișiere ascunse, activați setarea „Afișați elemente ascunse” din „Gestionare fișiere” - „Interfață utilizator” din setările aplicației.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Fișierele partajate rămân vizibile</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <string name="hidden_nodes_description_visible_shared_files">Fișierele și folderele partajate cu contactele sau cu link-urile publice sunt în continuare accesibile și vizibile, chiar dacă sunt ascunse</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Păstrați-vă fotografiile în siguranță, întotdeauna</string>
     <!--Camera backup permission screen description-->
-    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <string name="camera_backup_permission_screen_description">Amintirile tale contează.\n\nÎncărcările camerei fac automat copii de rezervă ale fotografiilor și videoclipurilor dvs. pe Unitatea dvs. MEGA Cloud, astfel încât să nu vă faceți griji că le pierdeți.</string>
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
-    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <string name="camera_backup_permission_banner_info_description">Este nevoie de încărcări de camere [A]acces complet[/A] în biblioteca foto a dispozitivului</string>
     <!--Button text to request camera backup permission-->
     <string name="camera_backup_permission_enable_button_text">Activează Încărcări cameră</string>
     <!--Permission screen skip requesting permission button text-->
@@ -1130,41 +1123,41 @@
     <!--Notification permission screen title-->
     <string name="notification_permission_screen_title">Nu ratați niciodată o actualizare importantă</string>
     <!--Notification permission screen description-->
-    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <string name="notification_permission_screen_description">Rămâneți informat cu actualizările în timp real care contează pentru dvs. Obțineți alerte pentru activitatea folderelor partajate, actualizări de securitate și oferte exclusive, astfel încât să nu pierdeți niciodată nimic important.\n\nPuteți gestiona preferințele de notificare în orice moment din setările dispozitivului.</string>
     <!--Button text to request Notification permission-->
     <string name="notification_permission_enable_button_text">Activează notificările</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
-    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
+    <string name="transfers_notification_title_single_upload">Încărcat „%1$s”</string>
     <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_warning_lost_wifi_title">Syncing paused due to lost connection.</string>
+    <string name="general_sync_warning_lost_wifi_title">Sincronizarea întreruptă din cauza conexiunii pierdute.</string>
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_warning_lost_wifi_text">Reconnect to Wi-Fi to resume.</string>
+    <string name="general_sync_warning_lost_wifi_text">Reconectați-vă la Wi-Fi pentru a relua.</string>
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
     <string name="general_link_unavailable_subtitle">Acest lucru ar putea fi din cauza următoarelor motive:</string>
     <!-- Bullet point shown when link is unavailable due to invalid URL -->
-    <string name="general_link_unavailable_invalid_url">Invalid URL - the link you’re trying to access does not exist</string>
+    <string name="general_link_unavailable_invalid_url">URL nevalid - linkul pe care încercați să îl accesați nu există</string>
     <!-- Bullet point shown when link is unavailable due to expiration -->
-    <string name="general_link_expired">The link has expired</string>
+    <string name="general_link_expired">Link-ul a expirat</string>
     <!-- Title shown when a folder link is unavailable (general case) -->
-    <string name="folder_link_unavailable_title">The folder link you’re trying to access is not available</string>
+    <string name="folder_link_unavailable_title">Link-ul folder pe care încercați să îl accesați nu este disponibil</string>
     <!-- Bullet point shown when a folder link is unavailable because the link has been disabled -->
-    <string name="folder_link_unavailable_disabled">The folder link has been disabled by the owner</string>
+    <string name="folder_link_unavailable_disabled">Link-ul folder a fost dezactivat de proprietar</string>
     <!-- Title shown when a folder link has expired -->
-    <string name="folder_link_expired_title">The folder link you’re trying to access is no longer available</string>
+    <string name="folder_link_expired_title">Link-ul folder pe care încercați să îl accesați nu mai este disponibil</string>
     <!-- Title of the dialog shown when the user needs to verify administrator credentials -->
-    <string name="unverified_business_account_dialog_title">Verify administrator credentials to continue</string>
+    <string name="unverified_business_account_dialog_title">Verificați acreditările de administrator pentru a continua</string>
     <!-- Description of the dialog explaining the need to verify administrator credentials -->
-    <string name="unverified_business_account_dialog_description">You need to verify your Business account administrator’s credentials in order to continue. Log in to your account in a desktop web browser and complete the credential verification.</string>
+    <string name="unverified_business_account_dialog_description">Pentru a continua, trebuie să confirmați acreditările administratorului contului Business. Conectați-vă la contul dvs. într-un browser web desktop și finalizați verificarea acreditării.</string>
     <!-- Title shown when a file link is unavailable (general case) -->
-    <string name="file_link_unavailable_title">The file link you’re trying to access is no longer available</string>
+    <string name="file_link_unavailable_title">Fișierul link-ul pe care încercați să îl accesați nu mai este disponibil</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="file_link_unavailable_disabled">The file link has been disabled by the owner</string>
+    <string name="file_link_unavailable_disabled">Proprietarul a dezactivat link-ul de fișier</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="file_link_unavailable_deleted">The file has been deleted</string>
+    <string name="file_link_unavailable_deleted">Fișierul a fost șters</string>
     <!-- Title shown when a file link has expired -->
-    <string name="file_link_expired_title">The file link you’re trying to access is not available</string>
+    <string name="file_link_expired_title">Fișierul link-ul pe care încercați să îl accesați nu este disponibil</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="folder_link_unavailable_deleted">The folder has been deleted</string>
+    <string name="folder_link_unavailable_deleted">Folderul a fost șters</string>
     <!-- Tooltip description for transfer section play action -->
     <string name="transfers_section_action_play">Redă</string>
     <!-- Tooltip description for transfer section play action -->
@@ -1182,15 +1175,15 @@
     <!--Text for showing the empty state when there are no completed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
     <string name="transfers_no_completed_transfers_empty_text">Niciun transfer finalizat</string>
     <!--Text for showing the empty state when there are no failed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
-    <string name="transfers_no_failed_transfers_empty_text">[A]No failed transfers[/A]</string>
+    <string name="transfers_no_failed_transfers_empty_text">[A]Nu există transferuri nereușite[/A]</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the current transferred size, the second one is to set the size of the file. Example 12.4MB of 33.3MB -->
-    <string name="transfers_completed_transfer_size_indicator">%1$s of %2$s</string>
+    <string name="transfers_completed_transfer_size_indicator">%1$s de %2$s</string>
     <!-- Title for the Free Plan card -->
-    <string name="free_plan_card_title">Începeți cu abonamentul nostru gratuit</string>
+    <string name="free_plan_card_title">Începe cu abonamentul nostru gratuit</string>
     <!-- Description for the Free Plan card -->
-    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our Free plan offers generous amount of storage and transfer quota.</string>
+    <string name="free_plan_card_description">Nu trebuie să vă angajați încă la un abonament plătit, planul nostru gratuit oferă cantități generoase de spațiu de stocare și cotă de transfer</string>
     <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">20 GB de spațiu de stocare gratuit</string>
+    <string name="free_plan_card_storage_feature">20&#160;GB de spațiu de stocare</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">Transferuri limitate</string>
     <!-- Button text for Free Plan card -->
@@ -1200,23 +1193,106 @@
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Spațiu de stocare generos</string>
     <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Store unlimited data up to 16 TB of storage</string>
+    <string name="pro_plan_feature_storage_desc">Depozitați până la 16&#160;TB de date</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Partajarea transferurilor</string>
     <!-- Description for transfer sharing feature -->
-    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files.</string>
+    <string name="pro_plan_feature_transfer_desc">Persoanele cu care partajați articole pot folosi cota dvs. pentru a descărca și a transmite fișiere în flux continuu</string>
     <!-- Title for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
+    <string name="pro_plan_feature_vpn_title">Acces la MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_desc">Keep your online life safe, fast, and easy with our high-speed VPN.</string>
+    <string name="pro_plan_feature_vpn_desc">Rămâneți în siguranță online cu VPN-ul nostru de mare viteză, care este atât rapid, cât și simplu de folosit</string>
     <!-- Title for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_title">MEGA Pass</string>
+    <string name="pro_plan_feature_pass_title">MEGA&#160;Pass</string>
     <!-- Description for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager.</string>
+    <string name="pro_plan_feature_pass_desc">Organizați-vă toate parolele și păstrați-le în siguranță cu managerul nostru de parole</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Recomandat</string>
     <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
     <string name="transfers_over_quota_banner_title">Obține o cotă de transfer mai mare</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">Upgradați acum</string>
+    <!-- Section title for additional benefits of Pro plans -->
+    <string name="pro_plan_additional_benefits_section_title">Beneficii suplimentare ale abonamentelor Pro</string>
+    <!-- Benefit: Password-protected links -->
+    <string name="pro_plan_benefit_password_protected_links">Link-uri protejate prin parolă</string>
+    <!-- Benefit: Links with expiry dates -->
+    <string name="pro_plan_benefit_links_with_expiry_dates">Linkuri cu date de expirare</string>
+    <!-- Benefit: Transfer quota sharing -->
+    <string name="pro_plan_benefit_transfer_quota_sharing">Partajarea cotelor de transfer</string>
+    <!-- Benefit: Automatically sync the folders on your mobile device -->
+    <string name="pro_plan_benefit_auto_sync_mobile">Automatically sync the folders on your mobile device</string>
+    <!-- Benefit: Rewind up to 180 days of deleted data -->
+    <string name="pro_plan_benefit_rewind_180_days">Rewind up to 180 days of deleted data</string>
+    <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
+    <string name="pro_plan_benefit_host_calls_unlimited">Host calls and meetings with unlimited participants and no time restrictions</string>
+    <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Schedule Rubbish bin clearing between 7 days and 10 years</string>
+    <!-- Benefit: Priority support -->
+    <string name="pro_plan_benefit_priority_support">Asistență prioritară</string>
+    <!-- Subscription page information section title at the bottom of the page-->
+    <string name="choose_account_screen_subscription_information_title">Detaliile abonamentului</string>
+    <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
+    <string name="choose_account_screen_subscription_information_description">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.\n\nYou can cancel your plan subscription any time but no later than 24 hours before your next subscription payment is due. [A]Learn how to manage your subscription in your settings[/A].</string>
+    <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]Termenii de utilizare a serviciului și Politica de confidențialitate[/A]</string>
+    <!-- Get more with Pro plan title in choose account screen-->
+    <string name="choose_account_screen_get_more_with_pro_plan_title">Obțineți mai mult cu un abonament Pro</string>
+    <!-- Maybe later button text in the choose account screen-->
+    <string name="choose_account_screen_maybe_later_button_text">Poate mai târziu</string>
+    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_monthly">Lunară</string>
+    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_yearly">Anual</string>
+    <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_label_save_up_to">Economisiți până la 16&#160;% cu facturarea anuală</string>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
+    <string name="choose_account_screen_storage_label">%1$s spațiu de stocare</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
+    <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
+    <!-- General month label -->
+    <string name="general_month">lună</string>
+    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
+    <string name="choose_account_screen_currency_per_month">%1$s pe lună</string>
+    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
+    <string name="choose_account_screen_billed_yearly">%1$s charged yearly</string>
+    <!-- The snackbar message of unhidden nodes operation -->
+    <plurals name="unhidden_nodes_result_message">
+        <item quantity="one">%1$d item unhidden</item>
+        <item quantity="other">%1$d items unhidden</item>
+    </plurals>
+    <!-- Title for secure slideshow mode tutorial -->
+    <string name="slideshow_tutorial_title">Play slideshows securely</string>
+    <!-- Step 1 for slideshow secure mode tutorial -->
+    <string name="slideshow_tutorial_step1">Press the power button to lock your screen.</string>
+    <!-- Step 2 for slideshow secure mode tutorial -->
+    <string name="slideshow_tutorial_step2">Wait for 2 seconds.</string>
+    <!-- Step 3 for slideshow secure mode tutorial -->
+    <string name="slideshow_tutorial_step3">Press the power button again to turn the screen back on.</string>
+    <!-- Note indicating the slideshow plays securely while locked -->
+    <string name="slideshow_tutorial_note">The slideshow will play while your device remains securely locked.</string>
+    <!-- State to indicate an achievement has applied -->
+    <string name="applied_label">Aplicată</string>
+    <!-- title of the section for start mega vpn free trial in achivements section -->
+    <string name="title_start_mega_vpn_free_trial">Începeți perioada de probă gratuită MEGA&#160;VPN</string>
+    <!-- Text of the section for start mega vpn free trial in achivements section -->
+    <string name="text_start_mega_vpn_free_trial">%1$s de spațiu de stocare. Valabil permanent.</string>
+    <!-- title of the section for start mega pass free trial in achivements section -->
+    <string name="title_start_mega_pass_free_trial">Începeți perioada de probă gratuită MEGA&#160;Pass</string>
+    <!-- Text of the section for start mega pass free trial in achivements section -->
+    <string name="text_start_mega_pass_free_trial">%1$s de spațiu de stocare. Valabil permanent.</string>
+    <!-- Text of the button for install mega vpn in achivements section -->
+    <string name="button_text_install_mega_vpn">Instalați MEGA&#160;VPN</string>
+    <!-- Text of the button for install mega pass in achivements section -->
+    <string name="button_text_install_mega_pass">Instalați MEGA&#160;Pass</string>
+    <!-- title of how it works for mega vpn free trial in achivements section -->
+    <string name="title_how_it_works_free_trial">Cum funcționează</string>
+    <!-- text of how it works for mega vpn free trial in achivements section -->
+    <string name="text_how_it_works_mega_vpn_free_trial">Instalează aplicația MEGA&#160;VPN, conectează-te cu contul tău MEGA și începe perioada de probă gratuită. Spațiul de stocare bonus este adăugat automat după începerea perioadei de probă gratuite.</string>
+    <!-- text of how it works for mega pass free trial in achivements section -->
+    <string name="text_how_it_works_mega_pass_free_trial">Instalează aplicația MEGA&#160;Pass, conectează-te cu contul tău MEGA și începe perioada de probă gratuită. Spațiul de stocare bonus este adăugat automat după începerea perioadei de probă gratuite.</string>
+    <!-- text of received for mega vpn free trial in achivements section -->
+    <string name="text_received_mega_vpn_free_trial">Ați primit %1$s spațiu de stocare pentru pornirea unui MEGA&#160;VPN de încercare gratuită</string>
+    <!-- text of received mega pass free trial in achivements section -->
+    <string name="text_received_mega_pass_free_trial">Ați primit %1$s spațiu de stocare pentru pornirea unui MEGA&#160;Pass încercarea gratuită</string>
 </resources>

@@ -842,24 +842,16 @@
     <plurals name="album_add_to_files_existed">
         <item quantity="other">これらのファイルは既に「%1$s」に存在しており、再度追加することはできません。</item>
     </plurals>
-    <!-- Add to album partial added message -->
-    <plurals name="album_add_to_partial_added_message">
-        <item quantity="other">%2$d個のファイルが「%1$s」に追加されました。いくつかのファイルはすでに存在し、再度追加することはできません。</item>
-    </plurals>
     <!--Content on the Multi-Factor Authentication Login page -->
     <string name="multi_factor_auth_login_verification_content">認証アプリからの6桁のコードを入力してください。</string>
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">認証コードが間違っています</string>
-    <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
-    <string name="transfers_preview_slow_snackbar">プレビュー用にファイルを準備しています。詳細については通知を参照してください。</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview">プレビュー用に%1$sを準備しています</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">%1$sをプレビュー用に準備しています（一時停止）</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
     <string name="audio_queue_single_item_removed_message">「%1$s」が削除されました</string>
-    <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
-    <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="other">キューから%2$d個の項目を削除しました</item>
@@ -1081,7 +1073,7 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">表示/非表示を簡単に制御</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">非表示ファイルを表示するには、アプリの設定で「ファイル管理（File Management） -&gt; ユーザーインターフェース（User interface）」の「非表示項目を表示（Show hidden items）」をオンにします。</string>
+    <string name="hidden_nodes_description_control_visibility">非表示ファイルを表示するには、アプリの設定で「ファイル管理（File Management）－ ユーザーインターフェース（User interface）」の「非表示項目を表示（Show hidden items）」をオンにします。</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">共有ファイルは表示されたまま</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
@@ -1157,9 +1149,9 @@
     <!-- Title for the Free Plan card -->
     <string name="free_plan_card_title">当社の無料プランで始めましょう</string>
     <!-- Description for the Free Plan card -->
-    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our Free plan offers generous amount of storage and transfer quota.</string>
+    <string name="free_plan_card_description">まだ有料プランの契約を確定する必要はありません。無料プランでも、十分な量のストレージと転送容量をご用意しております。</string>
     <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">20GBの無料ストレージ</string>
+    <string name="free_plan_card_storage_feature">20GBのストレージ</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">転送制限あり</string>
     <!-- Button text for Free Plan card -->
@@ -1169,23 +1161,105 @@
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">豊富なストレージ</string>
     <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">最大16TBのストレージにデータを無制限に保管できます</string>
+    <string name="pro_plan_feature_storage_desc">最大16&#160;TBのデータを保管</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">転送共有</string>
     <!-- Description for transfer sharing feature -->
-    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files.</string>
+    <string name="pro_plan_feature_transfer_desc">項目を共有するお相手は、ファイルのダウンロードやストリーミングにあなたの容量を使用できます。</string>
     <!-- Title for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_title">MEGA VPN</string>
+    <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_desc">Keep your online life safe, fast, and easy with our high-speed VPN.</string>
+    <string name="pro_plan_feature_vpn_desc">高速かつ簡単にご使用いただける当社の高速VPNなら、オンラインでの安全も常に確保できます。</string>
     <!-- Title for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_title">MEGA Pass</string>
+    <string name="pro_plan_feature_pass_title">MEGA&#160;Pass</string>
     <!-- Description for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager.</string>
+    <string name="pro_plan_feature_pass_desc">当社のパスワードマネージャーで、すべてのパスワードを整理し、安全に管理できます。</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">推奨</string>
     <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
     <string name="transfers_over_quota_banner_title">転送容量を増やす</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">今すぐアップグレード</string>
+    <!-- Section title for additional benefits of Pro plans -->
+    <string name="pro_plan_additional_benefits_section_title">Proプランの追加特典</string>
+    <!-- Benefit: Password-protected links -->
+    <string name="pro_plan_benefit_password_protected_links">パスワードで保護されたリンク</string>
+    <!-- Benefit: Links with expiry dates -->
+    <string name="pro_plan_benefit_links_with_expiry_dates">有効期限のあるリンク</string>
+    <!-- Benefit: Transfer quota sharing -->
+    <string name="pro_plan_benefit_transfer_quota_sharing">転送容量の共有</string>
+    <!-- Benefit: Automatically sync the folders on your mobile device -->
+    <string name="pro_plan_benefit_auto_sync_mobile">モバイルデバイス上のフォルダを自動的に同期</string>
+    <!-- Benefit: Rewind up to 180 days of deleted data -->
+    <string name="pro_plan_benefit_rewind_180_days">削除されたデータを最大180日分復元</string>
+    <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
+    <string name="pro_plan_benefit_host_calls_unlimited">無制限の参加者と時間制限なしで、通話やミーティングを開催</string>
+    <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">ごみ箱を空にするのを7日から10年の間でスケジュール</string>
+    <!-- Benefit: Priority support -->
+    <string name="pro_plan_benefit_priority_support">優先サポート</string>
+    <!-- Subscription page information section title at the bottom of the page-->
+    <string name="choose_account_screen_subscription_information_title">サブスクリプションの詳細</string>
+    <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
+    <string name="choose_account_screen_subscription_information_description">サブスクリプションは、最初に選択された期間と同じ期間および同じ価格で、連続するサブスクリプション期間に対して自動的に更新されます。\n\nお客様のプランのサブスクリプションはいつでもキャンセルできますが、次のサブスクリプションのお支払い期日の24時間前までにキャンセルしてください。[A]サブスクリプションを管理する方法は設定でご欄ください。[/A]</string>
+    <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]ご利用規約とプライバシーポリシー[/A]</string>
+    <!-- Get more with Pro plan title in choose account screen-->
+    <string name="choose_account_screen_get_more_with_pro_plan_title">Proプランでさらに充実</string>
+    <!-- Maybe later button text in the choose account screen-->
+    <string name="choose_account_screen_maybe_later_button_text">たぶん後で</string>
+    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_monthly">月ごと</string>
+    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_yearly">年額</string>
+    <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_label_save_up_to">年払いで最大16%ご節約</string>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
+    <string name="choose_account_screen_storage_label">%1$sストレージ</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
+    <string name="choose_account_screen_transfer_quota_label">%1$s転送</string>
+    <!-- General month label -->
+    <string name="general_month">月</string>
+    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
+    <string name="choose_account_screen_currency_per_month">%1$s/月</string>
+    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
+    <string name="choose_account_screen_billed_yearly">%1$s年払い</string>
+    <!-- The snackbar message of unhidden nodes operation -->
+    <plurals name="unhidden_nodes_result_message">
+        <item quantity="other">%1$d項目非表示解除</item>
+    </plurals>
+    <!-- Title for secure slideshow mode tutorial -->
+    <string name="slideshow_tutorial_title">スライドショーを安全に再生</string>
+    <!-- Step 1 for slideshow secure mode tutorial -->
+    <string name="slideshow_tutorial_step1">電源ボタンを押して画面をロックする。</string>
+    <!-- Step 2 for slideshow secure mode tutorial -->
+    <string name="slideshow_tutorial_step2">2秒間待つ。</string>
+    <!-- Step 3 for slideshow secure mode tutorial -->
+    <string name="slideshow_tutorial_step3">電源ボタンをもう一度押すと、画面がオンに戻ります。</string>
+    <!-- Note indicating the slideshow plays securely while locked -->
+    <string name="slideshow_tutorial_note">スライドショーは、デバイスが安全にロックされたまま再生されます。</string>
+    <!-- State to indicate an achievement has applied -->
+    <string name="applied_label">適用済み</string>
+    <!-- title of the section for start mega vpn free trial in achivements section -->
+    <string name="title_start_mega_vpn_free_trial">MEGA&#160;VPNの無料トライアルを開始</string>
+    <!-- Text of the section for start mega vpn free trial in achivements section -->
+    <string name="text_start_mega_vpn_free_trial">%1$sGBのストレージ。無期限に有効。</string>
+    <!-- title of the section for start mega pass free trial in achivements section -->
+    <string name="title_start_mega_pass_free_trial">MEGA&#160;Passの無料トライアルを開始</string>
+    <!-- Text of the section for start mega pass free trial in achivements section -->
+    <string name="text_start_mega_pass_free_trial">%1$sGBのストレージ。無期限に有効。</string>
+    <!-- Text of the button for install mega vpn in achivements section -->
+    <string name="button_text_install_mega_vpn">MEGA&#160;VPNをインストール</string>
+    <!-- Text of the button for install mega pass in achivements section -->
+    <string name="button_text_install_mega_pass">MEGA&#160;Passをインストール</string>
+    <!-- title of how it works for mega vpn free trial in achivements section -->
+    <string name="title_how_it_works_free_trial">仕組み</string>
+    <!-- text of how it works for mega vpn free trial in achivements section -->
+    <string name="text_how_it_works_mega_vpn_free_trial">MEGA&#160;VPNアプリをインストールし、MEGAアカウントでログインして無料トライアルを開始してください。無料トライアル開始後、ボーナスストレージが自動的に追加されます。</string>
+    <!-- text of how it works for mega pass free trial in achivements section -->
+    <string name="text_how_it_works_mega_pass_free_trial">MEGA&#160;Passアプリをインストールし、MEGAアカウントでログインして無料トライアルを開始してください。無料トライアル開始後、ボーナスストレージが自動的に追加されます。</string>
+    <!-- text of received for mega vpn free trial in achivements section -->
+    <string name="text_received_mega_vpn_free_trial">%1$sGBのストレージスペースを受け取りました。これでMEGA&#160;VPNの無料トライアルを開始できます。</string>
+    <!-- text of received mega pass free trial in achivements section -->
+    <string name="text_received_mega_pass_free_trial">%1$sGBのストレージスペースを受け取りました。これでMEGA&#160;Passの無料トライアルを開始できます。</string>
 </resources>

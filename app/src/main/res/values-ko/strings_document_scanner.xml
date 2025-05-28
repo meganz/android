@@ -33,7 +33,7 @@
     <!-- Body text shown on document scanner dialog to discard all scans -->
     <string name="scan_dialog_discard_all_body">현재 문서를 잃게 됩니다</string>
     <!-- Action text shown on document scanner dialog to discard scans -->
-    <string name="scan_dialog_discard_action">폐기</string>
+    <string name="scan_dialog_discard_action">취소</string>
     <!-- Body text shown on document scanner dialog to delete current scan -->
     <string name="scan_dialog_delete_body">현재 스캔을 삭제할까요?</string>
     <!-- Message shown when users deny camera permissions to scan documents -->
@@ -45,7 +45,7 @@
     <!-- Snackbar text for incorrect name -->
     <string name="scan_snackbar_incorrect_name">진행하기 전에 파일 이름을 수정하세요</string>
     <!-- Dialog message showing file progress -->
-    <string name="scan_dialog_progress">%1$s 준비중. 잠시 기다리세요&#8230;</string>
+    <string name="scan_dialog_progress">%1$s 준비 중. 잠시 기다리세요&#8230;</string>
     <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->
     <string name="scan_snackbar_invalid_characters">다음의 문자는 허용되지 않습니다: %1$s</string>
 </resources>

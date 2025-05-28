@@ -125,7 +125,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">MEGA가 처음이신가요?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">MEGA 계정 생성</string>
+    <string name="create_account">가입</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">이메일을 입력하세요</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -2035,9 +2035,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">파일명</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">최근 연락 시간 보기</string>
+    <string name="option_enable_last_green_chat">최근 접속 시간 보여주기</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">당신의 연락처가 당신이 최근에 MEGA에서 활동한 시간을 볼 수 있도록 합니다</string>
+    <string name="subtitle_option_enable_last_green_chat">당신의 연락처가 당신이 언제 MEGA에서 활동하였는지 보는 것을 허용합니다</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">저장 공간 부족</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -2355,7 +2355,7 @@
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">뭔가 잘못됐습니다</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text_2">문제를 해결하고 계정을 활성화하려면 비즈니스 계정 관리자에게 연락하세요.</string>
+    <string name="expired_user_business_text_2">Contact your Business account administrator to resolve the issue and activate your account.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
     <string name="logout_warning_offline">로그아웃할 때, 오프라인 섹션의 파일들이 당신의 기기에서 삭제됩니다.</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
@@ -4657,7 +4657,7 @@
     <!-- Camera uploads updated info in Photos screen. -->
     <string name="photos_camera_uploads_updated">카메라 업로드 업데이트됨</string>
     <!-- Camera uploads no internet info in Photos screen. -->
-    <string name="photos_camera_uploads_no_internet">인터넷 연결이 없어서 업로드가 일시정지 되었습니다</string>
+    <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">배터리가 %1$d%% 이하이기 대문에 업로드를 일시정지 하였습니다</string>
     <!-- Camera uploads general issue info in Photos screen. -->
@@ -4753,13 +4753,13 @@
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">지금 업그레이드</string>
     <!-- Search drop down chips filter type file type -->
-    <string name="search_dropdown_chip_filter_type_file_type">형식</string>
+    <string name="search_dropdown_chip_filter_type_file_type">유형</string>
     <!-- Search drop down chips filter type file type images -->
     <string name="search_dropdown_chip_filter_type_file_type_images">이미지</string>
     <!-- Search drop down chips filter type file type videos -->
     <string name="search_dropdown_chip_filter_type_file_type_video">동영상</string>
     <!-- Search drop down chips filter type file type audio -->
-    <string name="search_dropdown_chip_filter_type_file_type_audio">음성</string>
+    <string name="search_dropdown_chip_filter_type_file_type_audio">오디오</string>
     <!-- Search drop down chips filter type file type documents -->
     <string name="search_dropdown_chip_filter_type_file_type_documents">문서</string>
     <!-- Search drop down chips filter type date added -->
@@ -4797,7 +4797,7 @@
     <!-- Title of call button to show more options in call screen -->
     <string name="meetings_more_call_option_button">더 보기</string>
     <!-- Title of raise hand button in call screen -->
-    <string name="meetings_raise_hand_option_button">손을 드세요</string>
+    <string name="meetings_raise_hand_option_button">손 들기</string>
     <!-- Title of lower hand button in call screen -->
     <string name="meetings_lower_hand_option_button">손 내리기</string>
     <!-- Title of put call on hold button in call screen -->
@@ -4838,4 +4838,6 @@
     <string name="filestorage_menu_option_open_in_file_manager">파일 관리자에서 열기</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
     <string name="filestorage_snackbar_file_manager_is_not_available">이 장치에 이용 가능한 적합한 파일 관리자 앱이 없습니다</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_success_message">카메라 업로드 활성화됨</string>
 </resources>

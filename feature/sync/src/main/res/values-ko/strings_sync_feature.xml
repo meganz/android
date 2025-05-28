@@ -5,7 +5,7 @@
     <!-- Sync text for the the button to begin sync-->
     <string name="sync_button_label">동기화</string>
     <!-- Sync text of sync-->
-    <string name="sync">동기화</string>
+    <string name="sync">Sync</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">당신의 로컬 폴더를 동기화하기 위해 MEGA가 장치 저장소에 접근이 필요합니다. 접근을 승인하려면 여기를 탭하세요</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->

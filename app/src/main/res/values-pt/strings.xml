@@ -5292,4 +5292,6 @@
     <string name="filestorage_menu_option_open_in_file_manager">Abrir no gerenciador de arquivos</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
     <string name="filestorage_snackbar_file_manager_is_not_available">Não há um aplicativo gerenciador de arquivos adequado disponível neste dispositivo</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_success_message">Uploads da câmera ativos</string>
 </resources>

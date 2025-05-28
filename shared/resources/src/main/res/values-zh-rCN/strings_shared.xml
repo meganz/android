@@ -842,24 +842,16 @@
     <plurals name="album_add_to_files_existed">
         <item quantity="other">这些文件已经存在于“%1$s”，并且无法再次添加</item>
     </plurals>
-    <!-- Add to album partial added message -->
-    <plurals name="album_add_to_partial_added_message">
-        <item quantity="other">%2$d个文件已添加到“%1$s”。有些文件已经存在，无法再次添加。</item>
-    </plurals>
     <!--Content on the Multi-Factor Authentication Login page -->
     <string name="multi_factor_auth_login_verification_content">输入您身份验证应用程序中的6位数代码。</string>
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">验证码不正确</string>
-    <!-- Snackbar text to inform the user that preview may take some time because it needs to be downloaded -->
-    <string name="transfers_preview_slow_snackbar">正在准备文件预览。详情请参阅通知。</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview">正在准备%1$s用于预览</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">正在准备预览%1$s（已暂停）</string>
     <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
     <string name="audio_queue_single_item_removed_message">已删除“%1$s”</string>
-    <!-- Message when successfully deleting items from the audio queue. %1$d will be replaced with the removal count when multiple items are removed. -->
-    <string name="audio_queue_multiple_items_removed_message">Removed %1$d items from queue</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="other">已从队列中移除%2$d个项目</item>
@@ -1039,7 +1031,7 @@
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_text">您将无法再预览此文件</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">预览加载失败，请重试。</string>
+    <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_preview_download">出了点问题。预览未取消。详情请参阅通知。</string>
     <!-- Title of the Rename and Create Backup Dialog -->
@@ -1051,7 +1043,7 @@
     <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_positive_button">重命名</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
     <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">A backup with this name already exists. Enter a different name.</string>
     <!-- USP Carousel page 1 title-->
@@ -1081,7 +1073,7 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">轻松控制可见性</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” -&gt; “User interface” in your app settings.</string>
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” - “User interface” in your app settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">共享文件保持可见状态</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
@@ -1155,11 +1147,11 @@
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the current transferred size, the second one is to set the size of the file. Example 12.4MB of 33.3MB -->
     <string name="transfers_completed_transfer_size_indicator">%1$s of %2$s</string>
     <!-- Title for the Free Plan card -->
-    <string name="free_plan_card_title">从我们的免费方案开始吧</string>
+    <string name="free_plan_card_title">开始使用我们的免费方案</string>
     <!-- Description for the Free Plan card -->
-    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our Free plan offers generous amount of storage and transfer quota.</string>
+    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our free plan offers generous amounts of storage and transfer quota</string>
     <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">Free 20 GB of storage</string>
+    <string name="free_plan_card_storage_feature">20 GB of storage</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">Limited transfers</string>
     <!-- Button text for Free Plan card -->
@@ -1169,23 +1161,106 @@
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">大容量存储空间</string>
     <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Store unlimited data up to 16 TB of storage</string>
+    <string name="pro_plan_feature_storage_desc">Store up to 16&#160;TB of data</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">传输流量共享</string>
     <!-- Description for transfer sharing feature -->
-    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files.</string>
+    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files</string>
     <!-- Title for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_title">MEGA VPN</string>
+    <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_desc">Keep your online life safe, fast, and easy with our high-speed VPN.</string>
+    <string name="pro_plan_feature_vpn_desc">Stay safe online with our high-speed VPN that’s both fast and simple to use</string>
     <!-- Title for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_title">MEGA Pass</string>
+    <string name="pro_plan_feature_pass_title">MEGA&#160;Pass</string>
     <!-- Description for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager.</string>
+    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">推荐</string>
     <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
     <string name="transfers_over_quota_banner_title">获取更多流量</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">立即升级</string>
+    <!-- Section title for additional benefits of Pro plans -->
+    <string name="pro_plan_additional_benefits_section_title">Additional benefits of Pro plans</string>
+    <!-- Benefit: Password-protected links -->
+    <string name="pro_plan_benefit_password_protected_links">密码保护链接</string>
+    <!-- Benefit: Links with expiry dates -->
+    <string name="pro_plan_benefit_links_with_expiry_dates">为链接设置到期日期</string>
+    <!-- Benefit: Transfer quota sharing -->
+    <string name="pro_plan_benefit_transfer_quota_sharing">传输流量共享</string>
+    <!-- Benefit: Automatically sync the folders on your mobile device -->
+    <string name="pro_plan_benefit_auto_sync_mobile">Automatically sync the folders on your mobile device</string>
+    <!-- Benefit: Rewind up to 180 days of deleted data -->
+    <string name="pro_plan_benefit_rewind_180_days">Rewind up to 180 days of deleted data</string>
+    <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
+    <string name="pro_plan_benefit_host_calls_unlimited">Host calls and meetings with unlimited participants and no time restrictions</string>
+    <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Schedule Rubbish bin clearing between 7 days and 10 years</string>
+    <!-- Benefit: Priority support -->
+    <string name="pro_plan_benefit_priority_support">优先支持服务</string>
+    <!-- Subscription page information section title at the bottom of the page-->
+    <string name="choose_account_screen_subscription_information_title">订阅详情</string>
+    <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
+    <string name="choose_account_screen_subscription_information_description">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.\n\nYou can cancel your plan subscription any time but no later than 24 hours before your next subscription payment is due. [A]Learn how to manage your subscription in your settings[/A].</string>
+    <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]Terms of Service and Privacy Policy[/A]</string>
+    <!-- Get more with Pro plan title in choose account screen-->
+    <string name="choose_account_screen_get_more_with_pro_plan_title">通过Pro方案获得更多权益</string>
+    <!-- Maybe later button text in the choose account screen-->
+    <string name="choose_account_screen_maybe_later_button_text">稍后</string>
+    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_monthly">每月</string>
+    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_yearly">每年</string>
+    <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_label_save_up_to">按年结算最多可节省16%</string>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
+    <string name="choose_account_screen_storage_label">%1$s存储空间</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
+    <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
+    <!-- General month label -->
+    <string name="general_month">月</string>
+    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
+    <string name="choose_account_screen_currency_per_month">%1$s/月</string>
+    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
+    <string name="choose_account_screen_billed_yearly">%1$s charged yearly</string>
+    <!-- The snackbar message of unhidden nodes operation -->
+    <plurals name="unhidden_nodes_result_message">
+        <item quantity="one">%1$d item unhidden</item>
+        <item quantity="other">%1$d items unhidden</item>
+    </plurals>
+    <!-- Title for secure slideshow mode tutorial -->
+    <string name="slideshow_tutorial_title">Play slideshows securely</string>
+    <!-- Step 1 for slideshow secure mode tutorial -->
+    <string name="slideshow_tutorial_step1">Press the power button to lock your screen.</string>
+    <!-- Step 2 for slideshow secure mode tutorial -->
+    <string name="slideshow_tutorial_step2">Wait for 2 seconds.</string>
+    <!-- Step 3 for slideshow secure mode tutorial -->
+    <string name="slideshow_tutorial_step3">Press the power button again to turn the screen back on.</string>
+    <!-- Note indicating the slideshow plays securely while locked -->
+    <string name="slideshow_tutorial_note">The slideshow will play while your device remains securely locked.</string>
+    <!-- State to indicate an achievement has applied -->
+    <string name="applied_label">Applied</string>
+    <!-- title of the section for start mega vpn free trial in achivements section -->
+    <string name="title_start_mega_vpn_free_trial">Start MEGA&#160;VPN free trial</string>
+    <!-- Text of the section for start mega vpn free trial in achivements section -->
+    <string name="text_start_mega_vpn_free_trial">%1$s of storage. Valid permanently.</string>
+    <!-- title of the section for start mega pass free trial in achivements section -->
+    <string name="title_start_mega_pass_free_trial">Start MEGA&#160;Pass free trial</string>
+    <!-- Text of the section for start mega pass free trial in achivements section -->
+    <string name="text_start_mega_pass_free_trial">%1$s of storage. Valid permanently.</string>
+    <!-- Text of the button for install mega vpn in achivements section -->
+    <string name="button_text_install_mega_vpn">Install MEGA&#160;VPN</string>
+    <!-- Text of the button for install mega pass in achivements section -->
+    <string name="button_text_install_mega_pass">Install MEGA&#160;Pass</string>
+    <!-- title of how it works for mega vpn free trial in achivements section -->
+    <string name="title_how_it_works_free_trial">如何使用</string>
+    <!-- text of how it works for mega vpn free trial in achivements section -->
+    <string name="text_how_it_works_mega_vpn_free_trial">Install the MEGA&#160;VPN app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
+    <!-- text of how it works for mega pass free trial in achivements section -->
+    <string name="text_how_it_works_mega_pass_free_trial">Install the MEGA&#160;Pass app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
+    <!-- text of received for mega vpn free trial in achivements section -->
+    <string name="text_received_mega_vpn_free_trial">You have received %1$s storage space for starting a MEGA&#160;VPN free trial</string>
+    <!-- text of received mega pass free trial in achivements section -->
+    <string name="text_received_mega_pass_free_trial">You have received %1$s storage space for starting a MEGA&#160;Pass free trial</string>
 </resources>

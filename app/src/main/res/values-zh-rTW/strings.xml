@@ -1292,7 +1292,7 @@
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">您已經安裝我們的MEGA桌面應用程式而獲得%1$s儲存空間過了。</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">您已經由安裝MEGA手機應用程式而獲得%1$s儲存空間獎勵。</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">您已經安裝MEGA行動應用程式而獲得%1$s儲存空間獎勵。</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">您已收到%1$s儲存空間作為免費註冊的獎勵。</string>
     <!-- menu items -->
@@ -3429,7 +3429,7 @@
     <!-- Error message for creating an album with a system albums name -->
     <string name="photos_create_album_error_message_systems_album">不允許使用此相簿名稱。請輸入不同的名稱。</string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_create_album_error_message_duplicate">已存在具有此名稱的相簿。請輸入不同的名稱。</string>
+    <string name="photos_create_album_error_message_duplicate">已存在相同名稱的相簿。請輸入不同的名稱。</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">新增項目到「%s」</string>
     <!-- Message after photos are successfully added in album -->
@@ -4838,4 +4838,6 @@
     <string name="filestorage_menu_option_open_in_file_manager">在檔案管理員中開啟</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
     <string name="filestorage_snackbar_file_manager_is_not_available">此裝置上沒有可用的檔案管理器應用程式</string>
+    <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
+    <string name="onboarding_camera_upload_permission_enabled_success_message">已開啟相機上傳</string>
 </resources>
