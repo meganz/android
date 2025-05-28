@@ -30,11 +30,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toStorageString
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.AchievementsOverviewViewModel
+import mega.privacy.android.domain.entity.achievement.AchievementType
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.domain.entity.achievement.AchievementType
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.shared.resources.R as sharedR
 
 internal object AchievementViewTestTags {
     private const val ACHIEVEMENTS_VIEW = "achievements_info_view"
@@ -44,6 +46,10 @@ internal object AchievementViewTestTags {
     const val REGISTRATION_BONUS_SECTION = "${ACHIEVEMENTS_VIEW}:registration_bonus_section"
     const val INSTALL_MOBILE_SECTION = "${ACHIEVEMENTS_VIEW}:install_mobile_section"
     const val INSTALL_DESKTOP_SECTION = "${ACHIEVEMENTS_VIEW}:install_desktop_section"
+    const val START_MEGA_VPN_FREE_TRIAL_SECTION =
+        "${ACHIEVEMENTS_VIEW}:start_mega_vpn_free_trail_section"
+    const val START_MEGA_PASS_FREE_TRIAL_SECTION =
+        "${ACHIEVEMENTS_VIEW}:start_mega_vpn_pass_trail_section"
 }
 
 @Composable
@@ -52,6 +58,8 @@ internal fun AchievementRoute(
     onNavigateToInviteFriends: (Long) -> Unit,
     onNavigateToInfoAchievements: (achievementType: AchievementType) -> Unit,
     onNavigateToReferralBonuses: () -> Unit,
+    onNavigateToMegaVPNFreeTrial: (Boolean) -> Unit,
+    onNavigateToMegaPassFreeTrial: (Boolean) -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -73,8 +81,17 @@ internal fun AchievementRoute(
         installDesktopAwardDaysLeft = uiState.installDesktopAwardDaysLeft,
         installDesktopAwardStorage = uiState.installDesktopAwardStorage,
         onInviteFriendsClicked = onNavigateToInviteFriends,
+        isAchievementEnabled = uiState.isFreeTrialAchievementsEnabled,
         onShowInfoAchievementsClicked = onNavigateToInfoAchievements,
         onReferBonusesClicked = onNavigateToReferralBonuses,
+        onMegaVPNFreeTrialClicked = onNavigateToMegaVPNFreeTrial,
+        onMegaPassFreeTrialClicked = onNavigateToMegaPassFreeTrial,
+        hasMegaPassTrial = uiState.hasMegaPassTrial,
+        megaPassTrialStorage = uiState.megaPassTrialStorage,
+        megaPassTrialAwardStorage = uiState.megaPassTrialAwardStorage,
+        hasMegaVPNTrial = uiState.hasMegaVPNTrial,
+        megaVPNTrialStorage = uiState.megaVPNTrialStorage,
+        megaVPNTrialAwardStorage = uiState.megaVPNTrialAwardStorage
     )
 }
 
@@ -95,9 +112,18 @@ internal fun AchievementView(
     installDesktopStorage: Long?,
     installDesktopAwardDaysLeft: Long?,
     installDesktopAwardStorage: Long,
+    hasMegaPassTrial: Boolean,
+    megaPassTrialStorage: Long?,
+    megaPassTrialAwardStorage: Long,
+    hasMegaVPNTrial: Boolean,
+    megaVPNTrialStorage: Long?,
+    megaVPNTrialAwardStorage: Long,
     onInviteFriendsClicked: (Long) -> Unit = {},
+    isAchievementEnabled: Boolean = false,
     onShowInfoAchievementsClicked: (achievementType: AchievementType) -> Unit = {},
     onReferBonusesClicked: () -> Unit = {},
+    onMegaVPNFreeTrialClicked: (Boolean) -> Unit = {},
+    onMegaPassFreeTrialClicked: (Boolean) -> Unit = {},
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val scrollState = rememberScrollState()
@@ -257,6 +283,70 @@ internal fun AchievementView(
                             daysLeft = installDesktopAwardDaysLeft,
                         )
                     }
+
+                    if (isAchievementEnabled) {
+                        if (hasMegaVPNTrial) {
+                            Divider(
+                                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
+                                thickness = 1.dp
+                            )
+
+                            Row(
+                                Modifier
+                                    .testTag(AchievementViewTestTags.START_MEGA_VPN_FREE_TRIAL_SECTION)
+                                    .clickable {
+                                        onMegaVPNFreeTrialClicked(
+                                            megaVPNTrialAwardStorage > 0
+                                        )
+                                    }
+                            ) {
+                                AchievementListItem(
+                                    iconId = iconPackR.drawable.ic_mega_vpn_free_trial,
+                                    titleId = sharedR.string.title_start_mega_vpn_free_trial,
+                                    zeroFiguresTitle = if (megaVPNTrialAwardStorage <= 0) {
+                                        megaVPNTrialStorage?.let {
+                                            stringResource(sharedR.string.text_start_mega_pass_free_trial)
+                                        }
+                                    } else null,
+                                    hasFiguresTitle = if (megaVPNTrialAwardStorage > 0) {
+                                        megaVPNTrialAwardStorage.toUnitString(LocalContext.current)
+                                    } else null,
+                                    applied = megaVPNTrialAwardStorage > 0
+                                )
+                            }
+                        }
+
+                        if (hasMegaPassTrial) {
+                            Divider(
+                                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
+                                thickness = 1.dp
+                            )
+
+                            Row(
+                                Modifier
+                                    .testTag(AchievementViewTestTags.START_MEGA_PASS_FREE_TRIAL_SECTION)
+                                    .clickable {
+                                        onMegaPassFreeTrialClicked(
+                                            megaPassTrialAwardStorage > 0
+                                        )
+                                    }
+                            ) {
+                                AchievementListItem(
+                                    iconId = iconPackR.drawable.ic_mega_pass_free_trial,
+                                    titleId = sharedR.string.title_start_mega_pass_free_trial,
+                                    zeroFiguresTitle = if (megaPassTrialAwardStorage <= 0) {
+                                        megaPassTrialStorage?.let {
+                                            stringResource(sharedR.string.text_start_mega_vpn_free_trial)
+                                        }
+                                    } else null,
+                                    hasFiguresTitle = if (megaPassTrialAwardStorage > 0) {
+                                        megaPassTrialAwardStorage.toUnitString(LocalContext.current)
+                                    } else null,
+                                    applied = megaPassTrialAwardStorage > 0
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -285,6 +375,13 @@ fun AchievementPreview() {
             installDesktopStorage = 123,
             installDesktopAwardDaysLeft = 3333,
             installDesktopAwardStorage = 12,
+            isAchievementEnabled = true,
+            hasMegaVPNTrial = true,
+            hasMegaPassTrial = true,
+            megaPassTrialStorage = 123456789,
+            megaPassTrialAwardStorage = 5 * 1024 * 1024 * 1024,
+            megaVPNTrialStorage = 123456789,
+            megaVPNTrialAwardStorage = 5 * 1024 * 1024 * 1024,
         )
     }
 }
@@ -311,6 +408,13 @@ fun AchievementPreviewDark() {
             installDesktopStorage = null,
             installDesktopAwardDaysLeft = 14,
             installDesktopAwardStorage = 12,
+            isAchievementEnabled = true,
+            hasMegaVPNTrial = true,
+            hasMegaPassTrial = true,
+            megaPassTrialStorage = 123456789,
+            megaPassTrialAwardStorage = 5 * 1024 * 1024 * 1024,
+            megaVPNTrialStorage = 123456789,
+            megaVPNTrialAwardStorage = 5 * 1024 * 1024 * 1024,
         )
     }
 }

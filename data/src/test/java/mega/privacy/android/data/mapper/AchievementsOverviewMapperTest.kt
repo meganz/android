@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper
 
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.achievement.AchievementType.MEGA_ACHIEVEMENT_WELCOME
 import mega.privacy.android.domain.entity.achievement.AchievementType.MEGA_ACHIEVEMENT_INVITE
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
@@ -7,6 +8,7 @@ import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaStringList
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
 class AchievementsOverviewMapperTest {
@@ -29,19 +31,52 @@ class AchievementsOverviewMapperTest {
         on { getAwardClass(index) }.thenReturn(MEGA_ACHIEVEMENT_WELCOME.classValue)
         on { getAwardExpirationTs(index) }.thenReturn(expirationTimestamp)
         on { getClassStorage(MEGA_ACHIEVEMENT_WELCOME.classValue) }.thenReturn(
-            rewardedStorage)
+            rewardedStorage
+        )
         on { getClassTransfer(MEGA_ACHIEVEMENT_WELCOME.classValue) }.thenReturn(
-            rewardedTransfer)
+            rewardedTransfer
+        )
         on { getClassExpire(MEGA_ACHIEVEMENT_WELCOME.classValue) }.thenReturn(
-            expirationTimestamp.toInt())
+            expirationTimestamp.toInt()
+        )
         on { currentTransferReferrals() }.thenReturn(transferFromReferrals)
         on { currentStorageReferrals() }.thenReturn(storageFromReferrals)
         on { awardsCount }.thenReturn(1)
         on { getAwardId(index) }.thenReturn(awardId)
         on { getRewardAwardId(index) }.thenReturn(
-            awardId)
+            awardId
+        )
         on { getRewardStorageByAwardId(awardId) }.thenReturn(rewardedStorage)
         on { getRewardTransferByAwardId(awardId) }.thenReturn(rewardedTransfer)
+    }
+
+    @Test
+    fun `convert to achievement overview is not achievement when isValidClass returns false`() {
+        whenever(
+            megaAchievementsDetails.isValidClass(MEGA_ACHIEVEMENT_WELCOME.classValue)
+        ).thenReturn(false)
+
+        val achievementOverview =
+            toAchievementsOverview(megaAchievementsDetails = megaAchievementsDetails)
+
+        val actual = achievementOverview.allAchievements
+
+        assertThat(actual).isEmpty()
+    }
+
+    @Test
+    fun `convert to achievement overview has achievements when isValidClass returns true`() {
+        whenever(
+            megaAchievementsDetails.isValidClass(MEGA_ACHIEVEMENT_WELCOME.classValue)
+        ).thenReturn(true)
+
+        val achievementOverview =
+            toAchievementsOverview(megaAchievementsDetails = megaAchievementsDetails)
+
+        val actual = achievementOverview.allAchievements
+
+        assertThat(actual).isNotEmpty()
+        assertThat(actual.size).isEqualTo(1)
     }
 
     @Test
@@ -106,19 +141,24 @@ class AchievementsOverviewMapperTest {
     fun `convert invite type of awarded achievement EXPECT have referral emails`() {
         val megaAchievementsDetails = mock<MegaAchievementsDetails> {
             on { getAwardEmails(index) }.thenReturn(
-                emailMegaStringList)
+                emailMegaStringList
+            )
             on { getAwardClass(index) }.thenReturn(MEGA_ACHIEVEMENT_INVITE.classValue)
             on { getAwardExpirationTs(index) }.thenReturn(expirationTimestamp)
             on { getClassStorage(MEGA_ACHIEVEMENT_INVITE.classValue) }.thenReturn(
-                rewardedStorage)
+                rewardedStorage
+            )
             on { getClassTransfer(MEGA_ACHIEVEMENT_INVITE.classValue) }.thenReturn(
-                rewardedTransfer)
+                rewardedTransfer
+            )
             on { getClassExpire(MEGA_ACHIEVEMENT_INVITE.classValue) }.thenReturn(
-                expirationTimestamp.toInt())
+                expirationTimestamp.toInt()
+            )
             on { awardsCount }.thenReturn(1)
             on { getAwardId(index) }.thenReturn(awardId)
             on { getRewardAwardId(index) }.thenReturn(
-                awardId)
+                awardId
+            )
             on { getRewardStorageByAwardId(awardId) }.thenReturn(rewardedStorage)
             on { getRewardTransferByAwardId(awardId) }.thenReturn(rewardedTransfer)
         }

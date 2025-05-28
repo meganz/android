@@ -30,19 +30,20 @@ internal fun toAchievementsOverview(
 
 private fun convertAllAchievements(achievementsModel: MegaAchievementsDetails): List<Achievement> =
     getAllAchievementTypes()
-        .map { achievementType ->
-            Achievement(
-                grantStorageInBytes = achievementsModel.getClassStorage(achievementType.classValue),
-                grantTransferQuotaInBytes = achievementsModel.getClassTransfer(achievementType.classValue),
-                type = achievementType,
-                durationInDays = achievementsModel.getClassExpire(achievementType.classValue)
-            )
+        .mapNotNull { achievementType ->
+            val isValid = achievementsModel.isValidClass(achievementType.classValue)
+            if (isValid) {
+                Achievement(
+                    grantStorageInBytes = achievementsModel.getClassStorage(achievementType.classValue),
+                    grantTransferQuotaInBytes = achievementsModel.getClassTransfer(achievementType.classValue),
+                    type = achievementType,
+                    durationInDays = achievementsModel.getClassExpire(achievementType.classValue)
+                )
+            } else null
         }
 
 private fun getAllAchievementTypes(): List<AchievementType> =
-    AchievementType
-        .values()
-        .toList()
+    AchievementType.entries
         .filter { it != INVALID_ACHIEVEMENT }
 
 private fun convertAllAwards(megaAchievementsDetails: MegaAchievementsDetails): List<AwardedAchievement> =
@@ -50,8 +51,7 @@ private fun convertAllAwards(megaAchievementsDetails: MegaAchievementsDetails): 
         .map { index ->
             val awardId = megaAchievementsDetails.getAwardId(index)
 
-            val type = AchievementType
-                .values()
+            val type = AchievementType.entries
                 .find { it.classValue == megaAchievementsDetails.getAwardClass(index) }
                 ?: INVALID_ACHIEVEMENT
 
@@ -59,7 +59,9 @@ private fun convertAllAwards(megaAchievementsDetails: MegaAchievementsDetails): 
                 AwardedAchievement(
                     awardId = awardId,
                     type = type,
-                    expirationTimestampInSeconds = megaAchievementsDetails.getAwardExpirationTs(index),
+                    expirationTimestampInSeconds = megaAchievementsDetails.getAwardExpirationTs(
+                        index
+                    ),
                     rewardedStorageInBytes = megaAchievementsDetails.getRewardStorageByAwardId(
                         awardId
                     ),

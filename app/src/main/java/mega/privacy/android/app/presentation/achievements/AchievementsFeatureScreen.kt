@@ -20,6 +20,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import de.palm.composestateevents.EventEffect
+import mega.privacy.android.app.presentation.achievements.freetrial.megaPassFreeTrialScreen
+import mega.privacy.android.app.presentation.achievements.freetrial.megaVPNFreeTrialScreen
+import mega.privacy.android.app.presentation.achievements.freetrial.navigateToMegaPassFreeTrial
+import mega.privacy.android.app.presentation.achievements.freetrial.navigateToMegaVPNFreeTrial
 import mega.privacy.android.app.presentation.achievements.info.achievementsInfoScreen
 import mega.privacy.android.app.presentation.achievements.info.navigateToAchievementsInfo
 import mega.privacy.android.app.presentation.achievements.invites.inviteFriendsScreen
@@ -88,10 +92,14 @@ internal fun AchievementsNavHostController(
         achievementScreen(
             onNavigateToInfoAchievements = navHostController::navigateToAchievementsInfo,
             onNavigateToInviteFriends = navHostController::navigateToInviteFriends,
-            onNavigateToReferralBonuses = navHostController::navigateToReferralBonus
+            onNavigateToReferralBonuses = navHostController::navigateToReferralBonus,
+            onNavigateToMegaVPNFreeTrial = navHostController::navigateToMegaVPNFreeTrial,
+            onNavigateToMegaPassFreeTrial = navHostController::navigateToMegaPassFreeTrial
         )
         achievementsInfoScreen()
         referralBonusScreen()
         inviteFriendsScreen()
+        megaVPNFreeTrialScreen()
+        megaPassFreeTrialScreen()
     }
 }

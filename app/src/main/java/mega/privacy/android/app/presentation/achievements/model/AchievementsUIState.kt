@@ -23,6 +23,12 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
  * @property hasRegistrationAward User got award for registration
  * @property registrationAwardDaysLeft Storage awarded by registration days left
  * @property registrationAwardStorage Storage awarded by registration left
+ * @property hasMegaPassTrial User has a Mega Pass trial
+ * @property hasMegaVPNTrial User has a Mega VPN trial
+ * @property megaPassTrialAwardDaysLeft Storage awarded by Mega Pass trial days left
+ * @property megaPassTrialAwardStorage Storage awarded by Mega Pass trial left
+ * @property megaVPNTrialAwardDaysLeft Storage awarded by Mega VPN trial days left
+ * @property megaVPNTrialAwardStorage Storage awarded by Mega VPN trial left
  *
  **/
 data class AchievementsUIState(
@@ -42,4 +48,13 @@ data class AchievementsUIState(
     val hasRegistrationAward: Boolean = false,
     val registrationAwardDaysLeft: Long? = null,
     val registrationAwardStorage: Long = 0,
+    val hasMegaPassTrial: Boolean = false,
+    val megaPassTrialStorage: Long? = null,
+    val megaPassTrialAwardDaysLeft: Long? = null,
+    val megaPassTrialAwardStorage: Long = 0,
+    val hasMegaVPNTrial: Boolean = false,
+    val megaVPNTrialStorage: Long? = null,
+    val megaVPNTrialAwardDaysLeft: Long? = null,
+    val megaVPNTrialAwardStorage: Long = 0,
+    val isFreeTrialAchievementsEnabled: Boolean = false,
 )

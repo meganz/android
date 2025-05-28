@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.achievements.model.AchievementsUIState
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -29,6 +31,7 @@ import javax.inject.Inject
 class AchievementsOverviewViewModel @Inject constructor(
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
     private val areAchievementsEnabled: AreAchievementsEnabledUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AchievementsUIState())
@@ -40,12 +43,28 @@ class AchievementsOverviewViewModel @Inject constructor(
 
     init {
         logAchievementsEnabled()
+        isFreeTrialAchievementsEnabled()
         getAchievementsInformation()
+
+
     }
 
     private fun logAchievementsEnabled() {
         viewModelScope.launch {
             Timber.d("Achievements are enabled: ${areAchievementsEnabled()}")
+        }
+    }
+
+    private fun isFreeTrialAchievementsEnabled() {
+        viewModelScope.launch {
+            val isFreeTrialAchievementsEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.AchievementsFreeTrialReward)
+            }.onFailure {
+                Timber.e(it)
+            }.getOrDefault(false)
+            _state.update {
+                it.copy(isFreeTrialAchievementsEnabled = isFreeTrialAchievementsEnabled)
+            }
         }
     }
 
@@ -55,23 +74,33 @@ class AchievementsOverviewViewModel @Inject constructor(
                 getAccountAchievementsOverviewUseCase()
             }
                 .onSuccess { overview ->
-                    _state.value = AchievementsUIState(
-                        achievementsOverview = overview,
-                        currentStorage = overview.currentStorageInBytes,
-                        areAllRewardsExpired = overview.areAllRewardsExpired(),
-                        hasReferrals = overview.hasAnyReferrals(),
-                        referralsStorage = overview.referralsStorage(),
-                        referralsAwardStorage = overview.achievedStorageFromReferralsInBytes,
-                        installAppStorage = overview.installAppStorage(),
-                        installAppAwardDaysLeft = overview.installAppAwardDaysLeft(),
-                        installAppAwardStorage = overview.installAppAwardStorage(),
-                        installDesktopStorage = overview.installDesktopStorage(),
-                        installDesktopAwardDaysLeft = overview.installDesktopAwardDaysLeft(),
-                        installDesktopAwardStorage = overview.installDesktopAwardStorage(),
-                        hasRegistrationAward = overview.hasRegistrationAward(),
-                        registrationAwardDaysLeft = overview.registrationAwardDaysLeft(),
-                        registrationAwardStorage = overview.registrationAwardStorage(),
-                    )
+                    _state.update {
+                        it.copy(
+                            achievementsOverview = overview,
+                            currentStorage = overview.currentStorageInBytes,
+                            areAllRewardsExpired = overview.areAllRewardsExpired(),
+                            hasReferrals = overview.hasAnyReferrals(),
+                            referralsStorage = overview.referralsStorage(),
+                            referralsAwardStorage = overview.achievedStorageFromReferralsInBytes,
+                            installAppStorage = overview.installAppStorage(),
+                            installAppAwardDaysLeft = overview.installAppAwardDaysLeft(),
+                            installAppAwardStorage = overview.installAppAwardStorage(),
+                            installDesktopStorage = overview.installDesktopStorage(),
+                            installDesktopAwardDaysLeft = overview.installDesktopAwardDaysLeft(),
+                            installDesktopAwardStorage = overview.installDesktopAwardStorage(),
+                            hasRegistrationAward = overview.hasRegistrationAward(),
+                            registrationAwardDaysLeft = overview.registrationAwardDaysLeft(),
+                            registrationAwardStorage = overview.registrationAwardStorage(),
+                            hasMegaVPNTrial = overview.hasMegaVPNTrial(),
+                            megaVPNTrialStorage = overview.megaVPNTrialStorage(),
+                            megaVPNTrialAwardDaysLeft = overview.megaVPNTrialAwardDaysLeft(),
+                            megaVPNTrialAwardStorage = overview.megaVPNTrialAwardStorage(),
+                            hasMegaPassTrial = overview.hasMegaPassTrial(),
+                            megaPassTrialStorage = overview.megaPassTrialStorage(),
+                            megaPassTrialAwardDaysLeft = overview.megaPassTrialAwardDaysLeft(),
+                            megaPassTrialAwardStorage = overview.megaPassTrialAwardStorage(),
+                        )
+                    }
                 }
                 .onFailure {
                     showErrorMessage(R.string.cancel_subscription_error)
@@ -138,6 +167,42 @@ class AchievementsOverviewViewModel @Inject constructor(
 
     private fun AchievementsOverview.hasAnyReferrals() =
         this.achievedStorageFromReferralsInBytes > 0 || this.achievedTransferFromReferralsInBytes > 0
+
+    private fun AchievementsOverview.hasMegaPassTrial() = this.allAchievements.firstOrNull {
+        it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_PWM_TRIAL
+    } != null
+
+    private fun AchievementsOverview.megaPassTrialStorage() = this.allAchievements.firstOrNull {
+        it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_PWM_TRIAL
+    }?.grantStorageInBytes
+
+    private fun AchievementsOverview.megaPassTrialAwardDaysLeft() =
+        this.awardedAchievements.firstOrNull {
+            it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_PWM_TRIAL
+        }?.expirationTimestampInSeconds?.getDaysLeft()
+
+    private fun AchievementsOverview.megaPassTrialAwardStorage() =
+        this.awardedAchievements.firstOrNull {
+            it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_PWM_TRIAL
+        }?.rewardedStorageInBytes ?: 0
+
+    private fun AchievementsOverview.hasMegaVPNTrial() = this.allAchievements.firstOrNull {
+        it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_VPN_TRIAL
+    } != null
+
+    private fun AchievementsOverview.megaVPNTrialStorage() = this.allAchievements.firstOrNull {
+        it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_VPN_TRIAL
+    }?.grantStorageInBytes
+
+    private fun AchievementsOverview.megaVPNTrialAwardDaysLeft() =
+        this.awardedAchievements.firstOrNull {
+            it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_VPN_TRIAL
+        }?.expirationTimestampInSeconds?.getDaysLeft()
+
+    private fun AchievementsOverview.megaVPNTrialAwardStorage() =
+        this.awardedAchievements.firstOrNull {
+            it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_VPN_TRIAL
+        }?.rewardedStorageInBytes ?: 0
 
     /**
      * Check if all invite achievements are expired

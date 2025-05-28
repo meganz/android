@@ -17,6 +17,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Achievements Free Trial Reward
+     */
+    AchievementsFreeTrialReward(
+        "Enable achievements free trial reward",
+        true,
+    ),
+
+    /**
      * File contacts compose u i
      */
     FileContactsComposeUI(

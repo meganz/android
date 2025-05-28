@@ -4,6 +4,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -28,8 +31,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.theme.extensions.dark_blue_500_dark_blue_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_400
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun AchievementListItem(
@@ -41,6 +46,7 @@ internal fun AchievementListItem(
     @StringRes buttonTitleId: Int? = null,
     onButtonClick: () -> Unit = {},
     daysLeft: Long? = null,
+    applied: Boolean = false,
 ) {
     Row(
         modifier = Modifier
@@ -151,6 +157,28 @@ internal fun AchievementListItem(
                         } else {
                             MaterialTheme.colors.textColorSecondary
                         },
+                    ),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                )
+            }
+        }
+
+        if (applied) {
+            Box(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(end = 16.dp)
+                    .background(
+                        MaterialTheme.colors.grey_alpha_012_white_alpha_038,
+                        shape = RoundedCornerShape(4.dp)
+                    ),
+            ) {
+                Text(
+                    modifier = Modifier.padding(all = 5.dp),
+                    text = stringResource(id = sharedR.string.applied_label),
+                    style = MaterialTheme.typography.subtitle1.copy(
+                        color = MaterialTheme.colors.textColorSecondary,
                     ),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
