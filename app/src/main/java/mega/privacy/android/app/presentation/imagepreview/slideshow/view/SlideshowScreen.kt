@@ -82,6 +82,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
 import mega.privacy.mobile.analytics.event.SlideShowScreenEvent
+import mega.privacy.mobile.analytics.event.SlideshowTutorialMenuItemEvent
 import kotlin.math.absoluteValue
 
 @Composable
@@ -171,6 +172,7 @@ fun SlideshowScreen(
                             },
                             onClickTutorialMenu = {
                                 onNavigate(SlideshowSecureTutorialRoute)
+                                Analytics.tracker.trackEvent(SlideshowTutorialMenuItemEvent)
                             },
                             modifier = Modifier
                                 .windowInsetsPadding(WindowInsets.statusBars)

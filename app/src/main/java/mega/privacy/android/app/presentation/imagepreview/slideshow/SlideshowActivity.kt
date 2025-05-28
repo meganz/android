@@ -1,5 +1,10 @@
 package mega.privacy.android.app.presentation.imagepreview.slideshow
 
+import android.app.KeyguardManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -10,12 +15,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,6 +30,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SecureSlideshowTutorialBottomSheet
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SlideshowScreen
@@ -31,7 +39,9 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.navigation.rememberExtendedBottomSheetNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.mobile.analytics.event.SlideshowSecureModeActivatedEvent
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class SlideshowActivity : BaseActivity() {
@@ -39,6 +49,18 @@ class SlideshowActivity : BaseActivity() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
     private val slideshowViewModel: SlideshowViewModel by viewModels()
+    private val screenReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                Intent.ACTION_SCREEN_OFF -> {
+                    if (isScreenLocked()) {
+                        wasDeviceLocked = true
+                    }
+                }
+            }
+        }
+    }
+    private var wasDeviceLocked = false
 
     override fun shouldSetStatusBarTextColor() = false
 
@@ -48,10 +70,9 @@ class SlideshowActivity : BaseActivity() {
         val insetsController = WindowCompat.getInsetsController(window, window.decorView).apply {
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
-
         super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         activeSecureMode()
+        registerScreenLockBroadcastReceiver()
 
         setContent {
             val bottomSheetNavigator = rememberExtendedBottomSheetNavigator()
@@ -64,6 +85,15 @@ class SlideshowActivity : BaseActivity() {
                     color = Color.Transparent,
                     darkIcons = !isDarkMode
                 )
+            }
+
+            val uiState by slideshowViewModel.state.collectAsStateWithLifecycle()
+            LaunchedEffect(uiState.isPlaying) {
+                if (uiState.isPlaying) {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                } else {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                }
             }
 
             OriginalTheme(isDark = isDarkMode) {
@@ -144,8 +174,30 @@ class SlideshowActivity : BaseActivity() {
         }
     }
 
+    private fun isScreenLocked() =
+        (getSystemService(KEYGUARD_SERVICE) as KeyguardManager).isKeyguardLocked
+
+    private fun registerScreenLockBroadcastReceiver() {
+        registerReceiver(
+            receiver = screenReceiver,
+            filter = IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_OFF)
+            }
+        )
+    }
+
+    override fun onPostResume() {
+        super.onPostResume()
+        // Send analytics event when slideshow is activated
+        if (wasDeviceLocked) {
+            wasDeviceLocked = false
+            Analytics.tracker.trackEvent(SlideshowSecureModeActivatedEvent)
+        }
+    }
+
     override fun onDestroy() {
         slideshowViewModel.clearImageResultCache()
+        unregisterReceiver(screenReceiver)
         super.onDestroy()
     }
 }
