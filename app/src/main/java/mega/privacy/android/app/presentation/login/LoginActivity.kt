@@ -349,6 +349,8 @@ class LoginActivity : BaseActivity() {
         viewModel.triggerAccountBlockedEvent(accountBlockedDetail)
     }
 
+    override val allowToShowOverQuotaWarning: Boolean = false
+
     companion object {
 
         /**

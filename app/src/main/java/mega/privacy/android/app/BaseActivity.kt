@@ -8,8 +8,6 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.MotionEvent
@@ -40,7 +38,6 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.TransferOverquotaLayoutBinding
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -110,8 +107,6 @@ import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorSslVerificationFailedUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.TransferOverQuotaDialogEvent
 import mega.privacy.mobile.analytics.event.TransferOverQuotaUpgradeAccountButtonEvent
@@ -137,8 +132,6 @@ import kotlin.time.Duration.Companion.seconds
  * @property outMetrics                     [DisplayMetrics]
  * @property getAccountDetailsUseCase
  * @property billingViewModel
- * @property monitorTransferOverQuotaUseCase
- * @property pauseTransfersQueueUseCase
  */
 @AndroidEntryPoint
 abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionRequester,
@@ -168,9 +161,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     lateinit var getAccountDetailsUseCase: GetAccountDetailsUseCase
 
     @Inject
-    lateinit var monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase
-
-    @Inject
     lateinit var monitorCookieSettingsSavedUseCase: MonitorCookieSettingsSavedUseCase
 
     @Inject
@@ -188,9 +178,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     @Inject
     lateinit var monitorChatSignalPresenceUseCase: MonitorChatSignalPresenceUseCase
-
-    @Inject
-    lateinit var pauseTransfersQueueUseCase: PauseTransfersQueueUseCase
 
     /**
      * Psa handler
@@ -216,7 +203,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     private var activeSubscriptionSku: String? = null
     private var expiredBusinessAlert: AlertDialog? = null
     private var isExpiredBusinessAlertShown = false
-    private val uiHandler = Handler(Looper.getMainLooper())
 
     protected val outMetrics: DisplayMetrics by lazy { resources.displayMetrics }
 
@@ -311,11 +297,13 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             }
         }
 
-        collectFlow(transfersManagementViewModel.state.map { it.transferOverQuotaWarning }
-            .distinctUntilChanged()) { isTransferOverQuotaWarning ->
-            if (isTransferOverQuotaWarning) {
-                showGeneralTransferOverQuotaWarning()
-                transfersManagementViewModel.onTransferOverQuotaWarningConsumed()
+        if (allowToShowOverQuotaWarning) {
+            collectFlow(transfersManagementViewModel.state.map { it.transferOverQuotaWarning }
+                .distinctUntilChanged()) { isTransferOverQuotaWarning ->
+                if (isTransferOverQuotaWarning) {
+                    showGeneralTransferOverQuotaWarning()
+                    transfersManagementViewModel.onTransferOverQuotaWarningConsumed()
+                }
             }
         }
 
@@ -1372,6 +1360,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * @return true if handled and skip default behavior otherwise false
      */
     protected open fun handlePurchased(purchaseType: PurchaseType): Boolean = false
+
+    /**
+     * Allow to show the transfer over quota warning.
+     */
+    open val allowToShowOverQuotaWarning: Boolean = true
 
     companion object {
         private const val EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN"
