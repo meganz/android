@@ -145,7 +145,11 @@ interface AccountRepository {
      * @param transfer
      * @param pro
      */
-    suspend fun getSpecificAccountDetail(storage: Boolean, transfer: Boolean, pro: Boolean)
+    suspend fun getSpecificAccountDetail(
+        storage: Boolean,
+        transfer: Boolean,
+        pro: Boolean,
+    ): AccountDetail
 
     /**
      * Get extended account details
@@ -785,4 +789,17 @@ interface AccountRepository {
      * @return Flow of Boolean
      */
     fun monitorIsUnverifiedBusinessAccount(): Flow<Boolean>
+
+    /**
+     * Check if the current user has logged in before
+     * @return true if the user has logged in before, false otherwise
+     */
+    suspend fun hasUserLoggedInBefore(): Boolean
+
+    /**
+     * Add logged in user handle
+     *
+     * @param userHandle the user handle to add
+     */
+    suspend fun addLoggedInUserHandle(userHandle: Long)
 }

@@ -39,6 +39,7 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
+import mega.privacy.android.data.gateway.user.UserLoginPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
@@ -139,6 +140,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property cookieSettingsMapper         [CookieSettingsMapper]
  * @property storageStateMapper           [StorageStateMapper]
  * @property uiPreferencesGateway         [UIPreferencesGateway]
+ * @property userLoginPreferenceGateway   [UserLoginPreferenceGateway]
  */
 @ExperimentalContracts
 internal class DefaultAccountRepository @Inject constructor(
@@ -179,6 +181,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val userMapper: UserMapper,
     private val storageStateMapper: StorageStateMapper,
     private val uiPreferencesGateway: UIPreferencesGateway,
+    private val userLoginPreferenceGateway: UserLoginPreferenceGateway,
     @ExcludeFileName val excludeFileNames: Set<String>,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
@@ -198,29 +201,40 @@ internal class DefaultAccountRepository @Inject constructor(
     override fun storageCapacityUsedIsBlank() =
         myAccountInfoFacade.storageCapacityUsedAsFormattedString.isBlank()
 
-    override suspend fun requestAccount() = withContext(ioDispatcher) {
-        val request = suspendCancellableCoroutine { continuation ->
-            val listener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    if (error.errorCode == MegaError.API_OK) {
-                        continuation.resumeWith(Result.success(request))
-                    } else {
-                        continuation.failWithError(error, "requestAccount")
-                    }
-                },
-            )
-            megaApiGateway.getAccountDetails(listener)
+    override suspend fun requestAccount() {
+        withContext(ioDispatcher) {
+            val request = suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        if (error.errorCode == MegaError.API_OK) {
+                            continuation.resumeWith(Result.success(request))
+                        } else {
+                            continuation.failWithError(error, "requestAccount")
+                        }
+                    },
+                )
+                megaApiGateway.getAccountDetails(listener)
+            }
+            // Legacy support, will remove completely once refactor to flow done
+            myAccountInfoFacade.handleAccountDetail(request)
+            handleAccountDetail(request)
         }
-        // Legacy support, will remove completely once refactor to flow done
-        myAccountInfoFacade.handleAccountDetail(request)
-        handleAccountDetail(request)
     }
 
-    override suspend fun setUserHasLoggedIn() {
+    override suspend fun setUserHasLoggedIn() = withContext(ioDispatcher) {
         localStorageGateway.setUserHasLoggedIn()
     }
 
-    override fun isMultiFactorAuthAvailable() = megaApiGateway.multiFactorAuthAvailable()
+    override fun isMultiFactorAuthAvailable(): Boolean = megaApiGateway.multiFactorAuthAvailable()
+
+    override suspend fun hasUserLoggedInBefore(): Boolean = withContext(ioDispatcher) {
+        val userHandle = megaApiGateway.myUser?.handle ?: return@withContext false
+        userLoginPreferenceGateway.hasUserLoggedInBefore(userHandle)
+    }
+
+    override suspend fun addLoggedInUserHandle(userHandle: Long) = withContext(ioDispatcher) {
+        userLoginPreferenceGateway.addLoggedInUserHandle(userHandle)
+    }
 
     @Throws(MegaException::class)
     override suspend fun isMultiFactorAuthEnabled(): Boolean = withContext(ioDispatcher) {
@@ -529,7 +543,7 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    private suspend fun handleAccountDetail(request: MegaRequest) {
+    private suspend fun handleAccountDetail(request: MegaRequest): AccountDetail {
         val newDetail = accountDetailMapper(
             request.megaAccountDetails,
             request.numDetails,
@@ -547,6 +561,7 @@ internal class DefaultAccountRepository @Inject constructor(
                 storageState = null
             )
         )
+        return newDetail
     }
 
     override fun monitorAccountDetail(): Flow<AccountDetail> =
@@ -565,7 +580,6 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun saveAccountCredentials() = withContext(ioDispatcher) {
         var myUserHandle: Long? = null
         var email: String? = null
-        getUserData()
         megaApiGateway.myUser?.let { myUser ->
             email = myUser.email
             myUserHandle = myUser.handle

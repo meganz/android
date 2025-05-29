@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.data.database.MegaDatabaseConstant
+import mega.privacy.android.data.preferences.user.userLoginPreferenceDataStoreName
 import mega.privacy.android.data.qualifier.ExcludeFileName
 import mega.privacy.android.domain.qualifier.LogFileDirectory
 import mega.privacy.android.domain.qualifier.LogZipFileDirectory
@@ -43,4 +44,15 @@ internal class FileModule {
     @IntoSet
     @ExcludeFileName
     fun providePassphraseFileName(): String = MegaDatabaseConstant.PASSPHRASE_FILE_NAME
+
+    @Provides
+    @IntoSet
+    @ExcludeFileName
+    fun provideUserLoginPreferenceDatastoreFileName(): String =
+        "${userLoginPreferenceDataStoreName}.preferences_pb"
+
+    @Provides
+    @IntoSet
+    @ExcludeFileName
+    fun provideDatastoreFileName(): String = "datastore"
 }
