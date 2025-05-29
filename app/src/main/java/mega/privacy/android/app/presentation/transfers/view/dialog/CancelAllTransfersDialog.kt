@@ -1,14 +1,18 @@
 package mega.privacy.android.app.presentation.transfers.view.dialog
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import kotlinx.collections.immutable.toImmutableList
+import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.dialogs.BasicDialogButton
+import mega.android.core.ui.components.text.SpannableText
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * All contacts added dialog
@@ -19,24 +23,27 @@ fun CancelAllTransfersDialog(
     onCancelAllTransfers: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-) = ConfirmationDialog(
+) = BasicDialog(
     modifier = modifier.testTag(TEST_TAG_CANCEL_ALL_TRANSFERS_DIALOG),
-    text = stringResource(id = R.string.cancel_all_transfer_confirmation),
-    confirmButtonText = stringResource(id = R.string.cancel_all_action),
-    onDismiss = onDismiss,
-    cancelButtonText = stringResource(id = R.string.general_dismiss),
-    onConfirm = {
-        onCancelAllTransfers()
-        onDismiss()
-    },
+    title = SpannableText(stringResource(id = R.string.cancel_all_transfer_confirmation)),
+    buttons = listOf(
+        BasicDialogButton(stringResource(id = R.string.general_dismiss), onClick = onDismiss),
+        BasicDialogButton(stringResource(id = R.string.cancel_all_action), onClick = {
+            onCancelAllTransfers()
+            onDismiss()
+        }),
+    ).toImmutableList(),
+    onDismissRequest = onDismiss,
 )
 
 @CombinedThemePreviews
 @Composable
 private fun CancelAllTransfersDialogPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
-        CancelAllTransfersDialog(
-            onCancelAllTransfers = {}, onDismiss = {})
+    AndroidThemeForPreviews {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CancelAllTransfersDialog(
+                onCancelAllTransfers = {}, onDismiss = {})
+        }
     }
 }
 

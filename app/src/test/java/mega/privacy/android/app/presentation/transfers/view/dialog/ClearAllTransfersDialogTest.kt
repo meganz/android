@@ -7,8 +7,6 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CANCEL_TAG
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CONFIRM_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,7 +39,7 @@ class ClearAllTransfersDialogTest {
     fun `test that clicking on clear button calls onClearAllTransfers and onDismiss`() {
         initComposeTestRule()
 
-        composeTestRule.onNodeWithTag(CONFIRM_TAG).performClick()
+        composeTestRule.onNodeWithText(R.string.general_clear).performClick()
 
         verify(onClearAllTransfers).invoke()
         verify(onDismiss).invoke()
@@ -51,7 +49,7 @@ class ClearAllTransfersDialogTest {
     fun `test that clicking on dismiss button calls onDismiss but not onClearAllTransfers`() {
         initComposeTestRule()
 
-        composeTestRule.onNodeWithTag(CANCEL_TAG).performClick()
+        composeTestRule.onNodeWithText(R.string.general_dismiss).performClick()
 
         verify(onDismiss).invoke()
         verifyNoInteractions(onClearAllTransfers)
