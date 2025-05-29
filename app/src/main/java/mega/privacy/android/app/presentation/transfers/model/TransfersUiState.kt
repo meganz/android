@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  *
  * @property selectedTab Selected tab.
  * @property activeTransfers List of in progress transfers.
+ * @property selectedActiveTransfers List of selected in progress transfers. If not null, even empty, indicates selected mode is on.
  * @property isStorageOverQuota Whether the storage is over quota.
  * @property isTransferOverQuota Whether the transfer is over quota.
  * @property areTransfersPaused Whether the transfers are paused.
@@ -25,6 +26,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 data class TransfersUiState(
     val selectedTab: Int = ACTIVE_TAB_INDEX,
     val activeTransfers: ImmutableList<InProgressTransfer> = emptyList<InProgressTransfer>().toImmutableList(),
+    val selectedActiveTransfers: ImmutableList<InProgressTransfer>? = null,
     val isStorageOverQuota: Boolean = false,
     val isTransferOverQuota: Boolean = false,
     val areTransfersPaused: Boolean = false,
@@ -38,4 +40,14 @@ data class TransfersUiState(
      * Whether the storage or transfer is over quota.
      */
     val isOverQuota = isStorageOverQuota || isTransferOverQuota
+
+    /**
+     * @return true if it's in select mode, false otherwise
+     */
+    val isInSelectActiveTransfersMode = selectedActiveTransfers != null
+
+    /**
+     * All active transfers are selected
+     */
+    val areAllActiveTransfersSelected = activeTransfers == selectedActiveTransfers
 }

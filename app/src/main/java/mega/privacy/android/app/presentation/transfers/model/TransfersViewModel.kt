@@ -9,6 +9,9 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -31,6 +34,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
 import mega.privacy.android.domain.usecase.file.IsUriPathInCacheUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
@@ -75,6 +79,7 @@ class TransfersViewModel @Inject constructor(
     private val deleteCompletedTransfersByIdUseCase: DeleteCompletedTransfersByIdUseCase,
     private val isUriPathInCacheUseCase: IsUriPathInCacheUseCase,
     private val transferAppDataMapper: TransferAppDataMapper,
+    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -225,6 +230,9 @@ class TransfersViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Retry selected failed transfer
+     */
     fun retryFailedTransfer(transfer: CompletedTransfer) {
         viewModelScope.launch {
             if (canReadTransferUri(transfer)) {
@@ -309,7 +317,9 @@ class TransfersViewModel @Inject constructor(
                     if (isChatUpload) {
                         runCatching {
                             // This is failing and needs update
-                            retryChatUploadUseCase(appData.mapNotNull { it as? TransferAppData.ChatUpload })
+                            retryChatUploadUseCase(
+                                appData?.mapNotNull { it as? TransferAppData.ChatUpload }.orEmpty()
+                            )
                             return StartTransferEvent(id = failedTransfer.id, event = null)
                         }.onFailure {
                             //No chat uploads retried, try general upload only.
@@ -344,6 +354,9 @@ class TransfersViewModel @Inject constructor(
         _uiState.update { state -> state.copy(startEvent = triggered(event)) }
     }
 
+    /**
+     * Consume start transfer event
+     */
     fun consumeStartEvent() {
         _uiState.update { state -> state.copy(startEvent = consumed()) }
     }
@@ -435,6 +448,71 @@ class TransfersViewModel @Inject constructor(
                     reordering = false
                 }
             }
+    }
+
+    /**
+     * Start active transfers selection by updating the selected active transfers to an empty list
+     */
+    fun startActiveTransfersSelection() {
+        _uiState.update {
+            it.copy(selectedActiveTransfers = emptyList<InProgressTransfer>().toImmutableList())
+        }
+    }
+
+    /**
+     * Stop active transfers selection by updating the selected active transfers to null
+     */
+    fun stopActiveTransfersSelection() {
+        _uiState.update {
+            it.copy(selectedActiveTransfers = null)
+        }
+    }
+
+    /**
+     * Add the transfer to selected transfers
+     */
+    fun selectActiveTransfer(inProgressTransfer: InProgressTransfer) {
+        val newSelection = (uiState.value.selectedActiveTransfers ?: emptyList()).let { selected ->
+            if (selected.contains(inProgressTransfer)) {
+                selected - inProgressTransfer
+            } else {
+                selected + inProgressTransfer
+            }
+        }
+        _uiState.update {
+            it.copy(selectedActiveTransfers = newSelection.toImmutableList())
+        }
+    }
+
+    /**
+     * Add all the active transfers to the selected transfers
+     */
+    fun selectAllActiveTransfers() {
+        _uiState.update {
+            it.copy(selectedActiveTransfers = it.activeTransfers)
+        }
+    }
+
+    /**
+     * Cancel all selected active transfers
+     */
+    fun cancelSelectedActiveTransfers() {
+        if (uiState.value.areAllActiveTransfersSelected) {
+            cancelAllTransfers()
+        } else {
+            viewModelScope.launch {
+                runCatching<Unit> {
+                    coroutineScope {
+                        uiState.value.selectedActiveTransfers?.map {
+                            async {
+                                cancelTransferByTagUseCase(it.tag)
+                            }
+                        }?.awaitAll()
+                    }
+                }.onFailure { Timber.e(it) }
+                stopActiveTransfersSelection()
+            }
+        }
     }
 
     //internal value to preserve previous priority while dragged changes are not send to SDK yet

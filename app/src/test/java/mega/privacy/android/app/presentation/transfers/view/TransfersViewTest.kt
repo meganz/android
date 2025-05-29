@@ -13,9 +13,11 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
+import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_CANCEL_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_MORE_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_PAUSE_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_RESUME_ACTION
+import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_SELECT_ALL_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.CompletedTransferImageViewModel
@@ -210,6 +212,32 @@ class TransfersViewTest {
         composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that select all TransferMenuAction is displayed if it is the active tab and there are selected transfers`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = ACTIVE_TAB_INDEX,
+                activeTransfers = inProgressTransfers,
+                selectedActiveTransfers = inProgressTransfers.take(1).toImmutableList(),
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SELECT_ALL_ACTION).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that cancel selected TransferMenuAction is displayed if it is the active tab and there are selected transfers`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = ACTIVE_TAB_INDEX,
+                activeTransfers = inProgressTransfers,
+                selectedActiveTransfers = inProgressTransfers.take(1).toImmutableList(),
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_CANCEL_ACTION).assertIsDisplayed()
+    }
+
     private fun initComposeTestRule(uiState: TransfersUiState) {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
@@ -228,6 +256,11 @@ class TransfersViewTest {
                     onActiveTransfersReorderConfirmed = {},
                     onConsumeStartEvent = {},
                     onNavigateToStorageSettings = {},
+                    onCancelSelectedActiveTransfers = {},
+                    onActiveTransferSelected = {},
+                    onSelectActiveTransfers = {},
+                    onSelectAllActiveTransfers = {},
+                    onSelectActiveTransfersClose = {},
                 )
             }
         }

@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
 import mega.privacy.android.domain.usecase.file.IsUriPathInCacheUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
@@ -93,6 +94,7 @@ class TransfersViewModelTest {
     private val deleteCompletedTransfersByIdUseCase = mock<DeleteCompletedTransfersByIdUseCase>()
     private val isUriPathInCacheUseCase = mock<IsUriPathInCacheUseCase>()
     private val transferAppDataMapper = mock<TransferAppDataMapper>()
+    private val cancelTransferByTagUseCase = mock<CancelTransferByTagUseCase>()
 
     private val originalPath = "originalPath"
     private val appDataString = "appDataString"
@@ -161,6 +163,7 @@ class TransfersViewModelTest {
             deleteCompletedTransfersByIdUseCase,
             isUriPathInCacheUseCase,
             transferAppDataMapper,
+            cancelTransferByTagUseCase,
         )
         wheneverBlocking { monitorInProgressTransfersUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
@@ -195,6 +198,7 @@ class TransfersViewModelTest {
             isUriPathInCacheUseCase = isUriPathInCacheUseCase,
             transferAppDataMapper = transferAppDataMapper,
             savedStateHandle = savedStateHandle,
+            cancelTransferByTagUseCase = cancelTransferByTagUseCase,
         )
     }
 
@@ -917,6 +921,77 @@ class TransfersViewModelTest {
 
             verify(deleteCompletedTransfersUseCase).invoke()
         }
+
+    @Test
+    fun `test that startActiveTransfersSelection set selected transfers to empty list`() = runTest {
+        initTestClass()
+        underTest.uiState.test {
+            assertThat(awaitItem().selectedActiveTransfers).isNull()
+            underTest.startActiveTransfersSelection()
+            assertThat(awaitItem().selectedActiveTransfers).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that stopActiveTransfersSelection set selected transfers to null`() = runTest {
+        initTestClass()
+        underTest.startActiveTransfersSelection()
+        underTest.uiState.test {
+            assertThat(awaitItem().selectedActiveTransfers).isNotNull()
+            underTest.stopActiveTransfersSelection()
+            assertThat(awaitItem().selectedActiveTransfers).isNull()
+        }
+    }
+
+    @Test
+    fun `test that selectActiveTransfer adds the transfer to selected transfers`() = runTest {
+        initTestClass()
+        underTest.startActiveTransfersSelection()
+        val inProgressTransfer = mock<InProgressTransfer.Download>()
+        underTest.uiState.test {
+            assertThat(awaitItem().selectedActiveTransfers).isEmpty()
+            underTest.selectActiveTransfer(inProgressTransfer)
+            assertThat(awaitItem().selectedActiveTransfers).contains(inProgressTransfer)
+        }
+    }
+
+    @Test
+    fun `test that selectAllActiveTransfers adds all current active transfers to selected transfers`() =
+        runTest {
+            val initialActiveTransfers = (1..10).map { index ->
+                mock<InProgressTransfer.Download> {
+                    on { this.priority } doReturn index.toBigInteger()
+                    on { this.tag } doReturn index
+                }
+            }
+            val map = initialActiveTransfers.associateBy { it.tag.toLong() }
+            whenever(monitorInProgressTransfersUseCase()).thenReturn(
+                map.asHotFlow()
+            )
+            initTestClass()
+            underTest.startActiveTransfersSelection()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().selectedActiveTransfers).isEmpty()
+                underTest.selectAllActiveTransfers()
+                assertThat(awaitItem().selectedActiveTransfers)
+                    .containsExactlyElementsIn(initialActiveTransfers)
+            }
+        }
+
+    @Test
+    fun `test that cancelSelectedActiveTransfers cancels selected transfers`() = runTest {
+        initTestClass()
+        val tag = 3454
+        val inProgressTransfer = mock<InProgressTransfer.Download> {
+            on { it.tag } doReturn tag
+        }
+        underTest.selectActiveTransfer(inProgressTransfer)
+
+        underTest.cancelSelectedActiveTransfers()
+
+        verify(cancelTransferByTagUseCase)(tag)
+    }
 
     companion object {
         private val testDispatcher = UnconfinedTestDispatcher()

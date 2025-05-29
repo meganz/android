@@ -38,6 +38,11 @@ internal fun NavGraphBuilder.transfersScreen(
             onActiveTransfersReorderConfirmed = viewModel::onActiveTransfersReorderConfirmed,
             onConsumeStartEvent = viewModel::consumeStartEvent,
             onNavigateToStorageSettings = onNavigateToStorageSettings,
+            onSelectActiveTransfers = viewModel::startActiveTransfersSelection,
+            onActiveTransferSelected = viewModel::selectActiveTransfer,
+            onSelectAllActiveTransfers = viewModel::selectAllActiveTransfers,
+            onSelectActiveTransfersClose = viewModel::stopActiveTransfersSelection,
+            onCancelSelectedActiveTransfers = viewModel::cancelSelectedActiveTransfers,
         )
     }
 }

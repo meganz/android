@@ -169,6 +169,8 @@ class ActiveTransfersViewTest {
                     onPlayPauseClicked = {},
                     onReorderPreview = onReorderPreview,
                     onReorderConfirmed = onReorderConfirmed,
+                    selectedActiveTransfers = null,
+                    onActiveTransferSelected = {},
                 )
             }
         }

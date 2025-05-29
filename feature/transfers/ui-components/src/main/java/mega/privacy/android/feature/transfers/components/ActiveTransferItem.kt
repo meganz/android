@@ -1,6 +1,12 @@
 package mega.privacy.android.feature.transfers.components
 
 import android.net.Uri
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +60,8 @@ fun ActiveTransferItem(
     areTransfersPaused: Boolean,
     onPlayPauseClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    isDraggable: Boolean = true,
+    isSelected: Boolean = false,
 ) = Box(
     modifier = modifier
         .height(68.dp)
@@ -72,21 +80,36 @@ fun ActiveTransferItem(
             progressSizeString,
             speed,
         ).joinToString(" · ")
-        MegaIcon(
-            painter = painterResource(id = iconPackR.drawable.ic_queue_line_small_regular_outline),
-            contentDescription = "Reorder icon",
-            tint = IconColor.Secondary,
-            modifier = Modifier
-                .size(16.dp)
-                .testTag(TEST_TAG_QUEUE_ICON)
-        )
-        TransferImage(
-            fileTypeResId = fileTypeResId,
-            previewUri = previewUri,
-            modifier = Modifier
-                .padding(start = 4.dp)
-                .testTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE),
-        )
+        AnimatedVisibility(
+            isDraggable,
+            enter = fadeIn() + expandHorizontally(),
+            exit = fadeOut() + shrinkHorizontally(),
+        ) {
+            MegaIcon(
+                painter = painterResource(id = iconPackR.drawable.ic_queue_line_small_regular_outline),
+                contentDescription = "Reorder icon",
+                tint = IconColor.Secondary,
+                modifier = Modifier
+                    .size(16.dp)
+                    .padding(end = 4.dp)
+                    .testTag(TEST_TAG_QUEUE_ICON)
+            )
+        }
+        AnimatedContent(targetState = isSelected, label = "node thumbnail") {
+            if (it) {
+                MegaIcon(
+                    painterResource(id = iconPackR.drawable.ic_check_square_medium_thin_solid),
+                    tint = IconColor.Primary,
+                    modifier = Modifier.size(32.dp).testTag(TEST_TAG_ACTIVE_TRANSFER_SELECTED)
+                )
+            } else {
+                TransferImage(
+                    fileTypeResId = fileTypeResId,
+                    previewUri = previewUri,
+                    modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE),
+                )
+            }
+        }
         Column(
             Modifier
                 .padding(horizontal = 8.dp)
@@ -193,6 +216,8 @@ internal data class ActiveTransferUI(
     val isPaused: Boolean,
     val isOverQuota: Boolean,
     val areTransfersPaused: Boolean,
+    val isDraggable: Boolean = true,
+    val isSelected: Boolean = false,
 )
 
 private const val NAME = "File name.pdf"
@@ -227,20 +252,24 @@ private class ActiveTransferItemOrdinaryProvider :
 private class ActiveTransferItemUnusualProvider :
     PreviewParameterProvider<ActiveTransferUI> {
     override val values = listOf(false, true).flatMap { isOverQuota ->
-        listOf(false, true).map { areTransfersPaused ->
-            ActiveTransferUI(
-                isDownload = false,
-                fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
-                previewUri = null,
-                fileName = NAME,
-                progressSizeString = PROGRESS_SIZE,
-                progressPercentageString = PROGRESS_PERCENT,
-                progress = PROGRESS,
-                speed = if (areTransfersPaused) PAUSED else SPEED,
-                isPaused = false,
-                isOverQuota = isOverQuota,
-                areTransfersPaused = areTransfersPaused,
-            )
+        listOf(true, false).flatMap { isSelected ->
+            listOf(false, true).map { areTransfersPaused ->
+                ActiveTransferUI(
+                    isDownload = false,
+                    fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
+                    previewUri = null,
+                    fileName = NAME,
+                    progressSizeString = PROGRESS_SIZE,
+                    progressPercentageString = PROGRESS_PERCENT,
+                    progress = PROGRESS,
+                    speed = if (areTransfersPaused) PAUSED else SPEED,
+                    isPaused = false,
+                    isOverQuota = isOverQuota,
+                    areTransfersPaused = areTransfersPaused,
+                    isDraggable = !isSelected,
+                    isSelected = isSelected,
+                )
+            }
         }
     }.asSequence()
 }
@@ -259,6 +288,11 @@ const val TEST_TAG_ACTIVE_TRANSFER_ITEM = "$TEST_TAG_ACTIVE_TAB:transfer_item"
  * Tag for the active transfer image.
  */
 const val TEST_TAG_ACTIVE_TRANSFER_IMAGE = "$TEST_TAG_ACTIVE_TAB:transfer_image"
+
+/**
+ * Tag for selected active transfer check icon.
+ */
+const val TEST_TAG_ACTIVE_TRANSFER_SELECTED = "$TEST_TAG_ACTIVE_TAB:selected_icon"
 
 /**
  * Tag for the active transfer name.

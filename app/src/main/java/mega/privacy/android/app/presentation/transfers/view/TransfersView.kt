@@ -27,6 +27,7 @@ import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.model.TabItems
+import mega.android.core.ui.model.TopAppBarAction
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.AppTheme
@@ -38,6 +39,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartT
 import mega.privacy.android.app.presentation.transfers.view.active.ActiveTransfersView
 import mega.privacy.android.app.presentation.transfers.view.completed.CompletedTransfersView
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelAllTransfersDialog
+import mega.privacy.android.app.presentation.transfers.view.dialog.CancelTransfersConfirmationDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.ClearAllTransfersDialog
 import mega.privacy.android.app.presentation.transfers.view.failed.FailedTransfersView
 import mega.privacy.android.app.presentation.transfers.view.sheet.ActiveTransfersActionsBottomSheet
@@ -64,12 +66,18 @@ internal fun TransfersView(
     onActiveTransfersReorderConfirmed: (InProgressTransfer) -> Unit,
     onConsumeStartEvent: () -> Unit,
     onNavigateToStorageSettings: () -> Unit,
+    onSelectActiveTransfers: () -> Unit,
+    onSelectActiveTransfersClose: () -> Unit,
+    onActiveTransferSelected: (InProgressTransfer) -> Unit,
+    onSelectAllActiveTransfers: () -> Unit,
+    onCancelSelectedActiveTransfers: () -> Unit,
 ) = with(uiState) {
     var showActiveTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showFailedTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCancelAllTransfersDialog by rememberSaveable { mutableStateOf(false) }
     var showClearAllTransfersDialog by rememberSaveable { mutableStateOf(false) }
+    var showConfirmCancelTransfersDialog by rememberSaveable { mutableStateOf(false) }
 
     MegaScaffold(
         modifier = Modifier
@@ -79,11 +87,8 @@ internal fun TransfersView(
             .semantics { testTagsAsResourceId = true }
             .testTag(TEST_TAG_TRANSFERS_VIEW),
         topBar = {
-            MegaTopAppBar(
-                navigationType = AppBarNavigationType.Back(onBackPress),
-                title = stringResource(id = R.string.section_transfers),
-                actions = getTransferActions(uiState),
-                onActionPressed = { action ->
+            if (selectedActiveTransfers == null) {
+                TransfersTopBar(onBackPress, getTransferActions(uiState)) { action ->
                     when (action) {
                         TransferMenuAction.Pause -> onPauseTransfers()
                         TransferMenuAction.Resume -> onResumeTransfers()
@@ -95,8 +100,21 @@ internal fun TransfersView(
                             }
                         }
                     }
-                },
-            )
+                }
+            } else {
+                SelectActiveTransfersTopBar(
+                    onClose = onSelectActiveTransfersClose,
+                    selectedAmount = selectedActiveTransfers.size,
+                    actions = getTransferActions(uiState)
+                ) { action ->
+                    when (action) {
+                        TransferMenuAction.SelectAll -> onSelectAllActiveTransfers()
+                        TransferMenuAction.CancelSelected -> {
+                            showConfirmCancelTransfersDialog = true
+                        }
+                    }
+                }
+            }
         },
     ) { paddingValues ->
         val noTransfers =
@@ -115,6 +133,8 @@ internal fun TransfersView(
                     .padding(paddingValues)
                     .fillMaxSize(),
                 beyondViewportPageCount = 1,
+                hideTabs = isInSelectActiveTransfersMode,
+                pagerScrollEnabled = !isInSelectActiveTransfersMode,
                 cells = {
                     addTextTab(
                         tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_active_transfers)),
@@ -126,6 +146,8 @@ internal fun TransfersView(
                             onPlayPauseClicked = onPlayPauseTransfer,
                             onReorderPreview = onActiveTransfersReorderPreview,
                             onReorderConfirmed = onActiveTransfersReorderConfirmed,
+                            onActiveTransferSelected = onActiveTransferSelected,
+                            selectedActiveTransfers = selectedActiveTransfers,
                         )
                     }
                     addTextTab(
@@ -153,7 +175,7 @@ internal fun TransfersView(
 
         if (showActiveTransfersModal) {
             ActiveTransfersActionsBottomSheet(
-                onSelectTransfers = {},
+                onSelectTransfers = onSelectActiveTransfers,
                 onCancelAllTransfers = { showCancelAllTransfersDialog = true },
                 onDismissSheet = { showActiveTransfersModal = false },
             )
@@ -192,6 +214,15 @@ internal fun TransfersView(
                 onDismiss = { showClearAllTransfersDialog = false },
             )
         }
+        if (showConfirmCancelTransfersDialog) {
+            CancelTransfersConfirmationDialog(
+                selectedAmount = selectedActiveTransfers?.size ?: 1,
+                onCancelTransfers = {
+                    onCancelSelectedActiveTransfers()
+                },
+                onDismiss = { showConfirmCancelTransfersDialog = false },
+            )
+        }
         StartTransferComponent(
             event = uiState.startEvent,
             onConsumeEvent = onConsumeStartEvent,
@@ -221,27 +252,33 @@ internal fun EmptyTransfersView(
     )
 }
 
-private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
-    buildList {
-        when {
-            selectedTab == ACTIVE_TAB_INDEX && activeTransfers.isNotEmpty() -> {
-                if (areTransfersPaused) {
-                    add(TransferMenuAction.Resume)
-                } else {
-                    add(TransferMenuAction.Pause)
-                }
-                add(TransferMenuAction.More)
-            }
+@Composable
+internal fun TransfersTopBar(
+    onBackPress: () -> Unit,
+    actions: List<TransferMenuAction>,
+    onActionPressed: (TopAppBarAction) -> Unit,
+) {
+    MegaTopAppBar(
+        navigationType = AppBarNavigationType.Back(onBackPress),
+        title = stringResource(id = R.string.section_transfers),
+        actions = actions,
+        onActionPressed = onActionPressed,
+    )
+}
 
-            selectedTab == COMPLETED_TAB_INDEX && completedTransfers.isNotEmpty() -> {
-                add(TransferMenuAction.More)
-            }
-
-            selectedTab == FAILED_TAB_INDEX && failedTransfers.isNotEmpty() -> {
-                add(TransferMenuAction.More)
-            }
-        }
-    }
+@Composable
+internal fun SelectActiveTransfersTopBar(
+    onClose: () -> Unit,
+    selectedAmount: Int,
+    actions: List<TransferMenuAction>,
+    onActionPressed: (TopAppBarAction) -> Unit,
+) {
+    MegaTopAppBar(
+        navigationType = AppBarNavigationType.Close(onClose),
+        title = if (selectedAmount == 0) stringResource(R.string.title_select_transfers) else selectedAmount.toString(),
+        actions = actions,
+        onActionPressed = onActionPressed,
+    )
 }
 
 @CombinedThemePreviews
@@ -263,7 +300,49 @@ private fun TransfersViewPreview() {
             onActiveTransfersReorderConfirmed = {},
             onConsumeStartEvent = {},
             onNavigateToStorageSettings = {},
+            onSelectActiveTransfers = {},
+            onActiveTransferSelected = {},
+            onSelectActiveTransfersClose = {},
+            onSelectAllActiveTransfers = {},
+            onCancelSelectedActiveTransfers = {},
         )
+    }
+}
+
+/**
+ * Get the actions that should be shown given the ui state
+ */
+private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
+    buildList<TransferMenuAction> {
+        when {
+            selectedTab == ACTIVE_TAB_INDEX && activeTransfers.isNotEmpty() -> {
+                val isAtLeastOneActiveTransferSelected =
+                    selectedActiveTransfers?.isNotEmpty() == true
+                if (isInSelectActiveTransfersMode) {
+                    if (isAtLeastOneActiveTransferSelected) {
+                        add(TransferMenuAction.CancelSelected)
+                    }
+                    if (isAtLeastOneActiveTransferSelected && !areAllActiveTransfersSelected) {
+                        add(TransferMenuAction.SelectAll)
+                    }
+                } else {
+                    if (areTransfersPaused) {
+                        add(TransferMenuAction.Resume)
+                    } else {
+                        add(TransferMenuAction.Pause)
+                    }
+                    add(TransferMenuAction.More)
+                }
+            }
+
+            selectedTab == COMPLETED_TAB_INDEX && completedTransfers.isNotEmpty() -> {
+                add(TransferMenuAction.More)
+            }
+
+            selectedTab == FAILED_TAB_INDEX && failedTransfers.isNotEmpty() -> {
+                add(TransferMenuAction.More)
+            }
+        }
     }
 }
 

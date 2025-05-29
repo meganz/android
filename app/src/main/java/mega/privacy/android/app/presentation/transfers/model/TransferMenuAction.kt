@@ -38,6 +38,24 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_MORE_ACTION,
     ), TransferMenuAction
 
+    /**
+     * Select all
+     */
+    data object SelectAll : TopAppBarActionString(
+        iconRes = iconPackR.drawable.ic_check_stack_medium_regular_outline,
+        descriptionRes = R.string.action_select_all,
+        testTag = TEST_TAG_SELECT_ALL_ACTION,
+    ), TransferMenuAction
+
+    /**
+     * Select all
+     */
+    data object CancelSelected : TopAppBarActionString(
+        iconRes = iconPackR.drawable.ic_minus_circle_medium_regular_outline,
+        descriptionRes = R.string.cancel_transfers,
+        testTag = TEST_TAG_CANCEL_ACTION,
+    ), TransferMenuAction
+
     companion object {
         /**
          * Test Tag resume transfers Action
@@ -53,5 +71,15 @@ sealed interface TransferMenuAction : TopAppBarAction {
          * Test Tag cancel all transfers Action
          */
         const val TEST_TAG_MORE_ACTION = "transfers_view:action_more"
+
+        /**
+         * Test Tag select all transfers Action
+         */
+        const val TEST_TAG_SELECT_ALL_ACTION = "transfers_view:action_select_all"
+
+        /**
+         * Test Tag cancel selected transfers Action
+         */
+        const val TEST_TAG_CANCEL_ACTION = "transfers_view:action_cancel_selected"
     }
 }

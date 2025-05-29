@@ -89,23 +89,48 @@ class ActiveTransferItemTest {
         }
     }
 
+    @Test
+    fun `test that selected active transfer shows correctly`() {
+        initComposeRuleContent(
+            ActiveTransferUI(
+                isDownload = true,
+                fileTypeResId = R.drawable.ic_pdf_medium_solid,
+                previewUri = null,
+                fileName = name,
+                progressSizeString = progressSizeString,
+                progressPercentageString = progressPercentString,
+                progress = progress,
+                speed = speed,
+                isPaused = true,
+                isOverQuota = false,
+                areTransfersPaused = false,
+                isSelected = true,
+            )
+        )
+        with(composeRule) {
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_SELECTED).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE).assertDoesNotExist()
+        }
+    }
+
     private fun initComposeRuleContent(activeTransferUI: ActiveTransferUI) =
         with(activeTransferUI) {
             composeRule.setContent {
                 ActiveTransferItem(
                     tag = tag,
-                    isDownload,
-                    fileTypeResId,
-                    previewUri,
-                    fileName,
-                    this@ActiveTransferItemTest.progressSizeString,
-                    this@ActiveTransferItemTest.progressSizeString,
-                    progress,
-                    speed,
-                    isPaused,
-                    isOverQuota,
-                    areTransfersPaused,
-                    onPlayPauseClicked,
+                    isDownload = isDownload,
+                    fileTypeResId = fileTypeResId,
+                    previewUri = previewUri,
+                    fileName = fileName,
+                    progressPercentageString = this@ActiveTransferItemTest.progressSizeString,
+                    progressSizeString = this@ActiveTransferItemTest.progressSizeString,
+                    progress = progress,
+                    speed = speed,
+                    isPaused = isPaused,
+                    isOverQuota = isOverQuota,
+                    areTransfersPaused = areTransfersPaused,
+                    onPlayPauseClicked = onPlayPauseClicked,
+                    isSelected = isSelected,
                 )
             }
         }
