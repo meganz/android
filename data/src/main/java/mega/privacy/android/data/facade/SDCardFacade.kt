@@ -52,10 +52,6 @@ class SDCardFacade @Inject constructor(
     override suspend fun getOrCreateCacheFolder(folderName: String): File? =
         File(context.externalCacheDir, folderName).takeIf { it.exists() || it.mkdir() }
 
-    override suspend fun isSDCardCachePath(localPath: String): Boolean {
-        return localPath.startsWith(context.externalCacheDir?.path ?: return false)
-    }
-
     override suspend fun isSDCardUri(uriString: String) =
         uriString.toUri().let { uri ->
             runCatching {

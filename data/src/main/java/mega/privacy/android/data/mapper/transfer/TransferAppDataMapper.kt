@@ -8,7 +8,6 @@ import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.GeoLocatio
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OfflineDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OriginalContentUri
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.PreviewDownload
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.TransferGroup
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -16,7 +15,6 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData.ChatDownload
 import mega.privacy.android.domain.entity.transfer.TransferAppData.ChatUpload
 import mega.privacy.android.domain.entity.transfer.TransferAppData.Geolocation
 import mega.privacy.android.domain.entity.transfer.TransferAppData.OriginalUriPath
-import mega.privacy.android.domain.entity.transfer.TransferAppData.SdCardDownload
 import mega.privacy.android.domain.entity.transfer.TransferAppData.TransferGroup
 import mega.privacy.android.domain.entity.uri.UriPath
 import timber.log.Timber
@@ -30,14 +28,11 @@ class TransferAppDataMapper @Inject constructor() {
      * Get a list of [TransferAppData] corresponding to raw appData [String]
      *
      * @param appDataRaw the app data [String] as it is in MegaTransfer
-     * @param parentPath the parent path of the transfer as it is in MegaTransfer.
-     *                   It is only required for SDCardDownload.
      *
      * @return a [List] of [TransferAppData]
      */
     operator fun invoke(
         appDataRaw: String,
-        parentPath: String? = null,
     ): List<TransferAppData> = if (appDataRaw.isEmpty()) emptyList() else {
         appDataRaw
             .split(APP_DATA_REPEATED_TRANSFER_SEPARATOR)
@@ -53,16 +48,6 @@ class TransferAppDataMapper @Inject constructor() {
                     CameraUpload -> TransferAppData.CameraUpload
                     ChatUpload -> values.firstIfNotBlank()?.toLongOrNull()
                         ?.let { ChatUpload(it) }
-
-                    SDCardDownload -> {
-                        values.firstIfNotBlank()?.let {
-                            SdCardDownload(
-                                targetPathForSDK = it,
-                                finalTargetUri = values.getOrElse(1) { "" },
-                                parentPath = parentPath ?: values.getOrNull(2),
-                            )
-                        }
-                    }
 
                     BackgroundTransfer -> TransferAppData.BackgroundTransfer
 

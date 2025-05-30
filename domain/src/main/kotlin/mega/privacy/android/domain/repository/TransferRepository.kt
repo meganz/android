@@ -19,7 +19,6 @@ import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
-import java.io.File
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -201,11 +200,9 @@ interface TransferRepository {
     /**
      * Add a list of completed transfer to local storage
      *
-     * @param finishEventsAndPaths
+     * @param finishEvents
      */
-    suspend fun addCompletedTransfers(
-        finishEventsAndPaths: Map<TransferEvent.TransferFinishEvent, String?>,
-    )
+    suspend fun addCompletedTransfers(finishEvents: List<TransferEvent.TransferFinishEvent>)
 
     /**
      * Add failed completed transfers from a failed pending transfer
@@ -479,14 +476,6 @@ interface TransferRepository {
     suspend fun getCurrentDownloadSpeed(): Int
 
     /**
-     * Get or create a folder for transfers in the cache of SD Card if any
-     *
-     * @return the File corresponding to the folder in cache in the SD
-     *         Return null if the folder cannot be created or there's no SD card
-     */
-    suspend fun getOrCreateSDCardTransfersCacheFolder(): File?
-
-    /**
      * @return a flow that emits true if DownloadsWorker is enqueued. false otherwise
      */
     fun monitorIsDownloadsWorkerEnqueued(): Flow<Boolean>
@@ -505,11 +494,6 @@ interface TransferRepository {
      * @return a flow that emits true if ChatUploadsWorker is finished (not running or enqueued). false otherwise
      */
     fun monitorIsChatUploadsWorkerFinished(): Flow<Boolean>
-
-    /**
-     * @return true if the user can choose download's destination. False means downloads will be saved to default destination. See [settingsRepository.setDefaultStorageDownloadLocation()]
-     */
-    suspend fun allowUserToSetDownloadDestination(): Boolean
 
     /**
      * Monitors ask resume transfers.

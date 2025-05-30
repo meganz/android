@@ -28,12 +28,6 @@ class TransferAppDataStringMapper @Inject constructor() {
         listOf(this.rawString()).plus(
             when (this) {
                 is TransferAppData.ChatUpload -> listOf(pendingMessageId.toString())
-                is TransferAppData.SdCardDownload -> listOf(
-                    targetPathForSDK,
-                    finalTargetUri,
-                    parentPath
-                )
-
                 is TransferAppData.OriginalUriPath -> listOf(originalUriPath.value)
                 is TransferAppData.ChatDownload -> listOf(
                     chatId.toString(),

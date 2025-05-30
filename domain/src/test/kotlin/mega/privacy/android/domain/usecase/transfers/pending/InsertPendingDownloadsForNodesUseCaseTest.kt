@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.transfers.pending
 
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -15,8 +14,6 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceForNodesUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.DestinationAndAppDataForDownloadResult
-import mega.privacy.android.domain.usecase.transfers.downloads.GetFileDestinationAndAppDataForDownloadUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,7 +24,6 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -42,8 +38,6 @@ class InsertPendingDownloadsForNodesUseCaseTest {
         mock<GetPendingTransferNodeIdentifierUseCase>()
     private val doesUriPathHaveSufficientSpaceForNodesUseCase =
         mock<DoesUriPathHaveSufficientSpaceForNodesUseCase>()
-    private val getFileDestinationAndAppDataForDownloadUseCase =
-        mock<GetFileDestinationAndAppDataForDownloadUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val timeSystemRepository = mock<TimeSystemRepository>()
 
@@ -53,7 +47,6 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             transferRepository,
             getPendingTransferNodeIdentifierUseCase,
             doesUriPathHaveSufficientSpaceForNodesUseCase,
-            getFileDestinationAndAppDataForDownloadUseCase,
             fileSystemRepository,
             timeSystemRepository
         )
@@ -65,14 +58,11 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             transferRepository,
             getPendingTransferNodeIdentifierUseCase,
             doesUriPathHaveSufficientSpaceForNodesUseCase,
-            getFileDestinationAndAppDataForDownloadUseCase,
             fileSystemRepository,
             timeSystemRepository,
         )
         val nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(647L))
         whenever(getPendingTransferNodeIdentifierUseCase(anyOrNull())) doReturn nodeIdentifier
-        whenever(getFileDestinationAndAppDataForDownloadUseCase(UriPath(PATH_STRING))) doReturn
-                DestinationAndAppDataForDownloadResult(UriPath(PATH_STRING), null)
         whenever(transferRepository.insertActiveTransferGroup(any())) doReturn GROUP_ID
     }
 
@@ -87,11 +77,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             }
         }
         val appData = TransferAppData.OfflineDownload
-        val destinationAppData = mock<TransferAppData.SdCardDownload>()
-        val expectedAppData =
-            listOf(appData, destinationAppData, TransferAppData.TransferGroup(GROUP_ID))
-        whenever(getFileDestinationAndAppDataForDownloadUseCase(UriPath(PATH_STRING))) doReturn
-                DestinationAndAppDataForDownloadResult(UriPath(PATH_STRING), destinationAppData)
+        val expectedAppData = listOf(appData, TransferAppData.TransferGroup(GROUP_ID))
         val uriPath = UriPath(PATH_STRING)
         val expected = nodes.mapIndexed { index, node ->
             val nodeIdentifier =
@@ -158,21 +144,6 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             assertThrows<NotEnoughStorageException> {
                 underTest(listOf(node), destination, false, null)
             }
-        }
-
-    @Test
-    fun `test that an exception thrown by getDestinationForSdkAndAppDataForDownloadUseCase is propagated`() =
-        runTest {
-            val node = mock<DefaultTypedFileNode>()
-            val destination = PATH_STRING
-            val expected = RuntimeException()
-            whenever(getFileDestinationAndAppDataForDownloadUseCase(UriPath(destination))) doThrow expected
-
-            val actual = runCatching {
-                underTest(listOf(node), UriPath(destination), false, null)
-            }.exceptionOrNull()
-
-            assertThat(actual).isEqualTo(expected)
         }
 
     @Test

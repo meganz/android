@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase.transfers.active
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.transfer.DestinationUriAndSubFolders
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -14,8 +13,6 @@ import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpi
 import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
-import mega.privacy.android.domain.usecase.transfers.sd.GetTransferDestinationUriUseCase
-import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -47,8 +44,6 @@ class HandleTransferEventUseCaseTest {
         mock<BroadcastBusinessAccountExpiredUseCase>()
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
     private val handleAvailableOfflineEventUseCase = mock<HandleAvailableOfflineEventUseCase>()
-    private val handleSDCardEventUseCase = mock<HandleSDCardEventUseCase>()
-    private val getTransferDestinationUriUseCase = mock<GetTransferDestinationUriUseCase>()
     private val broadcastStorageOverQuotaUseCase = mock<BroadcastStorageOverQuotaUseCase>()
 
     @BeforeAll
@@ -59,8 +54,6 @@ class HandleTransferEventUseCaseTest {
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
             broadcastStorageOverQuotaUseCase = broadcastStorageOverQuotaUseCase,
             handleAvailableOfflineEventUseCase = handleAvailableOfflineEventUseCase,
-            handleSDCardEventUseCase = handleSDCardEventUseCase,
-            getTransferDestinationUriUseCase = getTransferDestinationUriUseCase,
         )
     }
 
@@ -72,8 +65,6 @@ class HandleTransferEventUseCaseTest {
             broadcastTransferOverQuotaUseCase,
             broadcastStorageOverQuotaUseCase,
             handleAvailableOfflineEventUseCase,
-            handleSDCardEventUseCase,
-            getTransferDestinationUriUseCase,
         )
     }
 
@@ -339,26 +330,20 @@ class HandleTransferEventUseCaseTest {
     fun `test that invoke call addCompletedTransfers when the event is a finish event`(
         transferEvent: TransferEvent.TransferFinishEvent,
     ) = runTest {
-        val destinationUriAndSubFolders = DestinationUriAndSubFolders("folder/file")
-        whenever(getTransferDestinationUriUseCase(transferEvent.transfer)) doReturn destinationUriAndSubFolders
-
         underTest.invoke(transferEvent)
-        verify(transferRepository).addCompletedTransfers(eq(mapOf(transferEvent to destinationUriAndSubFolders.toString())))
+        verify(transferRepository).addCompletedTransfers(eq(listOf(transferEvent)))
     }
 
     @Test
     fun `test that invoke call addCompletedTransfers with all events when multiple events are send`() =
         runTest {
-            val destinationUriAndSubFolders = DestinationUriAndSubFolders("folder/file")
-            whenever(getTransferDestinationUriUseCase(any())) doReturn destinationUriAndSubFolders
             val events = listOf(
                 mockTransferEvent<TransferEvent.TransferFinishEvent>(TransferType.DOWNLOAD, 1),
                 mockTransferEvent<TransferEvent.TransferFinishEvent>(TransferType.DOWNLOAD, 2),
                 mockTransferEvent<TransferEvent.TransferFinishEvent>(TransferType.DOWNLOAD, 3),
             )
-            val expected = events.associateWith { destinationUriAndSubFolders.toString() }
             underTest.invoke(events = events.toTypedArray())
-            verify(transferRepository).addCompletedTransfers(eq(expected))
+            verify(transferRepository).addCompletedTransfers(eq(events))
         }
 
     @Test
@@ -372,9 +357,6 @@ class HandleTransferEventUseCaseTest {
             val transferEvent = mock<TransferEvent.TransferFinishEvent> {
                 on { this.transfer }.thenReturn(transfer)
             }
-            val destinationUriAndSubFolders = DestinationUriAndSubFolders("folder/file")
-
-            whenever(getTransferDestinationUriUseCase(transferEvent.transfer)) doReturn destinationUriAndSubFolders
 
             underTest.invoke(transferEvent)
 
@@ -397,9 +379,6 @@ class HandleTransferEventUseCaseTest {
             val transferEvent = mock<TransferEvent.TransferFinishEvent> {
                 on { this.transfer }.thenReturn(transfer)
             }
-            val destinationUriAndSubFolders = DestinationUriAndSubFolders("folder/file")
-
-            whenever(getTransferDestinationUriUseCase(transferEvent.transfer)) doReturn destinationUriAndSubFolders
 
             underTest.invoke(transferEvent)
 
@@ -409,19 +388,6 @@ class HandleTransferEventUseCaseTest {
                 any()
             )
         }
-
-    @ParameterizedTest
-    @MethodSource("provideStartFinishEvents")
-    fun `test that handleSDCardEventUseCase with correct destination is invoked when start and update event is received`(
-        transferEvent: TransferEvent,
-    ) = runTest {
-        val destinationUriAndSubFolders = mock<DestinationUriAndSubFolders>()
-        whenever(getTransferDestinationUriUseCase(transferEvent.transfer)) doReturn destinationUriAndSubFolders
-        underTest.invoke(transferEvent)
-        verify(
-            handleSDCardEventUseCase,
-        ).invoke(transferEvent, destinationUriAndSubFolders)
-    }
 
     @ParameterizedTest
     @MethodSource("provideFinishEvents")

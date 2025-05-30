@@ -16,7 +16,6 @@ import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -34,7 +33,6 @@ import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.RequestEvent
-import mega.privacy.android.data.repository.DefaultTransfersRepository.Companion.TRANSFERS_SD_TEMPORARY_FOLDER
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
@@ -83,7 +81,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.io.File
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -112,7 +109,6 @@ class DefaultTransfersRepositoryTest {
     private val cancelTokenProvider = mock<CancelTokenProvider>()
     private val activeTransferTotalsMapper = mock<ActiveTransferTotalsMapper>()
     private val megaNodeMapper = mock<MegaNodeMapper>()
-    private val sdCardGateway = mock<SDCardGateway>()
     private val deviceGateway = mock<DeviceGateway>()
     private val inProgressTransferMapper = mock<InProgressTransferMapper>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
@@ -150,7 +146,6 @@ class DefaultTransfersRepositoryTest {
             cancelTokenProvider = cancelTokenProvider,
             scope = testScope,
             megaNodeMapper = megaNodeMapper,
-            sdCardGateway = sdCardGateway,
             deviceGateway = deviceGateway,
             inProgressTransferMapper = inProgressTransferMapper,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
@@ -174,7 +169,6 @@ class DefaultTransfersRepositoryTest {
             completedTransferMapper,
             completedTransferPendingTransferMapper,
             megaNodeMapper,
-            sdCardGateway,
             deviceGateway,
             inProgressTransferMapper,
             transferAppDataStringMapper,
@@ -750,13 +744,12 @@ class DefaultTransfersRepositoryTest {
             }
             val error = mock<MegaException>()
             val expected = listOf(mock<CompletedTransfer>())
-            val path = "path"
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
                 on { it.error } doReturn error
             }
-            whenever(completedTransferMapper(transfer, error, path)).thenReturn(expected.first())
-            underTest.addCompletedTransfers(mapOf(event to path))
+            whenever(completedTransferMapper(transfer, error)).thenReturn(expected.first())
+            underTest.addCompletedTransfers(listOf(event))
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
             verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Error)
         }
@@ -769,13 +762,12 @@ class DefaultTransfersRepositoryTest {
             }
             val error = mock<MegaException>()
             val expected = listOf(mock<CompletedTransfer>())
-            val path = "path"
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
                 on { it.error } doReturn error
             }
-            whenever(completedTransferMapper(transfer, error, path)).thenReturn(expected.first())
-            underTest.addCompletedTransfers(mapOf(event to path))
+            whenever(completedTransferMapper(transfer, error)).thenReturn(expected.first())
+            underTest.addCompletedTransfers(listOf(event))
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
             verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Completed)
         }
@@ -1101,15 +1093,6 @@ class DefaultTransfersRepositoryTest {
             val id = 1
             underTest.getCompletedTransferById(id)
             verify(megaLocalRoomGateway).getCompletedTransferById(id)
-        }
-
-    @Test
-    fun `test that getOrCreateSDCardCacheFolder returns gateway value`() =
-        runTest {
-            val result = File("path")
-            whenever(sdCardGateway.getOrCreateCacheFolder(TRANSFERS_SD_TEMPORARY_FOLDER))
-                .thenReturn(result)
-            assertThat(underTest.getOrCreateSDCardTransfersCacheFolder()).isEqualTo(result)
         }
 
     @Nested
@@ -1556,26 +1539,6 @@ class DefaultTransfersRepositoryTest {
             assertThat(underTest.getCurrentDownloadSpeed()).isEqualTo(speed)
         }
     }
-
-    @ParameterizedTest
-    @ValueSource(ints = [26, 27, 28, 29])
-    fun `test that allowUserToSetDownloadDestination returns true when sdk is lower than Android 11`(
-        sdk: Int,
-    ) =
-        runTest {
-            whenever(deviceGateway.getSdkVersionInt()).thenReturn(sdk)
-            assertThat(underTest.allowUserToSetDownloadDestination()).isTrue()
-        }
-
-    @ParameterizedTest
-    @ValueSource(ints = [30, 31, 32, 33, 34])
-    fun `test that allowUserToSetDownloadDestination returns false when sdk is equal or higher than Android 11`(
-        sdk: Int,
-    ) =
-        runTest {
-            whenever(deviceGateway.getSdkVersionInt()).thenReturn(sdk)
-            assertThat(underTest.allowUserToSetDownloadDestination()).isFalse()
-        }
 
     private fun stubPauseTransfers(isPause: Boolean) {
         val megaError = mock<MegaError> {

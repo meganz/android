@@ -15,7 +15,6 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.UpdatePendingTransferStateUseCase
-import mega.privacy.android.domain.usecase.transfers.sd.HandleNotInProgressSDCardActiveTransfersUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,7 +32,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -44,8 +42,6 @@ internal class CorrectActiveTransfersUseCaseTest {
     private val transferRepository = mock<TransferRepository>()
     private val getInProgressTransfersUseCase = mock<GetInProgressTransfersUseCase>()
     private val updatePendingTransferStateUseCase = mock<UpdatePendingTransferStateUseCase>()
-    private val handleNotInProgressSDCardActiveTransfersUseCase =
-        mock<HandleNotInProgressSDCardActiveTransfersUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
 
     private val mockedActiveTransfers = (0L..10L).map { mock<ActiveTransfer>() }
@@ -57,7 +53,6 @@ internal class CorrectActiveTransfersUseCaseTest {
             getInProgressTransfersUseCase = getInProgressTransfersUseCase,
             transferRepository = transferRepository,
             updatePendingTransferStateUseCase = updatePendingTransferStateUseCase,
-            handleNotInProgressSDCardActiveTransfersUseCase = handleNotInProgressSDCardActiveTransfersUseCase,
             fileSystemRepository = fileSystemRepository,
         )
     }
@@ -88,25 +83,17 @@ internal class CorrectActiveTransfersUseCaseTest {
             .thenReturn(emptyList())
     }
 
-    private fun stubActiveTransfers(areFinished: Boolean, isSdCardDownload: Boolean = false) {
+    private fun stubActiveTransfers(areFinished: Boolean) {
         mockedActiveTransfers.forEachIndexed { index, activeTransfer ->
             whenever(activeTransfer.uniqueId).thenReturn(index.toLong())
             whenever(activeTransfer.isFinished).thenReturn(areFinished)
             whenever(activeTransfer.localPath).thenReturn("path$index")
-            if (isSdCardDownload) {
-                val data = mock<TransferAppData.SdCardDownload>()
-                whenever(activeTransfer.appData).thenReturn(listOf(data))
-            }
         }
     }
 
-    private fun stubTransfers(isSdCardDownload: Boolean = false) {
+    private fun stubTransfers() {
         mockedTransfers.forEachIndexed { index, transfer ->
             whenever(transfer.uniqueId).thenReturn(index.toLong())
-            if (isSdCardDownload) {
-                val data = mock<TransferAppData.SdCardDownload>()
-                whenever(transfer.appData).thenReturn(listOf(data))
-            }
         }
     }
 
@@ -157,24 +144,6 @@ internal class CorrectActiveTransfersUseCaseTest {
                 expected.map { it.uniqueId },
                 true
             )
-        }
-
-    @Test
-    fun `test that when there are active transfers not finished and not in progress which are SD card, HandleNotInProgressSDCardActiveTransfersUseCase is invoked`() =
-        runTest {
-            stubActiveTransfers(areFinished = false, isSdCardDownload = true)
-            stubTransfers(isSdCardDownload = true)
-            val inProgress = subSetTransfers()
-            val expected = mockedActiveTransfers
-                .filter { it.uniqueId !in inProgress.map { it.uniqueId } }
-
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
-                .thenReturn(mockedActiveTransfers)
-            whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
-
-            underTest(TransferType.DOWNLOAD)
-
-            verify(handleNotInProgressSDCardActiveTransfersUseCase).invoke(expected.associate { it.uniqueId to it.appData })
         }
 
     @Test

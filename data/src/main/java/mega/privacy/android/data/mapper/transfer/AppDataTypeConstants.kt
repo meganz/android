@@ -10,7 +10,6 @@ internal enum class AppDataTypeConstants(
     VoiceClip("VOICE_CLIP", TransferAppData.VoiceClip::class),
     ChatUpload("CHAT_UPLOAD", TransferAppData.ChatUpload::class),
     CameraUpload("CU_UPLOAD", TransferAppData.CameraUpload::class),
-    SDCardDownload("SD_CARD_DOWNLOAD", TransferAppData.SdCardDownload::class),
     BackgroundTransfer("BACKGROUND_TRANSFER", TransferAppData.BackgroundTransfer::class),
     OriginalContentUri("ORIGINAL_URI", TransferAppData.OriginalUriPath::class),
     ChatDownload("CHAT_DOWNLOAD", TransferAppData.ChatDownload::class),
