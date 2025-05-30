@@ -49,7 +49,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -156,6 +160,7 @@ fun NewLoginView(
     modifier: Modifier = Modifier,
     onLoginExceptionConsumed: () -> Unit = {},
 ) {
+    val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
     val showLoginInProgress =
@@ -198,7 +203,10 @@ fun NewLoginView(
                 ) {
                     MegaTopAppBar(
                         title = "",
-                        navigationType = AppBarNavigationType.Back(onBackPressed),
+                        navigationType = AppBarNavigationType.Back {
+                            onBackPressed()
+                            focusManager.clearFocus(true)
+                        },
                         trailingIcons = {
                             IconButton(
                                 onClick = {
@@ -295,9 +303,16 @@ private fun RequireLogin(
     val isTablet = LocalDeviceType.current == DeviceType.Tablet
     val isPhoneLandscape =
         orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
+    val emailRequester = remember { FocusRequester() }
+    val passwordRequester = remember { FocusRequester() }
     var wrongCredentials by remember { mutableStateOf(false) }
     var tooManyAttempts by remember { mutableStateOf(false) }
     var accountBlockedDetail by remember { mutableStateOf<AccountBlockedDetail?>(null) }
+
+    LaunchedEffect(Unit) {
+        delay(300L)
+        emailRequester.requestFocus()
+    }
 
     LaunchedEffect(state.loginException) {
         if (state.loginException is LoginWrongEmailOrPassword) {
@@ -388,6 +403,10 @@ private fun RequireLogin(
             TextInputField(
                 modifier = Modifier
                     .testTag(LoginTestTags.EMAIL_INPUT)
+                    .focusRequester(emailRequester)
+                    .focusProperties {
+                        next = passwordRequester
+                    }
                     .padding(
                         top = 40.dp, start = 16.dp, end = 16.dp
                     ),
@@ -406,12 +425,17 @@ private fun RequireLogin(
                     wrongCredentials -> ""
                     tooManyAttempts -> ""
                     else -> null
-                }
+                },
+                contentType = ContentType.EmailAddress
             )
 
             PasswordTextInputField(
                 modifier = Modifier
                     .testTag(LoginTestTags.PASSWORD_INPUT)
+                    .focusRequester(passwordRequester)
+                    .focusProperties {
+                        previous = emailRequester
+                    }
                     .padding(
                         top = 16.dp, start = 16.dp, end = 16.dp
                     ),

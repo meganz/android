@@ -53,6 +53,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.delay
 import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
@@ -192,6 +193,10 @@ internal fun NewCreateAccountScreen(
         showAgreeToTerms = true
     }
 
+    LaunchedEffect(Unit) {
+        delay(300L)
+        firstNameFocusRequester.requestFocus()
+    }
 
     EventEffect(
         event = uiState.createAccountStatusEvent,
