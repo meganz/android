@@ -140,4 +140,30 @@ internal class SyncGatewayImpl @Inject constructor(
 
     override suspend fun isNodeSyncableWithError(megaNode: MegaNode): MegaError =
         megaApi.isNodeSyncableWithError(megaNode)
+
+
+    override suspend fun changeSyncLocalRoot(
+        syncBackupId: Long,
+        newLocalSyncRootUri: String,
+    ): Long? =
+        suspendCancellableCoroutine { continuation ->
+            val requestListener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request: MegaRequest, error: MegaError ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            continuation.resumeWith(Result.success(request.parentHandle))
+                        }
+
+                        else -> {
+                            continuation.resumeWith(Result.success(null))
+                        }
+                    }
+                }
+            )
+            megaApi.changeSyncLocalRoot(
+                syncBackupId,
+                newLocalSyncRootUri,
+                requestListener
+            )
+        }
 }

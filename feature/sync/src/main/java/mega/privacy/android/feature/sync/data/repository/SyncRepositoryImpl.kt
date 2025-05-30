@@ -196,6 +196,13 @@ internal class SyncRepositoryImpl @Inject constructor(
         syncWorkManagerGateway.cancelSyncWorkerRequest()
     }
 
+    override suspend fun changeSyncLocalRoot(
+        syncBackupId: Long,
+        newLocalSyncRootUri: String,
+    ): Long? = withContext(ioDispatcher) {
+        syncGateway.changeSyncLocalRoot(syncBackupId, newLocalSyncRootUri)
+    }
+
     private companion object {
         /**
          * Delay to ensure two things:

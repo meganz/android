@@ -200,6 +200,17 @@ class SyncRepositoryImplTest {
         verify(syncWorkManagerGateway).cancelSyncWorkerRequest()
     }
 
+    @Test
+    fun `test that changeSyncLocalRoot calls changeSyncLocalRoot on MegaApi`() = runTest {
+        val syncId = 123L
+        val newLocalPath = "content://com.example.app/syncs/123"
+        whenever(syncGateway.changeSyncLocalRoot(syncId, newLocalPath)).thenReturn(syncId)
+
+        val result = underTest.changeSyncLocalRoot(syncId, newLocalPath)
+
+        assertThat(result).isEqualTo(syncId)
+    }
+
     private fun provideSyncTypeMapperParametersDirect(): Stream<Arguments> = Stream.of(
         Arguments.of(SyncType.TYPE_TWOWAY, MegaSync.SyncType.TYPE_TWOWAY),
         Arguments.of(SyncType.TYPE_BACKUP, MegaSync.SyncType.TYPE_BACKUP),

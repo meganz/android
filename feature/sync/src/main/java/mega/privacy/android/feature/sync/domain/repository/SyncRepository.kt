@@ -108,4 +108,15 @@ interface SyncRepository {
      * Stops the sync worker
      */
     suspend fun stopSyncWorker()
+
+    /**
+     * Change the local path that is being used as root for a sync.
+     *
+     * @param syncBackupId - id of the folder pair to change
+     * @param newLocalSyncRootUri - new local uri to be used as root for the sync
+     */
+    suspend fun changeSyncLocalRoot(
+        syncBackupId: Long,
+        newLocalSyncRootUri: String,
+    ): Long?
 }
