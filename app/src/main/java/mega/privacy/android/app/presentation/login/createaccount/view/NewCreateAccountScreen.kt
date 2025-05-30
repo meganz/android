@@ -378,9 +378,12 @@ internal fun NewCreateAccountScreen(
                     capitalization = KeyboardCapitalization.None,
                     maxCharLimit = EMAIL_CHAR_LIMIT,
                     onValueChanged = {
-                        email = it.trim().lowercase()
-                        showAccountExistsMessage = false
-                        onEmailInputChanged(email)
+                        val normalizedEmail = it.trim().lowercase()
+                        if (normalizedEmail.length <= EMAIL_CHAR_LIMIT) {
+                            email = normalizedEmail
+                            showAccountExistsMessage = false
+                            onEmailInputChanged(email)
+                        }
                     },
                     imeAction = ImeAction.Next,
                     errorText = when {
