@@ -24,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -152,7 +154,7 @@ private fun OnboardingPageContent(
             Image(
                 modifier = Modifier
                     .testTag("${ONBOARDING_IMAGE}_$pageIndex")
-                    .size(TOUR_SCREEN_IMAGE_SIZE_PHONE_LANDSCAPE.dp)
+                    .size(TOUR_SCREEN_IMAGE_SIZE_PHONE_LANDSCAPE_OR_SMALL_PHONE_PORTRAIT.dp)
                     .weight(1f),
                 painter = painterResource(id = pageItem.image),
                 contentDescription = stringResource(id = pageItem.title)
@@ -181,8 +183,14 @@ private fun OnboardingPageContent(
                 .padding(horizontal = spacing.x16),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val imageSize =
-                if (isTablet) TOUR_SCREEN_TABLET_IMAGE_SIZE else TOUR_SCREEN_IMAGE_SIZE_PHONE_PORTRAIT
+            val isSmallDevice = isSmallDevice()
+
+            val imageSize = when {
+                isTablet -> TOUR_SCREEN_TABLET_IMAGE_SIZE
+                isSmallDevice -> TOUR_SCREEN_IMAGE_SIZE_PHONE_LANDSCAPE_OR_SMALL_PHONE_PORTRAIT
+                else -> TOUR_SCREEN_IMAGE_SIZE_PHONE_PORTRAIT
+            }
+
             Image(
                 modifier = Modifier
                     .testTag("${ONBOARDING_IMAGE}_$pageIndex")
@@ -204,6 +212,17 @@ private fun OnboardingPageContent(
             )
         }
     }
+}
+
+@Composable
+private fun isSmallDevice(): Boolean {
+    val containerSize = LocalWindowInfo.current.containerSize
+    val density = LocalDensity.current
+
+    val screenHeightDp = with(density) { containerSize.height.toDp() }
+    val screenWidthDp = with(density) { containerSize.width.toDp() }
+
+    return screenHeightDp <= 640.dp || screenWidthDp <= 360.dp
 }
 
 @Composable
@@ -373,5 +392,5 @@ internal object TourTestTags {
 
 private const val TOUR_SCREEN_TABLET_WIDTH = 500
 private const val TOUR_SCREEN_IMAGE_SIZE_PHONE_PORTRAIT = 380
-private const val TOUR_SCREEN_IMAGE_SIZE_PHONE_LANDSCAPE = 204
+private const val TOUR_SCREEN_IMAGE_SIZE_PHONE_LANDSCAPE_OR_SMALL_PHONE_PORTRAIT = 204
 private const val TOUR_SCREEN_TABLET_IMAGE_SIZE = 358
