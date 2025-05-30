@@ -619,11 +619,7 @@ class LoginFragment : Fragment() {
         confirmLogoutDialog?.dismiss()
         val loginActivity = requireActivity() as LoginActivity
 
-        val isLoggedInToConfirmedAccount =
-            !loginActivity.intent.getStringExtra(Constants.EXTRA_CONFIRMATION).isNullOrEmpty()
-                    && uiState.isAccountConfirmed
-                    && uiState.accountSession?.email == uiState.temporalEmail
-        if (!isLoggedInToConfirmedAccount) {
+        if (!uiState.shouldShowUpgradeAccount) {
             if (getChatManagement().isPendingJoinLink()) {
                 LoginActivity.isBackFromLoginPage = false
                 getChatManagement().pendingJoinLink = null

@@ -43,6 +43,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCase
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
+import mega.privacy.android.domain.usecase.account.ShouldShowUpgradeAccountUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
@@ -151,6 +152,7 @@ internal class LoginViewModelTest {
     private val savedStateHandle = mock<SavedStateHandle>()
     private val shouldShowNotificationReminderUseCase =
         mock<ShouldShowNotificationReminderUseCase>()
+    private val shouldShowUpgradeAccountUseCase = mock<ShouldShowUpgradeAccountUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -202,6 +204,7 @@ internal class LoginViewModelTest {
             setLoggedOutFromAnotherLocationUseCase = setLoggedOutFromAnotherLocationUseCase,
             savedStateHandle = savedStateHandle,
             shouldShowNotificationReminderUseCase = shouldShowNotificationReminderUseCase,
+            shouldShowUpgradeAccountUseCase = shouldShowUpgradeAccountUseCase
         )
     }
 
@@ -233,7 +236,8 @@ internal class LoginViewModelTest {
             checkRecoveryKeyUseCase,
             setLoggedOutFromAnotherLocationUseCase,
             savedStateHandle,
-            shouldShowNotificationReminderUseCase
+            shouldShowNotificationReminderUseCase,
+            shouldShowUpgradeAccountUseCase
         )
     }
 
@@ -634,6 +638,18 @@ internal class LoginViewModelTest {
 
             assertThat(underTest.shouldShowNotificationPermission()).isFalse()
         }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that should show upgrade account returns correct value`(value: Boolean) = runTest {
+        whenever(shouldShowUpgradeAccountUseCase()) doReturn value
+
+        underTest.shouldShowUpgradeAccount()
+        underTest.state.test {
+            val item = awaitItem()
+            assertThat(item.shouldShowUpgradeAccount).isEqualTo(value)
+        }
+    }
 
     companion object {
         private val scheduler = TestCoroutineScheduler()

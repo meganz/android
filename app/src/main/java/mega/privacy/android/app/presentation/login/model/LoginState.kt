@@ -98,6 +98,7 @@ data class LoginState(
     val resendVerificationEmailEvent: StateEventWithContent<Boolean> = consumed(),
     val checkRecoveryKeyEvent: StateEventWithContent<Result<RkLink>> = consumed(),
     val onBackPressedEvent: StateEvent = consumed,
+    val shouldShowUpgradeAccount: Boolean = false,
 ) {
 
     /**

@@ -68,6 +68,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCase
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
+import mega.privacy.android.domain.usecase.account.ShouldShowUpgradeAccountUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
@@ -157,6 +158,7 @@ class LoginViewModel @Inject constructor(
     private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase,
     private val shouldShowNotificationReminderUseCase: ShouldShowNotificationReminderUseCase,
     private val savedStateHandle: SavedStateHandle,
+    private val shouldShowUpgradeAccountUseCase: ShouldShowUpgradeAccountUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -742,7 +744,7 @@ class LoginViewModel @Inject constructor(
                 state.value.accountSession?.session ?: return@launch,
                 refreshChatUrl,
                 DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
-            ).collectLatest { status -> status.checkStatus(true) }
+            ).collectLatest { status -> status.checkStatus(isFastLogin = true) }
         }.onFailure { exception ->
             if (exception !is LoginException) return@onFailure
             exception.loginFailed()
@@ -784,7 +786,7 @@ class LoginViewModel @Inject constructor(
             }
         }
 
-    private fun LoginStatus.checkStatus(
+    private suspend fun LoginStatus.checkStatus(
         isFastLogin: Boolean = false,
         email: String? = null,
     ) = when (this) {
@@ -818,6 +820,9 @@ class LoginViewModel @Inject constructor(
                         multiFactorAuthState = null
                     )
                 }
+            }
+            if (!isFastLogin) {
+                shouldShowUpgradeAccount()
             }
             fetchNodes()
             sendAnalyticsEventIfFirstTimeLogin(email)
@@ -855,6 +860,14 @@ class LoginViewModel @Inject constructor(
                 Unit
             }
         }
+    }
+
+    /**
+     * Should show upgrade account
+     */
+    suspend fun shouldShowUpgradeAccount() {
+        _state.update { it.copy(shouldShowUpgradeAccount = shouldShowUpgradeAccountUseCase()) }
+        Timber.d("Should show upgrade account: ${state.value.shouldShowUpgradeAccount}")
     }
 
     /**
