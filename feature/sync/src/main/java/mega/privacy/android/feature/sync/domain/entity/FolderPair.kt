@@ -24,6 +24,8 @@ data class FolderPair(
     val syncError: SyncError? = null
 ) {
 
+    val isLocalPathUri = localFolderPath.startsWith("content://")
+
     companion object {
         /**
          * Reset the folder pair

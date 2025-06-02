@@ -12,7 +12,6 @@ import mega.privacy.android.feature.sync.domain.usecase.notifcation.GetSyncNotif
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -43,7 +42,7 @@ class GetSyncNotificationTypeUseCaseTest {
             id = 343L,
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "Sync",
-            localFolderPath = "/storage/emulated/0/Sync",
+            localFolderPath = LOCAL_FOLDER_PATH,
             remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
             syncStatus = SyncStatus.SYNCED,
         )
@@ -51,7 +50,7 @@ class GetSyncNotificationTypeUseCaseTest {
             id = 6886L,
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "Trip_to_NZ",
-            localFolderPath = "/storage/emulated/0/Trip_to_nz",
+            localFolderPath = LOCAL_FOLDER_PATH,
             remoteFolder = RemoteFolder(NodeId(1244L), "NZ_trip"),
             syncStatus = SyncStatus.SYNCED,
         )
@@ -71,7 +70,7 @@ class GetSyncNotificationTypeUseCaseTest {
             id = 343L,
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "Sync",
-            localFolderPath = "/storage/emulated/0/Sync",
+            localFolderPath = LOCAL_FOLDER_PATH,
             remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
             syncStatus = SyncStatus.SYNCED,
         )
@@ -79,7 +78,7 @@ class GetSyncNotificationTypeUseCaseTest {
             id = 6886L,
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "Trip_to_NZ",
-            localFolderPath = "/storage/emulated/0/Trip_to_nz",
+            localFolderPath = LOCAL_FOLDER_PATH,
             remoteFolder = RemoteFolder(NodeId(1244L), "NZ_trip"),
             syncStatus = SyncStatus.SYNCED,
         )
@@ -99,7 +98,7 @@ class GetSyncNotificationTypeUseCaseTest {
             id = 343L,
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "Sync",
-            localFolderPath = "/storage/emulated/0/Sync",
+            localFolderPath = LOCAL_FOLDER_PATH,
             remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
             syncStatus = SyncStatus.SYNCED,
         )
@@ -107,7 +106,7 @@ class GetSyncNotificationTypeUseCaseTest {
             id = 6886L,
             syncType = SyncType.TYPE_TWOWAY,
             pairName = "Trip_to_NZ",
-            localFolderPath = "/storage/emulated/0/Trip_to_nz",
+            localFolderPath = LOCAL_FOLDER_PATH,
             remoteFolder = RemoteFolder(NodeId(1244L), "NZ_trip"),
             syncStatus = SyncStatus.ERROR,
         )
@@ -123,13 +122,20 @@ class GetSyncNotificationTypeUseCaseTest {
 
     @Test
     fun `test that it returns STALLED_ISSUE when there are stalled issues`() {
-        val syncs =
-            listOf(mock<FolderPair> { on { syncError } doReturn SyncError.NO_SYNC_ERROR })
+        val sync = FolderPair(
+            id = 343L,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "Sync",
+            localFolderPath = LOCAL_FOLDER_PATH,
+            remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
+            syncStatus = SyncStatus.SYNCED,
+            syncError = SyncError.NO_SYNC_ERROR
+        )
         val result = underTest(
             isBatteryLow = false,
             isUserOnWifi = true,
             isSyncOnlyByWifi = true,
-            syncs = syncs,
+            syncs = listOf(sync),
             stalledIssues = listOf(mock(), mock())
         )
         Truth.assertThat(result).isEqualTo(SyncNotificationType.STALLED_ISSUE)
@@ -145,5 +151,80 @@ class GetSyncNotificationTypeUseCaseTest {
             stalledIssues = emptyList()
         )
         Truth.assertThat(result).isNull()
+    }
+
+    @Test
+    fun `test that it returns CHANGE_SYNC_ROOT when local folder path is not an URI`() {
+        val firstSync = FolderPair(
+            id = 343L,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "Sync",
+            localFolderPath = LOCAL_FOLDER_PATH,
+            remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
+            syncStatus = SyncStatus.SYNCED,
+        )
+        val secondSync = FolderPair(
+            id = 6886L,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "Trip_to_NZ",
+            localFolderPath = "/path/to/trip_to_nz",
+            remoteFolder = RemoteFolder(NodeId(1244L), "NZ_trip"),
+            syncStatus = SyncStatus.SYNCED,
+        )
+        val result = underTest(
+            isBatteryLow = true,
+            isUserOnWifi = true,
+            isSyncOnlyByWifi = true,
+            syncs = listOf(firstSync, secondSync),
+            stalledIssues = emptyList()
+        )
+        Truth.assertThat(result).isEqualTo(SyncNotificationType.CHANGE_SYNC_ROOT)
+    }
+
+    @Test
+    fun `test that it returns CHANGE_SYNC_ROOT when syncError is COULD_NOT_CREATE_IGNORE_FILE`() {
+        val firstSync = FolderPair(
+            id = 343L,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "Sync",
+            localFolderPath = LOCAL_FOLDER_PATH,
+            remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
+            syncStatus = SyncStatus.SYNCED,
+            syncError = SyncError.COULD_NOT_CREATE_IGNORE_FILE
+        )
+        val result = underTest(
+            isBatteryLow = false,
+            isUserOnWifi = true,
+            isSyncOnlyByWifi = true,
+            syncs = listOf(firstSync),
+            stalledIssues = emptyList()
+        )
+        Truth.assertThat(result).isEqualTo(SyncNotificationType.CHANGE_SYNC_ROOT)
+    }
+
+    @Test
+    fun `test that it returns null when all conditions are met and no issues exist`() {
+        val firstSync = FolderPair(
+            id = 343L,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "Sync",
+            localFolderPath = LOCAL_FOLDER_PATH,
+            remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
+            syncStatus = SyncStatus.SYNCED,
+            syncError = SyncError.NO_SYNC_ERROR
+        )
+        val result = underTest(
+            isBatteryLow = false,
+            isUserOnWifi = true,
+            isSyncOnlyByWifi = true,
+            syncs = listOf(firstSync),
+            stalledIssues = emptyList()
+        )
+        Truth.assertThat(result).isNull()
+    }
+
+    private companion object {
+        const val LOCAL_FOLDER_PATH =
+            "content://com.android.externalstorage.documents/document/primary%3APHOTOS"
     }
 }

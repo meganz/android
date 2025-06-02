@@ -23,5 +23,10 @@ enum class SyncNotificationType {
      * Notification for when device is not connected to WiFi
      * but the sync preference is set to only happen when connected to WiFi
      */
-    NOT_CONNECTED_TO_WIFI
+    NOT_CONNECTED_TO_WIFI,
+
+    /**
+     * Change sync root notification
+     */
+    CHANGE_SYNC_ROOT,
 }

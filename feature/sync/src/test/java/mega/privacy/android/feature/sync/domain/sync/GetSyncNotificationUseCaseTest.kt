@@ -436,7 +436,11 @@ internal class GetSyncNotificationUseCaseTest {
             )
 
             assertThat(result).isNull()
-            verify(syncNotificationManager).cancelNotification(notificationId)
-            verify(syncNotificationRepository).deleteDisplayedNotificationByType(notificationType)
+            if (notificationType != SyncNotificationType.CHANGE_SYNC_ROOT) {
+                verify(syncNotificationManager).cancelNotification(notificationId)
+                verify(syncNotificationRepository).deleteDisplayedNotificationByType(
+                    notificationType
+                )
+            }
         }
 }

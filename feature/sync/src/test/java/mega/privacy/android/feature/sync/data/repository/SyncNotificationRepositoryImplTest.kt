@@ -77,12 +77,14 @@ internal class SyncNotificationRepositoryImplTest {
                     SyncNotificationType.NOT_CONNECTED_TO_WIFI -> sharedResR.string.general_sync_notification_lost_wifi_title
                     SyncNotificationType.ERROR -> sharedResR.string.general_sync_notification_generic_error_title
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_title
+                    SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_title
                 },
                 text = when (notificationType) {
                     SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_text
                     SyncNotificationType.NOT_CONNECTED_TO_WIFI -> sharedResR.string.general_sync_notification_lost_wifi_text
                     SyncNotificationType.ERROR -> sharedResR.string.general_sync_notification_generic_error_text
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_text
+                    SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_text
                 },
                 syncNotificationType = notificationType,
                 notificationDetails = NotificationDetails(path = "Path", errorCode = 0)
@@ -111,12 +113,14 @@ internal class SyncNotificationRepositoryImplTest {
                     SyncNotificationType.NOT_CONNECTED_TO_WIFI -> sharedResR.string.general_sync_notification_lost_wifi_title
                     SyncNotificationType.ERROR -> sharedResR.string.general_sync_notification_generic_error_title
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_title
+                    SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_title
                 },
                 text = when (notificationType) {
                     SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_text
                     SyncNotificationType.NOT_CONNECTED_TO_WIFI -> sharedResR.string.general_sync_notification_lost_wifi_text
                     SyncNotificationType.ERROR -> sharedResR.string.general_sync_notification_generic_error_text
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_text
+                    SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_text
                 },
                 syncNotificationType = notificationType,
                 notificationDetails = NotificationDetails(path = "Path", errorCode = null)

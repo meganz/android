@@ -5,6 +5,7 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.BATTERY_LOW
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.CHANGE_SYNC_ROOT
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.ERROR
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.NOT_CONNECTED_TO_WIFI
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.STALLED_ISSUE
@@ -30,6 +31,10 @@ class GetSyncNotificationTypeUseCase @Inject constructor() {
         return when {
             syncs.isEmpty() -> {
                 null
+            }
+
+            syncs.any { it.isLocalPathUri.not() || it.syncError == SyncError.COULD_NOT_CREATE_IGNORE_FILE } -> {
+                CHANGE_SYNC_ROOT
             }
 
             isBatteryLow -> {
