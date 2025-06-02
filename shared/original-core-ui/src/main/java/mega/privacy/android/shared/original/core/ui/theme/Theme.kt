@@ -16,6 +16,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.android.core.ui.tokens.theme.colors.DSColors
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
+import mega.privacy.android.shared.original.core.ui.theme.shape.Shapes
 
 /**
  * Android original theme to be used only in Previews.

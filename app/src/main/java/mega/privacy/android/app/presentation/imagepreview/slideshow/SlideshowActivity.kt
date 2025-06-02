@@ -13,11 +13,9 @@ import android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALW
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -36,6 +34,7 @@ import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SecureS
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SlideshowScreen
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SlideshowSettingScreen
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheetRoundedShape
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.navigation.rememberExtendedBottomSheetNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -99,7 +98,7 @@ class SlideshowActivity : BaseActivity() {
             OriginalTheme(isDark = isDarkMode) {
                 MegaBottomSheetLayout(
                     bottomSheetNavigator = bottomSheetNavigator,
-                    sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+                    sheetShape = BottomSheetRoundedShape()
                 ) {
                     NavHost(navController, startDestination = SlideshowRoute) {
                         composable(SlideshowRoute) {
@@ -201,6 +200,7 @@ class SlideshowActivity : BaseActivity() {
         super.onDestroy()
     }
 }
+
 
 internal const val SlideshowRoute = "slideshow"
 internal const val SlideshowSettingsRoute = "settings"
