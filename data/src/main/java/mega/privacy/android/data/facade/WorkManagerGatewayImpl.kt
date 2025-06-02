@@ -14,6 +14,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkQuery
 import androidx.work.WorkRequest.Companion.MIN_BACKOFF_MILLIS
 import androidx.work.await
+import dagger.Lazy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.mapNotNull
@@ -62,20 +63,20 @@ private val CU_SCHEDULER_INTERVAL = 60.minutes
  * Responsible of managing the queue of workers in the WorkManager
  */
 class WorkManagerGatewayImpl @Inject constructor(
-    private val workManager: WorkManager,
+    private val workManager: Lazy<WorkManager>,
     private val crashReporter: CrashReporter,
     private val workerClassGateway: WorkerClassGateway,
 ) : WorkManagerGateway {
 
     override suspend fun enqueueDeleteOldestCompletedTransfersWorkRequest() {
-        workManager.debugWorkInfo(crashReporter)
+        workManager.get().debugWorkInfo(crashReporter)
 
         val workRequest =
             OneTimeWorkRequest.Builder(workerClassGateway.deleteOldestCompletedTransferWorkerClass)
                 .addTag(DeleteOldestCompletedTransfersWorker.DELETE_OLDEST_TRANSFERS_WORKER_TAG)
                 .build()
 
-        workManager
+        workManager.get()
             .enqueueUniqueWork(
                 DeleteOldestCompletedTransfersWorker.DELETE_OLDEST_TRANSFERS_WORKER_TAG,
                 ExistingWorkPolicy.KEEP,
@@ -84,14 +85,14 @@ class WorkManagerGatewayImpl @Inject constructor(
     }
 
     override suspend fun enqueueDownloadsWorkerRequest() {
-        workManager.debugWorkInfo(crashReporter)
+        workManager.get().debugWorkInfo(crashReporter)
 
         val request =
             OneTimeWorkRequest.Builder(workerClassGateway.downloadsWorkerClass)
                 .addTag(DownloadsWorker.SINGLE_DOWNLOAD_TAG)
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
-        workManager
+        workManager.get()
             .enqueueUniqueWork(
                 DownloadsWorker.SINGLE_DOWNLOAD_TAG,
                 ExistingWorkPolicy.KEEP,
@@ -100,14 +101,14 @@ class WorkManagerGatewayImpl @Inject constructor(
     }
 
     override suspend fun enqueueChatUploadsWorkerRequest() {
-        workManager.debugWorkInfo(crashReporter)
+        workManager.get().debugWorkInfo(crashReporter)
 
         val request =
             OneTimeWorkRequest.Builder(workerClassGateway.chatUploadsWorkerClass)
                 .addTag(ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG)
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
-        workManager
+        workManager.get()
             .enqueueUniqueWork(
                 ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG,
                 ExistingWorkPolicy.KEEP,
@@ -116,7 +117,7 @@ class WorkManagerGatewayImpl @Inject constructor(
     }
 
     override suspend fun enqueueNewMediaWorkerRequest(forceEnqueue: Boolean) {
-        workManager.debugWorkInfo(crashReporter)
+        workManager.get().debugWorkInfo(crashReporter)
 
         val tag = NewMediaWorker.NEW_MEDIA_WORKER_TAG
         if (forceEnqueue || !(isWorkerEnqueuedOrRunning(tag))) {
@@ -144,7 +145,7 @@ class WorkManagerGatewayImpl @Inject constructor(
                     )
                     .addTag(NewMediaWorker.NEW_MEDIA_WORKER_TAG)
                     .build()
-            workManager.enqueue(workRequest)
+            workManager.get().enqueue(workRequest)
         } else {
             Timber.d("New media worker is already running, cannot proceed with one time request")
         }
@@ -153,7 +154,7 @@ class WorkManagerGatewayImpl @Inject constructor(
     override suspend fun startCameraUploads() {
         // Check if CU periodic worker is working. If yes, then don't start a single one
         if (!isWorkerRunning(CAMERA_UPLOAD_TAG)) {
-            workManager.debugWorkInfo(crashReporter)
+            workManager.get().debugWorkInfo(crashReporter)
 
             Timber.d("No CU periodic process currently running, proceed with one time request")
             val cameraUploadWorkRequest =
@@ -165,7 +166,7 @@ class WorkManagerGatewayImpl @Inject constructor(
                     )
                     .build()
 
-            workManager
+            workManager.get()
                 .enqueueUniqueWork(
                     SINGLE_CAMERA_UPLOAD_TAG,
                     ExistingWorkPolicy.KEEP,
@@ -189,7 +190,7 @@ class WorkManagerGatewayImpl @Inject constructor(
     override suspend fun scheduleCameraUploads() {
         scheduleCameraUploadSyncActiveHeartbeat()
 
-        workManager.debugWorkInfo(crashReporter)
+        workManager.get().debugWorkInfo(crashReporter)
 
         // periodic work that runs during the last 5 minutes of every one hour period
         val cameraUploadWorkRequest = PeriodicWorkRequest.Builder(
@@ -200,7 +201,7 @@ class WorkManagerGatewayImpl @Inject constructor(
             .addTag(CAMERA_UPLOAD_TAG)
             .setInitialDelay(duration = CU_SCHEDULER_INTERVAL.toJavaDuration())
             .build()
-        workManager
+        workManager.get()
             .enqueueUniquePeriodicWork(
                 CAMERA_UPLOAD_TAG,
                 ExistingPeriodicWorkPolicy.KEEP,
@@ -213,7 +214,7 @@ class WorkManagerGatewayImpl @Inject constructor(
      * Schedule camera uploads active heartbeat worker
      */
     private suspend fun scheduleCameraUploadSyncActiveHeartbeat() {
-        workManager.debugWorkInfo(crashReporter)
+        workManager.get().debugWorkInfo(crashReporter)
 
         // periodic work that runs during the last 5 minutes of every half an hour period
         val cuSyncActiveHeartbeatWorkRequest = PeriodicWorkRequest.Builder(
@@ -223,7 +224,7 @@ class WorkManagerGatewayImpl @Inject constructor(
         )
             .addTag(HEART_BEAT_TAG)
             .build()
-        workManager
+        workManager.get()
             .enqueueUniquePeriodicWork(
                 HEART_BEAT_TAG,
                 ExistingPeriodicWorkPolicy.KEEP,
@@ -244,7 +245,7 @@ class WorkManagerGatewayImpl @Inject constructor(
             HEART_BEAT_TAG,
             NewMediaWorker.NEW_MEDIA_WORKER_TAG,
         ).forEach {
-            workManager.cancelAllWorkByTag(it).await()
+            workManager.get().cancelAllWorkByTag(it).await()
         }
         Timber.d("cancelCameraUploadAndHeartbeatWorkRequest() SUCCESS")
     }
@@ -253,7 +254,7 @@ class WorkManagerGatewayImpl @Inject constructor(
      * Cancel the Camera Upload one-time worker
      */
     private suspend fun cancelOneTimeCameraUploadWorkRequest() {
-        workManager
+        workManager.get()
             .cancelAllWorkByTag(SINGLE_CAMERA_UPLOAD_TAG)
             .await()
         Timber.d("cancelUniqueCameraUploadWorkRequest() SUCCESS")
@@ -263,7 +264,7 @@ class WorkManagerGatewayImpl @Inject constructor(
      * Cancel the Camera Upload periodic worker
      */
     private suspend fun cancelPeriodicCameraUploadWorkRequest() {
-        workManager
+        workManager.get()
             .cancelAllWorkByTag(CAMERA_UPLOAD_TAG)
             .await()
         Timber.d("cancelPeriodicCameraUploadWorkRequest() SUCCESS")
@@ -275,7 +276,7 @@ class WorkManagerGatewayImpl @Inject constructor(
      * @param tag
      */
     private fun isWorkerRunning(tag: String): Boolean {
-        return workManager.getWorkInfosByTag(tag).get()
+        return workManager.get().getWorkInfosByTag(tag).get()
             ?.map { workInfo -> workInfo.state == WorkInfo.State.RUNNING }
             ?.contains(true)
             ?: false
@@ -287,36 +288,36 @@ class WorkManagerGatewayImpl @Inject constructor(
      * @param tag
      */
     private fun isWorkerEnqueuedOrRunning(tag: String): Boolean {
-        return workManager.getWorkInfosByTag(tag).get()
+        return workManager.get().getWorkInfosByTag(tag).get()
             ?.map { workInfo -> workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING }
             ?.contains(true)
             ?: false
     }
 
     override fun monitorCameraUploadsStatusInfo(): Flow<List<WorkInfo>> {
-        val uploadFlow = workManager.getWorkInfosByTagFlow(CAMERA_UPLOAD_TAG)
+        val uploadFlow = workManager.get().getWorkInfosByTagFlow(CAMERA_UPLOAD_TAG)
         val singleUploadFlow =
-            workManager.getWorkInfosByTagFlow(SINGLE_CAMERA_UPLOAD_TAG)
+            workManager.get().getWorkInfosByTagFlow(SINGLE_CAMERA_UPLOAD_TAG)
         return merge(uploadFlow, singleUploadFlow).mapNotNull {
             it.takeUnless { it.isEmpty() }
         }
     }
 
     override fun monitorDownloadsStatusInfo() =
-        workManager.getWorkInfosByTagFlow(DownloadsWorker.SINGLE_DOWNLOAD_TAG)
+        workManager.get().getWorkInfosByTagFlow(DownloadsWorker.SINGLE_DOWNLOAD_TAG)
 
     override fun monitorChatUploadsStatusInfo() =
-        workManager.getWorkInfosByTagFlow(ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG)
+        workManager.get().getWorkInfosByTagFlow(ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG)
 
     override suspend fun enqueueUploadsWorkerRequest() {
-        workManager.debugWorkInfo(crashReporter)
+        workManager.get().debugWorkInfo(crashReporter)
 
         val request =
             OneTimeWorkRequest.Builder(workerClassGateway.uploadsWorkerClass)
                 .addTag(UploadsWorker.SINGLE_UPLOAD_TAG)
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
-        workManager
+        workManager.get()
             .enqueueUniqueWork(
                 UploadsWorker.SINGLE_UPLOAD_TAG,
                 ExistingWorkPolicy.KEEP,
@@ -325,15 +326,15 @@ class WorkManagerGatewayImpl @Inject constructor(
     }
 
     override fun monitorUploadsStatusInfo() =
-        workManager.getWorkInfosByTagFlow(UploadsWorker.SINGLE_UPLOAD_TAG)
+        workManager.get().getWorkInfosByTagFlow(UploadsWorker.SINGLE_UPLOAD_TAG)
 
     override suspend fun startOfflineSync() {
-        workManager.debugWorkInfo(crashReporter)
+        workManager.get().debugWorkInfo(crashReporter)
         val request =
             OneTimeWorkRequest.Builder(workerClassGateway.offlineSyncWorkerClass)
                 .addTag(OFFLINE_SYNC_WORKER_TAG)
                 .build()
-        workManager
+        workManager.get()
             .enqueueUniqueWork(
                 OFFLINE_SYNC_WORKER_TAG,
                 ExistingWorkPolicy.KEEP,

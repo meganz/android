@@ -43,7 +43,7 @@ class SyncWorkManagerGatewayImplTest {
         workManager = WorkManager.getInstance(context)
 
         underTest = SyncWorkManagerGatewayImpl(
-            workManager = workManager,
+            workManager = { workManager },
             crashReporter = crashReporter,
         )
     }

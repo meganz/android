@@ -7,10 +7,12 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Handler
 import android.os.Looper
 import android.os.StrictMode
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDexApplication
+import androidx.work.Configuration
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
@@ -21,7 +23,11 @@ import com.google.android.gms.ads.MobileAds
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.Lazy
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -103,7 +109,7 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
-    ImageLoaderFactory {
+    ImageLoaderFactory, Configuration.Provider {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
@@ -539,6 +545,26 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
      */
     val currentActivity: Activity?
         get() = activityLifecycleHandler.getCurrentActivity()
+
+    override val workManagerConfiguration: Configuration
+        get() {
+            val workManagerEntryPoint = EntryPointAccessors.fromApplication(
+                this,
+                WorkManagerInitializerEntryPoint::class.java
+            )
+            return Configuration.Builder()
+                .setWorkerFactory(workManagerEntryPoint.hiltWorkerFactory())
+                .build()
+        }
+
+    @InstallIn(SingletonComponent::class)
+    @EntryPoint
+    internal interface WorkManagerInitializerEntryPoint {
+        /**
+         * HiltWorkerFactory
+         */
+        fun hiltWorkerFactory(): HiltWorkerFactory
+    }
 
     companion object {
         /**

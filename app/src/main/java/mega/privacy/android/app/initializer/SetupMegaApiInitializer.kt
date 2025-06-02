@@ -136,7 +136,7 @@ class SetupMegaApiInitializer : Initializer<Unit> {
      *
      */
     override fun dependencies(): List<Class<out Initializer<*>>> =
-        listOf(LoggerInitializer::class.java, WorkManagerInitializer::class.java)
+        listOf(LoggerInitializer::class.java)
 
     companion object {
         private const val BUFFER_COMP: Long = 1073741824 // 1 GB

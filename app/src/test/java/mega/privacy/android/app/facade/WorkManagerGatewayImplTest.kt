@@ -50,7 +50,7 @@ class WorkManagerGatewayImplTest {
         workManager = WorkManager.getInstance(context)
 
         underTest = WorkManagerGatewayImpl(
-            workManager = workManager,
+            workManager = { workManager },
             crashReporter = crashReporter,
             workerClassGateway = workerClassGateway,
         )
