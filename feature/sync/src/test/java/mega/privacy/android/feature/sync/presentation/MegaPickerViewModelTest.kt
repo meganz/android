@@ -18,6 +18,7 @@ import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -32,12 +33,14 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -54,6 +57,7 @@ internal class MegaPickerViewModelTest {
     private val getMediaUploadsFolderHandleUseCase: GetSecondaryFolderNodeUseCase = mock()
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase = mock()
     private val createFolderNodeUseCase: CreateFolderNodeUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private val typedNodeUiModels: List<TypedNodeUiModel> = emptyList()
     private val childrenNodes: List<TypedNode> = emptyList()
@@ -73,6 +77,7 @@ internal class MegaPickerViewModelTest {
             getMediaUploadsFolderHandleUseCase,
             getMyChatsFilesFolderIdUseCase,
             createFolderNodeUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 
@@ -274,6 +279,7 @@ internal class MegaPickerViewModelTest {
     fun `test that disable battery optimization permission is shown when it is not granted`() =
         runTest {
             initViewModel()
+            whenever(getFeatureFlagValueUseCase.invoke(any())).thenReturn(true)
 
             underTest.handleAction(
                 MegaPickerAction.CurrentFolderSelected(
@@ -415,6 +421,7 @@ internal class MegaPickerViewModelTest {
     }
 
     private fun initViewModel() {
+        wheneverBlocking { getFeatureFlagValueUseCase.invoke(any()) }.thenReturn(false)
         underTest = MegaPickerViewModel(
             setSelectedMegaFolderUseCase,
             getRootNodeUseCase,
@@ -425,7 +432,8 @@ internal class MegaPickerViewModelTest {
             getCameraUploadsFolderHandleUseCase,
             getMediaUploadsFolderHandleUseCase,
             getMyChatsFilesFolderIdUseCase,
-            createFolderNodeUseCase
+            createFolderNodeUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 }

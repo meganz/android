@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
-import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,12 +20,15 @@ import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -42,6 +44,7 @@ internal class MegaPickerViewModel @Inject constructor(
     private val getMediaUploadsFolderHandleUseCase: GetSecondaryFolderNodeUseCase,
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MegaPickerState())
@@ -77,13 +80,16 @@ internal class MegaPickerViewModel @Inject constructor(
             }
 
             is MegaPickerAction.CurrentFolderSelected -> {
-                if (action.allFilesAccessPermissionGranted) {
-                    allFilesPermissionShown = true
-                }
-                if (action.disableBatteryOptimizationPermissionGranted) {
-                    disableBatteryOptimizationsPermissionShown = true
-                }
                 viewModelScope.launch {
+                    if (action.allFilesAccessPermissionGranted) {
+                        allFilesPermissionShown = true
+                    }
+                    if (action.disableBatteryOptimizationPermissionGranted || !getFeatureFlagValueUseCase(
+                            SyncFeatures.DisableBatteryOptimization
+                        )
+                    ) {
+                        disableBatteryOptimizationsPermissionShown = true
+                    }
                     runCatching {
                         tryNodeSyncUseCase(state.value.currentFolder?.id ?: NodeId(0))
                     }.onSuccess {
