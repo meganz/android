@@ -100,6 +100,9 @@ internal class FileFacadeTest {
 
                 whenever(contentUriMock.toString()).thenReturn(uriString)
                 whenever(Uri.parse(uriString)).thenReturn(contentUriMock)
+                whenever(documentFileWrapper.getAbsolutePathFromContentUri(contentUriMock)).thenReturn(
+                    expected
+                )
 
                 assertThat(underTest.getExternalPathByUri(uriString)).isEqualTo(expected)
             }
@@ -119,8 +122,9 @@ internal class FileFacadeTest {
                 whenever(contentUriMock.toString()).thenReturn(uriString)
                 whenever(contentUriMock.lastPathSegment).thenReturn("primary:Sync/someFolder")
                 whenever(Uri.parse(uriString)).thenReturn(contentUriMock)
-                whenever(Environment.getExternalStorageDirectory())
-                    .thenReturn(File("/storage/emulated/0"))
+                whenever(documentFileWrapper.getAbsolutePathFromContentUri(contentUriMock)).thenReturn(
+                    expected
+                )
 
                 assertThat(underTest.getExternalPathByUri(uriString)).isEqualTo(expected)
             }

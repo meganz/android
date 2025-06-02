@@ -310,26 +310,7 @@ internal class FileFacade @Inject constructor(
             uriString
         } else {
             toUri().let { uri ->
-                when (uri.scheme) {
-                    "file" -> {
-                        uri.path
-                    }
-
-                    "content" -> {
-                        val externalStorageDir = Environment.getExternalStorageDirectory().path
-                        uri.lastPathSegment
-                            ?.split(":")
-                            ?.lastOrNull()
-                            ?.let {
-                                if (it.contains(externalStorageDir)) it
-                                else "$externalStorageDir/$it"
-                            }
-                    }
-
-                    else -> {
-                        null
-                    }
-                }
+                documentFileWrapper.getAbsolutePathFromContentUri(uri)
             }
         }
     }
