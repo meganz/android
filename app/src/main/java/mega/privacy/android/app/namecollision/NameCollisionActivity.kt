@@ -1,6 +1,5 @@
 package mega.privacy.android.app.namecollision
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -34,7 +33,6 @@ import mega.privacy.android.app.presentation.settings.model.StorageTargetPrefere
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
-import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_COLLISION_RESULTS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_SINGLE_COLLISION_RESULT
@@ -46,6 +44,8 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
 import javax.inject.Inject

@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.favourites.model
 
-import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.MegaException
 
 /**
  * The favourite list load state

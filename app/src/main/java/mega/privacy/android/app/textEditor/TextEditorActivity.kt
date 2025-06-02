@@ -1,6 +1,5 @@
 package mega.privacy.android.app.textEditor
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
@@ -62,7 +61,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CONVERTED_FILE_NAME
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
-import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.ANIMATION_DURATION
@@ -102,8 +100,10 @@ import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.TextEditorCloseMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.TextEditorCopyMenuItemEvent
 import mega.privacy.mobile.analytics.event.TextEditorDownloadMenuToolbarEvent

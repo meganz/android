@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.fileinfo.model
 import android.content.Context
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
-import mega.privacy.android.app.usecase.exception.MegaException
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.ShareAccessNotSetException
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import nz.mega.sdk.MegaError
@@ -73,7 +73,7 @@ sealed class FileInfoJobInProgressState(
     ) {
         override fun customErrorMessage(context: Context, exception: Throwable?): String? =
             (exception as? MegaException)
-                ?.takeIf { it.errorCode == MegaError.API_EMASTERONLY }?.errorMessage
+                ?.takeIf { it.errorCode == MegaError.API_EMASTERONLY }?.errorString
     }
 
     /**

@@ -57,8 +57,6 @@ import mega.privacy.android.app.presentation.verification.SMSVerificationActivit
 import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountProtectionAlertActivity
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
-import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
-import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
@@ -99,6 +97,8 @@ import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
@@ -1310,12 +1310,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             true
         }
 
-        is QuotaExceededMegaException, is mega.privacy.android.domain.exception.QuotaExceededMegaException -> {
+        is QuotaExceededMegaException -> {
             launchOverQuota()
             true
         }
 
-        is NotEnoughQuotaMegaException, is mega.privacy.android.domain.exception.NotEnoughQuotaMegaException -> {
+        is NotEnoughQuotaMegaException -> {
             launchPreOverQuota()
             true
         }
