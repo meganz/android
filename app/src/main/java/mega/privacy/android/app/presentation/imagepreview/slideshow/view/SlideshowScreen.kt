@@ -293,13 +293,16 @@ private suspend fun resetZoom(
     viewState: SlideshowState,
     zoomableStateMap: Map<NodeId, ZoomableState?>,
 ) {
-    val page = pagerState.currentPage
-    for (candidatePage in page - 1..page + 1) {
-        viewState.imageNodes.getOrNull(candidatePage)
-            ?.let { node ->
-                zoomableStateMap[node.id]?.resetZoom()
+    val currentPage = pagerState.currentPage
+    (currentPage - 1..currentPage + 1)
+        .asSequence()
+        .mapNotNull { index ->
+            viewState.imageNodes.getOrNull(index)?.id?.let { nodeId ->
+                zoomableStateMap[nodeId]
             }
-    }
+        }
+        .firstOrNull { state -> (state.zoomFraction ?: 0f) > 0f }
+        ?.resetZoom()
 }
 
 @Composable
