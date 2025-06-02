@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.chat.message.paging
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
@@ -38,7 +39,15 @@ class FetchMessagePageUseCase @Inject constructor(
         )
 
         return kotlinx.coroutines.coroutineScope {
-            val messageResponse = async { getMessageListUseCase(messageFlow) }
+            val messageResponse =
+                async {
+                    runCatching { getMessageListUseCase(messageFlow) }
+                        .getOrElse {
+                            if (it is TimeoutCancellationException) {
+                                emptyList()
+                            } else throw it
+                        }
+                }
             val loadResponse = async { loadMessagesUseCase(chatId) }
             return@coroutineScope FetchMessagePageResponse(
                 chatId = chatId,
