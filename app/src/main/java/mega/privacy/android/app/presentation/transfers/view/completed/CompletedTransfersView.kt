@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.transfers.view.completed
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -7,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,9 +27,13 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 internal fun CompletedTransfersView(
     completedTransfers: ImmutableList<CompletedTransfer>,
+    selectedCompletedTransfersIds: ImmutableList<Int>?,
+    onCompletedTransferSelected: (CompletedTransfer) -> Unit,
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
+    val selectMode =
+        remember(selectedCompletedTransfersIds) { selectedCompletedTransfersIds != null }
     if (completedTransfers.isEmpty()) {
         EmptyTransfersView(
             emptyStringId = sharedR.string.transfers_no_completed_transfers_empty_text,
@@ -40,7 +47,20 @@ internal fun CompletedTransfersView(
                 .testTag(TEST_TAG_COMPLETED_TRANSFERS_VIEW)
         ) {
             items(items = completedTransfers, key = { it.id ?: 0 }) { item ->
-                CompletedTransferItem(completedTransfer = item)
+                CompletedTransferItem(
+                    completedTransfer = item,
+                    isSelected = selectedCompletedTransfersIds?.contains(item.id) == true,
+                    modifier = Modifier.then(
+                        if (selectMode) {
+                            Modifier.clickable { onCompletedTransferSelected(item) }
+                        } else {
+                            Modifier.combinedClickable(
+                                onClick = { },
+                                onLongClick = { onCompletedTransferSelected(item) },
+                            )
+                        }
+                    ),
+                )
             }
         }
     }
@@ -49,6 +69,8 @@ internal fun CompletedTransfersView(
 @Composable
 internal fun CompletedTransferItem(
     completedTransfer: CompletedTransfer,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier,
     viewModel: CompletedTransferImageViewModel = hiltViewModel(),
 ) = with(completedTransfer) {
     id?.let {
@@ -65,7 +87,9 @@ internal fun CompletedTransferItem(
             fileName = fileName,
             location = path,
             sizeString = size,
-            date = TimeUtils.formatLongDateTime(timestamp.milliseconds.inWholeSeconds)
+            date = TimeUtils.formatLongDateTime(timestamp.milliseconds.inWholeSeconds),
+            isSelected = isSelected,
+            modifier = modifier
         )
     }
 }

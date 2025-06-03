@@ -116,6 +116,9 @@ class TransfersViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 activeTransfers = activeTransfers.toImmutableList(),
+                selectedActiveTransfersIds = state.selectedActiveTransfersIds?.filter { selectedId ->
+                    activeTransfers.any { it.uniqueId == selectedId }
+                }?.toImmutableList()
             )
         }
     }
@@ -455,32 +458,33 @@ class TransfersViewModel @Inject constructor(
      */
     fun startActiveTransfersSelection() {
         _uiState.update {
-            it.copy(selectedActiveTransfers = emptyList<InProgressTransfer>().toImmutableList())
+            it.copy(selectedActiveTransfersIds = emptyList<Long>().toImmutableList())
         }
     }
 
     /**
-     * Stop active transfers selection by updating the selected active transfers to null
+     * Stop transfers selection by updating the selected transfers to null
      */
-    fun stopActiveTransfersSelection() {
+    fun stopTransfersSelection() {
         _uiState.update {
-            it.copy(selectedActiveTransfers = null)
+            it.copy(selectedActiveTransfersIds = null, selectedCompletedTransfersIds = null)
         }
     }
 
     /**
      * Add the transfer to selected transfers
      */
-    fun selectActiveTransfer(inProgressTransfer: InProgressTransfer) {
-        val newSelection = (uiState.value.selectedActiveTransfers ?: emptyList()).let { selected ->
-            if (selected.contains(inProgressTransfer)) {
-                selected - inProgressTransfer
-            } else {
-                selected + inProgressTransfer
+    fun toggleActiveTransferSelected(inProgressTransfer: InProgressTransfer) {
+        val newSelection =
+            (uiState.value.selectedActiveTransfersIds ?: emptyList()).let { selected ->
+                if (selected.contains(inProgressTransfer.uniqueId)) {
+                    selected - inProgressTransfer.uniqueId
+                } else {
+                    selected + inProgressTransfer.uniqueId
+                }
             }
-        }
         _uiState.update {
-            it.copy(selectedActiveTransfers = newSelection.toImmutableList())
+            it.copy(selectedActiveTransfersIds = newSelection.toImmutableList())
         }
     }
 
@@ -488,8 +492,9 @@ class TransfersViewModel @Inject constructor(
      * Add all the active transfers to the selected transfers
      */
     fun selectAllActiveTransfers() {
-        _uiState.update {
-            it.copy(selectedActiveTransfers = it.activeTransfers)
+        _uiState.update { uiState ->
+            uiState.copy(selectedActiveTransfersIds = uiState.activeTransfers.map { it.uniqueId }
+                .toImmutableList())
         }
     }
 
@@ -503,20 +508,80 @@ class TransfersViewModel @Inject constructor(
             viewModelScope.launch {
                 runCatching<Unit> {
                     coroutineScope {
-                        uiState.value.selectedActiveTransfers?.map {
+                        uiState.value.selectedActiveTransfersIds?.map { uniqueId ->
                             async {
-                                cancelTransferByTagUseCase(it.tag)
+                                uiState.value.activeTransfers.firstOrNull { it.uniqueId == uniqueId }
+                                    ?.let {
+                                        cancelTransferByTagUseCase(it.tag)
+                                    }
                             }
                         }?.awaitAll()
                     }
                 }.onFailure { Timber.e(it) }
-                stopActiveTransfersSelection()
             }
         }
+        stopTransfersSelection()
     }
 
     //internal value to preserve previous priority while dragged changes are not send to SDK yet
     private var reordering = false
+
+    /**
+     * Add the transfer to selected transfers
+     */
+    fun toggleCompletedTransferSelection(completedTransfer: CompletedTransfer) {
+        val newSelection =
+            (uiState.value.selectedCompletedTransfersIds ?: emptyList()).let { selected ->
+                if (selected.contains(completedTransfer.id)) {
+                    selected - completedTransfer.id
+                } else {
+                    selected + completedTransfer.id
+                }
+            }.filterNotNull()
+        _uiState.update {
+            it.copy(selectedCompletedTransfersIds = newSelection.toImmutableList())
+        }
+    }
+
+    /**
+     * Add all the active transfers to the selected transfers
+     */
+    fun selectAllCompletedTransfers() {
+        _uiState.update { uiState ->
+            uiState.copy(
+                selectedCompletedTransfersIds = uiState.completedTransfers.mapNotNull { it.id }
+                    .toImmutableList()
+            )
+        }
+    }
+
+    /**
+     * Cancel all selected active transfers
+     */
+    fun clearSelectedCompletedTransfers() {
+        if (uiState.value.areAllCompletedTransfersSelected) {
+            clearAllCompletedTransfers()
+        } else {
+            viewModelScope.launch {
+                runCatching<Unit> {
+                    uiState.value.selectedCompletedTransfersIds?.takeIf { it.isNotEmpty() }
+                        ?.let { selectedCompletedTransfers ->
+                            deleteCompletedTransfersByIdUseCase(selectedCompletedTransfers)
+                        }
+                }.onFailure { Timber.e(it) }
+            }
+        }
+        stopTransfersSelection()
+    }
+
+    /**
+     * Start completed transfers selection by updating the selected active transfers to an empty list
+     */
+    fun startCompletedTransfersSelection() {
+        _uiState.update {
+            it.copy(selectedCompletedTransfersIds = emptyList<Int>().toImmutableList())
+        }
+    }
 }
 
 internal class StartTransferEvent(

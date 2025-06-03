@@ -38,7 +38,13 @@ class CompletedTransfersViewTest {
         completedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
     ) {
         composeTestRule.setContent {
-            CompletedTransfersView(completedTransfers = completedTransfers, lazyListState = mock(),)
+            CompletedTransfersView(
+                completedTransfers = completedTransfers,
+                lazyListState = mock(),
+                selectedCompletedTransfersIds = mock(),
+                onCompletedTransferSelected = mock(),
+                modifier = mock(),
+            )
         }
     }
 }

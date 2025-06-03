@@ -218,7 +218,10 @@ class TransfersViewTest {
             uiState = TransfersUiState(
                 selectedTab = ACTIVE_TAB_INDEX,
                 activeTransfers = inProgressTransfers,
-                selectedActiveTransfers = inProgressTransfers.take(1).toImmutableList(),
+                selectedActiveTransfersIds = inProgressTransfers
+                    .take(1)
+                    .map { it.uniqueId }
+                    .toImmutableList(),
             )
         )
 
@@ -231,7 +234,10 @@ class TransfersViewTest {
             uiState = TransfersUiState(
                 selectedTab = ACTIVE_TAB_INDEX,
                 activeTransfers = inProgressTransfers,
-                selectedActiveTransfers = inProgressTransfers.take(1).toImmutableList(),
+                selectedActiveTransfersIds = inProgressTransfers
+                    .take(1)
+                    .map { it.uniqueId }
+                    .toImmutableList(),
             )
         )
 
@@ -260,7 +266,11 @@ class TransfersViewTest {
                     onActiveTransferSelected = {},
                     onSelectActiveTransfers = {},
                     onSelectAllActiveTransfers = {},
-                    onSelectActiveTransfersClose = {},
+                    onSelectTransfersClose = {},
+                    onSelectCompletedTransfers = {},
+                    onCompletedTransferSelected = {},
+                    onClearSelectedCompletedTransfers = {},
+                    onSelectAllCompletedTransfers = {},
                 )
             }
         }

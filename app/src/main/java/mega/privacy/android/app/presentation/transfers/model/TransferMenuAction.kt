@@ -48,12 +48,21 @@ sealed interface TransferMenuAction : TopAppBarAction {
     ), TransferMenuAction
 
     /**
-     * Select all
+     * Cancel selected
      */
     data object CancelSelected : TopAppBarActionString(
         iconRes = iconPackR.drawable.ic_minus_circle_medium_regular_outline,
         descriptionRes = R.string.cancel_transfers,
         testTag = TEST_TAG_CANCEL_ACTION,
+    ), TransferMenuAction
+
+    /**
+     * Clear selected
+     */
+    data object ClearSelected : TopAppBarActionString(
+        iconRes = iconPackR.drawable.ic_eraser_medium_regular_outline,
+        descriptionRes = R.string.general_clear,
+        testTag = TEST_TAG_CLEAR_ACTION,
     ), TransferMenuAction
 
     companion object {
@@ -81,5 +90,10 @@ sealed interface TransferMenuAction : TopAppBarAction {
          * Test Tag cancel selected transfers Action
          */
         const val TEST_TAG_CANCEL_ACTION = "transfers_view:action_cancel_selected"
+
+        /**
+         * Test Tag clear selected transfers Action
+         */
+        const val TEST_TAG_CLEAR_ACTION = "transfers_view:action_clear_selected"
     }
 }

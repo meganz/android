@@ -9,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueU
 import nz.mega.sdk.MegaTransfer
 import okhttp3.internal.immutableListOf
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
@@ -133,16 +135,16 @@ class TransfersViewModelTest {
         on { this.appData } doReturn appDataString
         on { this.originalPath } doReturn originalPath
     }
-    val typedNode = mock<TypedNode>()
-    val offlineStartEvent = TransferTriggerEvent.StartDownloadForOffline(
+    private val typedNode = mock<TypedNode>()
+    private val offlineStartEvent = TransferTriggerEvent.StartDownloadForOffline(
         node = typedNode,
         withStartMessage = false
     )
-    val downloadStartEvent = TransferTriggerEvent.StartDownloadNode(
+    private val downloadStartEvent = TransferTriggerEvent.StartDownloadNode(
         nodes = listOf(typedNode),
         withStartMessage = false
     )
-    val uploadStartEvent = TransferTriggerEvent.StartUpload.Files(
+    private val uploadStartEvent = TransferTriggerEvent.StartUpload.Files(
         mapOf(originalPath to null),
         NodeId(failedUpload.parentHandle)
     )
@@ -164,6 +166,8 @@ class TransfersViewModelTest {
             isUriPathInCacheUseCase,
             transferAppDataMapper,
             cancelTransferByTagUseCase,
+            cancelTransfersUseCase,
+            monitorCompletedTransfersUseCase,
         )
         wheneverBlocking { monitorInProgressTransfersUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
@@ -922,75 +926,189 @@ class TransfersViewModelTest {
             verify(deleteCompletedTransfersUseCase).invoke()
         }
 
-    @Test
-    fun `test that startActiveTransfersSelection set selected transfers to empty list`() = runTest {
-        initTestClass()
-        underTest.uiState.test {
-            assertThat(awaitItem().selectedActiveTransfers).isNull()
+    @Nested
+    inner class SelectModeActiveTransfers {
+        @Test
+        fun `test that startActiveTransfersSelection set selected transfers to empty list`() =
+            runTest {
+                initTestClass()
+                underTest.uiState.test {
+                    assertThat(awaitItem().selectedActiveTransfersIds).isNull()
+                    underTest.startActiveTransfersSelection()
+                    assertThat(awaitItem().selectedActiveTransfersIds).isEmpty()
+                }
+            }
+
+        @Test
+        fun `test that stopActiveTransfersSelection set selected transfers to null`() = runTest {
+            initTestClass()
             underTest.startActiveTransfersSelection()
-            assertThat(awaitItem().selectedActiveTransfers).isEmpty()
+            underTest.uiState.test {
+                assertThat(awaitItem().selectedActiveTransfersIds).isNotNull()
+                underTest.stopTransfersSelection()
+                assertThat(awaitItem().selectedActiveTransfersIds).isNull()
+            }
         }
-    }
 
-    @Test
-    fun `test that stopActiveTransfersSelection set selected transfers to null`() = runTest {
-        initTestClass()
-        underTest.startActiveTransfersSelection()
-        underTest.uiState.test {
-            assertThat(awaitItem().selectedActiveTransfers).isNotNull()
-            underTest.stopActiveTransfersSelection()
-            assertThat(awaitItem().selectedActiveTransfers).isNull()
-        }
-    }
-
-    @Test
-    fun `test that selectActiveTransfer adds the transfer to selected transfers`() = runTest {
-        initTestClass()
-        underTest.startActiveTransfersSelection()
-        val inProgressTransfer = mock<InProgressTransfer.Download>()
-        underTest.uiState.test {
-            assertThat(awaitItem().selectedActiveTransfers).isEmpty()
-            underTest.selectActiveTransfer(inProgressTransfer)
-            assertThat(awaitItem().selectedActiveTransfers).contains(inProgressTransfer)
-        }
-    }
-
-    @Test
-    fun `test that selectAllActiveTransfers adds all current active transfers to selected transfers`() =
-        runTest {
+        @Test
+        fun `test that selectActiveTransfer adds the transfer to selected transfers`() = runTest {
             val initialActiveTransfers = (1..10).map { index ->
                 mock<InProgressTransfer.Download> {
                     on { this.priority } doReturn index.toBigInteger()
                     on { this.tag } doReturn index
+                    on { this.uniqueId } doReturn index.toLong()
                 }
             }
-            val map = initialActiveTransfers.associateBy { it.tag.toLong() }
-            whenever(monitorInProgressTransfersUseCase()).thenReturn(
-                map.asHotFlow()
-            )
+            val map = initialActiveTransfers.associateBy { it.uniqueId }
+            whenever(monitorInProgressTransfersUseCase()).thenReturn(map.asHotFlow())
             initTestClass()
             underTest.startActiveTransfersSelection()
-
+            val inProgressTransfer = initialActiveTransfers[3]
+            val uniqueId = inProgressTransfer.uniqueId
             underTest.uiState.test {
-                assertThat(awaitItem().selectedActiveTransfers).isEmpty()
-                underTest.selectAllActiveTransfers()
-                assertThat(awaitItem().selectedActiveTransfers)
-                    .containsExactlyElementsIn(initialActiveTransfers)
+                assertThat(awaitItem().selectedActiveTransfersIds).isEmpty()
+                underTest.toggleActiveTransferSelected(inProgressTransfer)
+                assertThat(awaitItem().selectedActiveTransfersIds).contains(uniqueId)
             }
         }
 
-    @Test
-    fun `test that cancelSelectedActiveTransfers cancels selected transfers`() = runTest {
-        initTestClass()
-        val tag = 3454
-        val inProgressTransfer = mock<InProgressTransfer.Download> {
-            on { it.tag } doReturn tag
+        @Test
+        fun `test that selectAllActiveTransfers adds all current active transfers to selected transfers`() =
+            runTest {
+                val initialActiveTransfers = (1..10).map { index ->
+                    mock<InProgressTransfer.Download> {
+                        on { this.priority } doReturn index.toBigInteger()
+                        on { this.tag } doReturn index
+                        on { this.uniqueId } doReturn index.toLong()
+                    }
+                }
+                val map = initialActiveTransfers.associateBy { it.uniqueId }
+                val uniqueIds = initialActiveTransfers.map { it.uniqueId }
+                whenever(monitorInProgressTransfersUseCase()).thenReturn(map.asHotFlow())
+                initTestClass()
+                underTest.startActiveTransfersSelection()
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().selectedActiveTransfersIds).isEmpty()
+                    underTest.selectAllActiveTransfers()
+                    assertThat(awaitItem().selectedActiveTransfersIds)
+                        .containsExactlyElementsIn(uniqueIds)
+                }
+            }
+
+        @Test
+        fun `test that cancelSelectedActiveTransfers cancels selected transfers`() = runTest {
+            val tag = 3454
+            val inProgressTransfer = mock<InProgressTransfer.Download> {
+                on { it.tag } doReturn tag
+                on { it.uniqueId } doReturn 546345L
+            }
+            val inProgressTransfer2 = mock<InProgressTransfer.Download> {
+                on { it.tag } doReturn 4643
+                on { it.uniqueId } doReturn 94354L
+            }
+            val flow = flowOf(
+                listOf(
+                    inProgressTransfer,
+                    inProgressTransfer2,
+                ).associateBy { it.uniqueId }
+            )
+            whenever(monitorInProgressTransfersUseCase()).thenReturn(flow)
+            initTestClass()
+
+            underTest.toggleActiveTransferSelected(inProgressTransfer)
+
+            underTest.cancelSelectedActiveTransfers()
+
+            verify(cancelTransferByTagUseCase)(tag)
         }
-        underTest.selectActiveTransfer(inProgressTransfer)
+    }
 
-        underTest.cancelSelectedActiveTransfers()
+    @Nested
+    inner class SelectModeCompletedTransfers {
+        @Test
+        fun `test that startCompletedTransfersSelection set selected transfers to empty list`() =
+            runTest {
+                initTestClass()
+                underTest.uiState.test {
+                    assertThat(awaitItem().selectedCompletedTransfersIds).isNull()
+                    underTest.startCompletedTransfersSelection()
+                    assertThat(awaitItem().selectedCompletedTransfersIds).isEmpty()
+                }
+            }
 
-        verify(cancelTransferByTagUseCase)(tag)
+        @Test
+        fun `test that stopTransfersSelection set selected transfers to null`() = runTest {
+            initTestClass()
+            underTest.startCompletedTransfersSelection()
+            underTest.uiState.test {
+                assertThat(awaitItem().selectedCompletedTransfersIds).isNotNull()
+                underTest.stopTransfersSelection()
+                assertThat(awaitItem().selectedCompletedTransfersIds).isNull()
+            }
+        }
+
+        @Test
+        fun `test that toggleCompletedTransferSelection adds the transfer to selected transfers`() =
+            runTest {
+                val completedTransfers = (1..10).map { index ->
+                    mock<CompletedTransfer> {
+                        on { this.id } doReturn index
+                        on { it.state } doReturn MegaTransfer.STATE_COMPLETED
+                    }
+                }
+                whenever(monitorCompletedTransfersUseCase()) doReturn completedTransfers.asHotFlow()
+                initTestClass()
+                underTest.startCompletedTransfersSelection()
+                val completedTransfer = completedTransfers[3]
+                val id = completedTransfer.id
+                underTest.uiState.test {
+                    assertThat(awaitItem().selectedCompletedTransfersIds).isEmpty()
+                    underTest.toggleCompletedTransferSelection(completedTransfer)
+                    assertThat(awaitItem().selectedCompletedTransfersIds).contains(id)
+                }
+            }
+
+        @Test
+        fun `test that selectAllCompletedTransfers adds all current active transfers to selected transfers`() =
+            runTest {
+                val completedTransfers = (1..10).map { index ->
+                    mock<CompletedTransfer> {
+                        on { this.id } doReturn index
+                        on { it.state } doReturn MegaTransfer.STATE_COMPLETED
+                    }
+                }
+                whenever(monitorCompletedTransfersUseCase()) doReturn completedTransfers.asHotFlow()
+                initTestClass()
+                underTest.startCompletedTransfersSelection()
+                val ids = completedTransfers.map { it.id }
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().completedTransfers).isNotEmpty()
+                    underTest.selectAllCompletedTransfers()
+                    assertThat(awaitItem().selectedCompletedTransfersIds)
+                        .containsExactlyElementsIn(ids)
+                }
+            }
+
+        @Test
+        fun `test that clearSelectedCompletedTransfers clear selected transfers`() = runTest {
+            val completedTransfers = (1..10).map { index ->
+                mock<CompletedTransfer> {
+                    on { this.id } doReturn index
+                    on { it.state } doReturn MegaTransfer.STATE_COMPLETED
+                }
+            }
+            whenever(monitorCompletedTransfersUseCase()) doReturn completedTransfers.asHotFlow()
+            initTestClass()
+            val completedTransferSelected = completedTransfers[3]
+            val id = completedTransferSelected.id ?: -1
+            underTest.toggleCompletedTransferSelection(completedTransferSelected)
+
+            underTest.clearSelectedCompletedTransfers()
+
+            verify(deleteCompletedTransfersByIdUseCase)(listOf(id))
+        }
     }
 
     companion object {

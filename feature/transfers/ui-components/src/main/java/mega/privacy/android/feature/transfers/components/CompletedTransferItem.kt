@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.transfers.components
 
 import android.net.Uri
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +43,7 @@ fun CompletedTransferItem(
     location: String,
     sizeString: String?,
     date: String?,
+    isSelected: Boolean,
     modifier: Modifier = Modifier,
     onMoreClicked: () -> Unit = {},
 ) = CompletedTransferItem(
@@ -54,6 +56,7 @@ fun CompletedTransferItem(
     date = date,
     error = null,
     modifier = modifier,
+    isSelected = isSelected,
     onMoreClicked = onMoreClicked
 )
 
@@ -68,6 +71,7 @@ internal fun CompletedTransferItem(
     date: String?,
     error: String?,
     modifier: Modifier = Modifier,
+    isSelected: Boolean = false,
     onMoreClicked: () -> Unit = {},
 ) = Box {
     Row(
@@ -84,13 +88,17 @@ internal fun CompletedTransferItem(
         } else {
             error ?: stringResource(id = sharedR.string.transfers_section_cancelled)
         }
-        TransferImage(
-            fileTypeResId = fileTypeResId,
-            previewUri = previewUri,
-            modifier = Modifier
-                .testTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE)
-                .padding(start = 12.dp),
-        )
+        AnimatedContent(targetState = isSelected, label = "node thumbnail") {
+            if (it) {
+                SelectedTransferIcon()
+            } else {
+                TransferImage(
+                    fileTypeResId = fileTypeResId,
+                    previewUri = previewUri,
+                    modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE),
+                )
+            }
+        }
         Column(
             Modifier
                 .padding(horizontal = 8.dp)
@@ -163,6 +171,7 @@ private fun CompletedTransferItemPreview(
                 location = location ?: "Cloud Drive",
                 sizeString = sizeString,
                 date = date,
+                isSelected = isSelected,
             )
         }
     }
@@ -177,6 +186,7 @@ internal data class CompletedTransferUI(
     val error: String?,
     val sizeString: String?,
     val date: String?,
+    val isSelected: Boolean = false,
 )
 
 private class CompletedTransferItemProvider : PreviewParameterProvider<CompletedTransferUI> {
@@ -194,6 +204,7 @@ private class CompletedTransferItemProvider : PreviewParameterProvider<Completed
             error = null,
             sizeString = sizeString,
             date = date,
+            isSelected = false,
         ),
         CompletedTransferUI(
             isDownload = true,
@@ -204,6 +215,7 @@ private class CompletedTransferItemProvider : PreviewParameterProvider<Completed
             error = null,
             sizeString = sizeString,
             date = date,
+            isSelected = true,
         ),
     ).asSequence()
 }

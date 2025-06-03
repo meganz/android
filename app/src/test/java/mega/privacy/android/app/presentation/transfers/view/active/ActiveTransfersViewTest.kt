@@ -170,7 +170,7 @@ class ActiveTransfersViewTest {
                     onPlayPauseClicked = {},
                     onReorderPreview = onReorderPreview,
                     onReorderConfirmed = onReorderConfirmed,
-                    selectedActiveTransfers = null,
+                    selectedActiveTransfersIds = null,
                     onActiveTransferSelected = {},
                     lazyListState = rememberLazyListState(),
                 )

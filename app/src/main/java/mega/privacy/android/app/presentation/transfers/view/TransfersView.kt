@@ -44,6 +44,7 @@ import mega.privacy.android.app.presentation.transfers.view.failed.FailedTransfe
 import mega.privacy.android.app.presentation.transfers.view.sheet.ActiveTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfersActionsBottomSheet
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -65,10 +66,14 @@ internal fun TransfersView(
     onConsumeStartEvent: () -> Unit,
     onNavigateToStorageSettings: () -> Unit,
     onSelectActiveTransfers: () -> Unit,
-    onSelectActiveTransfersClose: () -> Unit,
+    onSelectCompletedTransfers: () -> Unit,
+    onSelectTransfersClose: () -> Unit,
     onActiveTransferSelected: (InProgressTransfer) -> Unit,
+    onCompletedTransferSelected: (CompletedTransfer) -> Unit,
     onSelectAllActiveTransfers: () -> Unit,
     onCancelSelectedActiveTransfers: () -> Unit,
+    onClearSelectedCompletedTransfers: () -> Unit,
+    onSelectAllCompletedTransfers: () -> Unit,
 ) = with(uiState) {
     var showActiveTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
@@ -85,7 +90,7 @@ internal fun TransfersView(
             .semantics { testTagsAsResourceId = true }
             .testTag(TEST_TAG_TRANSFERS_VIEW),
         topBar = {
-            if (selectedActiveTransfers == null) {
+            if (!isInSelectTransfersMode) {
                 TransfersTopBar(onBackPress, getTransferActions(uiState)) { action ->
                     when (action) {
                         TransferMenuAction.Pause -> onPauseTransfers()
@@ -101,14 +106,29 @@ internal fun TransfersView(
                 }
             } else {
                 SelectActiveTransfersTopBar(
-                    onClose = onSelectActiveTransfersClose,
-                    selectedAmount = selectedActiveTransfers.size,
+                    onClose = onSelectTransfersClose,
+                    selectedAmount = selectedTransfersAmount,
                     actions = getTransferActions(uiState)
                 ) { action ->
                     when (action) {
-                        TransferMenuAction.SelectAll -> onSelectAllActiveTransfers()
-                        TransferMenuAction.CancelSelected -> {
-                            showConfirmCancelTransfersDialog = true
+                        TransferMenuAction.SelectAll -> {
+                            when (selectedTab) {
+                                ACTIVE_TAB_INDEX -> onSelectAllActiveTransfers()
+                                COMPLETED_TAB_INDEX -> onSelectAllCompletedTransfers()
+                                FAILED_TAB_INDEX -> {
+                                    // TRAN-908
+                                }
+                            }
+                        }
+
+                        TransferMenuAction.CancelSelected, TransferMenuAction.ClearSelected -> {
+                            when (selectedTab) {
+                                ACTIVE_TAB_INDEX -> showConfirmCancelTransfersDialog = true
+                                COMPLETED_TAB_INDEX -> onClearSelectedCompletedTransfers()
+                                FAILED_TAB_INDEX -> {
+                                    // TRAN-908
+                                }
+                            }
                         }
                     }
                 }
@@ -131,8 +151,8 @@ internal fun TransfersView(
                     .padding(paddingValues)
                     .fillMaxSize(),
                 beyondViewportPageCount = 1,
-                hideTabs = isInSelectActiveTransfersMode,
-                pagerScrollEnabled = !isInSelectActiveTransfersMode,
+                hideTabs = isInSelectTransfersMode,
+                pagerScrollEnabled = !isInSelectTransfersMode,
                 cells = {
                     addTextTabWithLazyListState(
                         tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_active_transfers)),
@@ -145,7 +165,7 @@ internal fun TransfersView(
                             onReorderPreview = onActiveTransfersReorderPreview,
                             onReorderConfirmed = onActiveTransfersReorderConfirmed,
                             onActiveTransferSelected = onActiveTransferSelected,
-                            selectedActiveTransfers = selectedActiveTransfers,
+                            selectedActiveTransfersIds = selectedActiveTransfersIds,
                             lazyListState = listState,
                             modifier = modifier,
                         )
@@ -156,6 +176,8 @@ internal fun TransfersView(
                         CompletedTransfersView(
                             completedTransfers = completedTransfers,
                             lazyListState = listState,
+                            onCompletedTransferSelected = onCompletedTransferSelected,
+                            selectedCompletedTransfersIds = selectedCompletedTransfersIds,
                             modifier = modifier,
                         )
                     }
@@ -188,6 +210,7 @@ internal fun TransfersView(
         if (showCompletedTransfersModal) {
             CompletedTransfersActionsBottomSheet(
                 onClearAllTransfers = { showClearAllTransfersDialog = true },
+                onSelectTransfers = onSelectCompletedTransfers,
                 onDismissSheet = { showCompletedTransfersModal = false },
             )
         }
@@ -220,7 +243,7 @@ internal fun TransfersView(
         }
         if (showConfirmCancelTransfersDialog) {
             CancelTransfersConfirmationDialog(
-                selectedAmount = selectedActiveTransfers?.size ?: 1,
+                selectedAmount = selectedActiveTransfersIds?.size ?: 1,
                 onCancelTransfers = {
                     onCancelSelectedActiveTransfers()
                 },
@@ -307,9 +330,13 @@ private fun TransfersViewPreview() {
             onNavigateToStorageSettings = {},
             onSelectActiveTransfers = {},
             onActiveTransferSelected = {},
-            onSelectActiveTransfersClose = {},
+            onSelectTransfersClose = {},
             onSelectAllActiveTransfers = {},
             onCancelSelectedActiveTransfers = {},
+            onCompletedTransferSelected = {},
+            onSelectAllCompletedTransfers = {},
+            onClearSelectedCompletedTransfers = {},
+            onSelectCompletedTransfers = {},
         )
     }
 }
@@ -321,9 +348,9 @@ private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
     buildList<TransferMenuAction> {
         when {
             selectedTab == ACTIVE_TAB_INDEX && activeTransfers.isNotEmpty() -> {
-                val isAtLeastOneActiveTransferSelected =
-                    selectedActiveTransfers?.isNotEmpty() == true
-                if (isInSelectActiveTransfersMode) {
+                if (isInSelectTransfersMode) {
+                    val isAtLeastOneActiveTransferSelected =
+                        selectedActiveTransfersIds?.isNotEmpty() == true
                     if (isAtLeastOneActiveTransferSelected) {
                         add(TransferMenuAction.CancelSelected)
                     }
@@ -341,7 +368,18 @@ private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
             }
 
             selectedTab == COMPLETED_TAB_INDEX && completedTransfers.isNotEmpty() -> {
-                add(TransferMenuAction.More)
+                if (isInSelectTransfersMode) {
+                    val isAtLeastOneTransferSelected =
+                        selectedCompletedTransfersIds?.isNotEmpty() == true
+                    if (isAtLeastOneTransferSelected) {
+                        add(TransferMenuAction.ClearSelected)
+                    }
+                    if (isAtLeastOneTransferSelected && !areAllCompletedTransfersSelected) {
+                        add(TransferMenuAction.SelectAll)
+                    }
+                } else {
+                    add(TransferMenuAction.More)
+                }
             }
 
             selectedTab == FAILED_TAB_INDEX && failedTransfers.isNotEmpty() -> {

@@ -108,7 +108,7 @@ class ActiveTransferItemTest {
             )
         )
         with(composeRule) {
-            onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_SELECTED).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_TRANSFER_SELECTED).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE).assertDoesNotExist()
         }
     }

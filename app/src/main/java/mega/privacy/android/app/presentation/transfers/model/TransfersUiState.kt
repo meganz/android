@@ -14,11 +14,12 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  *
  * @property selectedTab Selected tab.
  * @property activeTransfers List of in progress transfers.
- * @property selectedActiveTransfers List of selected in progress transfers. If not null, even empty, indicates selected mode is on.
+ * @property selectedActiveTransfersIds List of selected in progress transfers ids. If not null, even empty, indicates selected mode is on.
  * @property isStorageOverQuota Whether the storage is over quota.
  * @property isTransferOverQuota Whether the transfer is over quota.
  * @property areTransfersPaused Whether the transfers are paused.
  * @property completedTransfers List of successfully completed transfers.
+ * @property selectedCompletedTransfersIds List of selected completed transfers. If not null, even empty, indicates selected mode is on.
  * @property failedTransfers List of cancelled or failed completed transfers.
  * @property startEvent event to start a new transfer
  * @property readRetryError Null if there is no error, read retry error count otherwise
@@ -26,11 +27,12 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 data class TransfersUiState(
     val selectedTab: Int = ACTIVE_TAB_INDEX,
     val activeTransfers: ImmutableList<InProgressTransfer> = emptyList<InProgressTransfer>().toImmutableList(),
-    val selectedActiveTransfers: ImmutableList<InProgressTransfer>? = null,
+    val selectedActiveTransfersIds: ImmutableList<Long>? = null,
     val isStorageOverQuota: Boolean = false,
     val isTransferOverQuota: Boolean = false,
     val areTransfersPaused: Boolean = false,
     val completedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
+    val selectedCompletedTransfersIds: ImmutableList<Int>? = null,
     val failedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
     val startEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val readRetryError: Int? = null,
@@ -42,12 +44,29 @@ data class TransfersUiState(
     val isOverQuota = isStorageOverQuota || isTransferOverQuota
 
     /**
-     * @return true if it's in select mode, false otherwise
+     * true if it's in select mode, false otherwise
      */
-    val isInSelectActiveTransfersMode = selectedActiveTransfers != null
+    val isInSelectTransfersMode =
+        selectedActiveTransfersIds != null || selectedCompletedTransfersIds != null
+
+
+    /**
+     * current selected transfers amount
+     */
+    val selectedTransfersAmount =
+        selectedActiveTransfersIds?.size ?: selectedCompletedTransfersIds?.size ?: 0
 
     /**
      * All active transfers are selected
      */
-    val areAllActiveTransfersSelected = activeTransfers == selectedActiveTransfers
+    val areAllActiveTransfersSelected by lazy {
+        selectedActiveTransfersIds?.containsAll(activeTransfers.map { it.uniqueId }) == true
+    }
+
+    /**
+     * All completed transfers are selected
+     */
+    val areAllCompletedTransfersSelected by lazy {
+        selectedCompletedTransfersIds?.containsAll(completedTransfers.map { it.id }) == true
+    }
 }

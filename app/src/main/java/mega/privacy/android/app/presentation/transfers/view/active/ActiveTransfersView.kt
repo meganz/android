@@ -28,7 +28,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 internal fun ActiveTransfersView(
     activeTransfers: ImmutableList<InProgressTransfer>,
-    selectedActiveTransfers: ImmutableList<InProgressTransfer>?,
+    selectedActiveTransfersIds: ImmutableList<Long>?,
     isOverQuota: Boolean,
     areTransfersPaused: Boolean,
     onPlayPauseClicked: (Int) -> Unit,
@@ -38,7 +38,7 @@ internal fun ActiveTransfersView(
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
-    val selectMode = remember(selectedActiveTransfers) { selectedActiveTransfers != null }
+    val selectMode = remember(selectedActiveTransfersIds) { selectedActiveTransfersIds != null }
     var draggedTransfer by remember { mutableStateOf<InProgressTransfer?>(null) }
     if (activeTransfers.isEmpty()) {
         EmptyTransfersView(
@@ -68,8 +68,8 @@ internal fun ActiveTransfersView(
                 isOverQuota = isOverQuota,
                 areTransfersPaused = areTransfersPaused,
                 onPlayPauseClicked = onPlayPauseClicked,
-                isSelected = selectedActiveTransfers?.contains(item) == true,
-                isDraggable = selectedActiveTransfers == null,
+                isSelected = selectedActiveTransfersIds?.contains(item.uniqueId) == true,
+                isDraggable = selectedActiveTransfersIds == null,
                 isBeingDragged = item == draggedTransfer,
                 modifier = Modifier.clickable(enabled = selectMode) {
                     onActiveTransferSelected(item)

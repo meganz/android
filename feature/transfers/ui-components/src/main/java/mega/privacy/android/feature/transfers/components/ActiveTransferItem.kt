@@ -98,13 +98,7 @@ fun ActiveTransferItem(
         }
         AnimatedContent(targetState = isSelected, label = "node thumbnail") {
             if (it) {
-                MegaIcon(
-                    painterResource(id = iconPackR.drawable.ic_check_square_medium_thin_solid),
-                    tint = IconColor.Primary,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .testTag(TEST_TAG_ACTIVE_TRANSFER_SELECTED)
-                )
+                SelectedTransferIcon()
             } else {
                 TransferImage(
                     fileTypeResId = fileTypeResId,
@@ -280,7 +274,7 @@ private class ActiveTransferItemUnusualProvider :
 /**
  * Tag for the active tab
  */
-private const val TEST_TAG_ACTIVE_TAB = "transfers_view:tab_active"
+internal const val TEST_TAG_ACTIVE_TAB = "transfers_view:tab_active"
 
 /**
  * Tag for the active transfer item.
@@ -291,11 +285,6 @@ const val TEST_TAG_ACTIVE_TRANSFER_ITEM = "$TEST_TAG_ACTIVE_TAB:transfer_item"
  * Tag for the active transfer image.
  */
 const val TEST_TAG_ACTIVE_TRANSFER_IMAGE = "$TEST_TAG_ACTIVE_TAB:transfer_image"
-
-/**
- * Tag for selected active transfer check icon.
- */
-const val TEST_TAG_ACTIVE_TRANSFER_SELECTED = "$TEST_TAG_ACTIVE_TAB:selected_icon"
 
 /**
  * Tag for the active transfer name.
