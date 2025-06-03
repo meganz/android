@@ -34,6 +34,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
+import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
@@ -44,6 +45,7 @@ import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUse
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransferCacheFilesUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadParentDocumentFileUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
@@ -79,6 +81,8 @@ class TransfersViewModel @Inject constructor(
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val deleteFailedOrCancelledTransferCacheFilesUseCase: DeleteFailedOrCancelledTransferCacheFilesUseCase,
     private val canReadUriUseCase: CanReadUriUseCase,
+    private val getDownloadParentDocumentFileUseCase: GetDownloadParentDocumentFileUseCase,
+    private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TransfersUiState())
 
@@ -119,6 +123,14 @@ class TransfersViewModel @Inject constructor(
      */
     val completedTransfers = _completedTransfers.asStateFlow()
 
+    private val _completedTransfersDestinations =
+        MutableStateFlow(emptyMap<CompletedTransfer, String>())
+
+    /**
+     * Completed transfers
+     */
+    val completedTransfersDestinations = _completedTransfersDestinations.asStateFlow()
+
     private var transferCallback = 0L
     private var currentTab = TransfersTab.NONE
     private var previousTab = TransfersTab.NONE
@@ -154,12 +166,32 @@ class TransfersViewModel @Inject constructor(
                 .catch {
                     Timber.e(it)
                 }.collect { completedTransfers ->
+                    completedTransfers.associateWith {
+                        getPath(it)
+                    }.let { completedTransfersDestinations ->
+                        _completedTransfersDestinations.update { completedTransfersDestinations }
+                    }
                     _completedTransfers.update { completedTransfers }
                 }
         }
 
         monitorTransferOverQuota()
     }
+
+    private suspend fun getPath(completedTransfer: CompletedTransfer): String =
+        with(completedTransfer) {
+            if (isContentUriDownload) {
+                runCatching { getDownloadParentDocumentFileUseCase(path) }
+                    .onFailure { Timber.w(it) }
+                    .getOrNull()?.uri?.let { uriPath ->
+                        runCatching { getPathByDocumentContentUriUseCase(uriPath.value) }
+                            .onFailure { Timber.w(it) }
+                            .getOrNull()
+                    } ?: path
+            } else {
+                path
+            }
+        }
 
     private fun monitorTransferOverQuota() {
         viewModelScope.launch {

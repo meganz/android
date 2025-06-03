@@ -18,6 +18,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
+import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
@@ -40,6 +42,7 @@ import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUse
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransferCacheFilesUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadParentDocumentFileUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
@@ -84,6 +87,9 @@ internal class TransfersViewModelTest {
     private val deleteFailedOrCancelledTransferCacheFilesUseCase =
         mock<DeleteFailedOrCancelledTransferCacheFilesUseCase>()
     private val canReadUriUseCase = mock<CanReadUriUseCase>()
+    private val getDownloadParentDocumentFileUseCase = mock<GetDownloadParentDocumentFileUseCase>()
+    private val getPathByDocumentContentUriUseCase = mock<GetPathByDocumentContentUriUseCase>()
+
 
     @BeforeEach
     fun setUp() {
@@ -112,7 +118,10 @@ internal class TransfersViewModelTest {
             monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
             deleteFailedOrCancelledTransferCacheFilesUseCase = deleteFailedOrCancelledTransferCacheFilesUseCase,
             canReadUriUseCase = canReadUriUseCase,
-        )
+            getDownloadParentDocumentFileUseCase = getDownloadParentDocumentFileUseCase,
+            getPathByDocumentContentUriUseCase = getPathByDocumentContentUriUseCase,
+
+            )
     }
 
     @Test
@@ -574,6 +583,50 @@ internal class TransfersViewModelTest {
 
         assertThat(underTest.getActiveTransfers()).isEqualTo(emptyList<Transfer>())
     }
+
+    @Test
+    fun `test that completedTransfersDestinations is correctly updated when getAllCompletedTransfersUseCase returns value`() =
+        runTest {
+            val pathAsUri = "content://com.android.externalstorage.documents/tree/primary%3AMusic"
+            val path = "storage/emulated/0/Music"
+            val uriPath = UriPath(pathAsUri)
+            val documentFile = mock<DocumentEntity> {
+                on { uri } doReturn uriPath
+            }
+            val completedDownload = mock<CompletedTransfer> {
+                on { isContentUriDownload } doReturn true
+                on { type } doReturn MegaTransfer.TYPE_DOWNLOAD
+                on { isOffline } doReturn false
+                on { this.path } doReturn pathAsUri
+            }
+            val completedOffline = mock<CompletedTransfer> {
+                on { isOffline } doReturn true
+                on { this.path } doReturn "offline"
+            }
+            val completedUpload = mock<CompletedTransfer> {
+                on { type } doReturn MegaTransfer.TYPE_UPLOAD
+                on { this.path } doReturn "Cloud/to/file"
+            }
+            val completedTransfers = listOf(completedDownload, completedOffline, completedUpload)
+            val completedTransfersDestinations = mapOf(
+                completedDownload to path,
+                completedOffline to completedOffline.path,
+                completedUpload to completedUpload.path,
+            )
+
+            whenever(monitorCompletedTransfersUseCase(TransfersViewModel.MAX_TRANSFERS))
+                .thenReturn(flowOf(completedTransfers))
+            whenever(getDownloadParentDocumentFileUseCase(completedDownload.path))
+                .thenReturn(documentFile)
+            whenever(getPathByDocumentContentUriUseCase(uriPath.value)) doReturn path
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.completedTransfersDestinations.test {
+                assertThat(awaitItem()).isEqualTo(completedTransfersDestinations)
+            }
+        }
 
     companion object {
         @JvmField

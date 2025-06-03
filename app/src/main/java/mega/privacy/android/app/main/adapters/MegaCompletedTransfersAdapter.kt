@@ -13,11 +13,11 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import nz.mega.sdk.MegaTransfer.STATE_CANCELLED
 import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
@@ -31,6 +31,7 @@ import timber.log.Timber
 class MegaCompletedTransfersAdapter(
     private val context: Context,
     private val onShowTransferOptionPanel: (CompletedTransfer) -> Unit,
+    private val getFilePath: (CompletedTransfer) -> String,
 ) : ListAdapter<CompletedTransfer, TransferViewHolder>(COMPLETED_TRANSFER_DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransferViewHolder {
@@ -106,7 +107,7 @@ class MegaCompletedTransfersAdapter(
                 stateParams.marginEnd = dp2px(5f, context.resources.displayMetrics)
                 when (completedTransfer.state) {
                     STATE_COMPLETED -> {
-                        textViewCompleted.text = completedTransfer.path
+                        textViewCompleted.text = getFilePath(completedTransfer)
                         imageViewCompleted.setColorFilter(
                             ContextCompat.getColor(
                                 context,
