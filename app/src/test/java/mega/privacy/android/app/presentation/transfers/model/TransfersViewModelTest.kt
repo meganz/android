@@ -1070,7 +1070,7 @@ class TransfersViewModelTest {
             }
 
         @Test
-        fun `test that selectAllCompletedTransfers adds all current active transfers to selected transfers`() =
+        fun `test that selectAllCompletedTransfers adds all current completed transfers to selected transfers`() =
             runTest {
                 val completedTransfers = (1..10).map { index ->
                     mock<CompletedTransfer> {
@@ -1106,6 +1106,93 @@ class TransfersViewModelTest {
             underTest.toggleCompletedTransferSelection(completedTransferSelected)
 
             underTest.clearSelectedCompletedTransfers()
+
+            verify(deleteCompletedTransfersByIdUseCase)(listOf(id))
+        }
+    }
+
+    @Nested
+    inner class SelectModeFailedTransfers {
+        @Test
+        fun `test that startFailedTransfersSelection set selected transfers to empty list`() =
+            runTest {
+                initTestClass()
+                underTest.uiState.test {
+                    assertThat(awaitItem().selectedFailedTransfersIds).isNull()
+                    underTest.startFailedTransfersSelection()
+                    assertThat(awaitItem().selectedFailedTransfersIds).isEmpty()
+                }
+            }
+
+        @Test
+        fun `test that stopTransfersSelection set selected transfers to null`() = runTest {
+            initTestClass()
+            underTest.startFailedTransfersSelection()
+            underTest.uiState.test {
+                assertThat(awaitItem().selectedFailedTransfersIds).isNotNull()
+                underTest.stopTransfersSelection()
+                assertThat(awaitItem().selectedFailedTransfersIds).isNull()
+            }
+        }
+
+        @Test
+        fun `test that toggleFailedTransferSelection adds the transfer to selected transfers`() =
+            runTest {
+                val failedTransfers = (1..10).map { index ->
+                    mock<CompletedTransfer> {
+                        on { this.id } doReturn index
+                        on { it.state } doReturn MegaTransfer.STATE_FAILED
+                    }
+                }
+                whenever(monitorCompletedTransfersUseCase()) doReturn failedTransfers.asHotFlow()
+                initTestClass()
+                underTest.startFailedTransfersSelection()
+                val failedTransfer = failedTransfers[3]
+                val id = failedTransfer.id
+                underTest.uiState.test {
+                    assertThat(awaitItem().selectedFailedTransfersIds).isEmpty()
+                    underTest.toggleFailedTransferSelection(failedTransfer)
+                    assertThat(awaitItem().selectedFailedTransfersIds).contains(id)
+                }
+            }
+
+        @Test
+        fun `test that selectAllFailedTransfers adds all current failed transfers to selected transfers`() =
+            runTest {
+                val failedTransfers = (1..10).map { index ->
+                    mock<CompletedTransfer> {
+                        on { this.id } doReturn index
+                        on { it.state } doReturn MegaTransfer.STATE_FAILED
+                    }
+                }
+                whenever(monitorCompletedTransfersUseCase()) doReturn failedTransfers.asHotFlow()
+                initTestClass()
+                underTest.startFailedTransfersSelection()
+                val ids = failedTransfers.map { it.id }
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().selectedFailedTransfersIds).isEmpty()
+                    underTest.selectAllFailedTransfers()
+                    assertThat(awaitItem().selectedFailedTransfersIds)
+                        .containsExactlyElementsIn(ids)
+                }
+            }
+
+        @Test
+        fun `test that clearSelectedFailedTransfers clear selected failed transfers`() = runTest {
+            val failedTransfers = (1..10).map { index ->
+                mock<CompletedTransfer> {
+                    on { this.id } doReturn index
+                    on { it.state } doReturn MegaTransfer.STATE_FAILED
+                }
+            }
+            whenever(monitorCompletedTransfersUseCase()) doReturn failedTransfers.asHotFlow()
+            initTestClass()
+            val failedTransferSelected = failedTransfers[3]
+            val id = failedTransferSelected.id ?: -1
+            underTest.toggleFailedTransferSelection(failedTransferSelected)
+
+            underTest.clearSelectedFailedTransfers()
 
             verify(deleteCompletedTransfersByIdUseCase)(listOf(id))
         }

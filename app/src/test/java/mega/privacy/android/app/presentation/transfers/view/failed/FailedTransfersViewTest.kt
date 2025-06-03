@@ -38,7 +38,11 @@ class FailedTransfersViewTest {
         failedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
     ) {
         composeTestRule.setContent {
-            FailedTransfersView(failedTransfers = failedTransfers, lazyListState = mock())
+            FailedTransfersView(
+                failedTransfers = failedTransfers, lazyListState = mock(),
+                selectedFailedTransfersIds = mock(),
+                onFailedTransferSelected = mock()
+            )
         }
     }
 }

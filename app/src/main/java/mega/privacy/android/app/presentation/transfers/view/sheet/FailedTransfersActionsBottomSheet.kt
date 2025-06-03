@@ -27,6 +27,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 fun FailedTransfersActionsBottomSheet(
     onRetryAllTransfers: () -> Unit,
     onClearAllTransfers: () -> Unit,
+    onSelectTransfers: () -> Unit,
     onDismissSheet: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
@@ -55,6 +56,14 @@ fun FailedTransfersActionsBottomSheet(
             onDismissSheet()
         },
     )
+    OneLineListItem(
+        modifier = Modifier.testTag(TEST_TAG_SELECT_ACTION),
+        text = stringResource(id = mega.privacy.android.shared.resources.R.string.general_select),
+        onClickListener = {
+            onSelectTransfers()
+            onDismissSheet()
+        },
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +74,7 @@ private fun FailedTransfersActionsBottomSheetPreview() {
         FailedTransfersActionsBottomSheet(
             onRetryAllTransfers = {},
             onClearAllTransfers = {},
+            onSelectTransfers = {},
             onDismissSheet = {},
         )
     }

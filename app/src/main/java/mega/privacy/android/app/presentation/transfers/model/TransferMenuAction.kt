@@ -65,6 +65,15 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_CLEAR_ACTION,
     ), TransferMenuAction
 
+    /**
+     * Retry selected
+     */
+    data object RetrySelected : TopAppBarActionString(
+        iconRes = iconPackR.drawable.ic_rotate_ccw_medium_regular_outline,
+        descriptionRes = R.string.general_retry,
+        testTag = TEST_TAG_RETRY_ACTION,
+    ), TransferMenuAction
+
     companion object {
         /**
          * Test Tag resume transfers Action
@@ -95,5 +104,10 @@ sealed interface TransferMenuAction : TopAppBarAction {
          * Test Tag clear selected transfers Action
          */
         const val TEST_TAG_CLEAR_ACTION = "transfers_view:action_clear_selected"
+
+        /**
+         * Test Tag retry selected transfers Action
+         */
+        const val TEST_TAG_RETRY_ACTION = "transfers_view:action_retry_selected"
     }
 }

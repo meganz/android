@@ -24,6 +24,7 @@ class FailedTransfersActionsBottomSheetTest {
     private val onRetryAllTransfers = mock<() -> Unit>()
     private val onClearAllTransfers = mock<() -> Unit>()
     private val onDismissSheet = mock<() -> Unit>()
+    private val onSelectTransfers = mock<() -> Unit>()
 
     @Test
     fun `test that sheet shows correctly`() {
@@ -60,12 +61,24 @@ class FailedTransfersActionsBottomSheetTest {
         verify(onDismissSheet).invoke()
     }
 
+    @Test
+    fun `test that clicking on select transfers option invokes onSelectTransfers and onDismissSheet`() {
+        initComposeTestRule()
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SELECT_ACTION)
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        verify(onSelectTransfers).invoke()
+        verify(onDismissSheet).invoke()
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     private fun initComposeTestRule() {
         composeTestRule.setContent {
             FailedTransfersActionsBottomSheet(
                 onRetryAllTransfers = onRetryAllTransfers,
                 onClearAllTransfers = onClearAllTransfers,
+                onSelectTransfers = onSelectTransfers,
                 onDismissSheet = onDismissSheet,
             )
         }

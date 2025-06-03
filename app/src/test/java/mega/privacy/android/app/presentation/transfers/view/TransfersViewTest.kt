@@ -14,9 +14,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_CANCEL_ACTION
+import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_CLEAR_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_MORE_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_PAUSE_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_RESUME_ACTION
+import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_RETRY_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_SELECT_ALL_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
@@ -52,6 +54,7 @@ class TransfersViewTest {
     private val onPauseTransfers: () -> Unit = mock()
     private val tag1 = 1
     private val tag2 = 2
+    private val tag3 = 3
     private val state =
         TransferImageUiState(fileTypeResId = iconPackR.drawable.ic_text_medium_solid)
     private val activeTransferViewModel = mock<ActiveTransferImageViewModel> {
@@ -61,6 +64,7 @@ class TransfersViewTest {
     private val completedTransferImageViewModel = mock<CompletedTransferImageViewModel> {
         on { getUiStateFlow(tag1) } doReturn MutableStateFlow(state)
         on { getUiStateFlow(tag2) } doReturn MutableStateFlow(state)
+        on { getUiStateFlow(tag3) } doReturn MutableStateFlow(state)
     }
     private val startTransfersComponentViewModel = mock<StartTransfersComponentViewModel> {
         on { uiState } doReturn MutableStateFlow(StartTransferViewState())
@@ -82,6 +86,7 @@ class TransfersViewTest {
     ).toImmutableList()
     private val failedTransfers = listOf(
         getCompletedTransfer(tag2, MegaTransfer.STATE_FAILED),
+        getCompletedTransfer(tag3, MegaTransfer.STATE_FAILED),
     ).toImmutableList()
 
     @Test
@@ -244,6 +249,54 @@ class TransfersViewTest {
         composeTestRule.onNodeWithTag(TEST_TAG_CANCEL_ACTION).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that select all TransferMenuAction is displayed if it is the failed tab and there are selected and unselected transfers`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = FAILED_TAB_INDEX,
+                failedTransfers = failedTransfers,
+                selectedFailedTransfersIds = failedTransfers
+                    .take(1)
+                    .mapNotNull { it.id }
+                    .toImmutableList(),
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SELECT_ALL_ACTION).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that clear selected TransferMenuAction is displayed if it is the failed tab and there are selected transfers`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = FAILED_TAB_INDEX,
+                failedTransfers = failedTransfers,
+                selectedFailedTransfersIds = failedTransfers
+                    .take(1)
+                    .mapNotNull { it.id }
+                    .toImmutableList(),
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_CLEAR_ACTION).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that retry selected TransferMenuAction is displayed if it is the failed tab and there are selected transfers`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = FAILED_TAB_INDEX,
+                failedTransfers = failedTransfers,
+                selectedFailedTransfersIds = failedTransfers
+                    .take(1)
+                    .mapNotNull { it.id }
+                    .toImmutableList(),
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_RETRY_ACTION).assertIsDisplayed()
+    }
+
     private fun initComposeTestRule(uiState: TransfersUiState) {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
@@ -256,21 +309,26 @@ class TransfersViewTest {
                     onPauseTransfers = onPauseTransfers,
                     onRetryFailedTransfers = {},
                     onCancelAllFailedTransfers = {},
-                    onClearAllFailedTransfers = {},
                     onClearAllCompletedTransfers = {},
+                    onClearAllFailedTransfers = {},
                     onActiveTransfersReorderPreview = { _, _ -> },
                     onActiveTransfersReorderConfirmed = {},
                     onConsumeStartEvent = {},
                     onNavigateToStorageSettings = {},
-                    onCancelSelectedActiveTransfers = {},
-                    onActiveTransferSelected = {},
                     onSelectActiveTransfers = {},
-                    onSelectAllActiveTransfers = {},
-                    onSelectTransfersClose = {},
                     onSelectCompletedTransfers = {},
+                    onSelectFailedTransfers = {},
+                    onSelectTransfersClose = {},
+                    onActiveTransferSelected = {},
                     onCompletedTransferSelected = {},
+                    onFailedTransferSelected = {},
+                    onCancelSelectedActiveTransfers = {},
                     onClearSelectedCompletedTransfers = {},
+                    onClearSelectedFailedTransfers = {},
+                    onRetrySelectedFailedTransfers = {},
+                    onSelectAllActiveTransfers = {},
                     onSelectAllCompletedTransfers = {},
+                    onSelectAllFailedTransfers = {},
                 )
             }
         }
@@ -295,10 +353,10 @@ class TransfersViewTest {
         type = 1,
         state = state,
         size = "3.57 MB",
-        handle = 27169983390750L,
+        handle = 27169983390750L + id,
         path = "Cloud drive",
         isOffline = false,
-        timestamp = 1684228012974L,
+        timestamp = 1684228012974L + id,
         error = "Error",
         originalPath = "/data/user/0/mega.privacy.android.app/DCIM/Camera/$id-fileName",
         parentHandle = 11622336899311L,

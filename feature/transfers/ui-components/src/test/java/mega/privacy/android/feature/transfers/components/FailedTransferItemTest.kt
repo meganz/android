@@ -117,6 +117,27 @@ class FailedTransferItemTest {
         }
     }
 
+    @Test
+    fun `test that selected active transfer shows correctly`() {
+        initComposeRuleContent(
+            CompletedTransferUI(
+                isDownload = false,
+                fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
+                previewUri = null,
+                fileName = name,
+                location = null,
+                error = null,
+                sizeString = "10 MB",
+                date = "10 Aug 2024 19:09",
+                isSelected = true,
+            )
+        )
+        with(composeRule) {
+            onNodeWithTag(TEST_TAG_TRANSFER_SELECTED).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE).assertDoesNotExist()
+        }
+    }
+
     private fun initComposeRuleContent(completedTransferUI: CompletedTransferUI) =
         with(completedTransferUI) {
             composeRule.setContent {
@@ -126,6 +147,7 @@ class FailedTransferItemTest {
                     previewUri = previewUri,
                     fileName = fileName,
                     error = error,
+                    isSelected = isSelected,
                 )
             }
         }

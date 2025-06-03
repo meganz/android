@@ -250,14 +250,25 @@ class TransfersViewModel @Inject constructor(
     }
 
     /**
+     * Retry selected failed transfers.
+     */
+    fun retrySelectedFailedTransfers() {
+        val selectedIds = uiState.value.selectedFailedTransfersIds ?: return
+        retryFailedTransfers(uiState.value.failedTransfers.filter { it.id in selectedIds })
+        stopTransfersSelection()
+    }
+
+    /**
      * Retry all failed transfers.
      */
-    fun retryAllFailedTransfers() {
+    fun retryAllFailedTransfers() = retryFailedTransfers(uiState.value.failedTransfers)
+
+    private fun retryFailedTransfers(failedTransfers: List<CompletedTransfer>) {
         viewModelScope.launch(ioDispatcher) {
             var cannotReadCount = 0
 
             buildList {
-                uiState.value.failedTransfers.forEach { transfer ->
+                failedTransfers.forEach { transfer ->
                     if (canReadTransferUri(transfer)) {
                         getStartTransferEventByFailedTransfer(transfer)?.let { startTransferEvent ->
                             add(startTransferEvent)
@@ -467,7 +478,11 @@ class TransfersViewModel @Inject constructor(
      */
     fun stopTransfersSelection() {
         _uiState.update {
-            it.copy(selectedActiveTransfersIds = null, selectedCompletedTransfersIds = null)
+            it.copy(
+                selectedActiveTransfersIds = null,
+                selectedCompletedTransfersIds = null,
+                selectedFailedTransfersIds = null,
+            )
         }
     }
 
@@ -544,6 +559,24 @@ class TransfersViewModel @Inject constructor(
     }
 
     /**
+     * Toggle the transfer to selected transfers
+     */
+    fun toggleFailedTransferSelection(completedTransfer: CompletedTransfer) {
+        val newSelection =
+            (uiState.value.selectedFailedTransfersIds ?: emptyList()).let { selected ->
+                if (selected.contains(completedTransfer.id)) {
+                    selected - completedTransfer.id
+                } else {
+                    selected + completedTransfer.id
+                }
+            }.filterNotNull()
+        _uiState.update {
+            it.copy(selectedFailedTransfersIds = newSelection.toImmutableList())
+        }
+    }
+
+
+    /**
      * Add all the active transfers to the selected transfers
      */
     fun selectAllCompletedTransfers() {
@@ -556,22 +589,48 @@ class TransfersViewModel @Inject constructor(
     }
 
     /**
-     * Cancel all selected active transfers
+     * Add all the failed transfers to the selected transfers
+     */
+    fun selectAllFailedTransfers() {
+        _uiState.update { uiState ->
+            uiState.copy(selectedFailedTransfersIds = uiState.failedTransfers.mapNotNull { it.id }
+                .toImmutableList())
+        }
+    }
+
+    /**
+     * Clear all selected completed transfers
      */
     fun clearSelectedCompletedTransfers() {
         if (uiState.value.areAllCompletedTransfersSelected) {
             clearAllCompletedTransfers()
         } else {
-            viewModelScope.launch {
-                runCatching<Unit> {
-                    uiState.value.selectedCompletedTransfersIds?.takeIf { it.isNotEmpty() }
-                        ?.let { selectedCompletedTransfers ->
-                            deleteCompletedTransfersByIdUseCase(selectedCompletedTransfers)
-                        }
-                }.onFailure { Timber.e(it) }
-            }
+            deleteCompletedTransfersByIds(uiState.value.selectedCompletedTransfersIds)
         }
         stopTransfersSelection()
+    }
+
+    /**
+     * Clear all selected failed transfers
+     */
+    fun clearSelectedFailedTransfers() {
+        if (uiState.value.areAllFailedTransfersSelected) {
+            clearAllFailedTransfers()
+        } else {
+            deleteCompletedTransfersByIds(uiState.value.selectedFailedTransfersIds)
+        }
+        stopTransfersSelection()
+    }
+
+    private fun deleteCompletedTransfersByIds(ids: List<Int>?) {
+        viewModelScope.launch {
+            runCatching<Unit> {
+                ids?.takeIf { it.isNotEmpty() }
+                    ?.let { selectedCompletedTransfers ->
+                        deleteCompletedTransfersByIdUseCase(selectedCompletedTransfers)
+                    }
+            }.onFailure { Timber.e(it) }
+        }
     }
 
     /**
@@ -580,6 +639,15 @@ class TransfersViewModel @Inject constructor(
     fun startCompletedTransfersSelection() {
         _uiState.update {
             it.copy(selectedCompletedTransfersIds = emptyList<Int>().toImmutableList())
+        }
+    }
+
+    /**
+     * Start failed transfers selection by updating the selected failed transfers to an empty list
+     */
+    fun startFailedTransfersSelection() {
+        _uiState.update {
+            it.copy(selectedFailedTransfersIds = emptyList<Int>().toImmutableList())
         }
     }
 }

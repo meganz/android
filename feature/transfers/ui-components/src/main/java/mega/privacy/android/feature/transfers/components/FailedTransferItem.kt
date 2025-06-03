@@ -19,6 +19,7 @@ fun FailedTransferItem(
     previewUri: Uri?,
     fileName: String,
     error: String?,
+    isSelected: Boolean,
     modifier: Modifier = Modifier,
     onMoreClicked: () -> Unit = {},
 ) = CompletedTransferItem(
@@ -30,6 +31,7 @@ fun FailedTransferItem(
     sizeString = null,
     date = null,
     error = error,
+    isSelected = isSelected,
     modifier = modifier,
     onMoreClicked = onMoreClicked
 )
@@ -47,6 +49,7 @@ private fun FailedTransferItemPreview(
                 previewUri = previewUri,
                 fileName = fileName,
                 error = error,
+                isSelected = isSelected,
             )
         }
     }
@@ -98,6 +101,7 @@ private class FailedTransferItemProvider : PreviewParameterProvider<CompletedTra
             error = null,
             sizeString = sizeString,
             date = date,
+            isSelected = true,
         )
     ).asSequence()
 }

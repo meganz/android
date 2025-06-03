@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.transfers.view.failed
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -7,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,9 +26,13 @@ import nz.mega.sdk.MegaTransfer
 @Composable
 internal fun FailedTransfersView(
     failedTransfers: ImmutableList<CompletedTransfer>,
+    selectedFailedTransfersIds: ImmutableList<Int>?,
+    onFailedTransferSelected: (CompletedTransfer) -> Unit,
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
+    val selectMode =
+        remember(selectedFailedTransfersIds) { selectedFailedTransfersIds != null }
     if (failedTransfers.isEmpty()) {
         EmptyTransfersView(
             emptyStringId = sharedR.string.transfers_no_failed_transfers_empty_text,
@@ -39,7 +46,20 @@ internal fun FailedTransfersView(
                 .testTag(TEST_TAG_FAILED_TRANSFERS_VIEW)
         ) {
             items(items = failedTransfers, key = { it.id ?: 0 }) { item ->
-                FailedTransferItem(failedTransfer = item)
+                FailedTransferItem(
+                    failedTransfer = item,
+                    isSelected = selectedFailedTransfersIds?.contains(item.id) == true,
+                    modifier = Modifier.then(
+                        if (selectMode) {
+                            Modifier.clickable { onFailedTransferSelected(item) }
+                        } else {
+                            Modifier.combinedClickable(
+                                onClick = { },
+                                onLongClick = { onFailedTransferSelected(item) },
+                            )
+                        }
+                    ),
+                )
             }
         }
     }
@@ -48,6 +68,8 @@ internal fun FailedTransfersView(
 @Composable
 internal fun FailedTransferItem(
     failedTransfer: CompletedTransfer,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier,
     viewModel: CompletedTransferImageViewModel = hiltViewModel(),
 ) = with(failedTransfer) {
     id?.let {
@@ -62,7 +84,9 @@ internal fun FailedTransferItem(
             fileTypeResId = uiState.fileTypeResId,
             previewUri = uiState.previewUri,
             fileName = fileName,
+            isSelected = isSelected,
             error = error.takeIf { state != MegaTransfer.STATE_CANCELLED },
+            modifier = modifier,
         )
     }
 }

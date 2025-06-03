@@ -67,13 +67,18 @@ internal fun TransfersView(
     onNavigateToStorageSettings: () -> Unit,
     onSelectActiveTransfers: () -> Unit,
     onSelectCompletedTransfers: () -> Unit,
+    onSelectFailedTransfers: () -> Unit,
     onSelectTransfersClose: () -> Unit,
     onActiveTransferSelected: (InProgressTransfer) -> Unit,
     onCompletedTransferSelected: (CompletedTransfer) -> Unit,
-    onSelectAllActiveTransfers: () -> Unit,
+    onFailedTransferSelected: (CompletedTransfer) -> Unit,
     onCancelSelectedActiveTransfers: () -> Unit,
     onClearSelectedCompletedTransfers: () -> Unit,
+    onClearSelectedFailedTransfers: () -> Unit,
+    onRetrySelectedFailedTransfers: () -> Unit,
+    onSelectAllActiveTransfers: () -> Unit,
     onSelectAllCompletedTransfers: () -> Unit,
+    onSelectAllFailedTransfers: () -> Unit,
 ) = with(uiState) {
     var showActiveTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
@@ -115,9 +120,7 @@ internal fun TransfersView(
                             when (selectedTab) {
                                 ACTIVE_TAB_INDEX -> onSelectAllActiveTransfers()
                                 COMPLETED_TAB_INDEX -> onSelectAllCompletedTransfers()
-                                FAILED_TAB_INDEX -> {
-                                    // TRAN-908
-                                }
+                                FAILED_TAB_INDEX -> onSelectAllFailedTransfers()
                             }
                         }
 
@@ -125,10 +128,12 @@ internal fun TransfersView(
                             when (selectedTab) {
                                 ACTIVE_TAB_INDEX -> showConfirmCancelTransfersDialog = true
                                 COMPLETED_TAB_INDEX -> onClearSelectedCompletedTransfers()
-                                FAILED_TAB_INDEX -> {
-                                    // TRAN-908
-                                }
+                                FAILED_TAB_INDEX -> onClearSelectedFailedTransfers()
                             }
+                        }
+
+                        TransferMenuAction.RetrySelected -> {
+                            onRetrySelectedFailedTransfers()
                         }
                     }
                 }
@@ -187,6 +192,8 @@ internal fun TransfersView(
                         FailedTransfersView(
                             failedTransfers = failedTransfers,
                             lazyListState = listState,
+                            onFailedTransferSelected = onFailedTransferSelected,
+                            selectedFailedTransfersIds = selectedFailedTransfersIds,
                             modifier = modifier,
                         )
                     }
@@ -219,6 +226,7 @@ internal fun TransfersView(
             FailedTransfersActionsBottomSheet(
                 onRetryAllTransfers = onRetryFailedTransfers,
                 onClearAllTransfers = { showClearAllTransfersDialog = true },
+                onSelectTransfers = onSelectFailedTransfers,
                 onDismissSheet = { showFailedTransfersModal = false },
             )
         }
@@ -329,14 +337,19 @@ private fun TransfersViewPreview() {
             onConsumeStartEvent = {},
             onNavigateToStorageSettings = {},
             onSelectActiveTransfers = {},
-            onActiveTransferSelected = {},
-            onSelectTransfersClose = {},
-            onSelectAllActiveTransfers = {},
-            onCancelSelectedActiveTransfers = {},
-            onCompletedTransferSelected = {},
-            onSelectAllCompletedTransfers = {},
-            onClearSelectedCompletedTransfers = {},
             onSelectCompletedTransfers = {},
+            onSelectFailedTransfers = {},
+            onSelectTransfersClose = {},
+            onActiveTransferSelected = {},
+            onCompletedTransferSelected = {},
+            onFailedTransferSelected = {},
+            onCancelSelectedActiveTransfers = {},
+            onClearSelectedCompletedTransfers = {},
+            onClearSelectedFailedTransfers = {},
+            onRetrySelectedFailedTransfers = {},
+            onSelectAllActiveTransfers = {},
+            onSelectAllCompletedTransfers = {},
+            onSelectAllFailedTransfers = {},
         )
     }
 }
@@ -383,7 +396,19 @@ private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
             }
 
             selectedTab == FAILED_TAB_INDEX && failedTransfers.isNotEmpty() -> {
-                add(TransferMenuAction.More)
+                if (isInSelectTransfersMode) {
+                    val isAtLeastOneTransferSelected =
+                        selectedFailedTransfersIds?.isNotEmpty() == true
+                    if (isAtLeastOneTransferSelected) {
+                        add(TransferMenuAction.RetrySelected)
+                        add(TransferMenuAction.ClearSelected)
+                    }
+                    if (isAtLeastOneTransferSelected && !areAllFailedTransfersSelected) {
+                        add(TransferMenuAction.SelectAll)
+                    }
+                } else {
+                    add(TransferMenuAction.More)
+                }
             }
         }
     }

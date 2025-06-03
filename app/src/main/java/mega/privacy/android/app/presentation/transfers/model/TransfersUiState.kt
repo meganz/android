@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  * @property completedTransfers List of successfully completed transfers.
  * @property selectedCompletedTransfersIds List of selected completed transfers. If not null, even empty, indicates selected mode is on.
  * @property failedTransfers List of cancelled or failed completed transfers.
+ * @property selectedFailedTransfersIds List of selected failed or cancelled transfers. If not null, even empty, indicates selected mode is on.
  * @property startEvent event to start a new transfer
  * @property readRetryError Null if there is no error, read retry error count otherwise
  */
@@ -34,6 +35,7 @@ data class TransfersUiState(
     val completedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
     val selectedCompletedTransfersIds: ImmutableList<Int>? = null,
     val failedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
+    val selectedFailedTransfersIds: ImmutableList<Int>? = null,
     val startEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val readRetryError: Int? = null,
 ) {
@@ -47,14 +49,16 @@ data class TransfersUiState(
      * true if it's in select mode, false otherwise
      */
     val isInSelectTransfersMode =
-        selectedActiveTransfersIds != null || selectedCompletedTransfersIds != null
+        selectedActiveTransfersIds != null || selectedCompletedTransfersIds != null || selectedFailedTransfersIds != null
 
 
     /**
      * current selected transfers amount
      */
-    val selectedTransfersAmount =
-        selectedActiveTransfersIds?.size ?: selectedCompletedTransfersIds?.size ?: 0
+    val selectedTransfersAmount = selectedActiveTransfersIds?.size
+        ?: selectedCompletedTransfersIds?.size
+        ?: selectedFailedTransfersIds?.size
+        ?: 0
 
     /**
      * All active transfers are selected
@@ -68,5 +72,12 @@ data class TransfersUiState(
      */
     val areAllCompletedTransfersSelected by lazy {
         selectedCompletedTransfersIds?.containsAll(completedTransfers.map { it.id }) == true
+    }
+
+    /**
+     * All completed transfers are selected
+     */
+    val areAllFailedTransfersSelected by lazy {
+        selectedFailedTransfersIds?.containsAll(failedTransfers.map { it.id }) == true
     }
 }
