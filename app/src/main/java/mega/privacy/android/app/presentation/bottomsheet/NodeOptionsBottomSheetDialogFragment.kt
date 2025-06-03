@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.bottomsheet
 
-import mega.privacy.android.icon.pack.R as RPack
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
@@ -81,7 +79,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelText
 import mega.privacy.android.app.utils.MegaNodeUtil.isEmptyFolder
-import mega.privacy.android.app.utils.MegaNodeUtil.isOutShare
 import mega.privacy.android.app.utils.MegaNodeUtil.manageEditTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
@@ -98,8 +95,10 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.icon.pack.R as RPack
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.HideNodeMenuItemEvent
 import nz.mega.sdk.MegaNode
@@ -528,7 +527,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         optionClearShares.visibility = View.GONE
                     } else {
                         optionShareFolder.visibility = View.VISIBLE
-                        if (isOutShare(node)) {
+                        if (megaNodeUtilWrapper.isOutShare(node)) {
                             optionShareFolder.setText(R.string.manage_share)
                             optionShareFolder.setCompoundDrawablesWithIntrinsicBounds(
                                 RPack.drawable.ic_gear_six_medium_regular_outline,
@@ -1706,7 +1705,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun showShareFolderOptions(node: MegaNode?) {
         node?.let {
             val nodeType = checkBackupNodeTypeByHandle(megaApi, node)
-            if (isOutShare(it)) {
+            if (megaNodeUtilWrapper.isOutShare(it)) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     val intent =
                         if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {

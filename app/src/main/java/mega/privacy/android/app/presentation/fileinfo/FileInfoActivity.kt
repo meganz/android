@@ -66,6 +66,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -105,6 +106,9 @@ class FileInfoActivity : BaseActivity() {
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
     private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
@@ -306,7 +310,9 @@ class FileInfoActivity : BaseActivity() {
                     }
                 }
             },
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,)
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            megaNodeUtilWrapper = megaNodeUtilWrapper,
+        )
     }
 
     private fun configureActivityResultLaunchers() {

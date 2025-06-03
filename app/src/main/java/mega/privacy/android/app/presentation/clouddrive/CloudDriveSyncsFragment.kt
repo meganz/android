@@ -89,6 +89,7 @@ import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
@@ -201,6 +202,12 @@ class CloudDriveSyncsFragment : Fragment() {
     lateinit var syncPermissionsManager: SyncPermissionsManager
 
     /**
+     * Mega node util wrapper
+     */
+    @Inject
+    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
+
+    /**
      * onAttach
      */
     override fun onAttach(context: Context) {
@@ -221,6 +228,7 @@ class CloudDriveSyncsFragment : Fragment() {
                 }
             },
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            megaNodeUtilWrapper = megaNodeUtilWrapper,
         )
     }
 

@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.shares.links
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -60,6 +58,7 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -70,9 +69,11 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -112,6 +113,9 @@ class LinksComposeFragment : Fragment() {
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
     /**
      * Interface that notifies the attached Activity to execute specific functions
@@ -324,15 +328,15 @@ class LinksComposeFragment : Fragment() {
 
         viewLifecycleOwner.collectFlow(
             viewModel.state
-            .map { it.nodesList.isEmpty() }
-            .distinctUntilChanged()) {
+                .map { it.nodesList.isEmpty() }
+                .distinctUntilChanged()) {
             linksActionListener?.updateSharesPageToolbarTitleAndFAB(invalidateOptionsMenu = true)
         }
 
         viewLifecycleOwner.collectFlow(
             viewModel.state
-            .map { it.parentNode != null }
-            .distinctUntilChanged()) {
+                .map { it.parentNode != null }
+                .distinctUntilChanged()) {
             toggleAppBarElevation(false)
         }
     }
@@ -387,6 +391,7 @@ class LinksComposeFragment : Fragment() {
                 }
             },
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            megaNodeUtilWrapper = megaNodeUtilWrapper,
         )
     }
 

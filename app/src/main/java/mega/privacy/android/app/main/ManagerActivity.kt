@@ -277,6 +277,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -384,6 +385,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      */
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
     private val searchResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -7274,6 +7278,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             ) = Unit
         },
         getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+        megaNodeUtilWrapper = megaNodeUtilWrapper,
     )
 
     /**

@@ -60,6 +60,7 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -128,6 +129,9 @@ class IncomingSharesComposeFragment : Fragment() {
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
+    @Inject
+    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
+
     private val viewModel: IncomingSharesComposeViewModel by activityViewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
@@ -158,6 +162,7 @@ class IncomingSharesComposeFragment : Fragment() {
                 }
             },
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            megaNodeUtilWrapper = megaNodeUtilWrapper,
         )
     }
 

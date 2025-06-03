@@ -12,6 +12,7 @@ import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
+import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_CANCEL
@@ -21,9 +22,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOL
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_MENU_BACKUP_SHARE_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.createBackupsWarningDialog
-import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeInList
-import mega.privacy.android.app.utils.MegaNodeUtil.getBackupRootNodeByHandle
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -35,6 +34,7 @@ class FileBackupManager(
     val activity: FragmentActivity,
     val actionBackupListener: ActionBackupListener?,
     val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    val megaNodeUtilWrapper: MegaNodeUtilWrapper,
 ) {
 
     object BackupDialogState {
@@ -112,13 +112,14 @@ class FileBackupManager(
         ) {
             initBackupWarningState()
             when (actionType) {
-                ACTION_BACKUP_SHARE_FOLDER -> if (MegaNodeUtil.isOutShare(megaNode)) {
+                ACTION_BACKUP_SHARE_FOLDER -> if (megaNode?.let { megaNodeUtilWrapper.isOutShare(it) } == true) {
                     activity.lifecycleScope.launch {
                         val intent =
                             if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {
-                                Intent(
-                                    activity,
-                                    FileContactListActivity::class.java
+                                FileContactListComposeActivity.newIntent(
+                                    context = activity,
+                                    nodeHandle = megaNode.handle,
+                                    nodeName = megaNode.name
                                 )
                             } else {
                                 Intent(
@@ -126,7 +127,7 @@ class FileBackupManager(
                                     FileContactListActivity::class.java
                                 )
                             }
-                        intent.putExtra(Constants.NAME, megaNode?.handle)
+                        intent.putExtra(Constants.NAME, megaNode.handle)
                         activity.startActivity(intent)
                     }
                 } else {
@@ -158,8 +159,8 @@ class FileBackupManager(
     ): Boolean {
         val handleList = ArrayList<Long>()
         nodeHandles.toCollection(handleList)
-        val pNode = getBackupRootNodeByHandle(megaApi, handleList)
-        val nodeType = checkBackupNodeTypeInList(megaApi, handleList)
+        val pNode = megaNodeUtilWrapper.getBackupRootNodeByHandle(megaApi, handleList)
+        val nodeType = megaNodeUtilWrapper.checkBackupNodeTypeInList(megaApi, handleList)
 
         if (nodeType != BACKUP_NONE || pNode != null) {
             Timber.d("shareFolder with accessType = $accessType")
@@ -216,8 +217,8 @@ class FileBackupManager(
         handleList: ArrayList<Long>,
         actionBackupNodeCallback: ActionBackupNodeCallback,
     ): Boolean {
-        val backupRootNode = getBackupRootNodeByHandle(megaApi, handleList)
-        val backupNodeType = checkBackupNodeTypeInList(megaApi, handleList)
+        val backupRootNode = megaNodeUtilWrapper.getBackupRootNodeByHandle(megaApi, handleList)
+        val backupNodeType = megaNodeUtilWrapper.checkBackupNodeTypeInList(megaApi, handleList)
 
         if (backupNodeType == BACKUP_NONE && backupRootNode == null) {
             // No backup node in the selected nodes
