@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.chat.settings.calls.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
@@ -9,10 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -21,11 +18,11 @@ import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.toggle.Toggle
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.chat.settings.calls.model.CallSettingsUiState
-import mega.privacy.android.feature.settings.R
-import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Call settings screen
@@ -43,8 +40,6 @@ internal fun CallSettingsScreen(
     )
 }
 
-
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun CallSettingsView(
     onBackPressed: () -> Unit = {},

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.transfers.view.completed
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +24,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 internal fun CompletedTransfersView(
     completedTransfers: ImmutableList<CompletedTransfer>,
+    lazyListState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
     if (completedTransfers.isEmpty()) {
@@ -32,6 +34,7 @@ internal fun CompletedTransfersView(
         )
     } else {
         LazyColumn(
+            state = lazyListState,
             modifier = modifier
                 .fillMaxSize()
                 .testTag(TEST_TAG_COMPLETED_TRANSFERS_VIEW)

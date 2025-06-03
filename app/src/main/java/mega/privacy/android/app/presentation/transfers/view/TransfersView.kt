@@ -5,7 +5,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.SpanStyle
-import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -49,7 +48,6 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TransfersView(
     onBackPress: () -> Unit,
@@ -79,10 +77,10 @@ internal fun TransfersView(
     var showClearAllTransfersDialog by rememberSaveable { mutableStateOf(false) }
     var showConfirmCancelTransfersDialog by rememberSaveable { mutableStateOf(false) }
 
-    MegaScaffold(
+    @OptIn(ExperimentalMaterial3Api::class)
+    MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
-            .systemBarsPadding()
             .imePadding()
             .semantics { testTagsAsResourceId = true }
             .testTag(TEST_TAG_TRANSFERS_VIEW),
@@ -136,9 +134,9 @@ internal fun TransfersView(
                 hideTabs = isInSelectActiveTransfersMode,
                 pagerScrollEnabled = !isInSelectActiveTransfersMode,
                 cells = {
-                    addTextTab(
+                    addTextTabWithLazyListState(
                         tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_active_transfers)),
-                    ) {
+                    ) { _, listState, modifier ->
                         ActiveTransfersView(
                             activeTransfers = activeTransfers,
                             isOverQuota = isOverQuota,
@@ -148,20 +146,26 @@ internal fun TransfersView(
                             onReorderConfirmed = onActiveTransfersReorderConfirmed,
                             onActiveTransferSelected = onActiveTransferSelected,
                             selectedActiveTransfers = selectedActiveTransfers,
+                            lazyListState = listState,
+                            modifier = modifier,
                         )
                     }
-                    addTextTab(
+                    addTextTabWithLazyListState(
                         tabItem = TabItems(stringResource(id = R.string.title_tab_completed_transfers)),
-                    ) {
+                    ) { _, listState, modifier ->
                         CompletedTransfersView(
                             completedTransfers = completedTransfers,
+                            lazyListState = listState,
+                            modifier = modifier,
                         )
                     }
-                    addTextTab(
+                    addTextTabWithLazyListState(
                         tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_failed_transfers)),
-                    ) {
+                    ) { _, listState, modifier ->
                         FailedTransfersView(
                             failedTransfers = failedTransfers,
+                            lazyListState = listState,
+                            modifier = modifier,
                         )
                     }
                 },
@@ -278,6 +282,7 @@ internal fun SelectActiveTransfersTopBar(
         title = if (selectedAmount == 0) stringResource(R.string.title_select_transfers) else selectedAmount.toString(),
         actions = actions,
         onActionPressed = onActionPressed,
+        drawBottomLineOnScrolledContent = true,
     )
 }
 

@@ -13,6 +13,7 @@ import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class CompletedTransfersViewTest {
@@ -37,7 +38,7 @@ class CompletedTransfersViewTest {
         completedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
     ) {
         composeTestRule.setContent {
-            CompletedTransfersView(completedTransfers = completedTransfers)
+            CompletedTransfersView(completedTransfers = completedTransfers, lazyListState = mock(),)
         }
     }
 }

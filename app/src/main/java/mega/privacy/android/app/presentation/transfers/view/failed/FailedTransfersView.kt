@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.transfers.view.failed
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +23,7 @@ import nz.mega.sdk.MegaTransfer
 @Composable
 internal fun FailedTransfersView(
     failedTransfers: ImmutableList<CompletedTransfer>,
+    lazyListState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
     if (failedTransfers.isEmpty()) {
@@ -31,6 +33,7 @@ internal fun FailedTransfersView(
         )
     } else {
         LazyColumn(
+            state = lazyListState,
             modifier = modifier
                 .fillMaxSize()
                 .testTag(TEST_TAG_FAILED_TRANSFERS_VIEW)

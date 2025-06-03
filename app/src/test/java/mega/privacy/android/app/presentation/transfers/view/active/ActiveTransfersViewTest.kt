@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.transfers.view.active
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
@@ -171,6 +172,7 @@ class ActiveTransfersViewTest {
                     onReorderConfirmed = onReorderConfirmed,
                     selectedActiveTransfers = null,
                     onActiveTransferSelected = {},
+                    lazyListState = rememberLazyListState(),
                 )
             }
         }

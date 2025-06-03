@@ -62,11 +62,12 @@ fun ActiveTransferItem(
     modifier: Modifier = Modifier,
     isDraggable: Boolean = true,
     isSelected: Boolean = false,
+    isBeingDragged: Boolean = false,
 ) = Box(
     modifier = modifier
         .height(68.dp)
         .fillMaxWidth()
-        .background(DSTokens.colors.background.pageBackground)
+        .background(if (isBeingDragged) DSTokens.colors.background.surface1 else DSTokens.colors.background.pageBackground)
         .testTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag")
 ) {
     Row(
@@ -100,7 +101,9 @@ fun ActiveTransferItem(
                 MegaIcon(
                     painterResource(id = iconPackR.drawable.ic_check_square_medium_thin_solid),
                     tint = IconColor.Primary,
-                    modifier = Modifier.size(32.dp).testTag(TEST_TAG_ACTIVE_TRANSFER_SELECTED)
+                    modifier = Modifier
+                        .size(32.dp)
+                        .testTag(TEST_TAG_ACTIVE_TRANSFER_SELECTED)
                 )
             } else {
                 TransferImage(

@@ -2,10 +2,13 @@ package mega.privacy.android.app.presentation.transfers.view.active
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,9 +35,11 @@ internal fun ActiveTransfersView(
     onReorderPreview: suspend (from: Int, to: Int) -> Unit,
     onReorderConfirmed: (InProgressTransfer) -> Unit,
     onActiveTransferSelected: (InProgressTransfer) -> Unit,
+    lazyListState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
     val selectMode = remember(selectedActiveTransfers) { selectedActiveTransfers != null }
+    var draggedTransfer by remember { mutableStateOf<InProgressTransfer?>(null) }
     if (activeTransfers.isEmpty()) {
         EmptyTransfersView(
             emptyStringId = sharedR.string.transfers_no_active_transfers_empty_text,
@@ -42,13 +47,20 @@ internal fun ActiveTransfersView(
         )
     } else {
         MegaReorderableLazyColumn(
+            lazyListState = lazyListState,
             items = activeTransfers,
             key = { it.tag },
             modifier = modifier
                 .fillMaxSize()
                 .testTag(TEST_TAG_ACTIVE_TRANSFERS_VIEW),
             onMove = { from, to -> onReorderPreview(from.index, to.index) },
-            onDragStopped = { onReorderConfirmed(it) },
+            onDragStarted = { dragged, _ ->
+                draggedTransfer = dragged
+            },
+            onDragStopped = {
+                draggedTransfer = null
+                onReorderConfirmed(it)
+            },
             dragEnabled = { !selectMode }
         ) { item ->
             ActiveTransferItem(
@@ -58,6 +70,7 @@ internal fun ActiveTransfersView(
                 onPlayPauseClicked = onPlayPauseClicked,
                 isSelected = selectedActiveTransfers?.contains(item) == true,
                 isDraggable = selectedActiveTransfers == null,
+                isBeingDragged = item == draggedTransfer,
                 modifier = Modifier.clickable(enabled = selectMode) {
                     onActiveTransferSelected(item)
                 }
@@ -74,6 +87,7 @@ internal fun ActiveTransferItem(
     onPlayPauseClicked: (Int) -> Unit,
     isSelected: Boolean,
     isDraggable: Boolean,
+    isBeingDragged: Boolean,
     modifier: Modifier = Modifier,
     viewModel: ActiveTransferImageViewModel = hiltViewModel(),
 ) = with(activeTransfer) {
@@ -100,6 +114,7 @@ internal fun ActiveTransferItem(
         modifier = modifier,
         isSelected = isSelected,
         isDraggable = isDraggable,
+        isBeingDragged = isBeingDragged,
     )
 }
 
