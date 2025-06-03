@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -39,6 +40,12 @@ import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.BuyProIEvent
+import mega.privacy.mobile.analytics.event.BuyProIIEvent
+import mega.privacy.mobile.analytics.event.BuyProIIIEvent
+import mega.privacy.mobile.analytics.event.BuyProLiteEvent
+import mega.privacy.mobile.analytics.event.GetStartedForFreeUpgradePlanButtonPressedEvent
+import mega.privacy.mobile.analytics.event.MaybeLaterUpgradeAccountButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantAViewProPlansButtonEvent
 import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantBFreePlanContinueButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantBProIIIPlanContinueButtonPressedEvent
@@ -46,6 +53,7 @@ import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantBProI
 import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantBProIPlanContinueButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantBProLitePlanContinueButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OnboardingUpsellingDialogVariantBProPlanIIIDisplayedEvent
+import mega.privacy.mobile.analytics.event.UpgradeAccountPlanScreenEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -100,6 +108,11 @@ class ChooseAccountFragment : Fragment() {
 
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+
+        LaunchedEffect(Unit) {
+            Analytics.tracker.trackEvent(UpgradeAccountPlanScreenEvent)
+        }
+
         if (uiState.isProPromoRevampEnabled) {
             SharedAppContainer(
                 themeMode = mode,
@@ -108,12 +121,20 @@ class ChooseAccountFragment : Fragment() {
             ) {
                 NewChooseAccountScreen(
                     uiState = uiState,
-                    onFreePlanClick = {
-                        callContinueButtonAnalytics(AccountType.FREE)
+                    onFreePlanClicked = {
+                        Analytics.tracker.trackEvent(
+                            GetStartedForFreeUpgradePlanButtonPressedEvent
+                        )
+                        chooseAccountActivity.onFreeClick()
+                    },
+                    maybeLaterClicked = {
+                        Analytics.tracker.trackEvent(
+                            MaybeLaterUpgradeAccountButtonPressedEvent
+                        )
                         chooseAccountActivity.onFreeClick()
                     },
                     onBuyPlanClick = { accountType, isMonthly ->
-                        callContinueButtonAnalytics(accountType)
+                        sendAccountTypeAnalytics(accountType)
                         billingViewModel.startPurchase(
                             chooseAccountActivity,
                             getProductId(isMonthly, accountType),
@@ -179,6 +200,20 @@ class ChooseAccountFragment : Fragment() {
                     )
                 }
             }
+        }
+    }
+
+    private fun sendAccountTypeAnalytics(planType: AccountType) {
+        when (planType) {
+            AccountType.PRO_I -> Analytics.tracker.trackEvent(BuyProIEvent)
+
+            AccountType.PRO_II -> Analytics.tracker.trackEvent(BuyProIIEvent)
+
+            AccountType.PRO_III -> Analytics.tracker.trackEvent(BuyProIIIEvent)
+
+            AccountType.PRO_LITE -> Analytics.tracker.trackEvent(BuyProLiteEvent)
+
+            else -> Unit
         }
     }
 

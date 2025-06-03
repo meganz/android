@@ -140,10 +140,12 @@ class NewChooseAccountScreenTest {
     private fun setContent(
         onBuyPlanClick: (AccountType, Boolean) -> Unit = { _, _ -> },
         onFreePlanClick: () -> Unit = {},
+        maybeLaterClicked: () -> Unit = {},
     ) = composeRule.setContent {
         NewChooseAccountScreen(
             onBuyPlanClick = onBuyPlanClick,
-            onFreePlanClick = onFreePlanClick,
+            onFreePlanClicked = onFreePlanClick,
+            maybeLaterClicked = maybeLaterClicked,
             uiState = ChooseAccountState(
                 localisedSubscriptionsList = expectedLocalisedSubscriptionsList
             )

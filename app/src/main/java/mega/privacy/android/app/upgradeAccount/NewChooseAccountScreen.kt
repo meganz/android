@@ -72,7 +72,8 @@ import java.util.Locale
 internal fun NewChooseAccountScreen(
     uiState: ChooseAccountState = ChooseAccountState(),
     onBuyPlanClick: (AccountType, Boolean) -> Unit,
-    onFreePlanClick: () -> Unit,
+    maybeLaterClicked: () -> Unit,
+    onFreePlanClicked: () -> Unit,
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
     var isMonthly by remember { mutableStateOf(true) }
@@ -122,7 +123,7 @@ internal fun NewChooseAccountScreen(
         topBar = {
             ChooseAccountScreenTopBar(
                 alpha = alpha,
-                onClick = onFreePlanClick
+                onClick = maybeLaterClicked
             )
         },
         bottomBar = {
@@ -323,7 +324,7 @@ internal fun NewChooseAccountScreen(
                     modifier = Modifier
                         .padding(16.dp)
                         .testTag(TEST_TAG_FREE_PLAN_CARD),
-                    onContinue = onFreePlanClick,
+                    onContinue = onFreePlanClicked,
                 )
             }
 
@@ -400,7 +401,8 @@ internal fun NewChooseAccountScreenPreview(
         NewChooseAccountScreen(
             uiState = state,
             onBuyPlanClick = { _, _ -> },
-            onFreePlanClick = {}
+            onFreePlanClicked = {},
+            maybeLaterClicked = {}
         )
     }
 }
