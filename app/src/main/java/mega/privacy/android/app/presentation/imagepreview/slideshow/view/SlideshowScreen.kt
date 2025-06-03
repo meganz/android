@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -79,6 +79,7 @@ import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.layouts.navigationBarsLandscapePadding
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
 import mega.privacy.mobile.analytics.event.SlideShowScreenEvent
@@ -175,7 +176,8 @@ fun SlideshowScreen(
                                 Analytics.tracker.trackEvent(SlideshowTutorialMenuItemEvent)
                             },
                             modifier = Modifier
-                                .windowInsetsPadding(WindowInsets.statusBars)
+                                .navigationBarsLandscapePadding()
+                                .statusBarsPadding()
                         )
                     }
                 },
@@ -187,13 +189,13 @@ fun SlideshowScreen(
                                 if (viewState.isPlaying) {
                                     viewModel.updateIsPlaying(isPlaying = false)
                                 } else {
-                                    inFullScreenMode = true
                                     coroutineScope.launch {
                                         resetZoom(
                                             pagerState = pagerState,
                                             viewState = viewState,
                                             zoomableStateMap = zoomableStateMap
                                         )
+                                        inFullScreenMode = true
                                         viewModel.updateIsPlaying(isPlaying = true)
                                     }
                                 }
@@ -295,14 +297,13 @@ private suspend fun resetZoom(
 ) {
     val currentPage = pagerState.currentPage
     (currentPage - 1..currentPage + 1)
-        .asSequence()
         .mapNotNull { index ->
             viewState.imageNodes.getOrNull(index)?.id?.let { nodeId ->
                 zoomableStateMap[nodeId]
             }
         }
-        .firstOrNull { state -> (state.zoomFraction ?: 0f) > 0f }
-        ?.resetZoom()
+        .filter { state -> (state.zoomFraction ?: 0f) > 0f }
+        .forEach { it.resetZoom() }
 }
 
 @Composable
