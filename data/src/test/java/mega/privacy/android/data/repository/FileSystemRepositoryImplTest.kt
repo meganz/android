@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import android.net.Uri
+import androidx.documentfile.provider.DocumentFile
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,7 @@ import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
+import mega.privacy.android.data.mapper.file.DocumentFileMapper
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -66,6 +68,7 @@ internal class FileSystemRepositoryImplTest {
     private val fileAttributeGateway = mock<FileAttributeGateway>()
     private val mimeTypeMapper = mock<MimeTypeMapper>()
     private val documentFileWrapper = mock<DocumentFileWrapper>()
+    private val documentFileMapper = mock<DocumentFileMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -88,6 +91,7 @@ internal class FileSystemRepositoryImplTest {
             deviceGateway = deviceGateway,
             fileAttributeGateway = fileAttributeGateway,
             documentFileWrapper = documentFileWrapper,
+            documentFileMapper = documentFileMapper,
         )
     }
 
@@ -102,6 +106,7 @@ internal class FileSystemRepositoryImplTest {
             fileAttributeGateway,
             mimeTypeMapper,
             documentFileWrapper,
+            documentFileMapper,
         )
     }
 
@@ -548,4 +553,44 @@ internal class FileSystemRepositoryImplTest {
             verify(fileGateway).takePersistablePermission(uri, writePermission)
         }
     }
+
+    @Test
+    fun `test that getDocumentFile returns the correct value when called with uri`() = runTest {
+        val uriString = "content://test/file/path"
+
+        mockStatic(DocumentFile::class.java).use {
+            val documentFile = mock<DocumentFile> {
+                on { isDirectory } doReturn false
+            }
+            val expected = mock<DocumentEntity>()
+
+            whenever(documentFileWrapper.getDocumentFile(uriString)) doReturn documentFile
+            whenever(documentFileMapper(documentFile, 0, 0)) doReturn expected
+
+            assertThat(underTest.getDocumentFileIfContentUri(uriString)).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that getDocumentFile returns the correct value when called with uri and file name`() =
+        runTest {
+            val uriString = "content://test/file/path"
+            val fileName = "file.txt"
+
+            mockStatic(DocumentFile::class.java).use {
+                val documentFile = mock<DocumentFile>()
+                val expected = mock<DocumentEntity>()
+
+                whenever(
+                    documentFileWrapper.getDocumentFile(
+                        uriString,
+                        fileName
+                    )
+                ) doReturn documentFile
+                whenever(documentFileMapper(documentFile, 0, 0)) doReturn expected
+
+                assertThat(underTest.getDocumentFileIfContentUri(uriString, fileName))
+                    .isEqualTo(expected)
+            }
+        }
 }

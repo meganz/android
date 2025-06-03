@@ -107,4 +107,29 @@ interface DocumentFileWrapper {
         fileName: String,
         mimeType: String,
     ): DocumentFile?
+
+    /**
+     * Get the document file for the given uri string.
+     *
+     * Note that, for downloads, we have this uri but it is not the real DocumentFile uri,
+     * so we need to find the real DocumentFile uri by using the given uriString, getting
+     * the tree uri DocumentFile and then.
+     *
+     * @param uriString the string representation of the uri
+     * @return the [DocumentFile] of the document file if found, null otherwise
+     */
+    suspend fun getDocumentFile(uriString: String): DocumentFile?
+
+    /**
+     * Get the document file for the given uri string and file name.
+     *
+     * Note that, for downloads, we have this uri but it is not the real DocumentFile uri,
+     * so we need to find the real DocumentFile uri by using the given uriString, getting
+     * the tree uri DocumentFile and then, finding the child by the file name.
+     *
+     * @param uriString the string representation of the uri
+     * @param fileName the name of the file to find
+     * @return the [DocumentFile] of the document file if found, null otherwise
+     */
+    suspend fun getDocumentFile(uriString: String, fileName: String): DocumentFile?
 }

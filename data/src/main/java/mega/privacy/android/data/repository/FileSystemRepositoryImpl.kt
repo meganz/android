@@ -17,6 +17,7 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.data.mapper.file.DocumentFileMapper
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -54,6 +55,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val deviceGateway: DeviceGateway,
     private val fileAttributeGateway: FileAttributeGateway,
     private val documentFileWrapper: DocumentFileWrapper,
+    private val documentFileMapper: DocumentFileMapper,
 ) : FileSystemRepository {
 
     private val moveSdDocumentMutex = Mutex()
@@ -436,4 +438,32 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.takePersistablePermission(uriPath.toUri(), writePermission)
         }
     }
+
+    override suspend fun getDocumentFileIfContentUri(uriString: String) =
+        withContext(ioDispatcher) {
+            documentFileWrapper.getDocumentFile(uriString)
+                ?.let { parentDocumentFile ->
+                    val childFiles =
+                        if (parentDocumentFile.isDirectory) parentDocumentFile.listFiles()
+                        else emptyArray()
+
+                    documentFileMapper(
+                        file = parentDocumentFile,
+                        numFiles = childFiles.count { it.isFile },
+                        numFolders = childFiles.count { it.isDirectory },
+                    )
+                }
+        }
+
+    override suspend fun getDocumentFileIfContentUri(uriString: String, fileName: String) =
+        withContext(ioDispatcher) {
+            documentFileWrapper.getDocumentFile(uriString, fileName)
+                ?.let { documentFile ->
+                    documentFileMapper(
+                        file = documentFile,
+                        numFiles = 0,
+                        numFolders = 0,
+                    )
+                }
+        }
 }

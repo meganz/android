@@ -7,8 +7,14 @@ import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ensureActive
+import mega.privacy.android.data.facade.DocumentFileFacade.Companion.DOWNLOADS_FOLDER_AUTHORITY
+import mega.privacy.android.data.facade.DocumentFileFacade.Companion.EXTERNAL_STORAGE_AUTHORITY
+import mega.privacy.android.data.facade.DocumentFileFacade.Companion.PRIMARY
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import java.io.File
 import javax.inject.Inject
@@ -93,6 +99,79 @@ class DocumentFileFacade @Inject constructor(
         folderDocument?.findFile(fileName)?.delete()
 
         return folderDocument?.createFile(mimeType, fileName)
+    }
+
+    override suspend fun getDocumentFile(uriString: String) =
+        resolveDocumentFile(uriString) { folderTree ->
+            if (folderTree.isEmpty()) null else folderTree.last()
+        }
+
+    override suspend fun getDocumentFile(uriString: String, fileName: String) =
+        resolveDocumentFile(uriString) { fileName }
+
+    private suspend fun resolveDocumentFile(
+        uriString: String,
+        fileNameProvider: (List<String>) -> String?,
+    ): DocumentFile? {
+        val uri = uriString.toUri()
+        val file = uri.takeIf { uri.scheme == "file" }?.path?.let { File(it) }
+
+        return when {
+            file?.exists() == true -> DocumentFile.fromFile(file)
+
+
+            DocumentsContract.isTreeUri(uri) -> fromTreeUri(uri)?.let { documentFile ->
+                val folderTree = getFolderTreeFromPickedContentUri(uriString)
+
+                findDocumentFile(
+                    parent = documentFile,
+                    folderTree = folderTree,
+                    fileName = fileNameProvider(folderTree),
+                )
+            }
+
+            else -> fromSingleUri(uri)
+        }
+    }
+
+    /**
+     * Extracts the folder tree from the picked URI string.
+     */
+    private fun getFolderTreeFromPickedContentUri(uriString: String): List<String> =
+        uriString.removePrefix("content://").let {
+            val folderTree = it.substringAfterLast("//")
+
+            if (it == folderTree) {
+                emptyList()
+            } else {
+                folderTree.split(File.separator)
+            }
+        }
+
+    /**
+     * Finds a [DocumentFile] in the given [parent] directory, [folderTree] and [fileName].
+     */
+    private suspend fun findDocumentFile(
+        parent: DocumentFile,
+        folderTree: List<String>,
+        fileName: String?,
+    ): DocumentFile? = coroutineScope {
+        when {
+            folderTree.isNotEmpty() -> parent.findFile(folderTree.first())?.let { documentFile ->
+                folderTree.drop(1).let { newFolderTree ->
+                    if (newFolderTree.isEmpty() && documentFile.name == fileName) {
+                        documentFile
+                    } else {
+                        ensureActive()
+                        findDocumentFile(documentFile, newFolderTree, fileName)
+                    }
+                }
+            }
+
+            fileName == null -> parent
+
+            else -> parent.findFile(fileName)
+        }
     }
 
     private fun DocumentFile.getStorageId(context: Context): String =

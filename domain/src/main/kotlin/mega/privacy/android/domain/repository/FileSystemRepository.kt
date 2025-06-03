@@ -524,4 +524,29 @@ interface FileSystemRepository {
      * Takes persisted permission of the given Uri, this may throw security exception if the permission has not been granted or it's outdated
      */
     suspend fun takePersistablePermission(uriPath: UriPath, writePermission: Boolean)
+
+    /**
+     * Get [DocumentEntity] given uri string.
+     *
+     * Note that, for downloads, we have this uri but it is not the real DocumentFile uri,
+     * so we need to find the real DocumentFile uri by using the given uriString, getting
+     * the tree uri DocumentFile and then, finding the child by the file name.
+     *
+     * @param uriString The string Uri of the file, usually a content uri
+     * @return The [DocumentEntity] of the file.
+     */
+    suspend fun getDocumentFileIfContentUri(uriString: String): DocumentEntity?
+
+    /**
+     * Get [DocumentEntity] given uri string and file name.
+     *
+     * Note that, for downloads, we have this uri but it is not the real DocumentFile uri,
+     * so we need to find the real DocumentFile uri by using the given uriString, getting
+     * the tree uri DocumentFile and then, finding the child by the file name.
+     *
+     * @param uriString The string Uri of the file, usually a content uri
+     * @param fileName The name of the file.
+     * @return The [DocumentEntity] of the file.
+     */
+    suspend fun getDocumentFileIfContentUri(uriString: String, fileName: String): DocumentEntity?
 }
