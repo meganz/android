@@ -16,7 +16,6 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -153,19 +152,6 @@ class SlideshowActivity : BaseActivity() {
 
     private fun setupInsets() {
         enableEdgeToEdge()
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, insets ->
-            var leftInset = insets.stableInsetLeft
-            var rightInset = insets.stableInsetRight
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                leftInset = insets.getInsets(WindowInsetsCompat.Type.systemBars()).left
-                rightInset = insets.getInsets(WindowInsetsCompat.Type.systemBars()).right
-            }
-
-            v.setPadding(leftInset, 0, rightInset, 0)
-            insets
-        }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.attributes.layoutInDisplayCutoutMode = LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
             // No scrim behind transparent navigation bar.
