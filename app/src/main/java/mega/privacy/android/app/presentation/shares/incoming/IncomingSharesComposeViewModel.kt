@@ -130,6 +130,7 @@ class IncomingSharesComposeViewModel @Inject constructor(
             monitorContactUpdatesUseCase().collectLatest { updates ->
                 Timber.d("Received contact update")
                 if (updates.changes.values.any { it.any { change -> changesToObserve.contains(change) } }) {
+                    checkContactVerification()
                     refreshNodesState()
                 }
             }
@@ -173,6 +174,7 @@ class IncomingSharesComposeViewModel @Inject constructor(
                 monitorNodeUpdatesUseCase().catch {
                     Timber.e(it)
                 }.collect {
+                    checkContactVerification()
                     checkIfNodeIsDeleted(it.changes)
                     checkIfLeftFromShare(it.changes)
                 }
