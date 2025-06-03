@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.presentation
 
+import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
@@ -44,6 +46,7 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import mega.privacy.android.feature.sync.domain.usecase.sync.ChangeSyncLocalRootUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
@@ -105,6 +108,7 @@ class SyncFoldersViewModelTest {
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+    private val changeSyncLocalRootUseCase: ChangeSyncLocalRootUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private lateinit var underTest: SyncFoldersViewModel
 
@@ -137,6 +141,7 @@ class SyncFoldersViewModelTest {
             hasStalledIssues = true,
             megaStoragePath = "photos",
             megaStorageNodeId = NodeId(1234L),
+            deviceStorageUri = UriPath("content://com.android.externalstorage.documents/document/primary%3ADCIM"),
             expanded = false
         ),
         SyncUiItem(
@@ -169,6 +174,7 @@ class SyncFoldersViewModelTest {
             emit(folderPairs)
             awaitCancellation()
         })
+        whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         whenever(getBatteryInfoUseCase()).thenReturn(BatteryInfo(100, true))
         whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, true)))
 
@@ -424,6 +430,23 @@ class SyncFoldersViewModelTest {
             assertThat(underTest.uiState.value.isStorageOverQuota).isFalse()
         }
 
+
+    @Test
+    fun `test that change sync root action completes`() = runTest {
+        val syncUiItem = syncUiItems.first()
+        initViewModel()
+        val uri: Uri = mock()
+        val localFolderUri =
+            "content://com.android.externalstorage.documents/document/primary%3APhotos"
+        whenever(uri.toString()).thenReturn(localFolderUri)
+
+        underTest.handleAction(SyncFoldersAction.LocalFolderSelected(syncUiItem, uri))
+
+        verify(changeSyncLocalRootUseCase).invoke(syncUiItem.id, localFolderUri)
+        verify(resumeSyncUseCase).invoke(syncUiItem.id)
+    }
+
+
     private fun getSyncUiItem(status: SyncStatus): SyncUiItem = SyncUiItem(
         id = 3L,
         syncType = SyncType.TYPE_TWOWAY,
@@ -469,7 +492,8 @@ class SyncFoldersViewModelTest {
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            changeSyncLocalRootUseCase = changeSyncLocalRootUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 }

@@ -45,6 +45,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import mega.privacy.android.feature.sync.domain.usecase.sync.ChangeSyncLocalRootUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase.Companion.LOW_BATTERY_LEVEL
@@ -95,6 +96,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val changeSyncLocalRootUseCase: ChangeSyncLocalRootUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncFoldersUiState(emptyList()))
@@ -446,6 +448,21 @@ internal class SyncFoldersViewModel @Inject constructor(
                     state.copy(snackbarMessage = null)
                 }
             }
+
+            is SyncFoldersAction.LocalFolderSelected -> {
+                viewModelScope.launch {
+                    runCatching {
+                        changeSyncLocalRootUseCase(
+                            folderPairId = action.syncUiItem.id,
+                            newLocalPath = action.uri.toString(),
+                        )
+                        resumeSyncUseCase(action.syncUiItem.id)
+                    }.onFailure {
+                        Timber.e(it)
+                    }
+                }
+            }
+
         }
     }
 

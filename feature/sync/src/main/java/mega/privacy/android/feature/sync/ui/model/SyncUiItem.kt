@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui.model
 import androidx.annotation.StringRes
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.shared.resources.R
 
@@ -17,10 +18,12 @@ internal data class SyncUiItem(
     val megaStorageNodeId: NodeId,
     val expanded: Boolean,
     @StringRes val error: Int? = null,
+    val deviceStorageUri: UriPath? = null,
     val numberOfFiles: Int = 0,
     val numberOfFolders: Int = 0,
     val totalSizeInBytes: Long = 0,
     val creationTime: Long = 0,
+    val isLocalRootChangeNeeded: Boolean = false,
 ) {
     @get:StringRes
     val method: Int
