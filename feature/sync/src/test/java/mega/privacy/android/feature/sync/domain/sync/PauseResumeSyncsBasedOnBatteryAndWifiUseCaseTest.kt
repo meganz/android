@@ -4,8 +4,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -23,6 +23,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.reset
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
+import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -30,7 +31,6 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
 
     private lateinit var underTest: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 
-    private val isOnWifiNetworkUseCase = mock<IsOnWifiNetworkUseCase>()
     private val pauseSyncUseCase = mock<PauseSyncUseCase>()
     private val resumeSyncUseCase = mock<ResumeSyncUseCase>()
     private val monitorSyncsUseCase = mock<MonitorSyncsUseCase>()
@@ -60,7 +60,6 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest = PauseResumeSyncsBasedOnBatteryAndWiFiUseCase(
-            isOnWifiNetworkUseCase,
             pauseSyncUseCase,
             resumeSyncUseCase,
             monitorSyncsUseCase,
@@ -71,7 +70,6 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            isOnWifiNetworkUseCase,
             pauseSyncUseCase,
             resumeSyncUseCase,
             monitorSyncsUseCase,
@@ -81,23 +79,33 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
 
     @Test
     fun `test that sync is paused when not connected to internet`() = runTest {
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(folderPairs))
-        whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
-        whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
+        val newPairs = folderPairs.mapIndexed { index, item ->
+            item.copy(
+                syncStatus = if (index == 0) SyncStatus.SYNCING else SyncStatus.SYNCED,
+            )
+        }
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
+
 
         underTest(
             connectedToInternet = false,
             syncOnlyByWifi = true,
             batteryInfo = BatteryInfo(100, true),
+            isUserOnWifi = true,
         )
 
-        verify(pauseSyncUseCase).invoke(firstSyncId)
-        verifyNoInteractions(resumeSyncUseCase)
+        verify(pauseSyncUseCase).invoke(secondSyncId)
+        verifyNoInteractions(resumeSyncUseCase, isSyncPausedByTheUserUseCase)
     }
 
     @Test
     fun `test that sync is resumed when connected to internet and not only on wifi`() = runTest {
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(folderPairs))
+        val newPairs = folderPairs.mapIndexed { index, item ->
+            item.copy(
+                syncStatus = SyncStatus.PAUSED,
+            )
+        }
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
         whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
         whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 
@@ -105,15 +113,22 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             connectedToInternet = true,
             syncOnlyByWifi = false,
             batteryInfo = BatteryInfo(100, true),
+            isUserOnWifi = true,
         )
 
         verify(resumeSyncUseCase).invoke(firstSyncId)
+        verify(resumeSyncUseCase, times(0)).invoke(secondSyncId)
         verifyNoInteractions(pauseSyncUseCase)
     }
 
     @Test
     fun `test that sync is paused when device has low battery level and not charging`() = runTest {
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(folderPairs))
+        val newPairs = folderPairs.mapIndexed { index, item ->
+            item.copy(
+                syncStatus = SyncStatus.SYNCING,
+            )
+        }
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
         whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
         whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 
@@ -121,6 +136,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             connectedToInternet = true,
             syncOnlyByWifi = true,
             batteryInfo = BatteryInfo(LOW_BATTERY_LEVEL - 1, false),
+            isUserOnWifi = true
         )
 
         verify(pauseSyncUseCase).invoke(firstSyncId)
@@ -130,7 +146,12 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
     @Test
     fun `test that sync is resumed when device has low battery level but device is charging`() =
         runTest {
-            whenever(monitorSyncsUseCase()).thenReturn(flowOf(folderPairs))
+            val newPairs = folderPairs.mapIndexed { index, item ->
+                item.copy(
+                    syncStatus = SyncStatus.PAUSED,
+                )
+            }
+            whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
             whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
             whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 
@@ -138,6 +159,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
                 connectedToInternet = true,
                 syncOnlyByWifi = false,
                 batteryInfo = BatteryInfo(LOW_BATTERY_LEVEL - 1, true),
+                isUserOnWifi = true
             )
 
             verify(resumeSyncUseCase).invoke(firstSyncId)
@@ -145,34 +167,53 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
         }
 
     @Test
-    fun `test that sync is paused when user account is not pro`() = runTest {
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(folderPairs))
-        whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
-        whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 
-        underTest(
-            connectedToInternet = true,
-            syncOnlyByWifi = true,
-            batteryInfo = BatteryInfo(100, true),
-        )
+    fun `test that sync is not resumed when has any error and device is connected to internet`() =
+        runTest {
+            val newPairs = folderPairs.mapIndexed { index, item ->
+                item.copy(
+                    syncStatus = if (index == 0) SyncStatus.PAUSED else SyncStatus.ERROR,
+                    syncError = if (index == 0) SyncError.NO_SYNC_ERROR else SyncError.UNKNOWN_ERROR,
+                )
+            }
+            whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
+            whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
+            whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(false)
 
-        verify(pauseSyncUseCase).invoke(firstSyncId)
-        verifyNoInteractions(resumeSyncUseCase)
-    }
+            underTest(
+                connectedToInternet = true,
+                syncOnlyByWifi = false,
+                batteryInfo = BatteryInfo(100, true),
+                isUserOnWifi = true
+            )
+
+            verify(resumeSyncUseCase).invoke(firstSyncId)
+            verify(resumeSyncUseCase, times(0)).invoke(secondSyncId)
+            verifyNoInteractions(pauseSyncUseCase)
+        }
 
     @Test
-    fun `test that sync is resumed when user account is pro`() = runTest {
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(folderPairs))
-        whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
-        whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
+    fun `test that sync is not paused when has any error and device is not connected to wifi`() =
+        runTest {
+            val newPairs = folderPairs.mapIndexed { index, item ->
+                item.copy(
+                    syncStatus = if (index == 0) SyncStatus.SYNCING else SyncStatus.ERROR,
+                    syncError = if (index == 0) SyncError.NO_SYNC_ERROR else SyncError.UNKNOWN_ERROR,
+                )
+            }
+            whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
+            whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
+            whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(false)
 
-        underTest(
-            connectedToInternet = true,
-            syncOnlyByWifi = true,
-            batteryInfo = BatteryInfo(100, true),
-        )
+            underTest(
+                connectedToInternet = true,
+                syncOnlyByWifi = true,
+                batteryInfo = BatteryInfo(100, true),
+                isUserOnWifi = false
+            )
 
-        verify(pauseSyncUseCase).invoke(firstSyncId)
-        verifyNoInteractions(resumeSyncUseCase)
-    }
+            verify(pauseSyncUseCase).invoke(firstSyncId)
+            verify(pauseSyncUseCase, times(0)).invoke(secondSyncId)
+            verifyNoInteractions(resumeSyncUseCase)
+        }
 }

@@ -47,12 +47,16 @@ import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -242,5 +246,113 @@ class SyncWorkerTest {
         underTest.doWork()
 
         verify(syncNotificationManager).show(context, notification)
+    }
+
+    @Test
+    fun `test that sync worker retries if login fails`() = runTest {
+        whenever(loginMutex.isLocked).thenReturn(false) // Simulate login lock
+        whenever(backgroundFastLoginUseCase()).thenThrow(RuntimeException("Login failed"))
+
+        val result = underTest.doWork()
+
+        assertThat(result).isEqualTo(Result.retry())
+    }
+
+    @Test
+    fun `test that fast login mutex is waited at least 3 times and then sync worker retries`() =
+        runTest {
+            whenever(loginMutex.isLocked).thenReturn(true) // Simulate login lock
+            whenever(isRootNodeExistsUseCase()).thenReturn(false)
+            val result = underTest.doWork()
+
+            assertThat(result).isEqualTo(Result.retry())
+            verifyNoInteractions(backgroundFastLoginUseCase)
+        }
+
+    @Test
+    fun `test that no notification is displayed if permission is denied`() = runTest {
+        whenever(syncPermissionsManager.isNotificationsPermissionGranted()).thenReturn(false)
+
+        underTest.doWork()
+
+        verify(syncNotificationManager, never()).show(any(), any())
+    }
+
+    @Test
+    fun `test that syncs are paused when battery is low and not charging`() = runTest {
+        val batteryInfo = BatteryInfo(level = 10, isCharging = false)
+        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(batteryInfo))
+        whenever(isOnWifiNetworkUseCase()).thenReturn(true)
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(mock())))
+        whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(false))
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        underTest.doWork()
+
+        verify(pauseResumeSyncsBasedOnBatteryAndWiFiUseCase).invoke(
+            connectedToInternet = true,
+            syncOnlyByWifi = false,
+            batteryInfo = batteryInfo,
+            isUserOnWifi = true
+        )
+    }
+
+    @Test
+    fun `test that syncs are resumed when battery is not low and not charging`() = runTest {
+        val batteryInfo = BatteryInfo(level = 30, isCharging = false)
+        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(batteryInfo))
+        whenever(isOnWifiNetworkUseCase()).thenReturn(true)
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(mock())))
+        whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(false))
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        underTest.doWork()
+
+        verify(pauseResumeSyncsBasedOnBatteryAndWiFiUseCase).invoke(
+            connectedToInternet = true,
+            syncOnlyByWifi = false,
+            batteryInfo = batteryInfo,
+            isUserOnWifi = true
+        )
+    }
+
+    @Test
+    fun `test that sync worker retries on timeout`() = runTest(StandardTestDispatcher()) {
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(mock())))
+
+        val result = underTest.doWork()
+        testScheduler.advanceTimeBy(TimeUnit.MINUTES.toMillis(10)) // Simulate timeout
+
+        assertThat(result).isEqualTo(Result.retry())
+    }
+
+    @Test
+    fun `test isLoginSuccessful returns false when exception is thrown and worker retries`() =
+        runTest {
+            whenever(loginMutex.isLocked).thenReturn(false)
+            whenever(backgroundFastLoginUseCase()).thenThrow(RuntimeException("Login failed"))
+
+            val result = underTest.doWork()
+
+            assertThat(result).isEqualTo(Result.retry())
+        }
+
+    @Test
+    fun `test monitorNotifications handles exception from isOnWifiNetworkUseCase`() = runTest {
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(mock()))
+        whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(false))
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        whenever(isOnWifiNetworkUseCase()).thenThrow(RuntimeException("WiFi check failed"))
+
+        underTest.doWork()
+
+        verifyNoInteractions(
+            pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
+            syncNotificationManager,
+            syncPermissionsManager
+        )
     }
 }

@@ -111,24 +111,27 @@ class SyncMonitorViewModelTest {
     fun `test that monitor sync state updates sync state`() = runTest {
         val batteryInfo = mock<BatteryInfo>()
         val connectedToInternet = true
-        val syncByWifi = true
+        val syncOnlyByWifi = true
+        val isUserOnWifi = true
         whenever(monitorConnectivityUseCase()).thenReturn(
             flowOf(connectedToInternet)
         )
         whenever(monitorSyncByWiFiUseCase()).thenReturn(
-            flowOf(syncByWifi)
+            flowOf(syncOnlyByWifi)
         )
         whenever(monitorBatteryInfoUseCase()).thenReturn(
             flowOf(batteryInfo)
         )
+        whenever(isOnWifiNetworkUseCase()).thenReturn(isUserOnWifi)
 
         initViewModel()
         underTest.startMonitoring()
 
         verify(pauseResumeSyncsBasedOnBatteryAndWiFiUseCase).invoke(
-            connectedToInternet,
-            syncByWifi,
-            batteryInfo,
+            connectedToInternet = connectedToInternet,
+            isUserOnWifi = isUserOnWifi,
+            syncOnlyByWifi = syncOnlyByWifi,
+            batteryInfo = batteryInfo,
         )
     }
 

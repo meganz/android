@@ -8,6 +8,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -115,29 +116,36 @@ class SyncWorker @AssistedInject constructor(
      * @return [Boolean] true if the login process successful otherwise false
      */
     private suspend fun isLoginSuccessful(): Boolean {
-        Timber.d("Waiting for the user to complete the Fast Login procedure")
+        return runCatching {
+            Timber.d("Waiting for the user to complete the Fast Login procedure")
 
-        // arbitrary retry value
-        var retry = 3
-        while (loginMutex.isLocked && retry > 0) {
-            Timber.d("Wait for the login lock to be available")
-            delay(1000)
-            retry--
-        }
+            // arbitrary retry value
+            var retry = 3
+            while (loginMutex.isLocked && retry > 0) {
+                Timber.d("Wait for the login lock to be available")
+                delay(1000)
+                retry--
+            }
 
-        return if (!loginMutex.isLocked) {
-            val result = runCatching { backgroundFastLoginUseCase() }.onFailure {
-                Timber.e(it, "performCompleteFastLogin exception")
+            return if (!loginMutex.isLocked) {
+                val result = runCatching { backgroundFastLoginUseCase() }.onFailure {
+                    Timber.e(it, "performCompleteFastLogin exception")
+                }
+                if (result.isSuccess) {
+                    Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
+                    cookieEnabledCheckWrapper.checkEnabledCookies()
+                }
+                result.isSuccess
+            } else {
+                isRootNodeExistsUseCase().also { rootNodeExists ->
+                    if (rootNodeExists) {
+                        Timber.d("Root node exists, no need to perform login")
+                    } else {
+                        Timber.w("Root node does not exist, login failed in the SyncWorker")
+                    }
+                }
             }
-            if (result.isSuccess) {
-                Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
-                cookieEnabledCheckWrapper.checkEnabledCookies()
-            }
-            result.isSuccess
-        } else {
-            Timber.e("isLoggingIn lock not available, cannot perform backgroundFastLogin. Stop process")
-            isRootNodeExistsUseCase()
-        }
+        }.getOrElse { false }
     }
 
     private fun CoroutineScope.monitorNotifications() = launch {
@@ -150,26 +158,36 @@ class SyncWorker @AssistedInject constructor(
             monitorConnectivityUseCase()
         ) { stalledIssues: List<StalledIssue>, syncs: List<FolderPair>, batteryInfo: BatteryInfo, syncByWifi: Boolean, connectedToInternet ->
             runCatching {
-                updateSyncState(
-                    connectedToInternet = connectedToInternet,
-                    syncOnlyByWifi = syncByWifi,
-                    batteryInfo = batteryInfo
-                )
+                val isUserOnWifi = isOnWifiNetworkUseCase()
+                launch(NonCancellable) {
+                    runCatching {
+                        updateSyncState(
+                            connectedToInternet = connectedToInternet,
+                            syncOnlyByWifi = syncByWifi,
+                            batteryInfo = batteryInfo,
+                            isUserOnWifi = isUserOnWifi
+                        )
+                    }.onFailure {
+                        Timber.e("Error while updating sync state: $it")
+                    }
+                }
+                launch(NonCancellable) {
+                    runCatching {
+                        getSyncNotificationUseCase(
+                            isBatteryLow = batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging,
+                            isUserOnWifi = isUserOnWifi,
+                            isSyncOnlyByWifi = syncByWifi,
+                            syncs = syncs,
+                            stalledIssues = stalledIssues
+                        )
+                    }.onSuccess { notification ->
+                        displayNotification(notification)
+                    }.onFailure {
+                        Timber.e(it)
+                    }
+                }
             }.onFailure {
-                Timber.e("Error while updating sync state: $it")
-            }
-            runCatching {
-                getSyncNotificationUseCase(
-                    isBatteryLow = batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging,
-                    isUserOnWifi = isOnWifiNetworkUseCase(),
-                    isSyncOnlyByWifi = syncByWifi,
-                    syncs = syncs,
-                    stalledIssues = stalledIssues
-                )
-            }.onSuccess { notification ->
-                displayNotification(notification)
-            }.onFailure {
-                Timber.e(it)
+                Timber.d("Error while combining sync data: $it")
             }
         }.catch {
             Timber.e("Error while monitoring notifications: $it")
@@ -182,11 +200,13 @@ class SyncWorker @AssistedInject constructor(
         connectedToInternet: Boolean,
         syncOnlyByWifi: Boolean,
         batteryInfo: BatteryInfo,
+        isUserOnWifi: Boolean,
     ) {
         pauseResumeSyncsBasedOnBatteryAndWiFiUseCase(
             connectedToInternet = connectedToInternet,
             syncOnlyByWifi = syncOnlyByWifi,
             batteryInfo = batteryInfo,
+            isUserOnWifi = isUserOnWifi
         )
     }
 

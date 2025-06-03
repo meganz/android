@@ -2,21 +2,20 @@ package mega.privacy.android.feature.sync.domain.usecase.sync
 
 import kotlinx.coroutines.flow.first
 import mega.privacy.android.domain.entity.BatteryInfo
-import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
+import mega.privacy.android.domain.entity.sync.SyncError
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
 import javax.inject.Inject
 
 /**
  * Use case to pause/resume syncs based on the status of device battery and WiFi
  *
- * @param isOnWifiNetworkUseCase        [IsOnWifiNetworkUseCase]
  * @param pauseSyncUseCase              [PauseSyncUseCase]
  * @param resumeSyncUseCase             [ResumeSyncUseCase]
  * @param monitorSyncsUseCase         [MonitorSyncsUseCase]
  * @param isSyncPausedByTheUserUseCase  [IsSyncPausedByTheUserUseCase]
  */
 class PauseResumeSyncsBasedOnBatteryAndWiFiUseCase @Inject constructor(
-    private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase,
     private val pauseSyncUseCase: PauseSyncUseCase,
     private val resumeSyncUseCase: ResumeSyncUseCase,
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
@@ -32,20 +31,34 @@ class PauseResumeSyncsBasedOnBatteryAndWiFiUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         connectedToInternet: Boolean,
+        isUserOnWifi: Boolean,
         syncOnlyByWifi: Boolean,
         batteryInfo: BatteryInfo,
     ) {
         val internetNotAvailable = !connectedToInternet
-        val userNotOnWifi = !isOnWifiNetworkUseCase()
-        val activeSyncs =
-            monitorSyncsUseCase().first().filter { !isSyncPausedByTheUserUseCase(it.id) }
+        val userNotOnWifi = !isUserOnWifi
         val isLowBatteryLevel =
             batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging
 
         if (internetNotAvailable || syncOnlyByWifi && userNotOnWifi || isLowBatteryLevel) {
+            val activeSyncs =
+                monitorSyncsUseCase().first()
+                    .filter {
+                        (it.syncError == SyncError.NO_SYNC_ERROR || it.syncError == null)
+                                && (it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.SYNCING)
+                    }
             activeSyncs.forEach { pauseSyncUseCase(it.id) }
         } else {
-            activeSyncs.forEach { resumeSyncUseCase(it.id) }
+            val activeSyncs =
+                monitorSyncsUseCase().first()
+                    .filter {
+                        (it.syncError == SyncError.NO_SYNC_ERROR || it.syncError == null)
+                                && it.syncStatus == SyncStatus.PAUSED
+                                && !isSyncPausedByTheUserUseCase(it.id)
+                    }
+            activeSyncs.forEach {
+                resumeSyncUseCase(it.id)
+            }
         }
     }
 

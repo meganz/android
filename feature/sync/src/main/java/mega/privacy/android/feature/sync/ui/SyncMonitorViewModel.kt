@@ -16,8 +16,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.domain.extension.collectChunked
 import mega.privacy.android.domain.entity.BatteryInfo
+import mega.privacy.android.domain.extension.collectChunked
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -106,15 +106,23 @@ class SyncMonitorViewModel @Inject constructor(
                 ) { connectedToInternet: Boolean, syncByWifi: Boolean, batteryInfo: BatteryInfo ->
                     Pair(
                         batteryInfo,
-                        Pair(
+                        Triple(
                             connectedToInternet,
                             syncByWifi,
+                            isOnWifiNetworkUseCase(),
                         )
                     )
                 }
+                    .distinctUntilChanged()
+                    .catch { Timber.e("Error Monitoring SyncState $it") }
                     .collect { (batteryInfo, connectionDetails) ->
-                        val (connectedToInternet, syncByWifi) = connectionDetails
-                        updateSyncState(connectedToInternet, syncByWifi, batteryInfo)
+                        val (connectedToInternet, syncOnlyByWifi, isUserOnWifi) = connectionDetails
+                        updateSyncState(
+                            connectedToInternet = connectedToInternet,
+                            syncOnlyByWifi = syncOnlyByWifi,
+                            batteryInfo = batteryInfo,
+                            isUserOnWifi = isUserOnWifi
+                        )
                     }
             }
         }
@@ -124,11 +132,13 @@ class SyncMonitorViewModel @Inject constructor(
         connectedToInternet: Boolean,
         syncOnlyByWifi: Boolean,
         batteryInfo: BatteryInfo,
+        isUserOnWifi: Boolean,
     ) {
         pauseResumeSyncsBasedOnBatteryAndWiFiUseCase(
             connectedToInternet = connectedToInternet,
             syncOnlyByWifi = syncOnlyByWifi,
             batteryInfo = batteryInfo,
+            isUserOnWifi = isUserOnWifi,
         )
     }
 
