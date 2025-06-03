@@ -15,7 +15,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.view.Display
@@ -61,7 +60,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.Insets
-import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
@@ -71,7 +69,6 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-import androidx.documentfile.provider.DocumentFile
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
@@ -86,7 +83,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.WorkManager
-import com.anggrayudi.storage.file.getAbsolutePath
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -6982,7 +6978,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      *
      * @param transfer the transfer to open its location
      */
-    fun openTransferLocation(transfer: CompletedTransfer) {
+    fun openTransferLocation(transfer: CompletedTransfer, path: String) {
         when (transfer.type) {
             MegaTransfer.TYPE_DOWNLOAD -> {
                 val fileNames = arrayListOf(transfer.fileName)
@@ -6999,7 +6995,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     false -> {
                         Intent(this, FileStorageActivity::class.java).apply {
                             action = FileStorageActivity.Mode.BROWSE_FILES.action
-                            putExtra(FileStorageActivity.EXTRA_PATH, transfer.path)
+                            putExtra(FileStorageActivity.EXTRA_PATH, path)
                             putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, fileNames)
                             startActivity(this)
                         }
@@ -7025,27 +7021,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             else -> {
                 Timber.d("Unable to retrieve transfer type")
             }
-        }
-    }
-
-    private fun getFileFromUri(stringUri: String): File? {
-        val uri = stringUri.toUri()
-        return if (uri.scheme == "content") {
-            val documentFile = DocumentFile.fromTreeUri(this, uri)
-            if (documentFile == null) {
-                Timber.e("DocumentFile is null")
-                null
-            } else {
-                var file = File(documentFile.getAbsolutePath(this))
-                if (!file.exists()) {
-                    //best effort, probably a subfolder of downloads, but we can't access it as a file
-                    file =
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                }
-                file
-            }
-        } else {
-            File(stringUri)
         }
     }
 

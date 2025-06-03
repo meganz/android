@@ -1,11 +1,9 @@
 package mega.privacy.android.app.modalbottomsheet
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,8 +13,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.viewModels
 import coil.load
 import coil.transform.RoundedCornersTransformation
@@ -36,7 +34,6 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaTransfer
@@ -51,7 +48,8 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
     View.OnClickListener {
     private lateinit var managerActivity: ManagerActivity
     private var transfer: CompletedTransfer? = null
-    private var handle: Long = 0
+    private var parentFileUri: Uri? = null
+    private var fileUri: Uri? = null
     private val viewModel by viewModels<ManageTransferSheetViewModel>()
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,14 +65,22 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewLifecycleOwner.collectFlow(viewModel.uiState) {
-            transfer = it.transfer
-            handleCompletedTransfer(it)
+        viewLifecycleOwner.collectFlow(viewModel.uiState) { state ->
+            state.transfer?.let {
+                transfer = state.transfer
+                parentFileUri = state.parentUri
+                fileUri = state.fileUri
+                handleCompletedTransfer(state)
+            }
         }
     }
 
     private fun handleCompletedTransfer(uiState: ManageTransferSheetUiState) {
-        val transfer = uiState.transfer ?: return
+        val transfer = transfer ?: run {
+            Timber.w("Transfer is not initialized")
+            return
+        }
+
         val thumbnail = contentView.findViewById<ImageView>(R.id.manage_transfer_thumbnail)
         val type = contentView.findViewById<ImageView>(R.id.manage_transfer_small_icon)
         val stateIcon = contentView.findViewById<ImageView>(R.id.manage_transfer_completed_image)
@@ -83,12 +89,19 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         val viewInFolderOption = contentView.findViewById<TextView>(R.id.option_view)
         viewInFolderOption.setOnClickListener(this)
 
+        if (transfer.isContentUriDownload && fileUri != null) {
+            viewInFolderOption.visibility = View.VISIBLE
+        } else {
+            viewInFolderOption.visibility = View.GONE
+        }
+
         val openWith = contentView.findViewById<TextView>(R.id.option_open_with)
         openWith.setOnClickListener(this)
         val openWithSeparator = contentView.findViewById<View>(R.id.separator_open_with)
-        if (transfer.type == MegaTransfer.TYPE_DOWNLOAD) {
+        if (transfer.type == MegaTransfer.TYPE_DOWNLOAD && fileUri != null) {
             openWith.visibility = View.VISIBLE
-            openWithSeparator.visibility = View.VISIBLE
+            openWithSeparator.visibility =
+                if (viewInFolderOption.isGone) View.GONE else View.VISIBLE
         } else {
             openWith.visibility = View.GONE
             openWithSeparator.visibility = View.GONE
@@ -124,7 +137,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         location.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey_054_white_054))
         when (transfer.state) {
             MegaTransfer.STATE_COMPLETED -> {
-                location.text = transfer.path
+                location.text = uiState.parentFilePath ?: transfer.path
                 stateIcon.setColorFilter(
                     ContextCompat.getColor(
                         requireContext(),
@@ -168,12 +181,11 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
                 stateIcon.isVisible = true
             }
         }
-        if (getLinkOption.visibility == View.GONE && retryOption.visibility == View.GONE || viewInFolderOption.visibility == View.GONE) {
+        if (getLinkOption.isGone && retryOption.isGone || viewInFolderOption.isGone) {
             getLinkOptionSeparator.visibility = View.GONE
         }
-        handle = transfer.handle
         val thumbParams = thumbnail.layoutParams as FrameLayout.LayoutParams
-        thumbnail.load(ThumbnailRequest(NodeId(handle))) {
+        thumbnail.load(ThumbnailRequest(NodeId(transfer.handle))) {
             size(Util.dp2px(Constants.THUMB_SIZE_DP.toFloat()))
             transformations(
                 RoundedCornersTransformation(
@@ -194,10 +206,15 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
                 },
             )
         }
+        calculatePeekHeight()
     }
 
     override fun onClick(v: View) {
-        val transfer = transfer ?: return
+        val transfer = transfer ?: run {
+            Timber.w("Transfer is not initialized")
+            return
+        }
+
         val id = v.id
         if (id == R.id.option_view) {
             if (transfer.type == MegaTransfer.TYPE_UPLOAD && !Util.isOnline(requireContext())) {
@@ -207,7 +224,10 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
             } else {
-                managerActivity.openTransferLocation(transfer)
+                managerActivity.openTransferLocation(
+                    transfer,
+                    parentFileUri?.toString() ?: transfer.path
+                )
             }
         } else if (id == R.id.option_get_link) {
             if (!Util.isOnline(requireContext())) {
@@ -217,7 +237,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
             } else {
-                managerActivity.showGetLinkActivity(handle)
+                managerActivity.showGetLinkActivity(transfer.handle)
             }
         } else if (id == R.id.option_clear) {
             viewModel.completedTransferRemoved(transfer, true)
@@ -238,55 +258,50 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
     }
 
     private fun openFileWith() {
-        var uriPath = UriPath(transfer?.originalPath ?: return)
-        val fileName = transfer?.fileName ?: return
-        var uri: Uri = uriPath.value.toUri()
+        val transfer = transfer ?: run {
+            Timber.w("Transfer is not initialized")
+            return
+        }
 
-        if (uriPath.isPath()) {
-            val localFile = File(uriPath.value)
-            if (FileUtil.isFileAvailable(localFile)) {
+        with(transfer) {
+            var uri: Uri = originalPath.toUri()
+
+            if (originalPath.startsWith(File.separator)) {
+                val localFile = File(originalPath)
+                if (FileUtil.isFileAvailable(localFile)) {
+                    try {
+                        FileProvider.getUriForFile(
+                            requireActivity(),
+                            Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                            localFile
+                        )?.let { uri = it }
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                    }
+                } else {
+                    showSnackbar(requireActivity(), getString(R.string.corrupt_video_dialog_text))
+                    return
+                }
+            } else {
+                uri = fileUri ?: uri
+            }
+
+            Intent(Intent.ACTION_VIEW).apply {
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 try {
-                    FileProvider.getUriForFile(
-                        requireActivity(),
-                        Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                        localFile
-                    )?.let { uri = it }
+                    setDataAndType(uri, typeForName(fileName).type)
+                    val chooserTitle = resources.getString(
+                        sharedR.string.open_with_os_dialog_title,
+                        fileName
+                    )
+                    val intent = Intent.createChooser(this, chooserTitle)
+                    if (MegaApiUtils.isIntentAvailable(requireActivity(), intent)) {
+                        startActivity(intent)
+                        return
+                    }
                 } catch (e: Exception) {
                     Timber.e(e)
                 }
-            } else {
-                showSnackbar(requireActivity(), getString(R.string.corrupt_video_dialog_text))
-                return
-            }
-        } else {
-            if (DocumentsContract.isTreeUri(uri)) {
-                DocumentFile.fromTreeUri(context as Context, uri)
-            } else {
-                null
-            }?.let { documentFile ->
-                uri = if (documentFile.isDirectory) {
-                    documentFile.findFile(fileName)?.uri ?: uri
-                } else {
-                    documentFile.uri
-                }
-            }
-        }
-
-        Intent(Intent.ACTION_VIEW).apply {
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            try {
-                setDataAndType(uri, typeForName(fileName).type)
-                val chooserTitle = resources.getString(
-                    sharedR.string.open_with_os_dialog_title,
-                    fileName
-                )
-                val intent = Intent.createChooser(this, chooserTitle)
-                if (MegaApiUtils.isIntentAvailable(requireActivity(), intent)) {
-                    startActivity(intent)
-                    return
-                }
-            } catch (e: Exception) {
-                Timber.e(e)
             }
         }
 

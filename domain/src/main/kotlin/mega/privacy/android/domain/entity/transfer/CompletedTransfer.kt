@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.transfer
 
+import java.io.File
+
 /**
  * A representation of a completed transfer
  *
@@ -31,4 +33,9 @@ data class CompletedTransfer(
     val originalPath: String,
     val parentHandle: Long,
     val appData: String?,
-)
+) {
+    val isContentUriDownload
+        get() = isOffline == false
+                && type == 0 // Assuming 0 represents MegaTransfer.TYPE_DOWNLOAD
+                && path.startsWith(File.separator).not()
+}
