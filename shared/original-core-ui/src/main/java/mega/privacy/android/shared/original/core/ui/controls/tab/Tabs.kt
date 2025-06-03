@@ -20,6 +20,7 @@ import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -215,7 +216,7 @@ class TabsScope(
     val activeColor: Color,
     val color: Color,
 ) {
-    private val cells: MutableList<TabContent> = mutableListOf()
+    private val cells = mutableStateListOf<TabContent>()
     fun addTextTab(
         text: String,
         tag: String,
