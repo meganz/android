@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.permissions
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,18 +25,16 @@ import mega.privacy.android.app.presentation.permissions.model.Permission
 import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
 import mega.privacy.android.app.presentation.permissions.model.PermissionType
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
-import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.SetNotificationPermissionShownUseCase
+import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
 import timber.log.Timber
@@ -52,10 +51,8 @@ class PermissionsViewModel @Inject constructor(
     private val getThemeModeUseCase: GetThemeMode,
     private val setNotificationPermissionShownUseCase: SetNotificationPermissionShownUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
-    private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase,
-    private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
-    private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
+    private val enableCameraUploadsInPhotosUseCase: EnableCameraUploadsInPhotosUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
     internal val uiState: StateFlow<PermissionsUIState>
@@ -254,7 +251,12 @@ class PermissionsViewModel @Inject constructor(
     private fun enableCameraUploads() {
         viewModelScope.launch {
             val result = runCatching {
-                setupCameraUploadsSettingUseCase(isEnabled = true)
+                enableCameraUploadsInPhotosUseCase(
+                    shouldSyncVideos = false,
+                    shouldUseWiFiOnly = false,
+                    videoCompressionSizeLimit = VIDEO_COMPRESSION_SIZE_LIMIT,
+                    videoUploadQuality = VideoQuality.ORIGINAL
+                )
             }
 
             if (result.isFailure) {
@@ -263,7 +265,6 @@ class PermissionsViewModel @Inject constructor(
                     "PermissionsViewModel::enableCameraUploads - An error occurred when enabling Camera Uploads"
                 )
             } else {
-                broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsEnabled)
                 Analytics.tracker.trackEvent(CameraUploadsEnabledEvent)
                 uiState.update { it.copy(isCameraUploadsEnabled = true) }
                 Timber.d("PermissionsViewModel::enableCameraUploads - Camera Uploads enabled")
@@ -281,7 +282,6 @@ class PermissionsViewModel @Inject constructor(
         applicationScope.launch {
             runCatching {
                 startCameraUploadUseCase()
-                listenToNewMediaUseCase(forceEnqueue = false)
             }.onFailure { exception ->
                 Timber.e(exception, "An error occurred when starting Camera Uploads")
             }
@@ -290,5 +290,10 @@ class PermissionsViewModel @Inject constructor(
 
     internal fun resetFinishEvent() {
         uiState.update { it.copy(finishEvent = consumed) }
+    }
+
+    companion object {
+        @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+        internal const val VIDEO_COMPRESSION_SIZE_LIMIT = 200
     }
 }
