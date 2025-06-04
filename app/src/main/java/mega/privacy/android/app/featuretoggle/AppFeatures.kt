@@ -186,7 +186,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     OnboardingProPromoRevamp(
         "Onboarding Pro Promo Revamp with new components",
-        false,
+        true,
     );
 
     companion object : FeatureFlagValueProvider {
