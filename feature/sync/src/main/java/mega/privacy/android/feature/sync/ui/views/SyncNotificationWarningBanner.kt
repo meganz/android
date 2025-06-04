@@ -7,6 +7,7 @@ import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
 import mega.privacy.android.feature.sync.ui.SyncMonitorState
+import mega.privacy.android.shared.original.core.ui.controls.banners.InlineErrorBanner
 import mega.privacy.android.shared.original.core.ui.controls.banners.InlineWarningBanner
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body3
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -33,6 +34,12 @@ fun SyncNotificationWarningBanner(
                 onCloseClick = {
                     onDismissNotification()
                 },
+            )
+        }
+        if (it.syncNotificationType == SyncNotificationType.CHANGE_SYNC_ROOT) {
+            InlineErrorBanner(
+                title = stringResource(sharedResR.string.sync_change_root_uri_warning_title),
+                titleStyle = MaterialTheme.typography.body3,
             )
         }
     }

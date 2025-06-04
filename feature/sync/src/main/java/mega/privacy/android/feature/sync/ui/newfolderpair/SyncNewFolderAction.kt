@@ -1,13 +1,13 @@
 package mega.privacy.android.feature.sync.ui.newfolderpair
 
-import android.net.Uri
+import androidx.documentfile.provider.DocumentFile
 
 internal sealed interface SyncNewFolderAction {
 
     /**
-     * @param path - file uri of the selected folder
+     * @param documentFile - the document file of selected folder
      */
-    data class LocalFolderSelected(val path: Uri) : SyncNewFolderAction
+    data class LocalFolderSelected(val documentFile: DocumentFile) : SyncNewFolderAction
 
     data object NextClicked : SyncNewFolderAction
 

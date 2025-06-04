@@ -1,9 +1,6 @@
 package mega.privacy.android.feature.sync.ui.views
 
-import mega.privacy.android.core.R as coreR
-import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
+import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -27,7 +24,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.SupportColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.R as coreR
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.domain.entity.node.NodeId
@@ -35,6 +35,8 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
+import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaButtonWithIconAndText
 import mega.privacy.android.shared.original.core.ui.controls.cards.MegaCard
@@ -42,13 +44,12 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.status.MegaStatusIndicator
 import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
-import mega.privacy.android.shared.original.core.ui.controls.status.getStatusIconColor
-import mega.privacy.android.shared.original.core.ui.controls.status.getStatusTextColor
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.SyncCardIssuesInfoButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardOpenDeviceFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardOpenMegaFolderButtonPressedEvent
@@ -72,6 +73,7 @@ internal fun SyncCard(
     @StringRes errorRes: Int?,
     deviceName: String,
     modifier: Modifier = Modifier,
+    onLocalFolderSelected: (Uri) -> Unit = {},
 ) {
     MegaCard(
         content = {
@@ -83,10 +85,11 @@ internal fun SyncCard(
                 },
                 status = sync.status,
                 hasStalledIssues = sync.hasStalledIssues,
-                method = stringResource(id = sync.method)
+                method = stringResource(id = sync.method),
+                isLocalRootChangeNeeded = sync.isLocalRootChangeNeeded,
             )
 
-            if (errorRes != null && errorRes != sharedR.string.general_sync_storage_overquota) {
+            if (errorRes != null && errorRes != sharedR.string.general_sync_storage_overquota && sync.isLocalRootChangeNeeded.not()) {
                 WarningBanner(
                     textString = stringResource(errorRes),
                     onCloseClick = null,
@@ -123,6 +126,8 @@ internal fun SyncCard(
                 isStorageOverQuota = isStorageOverQuota,
                 isError = errorRes != null && errorRes != sharedR.string.general_sync_storage_overquota,
                 expanded = sync.expanded,
+                isLocalRootChangeNeeded = sync.isLocalRootChangeNeeded,
+                onLocalFolderSelected = onLocalFolderSelected
             )
         },
         onClicked = expandClicked,
@@ -137,6 +142,7 @@ private fun SyncCardHeader(
     status: SyncStatus,
     hasStalledIssues: Boolean,
     method: String,
+    isLocalRootChangeNeeded: Boolean = false,
 ) {
     Row(
         modifier = Modifier
@@ -167,6 +173,7 @@ private fun SyncCardHeader(
                 MegaStatusIndicator(
                     modifier = Modifier.padding(top = 2.dp, bottom = 2.dp),
                     statusText = when {
+                        isLocalRootChangeNeeded -> stringResource(id = sharedR.string.device_center_list_view_item_status_error)
                         hasStalledIssues -> stringResource(id = sharedR.string.device_center_list_view_item_status_error)
                         status == SyncStatus.SYNCING -> when (syncType) {
                             SyncType.TYPE_CAMERA_UPLOADS,
@@ -182,6 +189,7 @@ private fun SyncCardHeader(
                         else -> stringResource(id = sharedR.string.sync_list_sync_state_up_to_date)
                     },
                     statusIcon = when {
+                        isLocalRootChangeNeeded -> iconPackR.drawable.ic_x_circle_medium_regular_outline
                         hasStalledIssues -> iconPackR.drawable.ic_alert_circle_regular_medium_outline
                         status == SyncStatus.SYNCING -> coreR.drawable.ic_sync_02
                         status == SyncStatus.PAUSED -> coreR.drawable.ic_pause
@@ -190,6 +198,7 @@ private fun SyncCardHeader(
                         else -> coreR.drawable.ic_check_circle
                     },
                     statusColor = when {
+                        isLocalRootChangeNeeded -> StatusColor.Error
                         hasStalledIssues -> StatusColor.Error
                         status == SyncStatus.SYNCING -> StatusColor.Info
                         status == SyncStatus.PAUSED -> null
@@ -340,7 +349,14 @@ private fun SyncCardFooter(
     isStorageOverQuota: Boolean,
     isError: Boolean,
     expanded: Boolean,
+    isLocalRootChangeNeeded: Boolean,
+    onLocalFolderSelected: (Uri) -> Unit = {},
 ) {
+    val launcher = launchFolderPicker(
+        onFolderSelected = { uri ->
+            onLocalFolderSelected(uri)
+        },
+    )
     when {
         isError && !expanded -> MegaDivider(dividerType = DividerType.Centered)
         else -> MegaDivider(
@@ -365,8 +381,8 @@ private fun SyncCardFooter(
                         issuesInfoClicked()
                     },
                     icon = coreR.drawable.ic_info,
-                    iconColor = StatusColor.Error.getStatusIconColor(),
-                    textColor = StatusColor.Error.getStatusTextColor(),
+                    iconColor = SupportColor.Error,
+                    textColor = TextColor.Error,
                     text = stringResource(id = R.string.sync_card_sync_issues_info)
                 )
             }
@@ -397,19 +413,25 @@ private fun SyncCardFooter(
                         .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
                     onClick = {
                         Analytics.tracker.trackEvent(SyncCardPauseRunButtonPressedEvent)
-                        pauseRunClicked()
+                        if (isLocalRootChangeNeeded) {
+                            launcher.launch(null)
+                        } else {
+                            pauseRunClicked()
+                        }
                     },
                     icon = if (isSyncRunning) {
                         coreR.drawable.ic_pause
                     } else {
-                        coreR.drawable.ic_play_circle
+                        coreR.drawable.ic_play_circle_medium_regular_outline
                     },
-                    text = if (isSyncRunning) {
+                    text = if (isSyncRunning && !isLocalRootChangeNeeded) {
                         stringResource(id = R.string.sync_card_pause_sync)
                     } else {
                         stringResource(id = R.string.sync_card_run_sync)
                     },
-                    enabled = !isLowBatteryLevel && !isStorageOverQuota && !isError
+                    enabled = (!isLowBatteryLevel && !isStorageOverQuota && !isError) || isLocalRootChangeNeeded,
+                    iconColor = if (isLocalRootChangeNeeded) SupportColor.Error else null,
+                    textColor = if (isLocalRootChangeNeeded) TextColor.Error else TextColor.Primary,
                 )
                 MegaButtonWithIconAndText(
                     modifier = Modifier
@@ -433,7 +455,7 @@ private fun SyncCardFooter(
 @CombinedThemePreviews
 @Composable
 private fun SyncCardExpandedPreview(
-    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
@@ -469,7 +491,7 @@ private fun SyncCardExpandedPreview(
 @CombinedThemePreviews
 @Composable
 private fun SyncCardExpandedWithBannerPreview(
-    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
@@ -505,7 +527,7 @@ private fun SyncCardExpandedWithBannerPreview(
 @CombinedThemePreviews
 @Composable
 private fun SyncCardCollapsedPreview(
-    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
@@ -541,7 +563,7 @@ private fun SyncCardCollapsedPreview(
 @CombinedThemePreviews
 @Composable
 private fun SyncCardCollapsedWithBannerPreview(
-    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(

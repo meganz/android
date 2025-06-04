@@ -157,8 +157,7 @@ internal fun SyncListScreen(
         ComposableLifecycle { event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 isWarningBannerDisplayed =
-                    syncPermissionsManager.isManageExternalStoragePermissionGranted().not()
-                            || syncPermissionsManager.isDisableBatteryOptimizationGranted().not()
+                    syncPermissionsManager.isDisableBatteryOptimizationGranted().not()
             }
         }
 

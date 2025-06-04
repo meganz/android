@@ -26,25 +26,7 @@ class SyncPermissionWarningBannerTest {
     private val syncPermissionsManager: SyncPermissionsManager = mock()
 
     @Test
-    fun `test that storage permission banner is displayed when allFileAccess is false`() {
-        whenever(syncPermissionsManager.isSDKAboveOrEqualToR()).thenReturn(true)
-        whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted()).thenReturn(false)
-        composeTestRule.setContent {
-            SyncPermissionWarningBanner(
-                syncPermissionsManager = syncPermissionsManager,
-                isDisableBatteryOptimizationEnabled = false,
-            )
-        }
-
-        composeTestRule.onNodeWithText(
-            composeTestRule.activity.getString(R.string.sync_storage_permission_banner)
-        ).assertIsDisplayed()
-    }
-
-    @Test
     fun `test that battery optimization banner is displayed when hasUnrestrictedBatteryUsage is false`() {
-        whenever(syncPermissionsManager.isSDKAboveOrEqualToR()).thenReturn(true)
-        whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted()).thenReturn(true)
         whenever(syncPermissionsManager.isDisableBatteryOptimizationGranted()).thenReturn(false)
         composeTestRule.setContent {
             SyncPermissionWarningBanner(
@@ -59,28 +41,7 @@ class SyncPermissionWarningBannerTest {
     }
 
     @Test
-    fun `test that clicking storage permission banner triggers the correct action`() {
-        whenever(syncPermissionsManager.isSDKAboveOrEqualToR()).thenReturn(true)
-        whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted()).thenReturn(false)
-
-        composeTestRule.setContent {
-            SyncPermissionWarningBanner(
-                syncPermissionsManager = syncPermissionsManager,
-                isDisableBatteryOptimizationEnabled = false
-            )
-        }
-
-        composeTestRule.onNodeWithText(
-            composeTestRule.activity.getString(R.string.sync_storage_permission_banner)
-        ).performClick()
-
-        verify(syncPermissionsManager).launchAppSettingFileStorageAccess()
-    }
-
-    @Test
     fun `test that clicking battery optimization banner triggers the correct action`() {
-        whenever(syncPermissionsManager.isSDKAboveOrEqualToR()).thenReturn(true)
-        whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted()).thenReturn(true)
         whenever(syncPermissionsManager.isDisableBatteryOptimizationGranted()).thenReturn(false)
 
         composeTestRule.setContent {

@@ -33,7 +33,7 @@ internal interface SyncGateway {
         syncType: SyncType,
         name: String?,
         localPath: String,
-        remoteFolderId: Long
+        remoteFolderId: Long,
     ): Long?
 
     /**

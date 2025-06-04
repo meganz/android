@@ -13,16 +13,19 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.SupportColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.supportColor
+import mega.privacy.android.shared.original.core.ui.theme.textColor
 
 /**
  * Button with icon and text
@@ -41,8 +44,8 @@ fun MegaButtonWithIconAndText(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    iconColor: Color = DSTokens.colors.icon.primary,
-    textColor: Color = DSTokens.colors.text.primary,
+    iconColor: SupportColor? = null,
+    textColor: TextColor = TextColor.Primary,
     enabled: Boolean = true,
 ) {
     Column(modifier.clickable(enabled = enabled) { onClick() }) {
@@ -54,12 +57,23 @@ fun MegaButtonWithIconAndText(
                 .height(16.dp)
                 .width(16.dp)
                 .align(Alignment.CenterHorizontally),
-            colorFilter = ColorFilter.tint(color = if (enabled) iconColor else DSTokens.colors.icon.disabled)
+            colorFilter = ColorFilter.tint(
+                color = if (enabled) iconColor?.let {
+                    DSTokens.supportColor(
+                        it
+                    )
+                }
+                    ?: DSTokens.colors.icon.primary else DSTokens.colors.icon.disabled
+            )
         )
         Text(
             text = text,
             Modifier.align(Alignment.CenterHorizontally),
-            style = MaterialTheme.typography.caption.copy(color = if (enabled) textColor else DSTokens.colors.text.disabled)
+            style = MaterialTheme.typography.caption.copy(
+                color = if (enabled) DSTokens.textColor(
+                    textColor
+                ) else DSTokens.colors.text.disabled
+            )
         )
     }
 }

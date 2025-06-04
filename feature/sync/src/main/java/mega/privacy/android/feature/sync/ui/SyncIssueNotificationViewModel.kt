@@ -29,7 +29,9 @@ class SyncIssueNotificationViewModel @Inject constructor(
                 Timber.e(it)
             }.collect { notificationType ->
                 val notificationMessage =
-                    if (notificationType == SyncNotificationType.NOT_CONNECTED_TO_WIFI) runCatching {
+                    if (notificationType == SyncNotificationType.NOT_CONNECTED_TO_WIFI
+                        || notificationType == SyncNotificationType.CHANGE_SYNC_ROOT
+                    ) runCatching {
                         getSyncIssueNotificationByTypeUseCase(
                             notificationType
                         )

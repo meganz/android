@@ -9,6 +9,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -206,28 +207,26 @@ internal class MegaPickerViewModel @Inject constructor(
                 null
             }
 
-            runCatching {
-                getTypedNodesFromFolder(currentFolder.id).collectLatest { childFolders ->
-                    _state.update { megaPickerState ->
-                        megaPickerState.copy(
-                            currentFolder = currentFolder,
-                            nodes = if (excludeFolders != null) {
-                                childFolders.map {
-                                    TypedNodeUiModel(
-                                        it,
-                                        excludeFolders.contains(it.id)
-                                    )
-                                }
-                            } else {
-                                childFolders.map { TypedNodeUiModel(it, false) }
-                            },
-                            isSelectEnabled = isRootFolder(currentFolder).not(),
-                            isLoading = false,
-                        )
-                    }
-                }
-            }.onFailure {
+            getTypedNodesFromFolder(currentFolder.id).catch {
                 Timber.d(it, "Error getting child folders of current folder ${currentFolder.name}")
+            }.collectLatest { childFolders ->
+                _state.update { megaPickerState ->
+                    megaPickerState.copy(
+                        currentFolder = currentFolder,
+                        nodes = if (excludeFolders != null) {
+                            childFolders.map {
+                                TypedNodeUiModel(
+                                    it,
+                                    excludeFolders.contains(it.id)
+                                )
+                            }
+                        } else {
+                            childFolders.map { TypedNodeUiModel(it, false) }
+                        },
+                        isSelectEnabled = isRootFolder(currentFolder).not(),
+                        isLoading = false,
+                    )
+                }
             }
         }
     }

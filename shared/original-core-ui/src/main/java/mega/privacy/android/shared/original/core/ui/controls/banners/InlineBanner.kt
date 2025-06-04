@@ -33,7 +33,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 @Composable
 private fun InlineBaseBanner(
     title: String,
-    message: String,
+    message: String?,
     actionButtonText: String?,
     iconColor: Color,
     modifier: Modifier = Modifier,
@@ -77,13 +77,15 @@ private fun InlineBaseBanner(
 
                 Spacer(modifier = Modifier.size(8.dp))
 
-                MegaText(
-                    text = message,
-                    textColor = TextColor.Primary,
-                    style = messageStyle
-                )
+                message?.let {
+                    MegaText(
+                        text = message,
+                        textColor = TextColor.Primary,
+                        style = messageStyle
+                    )
 
-                Spacer(modifier = Modifier.size(4.dp))
+                    Spacer(modifier = Modifier.size(4.dp))
+                }
 
                 actionButtonText?.let {
                     Box(
@@ -157,10 +159,12 @@ fun InlineWarningBanner(
 @Composable
 fun InlineErrorBanner(
     title: String,
-    message: String,
-    actionButtonText: String,
-    onActionButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
+    message: String? = null,
+    actionButtonText: String? = null,
+    onActionButtonClick: (() -> Unit)? = null,
+    titleStyle: TextStyle = MaterialTheme.typography.subtitle1,
+    messageStyle: TextStyle = MaterialTheme.typography.body2,
 ) {
     InlineBaseBanner(
         title = title,
@@ -170,7 +174,9 @@ fun InlineErrorBanner(
         modifier = modifier,
         iconResId = mega.privacy.android.icon.pack.R.drawable.ic_warning_icon,
         iconColor = DSTokens.colors.support.error,
-        backgroundColor = DSTokens.colors.notifications.notificationError
+        backgroundColor = DSTokens.colors.notifications.notificationError,
+        titleStyle = titleStyle,
+        messageStyle = messageStyle,
     )
 }
 

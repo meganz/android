@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.newfolderpair
 
-import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
@@ -21,20 +20,16 @@ import mega.privacy.android.domain.repository.BackupRepository.Companion.BACKUPS
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
-import mega.privacy.android.domain.usecase.file.GetExternalStorageDirectoryPathUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.exception.BackupAlreadyExistsException
-import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.backup.MyBackupsFolderExistsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.backup.SetMyBackupsFolderUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
-import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityMapper
+import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityResult
 import timber.log.Timber
-import kotlin.io.path.Path
-import kotlin.io.path.name
 
 @HiltViewModel(assistedFactory = SyncNewFolderViewModel.SyncNewFolderViewModelFactory::class)
 internal class SyncNewFolderViewModel @AssistedInject constructor(
@@ -44,14 +39,12 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
     private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase,
     private val syncFolderPairUseCase: SyncFolderPairUseCase,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
-    private val getLocalDCIMFolderPathUseCase: GetLocalDCIMFolderPathUseCase,
     private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase,
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
     private val getDeviceNameUseCase: GetDeviceNameUseCase,
-    private val getFolderPairsUseCase: GetFolderPairsUseCase,
     private val myBackupsFolderExistsUseCase: MyBackupsFolderExistsUseCase,
     private val setMyBackupsFolderUseCase: SetMyBackupsFolderUseCase,
-    private val getExternalStorageDirectoryPathUseCase: GetExternalStorageDirectoryPathUseCase,
+    private val syncUriValidityMapper: SyncUriValidityMapper,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -108,40 +101,31 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
         when (action) {
             is SyncNewFolderAction.LocalFolderSelected -> {
                 viewModelScope.launch {
-                    Timber.d("Local folder selected: ${action.path}")
-                    action.path.toFile().absolutePath.let { path ->
-                        if (path == getExternalStorageDirectoryPathUseCase()) {
-                            return@let
+                    val documentFile = action.documentFile
+                    val validityResult = syncUriValidityMapper(documentFile.uri.toString())
+                    when (validityResult) {
+                        is SyncUriValidityResult.ShowSnackbar -> {
+                            _state.update { state ->
+                                state.copy(showSnackbar = triggered(validityResult.messageResId))
+                            }
                         }
-                        val localDCIMFolderPath = getLocalDCIMFolderPathUseCase()
-                        val folderPairs = getFolderPairsUseCase()
-                        when {
-                            localDCIMFolderPath.isNotEmpty() && path.contains(localDCIMFolderPath) -> {
-                                _state.update { state ->
-                                    state.copy(showSnackbar = triggered(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message))
-                                }
+
+                        is SyncUriValidityResult.ValidFolderSelected -> {
+                            _state.update { state ->
+                                state.copy(
+                                    selectedLocalFolder = validityResult.localFolderUri.value,
+                                    selectedFolderName = validityResult.folderName
+                                )
                             }
+                        }
 
-                            folderPairs.any { it.localFolderPath == path } -> {
-                                when (folderPairs.first { it.localFolderPath == path }.syncType) {
-                                    SyncType.TYPE_BACKUP -> {
-                                        _state.update { state ->
-                                            state.copy(showSnackbar = triggered(sharedR.string.sync_local_device_folder_currently_backed_up_message))
-                                        }
-                                    }
-
-                                    else -> {
-                                        _state.update { state ->
-                                            state.copy(showSnackbar = triggered(sharedR.string.sync_local_device_folder_currently_synced_message))
-                                        }
-                                    }
-                                }
-                            }
-
-                            else -> {
-                                _state.update { state ->
-                                    state.copy(selectedLocalFolder = path)
-                                }
+                        SyncUriValidityResult.Invalid -> {
+                            Timber.d("Invalid folder selected")
+                            _state.update { state ->
+                                state.copy(
+                                    selectedLocalFolder = "",
+                                    selectedFolderName = ""
+                                )
                             }
                         }
                     }
@@ -219,7 +203,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
             if (exception is BackupAlreadyExistsException) {
                 _state.update { state ->
                     state.copy(
-                        showRenameAndCreateBackupDialog = Path(_state.value.selectedLocalFolder).name
+                        showRenameAndCreateBackupDialog = _state.value.selectedFolderName
                     )
                 }
             } else {

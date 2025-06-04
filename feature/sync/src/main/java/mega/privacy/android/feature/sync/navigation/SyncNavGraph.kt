@@ -1,12 +1,10 @@
 package mega.privacy.android.feature.sync.navigation
 
-import android.app.Activity
 import android.content.Intent
-import android.net.Uri
-import android.os.Environment
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import android.provider.DocumentsContract
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toFile
+import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavController
@@ -28,9 +26,11 @@ import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.mobile.analytics.event.AddSyncScreenEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncGetStartedButtonEvent
+import timber.log.Timber
 
 /**
  * Route ro the Sync feature
@@ -181,15 +181,26 @@ internal fun NavGraphBuilder.syncNavGraph(
                     )
                 }
 
-            val launcher =
-                rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                    if (it.resultCode == Activity.RESULT_OK) {
-                        val uri = it.data?.data
-                        if (uri != null) {
-                            viewModel.handleAction(SyncNewFolderAction.LocalFolderSelected(uri))
+            val launcher = launchFolderPicker(
+                onFolderSelected = { uri ->
+                    runCatching {
+                        val documentFile = if (DocumentsContract.isTreeUri(uri)) {
+                            DocumentFile.fromTreeUri(context, uri)
+                        } else {
+                            DocumentFile.fromFile(uri.toFile())
                         }
+                        documentFile?.let {
+                            viewModel.handleAction(
+                                SyncNewFolderAction.LocalFolderSelected(
+                                    documentFile
+                                )
+                            )
+                        }
+                    }.onFailure {
+                        Timber.e(it)
                     }
-                }
+                },
+            )
 
             SyncNewFolderScreenRoute(
                 viewModel = viewModel,
@@ -219,11 +230,7 @@ internal fun NavGraphBuilder.syncNavGraph(
                     }
                 },
                 onSelectFolder = {
-                    megaNavigator.openInternalFolderPicker(
-                        context = context,
-                        launcher,
-                        Uri.fromFile(Environment.getExternalStorageDirectory())
-                    )
+                    launcher.launch(null)
                 },
             )
         }

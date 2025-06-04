@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui
 
-import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -23,6 +22,7 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SC
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.views.SELECT_DEVICE_FOLDER_OPTION_TEST_TAG
 import mega.privacy.android.shared.original.core.ui.controls.appbar.APP_BAR_BACK_BUTTON_TAG
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AndroidSyncSelectDeviceFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncNewFolderScreenBackNavigationEvent
 import org.junit.Rule
@@ -123,6 +123,7 @@ class SyncNewFolderScreenRouteTest {
                 syncType = SyncType.TYPE_TWOWAY,
                 deviceName = "Device Name",
                 selectedLocalFolder = localFolderName,
+                selectedFolderName = localFolderName,
             )
         )
         whenever(viewModel.state).thenReturn(state)
@@ -149,6 +150,7 @@ class SyncNewFolderScreenRouteTest {
                 syncType = SyncType.TYPE_BACKUP,
                 deviceName = "Device Name",
                 selectedLocalFolder = localFolderName,
+                selectedFolderName = localFolderName,
             )
         )
         whenever(viewModel.state).thenReturn(state)

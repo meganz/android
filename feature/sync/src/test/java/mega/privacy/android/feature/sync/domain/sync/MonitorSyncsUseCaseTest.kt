@@ -97,7 +97,7 @@ class MonitorSyncsUseCaseTest {
             flow {
                 emit(validFolderPairs)
                 awaitCancellation()
-            },
+            }
         )
 
         underTest().test {

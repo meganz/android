@@ -7,7 +7,6 @@ class GetExternalPathByContentUriUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
 ) {
 
-    suspend operator fun invoke(uri: String): String? {
-        return fileSystemRepository.getExternalPathByUri(uri)
-    }
+    suspend operator fun invoke(uri: String): String? =
+        fileSystemRepository.getExternalPathByUri(uri)
 }

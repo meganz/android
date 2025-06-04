@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
-import mega.privacy.android.shared.resources.R as sharedResR
 import android.content.Intent
 import android.provider.DocumentsContract
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -23,6 +22,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.Confirmatio
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun SyncFoldersRoute(
@@ -69,6 +69,14 @@ internal fun SyncFoldersRoute(
         isStorageOverQuota = uiState.isStorageOverQuota,
         isLoading = uiState.isLoading,
         deviceName = deviceName,
+        onLocalFolderSelected = { sync, uri ->
+            viewModel.handleAction(
+                SyncFoldersAction.LocalFolderSelected(
+                    syncUiItem = sync,
+                    uri = uri,
+                )
+            )
+        },
     )
 
     uiState.syncUiItemToRemove?.let { syncUiItemToRemove ->

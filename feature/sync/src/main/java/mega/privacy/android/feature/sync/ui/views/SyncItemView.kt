@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.views
 
+import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,7 +22,8 @@ internal fun SyncItemView(
     isLowBatteryLevel: Boolean,
     isStorageOverQuota: Boolean,
     deviceName: String,
-    @StringRes errorRes: Int? = null
+    @StringRes errorRes: Int? = null,
+    onLocalFolderSelected: (SyncUiItem, Uri) -> Unit = { _, _ -> },
 ) {
     val sync = syncUiItems[itemIndex]
     SyncCard(
@@ -46,6 +48,9 @@ internal fun SyncItemView(
         isStorageOverQuota = isStorageOverQuota,
         errorRes = errorRes,
         deviceName = deviceName,
+        onLocalFolderSelected = {
+            onLocalFolderSelected(sync, it)
+        },
     )
 }
 

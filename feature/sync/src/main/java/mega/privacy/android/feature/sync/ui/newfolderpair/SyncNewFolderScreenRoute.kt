@@ -24,7 +24,8 @@ internal fun SyncNewFolderScreenRoute(
     val state = viewModel.state.collectAsStateWithLifecycle()
 
     SyncNewFolderScreen(
-        selectedLocalFolder = state.value.selectedLocalFolder,
+        selectedLocalFolder = state.value.selectedFolderName,
+        selectedLocalFolderUri = state.value.selectedLocalFolder,
         selectedMegaFolder = state.value.selectedMegaFolder,
         onSelectFolder = {
             Analytics.tracker.trackEvent(AndroidSyncLocalFolderSelectedEvent)

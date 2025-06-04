@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -66,6 +67,7 @@ internal fun SyncFoldersScreen(
     isLoading: Boolean,
     deviceName: String,
     modifier: Modifier = Modifier,
+    onLocalFolderSelected: (SyncUiItem, Uri) -> Unit = { _, _ -> },
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -114,6 +116,7 @@ internal fun SyncFoldersScreen(
                         isStorageOverQuota = isStorageOverQuota,
                         errorRes = syncUiItems[itemIndex].error,
                         deviceName = deviceName,
+                        onLocalFolderSelected = onLocalFolderSelected
                     )
                 }
             }

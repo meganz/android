@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.newfolderpair
 
-import mega.privacy.android.shared.resources.R as sharedResR
 import android.Manifest
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -67,12 +66,14 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDisplayedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncSelectDeviceFolderButtonPressedEvent
 
 @Composable
 internal fun SyncNewFolderScreen(
     selectedLocalFolder: String,
+    selectedLocalFolderUri: String,
     selectedMegaFolder: RemoteFolder?,
     onSelectFolder: () -> Unit,
     selectMegaFolderClicked: () -> Unit,
@@ -89,6 +90,7 @@ internal fun SyncNewFolderScreen(
     SyncNewFolderScreenScaffold(
         state = state,
         selectedLocalFolder = selectedLocalFolder,
+        selectedLocalFolderUri = selectedLocalFolderUri,
         selectedMegaFolder = selectedMegaFolder,
         onSelectFolder = onSelectFolder,
         selectMegaFolderClicked = selectMegaFolderClicked,
@@ -108,6 +110,7 @@ internal fun SyncNewFolderScreen(
 private fun SyncNewFolderScreenScaffold(
     state: SyncNewFolderState,
     selectedLocalFolder: String,
+    selectedLocalFolderUri: String,
     selectedMegaFolder: RemoteFolder?,
     onSelectFolder: () -> Unit,
     selectMegaFolderClicked: () -> Unit,
@@ -154,6 +157,7 @@ private fun SyncNewFolderScreenScaffold(
                     onSelectFolder = onSelectFolder,
                     selectMegaFolderClicked = selectMegaFolderClicked,
                     selectedLocalFolder = selectedLocalFolder,
+                    selectedLocalFolderUri = selectedLocalFolderUri,
                     selectedMegaFolder = selectedMegaFolder,
                     syncClicked = syncClicked,
                     syncPermissionsManager = syncPermissionsManager,
@@ -192,6 +196,7 @@ private fun SyncNewFolderScreenContent(
     onSelectFolder: () -> Unit,
     selectMegaFolderClicked: () -> Unit,
     selectedLocalFolder: String,
+    selectedLocalFolderUri: String,
     selectedMegaFolder: RemoteFolder?,
     syncClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
@@ -311,7 +316,7 @@ private fun SyncNewFolderScreenContent(
         showRenameAndCreateBackupDialog?.let { folderPairName ->
             RenameAndCreateBackupDialog(
                 backupName = folderPairName,
-                localPath = selectedLocalFolder,
+                localPath = selectedLocalFolderUri,
                 onSuccess = {
                     onDismissRenameAndCreateBackupDialog()
                     onRenameAndCreateBackupSucceeded()
@@ -437,6 +442,7 @@ private fun SyncNewFolderScreenPreview(
                 deviceName = "Device Name",
             ),
             selectedLocalFolder = "",
+            selectedLocalFolderUri = "",
             selectedMegaFolder = null,
             onSelectFolder = {},
             selectMegaFolderClicked = {},
@@ -463,6 +469,7 @@ private fun SyncNewFolderScreenContentPreview(
             syncType = syncType,
             deviceName = "Device Name",
             selectedLocalFolder = "",
+            selectedLocalFolderUri = "",
             selectedMegaFolder = null,
             onSelectFolder = {},
             selectMegaFolderClicked = {},

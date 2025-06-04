@@ -8,23 +8,24 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 
 /**
  * State of SyncNewFolderScreen
- * @param syncType type of the sync folder pair
- * @param deviceName name of the device
- * @param folderPairName name of the folder pair
- * @param selectedLocalFolder selected local folder
- * @param selectedMegaFolder selected MEGA folder
- * @param showDisableBatteryOptimizationsBanner True if have to show the disable battery optimizations banner, False otherwise
- * @param showAllFilesAccessBanner True if have to show the all files access banner, False otherwise
- * @param showStorageOverQuota True if have to show the storage over quota message, False otherwise
- * @param openSyncListScreen Event to open sync list screen
- * @param showSnackbar Event to show a snackbar message
- * @param showRenameAndCreateBackupDialog Show the rename and create backup dialog with the current name
+ * @property syncType type of the sync folder pair
+ * @property deviceName name of the device
+ * @property folderPairName name of the folder pair
+ * @property selectedLocalFolder selected local folder
+ * @property selectedFolderName name of the selected folder
+ * @property selectedMegaFolder selected MEGA folder
+ * @property showDisableBatteryOptimizationsBanner True if have to show the disable battery optimizations banner, False otherwise
+ * @property showAllFilesAccessBanner True if have to show the all files access banner, False otherwise
+ * @property showStorageOverQuota True if have to show the storage over quota message, False otherwise
+ * @property openSyncListScreen Event to open sync list screen
+ * @property showSnackbar Event to show a snackbar message
  */
 internal data class SyncNewFolderState(
     val syncType: SyncType,
     val deviceName: String = "",
     val folderPairName: String = "",
     val selectedLocalFolder: String = "",
+    val selectedFolderName: String = "",
     val selectedMegaFolder: RemoteFolder? = null,
     val showDisableBatteryOptimizationsBanner: Boolean = false,
     val showAllFilesAccessBanner: Boolean = false,
