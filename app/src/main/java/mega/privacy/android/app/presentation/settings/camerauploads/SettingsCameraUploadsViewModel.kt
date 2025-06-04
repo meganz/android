@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
@@ -74,6 +75,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFo
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
+import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
@@ -211,6 +213,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val uploadOptionUiItemMapper: UploadOptionUiItemMapper,
     private val videoQualityUiItemMapper: VideoQualityUiItemMapper,
     private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase,
+    private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsCameraUploadsUiState())
@@ -798,10 +801,17 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
      *
      * @param newPrimaryFolderPath The new Primary Folder path, which may be nullable
      */
-    fun onLocalPrimaryFolderSelected(newPrimaryFolderPath: String?) {
+    fun onLocalPrimaryFolderSelected(newPrimaryFolderPath: UriPath?) {
         viewModelScope.launch {
+            val primaryFolderPath = getPathByDocumentContentUriUseCase(
+                newPrimaryFolderPath?.value ?: run {
+                    Timber.d("The new Camera Uploads local folder is null")
+                    showInvalidFolderSnackbar()
+                    return@launch
+                }
+            )
             runCatching {
-                newPrimaryFolderPath?.let { primaryFolderPath ->
+                primaryFolderPath?.let { primaryFolderPath ->
                     if (isFolderPathExistingUseCase(primaryFolderPath)) {
                         if (isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase(primaryFolderPath)) {
                             setPrimaryFolderPathUseCase(primaryFolderPath)
@@ -866,10 +876,17 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
      *
      * @param newSecondaryFolderPath The new Secondary Folder path, which may be nullable
      */
-    fun onLocalSecondaryFolderSelected(newSecondaryFolderPath: String?) {
+    fun onLocalSecondaryFolderSelected(newSecondaryFolderPath: UriPath?) {
         viewModelScope.launch {
+            val secondaryFolderPath = getPathByDocumentContentUriUseCase(
+                newSecondaryFolderPath?.value ?: run {
+                    Timber.d("The new Camera Uploads local folder is null")
+                    showInvalidFolderSnackbar()
+                    return@launch
+                }
+            )
             runCatching {
-                newSecondaryFolderPath?.let { secondaryFolderPath ->
+                secondaryFolderPath?.let { secondaryFolderPath ->
                     if (isFolderPathExistingUseCase(secondaryFolderPath)) {
                         if (isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase(secondaryFolderPath)) {
                             setSecondaryFolderLocalPathUseCase(secondaryFolderPath)

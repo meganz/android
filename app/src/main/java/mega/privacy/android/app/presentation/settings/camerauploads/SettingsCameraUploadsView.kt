@@ -35,7 +35,6 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.business.BusinessAccountPromptHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FileUploadDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HowToUploadDialog
@@ -47,7 +46,6 @@ import mega.privacy.android.app.presentation.settings.camerauploads.model.Upload
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadOptionUiItem
 import mega.privacy.android.app.presentation.settings.camerauploads.model.VideoQualityUiItem
 import mega.privacy.android.app.presentation.settings.camerauploads.navigation.pickers.openFolderNodePicker
-import mega.privacy.android.app.presentation.settings.camerauploads.navigation.pickers.openLocalFolderPicker
 import mega.privacy.android.app.presentation.settings.camerauploads.permissions.CameraUploadsPermissionsHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CameraUploadsFolderNodeTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CameraUploadsLocalFolderTile
@@ -64,9 +62,11 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.Upload
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoCompressionTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoQualityTile
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -130,8 +130,8 @@ internal fun SettingsCameraUploadsView(
     onHowToUploadPromptOptionSelected: (UploadConnectionType) -> Unit,
     onIncludeLocationTagsStateChanged: (Boolean) -> Unit,
     onKeepFileNamesStateChanged: (Boolean) -> Unit,
-    onLocalPrimaryFolderSelected: (String?) -> Unit,
-    onLocalSecondaryFolderSelected: (String?) -> Unit,
+    onLocalPrimaryFolderSelected: (UriPath?) -> Unit,
+    onLocalSecondaryFolderSelected: (UriPath?) -> Unit,
     onLocationPermissionGranted: () -> Unit,
     onMediaPermissionsGranted: () -> Unit,
     onMediaUploadsStateChanged: (Boolean) -> Unit,
@@ -156,22 +156,16 @@ internal fun SettingsCameraUploadsView(
     var showVideoCompressionSizeInputPrompt by rememberSaveable { mutableStateOf(false) }
     var showVideoQualityPrompt by rememberSaveable { mutableStateOf(false) }
 
-    val cameraUploadsLocalFolderLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult(),
-    ) {
-        if (it.resultCode == RESULT_OK) {
-            val primaryFolderLocalPath = it.data?.getStringExtra(FileStorageActivity.EXTRA_PATH)
-            onLocalPrimaryFolderSelected.invoke(primaryFolderLocalPath)
-        }
-    }
-    val mediaUploadsLocalFolderLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult(),
-    ) {
-        if (it.resultCode == RESULT_OK) {
-            val secondaryFolderLocalPath = it.data?.getStringExtra(FileStorageActivity.EXTRA_PATH)
-            onLocalSecondaryFolderSelected.invoke(secondaryFolderLocalPath)
-        }
-    }
+    val cameraUploadsLocalFolderLauncher = launchFolderPicker(
+        onFolderSelected = { uri ->
+            onLocalPrimaryFolderSelected(UriPath(uri.toString()))
+        },
+    )
+    val mediaUploadsLocalFolderLauncher = launchFolderPicker(
+        onFolderSelected = { uri ->
+            onLocalSecondaryFolderSelected(UriPath(uri.toString()))
+        },
+    )
     val cameraUploadsFolderNodeLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
     ) {
@@ -346,10 +340,7 @@ internal fun SettingsCameraUploadsView(
                     CameraUploadsLocalFolderTile(
                         primaryFolderPath = uiState.primaryFolderPath,
                         onItemClicked = {
-                            openLocalFolderPicker(
-                                context = context,
-                                launcher = cameraUploadsLocalFolderLauncher,
-                            )
+                            cameraUploadsLocalFolderLauncher.launch(null)
                         },
                     )
                     CameraUploadsFolderNodeTile(
@@ -371,10 +362,7 @@ internal fun SettingsCameraUploadsView(
                             secondaryFolderPath = uiState.secondaryFolderPath.takeIf { it.isNotBlank() }
                                 ?: stringResource(R.string.settings_empty_folder),
                             onItemClicked = {
-                                openLocalFolderPicker(
-                                    context = context,
-                                    launcher = mediaUploadsLocalFolderLauncher,
-                                )
+                                mediaUploadsLocalFolderLauncher.launch(null)
                             },
                         )
                         MediaUploadsFolderNodeTile(

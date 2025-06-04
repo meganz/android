@@ -8,8 +8,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.camerauploads.SETTINGS_CAMERA_UPLOADS_TOOLBAR
-import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsView
+import mega.privacy.android.app.fromId
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FILE_UPLOAD_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HOW_TO_UPLOAD_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.RELATED_NEW_LOCAL_FOLDER_WARNING_DIALOG
@@ -35,7 +34,6 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import mega.privacy.android.app.fromId
 
 /**
  * Test class for [SettingsCameraUploadsView]
