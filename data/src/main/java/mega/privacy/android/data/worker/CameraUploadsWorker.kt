@@ -327,7 +327,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && it is ForegroundServiceStartNotAllowedException) {
                     Timber.d("Foreground service start not allowed exception $it.")
                 } else {
-                    crashReporter.report(it)
                     Timber.d("setForeground failed with exception: $it")
                 }
             }

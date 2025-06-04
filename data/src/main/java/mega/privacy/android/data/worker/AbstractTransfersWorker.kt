@@ -127,7 +127,6 @@ abstract class AbstractTransfersWorker(
                         // this is expected: https://developer.android.com/develop/background-work/background-tasks/persistent/getting-started/define-work#backwards-compat
                         Timber.d(e, "$simpleName foreground service not allowed")
                     } else {
-                        crashReporter.report(e)
                         Timber.e(e, "$simpleName failed to start foreground service")
                     }
                 }
