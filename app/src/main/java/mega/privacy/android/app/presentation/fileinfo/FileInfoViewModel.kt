@@ -732,17 +732,7 @@ class FileInfoViewModel @Inject constructor(
 
                         Owner -> updateOwner()
                         Inshare -> updateAccessPermission()
-                        Parent ->
-                            if (!_uiState.value.isNodeInRubbish
-                                && isNodeInRubbishBinUseCase(typedNode.id)
-                            ) {
-                                //if the node is moved to rubbish bin, let's close the screen like when it's deleted
-                                _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.NodeDeleted)
-                            } else {
-                                // maybe it's moved, or a new version is created, etc. let's update all to be safe
-                                return@any true
-                            }
-
+                        Parent -> return@any true
                         Description, Name, Tags, Timestamp -> updateTypedNode()
                         Outshare -> {
                             updateOutShares()

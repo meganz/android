@@ -21,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
@@ -39,6 +40,7 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.Aut
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
@@ -520,6 +522,12 @@ class FileInfoActivity : BaseActivity() {
 
             is FileInfoOneOffViewEvent.Finished -> {
                 if (event.exception == null) {
+                    if (event.jobFinished is FileInfoJobInProgressState.MovingToRubbish) {
+                        lifecycleScope.launch {
+                            delay(500)
+                            finish()
+                        }
+                    }
                     event.successMessage(this)?.let {
                         snackBarHostState.showAutoDurationSnackbar(it)
                     }

@@ -59,7 +59,7 @@ sealed class FileInfoJobInProgressState(
      */
     object MovingToRubbish : FileInfoJobInProgressState(
         progressMessage = R.string.context_move_to_trash,
-        successMessage = R.string.context_correctly_moved,
+        successMessage = R.string.context_correctly_moved_to_rubbish,
         failMessage = R.string.context_no_moved,
     )
 
