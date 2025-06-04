@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation
 
-import mega.privacy.android.core.R as CoreR
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -11,17 +10,18 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.GetLegacyNodeWrapperUseCase
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
+import mega.privacy.android.app.utils.wrapper.LegacyNodeWrapper
+import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -52,19 +52,18 @@ import org.mockito.kotlin.whenever
 class NodeOptionsViewModelTest {
 
     private lateinit var underTest: NodeOptionsViewModel
-    private val getNodeByHandle =
-        mock<GetNodeByHandle> { onBlocking { invoke(any()) }.thenReturn(null) }
+    private val getLegacyNodeWrapperUseCase =
+        mock<GetLegacyNodeWrapperUseCase> { onBlocking { invoke(any()) }.thenReturn(null) }
     private val createShareKeyUseCase = mock<CreateShareKeyUseCase>()
-    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase> {
         onBlocking { invoke(NodeId(any())) }.thenReturn(false)
     }
+
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
         onBlocking { invoke() }.thenReturn(
             MutableStateFlow(true)
         )
     }
-
     private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val getContactUserNameFromDatabaseUseCase =
@@ -84,6 +83,7 @@ class NodeOptionsViewModelTest {
             invoke(NodeId(any()))
         }.thenReturn(false)
     }
+
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase> {
         onBlocking {
             invoke(any())
@@ -96,7 +96,6 @@ class NodeOptionsViewModelTest {
 
     private val nodeDeviceCenterInformationFlow =
         MutableStateFlow<NodeDeviceCenterInformation?>(null)
-
     private val savedStateHandle = mock<SavedStateHandle> {
         on {
             getStateFlow(
@@ -120,14 +119,14 @@ class NodeOptionsViewModelTest {
     private val getCameraUploadsFolderHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
     private val getMediaUploadsFolderHandleUseCase = mock<GetSecondaryFolderNodeUseCase>()
     private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
+
     private val isNodeSyncedUseCase = mock<IsNodeSyncedUseCase>()
 
     @BeforeEach
     fun setUp() {
         underTest = NodeOptionsViewModel(
             createShareKeyUseCase = createShareKeyUseCase,
-            getNodeByIdUseCase = getNodeByIdUseCase,
-            getNodeByHandle = getNodeByHandle,
+            getLegacyNodeWrapperUseCase = getLegacyNodeWrapperUseCase,
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
@@ -153,7 +152,7 @@ class NodeOptionsViewModelTest {
             assertThat(initial.canMoveNode).isFalse()
             assertThat(initial.canRestoreNode).isFalse()
             assertThat(initial.isOnline).isTrue()
-            assertThat(initial.node).isNull()
+            assertThat(initial.legacyNodeWrapper).isNull()
             assertThat(initial.shareData).isNull()
             assertThat(initial.nodeDeviceCenterInformation).isNull()
             assertThat(initial.shareKeyCreated).isNull()
@@ -168,14 +167,13 @@ class NodeOptionsViewModelTest {
     fun `test that shareKeyCreated is true if created successfully`() = runTest {
         val node = mock<MegaNode>()
         val nodeId = 123L
-        getNodeByHandle.stub {
-            onBlocking { invoke(nodeId) }.thenReturn(node)
-        }
         val typedNode = mock<TypedFolderNode>()
-        whenever(getNodeByIdUseCase.invoke(NodeId(any()))).thenReturn(typedNode)
+        getLegacyNodeWrapperUseCase.stub {
+            onBlocking { invoke(nodeId) }.thenReturn(LegacyNodeWrapper(node, typedNode))
+        }
         nodeIdFlow.emit(nodeId)
 
-        underTest.state.filter { it.node != null }
+        underTest.state.filter { it.legacyNodeWrapper != null }
             .distinctUntilChangedBy(NodeBottomSheetUIState::shareKeyCreated)
             .test {
                 assertThat(awaitItem().shareKeyCreated).isNull()
@@ -189,15 +187,16 @@ class NodeOptionsViewModelTest {
     fun `test that shareKeyCreated is false if created throws an exception`() = runTest {
         val node = mock<MegaNode>()
         val nodeId = 123L
-        getNodeByHandle.stub {
-            onBlocking { invoke(nodeId) }.thenReturn(node)
+        val typedNode = mock<TypedFolderNode>()
+        getLegacyNodeWrapperUseCase.stub {
+            onBlocking { invoke(nodeId) }.thenReturn(LegacyNodeWrapper(node, typedNode))
         }
         nodeIdFlow.emit(nodeId)
 
         createShareKeyUseCase.stub {
             onBlocking { invoke(any()) }.thenAnswer { throw Throwable() }
         }
-        underTest.state.filter { it.node != null }
+        underTest.state.filter { it.legacyNodeWrapper != null }
             .distinctUntilChangedBy(NodeBottomSheetUIState::shareKeyCreated)
             .test {
                 assertThat(awaitItem().shareKeyCreated).isNull()
@@ -218,7 +217,7 @@ class NodeOptionsViewModelTest {
             .test {
                 val initialState = awaitItem()
                 assertThat(initialState.shareKeyCreated).isNull()
-                assertThat(initialState.node).isNull()
+                assertThat(initialState.legacyNodeWrapper).isNull()
                 underTest.createShareKey()
                 testScheduler.advanceUntilIdle()
                 assertThat(awaitItem().shareKeyCreated).isFalse()
@@ -263,17 +262,19 @@ class NodeOptionsViewModelTest {
         runTest {
             val node = mock<MegaNode>()
             val nodeId = 123L
-            getNodeByHandle.stub {
-                onBlocking { invoke(nodeId) }.thenReturn(node)
+            val typedNode = mock<TypedFolderNode>()
+            val legacyNodeWrapper = LegacyNodeWrapper(node, typedNode)
+            getLegacyNodeWrapperUseCase.stub {
+                onBlocking { invoke(nodeId) }.thenReturn(legacyNodeWrapper)
             }
             isNodeDeletedFromBackupsUseCase.stub {
                 onBlocking { invoke(NodeId(any())) }.thenReturn(false)
             }
 
             underTest.state.test {
-                assertThat(awaitItem().node).isNull()
+                assertThat(awaitItem().legacyNodeWrapper).isNull()
                 nodeIdFlow.emit(nodeId)
-                assertThat(awaitItem().node).isEqualTo(node)
+                assertThat(awaitItem().legacyNodeWrapper).isEqualTo(legacyNodeWrapper)
                 underTest.setRestoreNodeClicked(true)
                 assertThat(awaitItem().canRestoreNode).isTrue()
             }
@@ -284,17 +285,19 @@ class NodeOptionsViewModelTest {
         runTest {
             val node = mock<MegaNode>()
             val nodeId = 123L
-            getNodeByHandle.stub {
-                onBlocking { invoke(nodeId) }.thenReturn(node)
+            val typedNode = mock<TypedFolderNode>()
+            val legacyNodeWrapper = LegacyNodeWrapper(node, typedNode)
+            getLegacyNodeWrapperUseCase.stub {
+                onBlocking { invoke(nodeId) }.thenReturn(legacyNodeWrapper)
             }
             isNodeDeletedFromBackupsUseCase.stub {
                 onBlocking { invoke(NodeId(any())) }.thenReturn(true)
             }
 
             underTest.state.test {
-                assertThat(awaitItem().node).isNull()
+                assertThat(awaitItem().legacyNodeWrapper).isNull()
                 nodeIdFlow.emit(nodeId)
-                assertThat(awaitItem().node).isEqualTo(node)
+                assertThat(awaitItem().legacyNodeWrapper).isEqualTo(legacyNodeWrapper)
                 underTest.setRestoreNodeClicked(true)
                 assertThat(awaitItem().canMoveNode).isTrue()
             }

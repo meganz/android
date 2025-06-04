@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -13,13 +12,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.domain.usecase.GetLegacyNodeWrapperUseCase
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
+import mega.privacy.android.app.utils.wrapper.LegacyNodeWrapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -64,8 +66,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NodeOptionsViewModel @Inject constructor(
     private val createShareKeyUseCase: CreateShareKeyUseCase,
-    private val getNodeByIdUseCase: GetNodeByIdUseCase,
-    private val getNodeByHandle: GetNodeByHandle,
+    private val getLegacyNodeWrapperUseCase: GetLegacyNodeWrapperUseCase,
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
@@ -101,25 +102,25 @@ class NodeOptionsViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 savedStateHandle.getStateFlow(NODE_ID_KEY, -1L).map {
-                    val megaNode = async {
-                        runCatching {
-                            getNodeByHandle(it)
-                        }.onFailure {
-                            Timber.e(it)
-                        }.getOrNull()
-                    }
-                    val availableOffline = async { isAvailableOffline(NodeId(it)) }
-                    megaNode.await() to availableOffline.await()
+                    val info = runCatching { getLegacyNodeWrapperUseCase(it) }.onFailure {
+                        Timber.e(it)
+                    }.getOrNull()
+                    if (info != null) {
+                        LegacyNodeWrapper(
+                            node = info.node,
+                            typedNode = info.typedNode,
+                        ) to isAvailableOffline(info.typedNode)
+                    } else null to false
                 },
                 savedStateHandle.getStateFlow(SHARE_DATA_KEY, null),
                 savedStateHandle.getStateFlow(NODE_DEVICE_CENTER_INFORMATION_KEY, null),
                 shareKeyCreated,
                 monitorConnectivityUseCase(),
-            ) { nodeInfo: Pair<MegaNode?, Boolean>, shareData: NodeShareInformation?, nodeDeviceCenterInformation: NodeDeviceCenterInformation?, shareKeyCreated: Boolean?, isOnline: Boolean ->
+            ) { legacyNodeWrapperPair: Pair<LegacyNodeWrapper?, Boolean>, shareData: NodeShareInformation?, nodeDeviceCenterInformation: NodeDeviceCenterInformation?, shareKeyCreated: Boolean?, isOnline: Boolean ->
                 { state: NodeBottomSheetUIState ->
                     state.copy(
-                        node = nodeInfo.first,
-                        isAvailableOffline = nodeInfo.second,
+                        legacyNodeWrapper = legacyNodeWrapperPair.first,
+                        isAvailableOffline = legacyNodeWrapperPair.second,
                         shareData = shareData,
                         nodeDeviceCenterInformation = nodeDeviceCenterInformation,
                         shareKeyCreated = shareKeyCreated,
@@ -175,8 +176,7 @@ class NodeOptionsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun isAvailableOffline(nodeId: NodeId) = runCatching {
-        val node = getNodeByIdUseCase(nodeId) ?: return false
+    private suspend fun isAvailableOffline(node: TypedNode) = runCatching {
         isAvailableOfflineUseCase(node)
     }.getOrDefault(false)
 
@@ -203,9 +203,9 @@ class NodeOptionsViewModel @Inject constructor(
      * @param clicked true if the option is clicked, and false if otherwise
      */
     fun setRestoreNodeClicked(clicked: Boolean) = viewModelScope.launch {
-        _state.value.node?.let { nonNullNode ->
+        _state.value.legacyNodeWrapper?.let { info ->
             val isNodeDeletedFromBackups =
-                isNodeDeletedFromBackupsUseCase(NodeId(nonNullNode.handle))
+                isNodeDeletedFromBackupsUseCase(info.typedNode.id)
             if (isNodeDeletedFromBackups) {
                 _state.update { it.copy(canMoveNode = clicked) }
             } else {
@@ -220,15 +220,12 @@ class NodeOptionsViewModel @Inject constructor(
     fun createShareKey() {
         viewModelScope.launch {
             runCatching {
-                val node = state.value.node
-                require(node != null) { "Cannot create a share key for a null node" }
-
-                val typedNode = getNodeByIdUseCase(NodeId(node.handle))
-                require(typedNode is FolderNode) {
+                val nodeInfo = state.value.legacyNodeWrapper
+                require(nodeInfo != null) { "Cannot create a share key for a null node" }
+                require(nodeInfo.typedNode is FolderNode) {
                     "Cannot create a share key for a non-folder node"
                 }
-
-                createShareKeyUseCase(typedNode)
+                createShareKeyUseCase(nodeInfo.typedNode)
             }.onSuccess {
                 shareKeyCreated.emit(true)
             }.onFailure {

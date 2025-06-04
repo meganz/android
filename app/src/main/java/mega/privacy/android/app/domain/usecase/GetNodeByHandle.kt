@@ -5,6 +5,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Get the node corresponding to a handle
  */
+@Deprecated("Use GetNodeInfoUseCase instead", ReplaceWith("GetNodeInfoUseCase"))
 fun interface GetNodeByHandle {
     /**
      * Get the node corresponding to a handle

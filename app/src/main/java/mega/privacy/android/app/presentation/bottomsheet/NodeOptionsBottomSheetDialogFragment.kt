@@ -55,6 +55,7 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterI
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -84,6 +85,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
+import mega.privacy.android.app.utils.wrapper.LegacyNodeWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -91,6 +93,8 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
@@ -113,7 +117,7 @@ import javax.inject.Inject
 class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private var mode = DEFAULT_MODE
     private lateinit var nodeController: NodeController
-    private var nodeInfo: TextView? = null
+    private var nodeInfoText: TextView? = null
     private var drawerItem: DrawerItem? = null
     private var cannotOpenFileDialog: AlertDialog? = null
     private var isHiddenNodesEnabled: Boolean = false
@@ -192,7 +196,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val nodeThumb = contentView.findViewById<ImageView>(R.id.node_thumbnail)
         val nodeName = contentView.findViewById<TextView>(R.id.node_name_text)
-        nodeInfo = contentView.findViewById(R.id.node_info_text)
+        nodeInfoText = contentView.findViewById(R.id.node_info_text)
         val nodeVersionsIcon = contentView.findViewById<ImageView>(R.id.node_info_versions_icon)
         val nodeStatusIcon = contentView.findViewById<ImageView>(R.id.node_status_icon)
         val optionOffline = contentView.findViewById<LinearLayout>(R.id.option_offline_layout)
@@ -253,10 +257,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (!Util.isScreenInPortrait(requireContext())) {
             Timber.d("Landscape configuration")
             nodeName.maxWidth = Util.scaleWidthPx(275, resources.displayMetrics)
-            nodeInfo?.maxWidth = Util.scaleWidthPx(275, resources.displayMetrics)
+            nodeInfoText?.maxWidth = Util.scaleWidthPx(275, resources.displayMetrics)
         } else {
             nodeName.maxWidth = Util.scaleWidthPx(210, resources.displayMetrics)
-            nodeInfo?.maxWidth = Util.scaleWidthPx(210, resources.displayMetrics)
+            nodeInfoText?.maxWidth = Util.scaleWidthPx(210, resources.displayMetrics)
         }
 
         viewLifecycleOwner.collectFlow(
@@ -273,7 +277,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             if (state.shareKeyCreated != null) {
                 if (state.shareKeyCreated) {
-                    showShareFolderOptions(state.node)
+                    showShareFolderOptions(state.legacyNodeWrapper)
                 } else {
                     Util.showSnackbar(
                         requireActivity(),
@@ -284,12 +288,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             if (state.canMoveNode) {
-                state.node?.let { onMoveClicked(it) }
+                state.legacyNodeWrapper?.let { onMoveClicked(it.node) }
                 // Once the action has been acknowledged, notify the ViewModel
                 nodeOptionsViewModel.setMoveNodeClicked(false)
             }
             if (state.canRestoreNode) {
-                state.node?.let { onRestoreClicked(it) }
+                state.legacyNodeWrapper?.let { onRestoreClicked(it.node) }
                 // Once the action has been acknowledged, notify the ViewModel
                 nodeOptionsViewModel.setRestoreNodeClicked(false)
             }
@@ -297,28 +301,28 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             val accountType = state.accountType
             val isBusinessAccountExpired = state.isBusinessAccountExpired
             val isHiddenNodesOnboarded = state.isHiddenNodesOnboarded
-            state.node?.let { node ->
-                if (megaApi.isInRubbish(node)) {
+            state.legacyNodeWrapper?.let { nodeInfo ->
+                if (megaApi.isInRubbish(nodeInfo.node)) {
                     mode = RUBBISH_BIN_MODE
-                } else if (nodeController.nodeComesFromIncoming(node)) {
+                } else if (nodeController.nodeComesFromIncoming(nodeInfo.node)) {
                     mode = SHARED_ITEMS_MODE
                 }
 
                 if (mode == RECENTS_MODE || mode == FAVOURITES_IN_TAB_MODE) {
                     viewInFolder.visibility = View.VISIBLE
-                    viewInFolder.setOnClickListener { onClick { onViewInFolderClicked(node) } }
+                    viewInFolder.setOnClickListener { onClick { onViewInFolderClicked(nodeInfo.node) } }
                 } else {
                     viewInFolder.visibility = View.GONE
                     viewInFolder.setOnClickListener(null)
                 }
 
-                optionEdit.setOnClickListener { onClick { onEditClicked(node) } }
-                optionLabel.setOnClickListener { onClick { onLabelClicked(node) } }
-                optionFavourite.setOnClickListener { onClick { onFavouriteClicked(node) } }
+                optionEdit.setOnClickListener { onClick { onEditClicked(nodeInfo.node) } }
+                optionLabel.setOnClickListener { onClick { onLabelClicked(nodeInfo.node) } }
+                optionFavourite.setOnClickListener { onClick { onFavouriteClicked(nodeInfo.node) } }
                 optionHideLayout.setOnClickListener {
                     onClick {
                         onHideClicked(
-                            node,
+                            nodeInfo.node,
                             accountType,
                             isBusinessAccountExpired,
                             isHiddenNodesOnboarded
@@ -326,62 +330,62 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     }
                 }
                 optionHideHelp.setOnClickListener { showHiddenNodesOnboarding(false) }
-                optionDownload.setOnClickListener { onClick { onDownloadClicked(node) } }
+                optionDownload.setOnClickListener { onClick { onDownloadClicked(nodeInfo.node) } }
                 optionOffline.setOnClickListener {
                     onClick {
                         onOfflineClicked(
                             isAvailableOffline = state.isAvailableOffline,
-                            nodeId = NodeId(node.handle),
+                            nodeId = nodeInfo.typedNode.id,
                         )
                     }
                 }
-                optionInfo.setOnClickListener { onClick { onInfoClicked(node) } }
+                optionInfo.setOnClickListener { onClick { onInfoClicked(nodeInfo.node) } }
                 optionLink.setOnClickListener {
                     onClick {
-                        onLinkClicked(node)
+                        onLinkClicked(nodeInfo.node)
                     }
                 }
-                optionRemoveLink.setOnClickListener { onClick { onRemoveLinkClicked(node) } }
+                optionRemoveLink.setOnClickListener { onClick { onRemoveLinkClicked(nodeInfo.node) } }
                 optionShare.setOnClickListener {
                     onClick {
-                        shareNode(requireActivity(), node)
+                        shareNode(requireActivity(), nodeInfo.node)
                     }
                 }
                 optionShareFolder.setOnClickListener { onClick { nodeOptionsViewModel.createShareKey() } }
-                optionClearShares.setOnClickListener { onClick { onClearShareClicked(node) } }
-                optionLeaveShares.setOnClickListener { onClick { onLeaveShareClicked(node) } }
-                optionRename.setOnClickListener { onClick { onRenameClicked(node) } }
-                optionSendChat.setOnClickListener { onClick { onSendChatClicked(node) } }
+                optionClearShares.setOnClickListener { onClick { onClearShareClicked(nodeInfo.node) } }
+                optionLeaveShares.setOnClickListener { onClick { onLeaveShareClicked(nodeInfo.node) } }
+                optionRename.setOnClickListener { onClick { onRenameClicked(nodeInfo.node) } }
+                optionSendChat.setOnClickListener { onClick { onSendChatClicked(nodeInfo.node) } }
                 optionMove.setOnClickListener {
                     onClick {
                         nodeOptionsViewModel.setMoveNodeClicked(true)
                     }
                 }
-                optionCopy.setOnClickListener { onClick { onCopyClicked(node) } }
-                optionRubbishBin.setOnClickListener { onClick { onDeleteClicked(node) } }
+                optionCopy.setOnClickListener { onClick { onCopyClicked(nodeInfo.node) } }
+                optionRubbishBin.setOnClickListener { onClick { onDeleteClicked(nodeInfo.node) } }
                 optionRestoreFromRubbish.setOnClickListener {
                     onClick { nodeOptionsViewModel.setRestoreNodeClicked(true) }
                 }
-                optionRemove.setOnClickListener { onClick { onDeleteClicked(node) } }
-                optionOpenFolder.setOnClickListener { onClick { onOpenFolderClicked(node) } }
+                optionRemove.setOnClickListener { onClick { onDeleteClicked(nodeInfo.node) } }
+                optionOpenFolder.setOnClickListener { onClick { onOpenFolderClicked(nodeInfo.node) } }
                 optionOpenWith.setOnClickListener {
                     onClick {
-                        onOpenWithClicked(node)
+                        onOpenWithClicked(nodeInfo.node)
                     }
                 }
-                optionVersionsLayout.setOnClickListener { onClick { onVersionsClicked(node) } }
+                optionVersionsLayout.setOnClickListener { onClick { onVersionsClicked(nodeInfo.node) } }
                 optionRemoveRecentlyWatchedItem.setOnClickListener {
-                    videoSectionViewModel.removeRecentlyWatchedItem(node.handle)
+                    videoSectionViewModel.removeRecentlyWatchedItem(nodeInfo.node.handle)
                     setStateBottomSheetBehaviorHidden()
                 }
                 optionAddVideoToPlaylistItem.setOnClickListener {
-                    videoSectionViewModel.launchVideoToPlaylistActivity(node.handle)
+                    videoSectionViewModel.launchVideoToPlaylistActivity(nodeInfo.node.handle)
                     setStateBottomSheetBehaviorHidden()
                 }
 
-                val isTakenDown = node.isTakenDown
-                val accessLevel = megaApi.getAccess(node)
-                if (node.isFile && !isTakenDown) {
+                val isTakenDown = nodeInfo.typedNode.isTakenDown
+                val accessLevel = megaApi.getAccess(nodeInfo.node)
+                if (nodeInfo.typedNode is TypedFileNode && !isTakenDown) {
                     optionOpenWith.visibility = View.VISIBLE
                 } else {
                     counterOpen--
@@ -400,45 +404,45 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     nodeName.setupNodeTitleText(
                         nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
                         nodeShareInformation = state.shareData,
-                        megaNode = node,
+                        megaNode = nodeInfo.node,
                     )
                     nodeThumb.setupNodeIcon(
                         nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
-                        megaNode = node,
+                        megaNode = nodeInfo.node,
                     )
-                    nodeInfo?.run {
+                    nodeInfoText?.run {
                         setupNodeBodyText(
                             isClearSharesVisible = optionClearShares.isVisible,
                             nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
                             nodeShareInformation = state.shareData,
-                            megaNode = node,
+                            megaNode = nodeInfo.node,
                         )
                         setupNodeBodyIcon(
                             nodeVersionsImageView = nodeVersionsIcon,
                             nodeStatusImageView = nodeStatusIcon,
                             nodeBodyTextView = this,
                             nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
-                            megaNode = node,
+                            megaNode = nodeInfo.node,
                         )
                     }
-                    if (node.isFolder) {
+                    if (nodeInfo.typedNode is TypedFolderNode) {
                         optionVersionsLayout.visibility = View.GONE
-                        if (isEmptyFolder(node)) {
+                        if (isEmptyFolder(nodeInfo.node)) {
                             counterSave--
                             optionOffline.visibility = View.GONE
                         }
                         counterShares--
                         optionSendChat.visibility = View.GONE
                     } else {
-                        if (typeForName(node.name).isOpenableTextFile(
-                                node.size
+                        if (typeForName(nodeInfo.typedNode.name).isOpenableTextFile(
+                                nodeInfo.node.size
                             ) && accessLevel >= MegaShare.ACCESS_READWRITE && !isTakenDown
                         ) {
                             optionEdit.visibility = View.VISIBLE
                         }
-                        if (megaApi.hasVersions(node) && !isTakenDown) {
+                        if (megaApi.hasVersions(nodeInfo.node) && !isTakenDown) {
                             optionVersionsLayout.visibility = View.VISIBLE
-                            versions.text = (megaApi.getNumVersions(node) - 1).toString()
+                            versions.text = (megaApi.getNumVersions(nodeInfo.node) - 1).toString()
                         } else {
                             optionVersionsLayout.visibility = View.GONE
                         }
@@ -479,7 +483,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         && isHiddenNodesOnboarded != null
                         && state.isHidingActionAllowed
                     ) {
-                        val parentNode = megaApi.getParentNode(node)
+                        val parentNode = megaApi.getParentNode(nodeInfo.node)
                         val isSensitiveInherited =
                             parentNode?.let { megaApi.isSensitiveInherited(it) } == true
 
@@ -494,9 +498,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionHideProLabel.visibility =
                     if (accountType?.isPaid != true || isBusinessAccountExpired) View.VISIBLE else View.GONE
                 optionHideHelp.visibility =
-                    if (accountType?.isPaid == true && !isBusinessAccountExpired && !node.isMarkedSensitive) View.VISIBLE else View.GONE
+                    if (accountType?.isPaid == true && !isBusinessAccountExpired && !nodeInfo.typedNode.isMarkedSensitive) View.VISIBLE else View.GONE
                 optionAddToAlbum.let { option ->
-                    val fileType = getFileTypeInfoByNameUseCase(node.name)
+                    val fileType = getFileTypeInfoByNameUseCase(nodeInfo.typedNode.name)
                     if (fileType is ImageFileTypeInfo || fileType is VideoFileTypeInfo) {
                         option.visibility = View.VISIBLE
                         option.setText(if (fileType is ImageFileTypeInfo) sharedR.string.album_add_to_image else sharedR.string.album_add_to_media)
@@ -507,7 +511,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     option.setOnClickListener {
                         val intent =
                             Intent(requireContext(), AddToAlbumActivity::class.java).apply {
-                                val ids = listOf(node.handle).toTypedArray()
+                                val ids = listOf(nodeInfo.node.handle).toTypedArray()
                                 val type = if (fileType is ImageFileTypeInfo) 0 else 1
                                 putExtra("ids", ids)
                                 putExtra("type", type)
@@ -519,7 +523,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     counterShares--
                     optionShare.visibility = View.GONE
                 }
-                if (node.isFolder) {
+                if (nodeInfo.typedNode is TypedFolderNode) {
                     if (isTakenDown) {
                         counterShares--
                         optionShareFolder.visibility = View.GONE
@@ -527,7 +531,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         optionClearShares.visibility = View.GONE
                     } else {
                         optionShareFolder.visibility = View.VISIBLE
-                        if (megaNodeUtilWrapper.isOutShare(node)) {
+                        if (nodeInfo.typedNode.isOutShare()) {
                             optionShareFolder.setText(R.string.manage_share)
                             optionShareFolder.setCompoundDrawablesWithIntrinsicBounds(
                                 RPack.drawable.ic_gear_six_medium_regular_outline,
@@ -563,7 +567,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     optionCopy.visibility = View.GONE
                 } else {
                     optionLink.visibility = View.VISIBLE
-                    if (node.isExported) {
+                    if (nodeInfo.node.isExported) {
                         //Node has public link
                         optionLink.setText(R.string.edit_link_option)
                         optionRemoveLink.visibility = View.VISIBLE
@@ -583,7 +587,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         optionSync.visibility = View.VISIBLE
                         separatorSync.visibility = View.VISIBLE
                         optionSync.setOnClickListener {
-                            openNewSyncScreen(node)
+                            openNewSyncScreen(nodeInfo.node)
                         }
                     } else {
                         optionSync.visibility = View.GONE
@@ -699,7 +703,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     SHARED_ITEMS_MODE -> {
                         val tabSelected = (requireActivity() as ManagerActivity).tabItemShares
                         if (tabSelected === SharesTab.INCOMING_TAB || nodeController.nodeComesFromIncoming(
-                                node
+                                nodeInfo.node
                             )
                         ) {
                             Timber.d("showOptionsPanelIncoming")
@@ -712,7 +716,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                 counterShares--
                                 optionClearShares.visibility = View.GONE
                             }
-                            val dBT = nodeController.getIncomingLevel(node)
+                            val dBT = nodeController.getIncomingLevel(nodeInfo.node)
                             Timber.d("DeepTree value:%s", dBT)
                             if (dBT > Constants.FIRST_NAVIGATION_LEVEL) {
                                 optionLeaveShares.visibility = View.GONE
@@ -802,7 +806,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                             optionRemove.visibility = View.GONE
                             optionLeaveShares.visibility = View.GONE
                         } else if (tabSelected === SharesTab.LINKS_TAB) {
-                            if (!isTakenDown && node.isShared) {
+                            if (!isTakenDown && nodeInfo.node.isShared) {
                                 optionClearShares.visibility = View.VISIBLE
                             } else if (optionClearShares.isVisible()) {
                                 counterShares--
@@ -835,7 +839,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 // After setting up the content to be displayed in the Options Dialog, check if
                 // read-only properties should be applied.
                 checkIfShouldApplyReadOnlyState(
-                    node = node,
+                    node = nodeInfo.node,
                     decrementOpen = { counterOpen-- },
                     decrementModify = { counterModify-- },
                 )
@@ -847,30 +851,30 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     onClick {
                         onOfflineClicked(
                             isAvailableOffline = state.isAvailableOffline,
-                            nodeId = NodeId(node.handle),
+                            nodeId = nodeInfo.typedNode.id,
                         )
                     }
                 }
-                optionFavourite.setText(if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite)
+                optionFavourite.setText(if (nodeInfo.typedNode.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite)
                 optionFavourite.setCompoundDrawablesWithIntrinsicBounds(
-                    if (node.isFavourite) RPack.drawable.ic_heart_broken_medium_regular_outline else RPack.drawable.ic_heart_medium_regular_outline,
+                    if (nodeInfo.typedNode.isFavourite) RPack.drawable.ic_heart_broken_medium_regular_outline else RPack.drawable.ic_heart_medium_regular_outline,
                     0, 0, 0
                 )
-                optionHide.setText(if (accountType?.isPaid != true || isBusinessAccountExpired || !node.isMarkedSensitive) R.string.general_hide_node else R.string.general_unhide_node)
+                optionHide.setText(if (accountType?.isPaid != true || isBusinessAccountExpired || !nodeInfo.typedNode.isMarkedSensitive) R.string.general_hide_node else R.string.general_unhide_node)
                 optionHide.setCompoundDrawablesWithIntrinsicBounds(
-                    if (accountType?.isPaid != true || isBusinessAccountExpired || !node.isMarkedSensitive) RPack.drawable.ic_eye_off_medium_regular_outline else RPack.drawable.ic_eye_medium_regular_outline,
+                    if (accountType?.isPaid != true || isBusinessAccountExpired || !nodeInfo.typedNode.isMarkedSensitive) RPack.drawable.ic_eye_off_medium_regular_outline else RPack.drawable.ic_eye_medium_regular_outline,
                     0,
                     0,
                     0
                 )
-                if (node.label != MegaNode.NODE_LBL_UNKNOWN) {
+                if (nodeInfo.typedNode.label != MegaNode.NODE_LBL_UNKNOWN) {
                     val color = ResourcesCompat.getColor(
                         resources, getNodeLabelColor(
-                            node.label
+                            nodeInfo.typedNode.label
                         ), null
                     )
                     val drawable = getNodeLabelDrawable(
-                        node.label, resources
+                        nodeInfo.typedNode.label, resources
                     )
                     optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(
                         null,
@@ -878,13 +882,14 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         drawable,
                         null
                     )
-                    optionLabelCurrent.text = getNodeLabelText(node.label, requireContext())
+                    optionLabelCurrent.text =
+                        getNodeLabelText(nodeInfo.typedNode.label, requireContext())
                     optionLabelCurrent.setTextColor(color)
                     optionLabelCurrent.visibility = View.VISIBLE
                 } else {
                     optionLabelCurrent.visibility = View.GONE
                 }
-                state.shareData?.let { data -> hideNodeActions(data, node) }
+                state.shareData?.let { data -> hideNodeActions(data, nodeInfo.node) }
 
                 if (savedInstanceState?.getBoolean(
                         Constants.CANNOT_OPEN_FILE_SHOWN,
@@ -893,7 +898,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 ) {
                     contentView.post {
                         cannotOpenFileDialog = this.showCannotOpenFileDialog(requireActivity()) {
-                            (requireActivity() as ManagerActivity).saveNodeByTap(node)
+                            (requireActivity() as ManagerActivity).saveNodeByTap(nodeInfo.node)
                         }
                     }
                 }
@@ -1359,7 +1364,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (!nodeShareInformation.isVerified) {
             optionVerifyUser.text = getString(
                 R.string.shared_items_bottom_sheet_menu_verify_user,
-                nodeInfo?.text
+                nodeInfoText?.text
             )
         }
         optionVerifyUser.setOnClickListener {
@@ -1448,7 +1453,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             setStateBottomSheetBehaviorHidden()
         } else {
-            tempNodeId = nodeOptionsViewModel.state.value.node?.handle?.let { NodeId(it) }
+            tempNodeId = nodeOptionsViewModel.state.value.legacyNodeWrapper?.typedNode?.id
             showHiddenNodesOnboarding(true)
         }
     }
@@ -1702,33 +1707,33 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             else -> Constants.INVALID_VALUE
         }
 
-    private fun showShareFolderOptions(node: MegaNode?) {
-        node?.let {
-            val nodeType = checkBackupNodeTypeByHandle(megaApi, node)
-            if (megaNodeUtilWrapper.isOutShare(it)) {
+    private fun showShareFolderOptions(legacyNodeWrapper: LegacyNodeWrapper?) {
+        legacyNodeWrapper?.let {
+            val nodeType = checkBackupNodeTypeByHandle(megaApi, it.node)
+            if (it.typedNode.isOutShare()) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     val intent =
                         if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {
                             FileContactListComposeActivity.newIntent(
                                 context = requireContext(),
-                                nodeHandle = it.handle,
-                                nodeName = it.name
+                                nodeHandle = it.typedNode.id.longValue,
+                                nodeName = it.typedNode.name
                             )
                         } else {
                             Intent(requireContext(), FileContactListActivity::class.java)
                         }
-                    intent.putExtra(Constants.NAME, it.handle)
+                    intent.putExtra(Constants.NAME, it.typedNode.id.longValue)
                     startActivity(intent)
                     dismissAllowingStateLoss()
                 }
             } else {
                 if (nodeType != BACKUP_NONE) {
                     (requireActivity() as ManagerActivity).showShareBackupsFolderWarningDialog(
-                        node = it,
+                        node = it.node,
                         nodeType = nodeType,
                     )
                 } else {
-                    nodeController.selectContactToShareFolder(node)
+                    nodeController.selectContactToShareFolder(it.typedNode.id.longValue)
                 }
                 dismissAllowingStateLoss()
             }

@@ -1,7 +1,8 @@
 package mega.privacy.android.app.presentation.bottomsheet.model
 
+import mega.privacy.android.app.utils.wrapper.LegacyNodeWrapper
 import mega.privacy.android.domain.entity.AccountType
-import nz.mega.sdk.MegaNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 
 /**
  * Node bottom sheet ui state
@@ -9,7 +10,7 @@ import nz.mega.sdk.MegaNode
  * @property canRestoreNode
  * @property isOnline
  * @property isAvailableOffline
- * @property node
+ * @property legacyNodeWrapper
  * @property shareData
  * @property nodeDeviceCenterInformation
  * @property shareKeyCreated
@@ -24,8 +25,8 @@ data class NodeBottomSheetUIState(
     val canMoveNode: Boolean = false,
     val canRestoreNode: Boolean = false,
     val isOnline: Boolean = true,
+    val legacyNodeWrapper: LegacyNodeWrapper? = null,
     val isAvailableOffline: Boolean = false,
-    val node: MegaNode? = null,
     val shareData: NodeShareInformation? = null,
     val nodeDeviceCenterInformation: NodeDeviceCenterInformation? = null,
     val shareKeyCreated: Boolean? = null,
@@ -39,5 +40,7 @@ data class NodeBottomSheetUIState(
     /**
      * True if Sync action is allowed for the node or False otherwise
      */
-    val isSyncActionAllowed = node?.isFolder == true && !isUserAttributeFolder && !isSyncedFolder
+    val isSyncActionAllowed =
+        legacyNodeWrapper?.typedNode is TypedFolderNode == true && !isUserAttributeFolder && !isSyncedFolder
 }
+

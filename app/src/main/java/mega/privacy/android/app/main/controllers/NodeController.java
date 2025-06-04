@@ -181,13 +181,18 @@ public class NodeController {
 
     public void selectContactToShareFolder(MegaNode node) {
         Timber.d("shareFolder");
+        long handle = node.getHandle();
 
+        selectContactToShareFolder(handle);
+    }
+
+    public void selectContactToShareFolder(long handle) {
         Intent intent = new Intent();
         intent.setClass(context, AddContactActivity.class);
         intent.putExtra("contactType", CONTACT_TYPE_BOTH);
         //Multiselect=0
         intent.putExtra("MULTISELECT", 0);
-        intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, node.getHandle());
+        intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, handle);
         ((ManagerActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
     }
 
