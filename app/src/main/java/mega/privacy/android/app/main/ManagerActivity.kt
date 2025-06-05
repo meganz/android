@@ -5968,6 +5968,15 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             ) + Constants.SEPARATOR
             openFullscreenOfflineFragment(offlinePath, fileNames)
         } else {
+            val file = getFileFromUri(path)
+            if (file?.exists() != true) {
+                showSnackbar(
+                    SNACKBAR_TYPE,
+                    getString(R.string.location_not_exist),
+                    MEGACHAT_INVALID_HANDLE
+                )
+                return
+            }
             Intent(this, FileStorageActivity::class.java).apply {
                 action = FileStorageActivity.Mode.BROWSE_FILES.action
                 putExtra(FileStorageActivity.EXTRA_PATH, path)
