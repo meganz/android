@@ -66,6 +66,7 @@ fun Map<Long, ListGridState>.sync(
             this[currentHandle] = ListGridState()
         }
     }
+
 /**
  * Sync the [ListGridState] map with the opened folder node handles array queue and the current node handle
  */
@@ -79,7 +80,6 @@ fun Map<Long, ListGridState>.sync(
             this[currentHandle] = ListGridState()
         }
     }
-
 
 /**
  * Get the [ListGridState] for the given node handle

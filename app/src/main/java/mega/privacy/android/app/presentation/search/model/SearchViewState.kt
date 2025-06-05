@@ -60,8 +60,14 @@ data class SearchViewState(
     val nodeNameCollisionsResult: NodeNameCollisionsResult? = null,
     val moveRequestResult: Result<MoveRequestResult>? = null,
     val navigationLevel: List<Pair<Long, String>> = emptyList(),
+    val rootParentHandle: Long = -1L,
     val resetScrollEvent: StateEvent = consumed,
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
-)
+) {
+    /**
+     * Current parent handle based on the last item in the navigation level.
+     */
+    val currentParentHandle = navigationLevel.lastOrNull()?.first ?: rootParentHandle
+}

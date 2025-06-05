@@ -3,8 +3,6 @@ package mega.privacy.android.app.presentation.search.view
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarResult
@@ -48,6 +46,9 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.utils.ListGridStateMap
+import mega.privacy.android.shared.original.core.ui.utils.getState
+import mega.privacy.android.shared.original.core.ui.utils.sync
 
 /**
  * View for Search compose
@@ -86,11 +87,18 @@ fun SearchComposeView(
     nodeSourceType: NodeSourceType,
     modifier: Modifier = Modifier,
 ) {
-    val listState = rememberLazyListState()
-    val gridState = rememberLazyGridState()
+    var listStateMap by rememberSaveable(saver = ListGridStateMap.Saver) {
+        mutableStateOf(emptyMap())
+    }
+    LaunchedEffect(state.navigationLevel, state.currentParentHandle) {
+        listStateMap = listStateMap.sync(
+            openedHandles = listOf(state.rootParentHandle) + state.navigationLevel.map { it.first },
+            currentHandle = state.currentParentHandle,
+        )
+    }
+    val currentListState = listStateMap.getState(state.currentParentHandle)
     val scaffoldState = rememberScaffoldState()
     var topBarPadding by remember { mutableStateOf(0.dp) }
-
     var searchQuery by rememberSaveable {
         mutableStateOf(state.searchQuery)
     }
@@ -122,6 +130,7 @@ fun SearchComposeView(
 
         }
     }
+
     MegaScaffold(
         modifier = modifier.semantics { testTagsAsResourceId = true },
         topBar = {
@@ -172,8 +181,8 @@ fun SearchComposeView(
                         onChangeViewTypeClick = onChangeViewTypeClick,
                         onLinkClicked = onLinkClicked,
                         onDisputeTakeDownClicked = onDisputeTakeDownClicked,
-                        listState = listState,
-                        gridState = gridState,
+                        listState = currentListState.lazyListState,
+                        gridState = currentListState.lazyGridState,
                         modifier = Modifier.padding(padding),
                         fileTypeIconMapper = fileTypeIconMapper,
                         inSelectionMode = state.selectedNodes.isNotEmpty(),
@@ -197,9 +206,9 @@ fun SearchComposeView(
 
     EventEffect(state.resetScrollEvent, onResetScrollEventConsumed) {
         if (state.currentViewType == ViewType.LIST) {
-            listState.scrollToItem(0)
+            currentListState.lazyListState.scrollToItem(0)
         } else {
-            gridState.scrollToItem(0)
+            currentListState.lazyGridState.scrollToItem(0)
         }
     }
 }

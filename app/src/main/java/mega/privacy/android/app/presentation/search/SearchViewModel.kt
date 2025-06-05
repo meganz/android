@@ -157,6 +157,7 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update {
                 it.copy(
+                    rootParentHandle = parentHandle,
                     nodeSourceType = nodeSourceType,
                     typeSelectedFilterOption = null,
                     dateModifiedSelectedFilterOption = null,
@@ -590,7 +591,8 @@ class SearchViewModel @Inject constructor(
                 navigationLevel = list,
                 typeSelectedFilterOption = null,
                 dateModifiedSelectedFilterOption = null,
-                dateAddedSelectedFilterOption = null
+                dateAddedSelectedFilterOption = null,
+                resetScrollEvent = triggered
             )
         }
         performSearch()
