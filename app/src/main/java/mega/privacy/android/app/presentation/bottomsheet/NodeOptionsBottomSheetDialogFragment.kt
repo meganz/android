@@ -59,6 +59,7 @@ import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
+import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
@@ -75,7 +76,6 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo
-import mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelText
@@ -87,6 +87,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.app.utils.wrapper.LegacyNodeWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
@@ -95,9 +96,9 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.icon.pack.R as RPack
 import mega.privacy.android.navigation.MegaNavigator
@@ -136,9 +137,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
-
-    @Inject
-    lateinit var getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase
 
     @Inject
     lateinit var megaNavigator: MegaNavigator
@@ -183,12 +181,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         return contentView
     }
 
-    private suspend fun isHiddenNodesActive(): Boolean {
-        val result = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
-        }
-        return result.getOrNull() ?: false
-    }
+    private suspend fun isHiddenNodesActive() = runCatching {
+        getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+    }.getOrNull() == true
 
     /**
      * onViewCreated
@@ -408,7 +403,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     )
                     nodeThumb.setupNodeIcon(
                         nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
-                        megaNode = nodeInfo.node,
+                        typedNode = nodeInfo.typedNode,
                     )
                     nodeInfoText?.run {
                         setupNodeBodyText(
@@ -500,7 +495,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionHideHelp.visibility =
                     if (accountType?.isPaid == true && !isBusinessAccountExpired && !nodeInfo.typedNode.isMarkedSensitive) View.VISIBLE else View.GONE
                 optionAddToAlbum.let { option ->
-                    val fileType = getFileTypeInfoByNameUseCase(nodeInfo.typedNode.name)
+                    val fileType = (nodeInfo.typedNode as? TypedFileNode)?.type
                     if (fileType is ImageFileTypeInfo || fileType is VideoFileTypeInfo) {
                         option.visibility = View.VISIBLE
                         option.setText(if (fileType is ImageFileTypeInfo) sharedR.string.album_add_to_image else sharedR.string.album_add_to_media)
@@ -943,40 +938,37 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      */
     private fun ImageView.setupNodeIcon(
         nodeDeviceCenterInformation: NodeDeviceCenterInformation?,
-        megaNode: MegaNode,
+        typedNode: TypedNode,
     ) {
         if (nodeDeviceCenterInformation != null) {
             setImageResource(nodeDeviceCenterInformation.icon)
         } else {
-            val parentNode = megaApi.getParentNode(megaNode)
-            val isSensitiveInherited = parentNode?.let { megaApi.isSensitiveInherited(it) } == true
-
-            if (megaNode.isFolder) {
-                drawerItem?.let { nonNullDrawerItem ->
-                    load(
-                        getFolderIcon(
-                            node = megaNode,
-                            drawerItem = nonNullDrawerItem,
-                        )
-                    ) {
-                        if (megaNode.isMarkedSensitive || isSensitiveInherited) {
-                            transformations(
-                                BlurTransformation(
-                                    requireContext(),
-                                    radius = 16f,
-                                )
+            val iconResource = getNodeIcon(
+                typedNode = typedNode,
+                originShares = drawerItem == DrawerItem.SHARED_ITEMS,
+                fileTypeIconMapper = FileTypeIconMapper(),
+            )
+            if (typedNode is TypedFolderNode) {
+                load(
+                    iconResource
+                ) {
+                    if (typedNode.isMarkedSensitive || typedNode.isSensitiveInherited) {
+                        transformations(
+                            BlurTransformation(
+                                requireContext(),
+                                radius = 16f,
                             )
-                        }
+                        )
                     }
                 }
             } else {
                 val thumbnailParams = layoutParams as? ConstraintLayout.LayoutParams
                 thumbnailParams?.let {
-                    load(ThumbnailRequest(NodeId(megaNode.handle))) {
+                    load(ThumbnailRequest(typedNode.id)) {
                         size(Util.dp2px(Constants.THUMB_SIZE_DP.toFloat()))
 
                         transformations(buildList {
-                            if (megaNode.isMarkedSensitive || isSensitiveInherited) {
+                            if (typedNode.isMarkedSensitive || typedNode.isSensitiveInherited) {
                                 add(BlurTransformation(requireContext(), radius = 16f))
                             }
                             add(
@@ -998,7 +990,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                 thumbnailParams.width = Util.dp2px(Constants.ICON_SIZE_DP.toFloat())
                                 thumbnailParams.height = thumbnailParams.width
                                 thumbnailParams.setMargins(0, 0, 0, 0)
-                                setImageResource(typeForName(megaNode.name).iconResourceId)
+                                setImageResource(iconResource)
                                 layoutParams = thumbnailParams
                             },
                         )
