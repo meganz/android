@@ -2,8 +2,10 @@ package mega.privacy.android.feature.sync.data.gateway
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -49,4 +51,5 @@ internal class SyncPromotionDataStoreImpl @Inject constructor(
 
 internal val Context.syncPromotionDataStore: DataStore<Preferences> by preferencesDataStore(
     name = syncPromotionDataStoreName,
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
 )

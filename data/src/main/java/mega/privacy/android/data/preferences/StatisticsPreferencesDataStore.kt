@@ -2,6 +2,7 @@ package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -23,6 +24,7 @@ import javax.inject.Inject
 private const val mdClickPreferenceName = "MEDIA_DISCOVERY_CLICK"
 private val Context.mediaDiscoveryStatisticsDataStore: DataStore<Preferences> by preferencesDataStore(
     name = mdClickPreferenceName,
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
     produceMigrations = {
         listOf(
             SharedPreferencesMigration(it, mdClickPreferenceName)

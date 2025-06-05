@@ -2,6 +2,7 @@ package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -35,6 +36,7 @@ private const val LAST_REGISTERED_EMAIL = "LAST_REGISTERED_EMAIL"
 
 private val Context.accountPreferencesDataStore: DataStore<Preferences> by preferencesDataStore(
     name = accountPreferenceFileName,
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() }
 )
 
 /**

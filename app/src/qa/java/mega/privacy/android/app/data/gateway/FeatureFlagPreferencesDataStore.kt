@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import java.io.IOException
 import javax.inject.Inject
 
@@ -23,7 +24,10 @@ import javax.inject.Inject
  */
 const val FEATURE_FLAG_PREFERENCES = "FEATURE_FLAG_PREFERENCES"
 
-private val Context.featureFlagDataStore: DataStore<Preferences> by preferencesDataStore(name = FEATURE_FLAG_PREFERENCES)
+private val Context.featureFlagDataStore: DataStore<Preferences> by preferencesDataStore(
+    name = FEATURE_FLAG_PREFERENCES,
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+)
 
 /**
  * Implementation of [FeatureFlagPreferencesGateway] for interaction with Preferences DataStore

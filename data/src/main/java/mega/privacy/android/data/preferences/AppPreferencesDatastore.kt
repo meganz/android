@@ -2,6 +2,7 @@ package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -26,8 +27,8 @@ import java.io.IOException
 import javax.inject.Inject
 
 private val Context.appPreferencesDatastore: DataStore<Preferences> by preferencesDataStore(
-
     name = "app_preferences",
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
     produceMigrations = {
         listOf(
             SharedPreferencesMigration(
@@ -35,7 +36,8 @@ private val Context.appPreferencesDatastore: DataStore<Preferences> by preferenc
                 keysToMigrate = setOf(KEY_APPEARANCE_COLOR_THEME)
             )
         )
-    })
+    },
+)
 
 /**
  * App preferences datastore, implements [AppPreferencesGateway]

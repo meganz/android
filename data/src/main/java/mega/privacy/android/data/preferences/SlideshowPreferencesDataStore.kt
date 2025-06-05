@@ -2,9 +2,11 @@ package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,6 +29,7 @@ internal class SlideshowPreferencesDataStore @Inject constructor(
 ) : SlideshowPreferencesGateway {
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
         name = "SLIDESHOW_PREFERENCES",
+        corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() }
     )
 
     private lateinit var speedPreferenceKey: Preferences.Key<Int>

@@ -2,6 +2,7 @@ package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -27,7 +28,8 @@ import java.io.IOException
 import javax.inject.Inject
 
 private val Context.callsDataStore: DataStore<Preferences> by preferencesDataStore(
-    name = "CALLS_PREFERENCES"
+    name = "CALLS_PREFERENCES",
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
 )
 
 /**

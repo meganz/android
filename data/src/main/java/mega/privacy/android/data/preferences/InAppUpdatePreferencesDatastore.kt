@@ -2,9 +2,11 @@ package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -16,7 +18,8 @@ import javax.inject.Inject
 
 private val inAppUpdatePreferenceFileName = "IN_APP_UPDATE"
 private val Context.appInfoPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
-    name = inAppUpdatePreferenceFileName
+    name = inAppUpdatePreferenceFileName,
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() }
 )
 
 /**

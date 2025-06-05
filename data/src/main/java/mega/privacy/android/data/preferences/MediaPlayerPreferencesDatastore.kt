@@ -2,10 +2,12 @@ package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,6 +23,7 @@ private const val KEY_VIDEO_REPEAT_MODE = "settings_video_repeat_mode"
 private const val mediaPlayerPreferenceFileName = MEDIA_PLAYER_PREFERENCES
 private val Context.mediaPlayerPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = mediaPlayerPreferenceFileName,
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
     produceMigrations = {
         listOf(
             SharedPreferencesMigration(
