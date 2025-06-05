@@ -618,8 +618,11 @@ class LoginFragment : Fragment() {
 
         confirmLogoutDialog?.dismiss()
         val loginActivity = requireActivity() as LoginActivity
-
-        if (!uiState.shouldShowUpgradeAccount) {
+        val isLoggedInToConfirmedAccount =
+            !loginActivity.intent.getStringExtra(Constants.EXTRA_CONFIRMATION).isNullOrEmpty()
+                    && uiState.isAccountConfirmed
+                    && uiState.accountSession?.email == uiState.temporalEmail
+        if (!isLoggedInToConfirmedAccount) {
             if (getChatManagement().isPendingJoinLink()) {
                 LoginActivity.isBackFromLoginPage = false
                 getChatManagement().pendingJoinLink = null
@@ -750,25 +753,38 @@ class LoginFragment : Fragment() {
                             val shouldShowNotificationPermission =
                                 viewModel.shouldShowNotificationPermission()
 
-                            loginActivity.startActivity(
-                                intent.apply {
+                            intent.apply {
+                                putExtra(
+                                    IntentConstants.EXTRA_FIRST_LAUNCH,
+                                    uiState.isFirstTimeLaunch
+                                )
+                                if (shouldShowNotificationPermission) {
+                                    Timber.d("LoginFragment::shouldShowNotificationPermission")
                                     putExtra(
-                                        IntentConstants.EXTRA_FIRST_LAUNCH,
-                                        uiState.isFirstTimeLaunch
+                                        IntentConstants.EXTRA_ASK_PERMISSIONS,
+                                        true
                                     )
-                                    if (shouldShowNotificationPermission) {
-                                        Timber.d("LoginFragment::shouldShowNotificationPermission")
-                                        putExtra(
-                                            IntentConstants.EXTRA_ASK_PERMISSIONS,
-                                            true
-                                        )
-                                        putExtra(
-                                            IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION,
-                                            true
-                                        )
-                                    }
+                                    putExtra(
+                                        IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION,
+                                        true
+                                    )
                                 }
-                            )
+                            }
+
+                            // we show upgrade account for all accounts that are free and logged in for the first time
+                            if (uiState.shouldShowUpgradeAccount) {
+                                startActivity(
+                                    intent.setClass(
+                                        requireContext(),
+                                        ChooseAccountActivity::class.java
+                                    ).apply {
+                                        putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, false)
+                                        putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, false)
+                                    }
+                                )
+                            } else {
+                                startActivity(intent)
+                            }
                         }
                         Timber.d("LoginActivity finish")
                         loginActivity.finish()

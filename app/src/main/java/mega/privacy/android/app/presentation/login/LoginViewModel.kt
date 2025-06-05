@@ -875,7 +875,9 @@ class LoginViewModel @Inject constructor(
      */
     fun fetchNodes(isRefreshSession: Boolean = false) {
         viewModelScope.launch {
-            getAccountCredentialsUseCase()?.updateCredentials() ?: return@launch
+            if (isRefreshSession) {
+                getAccountCredentialsUseCase()?.updateCredentials() ?: return@launch
+            }
 
             MegaApplication.getInstance().checkEnabledCookies()
 

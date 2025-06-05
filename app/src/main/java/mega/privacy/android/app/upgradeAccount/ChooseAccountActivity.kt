@@ -49,12 +49,18 @@ open class ChooseAccountActivity : AppCompatActivity() {
      */
     internal fun onPlanClicked(accountType: AccountType) {
         val accountTypeInt = convertAccountTypeToInt(accountType)
-        val intent = Intent(this, ManagerActivity::class.java)
-            .putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
-            .putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
-            .putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
-            .putExtra(IntentConstants.EXTRA_UPGRADE_ACCOUNT, accountTypeInt != Constants.FREE)
-            .putExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, accountTypeInt)
+        val intent = Intent(this, ManagerActivity::class.java).apply {
+            putExtras(intent)
+            putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+            if (extras?.containsKey(IntentConstants.EXTRA_NEW_ACCOUNT) != true) {
+                putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
+            }
+            if (extras?.containsKey(ManagerActivity.NEW_CREATION_ACCOUNT) != true) {
+                putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
+            }
+            putExtra(IntentConstants.EXTRA_UPGRADE_ACCOUNT, accountTypeInt != Constants.FREE)
+            putExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, accountTypeInt)
+        }
 
         startActivity(intent)
         finish()
