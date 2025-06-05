@@ -103,7 +103,7 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.get().askSetDownloadLocation = value
     }
 
-    override suspend fun setStorageDownloadLocation(storageDownloadLocation: String) {
+    override suspend fun setStorageDownloadLocation(storageDownloadLocation: String?) {
         dbHandler.get().setStorageDownloadLocation(storageDownloadLocation)
     }
 

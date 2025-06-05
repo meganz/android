@@ -190,7 +190,7 @@ internal fun StartTransferComponent(
         onDestinationSet = viewModel::startDownloadWithDestination,
         onPromptSaveDestinationConsumed = viewModel::consumePromptSaveDestination,
         onSaveDestination = viewModel::saveDestination,
-        onDoNotPromptToSaveDestinationAgain = viewModel::doNotPromptToSaveDestinationAgain,
+        onAlwaysAskForDestination = viewModel::alwaysAskForDestination,
         onResumeTransfers = viewModel::resumeTransfers,
         onAskedResumeTransfers = viewModel::setAskedResumeTransfers,
         snackBarHostState = snackBarHostState.orProvided(),
@@ -249,7 +249,7 @@ private fun StartTransferComponent(
     onDestinationSet: (destination: Uri?) -> Unit,
     onPromptSaveDestinationConsumed: () -> Unit,
     onSaveDestination: (String) -> Unit,
-    onDoNotPromptToSaveDestinationAgain: () -> Unit,
+    onAlwaysAskForDestination: () -> Unit,
     onResumeTransfers: () -> Unit,
     onAskedResumeTransfers: () -> Unit,
     snackBarHostState: SnackbarHostStateWrapper?,
@@ -483,7 +483,7 @@ private fun StartTransferComponent(
                 showPromptSaveDestinationDialog = null
             },
             onCancel = {
-                onDoNotPromptToSaveDestinationAgain()
+                onAlwaysAskForDestination()
                 showPromptSaveDestinationDialog = null
             },
         )

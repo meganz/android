@@ -490,10 +490,18 @@ class StartTransfersComponentViewModelTest {
                 .isInstanceOf(StateEventWithContentConsumed::class.java)
         }
 
+
     @Test
-    fun `test that saveDoNotPromptToSaveDestinationUseCase is invoked when doNotPromptToSaveDestinationAgain is invoked`() =
+    fun `test that setStorageDownloadAskAlwaysUseCase is set to true when alwaysAskForDestination is invoked`() =
         runTest {
-            underTest.doNotPromptToSaveDestinationAgain()
+            underTest.alwaysAskForDestination()
+            verify(setStorageDownloadAskAlwaysUseCase).invoke(true)
+        }
+    
+    @Test
+    fun `test that saveDoNotPromptToSaveDestinationUseCase is invoked when alwaysAskForDestination is invoked`() =
+        runTest {
+            underTest.alwaysAskForDestination()
             verify(saveDoNotPromptToSaveDestinationUseCase).invoke()
         }
 

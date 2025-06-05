@@ -1137,7 +1137,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
 
     override fun setStorageDownloadLocation(storageDownloadLocation: String?) {
-        if (storageDownloadLocation == null) return
 
         val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
         val values = ContentValues()

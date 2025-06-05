@@ -239,7 +239,7 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalStorageGateway.setAskSetDownloadLocation(value)
     }
 
-    override suspend fun setStorageDownloadLocation(storageDownloadLocation: String) =
+    override suspend fun setStorageDownloadLocation(storageDownloadLocation: String?) =
         megaLocalStorageGateway.setStorageDownloadLocation(storageDownloadLocation)
 
     override suspend fun isAskBeforeLargeDownloads() =

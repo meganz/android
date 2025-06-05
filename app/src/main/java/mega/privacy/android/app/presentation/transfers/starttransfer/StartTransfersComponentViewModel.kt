@@ -656,10 +656,11 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     /**
      * Save setting to don't prompt the user again to save selected destination
      */
-    fun doNotPromptToSaveDestinationAgain() {
+    fun alwaysAskForDestination() {
         viewModelScope.launch {
             runCatching {
                 saveDoNotPromptToSaveDestinationUseCase()
+                setStorageDownloadAskAlwaysUseCase(true)
             }.onFailure {
                 Timber.e("Error saving the don't save destination again prompt:\n$it")
             }

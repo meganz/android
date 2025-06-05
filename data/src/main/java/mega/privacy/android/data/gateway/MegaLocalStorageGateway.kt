@@ -137,7 +137,7 @@ interface MegaLocalStorageGateway {
      *
      * @param storageDownloadLocation
      */
-    suspend fun setStorageDownloadLocation(storageDownloadLocation: String)
+    suspend fun setStorageDownloadLocation(storageDownloadLocation: String?)
 
     /**
      * @return ask for confirmation before large downloads preference

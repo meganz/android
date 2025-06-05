@@ -43,8 +43,10 @@ class DownloadSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             isStorageDownloadAskAlwaysUseCase().also { askAlways ->
                 _uiState.update { it.copy(isAskAlwaysChecked = askAlways) }
+                if (!askAlways) {
+                    setDownloadLocation(getStorageDownloadLocationUseCase())
+                }
             }
-            setDownloadLocation(getStorageDownloadLocationUseCase())
         }
     }
 
@@ -70,6 +72,9 @@ class DownloadSettingsViewModel @Inject constructor(
      */
     fun onStorageAskAlwaysChanged(isChecked: Boolean) = viewModelScope.launch {
         setStorageDownloadAskAlwaysUseCase(isChecked)
+        if (!isChecked) {
+            setDownloadLocation(_uiState.value.downloadLocationPath)
+        }
         _uiState.update { it.copy(isAskAlwaysChecked = isChecked) }
     }
 }
