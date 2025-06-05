@@ -8,8 +8,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -69,15 +71,18 @@ internal fun FreeTrialView(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(MaterialTheme.colors.grey_020_dark_grey)
+                .background(MaterialTheme.colors.surface)
                 .verticalScroll(rememberScrollState())
         ) {
-            Column(
+            Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(top = 6.dp)
-                    .background(MaterialTheme.colors.surface)
+                    .height(8.dp)
+                    .background(MaterialTheme.colors.grey_020_dark_grey)
+            )
+
+            Column(
+                modifier = Modifier.fillMaxWidth().wrapContentHeight()
             ) {
                 Box(
                     modifier = Modifier
@@ -123,12 +128,15 @@ internal fun FreeTrialView(
                 )
             }
 
-            Column(
+            Spacer(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(vertical = 6.dp)
-                    .weight(1f)
-                    .background(MaterialTheme.colors.surface)
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .background(MaterialTheme.colors.grey_020_dark_grey)
+            )
+
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
                 if (!isReceivedAward) {
                     Text(
