@@ -8,11 +8,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -33,9 +28,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
-import mega.privacy.android.shared.original.core.ui.utils.ListGridStateMap
-import mega.privacy.android.shared.original.core.ui.utils.getState
-import mega.privacy.android.shared.original.core.ui.utils.sync
+import mega.privacy.android.shared.original.core.ui.model.rememberListGridNavigationState
 
 /**
  * Composable view for FileBrowser
@@ -70,19 +63,10 @@ fun FileBrowserComposeView(
     onStorageAlmostFullWarningDismiss: () -> Unit,
 ) {
 
-    var listStateMap by rememberSaveable(saver = ListGridStateMap.Saver) {
-        mutableStateOf(emptyMap())
-    }
-
-    /**
-     * When back navigation performed from a folder, remove the listState/gridState of that node handle
-     */
-    LaunchedEffect(uiState.openedFolderNodeHandles, uiState.nodesList, uiState.fileBrowserHandle) {
-        listStateMap = listStateMap.sync(
-            uiState.openedFolderNodeHandles,
-            uiState.fileBrowserHandle
-        )
-    }
+    val currentListState = rememberListGridNavigationState(
+        currentHandle = uiState.fileBrowserHandle,
+        navigationHandles = uiState.openedFolderNodeHandles
+    )
 
     Column(
         modifier = Modifier
@@ -101,8 +85,6 @@ fun FileBrowserComposeView(
                 onUpgradeClicked = onUpgradeClicked
             )
         }
-
-        val currentListState = listStateMap.getState(uiState.fileBrowserHandle)
 
         if (!uiState.isLoading) {
             if (uiState.nodesList.isNotEmpty()) {

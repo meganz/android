@@ -11,6 +11,7 @@ import mega.privacy.android.shared.original.core.ui.utils.ListGridStateMap.Compa
 /**
  * The default [Saver] implementation for both LazyGridState and LazyListState.
  */
+@Deprecated("Use rememberListGridNavigationState")
 class ListGridStateMap {
     companion object {
         private const val LIST_GRID_MAP_ENTRY_SIZE = 5
@@ -56,6 +57,7 @@ class ListGridStateMap {
 /**
  * Sync the [ListGridState] map with the opened folder node handles and the current node handle
  */
+@Deprecated("Use rememberListGridNavigationState")
 fun Map<Long, ListGridState>.sync(
     openedHandles: Set<Long>,
     currentHandle: Long,
@@ -70,6 +72,7 @@ fun Map<Long, ListGridState>.sync(
 /**
  * Sync the [ListGridState] map with the opened folder node handles array queue and the current node handle
  */
+@Deprecated("Use rememberListGridNavigationState")
 fun Map<Long, ListGridState>.sync(
     openedHandles: List<Long>,
     currentHandle: Long,
@@ -84,6 +87,7 @@ fun Map<Long, ListGridState>.sync(
 /**
  * Get the [ListGridState] for the given node handle
  */
+@Deprecated("Use rememberListGridNavigationState")
 fun Map<Long, ListGridState>.getState(
     handle: Long,
 ) = this[handle] ?: ListGridState()
