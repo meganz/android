@@ -3,7 +3,9 @@ package mega.privacy.android.app.presentation.transfers.model
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -19,6 +21,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  * @property isTransferOverQuota Whether the transfer is over quota.
  * @property areTransfersPaused Whether the transfers are paused.
  * @property completedTransfers List of successfully completed transfers.
+ * @property completedTransfersPaths Map of completed transfer
  * @property selectedCompletedTransfersIds List of selected completed transfers. If not null, even empty, indicates selected mode is on.
  * @property failedTransfers List of cancelled or failed completed transfers.
  * @property selectedFailedTransfersIds List of selected failed or cancelled transfers. If not null, even empty, indicates selected mode is on.
@@ -33,6 +36,7 @@ data class TransfersUiState(
     val isTransferOverQuota: Boolean = false,
     val areTransfersPaused: Boolean = false,
     val completedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
+    val completedTransfersPaths: ImmutableMap<Int, String> = emptyMap<Int, String>().toImmutableMap(),
     val selectedCompletedTransfersIds: ImmutableList<Int>? = null,
     val failedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
     val selectedFailedTransfersIds: ImmutableList<Int>? = null,

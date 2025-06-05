@@ -23,6 +23,7 @@ import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
+import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsUriPathInCacheUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
@@ -44,6 +46,7 @@ import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTra
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadParentDocumentFileUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
@@ -51,6 +54,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUs
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import nz.mega.sdk.MegaTransfer
 import okhttp3.internal.immutableListOf
+import okhttp3.internal.toImmutableMap
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -97,6 +101,8 @@ class TransfersViewModelTest {
     private val isUriPathInCacheUseCase = mock<IsUriPathInCacheUseCase>()
     private val transferAppDataMapper = mock<TransferAppDataMapper>()
     private val cancelTransferByTagUseCase = mock<CancelTransferByTagUseCase>()
+    private val getDownloadParentDocumentFileUseCase = mock<GetDownloadParentDocumentFileUseCase>()
+    private val getPathByDocumentContentUriUseCase = mock<GetPathByDocumentContentUriUseCase>()
 
     private val originalPath = "originalPath"
     private val appDataString = "appDataString"
@@ -168,6 +174,8 @@ class TransfersViewModelTest {
             cancelTransferByTagUseCase,
             cancelTransfersUseCase,
             monitorCompletedTransfersUseCase,
+            getDownloadParentDocumentFileUseCase,
+            getPathByDocumentContentUriUseCase,
         )
         wheneverBlocking { monitorInProgressTransfersUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
@@ -201,8 +209,10 @@ class TransfersViewModelTest {
             deleteCompletedTransfersByIdUseCase = deleteCompletedTransfersByIdUseCase,
             isUriPathInCacheUseCase = isUriPathInCacheUseCase,
             transferAppDataMapper = transferAppDataMapper,
-            savedStateHandle = savedStateHandle,
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
+            getDownloadParentDocumentFileUseCase = getDownloadParentDocumentFileUseCase,
+            getPathByDocumentContentUriUseCase = getPathByDocumentContentUriUseCase,
+            savedStateHandle = savedStateHandle,
         )
     }
 
@@ -1197,6 +1207,76 @@ class TransfersViewModelTest {
             verify(deleteCompletedTransfersByIdUseCase)(listOf(id))
         }
     }
+
+    @Test
+    fun `test that MonitorCompletedTransfersUseCase updates state with completedTransfersPaths`() =
+        runTest {
+            val flow = MutableSharedFlow<List<CompletedTransfer>>()
+            val pathAsUri1 = "content://com.android.externalstorage.documents/tree/primary%3AMusic"
+            val realPath1 = "storage/emulated/0/Music"
+            val realPath2 = "/Folder/Path/To/File"
+            val pathAsUri3 =
+                "content://com.android.externalstorage.documents/tree/primary%3ADocuments/Folder/Test"
+            val realPath3 = "storage/emulated/0/Documents/Folder/Test"
+            val realPath4 = "Offline/Path/To/File"
+            val transfer1 = mock<CompletedTransfer> {
+                on { id } doReturn 1
+                on { type } doReturn MegaTransfer.TYPE_DOWNLOAD
+                on { state } doReturn MegaTransfer.STATE_COMPLETED
+                on { path } doReturn pathAsUri1
+                on { isContentUriDownload } doReturn true
+            }
+            val transfer2 = mock<CompletedTransfer> {
+                on { id } doReturn 2
+                on { type } doReturn MegaTransfer.TYPE_UPLOAD
+                on { state } doReturn MegaTransfer.STATE_COMPLETED
+                on { path } doReturn realPath2
+            }
+            val transfer3 = mock<CompletedTransfer> {
+                on { id } doReturn 3
+                on { type } doReturn MegaTransfer.TYPE_DOWNLOAD
+                on { state } doReturn MegaTransfer.STATE_COMPLETED
+                on { path } doReturn pathAsUri3
+                on { isContentUriDownload } doReturn true
+            }
+            val transfer4 = mock<CompletedTransfer> {
+                on { id } doReturn 4
+                on { type } doReturn MegaTransfer.TYPE_DOWNLOAD
+                on { state } doReturn MegaTransfer.STATE_COMPLETED
+                on { isOffline } doReturn true
+                on { path } doReturn realPath4
+            }
+            val list = listOf(transfer1, transfer2, transfer3, transfer4)
+            val uriPath1 = UriPath(pathAsUri1)
+            val documentFile1 = mock<DocumentEntity> {
+                on { this.uri } doReturn uriPath1
+            }
+            val uriPath3 = UriPath(pathAsUri3)
+            val documentFile3 = mock<DocumentEntity> {
+                on { this.uri } doReturn uriPath3
+            }
+            val expectedPaths = mapOf(
+                1 to realPath1,
+                2 to realPath2,
+                3 to realPath3,
+                4 to realPath4
+            ).toImmutableMap()
+
+            whenever(monitorCompletedTransfersUseCase()).thenReturn(flow)
+            whenever(getDownloadParentDocumentFileUseCase(pathAsUri1)) doReturn documentFile1
+            whenever(getDownloadParentDocumentFileUseCase(pathAsUri3)) doReturn documentFile3
+            whenever(getPathByDocumentContentUriUseCase(uriPath1.value)) doReturn realPath1
+            whenever(getPathByDocumentContentUriUseCase(uriPath3.value)) doReturn realPath3
+
+            initTestClass()
+
+            underTest.uiState.map { it.completedTransfersPaths }.test {
+                assertThat(awaitItem()).isEmpty()
+                flow.emit(list)
+                advanceUntilIdle()
+                assertThat(awaitItem()).isEqualTo(expectedPaths)
+            }
+        }
 
     companion object {
         private val testDispatcher = UnconfinedTestDispatcher()
