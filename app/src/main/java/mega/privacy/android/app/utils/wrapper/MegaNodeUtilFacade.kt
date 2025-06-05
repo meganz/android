@@ -86,7 +86,7 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun existsMyChatFilesFolder() = MegaNodeUtil.existsMyChatFilesFolder()
 
-    override fun isOutShare(node: MegaNode) = MegaNodeUtil.isOutShare(node)
+    override suspend fun isOutShare(node: MegaNode) = MegaNodeUtil.isOutShare(node)
 
     override fun getFolderIcon(node: MegaNode, drawerItem: DrawerItem) =
         MegaNodeUtil.getFolderIcon(node, drawerItem)

@@ -152,7 +152,7 @@ interface MegaNodeUtilWrapper {
      * @param node MegaNode to check
      * @return True if the node is a outgoing or a pending outgoing share, false otherwise
      */
-    fun isOutShare(node: MegaNode): Boolean
+    suspend fun isOutShare(node: MegaNode): Boolean
 
     /**
      * Gets the the icon that has to be displayed for a folder.

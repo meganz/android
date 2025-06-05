@@ -112,8 +112,8 @@ class FileBackupManager(
         ) {
             initBackupWarningState()
             when (actionType) {
-                ACTION_BACKUP_SHARE_FOLDER -> if (megaNode?.let { megaNodeUtilWrapper.isOutShare(it) } == true) {
-                    activity.lifecycleScope.launch {
+                ACTION_BACKUP_SHARE_FOLDER -> activity.lifecycleScope.launch {
+                    if (megaNode?.let { megaNodeUtilWrapper.isOutShare(it) } == true) {
                         val intent =
                             if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {
                                 FileContactListComposeActivity.newIntent(
@@ -129,9 +129,10 @@ class FileBackupManager(
                             }
                         intent.putExtra(Constants.NAME, megaNode.handle)
                         activity.startActivity(intent)
+
+                    } else {
+                        nodeController?.selectContactToShareFolder(megaNode)
                     }
-                } else {
-                    nodeController?.selectContactToShareFolder(megaNode)
                 }
 
                 ACTION_MENU_BACKUP_SHARE_FOLDER -> nodeController?.selectContactToShareFolders(
