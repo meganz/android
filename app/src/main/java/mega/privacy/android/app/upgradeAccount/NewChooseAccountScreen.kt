@@ -308,7 +308,6 @@ internal fun NewChooseAccountScreen(
                     benefits = listOf(
                         stringResource(id = sharedR.string.pro_plan_benefit_password_protected_links),
                         stringResource(id = sharedR.string.pro_plan_benefit_links_with_expiry_dates),
-                        stringResource(id = sharedR.string.pro_plan_benefit_transfer_quota_sharing),
                         stringResource(id = sharedR.string.pro_plan_benefit_auto_sync_mobile),
                         stringResource(id = sharedR.string.pro_plan_benefit_rewind_180_days),
                         stringResource(id = sharedR.string.pro_plan_benefit_host_calls_unlimited),
