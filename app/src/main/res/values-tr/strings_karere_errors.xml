@@ -9,9 +9,9 @@
     <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
     <string name="error_noent">Kaynak mevcut değil.</string>
     <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->
-    <string name="error_exist">Kaynak zaten var.</string>
+    <string name="error_exist">Kaynak zaten mevcut.</string>
     <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
     <string name="error_unknown">Bilinmeyen hata</string>
     <!-- Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation. -->
-    <string name="error_toomany">Bu kaynak için çok fazla kullanım.</string>
+    <string name="error_toomany">Bu kaynak için çok fazla kullanım var.</string>
 </resources>

@@ -885,7 +885,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">Kerahasiaan</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">Link ini tidak terkait dengan akun ini. Silahkan masuk dengan akun yang benar.</string>
+    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">Link batal ini telah kadarluarsa, coba lagi.</string>
     <!-- Text shown after searching and no results found -->
@@ -2986,8 +2986,6 @@
     <string name="disable_versioning_label">Nonaktifkan versi file</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">Fitur pembuatan versi file kami memastikan bahwa kami menyimpan salinan lama dari file anda jika anda menggantinya dengan versi yang lebih baru. Jika anda menonaktifkan Pembuatan Versi File, anda tidak akan lagi memiliki perlindungan ini; salinan lama akan hilang saat anda menggantinya.</string>
-    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
-    <string name="location_not_exist">Lokasi ini tidak ada lagi.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Anda sudah mengundang %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->

@@ -864,8 +864,6 @@
     <string name="transfers_notification_downloading_preview">Voorbereiden %1$s voor een voorvertoning</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">%1$svoorbereiden voor een weergave (gepauzeerd)</string>
-    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">‟%1$s” is verwijderd</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="one">”%1$s” is verwijderd uit de wachtrij</item>
@@ -917,16 +915,10 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie- en advertentie-instellingen</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">Een map op uw apparaat synchroniseren of er een back-up van maken met een map op MEGA. [U] Meer informatie [/U]</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="transfers_cancel_download_warning_title">Download annuleren?</string>
-    <!-- Confirmation message informing a download was successfully cancelled -->
-    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Hou er rekening mee dat ik mezelf</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">Hou het voor uzelf</string>
-    <!-- First message description in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_description">Stuur uzelf gevoelige informatie, foto\’s en video\’s of ideeën voor uw volgende grote onderneming. Gesynchroniseerd op al uw apparaten en beschermd met zero-knowledge codering.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="one">1 bestand toegevoegd aan “%1$s”. Dubbele bestanden kunnen niet opnieuw worden toegevoegd.</item>
@@ -934,8 +926,6 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">%1$sopslaan naar Cloud drive...</string>
-    <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_download">Er is iets misgegaan. De download was niet geannuleerd.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Er worden kosten in rekening gebracht %1$s onmiddellijk, maar uw abonnement zal niet automatisch na 12 maanden vernieuwen vanwege overheidsvoorschriften. Het is uw verantwoordelijkheid om uw abonnement te vernieuwen nadat het is verlopen. U kunt uw abonnement op elk gewenst moment beheren of annuleren via Abonnementen in [A]Google&#160;Play[/A]. Door uw account te upgraden, gaat u akkoord met MEGA\’s [B]Algemene Voorwaarden[/B] en [C]Privacybeleid[/C].</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
@@ -1047,7 +1037,7 @@
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_text">U kunt dit bestand niet langer bekijken</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again</string>
+    <string name="transfers_fake_preview_screen_general_error">Weergave kon niet worden geladen, probeer het opnieuw</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_preview_download">Er is iets misgegaan. De weergave is niet geannuleerd. Zie meldingen voor meer informatie.</string>
     <!-- Title of the Rename and Create Backup Dialog -->
@@ -1059,7 +1049,7 @@
     <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_positive_button">Hernoemen</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Een backupnaam invoeren</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
     <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">Er bestaat al een backup met deze naam. Voer een andere naam in.</string>
     <!-- USP Carousel page 1 title-->
@@ -1089,7 +1079,7 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Controleer de zichtbaarheid eenvoudig</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” - “User interface” in your app settings.</string>
+    <string name="hidden_nodes_description_control_visibility">Om verborgen bestanden weer te geven, zet u de instelling “Verborgen items weergeven” aan onder “Bestandsbeheer” - “Gebruikersinterface” in uw applicatie-instellingen.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Gedeelde bestanden blijven zichtbaar</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
@@ -1177,7 +1167,7 @@
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Gulle opslag</string>
     <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Store up to 16&#160;TB of data</string>
+    <string name="pro_plan_feature_storage_desc">Bewaar maximaal 16&#160;TB aan gegevens</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Overdrachtsdeling</string>
     <!-- Description for transfer sharing feature -->
@@ -1205,19 +1195,19 @@
     <!-- Benefit: Transfer quota sharing -->
     <string name="pro_plan_benefit_transfer_quota_sharing">Overdrachtstegoed deling</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
-    <string name="pro_plan_benefit_auto_sync_mobile">Automatically sync the folders on your mobile device</string>
+    <string name="pro_plan_benefit_auto_sync_mobile">De mappen automatisch synchroniseren op uw mobiele apparaat</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
-    <string name="pro_plan_benefit_rewind_180_days">Rewind up to 180 days of deleted data</string>
+    <string name="pro_plan_benefit_rewind_180_days">Terugspoelen van verwijderde gegevens tot 180 dagen</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
-    <string name="pro_plan_benefit_host_calls_unlimited">Host calls and meetings with unlimited participants and no time restrictions</string>
+    <string name="pro_plan_benefit_host_calls_unlimited">Organiseer gesprekken en vergaderingen met ongelimiteerde deelnemers en zonder tijdsbeperkingen</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
-    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Schedule Rubbish bin clearing between 7 days and 10 years</string>
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Plan het opruimen van de Prullenbak tussen 7 dagen en 10 jaar</string>
     <!-- Benefit: Priority support -->
     <string name="pro_plan_benefit_priority_support">Prioritaire ondersteuning</string>
     <!-- Subscription page information section title at the bottom of the page-->
     <string name="choose_account_screen_subscription_information_title">Abonnement details</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
-    <string name="choose_account_screen_subscription_information_description">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.\n\nYou can cancel your plan subscription any time but no later than 24 hours before your next subscription payment is due. [A]Learn how to manage your subscription in your settings[/A].</string>
+    <string name="choose_account_screen_subscription_information_description">Abonnementen worden automatisch verlengd voor opeenvolgende abonnementsperioden van dezelfde duur en tegen dezelfde prijs als de gekozen initiële periode.\n\nU kunt uw abonnement op elk gewenst moment opzeggen, maar niet later dan 24 uur voordat uw volgende abonnementsbetaling verschuldigd is. [A]Ontdek hoe u uw abonnement kunt beheren in uw instellingen[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
     <string name="choose_account_screen_terms_and_policies_link_text">[A]Algemene Voorwaarden en Privacybeleid[/A]</string>
     <!-- Get more with Pro plan title in choose account screen-->
@@ -1233,50 +1223,52 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s opslag</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
-    <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
+    <string name="choose_account_screen_transfer_quota_label">%1$s overdracht</string>
     <!-- General month label -->
     <string name="general_month">maand</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s per maand</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">%1$s charged yearly</string>
+    <string name="choose_account_screen_billed_yearly">%1$s jaarlijks in rekening gebracht</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
-        <item quantity="one">%1$d item unhidden</item>
-        <item quantity="other">%1$d items unhidden</item>
+        <item quantity="one">%1$d items niet verborgen</item>
+        <item quantity="other">%1$d items niet verborgen</item>
     </plurals>
     <!-- Title for secure slideshow mode tutorial -->
-    <string name="slideshow_tutorial_title">Play slideshows securely</string>
+    <string name="slideshow_tutorial_title">Slideshows veilig afspelen</string>
     <!-- Step 1 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step1">Press the power button to lock your screen.</string>
+    <string name="slideshow_tutorial_step1">Druk op de aan/uit-knop om het scherm te vergrendelen.</string>
     <!-- Step 2 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step2">Wait for 2 seconds.</string>
+    <string name="slideshow_tutorial_step2">Wacht 2 seconden.</string>
     <!-- Step 3 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step3">Press the power button again to turn the screen back on.</string>
+    <string name="slideshow_tutorial_step3">Druk opnieuw op de aan/uit-knop om het scherm weer in te schakelen.</string>
     <!-- Note indicating the slideshow plays securely while locked -->
-    <string name="slideshow_tutorial_note">The slideshow will play while your device remains securely locked.</string>
+    <string name="slideshow_tutorial_note">De diavoorstelling wordt afgespeeld terwijl uw apparaat veilig vergrendeld blijft.</string>
     <!-- State to indicate an achievement has applied -->
-    <string name="applied_label">Applied</string>
+    <string name="applied_label">Toegepast</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
-    <string name="title_start_mega_vpn_free_trial">Start MEGA&#160;VPN free trial</string>
+    <string name="title_start_mega_vpn_free_trial">MEGA&#160;VPN gratis proefversie starten</string>
     <!-- Text of the section for start mega vpn free trial in achivements section -->
-    <string name="text_start_mega_vpn_free_trial">%1$s of storage. Valid permanently.</string>
+    <string name="text_start_mega_vpn_free_trial">%1$s aan opslag. Permanent geldig.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
-    <string name="title_start_mega_pass_free_trial">Start MEGA&#160;Pass free trial</string>
+    <string name="title_start_mega_pass_free_trial">MEGA&#160;Pass gratis proefversie starten</string>
     <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s of storage. Valid permanently.</string>
+    <string name="text_start_mega_pass_free_trial">%1$s aan opslag. Permanent geldig.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
-    <string name="button_text_install_mega_vpn">Install MEGA&#160;VPN</string>
+    <string name="button_text_install_mega_vpn">MEGA&#160;VPN installeren</string>
     <!-- Text of the button for install mega pass in achivements section -->
-    <string name="button_text_install_mega_pass">Install MEGA&#160;Pass</string>
+    <string name="button_text_install_mega_pass">MEGA&#160;Pass installeren</string>
     <!-- title of how it works for mega vpn free trial in achivements section -->
     <string name="title_how_it_works_free_trial">Hoe het werkt</string>
     <!-- text of how it works for mega vpn free trial in achivements section -->
-    <string name="text_how_it_works_mega_vpn_free_trial">Install the MEGA&#160;VPN app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
+    <string name="text_how_it_works_mega_vpn_free_trial">Installeer de MEGA&#160;VPN-applicatie, inloggen met uw MEGA-account en uw gratis proefperiode starten. Uw bonusopslag wordt automatisch toegevoegd na het starten van uw gratis proefperiode.</string>
     <!-- text of how it works for mega pass free trial in achivements section -->
-    <string name="text_how_it_works_mega_pass_free_trial">Install the MEGA&#160;Pass app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
+    <string name="text_how_it_works_mega_pass_free_trial">Installeer de MEGA&#160;Pass-applicatie, log in met uw MEGA-account en uw gratis proefperiode starten. Uw bonusopslag wordt automatisch toegevoegd na het starten van uw gratis proefperiode.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">You have received %1$s storage space for starting a MEGA&#160;VPN free trial</string>
+    <string name="text_received_mega_vpn_free_trial">U heeft %1$saan opslagruimte voor het starten van een MEGA&#160;VPN gratis proefversie ontvangen</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">You have received %1$s storage space for starting a MEGA&#160;Pass free trial</string>
+    <string name="text_received_mega_pass_free_trial">U heeft %1$saan opslagruimte voor het starten van een MEGA&#160;Pass gratis proefversie ontvangen</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">Sommige mappen kunnen niet worden gesynchroniseerd of er kan geen back-up van worden gemaakt omdat de MEGA-applicatie geen rechten meer heeft om toegang te krijgen tot de lokale mappen. Tik op Hervatten om machtigingen opnieuw toe te voegen voor elke betreffende map.</string>
 </resources>

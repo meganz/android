@@ -913,7 +913,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">Confidencialidad</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">El enlace no está relacionado con esta cuenta. Inicia sesión con la cuenta correcta.</string>
+    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">El enlace para cancelar la cuenta ha caducado, solicita uno nuevo.</string>
     <!-- Text shown after searching and no results found -->
@@ -1092,7 +1092,7 @@
     <!-- Title of the tab section for transfers in progress -->
     <string name="title_tab_in_progress_transfers">En curso</string>
     <!-- Title of the tab section for completed transfers -->
-    <string name="title_tab_completed_transfers">Completado</string>
+    <string name="title_tab_completed_transfers">Completadas</string>
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
     <string name="transfer_paused">En pausa</string>
     <!-- Possible state of a transfer -->
@@ -3148,8 +3148,6 @@
     <string name="disable_versioning_label">Desactivar versionado de archivos</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">El control de versiones te permite mantener copias antiguas de tus archivos si los reemplazas con versiones nuevas. Si desactivas el control de versiones, ya no tendrás esta posibilidad; la copia anterior se perderá cuando la reemplaces.</string>
-    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
-    <string name="location_not_exist">Esta ubicación ya no existe.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Ya has invitado a %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
@@ -5099,7 +5097,7 @@
     <!-- Camera uploads updated info in Photos screen. -->
     <string name="photos_camera_uploads_updated">Subidas de la cámara actualizadas</string>
     <!-- Camera uploads no internet info in Photos screen. -->
-    <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
+    <string name="photos_camera_uploads_no_internet">La subida se ha detenido debido a la falta de conexión a Internet</string>
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">La subida está en pausa porque la batería está por debajo del %1$d&#160;%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->

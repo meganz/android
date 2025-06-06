@@ -148,4 +148,6 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">Ein Verschiebe- oder Umbenennungsvorgang wurde lokal erkannt, konnte jedoch auf MEGA nicht repliziert werden.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Abschluss des Scanvorgangs wird abgewartet, um zu bestimmen, ob die Datei verschoben oder gelöscht wurde.</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">Einige Ordner können nicht synchronisiert oder gesichert werden, da die MEGA-App keine Zugriffsrechte mehr auf die lokalen Ordner hat. Tippen Sie auf Fortsetzen, um die Berechtigungen für jeden betroffenen Ordner neu zu vergeben.</string>
 </resources>

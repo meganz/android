@@ -878,8 +878,6 @@
     <string name="transfers_notification_downloading_preview">Preparando %1$s para ser visualizado</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">Preparando %1$s para visualização (em pausa)</string>
-    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">‟%1$s” foi removido</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="one">“%1$s” foi removido da lista</item>
@@ -932,16 +930,10 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Configurações de cookies e anúncios</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">Sincronize ou faça backup de uma pasta no seu dispositivo com uma pasta no MEGA. [U]Mais informações[/U]</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="transfers_cancel_download_warning_title">Cancelar o download?</string>
-    <!-- Confirmation message informing a download was successfully cancelled -->
-    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Lembrete</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">Guarde para você</string>
-    <!-- First message description in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_description">Envie informações confidenciais, fotos, vídeos e ideias do seu próximo projeto para você mesmo. Sincronizado em todos os seus dispositivos e protegido com criptografia de conhecimento zero.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="one">1 arquivo foi adicionado a “%1$s”. Arquivos duplicados não podem ser adicionados novamente.</item>
@@ -950,8 +942,6 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Salvando %1$s na Nuvem de arquivos&#8230;</string>
-    <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_download">Não foi possível cancelar o download.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Neste momento, você receberá uma cobrança no valor de %1$s, mas a sua assinatura não será renovada automaticamente após 12 meses devido a regulamentações governamentais. Será sua responsabilidade renovar a sua assinatura depois que ela expirar. Você pode gerenciar ou cancelar a sua assinatura a qualquer momento por meio das Assinaturas na [A]Google&#160;Play Store[/A]. Ao fazer o upgrade, você concorda com os [B]Termos de serviço[/B] e a [C]Política de privacidade [/C] do MEGA.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
@@ -1296,4 +1286,6 @@
     <string name="text_received_mega_vpn_free_trial">Você recebeu %1$s de espaço de armazenamento adicional por iniciar o teste gratuito da MEGA&#160;VPN</string>
     <!-- text of received mega pass free trial in achivements section -->
     <string name="text_received_mega_pass_free_trial">Você recebeu %1$s de espaço de armazenamento adicional por iniciar o teste gratuito do MEGA&#160;Pass</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">Não é possível sincronizar ou fazer backup de algumas pastas, pois o aplicativo do MEGA já não tem permissão para acessar as pastas locais. Pressione Continuar para adicionar novamente as permissões para cada pasta afetada.</string>
 </resources>

@@ -135,7 +135,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Um erro local está impedindo o acesso à pasta</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Erro no sistema de arquivos impedindo o acesso à pasta.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">O objetivo é muito profundo na estrutura da sua pasta.\nMova-a para uma localização com menos de 64 pastas.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -152,4 +152,6 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">Foi detectada no dispositivo local uma ação para mover ou renomear, mas não foi possível replicá-la no MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Esperando terminar de escanear para comprovar se o arquivo foi movido ou deletado.</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">Não é possível sincronizar ou fazer backup de algumas pastas, pois o aplicativo do MEGA já não tem permissão para acessar as pastas locais. Pressione Continuar para adicionar novamente as permissões para cada pasta afetada.</string>
 </resources>

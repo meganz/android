@@ -144,4 +144,6 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">Một việc di&#160;chuyển hoặc đổi tên đã được phát hiện tại cục&#160;bộ, nhưng không thể phỏng&#160;y&#160;theo trên MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Đang chờ cho quá&#160;trình quét kết&#160;thúc để xác&#160;định xem có tệp&#160;tin nào đã di chuyển hay bị xóa.</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
 </resources>

@@ -7,9 +7,9 @@
     <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
     <string name="api_eargs">Geçersiz argüman</string>
     <!-- Label to show that a request error occurs during a SDK operation. -->
-    <string name="api_eagain">İstek başarısız oldu, yeniden deneniyor</string>
+    <string name="api_eagain">İstek başarısız, tekrar deneniyor</string>
     <!-- Label to show that the rate limit has been reached during a SDK operation. -->
-    <string name="api_eratelimit">Hız sınırı aşıldı</string>
+    <string name="api_eratelimit">İstek sınırı aşıldı</string>
     <!-- Label to show that a SDK operation has failed permanently. -->
     <string name="api_efailed">Kalıcı olarak başarısız oldu</string>
     <!-- Error shown when terms of service are breached during download. -->
@@ -17,29 +17,29 @@
     <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
     <string name="api_etoomay">Çok fazla eşzamanlı bağlantı veya aktarım</string>
     <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
-    <string name="api_erange">Menzil dışında</string>
+    <string name="api_erange">Aralık dışında</string>
     <!-- State to indicate something has expired (achivements of business status account for instance) -->
     <string name="api_eexpired">Süresi doldu</string>
     <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
     <string name="api_enoent">Bulunamadı</string>
     <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
-    <string name="api_ecircular">Dairesel bağlantı tespit edildi</string>
+    <string name="api_ecircular">Döngüsel bağlantı algılandı</string>
     <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
     <string name="api_eaccess">Erişim reddedildi</string>
     <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
-    <string name="api_eexist">Zaten var</string>
+    <string name="api_eexist">Zaten mevcut</string>
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
-    <string name="api_eincomplete">Tamamlanmamış</string>
+    <string name="api_eincomplete">Eksik</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">Şifre çözme hatası</string>
+    <string name="api_ekey">Şifreleme çözme hatası</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
-    <string name="api_esid">Kötü oturum kimliği</string>
+    <string name="api_esid">Hatalı oturum kimliği</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Engellendi</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
-    <string name="api_eoverquota">Kotanın aşımı</string>
+    <string name="api_eoverquota">Kota aşıldı</string>
     <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
-    <string name="api_etempunavail">Geçici olarak müsait değil</string>
+    <string name="api_etempunavail">Geçici olarak kullanılamıyor</string>
     <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
     <string name="api_etoomanyconnections">Bağlantı taşması</string>
     <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
@@ -53,7 +53,7 @@
     <!-- Label shown when current account does not have enough quota to complete the operation -->
     <string name="api_egoingoverquota">Yeterli kota yok</string>
     <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
-    <string name="api_emfarequired">İki faktörlü kimlik doğrulama gereklidir.</string>
+    <string name="api_emfarequired">İki faktörlü kimlik doğrulama gerekli.</string>
     <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
     <string name="api_emasteronly">Yönetici olmayan kullanıcılar için erişim reddedildi</string>
     <!-- A dialog title shown to users when their business account is expired. -->
@@ -67,11 +67,11 @@
     <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
     <string name="payment_etoomay">Çok fazla istek</string>
     <!-- Label to show that an error of Balance occurs during a SDK operation. -->
-    <string name="payment_ebalance">Denge hatası</string>
+    <string name="payment_ebalance">Bakiye hatası</string>
     <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
     <string name="payment_egeneric_api_error_unknown">Bilinmeyen hata</string>
     <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
     <string name="api_error_http">HTTP Hatası</string>
     <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->
-    <string name="api_ecircular_ec_upload">Yinelemeli dizin yapısı nedeniyle aktarım başarısız oldu</string>
+    <string name="api_ecircular_ec_upload">Özyinelemeli dizin yapısı nedeniyle aktarım başarısız oldu</string>
 </resources>

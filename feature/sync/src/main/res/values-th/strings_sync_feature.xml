@@ -127,7 +127,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">ไม่สามารถสร้างโฟลเดอร์ได้เนื่องจากข้อผิดพลาดภายในระบบ</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">ข้อผิดพลาดของระบบไฟล์ทำให้เข้าถึงโฟลเดอร์ไม่ได้</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">ปลายทางโฟลเดอร์ของคุณอยู่ลึกเกินไป\nกรุณาย้ายไปยังโฟลเดอร์ที่ลึกไม่เกิน 64 โฟลเดอร์</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -144,4 +144,6 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">ตรวจพบการย้ายหรือเปลี่ยนชื่อไฟล์ในอุปกรณ์ แต่ไม่สามารถอัปเดตรายการใน MEGA ให้ตรงกันได้</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">กำลังรอการสแกนเพื่อดูว่าไฟล์ถูกย้ายหรือลบไปหรือไม่</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">โฟลเดอร์บางรายการไม่สามารถซิงค์หรือสำรองข้อมูลได้ เนื่องจากแอป MEGA สูญเสียสิทธิ์ในการเข้าถึงโฟลเดอร์ในเครื่อง แตะ ดำเนินการต่อ เพื่อเพิ่มสิทธิ์สำหรับแต่ละโฟลเดอร์ที่ได้รับผลกระทบอีกครั้ง</string>
 </resources>

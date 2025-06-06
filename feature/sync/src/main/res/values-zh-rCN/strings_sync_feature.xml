@@ -144,4 +144,6 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">在本地检测到移动或重命名操作，但无法在MEGA中复制。</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">等待扫描完成以确定文件是否已移动或删除。</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
 </resources>

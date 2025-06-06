@@ -885,7 +885,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">เป็นความลับ</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">ลิงก์นี้ไม่เกี่ยวข้องกับบัญชีนี้ กรุณาเข้าสู่ระบบด้วยบัญชีที่ถูกต้อง</string>
+    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">ลิงก์ยกเลิกนี้หมดอายุแล้ว กรุณาลองอีกครั้ง</string>
     <!-- Text shown after searching and no results found -->
@@ -2986,8 +2986,6 @@
     <string name="disable_versioning_label">ปิดใช้งานการจัดเตรียมไฟล์</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">ฟีเจอร์การกำหนดเวอร์ชันไฟล์ของเราช่วยให้มั่นใจได้ว่าเราจะเก็บสำเนาไฟล์เก่าของคุณไว้หากคุณแทนที่ด้วยเวอร์ชันที่ใหม่กว่า หากคุณปิดใช้งานการกำหนดเวอร์ชันไฟล์ คุณจะไม่ได้รับการป้องกันเกี่ยวกับเวอร์ชันไฟล์ใด ๆ ของคุณอีกต่อไป สำเนาเก่าจะหายไปเมื่อคุณเปลี่ยน</string>
-    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
-    <string name="location_not_exist">ตำแหน่งที่ตั้งนี้ไม่มีอยู่แล้ว</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">คุณเคยเชิญ %1$s แล้ว</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
@@ -3453,9 +3451,9 @@
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">มุมมองแกลเลอรี่</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
+    <string name="settings_media_discovery_view_context">เปิดโฟลเดอร์ที่มีเฉพาะรูปภาพหรือวิดีโอในรูปแบบตาราง ดูสื่อจากรูปขนาดย่อ และกรองตามวันที่</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in gallery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">เนื่องจากโฟลเดอร์นี้มีเพียงรูปภาพและวิดีโอ เราจึงเปิดในมุมมองแกลเลอรี่โดยอัตโนมัติ คุณจะเพลิดเพลินกับเนื้อหาสื่อที่ดูได้เต็มตามากขึ้น คุณปิดใช้งานฟังก์ชันนี้ได้ในการตั้งค่า</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">ตั้งค่า</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4499,9 +4497,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">ต้นฉบับ</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Gallery view in subfolders</string>
+    <string name="settings_media_discovery_sub_folder_title">มุมมองแกลเลอรี่ในโฟลเดอร์ย่อย</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in gallery view</string>
+    <string name="settings_media_discovery_sub_folder_context">รูปภาพและวิดีโอจากโฟลเดอร์ย่อยจะแสดงในมุมมองแกลเลอรี่ด้วย</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">ไม่พบรายการค้นหา</string>
     <!-- Description text in empty search screen when images filter selected -->
