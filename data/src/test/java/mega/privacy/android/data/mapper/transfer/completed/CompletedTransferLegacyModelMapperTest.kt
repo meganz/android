@@ -63,6 +63,8 @@ internal class CompletedTransferLegacyModelMapperTest {
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             parentHandle = 11622336899311L,
             appData = "appData",
+            displayPath = null,
+            errorCode = null,
         )
         whenever(decryptData(entity.fileName)).thenReturn(entity.fileName)
         whenever(decryptData(entity.type)).thenReturn(entity.type)
@@ -111,6 +113,8 @@ internal class CompletedTransferLegacyModelMapperTest {
             originalPath = "",
             parentHandle = -1L,
             appData = null,
+            displayPath = null,
+            errorCode = null,
         )
         whenever(decryptData(entity.fileName)).thenReturn(null)
         whenever(decryptData(entity.type)).thenReturn(null)
@@ -160,6 +164,8 @@ internal class CompletedTransferLegacyModelMapperTest {
                 originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
                 parentHandle = -1L,
                 appData = "appData",
+                displayPath = null,
+                errorCode = null,
             )
             whenever(decryptData(entity.fileName)).thenReturn(entity.fileName)
             whenever(decryptData(entity.type)).thenReturn(entity.type)

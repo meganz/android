@@ -803,49 +803,6 @@ class DefaultTransfersRepositoryTest {
         }
 
     @Test
-    fun `test that addCompletedTransfersIfNotExist if there are no completed transfers in data base`() =
-        runTest {
-            val transfer1 = mock<Transfer>()
-            val transfer2 = mock<Transfer>()
-            val completedTransfer1 = getCompletedTransfer("transfer1")
-            val completedTransfer2 = getCompletedTransfer("transfer2")
-
-            whenever(megaLocalRoomGateway.getCompletedTransfers()).thenReturn(flowOf(emptyList()))
-            whenever(completedTransferMapper(transfer1, null)).thenReturn(completedTransfer1)
-            whenever(completedTransferMapper(transfer2, null)).thenReturn(completedTransfer2)
-
-            underTest.addCompletedTransfersIfNotExist(listOf(transfer1, transfer2))
-
-            verify(megaLocalRoomGateway).getCompletedTransfers()
-            verify(completedTransferMapper).invoke(transfer1, null)
-            verify(completedTransferMapper).invoke(transfer2, null)
-            verify(megaLocalRoomGateway)
-                .addCompletedTransfers(listOf(completedTransfer1, completedTransfer2))
-        }
-
-    @Test
-    fun `test that addCompletedTransfersIfNotExist invokes correctly if some of the received transfers are not in data base`() =
-        runTest {
-            val transfer1 = mock<Transfer>()
-            val transfer2 = mock<Transfer>()
-            val completedTransfer1 = getCompletedTransfer("transfer1")
-            val completedTransfer2 = getCompletedTransfer("transfer2")
-            val completedTransfer3 = getCompletedTransfer("transfer3")
-
-            whenever(megaLocalRoomGateway.getCompletedTransfers())
-                .thenReturn(flowOf(listOf(completedTransfer1, completedTransfer3)))
-            whenever(completedTransferMapper(transfer1, null)).thenReturn(completedTransfer1)
-            whenever(completedTransferMapper(transfer2, null)).thenReturn(completedTransfer2)
-
-            underTest.addCompletedTransfersIfNotExist(listOf(transfer1, transfer2))
-
-            verify(megaLocalRoomGateway).getCompletedTransfers()
-            verify(completedTransferMapper).invoke(transfer1, null)
-            verify(completedTransferMapper).invoke(transfer2, null)
-            verify(megaLocalRoomGateway).addCompletedTransfers(listOf(completedTransfer2))
-        }
-
-    @Test
     fun `test that monitorCompletedTransfer returns the result of app event gateway monitorCompletedTransfer`() =
         runTest {
             val expected = CompletedTransferState.Completed
@@ -1963,5 +1920,7 @@ class DefaultTransfersRepositoryTest {
         originalPath = "localPath",
         parentHandle = 2L,
         appData = null,
+        displayPath = null,
+        errorCode = null,
     )
 }

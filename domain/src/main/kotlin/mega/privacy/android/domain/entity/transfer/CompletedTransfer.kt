@@ -12,8 +12,10 @@ import java.io.File
  * @property size the size of the file
  * @property handle the handle of the node associated to the transfer
  * @property path the path of the node in case of a transfer to the cloud, the destination path in case of a transfer to SD card
+ * @property displayPath if path represents a content:// uri, this represents the path to display to the user if it's possible to get
  * @property isOffline true if the file is available offline
- * @property error the int representing the errorCode returned by API
+ * @property error the String representing the errorCode, if [errorCode] is not null is the raw string returned by the SDK
+ * @property errorCode the int representing the errorCode returned by API
  * @property originalPath the original local path of the file transferred
  * @property parentHandle  the parent handle of the file transferred
  * @property timestamp represents the time when the transfer is completed
@@ -27,9 +29,11 @@ data class CompletedTransfer(
     val size: String,
     val handle: Long,
     var path: String,
+    val displayPath: String?,
     var isOffline: Boolean?,
     val timestamp: Long,
     val error: String?,
+    val errorCode: Int?,
     val originalPath: String,
     val parentHandle: Long,
     val appData: String?,

@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -488,31 +487,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.addCompletedTransfers(completedTransfers)
         removeInProgressTransfers(pendingTransfers.mapNotNull { it.transferUniqueId }.toSet())
         appEventGateway.broadcastCompletedTransfer(CompletedTransferState.Error)
-    }
-
-    override suspend fun addCompletedTransfersIfNotExist(transfers: List<Transfer>) {
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.getCompletedTransfers().firstOrNull().orEmpty()
-                .let { completedDBTransfers ->
-                    if (completedDBTransfers.isEmpty()) {
-                        transfers.map { completedTransferMapper(it, null) }
-                    } else {
-                        //remove id before comparison
-                        val updatedCompletedDBTransfers =
-                            completedDBTransfers.map { it.copy(id = null) }
-
-                        transfers.mapNotNull { transfer ->
-                            completedTransferMapper(transfer, null).takeIf {
-                                it !in updatedCompletedDBTransfers
-                            }
-                        }
-                    }
-                }.also {
-                    if (it.isNotEmpty()) {
-                        megaLocalRoomGateway.addCompletedTransfers(it)
-                    }
-                }
-        }
     }
 
     override suspend fun deleteOldestCompletedTransfers() = withContext(ioDispatcher) {

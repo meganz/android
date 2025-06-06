@@ -361,5 +361,7 @@ class TransfersViewTest {
         originalPath = "/data/user/0/mega.privacy.android.app/DCIM/Camera/$id-fileName",
         parentHandle = 11622336899311L,
         appData = "appData",
+        displayPath = null,
+        errorCode = null,
     )
 }

@@ -198,9 +198,11 @@ class CompletedTransferDaoTest {
             size = "3.57 MB",
             handle = 27169983390750L,
             path = "Cloud drive/Camera uploads",
+            displayPath = null,
             isOffline = false,
             timestamp = 1684228012974L,
             error = "No error",
+            errorCode = null,
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             parentHandle = 11622336899311L,
             appData = "appData"

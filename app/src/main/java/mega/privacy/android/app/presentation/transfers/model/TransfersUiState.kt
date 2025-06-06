@@ -3,9 +3,7 @@ package mega.privacy.android.app.presentation.transfers.model
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableMap
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -36,7 +34,6 @@ data class TransfersUiState(
     val isTransferOverQuota: Boolean = false,
     val areTransfersPaused: Boolean = false,
     val completedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
-    val completedTransfersPaths: ImmutableMap<Int, String> = emptyMap<Int, String>().toImmutableMap(),
     val selectedCompletedTransfersIds: ImmutableList<Int>? = null,
     val failedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
     val selectedFailedTransfersIds: ImmutableList<Int>? = null,

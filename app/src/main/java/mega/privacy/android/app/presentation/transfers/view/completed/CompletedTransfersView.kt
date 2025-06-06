@@ -15,7 +15,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableMap
 import mega.privacy.android.app.presentation.transfers.model.image.CompletedTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_COMPLETED_TAB
@@ -28,7 +27,6 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 internal fun CompletedTransfersView(
     completedTransfers: ImmutableList<CompletedTransfer>,
-    completedTransfersPaths: ImmutableMap<Int, String>,
     selectedCompletedTransfersIds: ImmutableList<Int>?,
     onCompletedTransferSelected: (CompletedTransfer) -> Unit,
     lazyListState: LazyListState,
@@ -51,7 +49,6 @@ internal fun CompletedTransfersView(
             items(items = completedTransfers, key = { it.id ?: 0 }) { item ->
                 CompletedTransferItem(
                     completedTransfer = item,
-                    realPath = completedTransfersPaths[item.id ?: -1] ?: item.path,
                     isSelected = selectedCompletedTransfersIds?.contains(item.id) == true,
                     modifier = Modifier.then(
                         if (selectMode) {
@@ -72,7 +69,6 @@ internal fun CompletedTransfersView(
 @Composable
 internal fun CompletedTransferItem(
     completedTransfer: CompletedTransfer,
-    realPath: String,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
     viewModel: CompletedTransferImageViewModel = hiltViewModel(),
@@ -89,7 +85,7 @@ internal fun CompletedTransferItem(
             fileTypeResId = uiState.fileTypeResId,
             previewUri = uiState.previewUri,
             fileName = fileName,
-            location = realPath,
+            location = displayPath ?: path,
             sizeString = size,
             date = TimeUtils.formatLongDateTime(timestamp.milliseconds.inWholeSeconds),
             isSelected = isSelected,

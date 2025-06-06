@@ -8,7 +8,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -35,7 +34,6 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
-import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsUriPathInCacheUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
@@ -46,7 +44,6 @@ import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTra
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadParentDocumentFileUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
@@ -84,8 +81,6 @@ class TransfersViewModel @Inject constructor(
     private val isUriPathInCacheUseCase: IsUriPathInCacheUseCase,
     private val transferAppDataMapper: TransferAppDataMapper,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
-    private val getDownloadParentDocumentFileUseCase: GetDownloadParentDocumentFileUseCase,
-    private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -169,8 +164,6 @@ class TransfersViewModel @Inject constructor(
             monitorCompletedTransfersUseCase().conflate().collect { completedTransfers ->
                 val (completed, failed) = completedTransfers.partition { it.state == MegaTransfer.STATE_COMPLETED }
 
-                getCompletedTransfersPaths(completed)
-
                 _uiState.update { state ->
                     state.copy(
                         completedTransfers = completed
@@ -182,29 +175,6 @@ class TransfersViewModel @Inject constructor(
             }
         }
     }
-
-    private fun getCompletedTransfersPaths(completedTransfers: List<CompletedTransfer>) {
-        viewModelScope.launch {
-            val paths = completedTransfers
-                .mapNotNull { transfer -> transfer.id?.let { id -> id to transfer.getRealPath() } }
-                .toMap()
-
-            _uiState.update { state ->
-                state.copy(completedTransfersPaths = paths.toImmutableMap())
-            }
-        }
-    }
-
-    private suspend fun CompletedTransfer.getRealPath(): String =
-        if (isContentUriDownload) {
-            uiState.value.completedTransfersPaths[id] ?: runCatching {
-                getDownloadParentDocumentFileUseCase(path)?.let {
-                    getPathByDocumentContentUriUseCase(it.uri.value)
-                }
-            }.onFailure { Timber.w(it) }.getOrNull() ?: path
-        } else {
-            path
-        }
 
     /**
      * Pause or resume a transfer by tag.

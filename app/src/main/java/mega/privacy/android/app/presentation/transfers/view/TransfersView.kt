@@ -180,7 +180,6 @@ internal fun TransfersView(
                     ) { _, listState, modifier ->
                         CompletedTransfersView(
                             completedTransfers = completedTransfers,
-                            completedTransfersPaths = completedTransfersPaths,
                             lazyListState = listState,
                             onCompletedTransferSelected = onCompletedTransferSelected,
                             selectedCompletedTransfersIds = selectedCompletedTransfersIds,

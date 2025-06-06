@@ -5,6 +5,8 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.transfer.completed.API_EOVERQUOTA_FOREIGN
+import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -28,6 +30,7 @@ class CompletedTransferMapper @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val deviceGateway: DeviceGateway,
     private val fileGateway: FileGateway,
+    private val documentFileWrapper: DocumentFileWrapper,
     private val stringWrapper: StringWrapper,
     private val transferTypeIntMapper: TransferTypeIntMapper,
     private val transferStateIntMapper: TransferStateIntMapper,
@@ -57,10 +60,14 @@ class CompletedTransferMapper @Inject constructor(
                 isOffline = isOffline,
                 path = formatTransferPath(transfer, isOffline),
                 timestamp = deviceGateway.now,
-                error = error?.let { getErrorString(transfer, it) },
+                error = error?.errorString,
+                errorCode = error?.let { getErrorCode(transfer, it) },
                 originalPath = transfer.localPath,
                 parentHandle = transfer.parentHandle,
-                appData = transferAppDataStringMapper(transfer.appData)
+                appData = transferAppDataStringMapper(transfer.appData),
+                displayPath = documentFileWrapper.getDocumentFile(transfer.parentPath)?.let {
+                    documentFileWrapper.getAbsolutePathFromContentUri(it.uri)
+                }?.takeIf { it.isNotBlank() },
             )
         }
 
@@ -113,11 +120,9 @@ class CompletedTransferMapper @Inject constructor(
      * @param error    MegaError of the transfer.
      * @return The error to show as cause of the failure.
      */
-    private fun getErrorString(transfer: Transfer, error: MegaException): String =
-        if (error is QuotaExceededMegaException && transfer.isForeignOverQuota)
-            stringWrapper.getErrorStorageQuota()
-        else
-            stringWrapper.getErrorStringResource(error)
+    private fun getErrorCode(transfer: Transfer, error: MegaException): Int =
+        if (error is QuotaExceededMegaException && transfer.isForeignOverQuota) API_EOVERQUOTA_FOREIGN
+        else error.errorCode
 
     /**
      * Format the path of a node.
