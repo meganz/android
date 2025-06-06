@@ -135,7 +135,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">O eroare locală împiedică accesul la folder</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Eroare de sistem de fișiere care împiedică accesul la folder.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Ținta este prea adâncă în structura folderului.\nVă rugăm să îl mutați într-o locație care are o adâncime mai mică de 64 de foldere.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -152,4 +152,6 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">O mutare sau redenumire a fost detectată local, dar nu a putut fi replicată în MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Așteptarea finalizării scanării pentru a determina dacă fișierul a fost mutat sau șters.</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">Unele foldere nu pot fi sincronizate sau copiate de rezervă, deoarece aplicația MEGA a pierdut permisiunile de acces la folderele locale. Atingeți Reluare pentru a adăuga din nou permisiunile pentru fiecare folder afectat.</string>
 </resources>

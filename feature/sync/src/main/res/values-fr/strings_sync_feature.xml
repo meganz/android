@@ -135,7 +135,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Une erreur locale empêche l’accès au dossier</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Erreur du système de fichiers empêchant l\’accès au dossier.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">La cible est située trop profondément dans votre structure de dossiers.\nDéplacez-la vers un emplacement dont la profondeur est inférieure à 64&#160;dossiers.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -152,4 +152,6 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">Un déplacement ou un renommage a été détecté localement, mais n’a pas pu être reproduit sur MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Attente de la fin de l’analyse pour déterminer si le fichier a été déplacé ou supprimé.</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">Certains dossiers ne peuvent pas être synchronisés ou sauvegardés car l\’application MEGA a perdu les autorisations d\’accès aux dossiers locaux. Appuyez sur Reprendre pour rétablir les autorisations pour chaque dossier concerné.</string>
 </resources>

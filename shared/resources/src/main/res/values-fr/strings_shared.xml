@@ -693,7 +693,7 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favoris</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No syncs or backups have been set up yet</string>
+    <string name="device_center_sync_backup_list_empty_state_title">Aucune synchronisation ou sauvegarde n\’a encore été mise en place.</string>
     <!-- Message of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_message">Synchronisez ou sauvegardez un dossier sur votre appareil avec un dossier sur MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
@@ -878,8 +878,6 @@
     <string name="transfers_notification_downloading_preview">Préparation %1$s pour un aperçu</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">Préparation %1$s pour un aperçu (en pause)</string>
-    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">«%1$s» a été supprimé</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="one">«%1$s» a été retiré de la file d\’attente</item>
@@ -932,16 +930,10 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Paramètres relatifs aux cookies et aux annonces</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">Synchroniser ou sauvegarder un dossier sur votre appareil avec un dossier sur MEGA. [U]En apprendre davantage[/U]</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="transfers_cancel_download_warning_title">Annuler le téléchargement&#160;?</string>
-    <!-- Confirmation message informing a download was successfully cancelled -->
-    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Note pour moi-même</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">Gardez-le pour vous</string>
-    <!-- First message description in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_description">Envoyez-vous des renseignements sensibles, des photos et des vidéos, ou des idées pour votre prochaine grande entreprise. Synchronisé sur tous vos appareils et protégé par un chiffrement à divulgation nulle de connaissance.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="one">1 fichier ajouté à&#160;«%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
@@ -950,10 +942,8 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Enregistrement %1$s vers Disque nuagique&#8230;</string>
-    <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_download">Quelque chose s\’est mal passé. Le téléchargement n\’a pas été annulé.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Vous serez facturé %1$s immédiatement mais votre abonnement ne sera pas automatiquement renouvelé après 12 mois en raison des réglementations gouvernementales. Il vous incombera de renouveler votre abonnement après son expiration. Vous pouvez gérer ou annuler votre abonnement à tout moment via les Abonnements dans [A]Google&#160;Play[/A]. En mettant à jour votre compte, vous acceptez les [B]Conditions d\’utilisation[/B] et la [C]Politique de confidentialité[/C] de MEGA.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Téléversement&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -973,7 +963,7 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">Le courriel a été envoyé</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">An error occurred, try again</string>
+    <string name="general_request_failed_message">Une erreur s\’est produite, veuillez réessayer</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Votre compte MEGA a été désactivé en raison d’allégations répétées de violation des droits d’auteur. Cela signifie que vous ne pouvez ni accéder à votre compte ni à ses données.\nPour de plus amples renseignements sur la manière de déposer un contre-avis, vérifiez votre boîte de réception des courriels.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -1001,25 +991,25 @@
     <!-- First message header paragraph in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header_paragraph">Un espace privé pour des photos, des renseignements importants ou de grandes idées. Toujours synchronisé et protégé par un chiffrement à divulgation nulle de connaissance.</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <string name="general_sync_notification_low_battery_title">Synchronisation mise en pause en raison d\’une batterie faible</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <string name="general_sync_notification_low_battery_text">Rechargez votre appareil pour reprendre</string>
     <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <string name="general_sync_notification_lost_wifi_title">Synchronisation mise en pause en raison d\’une perte de connexion</string>
     <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <string name="general_sync_notification_lost_wifi_text">Reconnectez-vous au Wi-Fi pour reprendre</string>
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <string name="general_sync_notification_generic_error_title">La synchronisation a été interrompue</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Check your syncs in the app to resolve this.</string>
+    <string name="general_sync_notification_generic_error_text">Vérifiez vos synchronisations dans l\’appli pour résoudre ce problème.</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <string name="general_sync_notification_stalled_issues_title">Problèmes de synchronisation détectés</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <string name="general_sync_notification_stalled_issues_text">Consultez et résolvez les problèmes</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
     <string name="device_center_list_view_item_status_error">Erreur</string>
     <!-- Hint shown in the field to write a message in the note to self chat screen -->
-    <string name="chat_note_to_self_chat_message_hint">Write a message to yourself</string>
+    <string name="chat_note_to_self_chat_message_hint">Écrire un message à vous-même</string>
     <!--The title of the Change Email Address page-->
     <string name="change_email_address_title">Changer l’adresse courriel</string>
     <!--Change Email Address page content text to ask user to enter a new email address -->
@@ -1031,7 +1021,7 @@
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">L’adresse courriel a été mise à jour</string>
     <!-- Snackbar text to inform the user that download started -->
-    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <string name="transfers_download_started_snackbar">Le téléchargement a commencé. Voir la notification pour plus de détails.</string>
     <!--Sign Up page text field input first name error message when empty-->
     <string name="sign_up_first_name_text_field_error_message">Saisissez un prénom</string>
     <!--Sign Up page text field input last name error message when empty-->
@@ -1057,27 +1047,27 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Avez-vous déjà un compte MEGA ? [A]Connectez-vous[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Loading file&#8230;</string>
+    <string name="transfers_fake_preview_text">Chargement du fichier...</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_title">Cancel preview?</string>
+    <string name="transfers_cancel_preview_download_warning_title">Annuler la prévisualisation ?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_text">You will no longer be able to preview this file</string>
+    <string name="transfers_cancel_preview_download_warning_text">Vous ne pourrez plus prévisualiser ce fichier.</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again</string>
+    <string name="transfers_fake_preview_screen_general_error">La prévisualisation n\’a pas pu être chargée, essayez à nouveau</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_preview_download">Something went wrong. Preview was not cancelled. See notification for details.</string>
+    <string name="transfers_error_cancelling_preview_download">Il y a eu un problème. La prévisualisation n\’a pas été annulée. Voir la notification pour plus de détails.</string>
     <!-- Title of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_title">Backup name already exists</string>
+    <string name="sync_rename_and_create_backup_dialog_title">Le nom de sauvegarde existe déjà</string>
     <!-- Text of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_text">A folder with the same name already exists in your Backups. Rename the new folder to continue with the backup. Folder name will not change on your device.</string>
+    <string name="sync_rename_and_create_backup_dialog_text">Un dossier portant le même nom existe déjà dans vos sauvegardes. Renommez le nouveau dossier pour poursuivre la sauvegarde. Le nom du dossier ne changera pas sur votre appareil.</string>
     <!-- Rename and Create Backup Dialog hint text (input field description) -->
-    <string name="sync_rename_and_create_backup_dialog_hint_text">Backup name</string>
+    <string name="sync_rename_and_create_backup_dialog_hint_text">Nom de la sauvegarde</string>
     <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_positive_button">Renommer</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Saisissez un nom de sauvegarde</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">A backup with this name already exists. Enter a different name.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">Une sauvegarde portant ce nom existe déjà. Saisissez un autre nom.</string>
     <!-- USP Carousel page 1 title-->
     <string name="carousel_page_title_slide_1">Vous détenez les clés</string>
     <!-- USP Carousel page 1 description-->
@@ -1093,7 +1083,7 @@
     <!-- USP Carousel page 4 title-->
     <string name="carousel_page_title_slide_4">Dites-le en privé</string>
     <!-- USP Carousel page 4 description-->
-    <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
+    <string name="carousel_page_description_slide_4">Discutez avec vos amis et votre famille, partagez des photos ou des informations sensibles, faites des appels vidéo et planifiez des réunions. Sécurité et confidentialité garanties.</string>
     <!-- Create account label-->
     <string name="general_label_create_account">S\’inscrire</string>
     <!-- The new feature hidden nodes feature -->
@@ -1105,17 +1095,17 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Contrôler facilement la visibilité</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” - “User interface” in your app settings.</string>
+    <string name="hidden_nodes_description_control_visibility">Pour afficher les fichiers cachés, activez le paramètre «&#160;Afficher les éléments cachés&#160;» sous «&#160;Gestion des fichiers&#160;» - «&#160;Interface utilisateur&#160;» dans les paramètres de votre application.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">Les fichiers partagés restent visibles</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <string name="hidden_nodes_description_visible_shared_files">Les fichiers et dossiers partagés avec des contacts ou des liens publics restent accessibles et visibles, même s\’ils sont cachés.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Gardez vos photos en sécurité, en permanence</string>
     <!--Camera backup permission screen description-->
-    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <string name="camera_backup_permission_screen_description">Vos souvenirs sont importants\n\nLes téléversements de l\’appareil photo sauvegardent automatiquement vos photos et vidéos sur votre disque MEGA&#160;Cloud, pour que vous n\’ayez jamais à vous soucier de les perdre.</string>
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
-    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <string name="camera_backup_permission_banner_info_description">Les téléversements de l\’appareil photo nécessitent un [A]accès complet[/A] à la galerie photos de votre appareil.</string>
     <!--Button text to request camera backup permission-->
     <string name="camera_backup_permission_enable_button_text">Activer les Téléversements de l’appareil photo</string>
     <!--Permission screen skip requesting permission button text-->
@@ -1123,41 +1113,41 @@
     <!--Notification permission screen title-->
     <string name="notification_permission_screen_title">Ne manquez jamais de mise à jour importante</string>
     <!--Notification permission screen description-->
-    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <string name="notification_permission_screen_description">Restez informé des mises à jour qui vous concernent en temps réel. Recevez des alertes sur l\’activité des dossiers partagés, les mises à jour de sécurité et les offres exclusives, afin de ne jamais manquer quoi que ce soit d\’important.\n\nVous pouvez gérer les préférences de notification à tout moment dans les paramètres de votre appareil.</string>
     <!--Button text to request Notification permission-->
     <string name="notification_permission_enable_button_text">Activer les notifications</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
-    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
+    <string name="transfers_notification_title_single_upload">« %1$s » téléversé</string>
     <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_warning_lost_wifi_title">Syncing paused due to lost connection.</string>
+    <string name="general_sync_warning_lost_wifi_title">Synchronisation mise en pause en raison d\’une perte de connexion.</string>
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_warning_lost_wifi_text">Reconnect to Wi-Fi to resume.</string>
+    <string name="general_sync_warning_lost_wifi_text">Reconnectez-vous au Wi-Fi pour reprendre.</string>
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
     <string name="general_link_unavailable_subtitle">Les raisons suivantes pourraient en être la cause&#160;:</string>
     <!-- Bullet point shown when link is unavailable due to invalid URL -->
-    <string name="general_link_unavailable_invalid_url">Invalid URL - the link you’re trying to access does not exist</string>
+    <string name="general_link_unavailable_invalid_url">URL invalide, le lien auquel vous essayez d\’accéder n\’existe pas</string>
     <!-- Bullet point shown when link is unavailable due to expiration -->
-    <string name="general_link_expired">The link has expired</string>
+    <string name="general_link_expired">Le lien a expiré</string>
     <!-- Title shown when a folder link is unavailable (general case) -->
-    <string name="folder_link_unavailable_title">The folder link you’re trying to access is not available</string>
+    <string name="folder_link_unavailable_title">Le lien vers le dossier auquel vous essayez d\’accéder n\’est pas disponible</string>
     <!-- Bullet point shown when a folder link is unavailable because the link has been disabled -->
-    <string name="folder_link_unavailable_disabled">The folder link has been disabled by the owner</string>
+    <string name="folder_link_unavailable_disabled">Le lien vers le dossier a été désactivé par le propriétaire</string>
     <!-- Title shown when a folder link has expired -->
-    <string name="folder_link_expired_title">The folder link you’re trying to access is no longer available</string>
+    <string name="folder_link_expired_title">Le lien vers le dossier auquel vous essayez d\’accéder n\’est plus disponible</string>
     <!-- Title of the dialog shown when the user needs to verify administrator credentials -->
-    <string name="unverified_business_account_dialog_title">Verify administrator credentials to continue</string>
+    <string name="unverified_business_account_dialog_title">Vérifiez les identifiants de l\’administrateur pour continuer</string>
     <!-- Description of the dialog explaining the need to verify administrator credentials -->
-    <string name="unverified_business_account_dialog_description">You need to verify your Business account administrator’s credentials in order to continue. Log in to your account in a desktop web browser and complete the credential verification.</string>
+    <string name="unverified_business_account_dialog_description">Vous devez vérifier les identifiants de l\’administrateur de votre compte Entreprise pour pouvoir continuer. Connectez-vous à votre compte dans un navigateur web sur votre ordinateur et procédez à la vérification des identifiants.</string>
     <!-- Title shown when a file link is unavailable (general case) -->
-    <string name="file_link_unavailable_title">The file link you’re trying to access is no longer available</string>
+    <string name="file_link_unavailable_title">Le lien du fichier auquel vous essayez d\’accéder n\’est plus disponible</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="file_link_unavailable_disabled">The file link has been disabled by the owner</string>
+    <string name="file_link_unavailable_disabled">Le lien vers le fichier a été désactivé par le propriétaire</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="file_link_unavailable_deleted">The file has been deleted</string>
+    <string name="file_link_unavailable_deleted">Le fichier a été supprimé</string>
     <!-- Title shown when a file link has expired -->
-    <string name="file_link_expired_title">The file link you’re trying to access is not available</string>
+    <string name="file_link_expired_title">Le lien du fichier auquel vous essayez d\’accéder n\’est pas disponible</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="folder_link_unavailable_deleted">The folder has been deleted</string>
+    <string name="folder_link_unavailable_deleted">Le dossier a été supprimé</string>
     <!-- Tooltip description for transfer section play action -->
     <string name="transfers_section_action_play">Visionner</string>
     <!-- Tooltip description for transfer section play action -->
@@ -1175,15 +1165,15 @@
     <!--Text for showing the empty state when there are no completed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
     <string name="transfers_no_completed_transfers_empty_text">Aucun transfert terminé</string>
     <!--Text for showing the empty state when there are no failed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
-    <string name="transfers_no_failed_transfers_empty_text">[A]No failed transfers[/A]</string>
+    <string name="transfers_no_failed_transfers_empty_text">[A]Aucun échec de transfert[/A]</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the current transferred size, the second one is to set the size of the file. Example 12.4MB of 33.3MB -->
-    <string name="transfers_completed_transfer_size_indicator">%1$s of %2$s</string>
+    <string name="transfers_completed_transfer_size_indicator">%1$s sur %2$s</string>
     <!-- Title for the Free Plan card -->
     <string name="free_plan_card_title">Commencer avec notre abonnement gratuit</string>
     <!-- Description for the Free Plan card -->
-    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our free plan offers generous amounts of storage and transfer quota</string>
+    <string name="free_plan_card_description">Vous n\’avez pas besoin de vous engager dans un abonnement payant pour le moment, notre abonnement gratuit offre de généreux quotas de stockage et de transfert.</string>
     <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">20 GB of storage</string>
+    <string name="free_plan_card_storage_feature">20&#160;Go d\’espace de stockage</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">Transferts limités</string>
     <!-- Button text for Free Plan card -->
@@ -1193,15 +1183,15 @@
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Espace de stockage généreux</string>
     <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Store up to 16&#160;TB of data</string>
+    <string name="pro_plan_feature_storage_desc">Stockez jusqu\’à 16&#160;To de données.</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Partage des transferts</string>
     <!-- Description for transfer sharing feature -->
-    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files</string>
+    <string name="pro_plan_feature_transfer_desc">Les personnes avec lesquelles vous partagez des éléments peuvent utiliser votre quota pour télécharger et diffuser des fichiers.</string>
     <!-- Title for MEGA VPN feature -->
     <string name="pro_plan_feature_vpn_title">Accès au MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_desc">Stay safe online with our high-speed VPN that’s both fast and simple to use</string>
+    <string name="pro_plan_feature_vpn_desc">Restez protégé en ligne grâce à notre VPN à grande vitesse, à la fois rapide et simple à utiliser.</string>
     <!-- Title for MEGA Pass feature -->
     <string name="pro_plan_feature_pass_title">MEGA&#160;Pass</string>
     <!-- Description for MEGA Pass feature -->
@@ -1221,19 +1211,19 @@
     <!-- Benefit: Transfer quota sharing -->
     <string name="pro_plan_benefit_transfer_quota_sharing">Partage du quota de transfert</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
-    <string name="pro_plan_benefit_auto_sync_mobile">Automatically sync the folders on your mobile device</string>
+    <string name="pro_plan_benefit_auto_sync_mobile">Synchronisation automatique des dossiers sur votre appareil mobile</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
-    <string name="pro_plan_benefit_rewind_180_days">Rewind up to 180 days of deleted data</string>
+    <string name="pro_plan_benefit_rewind_180_days">Récupération de données supprimées sur une période pouvant aller jusqu\’à 180 jours</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
-    <string name="pro_plan_benefit_host_calls_unlimited">Host calls and meetings with unlimited participants and no time restrictions</string>
+    <string name="pro_plan_benefit_host_calls_unlimited">Organisation d\’appels et de réunions avec un nombre illimité de participants et sans restriction de temps</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
-    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Schedule Rubbish bin clearing between 7 days and 10 years</string>
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Planification de vidage de la Corbeille entre 7 jours et 10 ans</string>
     <!-- Benefit: Priority support -->
     <string name="pro_plan_benefit_priority_support">Assistance prioritaire</string>
     <!-- Subscription page information section title at the bottom of the page-->
     <string name="choose_account_screen_subscription_information_title">Détails de l’abonnement</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
-    <string name="choose_account_screen_subscription_information_description">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.\n\nYou can cancel your plan subscription any time but no later than 24 hours before your next subscription payment is due. [A]Learn how to manage your subscription in your settings[/A].</string>
+    <string name="choose_account_screen_subscription_information_description">Les abonnements sont renouvelés automatiquement pour des périodes d\’abonnement successives de même durée et au même prix que la période initiale choisie.\n\nVous pouvez résilier votre abonnement à tout moment, mais au plus tard 24 heures avant la date d\’échéance de votre prochain abonnement. [A]Apprenez à gérer votre abonnement dans vos paramètres[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
     <string name="choose_account_screen_terms_and_policies_link_text">[A]Conditions d\’utilisation et politique de confidentialité[/A]</string>
     <!-- Get more with Pro plan title in choose account screen-->
@@ -1249,50 +1239,53 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s d’espace de stockage</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
-    <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
+    <string name="choose_account_screen_transfer_quota_label">%1$s de transfert</string>
     <!-- General month label -->
     <string name="general_month">mois</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s par mois</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">%1$s charged yearly</string>
+    <string name="choose_account_screen_billed_yearly">%1$s facturés annuellement</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
-        <item quantity="one">%1$d item unhidden</item>
-        <item quantity="other">%1$d items unhidden</item>
+        <item quantity="one">%1$d élément non caché</item>
+        <item quantity="many">%1$d éléments non cachés</item>
+        <item quantity="other">%1$d éléments non cachés</item>
     </plurals>
     <!-- Title for secure slideshow mode tutorial -->
-    <string name="slideshow_tutorial_title">Play slideshows securely</string>
+    <string name="slideshow_tutorial_title">Visionnez les diaporamas en toute sécurité</string>
     <!-- Step 1 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step1">Press the power button to lock your screen.</string>
+    <string name="slideshow_tutorial_step1">Appuyez sur le bouton d\’alimentation pour verrouiller votre écran.</string>
     <!-- Step 2 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step2">Wait for 2 seconds.</string>
+    <string name="slideshow_tutorial_step2">Attendez 2 secondes.</string>
     <!-- Step 3 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step3">Press the power button again to turn the screen back on.</string>
+    <string name="slideshow_tutorial_step3">Appuyez à nouveau sur le bouton d\’alimentation pour rallumer l\’écran.</string>
     <!-- Note indicating the slideshow plays securely while locked -->
-    <string name="slideshow_tutorial_note">The slideshow will play while your device remains securely locked.</string>
+    <string name="slideshow_tutorial_note">Le diaporama sera lu pendant que votre appareil reste verrouillé.</string>
     <!-- State to indicate an achievement has applied -->
-    <string name="applied_label">Applied</string>
+    <string name="applied_label">Appliqué</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
-    <string name="title_start_mega_vpn_free_trial">Start MEGA&#160;VPN free trial</string>
+    <string name="title_start_mega_vpn_free_trial">Commencer l\’essai gratuit de MEGA&#160;VPN</string>
     <!-- Text of the section for start mega vpn free trial in achivements section -->
-    <string name="text_start_mega_vpn_free_trial">%1$s of storage. Valid permanently.</string>
+    <string name="text_start_mega_vpn_free_trial">%1$s de stockage. Valable de façon permanente.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
-    <string name="title_start_mega_pass_free_trial">Start MEGA&#160;Pass free trial</string>
+    <string name="title_start_mega_pass_free_trial">Commencer l\’essai gratuit de MEGA&#160;Pass</string>
     <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s of storage. Valid permanently.</string>
+    <string name="text_start_mega_pass_free_trial">%1$s de stockage. Valable de façon permanente.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
-    <string name="button_text_install_mega_vpn">Install MEGA&#160;VPN</string>
+    <string name="button_text_install_mega_vpn">Installer MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
-    <string name="button_text_install_mega_pass">Install MEGA&#160;Pass</string>
+    <string name="button_text_install_mega_pass">Installer MEGA&#160;Pass</string>
     <!-- title of how it works for mega vpn free trial in achivements section -->
-    <string name="title_how_it_works_free_trial">Fonctionnement</string>
+    <string name="title_how_it_works_free_trial">Comment ça marche</string>
     <!-- text of how it works for mega vpn free trial in achivements section -->
-    <string name="text_how_it_works_mega_vpn_free_trial">Install the MEGA&#160;VPN app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
+    <string name="text_how_it_works_mega_vpn_free_trial">Installez l\’appli MEGA&#160;VPN, connectez-vous avec votre compte MEGA et commencez votre essai gratuit. Votre bonus d\’espace de stockage est ajouté automatiquement après le démarrage de l\’essai gratuit.</string>
     <!-- text of how it works for mega pass free trial in achivements section -->
-    <string name="text_how_it_works_mega_pass_free_trial">Install the MEGA&#160;Pass app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
+    <string name="text_how_it_works_mega_pass_free_trial">Installez l\’appli MEGA&#160;Pass, connectez-vous avec votre compte MEGA et commencez votre essai gratuit. Votre bonus d\’espace de stockage est ajouté automatiquement après le démarrage de l\’essai gratuit.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">You have received %1$s storage space for starting a MEGA&#160;VPN free trial</string>
+    <string name="text_received_mega_vpn_free_trial">Vous avez reçu %1$s d\’espace de stockage pour avoir commencé l\’essai gratuit de MEGA&#160;VPN.</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">You have received %1$s storage space for starting a MEGA&#160;Pass free trial</string>
+    <string name="text_received_mega_pass_free_trial">Vous avez reçu %1$s d\’espace de stockage pour avoir commencé l\’essai gratuit de MEGA&#160;Pass.</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">Certains dossiers ne peuvent pas être synchronisés ou sauvegardés car l\’application MEGA a perdu les autorisations d\’accès aux dossiers locaux. Appuyez sur Reprendre pour rétablir les autorisations pour chaque dossier concerné.</string>
 </resources>

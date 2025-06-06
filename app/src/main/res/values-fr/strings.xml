@@ -913,7 +913,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">Confidentialité</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">Ce lien n’est pas associé à ce compte. Veuillez vous connecter avec le bon compte.</string>
+    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">Ce lien d’annulation est expiré, veuillez réessayer.</string>
     <!-- Text shown after searching and no results found -->
@@ -3148,8 +3148,6 @@
     <string name="disable_versioning_label">Désactiver le versionnage des fichiers</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">Notre fonction de versionnage des fichiers fait en sorte que nous conservons les anciennes versions de vos fichiers si vous les remplacez par de nouvelles versions. Si vous désactivez le versionnage des fichiers, vous ne profiterez plus de cette protection ; l’ancienne copie sera perdue quand vous la remplacerez.</string>
-    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
-    <string name="location_not_exist">Cet emplacement n’existe plus.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Vous avez déjà invité %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->

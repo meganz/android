@@ -3,7 +3,7 @@
     <!-- Title of the Rename Device Dialog -->
     <string name="device_center_rename_device_dialog_title">Cihazı yeniden adlandırın</string>
     <!-- The name of the Positive Button for the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_positive_button">Yeniden Adlandır</string>
+    <string name="device_center_rename_device_dialog_positive_button">Yeniden adlandır</string>
     <!-- The name of the Header in Device Center which signifies the User's Device that is currently in use -->
     <string name="device_center_list_view_item_header_this_device">Bu cihaz</string>
     <!-- The name of the Header in Device Center which signifies the User's Devices that are not currently in use  -->
@@ -15,11 +15,11 @@
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">Güncel</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
-    <string name="device_center_list_view_item_status_updating">Güncelleniyor...</string>
+    <string name="device_center_list_view_item_status_updating">Güncelleniyor&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents with a percentage completion -->
-    <string name="device_center_list_view_item_status_updating_with_progress">%1$d%% Güncelleniyor...</string>
+    <string name="device_center_list_view_item_status_updating_with_progress">%%%1$d Güncellendi&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is disabled -->
-    <string name="device_center_list_view_item_status_disabled">Engelli</string>
+    <string name="device_center_list_view_item_status_disabled">Devre dışı</string>
     <!-- The name of the Device or Folder Status which signifies that the backup procedure has been paused -->
     <string name="device_center_list_view_item_status_paused">Duraklatıldı</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
@@ -31,25 +31,25 @@
     <!-- The enabled Camera uploads status that is shown alongside the "Camera uploads" Device Center Bottom Sheet item -->
     <string name="device_center_bottom_sheet_item_camera_uploads_enabled_status">Etkin</string>
     <!-- The disabled Camera uploads status that is shown alongside the "Camera uploads" Device Center Bottom Sheet item -->
-    <string name="device_center_bottom_sheet_item_camera_uploads_disabled_status">Engelli</string>
+    <string name="device_center_bottom_sheet_item_camera_uploads_disabled_status">Devre dışı</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, opens the "Rename device" Dialog to let the User rename the selected Device -->
-    <string name="device_center_bottom_sheet_item_rename">Yeniden Adlandır</string>
+    <string name="device_center_bottom_sheet_item_rename">Yeniden adlandır</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Node Information screen to view more information about the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_info">Bilgi</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota">Depolama kotası sınırına ulaşıldı.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="device_center_list_view_item_sub_state_account_blocked">Hesap engellendiği için bu klasör senkronize edilemiyor veya yedeklenemiyor</string>
+    <string name="device_center_list_view_item_sub_state_account_blocked">Hesap engellendiği için bu klasörü senkronize edemiyor veya yedekleyemiyorsunuz.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="device_center_list_view_item_sub_state_logged_out">Masaüstü uygulamasından çıkış yapmış gibi göründüğünüzde senkronizasyon veya yedekleme durduruldu. Masaüstü uygulaması aracılığıyla tekrar giriş yapın ve senkronizasyona veya yedeklemeye devam edin.</string>
+    <string name="device_center_list_view_item_sub_state_logged_out">Masaüstü uygulamasından çıkış yaptığınız için senkronizasyon veya yedekleme durduruldu. Masaüstü uygulaması üzerinden tekrar giriş yapın ve senkronizasyonu veya yedeklemeyi devam ettirin.</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
-    <string name="device_center_list_view_item_sub_state_insufficient_disk_space">İndirme için yetersiz alan.</string>
+    <string name="device_center_list_view_item_sub_state_insufficient_disk_space">İndirme için yeterli alan yok.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
     <string name="device_center_rename_device_dialog_error_message_empty_device_name">Bir cihaz adı girin.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->
-    <string name="device_center_rename_device_dialog_error_message_name_already_exists">Bu ada sahip bir cihaz zaten var. Farklı bir ad girin.</string>
+    <string name="device_center_rename_device_dialog_error_message_name_already_exists">Bu ada sahip bir cihaz zaten mevcut. Farklı bir ad girin.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name with invalid characters -->
-    <string name="device_center_rename_device_dialog_error_message_invalid_characters">Aşağıdaki karakterlere izin verilmez: %1$s</string>
+    <string name="device_center_rename_device_dialog_error_message_invalid_characters">Şu karakterlere izin verilmez: %1$s</string>
     <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
     <string name="device_center_snackbar_message_rename_device_successful">Cihaz yeniden adlandırıldı</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
@@ -57,17 +57,17 @@
     <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the Camera uploads feature settings -->
     <string name="device_center_device_top_menu_option_camera_uploads">Kamera yüklemeleri</string>
     <!-- Label of the top app bar menu option of selected device in Device Center which opens the dialog to rename the selected Device -->
-    <string name="device_center_device_top_menu_option_rename">Yeniden Adlandır</string>
+    <string name="device_center_device_top_menu_option_rename">Yeniden adlandır</string>
     <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the device info screen -->
     <string name="device_center_device_top_menu_option_info">Bilgi</string>
     <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->
     <string name="device_center_no_network_state">İnternet bağlantısı yok</string>
     <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
-    <string name="device_center_nothing_setup_state">Henüz ayarlanmış bir şey yok</string>
+    <string name="device_center_nothing_setup_state">Henüz hiçbir şey ayarlanmadı</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->
-    <string name="device_center_top_app_bar_search_devices_hint">Arama cihazları</string>
+    <string name="device_center_top_app_bar_search_devices_hint">Cihaz ara</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Syncs -->
-    <string name="device_center_top_app_bar_search_syncs_hint">Arama senkronizasyonları</string>
+    <string name="device_center_top_app_bar_search_syncs_hint">Senkronizasyonları ara</string>
     <!-- Text to show in the Device Center when no search results are found -->
     <string name="device_center_empty_screen_no_results">Sonuç yok</string>
 </resources>

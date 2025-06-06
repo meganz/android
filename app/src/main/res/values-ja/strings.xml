@@ -885,7 +885,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">機密性</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">このリンクはこのアカウントとは関係ありません。正しいアカウントでログインしてください。</string>
+    <string name="error_not_logged_with_correct_account">別のMEGAアカウントにログインしています。ログアウトして、パスワードリセットリンクをもう一度開いてください。</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">このキャンセルリンクの有効期限が切れました。もう一度お試しください。</string>
     <!-- Text shown after searching and no results found -->
@@ -2986,8 +2986,6 @@
     <string name="disable_versioning_label">ファイルのバージョン管理を無効にする</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">当社のファイルのバージョン管理機能により、ユーザー様のファイルが新しいバージョンに置き換えられても、古いコピーを維持することができます。ファイルのバージョン管理を無効にすると、この保護機能は使えなくなります。また、置き換えた際に、古いコピーは失われます。</string>
-    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
-    <string name="location_not_exist">この場所はもう存在しません。</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">すでに%1$sさんを招待しています</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->

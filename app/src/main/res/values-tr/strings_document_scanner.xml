@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Screen title for cropping current scan (Document scanner) -->
-    <string name="scan_title_crop">Mahsul</string>
+    <string name="scan_title_crop">Kırp</string>
     <!-- Screen title for saving current scan (Document scanner) -->
     <string name="scan_title_save_scan">Taramayı kaydet</string>
     <!-- Label of the button to add a new page to the current document scan -->
@@ -9,13 +9,13 @@
     <!-- Action of a button to save something -->
     <string name="scan_action_save">Kaydet</string>
     <!-- Action text to retake current scan picture (Document scanner) -->
-    <string name="scan_action_retake">Tekrar al</string>
+    <string name="scan_action_retake">Yeniden çek</string>
     <!-- Document scanner file name -->
     <string name="scan_file_name">Dosya adı</string>
     <!-- Input field description in the document save screen (Document scanner) -->
     <string name="scan_file_type">Dosya türü</string>
     <!-- Input field description in the document save screen (Document scanner) -->
-    <string name="scan_quality">KALİTE</string>
+    <string name="scan_quality">Kalite</string>
     <!-- Input field description in the document save screen (Document scanner) -->
     <string name="scan_destination">Hedef</string>
     <!-- Document scanner high quality option -->
@@ -25,27 +25,27 @@
     <!-- Document scanner low quality option -->
     <string name="scan_quality_low">Düşük</string>
     <!-- Title text shown on document scanner dialog to discard scan -->
-    <string name="scan_dialog_discard_title">Taramayı atmak mı?</string>
+    <string name="scan_dialog_discard_title">Tarama yok sayılsın mi?</string>
     <!-- Body text shown on document scanner dialog to discard scan -->
     <string name="scan_dialog_discard_body">Mevcut tarama kaybolacak</string>
     <!-- Title text shown on document scanner dialog to discard scan all scans -->
-    <string name="scan_dialog_discard_all_title">Tüm taramaları atmak mı?</string>
+    <string name="scan_dialog_discard_all_title">Tüm taramalar yok sayılsın mı?</string>
     <!-- Body text shown on document scanner dialog to discard all scans -->
     <string name="scan_dialog_discard_all_body">Mevcut belge kaybolacak</string>
     <!-- Action text shown on document scanner dialog to discard scans -->
-    <string name="scan_dialog_discard_action">Atmak</string>
+    <string name="scan_dialog_discard_action">Yok say</string>
     <!-- Body text shown on document scanner dialog to delete current scan -->
-    <string name="scan_dialog_delete_body">Geçerli taramayı silmek mi?</string>
+    <string name="scan_dialog_delete_body">Mevcut tarama silinsin mi?</string>
     <!-- Message shown when users deny camera permissions to scan documents -->
-    <string name="scan_requires_permission">Belgeleri taramak için Kamera izni gereklidir</string>
+    <string name="scan_requires_permission">Belge taramak için Kamera izni gereklidir</string>
     <!-- Error text for incorrect name -->
-    <string name="scan_incorrect_name">Geçersiz isim</string>
+    <string name="scan_incorrect_name">Geçersiz ad</string>
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">Geçersiz karakterler</string>
     <!-- Snackbar text for incorrect name -->
-    <string name="scan_snackbar_incorrect_name">Devamadan önce dosya adınızı düzeltin</string>
+    <string name="scan_snackbar_incorrect_name">Devam etmeden önce dosya adını düzeltin</string>
     <!-- Dialog message showing file progress -->
-    <string name="scan_dialog_progress">Hazırlama %1$s. Lütfen bekleyin...</string>
+    <string name="scan_dialog_progress">%1$s hazırlanıyor. Lütfen bekleyin&#8230;</string>
     <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->
-    <string name="scan_snackbar_invalid_characters">Aşağıdaki karakterlere izin verilmez: %1$s</string>
+    <string name="scan_snackbar_invalid_characters">Şu karakterlere izin verilmiyor: %1$s</string>
 </resources>

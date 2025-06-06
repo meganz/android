@@ -899,7 +899,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">Datenschutz</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">Der Link gehört nicht zu diesem Account. Bitte melden Sie sich mit dem korrekten Account an.</string>
+    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">Dieser Stornolink ist abgelaufen – bitte versuchen Sie es erneut.</string>
     <!-- Text shown after searching and no results found -->
@@ -3067,8 +3067,6 @@
     <string name="disable_versioning_label">Dateiversionierung deaktivieren</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">Unsere Dateiversionierung speichert ältere Kopien Ihrer Dateien, wenn Sie sie durch neuere Versionen ersetzen. Wenn Sie die Dateiversionierung deaktivieren, haben Sie diese Sicherheit nicht mehr: Wenn Sie eine Datei überschreiben, geht die alte Version verloren.</string>
-    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
-    <string name="location_not_exist">Dieser Speicherort existiert nicht mehr.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Sie haben %1$s bereits eingeladen</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->

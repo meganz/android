@@ -139,7 +139,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Локальная ошибка, препятствующая доступу к папке</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Ошибка файловой системы, препятствующая доступу к папке.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Целевой элемент находится слишком глубоко в структуре папок.\nПереместите его в расположение глубиной менее 64 папок.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -156,4 +156,6 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">Обнаружена локальная операция перемещения или переименования, но её не удалось воспроизвести в MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Ожидание завершения сканирования, чтобы определить, был ли файл перемещён или удалён.</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">Для некоторых папок невозможно выполнить синхронизацию или резервное копирование, так как приложение MEGA потеряло разрешения на доступ к локальным папкам. Нажмите «Возобновить», чтобы повторно добавить разрешения для каждой затронутой папки.</string>
 </resources>

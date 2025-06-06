@@ -899,7 +899,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">Vertrouwelijk</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">Deze link is niet gerelateerd aan dit account. Log in met het juiste account.</string>
+    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">Deze annuleringslink is verlopen, probeer nogmaals.</string>
     <!-- Text shown after searching and no results found -->
@@ -3067,8 +3067,6 @@
     <string name="disable_versioning_label">Bestandsversies uitschakelen</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">Onze functie voor bestandsversies zorgt ervoor dat we oudere kopieën van uw bestanden bewaren als u ze vervangt door nieuwere versies. Als u Bestandsversiebeheer uitschakelt, heeft u deze bescherming niet meer; de oude kopie gaat verloren wanneer u deze vervangt.</string>
-    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
-    <string name="location_not_exist">Deze locatie bestaat niet langer.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">U heeft %1$s al uitgenodigd</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->

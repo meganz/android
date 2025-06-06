@@ -857,8 +857,6 @@
     <string name="transfers_notification_downloading_preview">Preparing %1$s for preview</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
-    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
-    <string name="audio_queue_single_item_removed_message">‟%1$s” was removed</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="one">“%1$s” was removed from the queue</item>
@@ -910,16 +908,10 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Pengaturan cookie dan iklan</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">Sync or back up a folder on your device with a folder on MEGA. [U]Learn more[/U]</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="transfers_cancel_download_warning_title">Cancel download?</string>
-    <!-- Confirmation message informing a download was successfully cancelled -->
-    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Catatan untuk diri sendiri</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">Simpan untuk dirimu sendiri</string>
-    <!-- First message description in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_description">Send yourself sensitive information, pics and videos, or ideas for your next big venture. Synced across all your devices, and protected with zero-knowledge encryption.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="one">1 file added to “%1$s”. Duplicate files cannot be added again.</item>
@@ -927,8 +919,6 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
-    <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_download">Something went wrong. Download was not cancelled.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
@@ -1249,27 +1239,29 @@
     <!-- Note indicating the slideshow plays securely while locked -->
     <string name="slideshow_tutorial_note">The slideshow will play while your device remains securely locked.</string>
     <!-- State to indicate an achievement has applied -->
-    <string name="applied_label">Applied</string>
+    <string name="applied_label">Diterapkan</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
-    <string name="title_start_mega_vpn_free_trial">Start MEGA&#160;VPN free trial</string>
+    <string name="title_start_mega_vpn_free_trial">Mulai MEGA&#160;Uji coba gratis VPN</string>
     <!-- Text of the section for start mega vpn free trial in achivements section -->
-    <string name="text_start_mega_vpn_free_trial">%1$s of storage. Valid permanently.</string>
+    <string name="text_start_mega_vpn_free_trial">%1$s penyimpanan. Berlaku secara permanen.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
-    <string name="title_start_mega_pass_free_trial">Start MEGA&#160;Pass free trial</string>
+    <string name="title_start_mega_pass_free_trial">Mulai MEGA&#160;Lulus uji coba gratis</string>
     <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s of storage. Valid permanently.</string>
+    <string name="text_start_mega_pass_free_trial">%1$s penyimpanan. Berlaku secara permanen.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
-    <string name="button_text_install_mega_vpn">Install MEGA&#160;VPN</string>
+    <string name="button_text_install_mega_vpn">Instal MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
-    <string name="button_text_install_mega_pass">Install MEGA&#160;Pass</string>
+    <string name="button_text_install_mega_pass">Instal MEGA&#160;Pass</string>
     <!-- title of how it works for mega vpn free trial in achivements section -->
     <string name="title_how_it_works_free_trial">Cara kerja</string>
     <!-- text of how it works for mega vpn free trial in achivements section -->
-    <string name="text_how_it_works_mega_vpn_free_trial">Install the MEGA&#160;VPN app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
+    <string name="text_how_it_works_mega_vpn_free_trial">Instal MEGA&#160;Aplikasi VPN, masuk dengan akun MEGA anda, dan mulai uji coba gratis anda. Penyimpanan bonus anda ditambahkan secara otomatis setelah memulai uji coba gratis anda.</string>
     <!-- text of how it works for mega pass free trial in achivements section -->
-    <string name="text_how_it_works_mega_pass_free_trial">Install the MEGA&#160;Pass app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
+    <string name="text_how_it_works_mega_pass_free_trial">Instal aplikasi MEGA&#160;Pass, masuk dengan akun MEGA anda, dan mulai uji coba gratis anda. Penyimpanan bonus anda ditambahkan secara otomatis setelah memulai uji coba gratis anda.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">You have received %1$s storage space for starting a MEGA&#160;VPN free trial</string>
+    <string name="text_received_mega_vpn_free_trial">Anda telah menerima %1$s ruang penyimpanan untuk memulai MEGA&#160;Uji coba gratis VPN</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">You have received %1$s storage space for starting a MEGA&#160;Pass free trial</string>
+    <string name="text_received_mega_pass_free_trial">Anda telah menerima %1$s ruang penyimpanan untuk memulai MEGA&#160;Lulus uji coba gratis</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
 </resources>

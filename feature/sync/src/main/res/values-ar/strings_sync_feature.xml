@@ -164,4 +164,6 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">تم اكتشاف إجراء نقل أو إعادة تسمية محليًا، ولكن تعذر نسخه في ميغا MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">في انتظار انتهاء الفحص لتحديد ما إذا كان الملف قد تم نقله أو حذفه.</string>
+    <!-- Sync change root path title-->
+    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
 </resources>
