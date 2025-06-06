@@ -96,17 +96,16 @@ internal fun LeadingIndicator(
 ) {
     Icon(
         modifier = Modifier
-            .size(14.dp)
+            .size(16.dp)
             .align(Alignment.Center),
         painter = painterResource(
-            id = if (isDownload) R.drawable.ic_arrow_down_circle_small_regular_outline
-            else R.drawable.ic_arrow_up_circle_small_regular_outline
+            id = if (isDownload) R.drawable.ic_arrow_down_small_regular_outline
+            else R.drawable.ic_arrow_up_small_regular_outline
         ),
         contentDescription = null,
         tint = when {
             isOverQuota -> DSTokens.colors.indicator.yellow
-            isDownload -> DSTokens.colors.indicator.green
-            else -> DSTokens.colors.indicator.blue
+            else -> DSTokens.colors.icon.primary
         },
     )
 }
