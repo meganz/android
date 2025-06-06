@@ -12,7 +12,7 @@ class MonitorInProgressTransfersUseCase @Inject constructor(private val transfer
     /**
      * Invoke
      *
-     * @return a flow of Map. Being the key an [Int] representing the transfer tag and [InProgressTransfer] as its value.
+     * @return a flow of Map. Being the key an [Int] representing the transfer uniqueId and [InProgressTransfer] as its value.
      */
     operator fun invoke() = transferRepository.monitorInProgressTransfers()
 }

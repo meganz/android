@@ -513,12 +513,6 @@ interface TransferRepository {
      */
     fun monitorIsUploadsWorkerFinished(): Flow<Boolean>
 
-
-    /**
-     * Updates or adds a new transfer to the in progress transfers list.
-     */
-    suspend fun updateInProgressTransfer(transfer: Transfer)
-
     /**
      * Updates or adds a list of transfers to the in progress transfers list.
      */

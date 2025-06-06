@@ -735,23 +735,18 @@ internal class DefaultTransfersRepository @Inject constructor(
             workInfos.any { it.state.isFinished }
         }
 
-    override suspend fun updateInProgressTransfer(transfer: Transfer) {
-        val inProgressTransfer = inProgressTransferMapper(transfer)
-        inProgressTransfersFlow.update { inProgressTransfers ->
-            inProgressTransfers.toMutableMap().also {
-                it[transfer.uniqueId] = inProgressTransfer
-            }
-        }
-    }
-
     override suspend fun updateInProgressTransfers(transfers: List<Transfer>) {
-        val newInProgressTransfers =
-            transfers.map { inProgressTransferMapper(it) }.associateBy { it.uniqueId }
-        inProgressTransfersFlow.update { inProgressTransfers ->
-            inProgressTransfers.toMutableMap().also {
-                it.putAll(newInProgressTransfers)
+        transfers
+            .filterNot { it.isFolderTransfer }
+            .map { inProgressTransferMapper(it) }
+            .associateBy { it.uniqueId }
+            .takeIf { it.isNotEmpty() }?.let { newInProgressTransfers ->
+                inProgressTransfersFlow.update { inProgressTransfers ->
+                    inProgressTransfers.toMutableMap().also {
+                        it.putAll(newInProgressTransfers)
+                    }
+                }
             }
-        }
     }
 
     override fun monitorInProgressTransfers() = inProgressTransfersFlow

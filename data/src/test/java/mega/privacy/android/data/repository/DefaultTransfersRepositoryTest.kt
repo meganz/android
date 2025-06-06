@@ -1525,32 +1525,12 @@ class DefaultTransfersRepositoryTest {
         }
 
     @Test
-    fun `test that monitorInProgressTransfers emits a map with a transfer after call updateInProgressTransfer`() =
-        runTest {
-            val uniqueId = 1L
-            val transfer = mock<Transfer> {
-                on { this.uniqueId } doReturn uniqueId
-            }
-            val expected = mock<InProgressTransfer.Upload> {
-                on { this.uniqueId } doReturn uniqueId
-            }
-
-            setUp()
-            whenever(inProgressTransferMapper(transfer)).thenReturn(expected)
-
-            underTest.monitorInProgressTransfers().test {
-                assertThat(awaitItem()).isEqualTo(emptyMap<Int, InProgressTransfer>())
-                underTest.updateInProgressTransfer(transfer)
-                assertThat(awaitItem()).isEqualTo(mapOf(Pair(uniqueId, expected)))
-            }
-        }
-
-    @Test
     fun `test that in progress transfers flow is updated correctly when updateInProgressTransfers and removeInProgressTransfers are called`() =
         runTest {
             val uniqueId = 5L
             val transfer = mock<Transfer> {
                 on { it.uniqueId } doReturn uniqueId
+                on { it.isFolderTransfer } doReturn false
             }
             val inProgressTransfer = mock<InProgressTransfer.Download> {
                 on { it.uniqueId } doReturn uniqueId
@@ -1565,6 +1545,31 @@ class DefaultTransfersRepositoryTest {
                 underTest.removeInProgressTransfers(setOf(uniqueId))
 
                 assertThat(awaitItem()).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that in progress transfers flow is not updated with folder transfers`() =
+        runTest {
+            val uniqueId = 5L
+            val folderTransfer = mock<Transfer> {
+                on { it.uniqueId } doReturn uniqueId
+                on { it.isFolderTransfer } doReturn true
+            }
+            val transfer = mock<Transfer> {
+                on { it.uniqueId } doReturn uniqueId
+                on { it.isFolderTransfer } doReturn false
+            }
+            val inProgressTransfer = mock<InProgressTransfer.Download> {
+                on { it.uniqueId } doReturn uniqueId
+            }
+            whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)
+            setUp()
+            underTest.monitorInProgressTransfers().test {
+                assertThat(awaitItem()).isEmpty()
+                underTest.updateInProgressTransfers(listOf(transfer, folderTransfer))
+
+                assertThat(awaitItem()).containsExactly(uniqueId, inProgressTransfer)
             }
         }
 
