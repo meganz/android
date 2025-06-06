@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -184,6 +185,8 @@ class LoginViewModel @Inject constructor(
 
     private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
 
+    private var performFetchNodesJob: Job? = null
+
     init {
         enableAndMonitorRequestStatusProgressEvent()
         viewModelScope.launch {
@@ -334,7 +337,7 @@ class LoginViewModel @Inject constructor(
             monitorAccountBlockedUseCase()
                 .filter { it.type in blockedTypes }
                 .collectLatest {
-                    if (it.type == AccountBlockedType.VERIFICATION_EMAIL) resetFetchNodesUpdate() else stopLogin()
+                    if (it.type == AccountBlockedType.VERIFICATION_EMAIL) resetLoginState() else stopLogin()
                 }
         }
     }
@@ -383,10 +386,13 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun resetFetchNodesUpdate() {
+    fun resetLoginState() {
+        performFetchNodesJob?.cancel()
         _state.update {
             it.copy(
-                fetchNodesUpdate = null
+                fetchNodesUpdate = null,
+                isLoginInProgress = false,
+                isLoginRequired = true
             )
         }
     }
@@ -890,39 +896,41 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun performFetchNodes() = viewModelScope.launch {
-        runCatching {
-            fetchNodesUseCase().collectLatest { update ->
-                if (update.progress?.floatValue == 1F) {
-                    Timber.d("fetch nodes finished")
-                    prefetchTimeline()
-                    _state.update {
-                        it.copy(
-                            intentState = LoginIntentState.ReadyForFinalSetup,
-                            fetchNodesUpdate = update
-                        )
+    private fun performFetchNodes() {
+        performFetchNodesJob = viewModelScope.launch {
+            runCatching {
+                fetchNodesUseCase().collectLatest { update ->
+                    if (update.progress?.floatValue == 1F) {
+                        Timber.d("fetch nodes finished")
+                        prefetchTimeline()
+                        _state.update {
+                            it.copy(
+                                intentState = LoginIntentState.ReadyForFinalSetup,
+                                fetchNodesUpdate = update
+                            )
+                        }
+                        startWorkers()
+                    } else {
+                        Timber.d("fetch nodes update")
+                        _state.update { it.copy(fetchNodesUpdate = update) }
                     }
-                    startWorkers()
-                } else {
-                    Timber.d("fetch nodes update")
-                    _state.update { it.copy(fetchNodesUpdate = update) }
                 }
-            }
-        }.onFailure { exception ->
-            Timber.e(exception)
-            if (exception !is FetchNodesException) return@launch
+            }.onFailure { exception ->
+                Timber.e(exception)
+                if (exception !is FetchNodesException) return@launch
 
-            _state.update { state ->
-                val messageId =
-                    exception.takeUnless { exception is FetchNodesErrorAccess || state.pressedBackWhileLogin }
+                _state.update { state ->
+                    val messageId =
+                        exception.takeUnless { exception is FetchNodesErrorAccess || state.pressedBackWhileLogin }
 
-                state.copy(
-                    isLoginInProgress = false,
-                    isLoginRequired = true,
-                    is2FAEnabled = false,
-                    is2FARequired = false,
-                    snackbarMessage = messageId?.let { triggered(exception.error) } ?: consumed()
-                )
+                    state.copy(
+                        isLoginInProgress = false,
+                        isLoginRequired = true,
+                        is2FAEnabled = false,
+                        is2FARequired = false,
+                        snackbarMessage = messageId?.let { triggered(exception.error) } ?: consumed()
+                    )
+                }
             }
         }
     }
