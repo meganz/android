@@ -45,10 +45,8 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.model.rememberListGridNavigationState
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.utils.ListGridStateMap
-import mega.privacy.android.shared.original.core.ui.utils.getState
-import mega.privacy.android.shared.original.core.ui.utils.sync
 
 /**
  * View for Search compose
@@ -87,16 +85,10 @@ fun SearchComposeView(
     nodeSourceType: NodeSourceType,
     modifier: Modifier = Modifier,
 ) {
-    var listStateMap by rememberSaveable(saver = ListGridStateMap.Saver) {
-        mutableStateOf(emptyMap())
-    }
-    LaunchedEffect(state.navigationLevel, state.currentParentHandle) {
-        listStateMap = listStateMap.sync(
-            openedHandles = listOf(state.rootParentHandle) + state.navigationLevel.map { it.first },
-            currentHandle = state.currentParentHandle,
-        )
-    }
-    val currentListState = listStateMap.getState(state.currentParentHandle)
+    val currentListState = rememberListGridNavigationState(
+        currentHandle = state.currentParentHandle,
+        navigationHandles = listOf(state.rootParentHandle) + state.navigationLevel.map { it.first },
+    )
     val scaffoldState = rememberScaffoldState()
     var topBarPadding by remember { mutableStateOf(0.dp) }
     var searchQuery by rememberSaveable {

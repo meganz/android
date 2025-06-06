@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.videosection.view.videoselected
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
@@ -17,12 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -43,13 +36,13 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
+import mega.privacy.android.shared.original.core.ui.model.rememberListGridNavigationState
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
-import mega.privacy.android.shared.original.core.ui.utils.ListGridStateMap
-import mega.privacy.android.shared.original.core.ui.utils.getState
-import mega.privacy.android.shared.original.core.ui.utils.sync
+import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -67,21 +60,11 @@ internal fun VideoSelectedView(
     fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
 ) {
-    var listStateMap by rememberSaveable(saver = ListGridStateMap.Saver) {
-        mutableStateOf(emptyMap())
-    }
 
-    /**
-     * When back navigation performed from a folder, remove the listState/gridState of that node handle
-     */
-    LaunchedEffect(
-        uiState.currentFolderHandle,
-        uiState.nodesList,
-        uiState.openedFolderNodeHandles
-    ) {
-        listStateMap =
-            listStateMap.sync(uiState.openedFolderNodeHandles, uiState.currentFolderHandle)
-    }
+    val currentListState = rememberListGridNavigationState(
+        currentHandle = uiState.currentFolderHandle,
+        navigationHandles = uiState.openedFolderNodeHandles,
+    )
 
     Scaffold(
         modifier = modifier
@@ -144,7 +127,6 @@ internal fun VideoSelectedView(
                     id = SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
                         ?: R.string.sortby_name
                 )
-                val currentListState = listStateMap.getState(uiState.currentFolderHandle)
 
                 if (uiState.currentViewType == ViewType.LIST) {
                     VideoSelectedNodeListView(

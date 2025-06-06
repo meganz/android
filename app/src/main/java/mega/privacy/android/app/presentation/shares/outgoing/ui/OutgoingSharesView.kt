@@ -5,10 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -25,9 +22,7 @@ import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
-import mega.privacy.android.shared.original.core.ui.utils.ListGridStateMap
-import mega.privacy.android.shared.original.core.ui.utils.getState
-import mega.privacy.android.shared.original.core.ui.utils.sync
+import mega.privacy.android.shared.original.core.ui.model.rememberListGridNavigationState
 
 /**
  * Composable view for Outgoing Shares
@@ -58,21 +53,10 @@ fun OutgoingSharesView(
     fileTypeIconMapper: FileTypeIconMapper
 ) {
 
-    var listStateMap by rememberSaveable(saver = ListGridStateMap.Saver) {
-        mutableStateOf(emptyMap())
-    }
-
-    /**
-     * When back navigation performed from a folder, remove the listState/gridState of that node handle
-     */
-    LaunchedEffect(uiState.openedFolderNodeHandles, uiState.nodesList, uiState.currentHandle) {
-        listStateMap = listStateMap.sync(
-            uiState.openedFolderNodeHandles,
-            uiState.currentHandle
-        )
-    }
-
-    val currentListState = listStateMap.getState(uiState.currentHandle)
+    val currentListState = rememberListGridNavigationState(
+        currentHandle = uiState.currentHandle,
+        navigationHandles = uiState.openedFolderNodeHandles,
+    )
 
     val isListAtTop by remember(currentListState) {
         derivedStateOf {
