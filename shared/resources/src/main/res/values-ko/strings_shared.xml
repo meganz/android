@@ -850,6 +850,8 @@
     <string name="transfers_notification_downloading_preview">미리 보기를 위해 %1$s 준비 중</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">%1$s의 미리보기를 준비 중 (일시정지됨)</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">‟%1$s” was removed</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="other">대기열에서 항목 %2$d개 제거함</item>
@@ -900,16 +902,24 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">쿠키와 광고 설정</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">장치의 폴더를 MEGA의 폴더와 동기화 또는 백업하세요. [U]더 알아보기[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">다운로드를 취소할까요?</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">나에게 쓴 노트</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">나를 위해 보관</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">자신에게 민감한 정보, 사진과 동영상, 다음 벤처를 위한 아이디어를 보내세요. 모든 장치에서 동기화되고 영지식 암호화로 보호됩니다.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="other">파일 %2$d개가 “%1$s”에 추가되었습니다. 중복 파일은 다시 추가할 수 없습니다.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">클라우드 드라이브에 %1$s를/을 저장하는 중...</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">무언가 잘못 되었습니다. 다운로드가 취소되지 않았습니다.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">즉시 %1$s가/이 청구되지만 정부 규제로 인하여 당신의 구독은 12개월 후 자동으로 갱신되지 않습니다. 기간이 만료된 이후 구독을 갱신하는 것은 당신의 책임입니다. [A]Google&#160;Play[/A]의 구독을 통하여 당신의 구독을 언제든지 관리하거나 취소할 수 있습니다. 당신의 계정을 업그레이드함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 처리 방침[/C]에 동의하는 것입니다.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
@@ -1252,6 +1262,4 @@
     <string name="text_received_mega_vpn_free_trial">MEGA&#160;VPN 무료 체험을 시작하여 %1$s 저장 공간을 받았습니다</string>
     <!-- text of received mega pass free trial in achivements section -->
     <string name="text_received_mega_pass_free_trial">MEGA&#160;Pass 무료 체험을 시작하여 %1$s 저장 공간을 받았습니다</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">일부 폴더는 MEGA 앱이 로컬 폴더에 대한 접근 권한을 상실하여 동기화하거나 백업할 수 없습니다. 재개를 탭하여 영향 받은 각 폴더의 권한을 다시 추가하세요.</string>
 </resources>

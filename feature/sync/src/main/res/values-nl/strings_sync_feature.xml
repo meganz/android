@@ -131,7 +131,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Een lokale fout verhindert maptoegang</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Bestandssysteemfout waardoor toegang tot mappen wordt voorkomen.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Het doel bevindt zich te diep in uw mappenstructuur.\n Verplaats het naar een locatie die minder dan 64 mappen diep is.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -148,6 +148,4 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">Er is lokaal een actie voor het verplaatsen of hernoemen van de naam gedetecteerd, maar deze kon niet worden gerepliceerd in MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Wacht tot de scan is voltooid om te bepalen of het bestand is verplaatst of verwijderd.</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Sommige mappen kunnen niet worden gesynchroniseerd of er kan geen back-up van worden gemaakt omdat de MEGA-applicatie geen rechten meer heeft om toegang te krijgen tot de lokale mappen. Tik op Hervatten om machtigingen opnieuw toe te voegen voor elke betreffende map.</string>
 </resources>

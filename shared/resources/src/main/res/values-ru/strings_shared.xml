@@ -892,6 +892,8 @@
     <string name="transfers_notification_downloading_preview">Подготовка %1$s для просмотра</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">Подготовка %1$s для предварительного просмотра (приостановлено)</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">«%1$s» удалён из очереди</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="one">«%1$s» удалён из очереди</item>
@@ -945,10 +947,16 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Настройки куки-файлов и рекламы</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">Синхронизируйте папку на устройстве с папкой в MEGA или создайте резервную копию. [U]Подробнее[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">Отменить скачивание?</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Заметка для себя</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">Сохраните себе</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">Отправляйте себе конфиденциальную информацию, фото и видео или идеи для следующего большого начинания. Синхронизируется на всех ваших устройствах и защищено шифрованием с нулевым разглашением.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="one">1 файл добавлен в «%1$s». Дубликаты файлов нельзя добавить ещё раз.</item>
@@ -958,6 +966,8 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Сохранение %1$s на Облачном диске&#8230;</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">Что-то пошло не так. Скачивание не было отменено.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">У вас немедленно будет списано %1$s, но в соответствии с правительственными постановлениями ваша подписка не будет автоматически продлена через 12 месяцев. Вы сами отвечаете за продление подписки после ее истечения. Управлять подпиской или отменить её можно в любое время в разделе «Подписки» в [A]Google&#160;Play[/A]. Улучшая аккаунт, вы соглашаетесь с [B]Условиями использования[/B] и [C]Политикой конфиденциальности[/C] MEGA.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
@@ -1282,13 +1292,13 @@
     <!-- State to indicate an achievement has applied -->
     <string name="applied_label">Применено</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
-    <string name="title_start_mega_vpn_free_trial">Активируйте бесплатную пробную версию MEGA&#160;VPN</string>
+    <string name="title_start_mega_vpn_free_trial">Начните бесплатную пробную версию MEGA&#160;VPN</string>
     <!-- Text of the section for start mega vpn free trial in achivements section -->
-    <string name="text_start_mega_vpn_free_trial">%1$s на диске. Действует постоянно.</string>
+    <string name="text_start_mega_vpn_free_trial">%1$s of storage. Valid permanently.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
-    <string name="title_start_mega_pass_free_trial">Активируйте бесплатную пробную версию MEGA&#160;Pass</string>
+    <string name="title_start_mega_pass_free_trial">Начните бесплатную пробную версию MEGA&#160;Pass</string>
     <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s на диске. Действует постоянно.</string>
+    <string name="text_start_mega_pass_free_trial">%1$s of storage. Valid permanently.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
     <string name="button_text_install_mega_vpn">Установите MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
@@ -1300,9 +1310,7 @@
     <!-- text of how it works for mega pass free trial in achivements section -->
     <string name="text_how_it_works_mega_pass_free_trial">Установите приложение MEGA&#160;Pass, войдите в свой аккаунт MEGA и активируйте бесплатную пробную версию. Бонусное хранилище будет добавлено автоматически после активации бесплатной пробной версии.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">Вы получили %1$s на диске за то, что активировали бесплатную пробную версию MEGA&#160;VPN</string>
+    <string name="text_received_mega_vpn_free_trial">You have received %1$s storage space for starting a MEGA&#160;VPN free trial</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">Вы получили %1$s на диске за то, что активировали бесплатную пробную версию MEGA&#160;Pass</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Для некоторых папок невозможно выполнить синхронизацию или резервное копирование, так как приложение MEGA потеряло разрешения на доступ к локальным папкам. Нажмите «Возобновить», чтобы повторно добавить разрешения для каждой затронутой папки.</string>
+    <string name="text_received_mega_pass_free_trial">You have received %1$s storage space for starting a MEGA&#160;Pass free trial</string>
 </resources>

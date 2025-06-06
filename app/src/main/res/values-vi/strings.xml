@@ -185,7 +185,7 @@
     <!-- The name of every users root drive in the cloud of MEGA. -->
     <string name="section_cloud_drive">Ổ&#160;Mây</string>
     <!-- Label to reference a recents section -->
-    <string name="section_recents">Gần&#160;Đây</string>
+    <string name="section_recents">Gần Đây</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Đăng tải phương&#160;tiện&#160;số</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
@@ -885,7 +885,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">Đảo Bảo Bí Mật</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">Đường liên kết này không thuộc sở hữu của tài khoản hiện tại. Xin đăng nhập vào tài khoản phù hợp.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">Đường liên kết này đã hết hạn, xin thử lạI cái khác.</string>
     <!-- Text shown after searching and no results found -->
@@ -2297,11 +2297,11 @@
     <!-- Title of the create account screen -->
     <string name="create_account_title">Đăng ký tài khoản MEGA</string>
     <!-- Label to reference a recents section -->
-    <string name="recents_label">Gần&#160;Đây</string>
+    <string name="recents_label">Gần Đây</string>
     <!-- Label to reference a chats section -->
     <string name="chats_label">Cuộc chat</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]Không có tệp&#160;tin nào trong [/B][A]sử&#160;dụng Gần&#160;Đây[/A]</string>
+    <string name="context_empty_recents">[B]Không có tệp tin nào trong [/B][A]Hoạt Động Gần Đây[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s và %2$d mục nữa</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -2335,7 +2335,7 @@
     <!-- The message of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_message">Vui lòng chờ&#8230;</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="business_label">Doanh&#160;Nghiệp</string>
+    <string name="business_label">Doanh Nghiệp</string>
     <!-- General label to show the status of something or someone -->
     <string name="status_label">Trạng thái</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
@@ -2967,7 +2967,7 @@
     <!-- Action button which allows to show the recent activity. -->
     <string name="show_activity_action">Hiện hoạt&#160;động</string>
     <!-- Text informing the recent activity is hidden. -->
-    <string name="recents_activity_hidden">Hoạt động [B]Gần&#160;Đây[/B] bị ẩn</string>
+    <string name="recents_activity_hidden">Hoạt động [B]gần đây[/B] bị ẩn</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">ID dấu vân tay</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
@@ -2986,6 +2986,8 @@
     <string name="disable_versioning_label">Tắt viết nhật&#160;ký phiên&#160;bản tệp&#160;tin</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">Tính năng ghi nhật&#160;ký phiên&#160;bản tệp&#160;tin của chúng&#160;tôi đảm&#160;bảo rằng phiên&#160;bản cũ của tệp&#160;tin được giữ lại khi bạn cập&#160;nhật và chỉnh&#160;sửa nội&#160;dung hiện có của tệp&#160;tin. Nếu bạn tắt đi nhật&#160;ký phiên&#160;bản tệp&#160;tin, bạn sẽ mất đi sự bảo&#160;vệ này; có nghĩa là khi bạn chỉnh&#160;sửa tệp&#160;tin, phiên&#160;bản cũ của tệp sẽ bị ghi đè và thay&#160;thế với cái mới.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">Vị trí này không còn tồn tại.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Bạn đã gửi cho %1$s rồi</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->

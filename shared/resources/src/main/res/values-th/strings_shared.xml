@@ -850,6 +850,8 @@
     <string name="transfers_notification_downloading_preview">กำลังเตรียม %1$s เพื่อแสดงตัวอย่าง</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">กำลังเตรียม %1$s เพื่อแสดงตัวอย่าง (หยุดชั่วคราว)</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">รายการ “%1$s” ถูกลบออกจากคิวแล้ว</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="other">ลบรายการออกจากคิวแล้ว %2$d รายการ</item>
@@ -900,18 +902,26 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">การตั้งค่าคุกกี้และโฆษณา</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">ซิงค์หรือสำรองข้อมูลในโฟลเดอร์ของอุปกรณ์คุณเข้ากับโฟลเดอร์ใน MEGA [U]เรียนรู้เพิ่มเติม[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">ยกเลิกการดาวน์โหลดหรือไม่</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">โน้ตถึงตัวเอง</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">เก็บโน้ตนี้ไว้สำหรับคุณ</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">ส่งข้อมูลลับ รูปภาพ วิดีโอ หรือไอเดียสำหรับธุรกิจใหญ่ครั้งต่อไปของคุณถึงตัวเอง ซิงค์ข้อมูลระหว่างอุปกรณ์ทั้งหมดของคุณ และปกป้องด้วยการเข้ารหัสแบบซีโร่-นอว์เลจ</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="other">เพิ่มไฟล์ %2$d ไฟล์ไปยังอัลบั้ม “%1$s”. ไม่สามารถเพิ่มไฟล์ที่ซ้ำกันได้</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">กำลังบันทึก %1$s ไปยังคลาว์ไดร์ฟ&#8230;</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">เกิดข้อผิดพลาด การดาวน์โหลดไม่ถูกยกเลิก</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">ระบบจะเรียกเก็บค่าบริการ %1$s ทันที แต่การสมัครใช้งานของคุณจะไม่ได้รับการต่ออายุโดยอัตโนมัติหลังจาก 12 เดือน เนื่องจากข้อกำหนดของรัฐบาล ผู้ใช้จะต้องดำเนินการต่ออายุการสมัครใช้งานด้วยตนเองเมื่อหมดอายุ ผู้ใช้สามารถจัดการหรือยกเลิกการสมัครใช้งานได้ทุกเมื่อผ่านเมนูการสมัครใช้บริการใน [A]Google&#160;Play[/A] เมื่อผู้ใช้ทำการอัปเกรดบัญชี แสดงว่าผู้ใช้ยอมรับ[B]เงื่อนไขการให้บริการ[/B]และ[C]นโยบายความเป็นส่วนตัว[/C]ของ MEGA</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">กำลังอัปโหลด&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -969,7 +979,7 @@
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
     <string name="general_sync_notification_generic_error_title">การซิงค์หยุดทำงาน</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">ตรวจสอบการซิงค์ของคุณในแอปเพื่อแก้ไขปัญหานี้</string>
+    <string name="general_sync_notification_generic_error_text">Check your syncs in the app to resolve this.</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
     <string name="general_sync_notification_stalled_issues_title">ตรวจพบปัญหาการซิงค์</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
@@ -1021,7 +1031,7 @@
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_text">คุณจะไม่สามารถแสดงตัวอย่างไฟล์นี้ได้อีกต่อไป</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">ไม่สามารถโหลดตัวอย่างได้ ลองอีกครั้ง</string>
+    <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_preview_download">เกิดข้อผิดพลาด ไม่สามารถยกเลิกแสดงตัวอย่างได้ ดูรายละเอียดที่การแจ้งเตือน</string>
     <!-- Title of the Rename and Create Backup Dialog -->
@@ -1033,7 +1043,7 @@
     <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_positive_button">เปลี่ยนชื่อ</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">กรอกชื่อสำรองข้อมูล</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
     <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">มีสำรองข้อมูลชื่อนี้อยู่แล้ว กรุณากรอกชื่ออื่น</string>
     <!-- USP Carousel page 1 title-->
@@ -1063,7 +1073,7 @@
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">ควบคุมการมองเห็นได้ง่าย</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">หากต้องการแสดงไฟล์ที่ซ่อนอยู่ ให้เปิดการตั้งค่า “แสดงรายการที่ซ่อนอยู่” ใน “การจัดการไฟล์ - หน้าจอผู้ใช้” ในการตั้งค่าแอปของคุณ</string>
+    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” - “User interface” in your app settings.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">ไฟล์ที่แชร์ยังคงมองเห็นได้</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
@@ -1093,29 +1103,29 @@
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
     <string name="general_link_unavailable_subtitle">ซึ่งอาจเป็นเพราะเหตุผลดังต่อไปนี้:</string>
     <!-- Bullet point shown when link is unavailable due to invalid URL -->
-    <string name="general_link_unavailable_invalid_url">URL ไม่ถูกต้อง - ลิงก์ที่คุณพยายามเข้าถึงไม่มีอยู่จริง</string>
+    <string name="general_link_unavailable_invalid_url">Invalid URL - the link you’re trying to access does not exist</string>
     <!-- Bullet point shown when link is unavailable due to expiration -->
-    <string name="general_link_expired">ลิงก์นี้หมดอายุแล้ว</string>
+    <string name="general_link_expired">The link has expired</string>
     <!-- Title shown when a folder link is unavailable (general case) -->
-    <string name="folder_link_unavailable_title">ลิงก์โฟลเดอร์ที่คุณกำลังจะเปิดไม่สามารถใช้งานได้</string>
+    <string name="folder_link_unavailable_title">The folder link you’re trying to access is not available</string>
     <!-- Bullet point shown when a folder link is unavailable because the link has been disabled -->
-    <string name="folder_link_unavailable_disabled">เจ้าของปิดใช้งานลิงก์โฟลเดอร์แล้ว</string>
+    <string name="folder_link_unavailable_disabled">The folder link has been disabled by the owner</string>
     <!-- Title shown when a folder link has expired -->
-    <string name="folder_link_expired_title">ลิงก์โฟลเดอร์ที่คุณกำลังจะเปิดไม่สามารถใช้งานได้แล้ว</string>
+    <string name="folder_link_expired_title">The folder link you’re trying to access is no longer available</string>
     <!-- Title of the dialog shown when the user needs to verify administrator credentials -->
-    <string name="unverified_business_account_dialog_title">ยืนยันข้อมูลรับรองผู้ดูแลระบบเพื่อดำเนินการต่อ</string>
+    <string name="unverified_business_account_dialog_title">Verify administrator credentials to continue</string>
     <!-- Description of the dialog explaining the need to verify administrator credentials -->
-    <string name="unverified_business_account_dialog_description">เพื่อดำเนินการต่อ คุณต้องยืนยันข้อมูลรับรองของผู้ดูแลระบบบัญชีธุรกิจของคุณ กรุณาเข้าสู่ระบบบัญชีของคุณผ่านเว็บเบราว์เซอร์บนคอมพิวเตอร์และทำการยืนยันข้อมูลรับรองให้เสร็จสิ้น</string>
+    <string name="unverified_business_account_dialog_description">You need to verify your Business account administrator’s credentials in order to continue. Log in to your account in a desktop web browser and complete the credential verification.</string>
     <!-- Title shown when a file link is unavailable (general case) -->
-    <string name="file_link_unavailable_title">ลิงก์ไฟล์ที่คุณกำลังจะเปิดไม่สามารถใช้งานได้แล้ว</string>
+    <string name="file_link_unavailable_title">The file link you’re trying to access is no longer available</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="file_link_unavailable_disabled">เจ้าของปิดใช้งานลิงก์ไฟล์แล้ว</string>
+    <string name="file_link_unavailable_disabled">The file link has been disabled by the owner</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="file_link_unavailable_deleted">ไฟล์ถูกลบแล้ว</string>
+    <string name="file_link_unavailable_deleted">The file has been deleted</string>
     <!-- Title shown when a file link has expired -->
-    <string name="file_link_expired_title">ลิงก์ไฟล์ที่คุณกำลังจะเปิดไม่สามารถใช้งานได้</string>
+    <string name="file_link_expired_title">The file link you’re trying to access is not available</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="folder_link_unavailable_deleted">โฟลเดอร์ถูกลบแล้ว</string>
+    <string name="folder_link_unavailable_deleted">The folder has been deleted</string>
     <!-- Tooltip description for transfer section play action -->
     <string name="transfers_section_action_play">เล่น</string>
     <!-- Tooltip description for transfer section play action -->
@@ -1133,17 +1143,17 @@
     <!--Text for showing the empty state when there are no completed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
     <string name="transfers_no_completed_transfers_empty_text">ไม่มีรายการถ่ายโอน</string>
     <!--Text for showing the empty state when there are no failed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
-    <string name="transfers_no_failed_transfers_empty_text">[A]ไม่พบรายการถ่ายโอนที่ล้มเหลว[/A]</string>
+    <string name="transfers_no_failed_transfers_empty_text">[A]No failed transfers[/A]</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the current transferred size, the second one is to set the size of the file. Example 12.4MB of 33.3MB -->
-    <string name="transfers_completed_transfer_size_indicator">%1$s จาก %2$s</string>
+    <string name="transfers_completed_transfer_size_indicator">%1$s of %2$s</string>
     <!-- Title for the Free Plan card -->
     <string name="free_plan_card_title">เริ่มต้นใช้งานแผนฟรีของเรา</string>
     <!-- Description for the Free Plan card -->
-    <string name="free_plan_card_description">คุณไม่จำเป็นต้องสมัครแผนแบบชำระเงินทันที แผนบริการฟรีของเรามีพื้นที่จัดเก็บและโควตาการถ่ายโอนให้มากมาย</string>
+    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our free plan offers generous amounts of storage and transfer quota</string>
     <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">พื้นที่จัดเก็บ 20 GB</string>
+    <string name="free_plan_card_storage_feature">20 GB of storage</string>
     <!-- Feature text for Free Plan transfer quota -->
-    <string name="free_plan_card_transfer_feature">การถ่ายโอนข้อมูลจำกัด</string>
+    <string name="free_plan_card_transfer_feature">Limited transfers</string>
     <!-- Button text for Free Plan card -->
     <string name="free_plan_card_button">เริ่มต้นใช้งานฟรี</string>
     <!-- Section title for the features list -->
@@ -1151,19 +1161,19 @@
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">พื้นที่เก็บข้อมูลจุได้ไม่อั้น</string>
     <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">จัดเก็บข้อมูลได้สูงสุด 16&#160;TB</string>
+    <string name="pro_plan_feature_storage_desc">Store up to 16&#160;TB of data</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">แชร์การถ่ายโอนของคุณให้คนอื่นได้</string>
     <!-- Description for transfer sharing feature -->
-    <string name="pro_plan_feature_transfer_desc">คนที่คุณแชร์รายการด้วยสามารถใช้โควต้าของคุณเพื่อดาวน์โหลดและสตรีมไฟล์ได้</string>
+    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files</string>
     <!-- Title for MEGA VPN feature -->
     <string name="pro_plan_feature_vpn_title">ได้สิทธิ์ใช้งาน MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_desc">ปลอดภัยบนออนไลน์ด้วย VPN ความเร็วสูงของเราที่ทั้งเร็วและใช้งานง่าย</string>
+    <string name="pro_plan_feature_vpn_desc">Stay safe online with our high-speed VPN that’s both fast and simple to use</string>
     <!-- Title for MEGA Pass feature -->
     <string name="pro_plan_feature_pass_title">MEGA&#160;Pass</string>
     <!-- Description for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_desc">จัดการรหัสผ่านทั้งหมดของคุณและเก็บไว้อย่างปลอดภัยด้วยตัวจัดการรหัสผ่านของเรา</string>
+    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">แนะนำ</string>
     <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
@@ -1171,7 +1181,7 @@
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">อัปเกรดตอนนี้เลย</string>
     <!-- Section title for additional benefits of Pro plans -->
-    <string name="pro_plan_additional_benefits_section_title">ประโยชน์เพิ่มเติมของแผน Pro</string>
+    <string name="pro_plan_additional_benefits_section_title">Additional benefits of Pro plans</string>
     <!-- Benefit: Password-protected links -->
     <string name="pro_plan_benefit_password_protected_links">ป้องกันลิงก์ด้วยรหัสผ่านได้</string>
     <!-- Benefit: Links with expiry dates -->
@@ -1179,21 +1189,21 @@
     <!-- Benefit: Transfer quota sharing -->
     <string name="pro_plan_benefit_transfer_quota_sharing">การแชร์โควต้าการถ่ายโอน</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
-    <string name="pro_plan_benefit_auto_sync_mobile">ซิงค์โฟลเดอร์ในอุปกรณ์มือถือของคุณโดยอัตโนมัติ</string>
+    <string name="pro_plan_benefit_auto_sync_mobile">Automatically sync the folders on your mobile device</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
-    <string name="pro_plan_benefit_rewind_180_days">กู้คืนข้อมูลที่ถูกลบได้นานสูงสุด 180 วัน</string>
+    <string name="pro_plan_benefit_rewind_180_days">Rewind up to 180 days of deleted data</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
-    <string name="pro_plan_benefit_host_calls_unlimited">โทรและประชุมได้แบบไม่จำกัดจำนวนผู้เข้าร่วมและไม่มีข้อจำกัดด้านเวลา</string>
+    <string name="pro_plan_benefit_host_calls_unlimited">Host calls and meetings with unlimited participants and no time restrictions</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
-    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">กำหนดเวลาการล้างถังขยะระหว่าง 7 วันถึง 10 ปี</string>
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Schedule Rubbish bin clearing between 7 days and 10 years</string>
     <!-- Benefit: Priority support -->
     <string name="pro_plan_benefit_priority_support">การสนับสนุนแบบพิเศษ</string>
     <!-- Subscription page information section title at the bottom of the page-->
     <string name="choose_account_screen_subscription_information_title">รายละเอียดการสมัครใช้งาน</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
-    <string name="choose_account_screen_subscription_information_description">การสมัครใช้งานจะต่ออายุโดยอัตโนมัติทุกครั้ง โดยจะใช้ระยะเวลาและราคาเท่ากับครั้งแรกที่สมัคร\n\nคุณสามารถยกเลิกการสมัคร แผนได้ตลอดเวลา แต่ต้องทำก่อน 24 ชั่วโมงก่อนวันที่จะตัดเงินครั้งต่อไป [A]เรียนรู้วิธีจัดการการสมัครใช้งานได้ในตั้งค่าของคุณ[/A]</string>
+    <string name="choose_account_screen_subscription_information_description">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.\n\nYou can cancel your plan subscription any time but no later than 24 hours before your next subscription payment is due. [A]Learn how to manage your subscription in your settings[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]เงื่อนไขการให้บริการ และนโยบายความเป็นส่วนตัว[/A]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]Terms of Service and Privacy Policy[/A]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">รับสิทธิประโยชน์เพิ่มเติมด้วยการอัปเกรดเป็นแผน Pro</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1207,51 +1217,50 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">พื้นที่เก็บข้อมูล %1$s</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
-    <string name="choose_account_screen_transfer_quota_label">ถ่ายโอนข้อมูล %1$s</string>
+    <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
     <!-- General month label -->
     <string name="general_month">เดือน</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s ต่อเดือน</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">%1$s ต่อปี</string>
+    <string name="choose_account_screen_billed_yearly">%1$s charged yearly</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
-        <item quantity="other">ยกเลิกการซ่อน %1$d รายการแล้ว</item>
+        <item quantity="one">%1$d item unhidden</item>
+        <item quantity="other">%1$d items unhidden</item>
     </plurals>
     <!-- Title for secure slideshow mode tutorial -->
-    <string name="slideshow_tutorial_title">นำเสนอภาพนิ่งอย่างปลอดภัย</string>
+    <string name="slideshow_tutorial_title">Play slideshows securely</string>
     <!-- Step 1 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step1">กดปุ่มเปิด/ปิดเครื่องเพื่อล็อกหน้าจอ</string>
+    <string name="slideshow_tutorial_step1">Press the power button to lock your screen.</string>
     <!-- Step 2 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step2">รอ 2 วินาที</string>
+    <string name="slideshow_tutorial_step2">Wait for 2 seconds.</string>
     <!-- Step 3 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step3">กดปุ่มเปิด/ปิดเครื่องอีกครั้งเพื่อเปิดหน้าจอ</string>
+    <string name="slideshow_tutorial_step3">Press the power button again to turn the screen back on.</string>
     <!-- Note indicating the slideshow plays securely while locked -->
-    <string name="slideshow_tutorial_note">การนำเสนอภาพนิ่งจะยังคงเล่นอยู่ขณะที่อุปกรณ์ของคุณล็อกอย่างปลอดภัย</string>
+    <string name="slideshow_tutorial_note">The slideshow will play while your device remains securely locked.</string>
     <!-- State to indicate an achievement has applied -->
-    <string name="applied_label">ใช้สิทธิ์แล้ว</string>
+    <string name="applied_label">Applied</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
-    <string name="title_start_mega_vpn_free_trial">เริ่มทดลองใช้ MEGA&#160;VPN ฟรี</string>
+    <string name="title_start_mega_vpn_free_trial">Start MEGA&#160;VPN free trial</string>
     <!-- Text of the section for start mega vpn free trial in achivements section -->
-    <string name="text_start_mega_vpn_free_trial">พื้นที่เก็บข้อมูล %1$s ใช้งานได้ถาวร</string>
+    <string name="text_start_mega_vpn_free_trial">%1$s of storage. Valid permanently.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
-    <string name="title_start_mega_pass_free_trial">เริ่มทดลองใช้ MEGA&#160;Pass ฟรี</string>
+    <string name="title_start_mega_pass_free_trial">Start MEGA&#160;Pass free trial</string>
     <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">พื้นที่เก็บข้อมูล %1$s ใช้งานได้ถาวร</string>
+    <string name="text_start_mega_pass_free_trial">%1$s of storage. Valid permanently.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
-    <string name="button_text_install_mega_vpn">ติดตั้ง MEGA&#160;VPN</string>
+    <string name="button_text_install_mega_vpn">Install MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
-    <string name="button_text_install_mega_pass">ติดตั้ง MEGA&#160;Pass</string>
+    <string name="button_text_install_mega_pass">Install MEGA&#160;Pass</string>
     <!-- title of how it works for mega vpn free trial in achivements section -->
     <string name="title_how_it_works_free_trial">วิธีการทำงาน</string>
     <!-- text of how it works for mega vpn free trial in achivements section -->
-    <string name="text_how_it_works_mega_vpn_free_trial">ติดตั้งแอป MEGA&#160;VPN เข้าสู่ระบบด้วยบัญชี MEGA ของคุณ แล้วเริ่มทดลองใช้ฟรี พื้นที่เก็บข้อมูลโบนัสของคุณจะถูกเพิ่มให้โดยอัตโนมัติหลังจากที่คุณเริ่มทดลองใช้ฟรี</string>
+    <string name="text_how_it_works_mega_vpn_free_trial">Install the MEGA&#160;VPN app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
     <!-- text of how it works for mega pass free trial in achivements section -->
-    <string name="text_how_it_works_mega_pass_free_trial">ติดตั้งแอป MEGA&#160;Pass เข้าสู่ระบบด้วยบัญชี MEGA ของคุณ แล้วเริ่มทดลองใช้ฟรี พื้นที่เก็บข้อมูลโบนัสของคุณจะถูกเพิ่มให้โดยอัตโนมัติหลังจากที่คุณเริ่มทดลองใช้ฟรี</string>
+    <string name="text_how_it_works_mega_pass_free_trial">Install the MEGA&#160;Pass app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">คุณได้รับพื้นที่เก็บข้อมูล %1$s จากการเริ่มทดลองใช้ MEGA&#160;VPN ฟรี</string>
+    <string name="text_received_mega_vpn_free_trial">You have received %1$s storage space for starting a MEGA&#160;VPN free trial</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">คุณได้รับพื้นที่เก็บข้อมูล %1$s จากการเริ่มทดลองใช้ MEGA&#160;Pass ฟรี</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">โฟลเดอร์บางรายการไม่สามารถซิงค์หรือสำรองข้อมูลได้ เนื่องจากแอป MEGA สูญเสียสิทธิ์ในการเข้าถึงโฟลเดอร์ในเครื่อง แตะ ดำเนินการต่อ เพื่อเพิ่มสิทธิ์สำหรับแต่ละโฟลเดอร์ที่ได้รับผลกระทบอีกครั้ง</string>
+    <string name="text_received_mega_pass_free_trial">You have received %1$s storage space for starting a MEGA&#160;Pass free trial</string>
 </resources>

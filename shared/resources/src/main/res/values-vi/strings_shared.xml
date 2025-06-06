@@ -850,6 +850,8 @@
     <string name="transfers_notification_downloading_preview">Đang chuẩn bị %1$s để xem trước</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">Đang chuẩn bị %1$s để xem trước (bị tạm dừng)</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">‟%1$s” đã bị loại bỏ</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="other">Đã loại bỏ %2$d mục khỏi xếp hàng chờ</item>
@@ -900,16 +902,24 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie và cài&#160;đặt quảng&#160;cáo</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">Đồng bộ hóa hoặc sao lưu một thư mục trên thiết bị của bạn với một thư mục trên MEGA. [U]Tìm hiểu thêm[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">Hủy phiên tải xuống?</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Ghi chú cho bản&#160;thân</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">Giữ mọi thứ cho riêng mình</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">Gửi cho chính mình thông&#160;tin nhạy&#160;cảm, hình ảnh và video hoặc ý&#160;tưởng cho dự&#160;án lớn tiếp theo của bạn. Tất cả được đồng&#160;bộ hóa trên tất cả các thiết&#160;bị của bạn và được bảo&#160;vệ bằng mã hóa vô kiến&#160;thức.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="other">%2$d tệp&#160;tin được thêm vào “%1$s”. Những tệp&#160;tin có trùng lặp sẽ không thể thêm lại</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Đang lưu %1$s vào Ổ&#160;Mây...</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">Có gì đó đã xảy ra. Phiên tải xuống đã không bị hủy.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
@@ -1053,13 +1063,13 @@
     <!-- USP Carousel page 4 description-->
     <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
     <!-- Create account label-->
-    <string name="general_label_create_account">Tạo tài&#160;khoản</string>
+    <string name="general_label_create_account">Tạo tài&#160;khoản MEGA</string>
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Tính năng mới: Tệp&#160;tin và thư&#160;mục ẩn</string>
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Ẩn đi tệp&#160;tin và thư&#160;mục</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Dễ&#160;dàng giữ các tệp&#160;tin nhạy cảm trong Ổ&#160;Mây của bạn ở chế&#160;độ riêng&#160;tư và ngoài tầm nhìn. Theo mặc&#160;định, các tệp&#160;tin ẩn đi không có xuất&#160;hiện trong phần Ổ&#160;Mây, Ảnh và hoạt&#160;động Gần&#160;Đây của bạn.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Dễ&#160;dàng giữ các tệp&#160;tin nhạy cảm trong Ổ&#160;Mây của bạn ở chế&#160;độ riêng&#160;tư và ngoài tầm nhìn. Theo mặc&#160;định, các tệp&#160;tin ẩn đi không có xuất&#160;hiện trong phần Ổ&#160;Mây, Ảnh và Sử dụng gần đây của bạn.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Kiểm soát chế&#160;độ hiển&#160;thị dễ dàng</string>
     <!-- Hidden nodes description: control visibility feature -->
@@ -1230,29 +1240,27 @@
     <!-- Note indicating the slideshow plays securely while locked -->
     <string name="slideshow_tutorial_note">The slideshow will play while your device remains securely locked.</string>
     <!-- State to indicate an achievement has applied -->
-    <string name="applied_label">Đã áp dụng</string>
+    <string name="applied_label">Applied</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
-    <string name="title_start_mega_vpn_free_trial">Bắt&#160;đầu hạn dùng thử MEGA&#160;VPN miễn&#160;phí</string>
+    <string name="title_start_mega_vpn_free_trial">Start MEGA&#160;VPN free trial</string>
     <!-- Text of the section for start mega vpn free trial in achivements section -->
-    <string name="text_start_mega_vpn_free_trial">%1$s vào không gian lưu trữ. Có hiệu lực vĩnh viễn.</string>
+    <string name="text_start_mega_vpn_free_trial">%1$s of storage. Valid permanently.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
-    <string name="title_start_mega_pass_free_trial">Bắt&#160;đầu hạn dùng thử MEGA&#160;Pass miễn&#160;phí</string>
+    <string name="title_start_mega_pass_free_trial">Start MEGA&#160;Pass free trial</string>
     <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s vào không gian lưu trữ. Có hiệu lực vĩnh viễn.</string>
+    <string name="text_start_mega_pass_free_trial">%1$s of storage. Valid permanently.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
-    <string name="button_text_install_mega_vpn">Cài MEGA&#160;VPN</string>
+    <string name="button_text_install_mega_vpn">Install MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
-    <string name="button_text_install_mega_pass">Cài MEGA&#160;Pass</string>
+    <string name="button_text_install_mega_pass">Install MEGA&#160;Pass</string>
     <!-- title of how it works for mega vpn free trial in achivements section -->
     <string name="title_how_it_works_free_trial">Cách hoạt động</string>
     <!-- text of how it works for mega vpn free trial in achivements section -->
-    <string name="text_how_it_works_mega_vpn_free_trial">Cài ứng&#160;dụng MEGA&#160;VPN, đăng&#160;nhập bằng tài&#160;khoản MEGA của bạn và bắt&#160;đầu hạn dùng thử miễn&#160;phí. Phần thưởng không&#160;gian lưu&#160;trữ sẽ được thêm tự&#160;động sau khi hạn dùng thử bắt&#160;đầu.</string>
+    <string name="text_how_it_works_mega_vpn_free_trial">Install the MEGA&#160;VPN app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
     <!-- text of how it works for mega pass free trial in achivements section -->
-    <string name="text_how_it_works_mega_pass_free_trial">Cài ứng&#160;dụng MEGA&#160;Pass, đăng&#160;nhập bằng tài&#160;khoản MEGA của bạn và bắt&#160;đầu hạn dùng thử miễn&#160;phí. Phần thưởng không&#160;gian lưu&#160;trữ sẽ được thêm tự&#160;động sau khi hạn dùng thử bắt&#160;đầu.</string>
+    <string name="text_how_it_works_mega_pass_free_trial">Install the MEGA&#160;Pass app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">Bạn đã nhận được %1$s cho không&#160;gian lưu&#160;trữ khi dùng thử MEGA&#160;VPN miễn&#160;phí</string>
+    <string name="text_received_mega_vpn_free_trial">You have received %1$s storage space for starting a MEGA&#160;VPN free trial</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">Bạn đã nhận được %1$s cho không&#160;gian lưu&#160;trữ khi dùng thử MEGA&#160;Pass miễn&#160;phí</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
+    <string name="text_received_mega_pass_free_trial">You have received %1$s storage space for starting a MEGA&#160;Pass free trial</string>
 </resources>

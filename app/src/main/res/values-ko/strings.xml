@@ -885,7 +885,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">비밀 보장</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">이 링크는 이 계정과 연결되어 있지 않습니다. 올바른 계정으로 로그인 하세요.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">이 취소 링크가 만료되었습니다, 다시 시도하세요.</string>
     <!-- Text shown after searching and no results found -->
@@ -2355,7 +2355,7 @@
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">뭔가 잘못됐습니다</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text_2">문제를 해결하고 계정을 활성화하려면 비즈니스 계정 관리자에게 연락하세요.</string>
+    <string name="expired_user_business_text_2">Contact your Business account administrator to resolve the issue and activate your account.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
     <string name="logout_warning_offline">로그아웃할 때, 오프라인 섹션의 파일들이 당신의 기기에서 삭제됩니다.</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
@@ -2986,6 +2986,8 @@
     <string name="disable_versioning_label">파일 버전 관리 비활성화</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">파일 버전 관리 기능은 만약 파일을 새 버전으로 교체했을 경우 오래된 버전을 유지합니다. 만약 비활성화하면 이러한 보호를 더이상 받지 못 합니다; 파일을 교체할 때 이전 버전이 사라집니다.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">이 위치가 더 이상 존재하지 않습니다.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">당신은 이미 %1$s님을 초대하였습니다</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
@@ -4655,7 +4657,7 @@
     <!-- Camera uploads updated info in Photos screen. -->
     <string name="photos_camera_uploads_updated">카메라 업로드 업데이트됨</string>
     <!-- Camera uploads no internet info in Photos screen. -->
-    <string name="photos_camera_uploads_no_internet">인터넷 연결이 없어서 업로드가 일시정지 되었습니다</string>
+    <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">배터리가 %1$d%% 이하이기 대문에 업로드를 일시정지 하였습니다</string>
     <!-- Camera uploads general issue info in Photos screen. -->

@@ -878,6 +878,8 @@
     <string name="transfers_notification_downloading_preview">Pregătirea %1$s pentru previzualizare</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">Pregătirea %1$s pentru previzualizare (întrerupt)</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">‟%1$s” was removed</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="one">„%1$s” a fost eliminat din coadă</item>
@@ -930,10 +932,16 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Setări cookie și anunțuri</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">Sincronizați sau faceți o copie de rezervă a unui folder de pe dispozitiv cu un folder de pe MEGA. [U] Aflați mai multe [/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">Anulați descărcarea?</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Notă pentru sine</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">Păstrează-l pentru tine</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">Trimite-ți informații sensibile, poze și videoclipuri sau idei pentru următoarea ta afacere mare. Sincronizat pe toate dispozitivele dvs. și protejat cu criptarea tip zero cunoștințe.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="one">1 fișier adăugat la „%1$s”. Fișierele duplicate nu pot fi adăugate din nou.</item>
@@ -942,6 +950,8 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Economisirea %1$s către Unitatea cloud...</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">Ceva nu a mers bine. Descărcarea nu a fost anulată.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Veți fi taxat %1$s imediat, dar abonamentul dvs. nu se va reînnoi automat după 12 luni din cauza reglementărilor guvernamentale. Va fi responsabilitatea dvs. să vă reînnoiți abonamentul după expirarea acestuia. Vă puteți gestiona sau anula abonamentul oricând prin Abonamente în [A]Google&#160;Play[/A]. Prin actualizarea contului dvs., sunteți de acord cu MEGA [B]Termenii de utilizare a serviciului[/B] și [C]Politica de Confidențialitate[/C].</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
@@ -1211,19 +1221,19 @@
     <!-- Benefit: Transfer quota sharing -->
     <string name="pro_plan_benefit_transfer_quota_sharing">Partajarea cotelor de transfer</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
-    <string name="pro_plan_benefit_auto_sync_mobile">Sincronizați automat folderele de pe dispozitivul mobil</string>
+    <string name="pro_plan_benefit_auto_sync_mobile">Automatically sync the folders on your mobile device</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
-    <string name="pro_plan_benefit_rewind_180_days">Derularea înapoi până la 180 de zile de date șterse</string>
+    <string name="pro_plan_benefit_rewind_180_days">Rewind up to 180 days of deleted data</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
-    <string name="pro_plan_benefit_host_calls_unlimited">Găzduiește apeluri și întâlniri cu participanți nelimitați și fără restricții de timp</string>
+    <string name="pro_plan_benefit_host_calls_unlimited">Host calls and meetings with unlimited participants and no time restrictions</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
-    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Programați curățarea Coșului de gunoi între 7 zile și 10 ani</string>
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Schedule Rubbish bin clearing between 7 days and 10 years</string>
     <!-- Benefit: Priority support -->
     <string name="pro_plan_benefit_priority_support">Asistență prioritară</string>
     <!-- Subscription page information section title at the bottom of the page-->
     <string name="choose_account_screen_subscription_information_title">Detaliile abonamentului</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
-    <string name="choose_account_screen_subscription_information_description">Abonamentele sunt reînnoite automat pentru perioade succesive de abonament cu aceeași durată și la același preț ca perioada inițială aleasă.\n\nVă puteți anula abonamentul la abonament oricând, dar nu mai târziu de 24 de ore înainte de scadența următoarei plăți a abonamentului. [A]Aflați cum să vă gestionați abonamentul în setări[/A].</string>
+    <string name="choose_account_screen_subscription_information_description">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.\n\nYou can cancel your plan subscription any time but no later than 24 hours before your next subscription payment is due. [A]Learn how to manage your subscription in your settings[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
     <string name="choose_account_screen_terms_and_policies_link_text">[A]Termenii de utilizare a serviciului și Politica de confidențialitate[/A]</string>
     <!-- Get more with Pro plan title in choose account screen-->
@@ -1239,29 +1249,28 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s spațiu de stocare</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
-    <string name="choose_account_screen_transfer_quota_label">%1$s transferuri</string>
+    <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
     <!-- General month label -->
     <string name="general_month">lună</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s pe lună</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">%1$s taxat anual</string>
+    <string name="choose_account_screen_billed_yearly">%1$s charged yearly</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
-        <item quantity="one">%1$d element neascuns</item>
-        <item quantity="few">%1$d elemente neascunse</item>
-        <item quantity="other">%1$d elemente neascunse</item>
+        <item quantity="one">%1$d item unhidden</item>
+        <item quantity="other">%1$d items unhidden</item>
     </plurals>
     <!-- Title for secure slideshow mode tutorial -->
-    <string name="slideshow_tutorial_title">Redați prezentările de diapozitive în siguranță</string>
+    <string name="slideshow_tutorial_title">Play slideshows securely</string>
     <!-- Step 1 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step1">Apăsați butonul de alimentare pentru a bloca ecranul.</string>
+    <string name="slideshow_tutorial_step1">Press the power button to lock your screen.</string>
     <!-- Step 2 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step2">Așteptați 2 secunde.</string>
+    <string name="slideshow_tutorial_step2">Wait for 2 seconds.</string>
     <!-- Step 3 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step3">Apăsați din nou butonul de alimentare pentru a porni din nou ecranul.</string>
+    <string name="slideshow_tutorial_step3">Press the power button again to turn the screen back on.</string>
     <!-- Note indicating the slideshow plays securely while locked -->
-    <string name="slideshow_tutorial_note">Prezentarea de diapozitive se va reda în timp ce dispozitivul rămâne blocat în siguranță.</string>
+    <string name="slideshow_tutorial_note">The slideshow will play while your device remains securely locked.</string>
     <!-- State to indicate an achievement has applied -->
     <string name="applied_label">Aplicată</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
@@ -1286,6 +1295,4 @@
     <string name="text_received_mega_vpn_free_trial">Ați primit %1$s spațiu de stocare pentru pornirea unui MEGA&#160;VPN de încercare gratuită</string>
     <!-- text of received mega pass free trial in achivements section -->
     <string name="text_received_mega_pass_free_trial">Ați primit %1$s spațiu de stocare pentru pornirea unui MEGA&#160;Pass încercarea gratuită</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Unele foldere nu pot fi sincronizate sau copiate de rezervă, deoarece aplicația MEGA a pierdut permisiunile de acces la folderele locale. Atingeți Reluare pentru a adăuga din nou permisiunile pentru fiecare folder afectat.</string>
 </resources>

@@ -3,91 +3,91 @@
     <!-- Sync title for toolbar when inside sync screen-->
     <string name="sync_toolbar_title">Senkronizasyon</string>
     <!-- Sync text for the the button to begin sync-->
-    <string name="sync_button_label">Senkronize et</string>
+    <string name="sync_button_label">Senkronizasyon</string>
     <!-- Sync text of sync-->
     <string name="sync">Sync</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">MEGA\’nın yerel klasörünüzü senkronize edebilmesi için cihazınızın depolama alanına erişmesi gerekiyor. Erişime izin vermek için buraya dokunun.</string>
+    <string name="sync_storage_permission_banner">MEGA\’nın yerel klasörünüzü senkronize etmek için cihaz depolama alanınıza erişmesi gerekir. Erişime izin vermek için buraya dokunun.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">Dosyalarınızı ve klasörlerinizi sürekli senkronize etmek için MEGA\’nın arka planda çalışmasına izin verin</string>
+    <string name="sync_battery_optimisation_banner">Dosyalarınızı ve klasörlerinizi sürekli olarak senkronize etmek için MEGA\’nın arka planda çalışmasına izin verin</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d dosya</item>
-        <item quantity="other">%d dosya</item>
+        <item quantity="other">%d dosyalar</item>
     </plurals>
     <!-- Sync folder counts to show ongoing syncing-->
     <plurals name="num_folders_with_parameter">
         <item quantity="one">%d klasör</item>
-        <item quantity="other">%d klasör</item>
+        <item quantity="other">%d klasörler</item>
     </plurals>
     <!-- Sync folder counts to show ongoing syncing-->
     <plurals name="num_folders_num_files">
         <item quantity="one">%1$d klasör&#160;·&#160;</item>
-        <item quantity="other">%1$d klasör&#160;·&#160;</item>
+        <item quantity="other">%1$d klasörler&#160;·&#160;</item>
     </plurals>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_folders_num_files_2">
         <item quantity="one">%1$d dosya</item>
-        <item quantity="other">%1$d dosya</item>
+        <item quantity="other">%1$d dosyalar</item>
     </plurals>
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">Çözülen sorunları temizle</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">İki yönlü senkronizasyon</string>
     <!-- Sync when stalled issues, message of the conflict -->
-    <string name="sync_resolve_rename_all_items">Tüm öğeleri yeniden adlandır</string>
+    <string name="sync_resolve_rename_all_items">Tüm öğeleri yeniden adlandırın</string>
     <!-- Sync to resolve conflict Merge folders -->
     <string name="sync_stalled_issue_merge_folders">Klasörleri birleştir</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">Yerel dosyayı seç</string>
+    <string name="sync_stalled_issue_choose_local_file">Yerel dosyayı seçin</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">MEGA\’da depolanan dosyayı seç</string>
+    <string name="sync_stalled_issue_choose_remote_file">MEGA\’da depolanan dosyayı seçin</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
-    <string name="sync_stalled_issue_choose_latest_modified_time">Son değiştirilen dosyayı seç</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time">Son değiştirilen dosyayı seçin</string>
     <!-- Sync message when conflict resolved -->
-    <string name="sync_stalled_issue_conflict_resolved">Çakışma çözüldü</string>
+    <string name="sync_stalled_issue_conflict_resolved">Çatışma çözüldü</string>
     <!-- Sync dialog continue button -->
-    <string name="sync_dialog_file_permission_positive_button">Devam et</string>
+    <string name="sync_dialog_file_permission_positive_button">Devamı</string>
     <!-- Sync dialog not now button -->
     <string name="sync_dialog_file_permission_negative_button">Şimdi değil</string>
     <!-- Sync dialog title for battery optimization -->
     <string name="sync_dialog_battery_optimization_title">Pil optimizasyonu</string>
     <!-- Sync dialog cancel button text -->
-    <string name="sync_dialog_battery_optimization_negative_button">İzin verme</string>
+    <string name="sync_dialog_battery_optimization_negative_button">İzin vermeyin</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">İzin ver</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">Sorun yok</string>
     <!-- Sync option to choose device folder -->
-    <string name="sync_folder_choose_device_folder_title">Cihaz klasörü</string>
+    <string name="sync_folder_choose_device_folder_title">Aygıt klasörü</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">MEGA klasörü</string>
     <!-- Sync state Paused -->
     <string name="sync_list_sync_state_paused">Duraklatıldı</string>
     <!-- Sync state syncing -->
-    <string name="sync_list_sync_state_syncing">Senkronize ediliyor&#8230;</string>
+    <string name="sync_list_sync_state_syncing">Senkronizasyon...</string>
     <!-- Sync permission title for device storage -->
-    <string name="sync_folders_device_storage">Cihaz klasörü</string>
+    <string name="sync_folders_device_storage">Aygıt klasörü</string>
     <!-- Sync permission title for mega storage -->
     <string name="sync_folders_mega_storage">MEGA klasörü</string>
     <!-- Sync while syncing title for Issues info -->
-    <string name="sync_card_sync_issues_info">Sorun bilgisi</string>
+    <string name="sync_card_sync_issues_info">Sorunlar bilgisi</string>
     <!-- Sync Pause -->
     <string name="sync_card_pause_sync">Duraklat</string>
     <!-- Sync Run -->
-    <string name="sync_card_run_sync">Devam ettir</string>
+    <string name="sync_card_run_sync">Devamını</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
     <string name="sync_dialog_message_wifi_or_mobile_data">Wi-Fi veya mobil veri</string>
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Yalnızca Wi-Fi</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">Cihazınızda, Bulut depolamanızdaki seçtiğiniz bir klasörle senkronize olacak bir yerel klasör ayarlamanız gerekecek</string>
+    <string name="sync_empty_state_message">Cihazınızda, Cloud sürücünüzdeki seçilen bir klasörle senkronize olacak yerel bir klasör ayarlamanız gerekir.</string>
     <!-- Sync stalled issue reason is no file issue-->
     <string name="sync_stalled_issue_file_issue">Dosya veya klasör sorunu</string>
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Taşınamıyor veya yeniden adlandırılamıyor</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Silme veya taşıma eylemi tarama bekliyor</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Silme veya taşıma eylemi taramayı bekliyor</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">Henüz silinemiyor</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -99,11 +99,11 @@
     <!-- Sync stalled issue reason is can not perform deletion-->
     <string name="sync_stalled_issue_cannot_perform_deletion">Öğe silinemiyor</string>
     <!-- Sync stalled issue reason is can not support tree depth-->
-    <string name="sync_stalled_issue_cannot_support_tree_depth">Senkronize edilen öğe, maksimum klasör derinliğini aşıyor</string>
+    <string name="sync_stalled_issue_cannot_support_tree_depth">Eşitleme öğesi maksimum klasör derinliğini aşıyor</string>
     <!-- Sync stalled issue reason is Folder Matched Against File-->
-    <string name="sync_stalled_issue_folder_matched_against_file">Senkronize etmeye çalıştığınız dosyanın uzantısı yok ve mevcut bir klasörle aynı ada sahip</string>
+    <string name="sync_stalled_issue_folder_matched_against_file">Eşitlemeye çalıştığınız dosyanın uzantısı yoktur ve mevcut bir klasörle aynı ada sahiptir</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Öğe son senkronizasyondan bu yana değişti</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Öğe son senkronizasyondan bu yana değiştirildi</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">Dosya veya klasör çakışması</string>
     <!-- Sync stalled issue reason is Name clash-->
@@ -115,39 +115,37 @@
     <!-- Sync stalled issue count chip title for 0 stalled issues-->
     <string name="sync_stalled_issue_zero">Sorunlar</string>
     <!-- Sync start sync button -->
-    <string name="sync_start_sync">Senkronizasyonu ayarla</string>
+    <string name="sync_start_sync">Senkronizasyon ayarlama</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="sync_file_browser_empty_folder">Boş klasör</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="sync_general_select">Seç</string>
+    <string name="sync_general_select">Seçiniz</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">Bir öğenin, çözülmesi için sizin kararınızı gerektiren bir sorunu var</string>
+    <string name="sync_stalled_issue_file_issue_detail">Bir öğenin çözümü için kararınızı gerektiren bir sorunu var</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
-    <string name="sync_stalled_issue_delete_or_move_detail">Diğer işlemlerin tamamlanması bekleniyor</string>
+    <string name="sync_stalled_issue_delete_or_move_detail">Diğer işlemlerin tamamlanmasını beklemek</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">Hedef klasöre ulaşılamıyor</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">Dosya indirilirken veya indirilen geçici dosya son konumuna taşınırken bir hata oluştu.</string>
+    <string name="sync_stalled_issue_download_issue_detail">Dosya indirilirken veya indirilen geçici dosyayı son konumuna taşırken bir hata oluştu.</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
-    <string name="sync_stalled_issue_cannot_create_folder_detail">Yerel bir hata klasör erişimini engelliyor</string>
+    <string name="sync_stalled_issue_cannot_create_folder_detail">Yerel bir hata klasör erişimini engeller</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Dosya sistemi hatası klasör erişimini engelliyor.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
-    <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Hedef, klasör yapınızda çok derinde.\n64 klasörden daha az derinliğe sahip bir konuma taşıyın.</string>
+    <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Hedef, klasör yapınızda çok derin.\n64 klasörden daha az derinliğe sahip bir konuma taşıyın.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
-    <string name="sync_stalled_issue_folder_matched_against_file_detail">Senkronize etmeye çalıştığınız dosyanın uzantısı yok ve mevcut bir klasörle aynı ada sahip</string>
+    <string name="sync_stalled_issue_folder_matched_against_file_detail">Eşitlemeye çalıştığınız dosyanın uzantısı yoktur ve mevcut bir klasörle aynı ada sahiptir</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync detailed description-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">Bu dosya, son senkronizasyondan bu yana hem MEGA\’da hem de yerel olarak değiştirildi.</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">Bu dosya, son senkronize edildiğinden beri hem MEGA\’da hem de yerel olarak değiştirildi.</string>
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
-    <string name="sync_stalled_issue_local_and_remote_not_synced_detail">Bu dosyanın çakışan kopyaları var</string>
+    <string name="sync_stalled_issue_local_and_remote_not_synced_detail">Bu dosyada çakışan kopyalar var</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
-    <string name="sync_stalled_issue_name_clash_detail">Senkronizasyonunuzun bir tarafında aynı ada sahip birden fazla öğe var ve bunların hepsi senkronizasyonunuzun diğer tarafında aynı tek öğe haline gelecek</string>
+    <string name="sync_stalled_issue_name_clash_detail">Senkronizasyonunuzun bir tarafında, senkronizasyonunuzun diğer tarafında aynı tek öğe haline gelecek olan aynı ada sahip birden fazla öğe vardır</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">MEGA\’da bir taşıma veya yeniden adlandırma eylemi algılandı, ancak yerel olarak çoğaltılamadı.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">Yerel olarak bir taşıma veya yeniden adlandırma eylemi algılandı, ancak MEGA\’da çoğaltılamadı.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
-    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Dosyanın taşınıp taşınmadığını veya silinip silinmediğini belirlemek için taramanın bitmesi bekleniyor.</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Bazı klasörler senkronize edilemez veya yedeklenemez çünkü MEGA uygulaması, yerel klasörlere erişim izinlerini kaybetti. Her etkilenen klasör için izinleri yeniden eklemek üzere Devam ettir\’e dokunun.</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Dosyanın taşınıp silinmediğini belirlemek için taramanın bitmesini bekliyorum.</string>
 </resources>

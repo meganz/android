@@ -850,6 +850,8 @@
     <string name="transfers_notification_downloading_preview">プレビュー用に%1$sを準備しています</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">%1$sをプレビュー用に準備しています（一時停止）</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">「%1$s」が削除されました</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="other">キューから%2$d個の項目を削除しました</item>
@@ -900,16 +902,24 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">クッキーと広告の設定</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">デバイス上のフォルダをMEGA上のフォルダと同期またはバックアップできます。[U]詳細はこちら[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">ダウンロードをキャンセルしますか？</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">自分へのメモ</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">秘密にしておく</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">自分自身に秘密の情報、写真や動画、次の大きな事業のアイデアなどを送れます。また、お持ちのすべてのデバイスで同期でき、ゼロ知識暗号化で保護されます。</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="other">%2$d個のファイルが「%1$s」に追加されました。重複したファイルを再度追加することはできません。</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">クラウドドライブに%1$sを保存中&#8230;</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">問題が発生しました。ダウンロードはキャンセルされませんでした。</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">すぐに%1$sが請求されますが、政府の規制により、12か月後に自動的にサブスクリプションが更新されることはありません。サブスクリプション期間終了後の更新は、お客様の責任となります。[A]Google&#160;Play[/A]のサブスクリプション（定期購入）からいつでもサブスクリプションの管理または解約ができます。アカウントをアップグレードしていただくことで、MEGAの[B]サービスご利用規約[/B]および[C]プライバシーポリシー[/C]に同意したものとみなされます。</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
@@ -1252,6 +1262,4 @@
     <string name="text_received_mega_vpn_free_trial">%1$sGBのストレージスペースを受け取りました。これでMEGA&#160;VPNの無料トライアルを開始できます。</string>
     <!-- text of received mega pass free trial in achivements section -->
     <string name="text_received_mega_pass_free_trial">%1$sGBのストレージスペースを受け取りました。これでMEGA&#160;Passの無料トライアルを開始できます。</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">MEGAアプリがローカルフォルダへのアクセス許可を失ったため、一部のフォルダが同期またはバックアップできません。「再開（Resume）」をタップすると、影響を受けた各フォルダのアクセス許可を再度追加できます。</string>
 </resources>

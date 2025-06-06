@@ -127,7 +127,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">ローカルエラーによりフォルダにアクセスできません</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">ファイルシステムエラーによりフォルダにアクセスできません。</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">ターゲットがフォルダ構造上で深すぎます。\nフォルダの深さが64未満の場所に移動してください。</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -144,6 +144,4 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">移動または名前変更アクションがローカルで検出されましたが、MEGAで複製できませんでした。</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">ファイルが移動または削除されたかどうかを判断するために、スキャンが完了するのを待っています。</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">MEGAアプリがローカルフォルダへのアクセス許可を失ったため、一部のフォルダが同期またはバックアップできません。「再開（Resume）」をタップすると、影響を受けた各フォルダのアクセス許可を再度追加できます。</string>
 </resources>

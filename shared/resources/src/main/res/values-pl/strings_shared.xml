@@ -892,6 +892,8 @@
     <string name="transfers_notification_downloading_preview">Przygotowanie %1$s do podglądu</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">Przygotowanie %1$s do podglądu (wstrzymane)</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">”%1$s” został usunięty</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="one">”%1$s” został usunięty z kolejki</item>
@@ -945,10 +947,16 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Ustawienia plików cookie i reklam</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">Synchronizuj lub utwórz kopię zapasową folderu na urządzeniu z katalog w MEGA. [U] Dowiedz się więcej [/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">Anuluj pobieranie?</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Uwaga dla siebie</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">Zachowaj to dla siebie</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">Wysyłaj sobie poufne informacje, zdjęcia i filmy, lub pomysły na następne duże przedsięwzięcie. Synchronizowane na wszystkich urządzeniach i chronione szyfrowanie z zerową wiedzą.</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="one">1 plik dodany do ”%1$s”. Nie można ponownie dodać zduplikowanych plików.</item>
@@ -958,6 +966,8 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Zapisywanie %1$s na Dysku w chmurze&#8230;</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">Coś poszło nie tak. Pobieranie nie zostało anulowane.</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Zostaniesz obciążony kwotą %1$s natychmiast, ale Twoja subskrypcja nie zostanie automatycznie odnowiona po 12 miesiącach z powodu regulacji rządowych. To będzie Twoja odpowiedzialność, aby odnowić subskrypcję po jej wygaśnięciu. Możesz zarządzać lub anulować swoją subskrypcję w dowolnym momencie poprzez Subskrypcje w [A]Google&#160;Play[/A]. Zmieniając swoje konto, zgadzasz się na [B]Warunki korzystania z usługi[/B] i [C]Politykę prywatności[/C] MEGA.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
@@ -1303,6 +1313,4 @@
     <string name="text_received_mega_vpn_free_trial">Otrzymałeś %1$s pojemności za rozpoczęcie darmowego okresu próbnego MEGA&#160;VPN</string>
     <!-- text of received mega pass free trial in achivements section -->
     <string name="text_received_mega_pass_free_trial">Otrzymałeś %1$s pojemności za rozpoczęcie darmowego okresu próbnego MEGA&#160;Pass</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Niektóre katalogi nie mogą być synchronizowane ani tworzone kopie zapasowe, ponieważ aplikacja MEGA utraciła uprawnienia do dostępu do lokalnych katalogów. Kliknij Wznów, aby ponownie dodać uprawnienia dla każdego dotkniętego katalogu.</string>
 </resources>

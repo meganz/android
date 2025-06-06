@@ -135,7 +135,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Un error local impide el acceso a la carpeta</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Error del sistema de archivos que impide el acceso a la carpeta.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">El destino está demasiado profundo en la estructura de carpetas.\nMuévelo a una ubicación que tenga menos de 64 carpetas.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -152,6 +152,4 @@
     <string name="sync_stalled_issues_move_or_rename_message_local">Se ha detectado un movimiento o cambio de nombre en tu dispositivo, pero no se ha podido replicar en MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Esperando a que finalice el análisis para determinar si el archivo se ha movido o eliminado.</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">No se puede hacer el backup o la sincronización de algunas carpetas porque la app de MEGA ha perdido los permisos para acceder a las carpetas locales. Toca Reanudar para volver a añadir los permisos para cada carpeta afectada.</string>
 </resources>

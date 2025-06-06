@@ -850,6 +850,8 @@
     <string name="transfers_notification_downloading_preview">正在准备%1$s用于预览</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">正在准备预览%1$s（已暂停）</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">已删除“%1$s”</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="other">已从队列中移除%2$d个项目</item>
@@ -900,16 +902,24 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie和广告设置</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">将您设备上的文件夹与MEGA上的文件夹同步或备份。[U]了解更多[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">取消下载？</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">隐私笔记</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">保留自己的隐私</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">将敏感信息、照片、视频或下一次大冒险的想法发送给自己。它们会在您的所有设备上同步，并使用零知识加密进行保护。</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="other">已添加%2$d个文件到“%1$s”。重复的文件无法再次添加。</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">正在保存%1$s到云盘...</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">出了点问题。下载未取消。</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
@@ -1230,29 +1240,27 @@
     <!-- Note indicating the slideshow plays securely while locked -->
     <string name="slideshow_tutorial_note">The slideshow will play while your device remains securely locked.</string>
     <!-- State to indicate an achievement has applied -->
-    <string name="applied_label">已生效</string>
+    <string name="applied_label">Applied</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
-    <string name="title_start_mega_vpn_free_trial">开始MEGA&#160;VPN的免费试用</string>
+    <string name="title_start_mega_vpn_free_trial">Start MEGA&#160;VPN free trial</string>
     <!-- Text of the section for start mega vpn free trial in achivements section -->
-    <string name="text_start_mega_vpn_free_trial">%1$s存储空间。永久有效。</string>
+    <string name="text_start_mega_vpn_free_trial">%1$s of storage. Valid permanently.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
-    <string name="title_start_mega_pass_free_trial">开始MEGA&#160;Pass的免费试用</string>
+    <string name="title_start_mega_pass_free_trial">Start MEGA&#160;Pass free trial</string>
     <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s存储空间。永久有效。</string>
+    <string name="text_start_mega_pass_free_trial">%1$s of storage. Valid permanently.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
-    <string name="button_text_install_mega_vpn">安装MEGA&#160;VPN</string>
+    <string name="button_text_install_mega_vpn">Install MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
-    <string name="button_text_install_mega_pass">安装MEGA&#160;Pass</string>
+    <string name="button_text_install_mega_pass">Install MEGA&#160;Pass</string>
     <!-- title of how it works for mega vpn free trial in achivements section -->
     <string name="title_how_it_works_free_trial">如何使用</string>
     <!-- text of how it works for mega vpn free trial in achivements section -->
-    <string name="text_how_it_works_mega_vpn_free_trial">安装MEGA&#160;VPN应用程序，使用您的MEGA帐户登录，然后开始免费试用。开启免费试用后，您的奖励存储空间将自动添加。</string>
+    <string name="text_how_it_works_mega_vpn_free_trial">Install the MEGA&#160;VPN app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
     <!-- text of how it works for mega pass free trial in achivements section -->
-    <string name="text_how_it_works_mega_pass_free_trial">安装MEGA&#160;Pass应用程序，使用您的MEGA帐户登录，然后开始免费试用。开启免费试用后，您的奖励存储空间将自动添加。</string>
+    <string name="text_how_it_works_mega_pass_free_trial">Install the MEGA&#160;Pass app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
     <!-- text of received for mega vpn free trial in achivements section -->
-    <string name="text_received_mega_vpn_free_trial">您已开始MEGA&#160;VPN的免费试用，因此您获得了%1$s的存储空间。</string>
+    <string name="text_received_mega_vpn_free_trial">You have received %1$s storage space for starting a MEGA&#160;VPN free trial</string>
     <!-- text of received mega pass free trial in achivements section -->
-    <string name="text_received_mega_pass_free_trial">您已开始MEGA&#160;Pass的免费试用，因此您获得了%1$s的存储空间。</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
+    <string name="text_received_mega_pass_free_trial">You have received %1$s storage space for starting a MEGA&#160;Pass free trial</string>
 </resources>

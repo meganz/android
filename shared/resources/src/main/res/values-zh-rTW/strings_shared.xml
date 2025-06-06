@@ -850,6 +850,8 @@
     <string name="transfers_notification_downloading_preview">正在準備預覽%1$s</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
     <string name="transfers_notification_downloading_preview_paused">正在準備預覽%1$s（暫停）</string>
+    <!-- Message when successfully deleting single item from the audio queue. %1$s will be replaced with the item name -->
+    <string name="audio_queue_single_item_removed_message">已移除「%1$s」</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="other">已從佇列中移除%2$d個項目</item>
@@ -900,16 +902,24 @@
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Cookie和廣告設定</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
     <string name="sync_promotion_bottom_sheet_body_text">將您裝置上的資料夾與MEGA上的資料夾同步或備份。[U]瞭解更多[/U]</string>
+    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
+    <string name="transfers_cancel_download_warning_title">取消上傳？</string>
+    <!-- Confirmation message informing a download was successfully cancelled -->
+    <string name="transfers_cancel_download_success_message">Download cancelled</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">隱私記事</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">自我保存的私隱</string>
+    <!-- First message description in note to self chat -->
+    <string name="chat_note_to_self_chat_first_message_description">將敏感資訊、圖片、影片或下一個天馬行空的想法發送給自己。它們會在您的所有裝置上同步，並受到零知識加密的保護。</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="other">已新增%2$d個檔案到「%1$s」。重複的檔案無法再次新增。</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">正在將%1$s保存到雲端硬碟⋯</string>
+    <!-- Warning shown after trying to cancel a download, but the request failed -->
+    <string name="transfers_error_cancelling_download">出了點問題。下載未被取消。</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">您將立即被收取%1$s的費用，然而，由於政府的規定，您的訂閱不會在12個月後自動續訂。訂閱到期後，您必須自行續訂。您可以隨時透過[A]Google&#160;Play[/A]中的訂閱管理或取消訂閱。升級您的帳戶，即表示您同意MEGA的[B]服務條款[/B]和[C]隱私權政策[/C]。</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
@@ -1252,6 +1262,4 @@
     <string name="text_received_mega_vpn_free_trial">您已經開始免費試用MEGA&#160;VPN而獲得%1$s儲存空間</string>
     <!-- text of received mega pass free trial in achivements section -->
     <string name="text_received_mega_pass_free_trial">您已經開始免費試用MEGA&#160;Pass而獲得%1$s儲存空間</string>
-    <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
 </resources>

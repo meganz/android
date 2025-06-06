@@ -885,7 +885,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">保密性</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">此链接未关联该帐户。请使用正确的帐户登录。</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">此取消链接已过期，请再试一次。</string>
     <!-- Text shown after searching and no results found -->
@@ -2986,6 +2986,8 @@
     <string name="disable_versioning_label">禁用文件版本</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">我们的文件版本管理功能可确保在您更新现有文件时会保留您文件的早期版本。如果您停用文件版本管理，您将不再拥有此保护；这意味着当您更新现有文件时，旧版本文件将被覆盖并替换。</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">此位置已不存在。</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">您已经邀请了%1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->

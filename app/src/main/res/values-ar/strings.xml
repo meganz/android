@@ -955,7 +955,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">السرية</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">هذا الرابط لا يعود لهذا الحساب. يرجى تسجيل الدخول باستخدام الحساب الصحيح.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">صلاحية رابط الإلغاء قد انتهت، الرجاء إعادة المحاولة.</string>
     <!-- Text shown after searching and no results found -->
@@ -3391,6 +3391,8 @@
     <string name="disable_versioning_label">تعطيل إصدار نسخ للملف</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">تضمن ميزة نسخ الملفات لدينا الاحتفاظ بنسخ أقدم من ملفاتك إذا قمت باستبدالها بنسخ أحدث. إذا قمت بتعطيل ميزة نسخ الملفات File Versioning، فلن تتمتع بهذه الحماية بعد الآن؛ ستفقد النسخة القديمة عند استبدالها.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">هذا الموقع لم يعد موجوداً.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">لقد قمت بالفعل بدعوة %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->

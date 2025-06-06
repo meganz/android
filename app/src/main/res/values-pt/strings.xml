@@ -913,7 +913,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">Confidencialidade</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">Este link não corresponde a esta conta. Por favor, faça o login na conta correta.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">Este link de cancelamento expirou, tente novamente.</string>
     <!-- Text shown after searching and no results found -->
@@ -3148,6 +3148,8 @@
     <string name="disable_versioning_label">Desativar o controle das versões de arquivos</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">O nosso recurso de controle de versão de arquivos garante que nós vamos manter as cópias anteriores dos seus arquivos se você as substituir por versões mais recentes. Se você desativar o Controle das versões de arquivos, não terá mais essa proteção; a cópia antiga será perdida quando você a substituir.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">Esta localização já não existe.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Você já convidou %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
