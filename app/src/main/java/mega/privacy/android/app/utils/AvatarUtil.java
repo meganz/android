@@ -48,10 +48,11 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtils;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
-import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.ShareContactInfo;
+import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
+import timber.log.Timber;
 
 public class AvatarUtil {
 
@@ -112,17 +113,20 @@ public class AvatarUtil {
             return null;
         }
 
-        List<String> listEmojis = EmojiParser.extractEmojis(text);
+        try {
+            List<String> listEmojis = EmojiParser.extractEmojis(text);
 
-        if (listEmojis != null && !listEmojis.isEmpty()) {
-            String substring = text.substring(0, listEmojis.get(0).length());
-            List<String> sublistEmojis = EmojiParser.extractEmojis(substring);
+            if (listEmojis != null && !listEmojis.isEmpty()) {
+                String substring = text.substring(0, listEmojis.get(0).length());
+                List<String> sublistEmojis = EmojiParser.extractEmojis(substring);
 
-            if (sublistEmojis != null && !sublistEmojis.isEmpty()) {
-                return substring;
+                if (sublistEmojis != null && !sublistEmojis.isEmpty()) {
+                    return substring;
+                }
             }
+        } catch (Exception e) {
+            Timber.e(e);
         }
-
         return null;
     }
 

@@ -52,7 +52,7 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 retrofit-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 shimmerlayout = 'io.supercharge:shimmerlayout:2.1.0'
 simplestorage = { module = "com.anggrayudi:storage", version.ref = "simplestorage" }
-vdurmont-emoji = 'com.vdurmont:emoji-java:4.0.0'
+vdurmont-emoji = 'com.vdurmont:emoji-java:5.1.1'
 compose-state-events = { module = "com.github.leonard-palm:compose-state-events", version.ref = "compose-state-events" }
 mega-analytics = "mega.privacy.mobile:analytics-events-android:+"
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
