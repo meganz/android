@@ -92,6 +92,7 @@ class VideoPlayerController(
     private var isVideoOptionPopupShown = mutableStateOf(false)
     private var currentSpeedPlayback = mutableStateOf(uiState.currentSpeedPlayback)
     private var isFullscreen = mutableStateOf(uiState.isFullscreen)
+    private var playbackState = uiState.mediaPlaybackState
 
     init {
         setupRepeatToggleButton(uiState.repeatToggleMode)
@@ -319,6 +320,10 @@ class VideoPlayerController(
         }
     }
 
+    internal fun updatePlaybackState(state: MediaPlaybackState) {
+        playbackState = state
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGestures() {
         scaleGestureDetector = ScaleGestureDetector(
@@ -371,7 +376,7 @@ class VideoPlayerController(
             matrix.postScale(zoomLevel, zoomLevel, textureView.width / 2f, textureView.height / 2f)
             matrix.postTranslate(translationX, translationY)
             textureView.setTransform(matrix)
-            if (uiState.mediaPlaybackState == MediaPlaybackState.Paused) {
+            if (playbackState == MediaPlaybackState.Paused) {
                 textureView.invalidate()
                 textureView.requestLayout()
             }

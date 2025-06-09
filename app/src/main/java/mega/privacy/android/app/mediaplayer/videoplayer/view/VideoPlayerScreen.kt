@@ -197,6 +197,10 @@ internal fun VideoPlayerScreen(
         videoPlayerController?.updateRepeatToggleButtonUI(context, uiState.repeatToggleMode)
     }
 
+    LaunchedEffect(uiState.mediaPlaybackState) {
+        videoPlayerController?.updatePlaybackState(uiState.mediaPlaybackState)
+    }
+
     DisposableEffect(Unit) {
         playbackState = player?.playbackState ?: STATE_IDLE
 
