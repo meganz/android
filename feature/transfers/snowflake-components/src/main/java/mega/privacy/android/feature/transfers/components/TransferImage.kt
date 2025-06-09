@@ -2,11 +2,9 @@ package mega.privacy.android.feature.transfers.components
 
 import android.net.Uri
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -84,31 +82,25 @@ internal fun LeadingIndicator(
     isDownload: Boolean,
     modifier: Modifier = Modifier,
     isOverQuota: Boolean = false,
-) = Box(
+    isError: Boolean = false,
+) = Icon(
     modifier = modifier
-        .size(16.dp)
-        .clip(CircleShape)
-        .background(color = DSTokens.colors.background.pageBackground)
         .testTag(
             if (isDownload) TEST_TAG_DOWNLOAD_LEADING_INDICATOR
             else TEST_TAG_UPLOAD_LEADING_INDICATOR
         )
-) {
-    Icon(
-        modifier = Modifier
-            .size(16.dp)
-            .align(Alignment.Center),
-        painter = painterResource(
-            id = if (isDownload) R.drawable.ic_arrow_down_small_regular_outline
-            else R.drawable.ic_arrow_up_small_regular_outline
-        ),
-        contentDescription = null,
-        tint = when {
-            isOverQuota -> DSTokens.colors.indicator.yellow
-            else -> DSTokens.colors.icon.primary
-        },
-    )
-}
+        .size(16.dp),
+    painter = painterResource(
+        id = if (isDownload) R.drawable.ic_arrow_down_small_regular_outline
+        else R.drawable.ic_arrow_up_small_regular_outline
+    ),
+    contentDescription = null,
+    tint = when {
+        isOverQuota -> DSTokens.colors.indicator.yellow
+        isError -> DSTokens.colors.support.error
+        else -> DSTokens.colors.icon.primary
+    },
+)
 
 @CombinedThemePreviews
 @Composable
@@ -130,6 +122,32 @@ private fun LeadingIndicatorPreview(
     AndroidThemeForPreviews {
         LeadingIndicator(
             isDownload = isDownload,
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun LeadingIndicatorOverquotaPreview(
+    @PreviewParameter(BooleanProvider::class) isDownload: Boolean,
+) {
+    AndroidThemeForPreviews {
+        LeadingIndicator(
+            isDownload = isDownload,
+            isOverQuota = true,
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun LeadingIndicatorErrorPreview(
+    @PreviewParameter(BooleanProvider::class) isDownload: Boolean,
+) {
+    AndroidThemeForPreviews {
+        LeadingIndicator(
+            isDownload = isDownload,
+            isError = true,
         )
     }
 }
