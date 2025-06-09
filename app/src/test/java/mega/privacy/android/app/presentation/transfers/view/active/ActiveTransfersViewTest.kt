@@ -6,16 +6,18 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
 import mega.privacy.android.domain.entity.Progress
@@ -76,7 +78,7 @@ class ActiveTransfersViewTest {
 
     @Test
     fun `test that view is displayed correctly if there is one in progress transfer`() {
-        val inProgressTransfers = listOf(getTransfer(tag = tag1)).toImmutableList()
+        val inProgressTransfers = listOf(getTransfer(tag = tag1))
 
         initComposeTestRule(inProgressTransfers = inProgressTransfers)
         with(composeTestRule) {
@@ -91,7 +93,7 @@ class ActiveTransfersViewTest {
         val inProgressTransfers = listOf(
             getTransfer(tag = tag1),
             getTransfer(tag = tag2),
-        ).toImmutableList()
+        )
 
         initComposeTestRule(inProgressTransfers = inProgressTransfers)
         with(composeTestRule) {
@@ -106,7 +108,7 @@ class ActiveTransfersViewTest {
         val inProgressTransfers = (1..10).map {
             whenever(viewModel.getUiStateFlow(it)) doReturn MutableStateFlow(state)
             getTransfer(tag = it)
-        }.toImmutableList()
+        }
         val index = 2
         val transferToDrag = inProgressTransfers[index]
         val dragPositions = 3
@@ -133,7 +135,7 @@ class ActiveTransfersViewTest {
         val inProgressTransfers = (1..10).map {
             whenever(viewModel.getUiStateFlow(it)) doReturn MutableStateFlow(state)
             getTransfer(tag = it)
-        }.toImmutableList()
+        }
         val transferToDrag = inProgressTransfers[2]
         val onReorderPreview = mock<(from: Int, to: Int) -> Unit>()
         val onReorderConfirmed = mock<(InProgressTransfer) -> Unit>()
@@ -154,17 +156,70 @@ class ActiveTransfersViewTest {
         verify(onReorderConfirmed).invoke(transferToDrag)
     }
 
+    @Test
+    fun `test that over quota banner is displayed when isOverQuota is true`() = runTest {
+        initComposeTestRule(
+            inProgressTransfers = listOf(getTransfer(1)),
+            isOverQuota = true,
+        )
+
+        composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that over quota banner is not displayed when isOverQuota is false`() = runTest {
+        initComposeTestRule(
+            inProgressTransfers = listOf(getTransfer(1)),
+            isOverQuota = false,
+        )
+
+        composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that over quota banner is hidden when close banner button is clicked`() = runTest {
+        initComposeTestRule(
+            inProgressTransfers = listOf(getTransfer(1)),
+            isOverQuota = true
+        )
+        composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertIsDisplayed()
+
+        composeTestRule.onNodeWithContentDescription(
+            "cancel",
+            substring = true,
+            ignoreCase = true,
+            useUnmergedTree = true,
+        ).performClick()
+
+        composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that onUpgrade is called when banner action is clicked`() = runTest {
+        val onUpgradeClick = mock<() -> Unit>()
+        initComposeTestRule(
+            inProgressTransfers = listOf(getTransfer(1)),
+            isOverQuota = true,
+            onUpgradeClick = onUpgradeClick
+        )
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.transfers_over_quota_banner_action_button))
+            .performClick()
+
+        verify(onUpgradeClick).invoke()
+    }
+
     private fun initComposeTestRule(
-        inProgressTransfers: ImmutableList<InProgressTransfer> = emptyList<InProgressTransfer>().toImmutableList(),
+        inProgressTransfers: List<InProgressTransfer> = emptyList(),
         isOverQuota: Boolean = false,
         areTransfersPaused: Boolean = false,
         onReorderPreview: (from: Int, to: Int) -> Unit = { _, _ -> },
         onReorderConfirmed: (InProgressTransfer) -> Unit = {},
+        onUpgradeClick: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
                 ActiveTransfersView(
-                    activeTransfers = inProgressTransfers,
+                    activeTransfers = inProgressTransfers.toImmutableList(),
                     isOverQuota = isOverQuota,
                     areTransfersPaused = areTransfersPaused,
                     onPlayPauseClicked = {},
@@ -173,6 +228,7 @@ class ActiveTransfersViewTest {
                     selectedActiveTransfersIds = null,
                     onActiveTransferSelected = {},
                     lazyListState = rememberLazyListState(),
+                    onUpgradeClick = onUpgradeClick,
                 )
             }
         }

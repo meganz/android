@@ -18,6 +18,7 @@ class TransfersInfo(
 internal fun NavGraphBuilder.transfersScreen(
     onBackPress: () -> Unit,
     onNavigateToStorageSettings: () -> Unit,
+    onNavigateToUpgradeAccount: () -> Unit,
 ) {
     composable<TransfersInfo> { backStackEntry ->
         val viewModel = hiltViewModel<TransfersViewModel>()
@@ -25,6 +26,8 @@ internal fun NavGraphBuilder.transfersScreen(
 
         TransfersView(
             onBackPress = onBackPress,
+            onNavigateToStorageSettings = onNavigateToStorageSettings,
+            onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
             uiState = uiState,
             onTabSelected = viewModel::updateSelectedTab,
             onPlayPauseTransfer = viewModel::playOrPauseTransfer,
@@ -37,7 +40,6 @@ internal fun NavGraphBuilder.transfersScreen(
             onActiveTransfersReorderPreview = viewModel::onActiveTransfersReorderPreview,
             onActiveTransfersReorderConfirmed = viewModel::onActiveTransfersReorderConfirmed,
             onConsumeStartEvent = viewModel::consumeStartEvent,
-            onNavigateToStorageSettings = onNavigateToStorageSettings,
             onSelectActiveTransfers = viewModel::startActiveTransfersSelection,
             onSelectCompletedTransfers = viewModel::startCompletedTransfersSelection,
             onSelectFailedTransfers = viewModel::startFailedTransfersSelection,

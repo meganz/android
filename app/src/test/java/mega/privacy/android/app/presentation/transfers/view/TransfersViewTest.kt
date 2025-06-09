@@ -329,6 +329,7 @@ class TransfersViewTest {
                     onSelectAllActiveTransfers = {},
                     onSelectAllCompletedTransfers = {},
                     onSelectAllFailedTransfers = {},
+                    onNavigateToUpgradeAccount = {},
                 )
             }
         }

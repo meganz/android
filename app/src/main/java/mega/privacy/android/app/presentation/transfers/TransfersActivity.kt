@@ -75,6 +75,9 @@ class TransfersActivity : AppCompatActivity() {
                                                     this@TransfersActivity,
                                                     StorageTargetPreference
                                                 )
+                                            },
+                                            onNavigateToUpgradeAccount = {
+                                                megaNavigator.openUpgradeAccount(this@TransfersActivity)
                                             }
                                         )
                                     }

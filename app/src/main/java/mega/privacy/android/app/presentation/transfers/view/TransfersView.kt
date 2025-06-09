@@ -52,6 +52,8 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 internal fun TransfersView(
     onBackPress: () -> Unit,
+    onNavigateToStorageSettings: () -> Unit,
+    onNavigateToUpgradeAccount: () -> Unit,
     uiState: TransfersUiState,
     onTabSelected: (Int) -> Unit,
     onPlayPauseTransfer: (Int) -> Unit,
@@ -64,7 +66,6 @@ internal fun TransfersView(
     onActiveTransfersReorderPreview: suspend (from: Int, to: Int) -> Unit,
     onActiveTransfersReorderConfirmed: (InProgressTransfer) -> Unit,
     onConsumeStartEvent: () -> Unit,
-    onNavigateToStorageSettings: () -> Unit,
     onSelectActiveTransfers: () -> Unit,
     onSelectCompletedTransfers: () -> Unit,
     onSelectFailedTransfers: () -> Unit,
@@ -171,6 +172,7 @@ internal fun TransfersView(
                             onReorderConfirmed = onActiveTransfersReorderConfirmed,
                             onActiveTransferSelected = onActiveTransferSelected,
                             selectedActiveTransfersIds = selectedActiveTransfersIds,
+                            onUpgradeClick = onNavigateToUpgradeAccount,
                             lazyListState = listState,
                             modifier = modifier,
                         )
@@ -350,6 +352,7 @@ private fun TransfersViewPreview() {
             onSelectAllActiveTransfers = {},
             onSelectAllCompletedTransfers = {},
             onSelectAllFailedTransfers = {},
+            onNavigateToUpgradeAccount = {},
         )
     }
 }
