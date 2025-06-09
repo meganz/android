@@ -53,12 +53,22 @@ fun SearchScreen(
     }
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
-    BackHandler(enabled = modalSheetState.isVisible) {
-        selectedNode = null
-        coroutineScope.launch {
-            modalSheetState.hide()
+    val hasOpenedFolder = remember(uiState.navigationLevel) {
+        uiState.navigationLevel.isNotEmpty()
+    }
+    BackHandler(enabled = modalSheetState.isVisible || hasOpenedFolder) {
+        when {
+            modalSheetState.isVisible -> {
+                selectedNode = null
+                coroutineScope.launch { modalSheetState.hide() }
+            }
+
+            hasOpenedFolder -> {
+                onBackPressed()
+            }
         }
     }
+
     SearchComposeView(
         modifier = modifier.semantics { testTagsAsResourceId = true },
         state = uiState,
