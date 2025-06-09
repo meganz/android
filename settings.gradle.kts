@@ -58,8 +58,8 @@ include(":shared:resources")
 include(":shared:sync")
 include(":android-database-sqlcipher")
 include(":feature:chat")
-include(":feature:transfers:ui-components")
-include(":feature:payment:ui-components")
+include(":feature:transfers:snowflake-components")
+include(":feature:payment:snowflake-components")
 
 
 println("isServerBuild = ${isServerBuild()}")
