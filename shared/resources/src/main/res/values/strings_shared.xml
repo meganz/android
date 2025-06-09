@@ -441,7 +441,7 @@
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">On a computer</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Visit [A]www.mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website">1. Visit [A]https://mega.nz[/A] in your web browser.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Log in to your MEGA account.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
