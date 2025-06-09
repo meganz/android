@@ -60,7 +60,6 @@ class CreateAccountViewModelTest {
     private val createAccountUseCase: CreateAccountUseCase = mock()
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase = mock()
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase = mock()
-    private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val doesTextContainSpecialCharacterUseCase: DoesTextContainSpecialCharacterUseCase =
         mock()
@@ -85,7 +84,6 @@ class CreateAccountViewModelTest {
             createAccountUseCase = createAccountUseCase,
             saveEphemeralCredentialsUseCase = saveEphemeralCredentialsUseCase,
             clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase,
-            saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             applicationScope = applicationScope,
             doesTextContainSpecialCharacterUseCase = doesTextContainSpecialCharacterUseCase,
@@ -103,7 +101,6 @@ class CreateAccountViewModelTest {
             createAccountUseCase,
             saveEphemeralCredentialsUseCase,
             clearEphemeralCredentialsUseCase,
-            saveLastRegisteredEmailUseCase,
             getFeatureFlagValueUseCase,
             doesTextContainSpecialCharacterUseCase,
             doesTextContainNumericUseCase,
@@ -690,7 +687,8 @@ class CreateAccountViewModelTest {
 
             underTest.onCreateAccountSuccess(credentials)
 
-            verify(saveLastRegisteredEmailUseCase).invoke(myEmail)
+            verify(clearEphemeralCredentialsUseCase).invoke()
+            verify(saveEphemeralCredentialsUseCase).invoke(credentials)
         }
 
     private suspend fun initInputFields() {

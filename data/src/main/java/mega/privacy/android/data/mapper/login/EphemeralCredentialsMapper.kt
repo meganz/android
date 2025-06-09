@@ -15,7 +15,6 @@ internal class EphemeralCredentialsMapper @Inject constructor(
         if (session.isBlank()) return null
         return EphemeralCredentials(
             email = decryptData(preferences[EphemeralCredentialsDataStore.emailPreferenceKey]).orEmpty(),
-            password = decryptData(preferences[EphemeralCredentialsDataStore.passwordPreferenceKey]).orEmpty(),
             session = decryptData(preferences[EphemeralCredentialsDataStore.sessionPreferenceKey]).orEmpty(),
             firstName = decryptData(preferences[EphemeralCredentialsDataStore.firstNamePreferenceKey]).orEmpty(),
             lastName = decryptData(preferences[EphemeralCredentialsDataStore.lastNamePreferenceKey]).orEmpty(),

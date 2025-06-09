@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -15,6 +16,7 @@ import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountRoute
 import mega.privacy.android.app.presentation.login.createaccount.view.NewCreateAccountRoute
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
@@ -39,6 +41,7 @@ class CreateAccountComposeFragment : Fragment() {
     lateinit var getThemeMode: GetThemeMode
 
     private val viewModel: CreateAccountViewModel by viewModels()
+    private val activityViewModel: LoginViewModel by activityViewModels()
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -79,9 +82,8 @@ class CreateAccountComposeFragment : Fragment() {
     }
 
     private fun setTemporalDataForAccountCreation(credentials: EphemeralCredentials) {
-        (requireActivity() as LoginActivity).setTemporalDataForAccountCreation(
-            credentials.email ?: return,
-        )
+        activityViewModel.setTemporalCredentials(credentials)
+        activityViewModel.setIsWaitingForConfirmAccount()
     }
 
     private fun navigateToLogin() {

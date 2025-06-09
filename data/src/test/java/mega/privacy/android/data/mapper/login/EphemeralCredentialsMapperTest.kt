@@ -68,7 +68,6 @@ internal class EphemeralCredentialsMapperTest {
             session = "session",
             firstName = "firstName",
             lastName = "lastName",
-            password = "password"
         )
 
         whenever(preference[EphemeralCredentialsDataStore.sessionPreferenceKey])
@@ -79,8 +78,6 @@ internal class EphemeralCredentialsMapperTest {
             .thenReturn(encryptedLastName)
         whenever(preference[EphemeralCredentialsDataStore.firstNamePreferenceKey])
             .thenReturn(encryptedFirstName)
-        whenever(preference[EphemeralCredentialsDataStore.passwordPreferenceKey])
-            .thenReturn(encryptedPassword)
         whenever(decryptData(encryptedSession)).thenReturn(expected.session)
         whenever(decryptData(encryptedPassword)).thenReturn(expected.password)
         whenever(decryptData(encryptedFirstName)).thenReturn(expected.firstName)

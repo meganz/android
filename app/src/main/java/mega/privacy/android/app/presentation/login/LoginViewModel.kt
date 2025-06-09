@@ -160,6 +160,7 @@ class LoginViewModel @Inject constructor(
     private val shouldShowNotificationReminderUseCase: ShouldShowNotificationReminderUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val shouldShowUpgradeAccountUseCase: ShouldShowUpgradeAccountUseCase,
+    private val ephemeralCredentialManager: EphemeralCredentialManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -317,8 +318,6 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch { resetChatSettingsUseCase() }
 
-        checkTemporalCredentials()
-
         viewModelScope.launch {
             val blockedTypes = if (getFeatureFlagValueUseCase(AppFeatures.LoginRevamp)) {
                 setOf(
@@ -345,22 +344,25 @@ class LoginViewModel @Inject constructor(
     /**
      * Sets confirm email fragment as pending in state.
      */
-    fun setIsWaitingForConfirmAccount() =
+    fun setIsWaitingForConfirmAccount() {
         _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.ConfirmEmail) }
+    }
 
     /**
      * Sets tour as pending fragment in state.
      */
-    private fun setTourAsPendingFragment() =
+    private fun setTourAsPendingFragment() {
         _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.Tour) }
+    }
 
     /**
      * Set pending fragment to show
      *
      * @param fragmentType
      */
-    fun setPendingFragmentToShow(fragmentType: LoginFragmentType) =
+    fun setPendingFragmentToShow(fragmentType: LoginFragmentType) {
         _state.update { state -> state.copy(isPendingToShowFragment = fragmentType) }
+    }
 
     /**
      * Update state with isPendingToShowFragment as null.
@@ -416,7 +418,6 @@ class LoginViewModel @Inject constructor(
                 isAccountConfirmed = false,
                 rootNodesExists = false,
                 temporalEmail = null,
-                temporalPassword = null,
                 hasPreferences = false,
                 hasCUSetting = false,
                 isCUSettingEnabled = false,
@@ -467,16 +468,20 @@ class LoginViewModel @Inject constructor(
     /**
      * Updates temporal email and password values in state.
      */
-    fun setTemporalCredentials(email: String?, password: String?) {
-        _state.update { it.copy(temporalEmail = email, temporalPassword = password) }
+    fun setTemporalCredentials(credentials: EphemeralCredentials) {
+        ephemeralCredentialManager.setEphemeralCredential(credentials)
     }
 
     /**
      * True if there is a not null email and a not null password, false otherwise.
      */
-    private fun checkTemporalCredentials() = with(state.value) {
-        if (temporalEmail != null && temporalPassword != null) {
-            performLogin(temporalEmail, temporalPassword)
+    private fun checkTemporalCredentials(): Boolean {
+        val ephemeralCredentials = ephemeralCredentialManager.getEphemeralCredential()
+        return if (ephemeralCredentials != null && !ephemeralCredentials.email.isNullOrEmpty() && !ephemeralCredentials.password.isNullOrEmpty()) {
+            performLogin(ephemeralCredentials.email, ephemeralCredentials.password)
+            true
+        } else {
+            false
         }
     }
 
@@ -499,11 +504,17 @@ class LoginViewModel @Inject constructor(
             val result = runCatching { querySignupLinkUseCase(link) }
             var accountConfirmed: Boolean? = null
             var newAccountSession: AccountSession? = null
+            var isLoginInProgress = false
             val messageId = if (result.isSuccess) {
                 accountConfirmed = true
                 newAccountSession = state.value.accountSession?.copy(email = result.getOrNull())
                     ?: AccountSession(email = result.getOrNull())
-                R.string.account_confirmed
+                if (checkTemporalCredentials()) {
+                    isLoginInProgress = true
+                    null
+                } else {
+                    R.string.account_confirmed
+                }
             } else {
                 (result.exceptionOrNull() as QuerySignupLinkException).messageId
             }
@@ -514,7 +525,7 @@ class LoginViewModel @Inject constructor(
 
                 state.copy(
                     isLoginRequired = true,
-                    isLoginInProgress = false,
+                    isLoginInProgress = isLoginInProgress,
                     temporalEmail = newAccountSession?.email,
                     accountSession = newAccountSession,
                     isAccountConfirmed = isAccountConfirmed,
@@ -814,6 +825,7 @@ class LoginViewModel @Inject constructor(
                     )
                 }
             } else {
+                ephemeralCredentialManager.setEphemeralCredential(null)
                 _state.update {
                     it.copy(
                         loginTemporaryError = null,

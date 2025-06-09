@@ -12,8 +12,6 @@ internal class EphemeralCredentialsPreferenceMapper @Inject constructor(
     suspend operator fun invoke(preferences: MutablePreferences, ephemeral: EphemeralCredentials) {
         preferences[EphemeralCredentialsDataStore.emailPreferenceKey] =
             encryptData(ephemeral.email).orEmpty()
-        preferences[EphemeralCredentialsDataStore.passwordPreferenceKey] =
-            encryptData(ephemeral.password).orEmpty()
         preferences[EphemeralCredentialsDataStore.sessionPreferenceKey] =
             encryptData(ephemeral.session).orEmpty()
         preferences[EphemeralCredentialsDataStore.firstNamePreferenceKey] =

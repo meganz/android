@@ -75,7 +75,6 @@ data class LoginState(
     val isAccountConfirmed: Boolean = false,
     val rootNodesExists: Boolean = false,
     val temporalEmail: String? = null,
-    val temporalPassword: String? = null,
     val hasPreferences: Boolean = false,
     val hasCUSetting: Boolean = false,
     val isCUSettingEnabled: Boolean = false,

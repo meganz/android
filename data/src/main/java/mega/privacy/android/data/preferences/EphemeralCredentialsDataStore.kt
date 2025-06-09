@@ -58,7 +58,6 @@ internal class EphemeralCredentialsDataStore @Inject constructor(
         private const val DATA_STORE_NAME = "ephemeral"
 
         val emailPreferenceKey = stringPreferencesKey("email")
-        val passwordPreferenceKey = stringPreferencesKey("password")
         val sessionPreferenceKey = stringPreferencesKey("session")
         val firstNamePreferenceKey = stringPreferencesKey("firstName")
         val lastNamePreferenceKey = stringPreferencesKey("lastName")

@@ -153,6 +153,7 @@ internal class LoginViewModelTest {
     private val shouldShowNotificationReminderUseCase =
         mock<ShouldShowNotificationReminderUseCase>()
     private val shouldShowUpgradeAccountUseCase = mock<ShouldShowUpgradeAccountUseCase>()
+    private val ephemeralCredentialManager = mock<EphemeralCredentialManager>()
 
     @BeforeEach
     fun setUp() {
@@ -204,7 +205,8 @@ internal class LoginViewModelTest {
             setLoggedOutFromAnotherLocationUseCase = setLoggedOutFromAnotherLocationUseCase,
             savedStateHandle = savedStateHandle,
             shouldShowNotificationReminderUseCase = shouldShowNotificationReminderUseCase,
-            shouldShowUpgradeAccountUseCase = shouldShowUpgradeAccountUseCase
+            shouldShowUpgradeAccountUseCase = shouldShowUpgradeAccountUseCase,
+            ephemeralCredentialManager = ephemeralCredentialManager
         )
     }
 
@@ -261,7 +263,6 @@ internal class LoginViewModelTest {
                 assertThat(isAccountConfirmed).isFalse()
                 assertThat(rootNodesExists).isFalse()
                 assertThat(temporalEmail).isNull()
-                assertThat(temporalPassword).isNull()
                 assertThat(hasPreferences).isFalse()
                 assertThat(hasCUSetting).isFalse()
                 assertThat(isCUSettingEnabled).isFalse()

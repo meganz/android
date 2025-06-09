@@ -58,7 +58,5 @@ internal class EphemeralCredentialsPreferenceMapperTest {
             "encryptedLastName"
         verify(preference)[EphemeralCredentialsDataStore.firstNamePreferenceKey] =
             "encryptedFirstName"
-        verify(preference)[EphemeralCredentialsDataStore.passwordPreferenceKey] =
-            "encryptedPassword"
     }
 }
