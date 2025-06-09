@@ -27,6 +27,7 @@ import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -43,6 +44,7 @@ class CreateAccountViewModel @Inject constructor(
     private val createAccountUseCase: CreateAccountUseCase,
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
+    private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val doesTextContainNumericUseCase: DoesTextContainNumericUseCase,
     private val doesTextContainMixedCaseUseCase: DoesTextContainMixedCaseUseCase,
@@ -324,6 +326,15 @@ class CreateAccountViewModel @Inject constructor(
 
     internal fun onCreateAccountSuccess(credentials: EphemeralCredentials) {
         saveEphemeral(credentials)
+        credentials.email?.let { saveLastRegisteredEmail(it) }
+    }
+
+    private fun saveLastRegisteredEmail(email: String) {
+        applicationScope.launch {
+            runCatching {
+                saveLastRegisteredEmailUseCase(email)
+            }.onFailure { Timber.e(it) }
+        }
     }
 
     private fun saveEphemeral(ephemeral: EphemeralCredentials) {
