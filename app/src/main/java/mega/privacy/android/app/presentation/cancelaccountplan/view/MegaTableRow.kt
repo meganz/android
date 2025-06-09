@@ -1,11 +1,12 @@
 package mega.privacy.android.app.presentation.cancelaccountplan.view
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -21,16 +22,22 @@ internal fun MegaTableRow(
     rowPadding: Dp,
     modifier: Modifier = Modifier,
 ) {
+    val totalColumns = rowCells.size
     LazyVerticalGrid(
-        columns = GridCells.Fixed(rowCells.size),
-        modifier = modifier
+        columns = GridCells.Fixed(totalColumns),
+        modifier = modifier.padding(horizontal = rowPadding)
     ) {
-        items(rowCells) { cell ->
+        itemsIndexed(rowCells) { index, cell ->
+            val columnIndex = index % totalColumns
+            val widthFraction = if (columnIndex == 0) 0.4f else
+                (0.6f / (totalColumns - 1).coerceAtLeast(1))
+
             MegaTableCell(
                 cell = cell,
                 modifier = Modifier
+                    .fillMaxWidth(widthFraction)
                     .height(rowHeight)
-                    .padding(horizontal = rowPadding)
+                    .padding(horizontal = 1.dp)
                     .testTag(TABLE_CELL_TEST_TAG)
             )
         }

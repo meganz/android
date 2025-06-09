@@ -12,13 +12,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
-import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 private fun getTextAlignment(cellAlignment: TableCell.CellAlignment): TextAlign {
@@ -67,7 +68,10 @@ internal fun MegaTableCell(
                     MegaText(
                         text = cell.text,
                         textColor = TextColor.Primary,
-                        style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.SemiBold),
+                        style = MaterialTheme.typography.caption.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            lineBreak = LineBreak.Heading
+                        ),
                         textAlign = textAlignment,
                         modifier = Modifier
                             .align(cellAlignment)
@@ -80,7 +84,7 @@ internal fun MegaTableCell(
                     MegaText(
                         text = cell.text,
                         textColor = TextColor.Secondary,
-                        style = MaterialTheme.typography.caption,
+                        style = MaterialTheme.typography.caption.copy(lineBreak = LineBreak.Heading),
                         textAlign = textAlignment,
                         modifier = Modifier
                             .align(cellAlignment)
