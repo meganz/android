@@ -37,18 +37,18 @@ fun CompletedTransfersActionsBottomSheet(
     sheetState = sheetState,
 ) {
     OneLineListItem(
-        modifier = Modifier.testTag(TEST_TAG_CLEAR_ALL_COMPLETED_ACTION),
-        text = stringResource(id = R.string.option_to_clear_transfers),
-        onClickListener = {
-            onClearAllTransfers()
-            onDismissSheet()
-        },
-    )
-    OneLineListItem(
         modifier = Modifier.testTag(TEST_TAG_SELECT_ACTION),
         text = stringResource(id = mega.privacy.android.shared.resources.R.string.general_select),
         onClickListener = {
             onSelectTransfers()
+            onDismissSheet()
+        },
+    )
+    OneLineListItem(
+        modifier = Modifier.testTag(TEST_TAG_CLEAR_ALL_COMPLETED_ACTION),
+        text = stringResource(id = R.string.option_to_clear_transfers),
+        onClickListener = {
+            onClearAllTransfers()
             onDismissSheet()
         },
     )
