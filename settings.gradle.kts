@@ -60,6 +60,7 @@ include(":android-database-sqlcipher")
 include(":feature:chat")
 include(":feature:transfers:snowflake-components")
 include(":feature:payment:snowflake-components")
+include(":feature:shared:snowflake-components")
 
 
 println("isServerBuild = ${isServerBuild()}")

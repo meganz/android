@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -38,6 +40,7 @@ fun CompletedTransferBottomSheetHeader(
 ) {
     Row(
         modifier = modifier
+            .semantics { testTagsAsResourceId = true }
             .testTag(TEST_TAG_COMPLETED_TRANSFER_SHEET_HEADER)
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
@@ -57,7 +60,7 @@ fun CompletedTransferBottomSheetHeader(
             MegaText(
                 text = fileName,
                 textColor = TextColor.Primary,
-                style = AppTheme.typography.bodyLarge,
+                style = AppTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_NAME),
@@ -75,7 +78,7 @@ fun CompletedTransferBottomSheetHeader(
                 MegaText(
                     text = info,
                     textColor = if (isError) TextColor.Error else TextColor.Secondary,
-                    style = AppTheme.typography.bodyMedium,
+                    style = AppTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.MiddleEllipsis
                 )

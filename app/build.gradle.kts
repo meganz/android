@@ -207,6 +207,7 @@ dependencies {
     implementation(project(":feature:chat"))
     implementation(project(":feature:transfers:snowflake-components"))
     implementation(project(":feature:payment:snowflake-components"))
+    implementation(project(":feature:shared:snowflake-components"))
     preBuiltSdkDependency(rootProject.extra)
 
     //Test Modules
