@@ -57,6 +57,11 @@ sealed interface StartTransferEvent {
         StartTransferEvent
 
     /**
+     * User is in paywall over quota, so no transfer is permitted
+     */
+    data object PayWall : StartTransferEvent
+
+    /**
      * A message should be shown
      * @param message the [StringRes] of the message to be shown
      * @param action the [StringRes] of the action, if any

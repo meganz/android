@@ -6,9 +6,11 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -25,6 +27,8 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -35,6 +39,7 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
@@ -160,6 +165,7 @@ class StartTransfersComponentViewModelTest {
     }
     private val broadcastTransferTagToCancelUseCase = mock<BroadcastTransferTagToCancelUseCase>()
     private val deleteCompletedTransfersByIdUseCase = mock<DeleteCompletedTransfersByIdUseCase>()
+    private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -234,6 +240,7 @@ class StartTransfersComponentViewModelTest {
             monitorTransferTagToCancelUseCase = monitorTransferTagToCancelUseCase,
             broadcastTransferTagToCancelUseCase = broadcastTransferTagToCancelUseCase,
             deleteCompletedTransfersByIdUseCase = deleteCompletedTransfersByIdUseCase,
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase
         )
     }
 
@@ -282,6 +289,7 @@ class StartTransfersComponentViewModelTest {
             getTransferByTagUseCase,
             broadcastTransferTagToCancelUseCase,
             deleteCompletedTransfersByIdUseCase,
+            monitorStorageStateEventUseCase
         )
         initialStub()
     }
@@ -290,6 +298,10 @@ class StartTransfersComponentViewModelTest {
         whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
         whenever(monitorRequestFilesPermissionDeniedUseCase()).thenReturn(emptyFlow())
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
+        val storageStateEvent = mock<StorageStateEvent> {
+            on { storageState } doReturn StorageState.Unknown
+        }
+        whenever(monitorStorageStateEventUseCase()).thenReturn(MutableStateFlow(storageStateEvent))
     }
 
     @ParameterizedTest
@@ -497,7 +509,7 @@ class StartTransfersComponentViewModelTest {
             underTest.alwaysAskForDestination()
             verify(setStorageDownloadAskAlwaysUseCase).invoke(true)
         }
-    
+
     @Test
     fun `test that saveDoNotPromptToSaveDestinationUseCase is invoked when alwaysAskForDestination is invoked`() =
         runTest {
@@ -809,6 +821,23 @@ class StartTransfersComponentViewModelTest {
         }
     }
 
+    @Test
+    fun `test that when storage state is paywall transfers are not started`() = runTest {
+        val storageStateEvent = mock<StorageStateEvent> {
+            on { storageState } doReturn StorageState.PayWall
+        }
+        whenever(monitorStorageStateEventUseCase()).thenReturn(MutableStateFlow(storageStateEvent))
+        initTest()
+        commonStub()
+        underTest.startTransfer(
+            TransferTriggerEvent.StartDownloadNode(
+                nodes = nodes,
+                withStartMessage = false,
+            )
+        )
+        assertThat(underTest.uiState.value.oneOffViewEvent).isEqualTo(triggered(StartTransferEvent.PayWall))
+    }
+
     @Nested
     inner class StartDownload {
         @Test
@@ -1013,16 +1042,16 @@ class StartTransfersComponentViewModelTest {
 
     @Nested
     inner class RetryTransfers {
-        val firstId = 1
-        val secondId = 2
-        val retriedTransferIds = listOf(firstId, secondId)
-        val retryUploadsEvent = TransferTriggerEvent.RetryTransfers(
+        private val firstId = 1
+        private val secondId = 2
+        private val retriedTransferIds = listOf(firstId, secondId)
+        private val retryUploadsEvent = TransferTriggerEvent.RetryTransfers(
             mapOf(firstId to startUploadFilesEvent, secondId to startUploadFilesEvent)
         )
-        val retryDownloadsEvent = TransferTriggerEvent.RetryTransfers(
+        private val retryDownloadsEvent = TransferTriggerEvent.RetryTransfers(
             mapOf(firstId to startDownloadEvent, secondId to startOfflineDownloadEvent)
         )
-        val retryUploadAndDownloadEvent = TransferTriggerEvent.RetryTransfers(
+        private val retryUploadAndDownloadEvent = TransferTriggerEvent.RetryTransfers(
             mapOf(firstId to startDownloadEvent, secondId to startUploadFilesEvent)
         )
 

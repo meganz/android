@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferStage
@@ -41,6 +42,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
@@ -134,6 +136,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val monitorTransferTagToCancelUseCase: MonitorTransferTagToCancelUseCase,
     private val broadcastTransferTagToCancelUseCase: BroadcastTransferTagToCancelUseCase,
     private val deleteCompletedTransfersByIdUseCase: DeleteCompletedTransfersByIdUseCase,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -160,6 +163,10 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         transferTriggerEvent: TransferTriggerEvent,
     ) {
         viewModelScope.launch {
+            if (monitorStorageStateEventUseCase().value.storageState == StorageState.PayWall) {
+                _uiState.updateEventAndClearProgress(StartTransferEvent.PayWall)
+                return@launch
+            }
             when (transferTriggerEvent) {
                 is TransferTriggerEvent.DownloadTriggerEvent -> {
                     val isCopyEvent = transferTriggerEvent is TransferTriggerEvent.CopyTriggerEvent

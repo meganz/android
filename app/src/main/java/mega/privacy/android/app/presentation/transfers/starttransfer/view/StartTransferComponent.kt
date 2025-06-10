@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
@@ -377,6 +378,13 @@ private fun StartTransferComponent(
                             )
                         }
                     )
+                }
+
+                StartTransferEvent.PayWall -> {
+                    context.startActivity(
+                        Intent(context, OverDiskQuotaPaywallActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                        })
                 }
             }
         })
