@@ -58,6 +58,7 @@ internal fun NavGraphBuilder.transfersScreen(
             onOpenWith = {},
             onShareLink = {},
             onClearTransfer = {},
+            onRetryTransfer = {},
         )
     }
 }

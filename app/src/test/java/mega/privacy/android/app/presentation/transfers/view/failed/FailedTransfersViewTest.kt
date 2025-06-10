@@ -41,7 +41,9 @@ class FailedTransfersViewTest {
             FailedTransfersView(
                 failedTransfers = failedTransfers, lazyListState = mock(),
                 selectedFailedTransfersIds = mock(),
-                onFailedTransferSelected = mock()
+                onFailedTransferSelected = mock(),
+                onRetryTransfer = mock(),
+                onClearTransfer = mock(),
             )
         }
     }

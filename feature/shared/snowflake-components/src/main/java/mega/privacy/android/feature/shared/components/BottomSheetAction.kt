@@ -38,7 +38,7 @@ fun BottomSheetAction(
         .semantics { testTagsAsResourceId = true }
         .testTag(TEST_TAG_BOTTOM_SHEET_ACTION)
         .height(56.dp)
-        .padding(horizontal = 16.dp)
+        .padding(horizontal = 20.dp)
         .clickable(onClick = onClick)
         .fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically,

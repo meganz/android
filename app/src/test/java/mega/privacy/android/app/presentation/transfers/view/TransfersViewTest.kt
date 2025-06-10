@@ -334,6 +334,7 @@ class TransfersViewTest {
                     onOpenWith = {},
                     onShareLink = {},
                     onClearTransfer = {},
+                    onRetryTransfer = {},
                 )
             }
         }

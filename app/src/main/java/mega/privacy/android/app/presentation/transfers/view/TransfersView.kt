@@ -84,6 +84,7 @@ internal fun TransfersView(
     onOpenWith: () -> Unit,
     onShareLink: (Long) -> Unit,
     onClearTransfer: (Int) -> Unit,
+    onRetryTransfer: (CompletedTransfer) -> Unit,
 ) = with(uiState) {
     var showActiveTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
@@ -204,6 +205,8 @@ internal fun TransfersView(
                             lazyListState = listState,
                             onFailedTransferSelected = onFailedTransferSelected,
                             selectedFailedTransfersIds = selectedFailedTransfersIds,
+                            onRetryTransfer = onRetryTransfer,
+                            onClearTransfer = onClearTransfer,
                             modifier = modifier,
                         )
                     }
@@ -365,6 +368,7 @@ private fun TransfersViewPreview() {
             onOpenWith = {},
             onShareLink = {},
             onClearTransfer = {},
+            onRetryTransfer = {}
         )
     }
 }

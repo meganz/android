@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.transfers.view.completed
 
 import android.net.Uri
+import android.os.Parcelable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +21,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.parcelize.Parcelize
 import mega.privacy.android.app.presentation.transfers.model.image.CompletedTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_COMPLETED_TAB
@@ -81,6 +83,9 @@ internal fun CompletedTransfersView(
 
     completedItemSelected?.let { completedItem ->
         with(completedItem) {
+            val completedTransfer = completedTransfers.firstOrNull { it.id == completedTransferId }
+                ?: return@let
+
             CompletedTransferActionsBottomSheet(
                 completedTransfer = completedTransfer,
                 fileTypeResId = fileTypeResId,
@@ -121,21 +126,24 @@ internal fun CompletedTransferItem(
             isSelected = isSelected,
             modifier = modifier,
             onMoreClicked = {
-                CompletedItemSelected(
-                    completedTransfer = completedTransfer,
-                    fileTypeResId = uiState.fileTypeResId,
-                    previewUri = uiState.previewUri
-                ).let { item -> onMoreClicked(item) }
+                completedTransfer.id?.let { id ->
+                    CompletedItemSelected(
+                        completedTransferId = id,
+                        fileTypeResId = uiState.fileTypeResId,
+                        previewUri = uiState.previewUri,
+                    ).let { item -> onMoreClicked(item) }
+                }
             },
         )
     }
 }
 
+@Parcelize
 internal class CompletedItemSelected(
-    val completedTransfer: CompletedTransfer,
+    val completedTransferId: Int,
     val fileTypeResId: Int?,
     val previewUri: Uri?,
-)
+) : Parcelable
 
 internal const val TEST_TAG_COMPLETED_TRANSFERS_VIEW = "$TEST_TAG_COMPLETED_TAB:view"
 internal const val TEST_TAG_COMPLETED_TRANSFERS_EMPTY_VIEW = "$TEST_TAG_COMPLETED_TAB:empty_view"

@@ -130,6 +130,7 @@ internal fun CompletedTransferItem(
                 LeadingIndicator(
                     modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
                     isDownload = isDownload,
+                    isError = error != null,
                 )
                 MegaText(
                     text = details,
