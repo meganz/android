@@ -111,7 +111,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -173,7 +173,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * The Application Theme Mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
     lateinit var monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase
@@ -652,7 +652,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         )
 
         binding.discardScanUploadingWarningDialogComposeView.setContent {
-            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val isDark = themeMode.isDarkMode()
             val state by viewModel.uiState.collectAsStateWithLifecycle()
 

@@ -12,7 +12,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import javax.inject.Inject
 
 private const val TITLE_TAG = "settingsActivityTitle"
@@ -25,7 +25,7 @@ class SettingsActivity : BaseActivity(),
     lateinit var passCodeFacade: PasscodeCheck
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @SuppressLint("CommitTransaction")
     override fun onCreate(savedInstanceState: Bundle?) {

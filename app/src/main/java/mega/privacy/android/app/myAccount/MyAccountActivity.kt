@@ -70,7 +70,7 @@ import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CancelSubscriptionMenuToolbarEvent
@@ -103,7 +103,7 @@ class MyAccountActivity : PasscodeActivity(),
      * Application Theme Mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
     private val isBusinessAccount
         get() = viewModel.state.value.isBusinessAccount
 
@@ -179,7 +179,7 @@ class MyAccountActivity : PasscodeActivity(),
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
-                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 if (uiState.showLogoutConfirmationDialog) {
                     OriginalTheme(isDark = themeMode.isDarkMode()) {
                         LogoutConfirmationDialog(

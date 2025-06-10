@@ -14,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import javax.inject.Inject
 
 /**
@@ -26,7 +26,7 @@ class SettingsChatImageQualityFragment : Fragment() {
     private val viewModel: SettingsChatImageQualityViewModel by viewModels()
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,7 +34,7 @@ class SettingsChatImageQualityFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
         setContent {
-            val themeMode by getThemeMode()
+            val themeMode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 ChatImageQualitySettingBody()

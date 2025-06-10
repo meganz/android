@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApiJava
@@ -32,7 +32,7 @@ internal class ContactLinkDialogFragment : DialogFragment() {
     private val viewModel: ContactLinkViewModel by viewModels()
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
     lateinit var inviteContactRequestStringMapper: InviteContactRequestStringMapper
@@ -46,7 +46,7 @@ internal class ContactLinkDialogFragment : DialogFragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val state by viewModel.state.collectAsStateWithLifecycle()
-                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
                 state.contactLinkResult?.let { result ->
                     if (result.isSuccess) {

@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -23,7 +23,7 @@ import javax.inject.Inject
  * Authenticity Credentials Activity.
  *
  * @property passCodeFacade [PasscodeCheck]
- * @property getThemeMode   [GetThemeMode]
+ * @property monitorThemeModeUseCase   [MonitorThemeModeUseCase]
  */
 @AndroidEntryPoint
 class AuthenticityCredentialsActivity : ComponentActivity() {
@@ -32,7 +32,7 @@ class AuthenticityCredentialsActivity : ComponentActivity() {
     lateinit var passCodeFacade: PasscodeCheck
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val viewModel by viewModels<AuthenticityCredentialsViewModel>()
 
@@ -68,7 +68,7 @@ class AuthenticityCredentialsActivity : ComponentActivity() {
 
     @Composable
     private fun AuthenticityCredentialsView() {
-        val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
+        val themeMode by monitorThemeModeUseCase().collectAsState(initial = ThemeMode.System)
         val uiState by viewModel.state.collectAsState()
 
         OriginalTheme(isDark = themeMode.isDarkMode()) {

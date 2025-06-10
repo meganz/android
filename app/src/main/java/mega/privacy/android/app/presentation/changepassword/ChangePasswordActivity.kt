@@ -29,7 +29,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHANGE_PASSWORD_2FA
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaError
 import timber.log.Timber
@@ -47,7 +47,7 @@ class ChangePasswordActivity : PasscodeActivity() {
      * Application Theme Mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * ViewModel for Change Password Feature
@@ -103,7 +103,7 @@ class ChangePasswordActivity : PasscodeActivity() {
      */
     @Composable
     fun ChangePasswordScreen() {
-        val themeMode by getThemeMode()
+        val themeMode by monitorThemeModeUseCase()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

@@ -69,7 +69,7 @@ import mega.privacy.android.domain.entity.photos.Album.GifAlbum
 import mega.privacy.android.domain.entity.photos.Album.RawAlbum
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.navigation.MegaNavigator
@@ -82,7 +82,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalMaterialNavigationApi::class)
 internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
@@ -122,7 +122,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
         val bottomSheetActionHandler = NodeActionHandler(this, nodeActionsViewModel)
 
         setContent {
-            val theme by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val theme by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             OriginalTheme(isDark = theme.isDarkMode()) {
                 val bottomSheetNavigator = rememberBottomSheetNavigator()
                 val navController = rememberNavController(bottomSheetNavigator)

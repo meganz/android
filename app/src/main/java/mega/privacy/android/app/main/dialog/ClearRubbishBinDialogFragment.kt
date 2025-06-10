@@ -16,7 +16,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
@@ -25,7 +25,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 internal class ClearRubbishBinDialogFragment : DialogFragment() {
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val nodeController: NodeController by lazy { NodeController(requireContext()) }
 
@@ -38,7 +38,7 @@ internal class ClearRubbishBinDialogFragment : DialogFragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val themeMode by getThemeMode()
+                val themeMode by monitorThemeModeUseCase()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 OriginalTheme(isDark = themeMode.isDarkMode()) {
                     ConfirmationDialog(

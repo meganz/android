@@ -26,7 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.navigation.getSyncRoute
 import mega.privacy.android.feature.sync.navigation.syncNavGraph
@@ -58,7 +58,7 @@ class SyncFragment : Fragment() {
      * Get Theme Mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * Get [FileTypeIconMapper]
@@ -82,7 +82,7 @@ class SyncFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val animatedNavController = rememberNavController()
-                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
                 OriginalTheme(isDark = themeMode.isDarkMode()) {

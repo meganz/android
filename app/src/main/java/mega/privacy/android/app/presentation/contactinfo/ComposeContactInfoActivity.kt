@@ -14,7 +14,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApiJava
 import javax.inject.Inject
@@ -30,7 +30,7 @@ class ComposeContactInfoActivity : BaseActivity() {
      * Application theme mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val viewModel by viewModels<ContactInfoViewModel>()
 
@@ -42,7 +42,7 @@ class ComposeContactInfoActivity : BaseActivity() {
         enableEdgeToEdge()
         intent.extras?.let { getContactData(extras = it) }
         setContent {
-            val themeMode by getThemeMode()
+            val themeMode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val density = LocalDensity.current.density

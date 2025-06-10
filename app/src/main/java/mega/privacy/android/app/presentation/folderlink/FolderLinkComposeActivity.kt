@@ -71,7 +71,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -91,7 +91,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
      * Application Theme Mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * [GetFeatureFlagValueUseCase]
@@ -208,7 +208,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
 
     @Composable
     private fun StartFolderLinkView() {
-        val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val request by googleAdsManager.request.collectAsStateWithLifecycle()
         val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()

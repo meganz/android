@@ -4,10 +4,9 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.main.view.OngoingCallViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.call.ChatCall
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorOngoingCallUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -22,17 +21,17 @@ import kotlin.test.Test
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OngoingCallViewModelTest {
     private val monitorOngoingCallUseCase: MonitorOngoingCallUseCase = mock()
-    private val getThemeMode: GetThemeMode = mock()
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
     private lateinit var underTest: OngoingCallViewModel
 
     @BeforeAll
     fun setup() {
-        underTest = OngoingCallViewModel(monitorOngoingCallUseCase, getThemeMode)
+        underTest = OngoingCallViewModel(monitorOngoingCallUseCase, monitorThemeModeUseCase)
     }
 
     @BeforeEach
     fun reset() {
-        reset(monitorOngoingCallUseCase, getThemeMode)
+        reset(monitorOngoingCallUseCase, monitorThemeModeUseCase)
     }
 
     @Test
@@ -62,6 +61,6 @@ class OngoingCallViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = OngoingCallViewModel(monitorOngoingCallUseCase, getThemeMode)
+        underTest = OngoingCallViewModel(monitorOngoingCallUseCase, monitorThemeModeUseCase)
     }
 }

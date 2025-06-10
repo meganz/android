@@ -73,7 +73,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -90,7 +90,7 @@ import javax.inject.Inject
  * Activity for showing file and folder info.
  *
  * @property passCodeFacade [PasscodeCheck] an injected component to enforce a Passcode security check
- * @property getThemeMode [GetThemeMode] application them mode
+ * @property monitorThemeModeUseCase [MonitorThemeModeUseCase] application them mode
  */
 @AndroidEntryPoint
 class FileInfoActivity : BaseActivity() {
@@ -98,7 +98,7 @@ class FileInfoActivity : BaseActivity() {
     lateinit var passCodeFacade: PasscodeCheck
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * Mega navigator
@@ -160,7 +160,7 @@ class FileInfoActivity : BaseActivity() {
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         Analytics.tracker.trackEvent(NodeInfoScreenEvent)
         setContent {
-            val themeMode by getThemeMode()
+            val themeMode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val snackBarHostState = remember { SnackbarHostState() }

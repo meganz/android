@@ -32,7 +32,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SecureSlideshowTutorialBottomSheet
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SlideshowScreen
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.SlideshowSettingScreen
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheetRoundedShape
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.navigation.rememberExtendedBottomSheetNavigator
@@ -45,7 +45,7 @@ import javax.inject.Inject
 class SlideshowActivity : BaseActivity() {
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
     private val slideshowViewModel: SlideshowViewModel by viewModels()
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {

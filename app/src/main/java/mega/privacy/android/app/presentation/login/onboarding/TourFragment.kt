@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.login.onboarding.view.TourViewModel
 import mega.privacy.android.app.presentation.meeting.view.dialog.ACTION_JOIN_AS_GUEST
 import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -40,7 +40,7 @@ class TourFragment : Fragment() {
      * Current theme
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val viewModel: TourViewModel by viewModels()
     private val activityViewModel: LoginViewModel by activityViewModels()
@@ -55,7 +55,7 @@ class TourFragment : Fragment() {
     ) = ComposeView(requireContext()).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
-            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             if (uiState.isNewRegistrationUiEnabled == true) {

@@ -27,7 +27,7 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -39,7 +39,7 @@ internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragme
     private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
@@ -52,7 +52,7 @@ internal class OfflineOptionsBottomSheetDialogFragment : BottomSheetDialogFragme
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val themeMode by getThemeMode()
+                val themeMode by monitorThemeModeUseCase()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

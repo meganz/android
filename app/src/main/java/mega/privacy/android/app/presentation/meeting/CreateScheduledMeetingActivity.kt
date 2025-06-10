@@ -42,7 +42,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.CreateMeetingMaxDurationReachedEvent
 import mega.privacy.mobile.analytics.event.EditMeetingMaxDurationReachedEvent
@@ -65,7 +65,7 @@ import javax.inject.Inject
  * Activity which shows scheduled meeting info screen.
  *
  * @property passCodeFacade         [PasscodeCheck]
- * @property getThemeMode           [GetThemeMode]
+ * @property monitorThemeModeUseCase           [MonitorThemeModeUseCase]
  */
 @AndroidEntryPoint
 class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
@@ -76,7 +76,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     lateinit var passCodeFacade: PasscodeCheck
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val viewModel by viewModels<CreateScheduledMeetingViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
@@ -201,7 +201,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
      */
     @Composable
     fun MainComposeView() {
-        val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()

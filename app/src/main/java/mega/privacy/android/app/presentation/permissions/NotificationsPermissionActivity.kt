@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.permissions.view.NotificationsPermi
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -33,7 +33,7 @@ import javax.inject.Inject
  *  - Enable CU
  *
  * @property passCodeFacade                    [PasscodeCheck]
- * @property getThemeMode                      [GetThemeMode]
+ * @property monitorThemeModeUseCase                      [MonitorThemeModeUseCase]
  * @property sharingScope                      [CoroutineScope]
  */
 @AndroidEntryPoint
@@ -43,7 +43,7 @@ class NotificationsPermissionActivity : ComponentActivity() {
     lateinit var passCodeFacade: PasscodeCheck
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @ApplicationScope
     @Inject
@@ -59,7 +59,7 @@ class NotificationsPermissionActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 NotificationsPermissionView()
             }

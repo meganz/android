@@ -38,7 +38,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.BuyProIEvent
 import mega.privacy.mobile.analytics.event.BuyProIIEvent
@@ -61,7 +61,7 @@ import javax.inject.Inject
 class ChooseAccountFragment : Fragment() {
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
@@ -108,7 +108,7 @@ class ChooseAccountFragment : Fragment() {
         val isNewCreationAccount =
             arguments?.getBoolean(ManagerActivity.NEW_CREATION_ACCOUNT, false) ?: false
 
-        val mode by getThemeMode()
+        val mode by monitorThemeModeUseCase()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
         LaunchedEffect(Unit) {

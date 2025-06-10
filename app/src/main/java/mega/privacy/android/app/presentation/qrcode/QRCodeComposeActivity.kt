@@ -25,7 +25,7 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NameCollision
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -51,7 +51,7 @@ class QRCodeComposeActivity : PasscodeActivity() {
      * Get theme mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * Mega navigator
@@ -89,7 +89,7 @@ class QRCodeComposeActivity : PasscodeActivity() {
 
         viewModel.setFinishActivityOnScanComplete(inviteContacts)
         setContent {
-            val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val viewState by viewModel.uiState.collectAsStateWithLifecycle()
             OriginalTheme(isDark = mode.isDarkMode()) {
                 QRCodeView(

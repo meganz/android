@@ -13,7 +13,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.listeners.GetAchievementsListener
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,7 +28,7 @@ class AchievementsFeatureActivity : PasscodeActivity() {
      * Get system's default theme mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val viewModel: AchievementsOverviewViewModel by viewModels()
 
@@ -51,7 +51,7 @@ class AchievementsFeatureActivity : PasscodeActivity() {
             return
         }
         setContent {
-            val themeMode by getThemeMode()
+            val themeMode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
             /**

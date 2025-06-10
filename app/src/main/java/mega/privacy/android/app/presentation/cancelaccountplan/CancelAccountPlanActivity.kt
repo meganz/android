@@ -25,7 +25,7 @@ import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel.Companion
 import mega.privacy.android.app.utils.MANAGE_PLAY_STORE_SUBSCRIPTION_URL
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.CancelSubscriptionContinueCancellationButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CancelSubscriptionKeepPlanButtonPressedEvent
@@ -46,7 +46,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
     }
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val viewModel: CancelAccountPlanViewModel by viewModels()
     private val accountStorageViewModel: AccountStorageViewModel by viewModels()
@@ -61,7 +61,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
 
         setContent {
             val navController = rememberNavController()
-            val themeMode by getThemeMode()
+            val themeMode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val accountUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()

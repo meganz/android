@@ -20,7 +20,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
@@ -32,7 +32,7 @@ internal class RemovePublicLinkDialogFragment : DialogFragment() {
     private val activityViewModel: ManagerViewModel by activityViewModels()
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,7 +42,7 @@ internal class RemovePublicLinkDialogFragment : DialogFragment() {
         val ids = requireArguments().getLongArray(EXTRA_NODE_IDS) ?: LongArray(0)
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
-            val themeMode by getThemeMode()
+            val themeMode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 MegaAlertDialog(

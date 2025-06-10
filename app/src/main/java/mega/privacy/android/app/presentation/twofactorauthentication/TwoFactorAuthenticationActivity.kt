@@ -30,7 +30,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFac
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -42,7 +42,7 @@ import javax.inject.Inject
 class TwoFactorAuthenticationActivity : PasscodeActivity() {
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
     lateinit var qrCodeMapper: QRCodeMapper
@@ -114,7 +114,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
         setContent {
-            val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
+            val themeMode by monitorThemeModeUseCase().collectAsState(initial = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 TwoFactorAuthenticationScreen(themeMode.isDarkMode())
             }

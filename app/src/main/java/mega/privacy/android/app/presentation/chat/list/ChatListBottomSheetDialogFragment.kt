@@ -37,7 +37,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestCallPerm
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ArchiveNoteToSelfButtonPressedEvent
@@ -63,7 +63,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val viewModel by viewModels<ChatTabsViewModel>({ requireParentFragment() })
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>(
@@ -112,7 +112,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
         setContent {
-            val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val item: ChatRoomItem? by viewModel.getChatRoom(chatId)
                 .collectAsStateWithLifecycle(null, viewLifecycleOwner, Lifecycle.State.STARTED)
             OriginalTheme(isDark = mode.isDarkMode()) {

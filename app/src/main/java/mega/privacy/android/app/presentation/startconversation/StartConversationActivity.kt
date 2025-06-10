@@ -29,7 +29,7 @@ import mega.privacy.android.app.presentation.startconversation.model.StartConver
 import mega.privacy.android.app.presentation.startconversation.view.StartConversationView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.mobile.analytics.event.CreateNoteToSelfButtonPressedEvent
 import mega.privacy.mobile.analytics.event.GroupChatPressedEvent
 import mega.privacy.mobile.analytics.event.InviteContactsPressedEvent
@@ -38,7 +38,7 @@ import javax.inject.Inject
 /**
  * Activity which allows to start a new chat conversation.
  *
- * @property getThemeMode   [GetThemeMode]
+ * @property monitorThemeModeUseCase   [MonitorThemeModeUseCase]
  * @property resultLauncher [ActivityResultLauncher]
  */
 @AndroidEntryPoint
@@ -48,7 +48,7 @@ class StartConversationActivity : ComponentActivity() {
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val viewModel by viewModels<StartConversationViewModel>()
     private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
@@ -116,7 +116,7 @@ class StartConversationActivity : ComponentActivity() {
 
     @Composable
     private fun StartConversationView() {
-        val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
+        val themeMode by monitorThemeModeUseCase().collectAsState(initial = ThemeMode.System)
         val uiState by viewModel.state.collectAsState()
         val noteToSelfChatUIState by noteToSelfChatViewModel.state.collectAsState()
 

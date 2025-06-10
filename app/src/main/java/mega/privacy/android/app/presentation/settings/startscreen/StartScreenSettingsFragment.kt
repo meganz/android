@@ -20,7 +20,7 @@ import mega.privacy.android.app.presentation.settings.startscreen.model.StartScr
 import mega.privacy.android.app.presentation.settings.startscreen.view.StartScreenOptionView
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import javax.inject.Inject
 
 /**
@@ -35,7 +35,7 @@ class StartScreenSettingsFragment : Fragment() {
      * Get theme mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,7 +43,7 @@ class StartScreenSettingsFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireContext()).apply {
         setContent {
-            val themeMode by getThemeMode()
+            val themeMode by monitorThemeModeUseCase()
                 .collectAsState(initial = ThemeMode.System)
             val uiState by viewModel.state.collectAsState()
             OriginalTheme(isDark = themeMode.isDarkMode()) {

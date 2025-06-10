@@ -37,7 +37,7 @@ import mega.privacy.android.domain.entity.PaymentPlatformType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AdsUpgradeAccountPlanPageBuyButtonPressedEvent
@@ -61,7 +61,7 @@ class UpgradeAccountFragment : Fragment() {
     lateinit var megaApi: MegaApiAndroid
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
@@ -110,7 +110,7 @@ class UpgradeAccountFragment : Fragment() {
         val uiState by upgradeAccountViewModel.state.collectAsStateWithLifecycle()
         val accountUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()
 
-        val mode by getThemeMode()
+        val mode by monitorThemeModeUseCase()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         BackHandler { trackAndFinish() }
         MegaAppContainer(

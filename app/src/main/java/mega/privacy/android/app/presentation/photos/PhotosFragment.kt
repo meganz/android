@@ -86,7 +86,8 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as SharedR
@@ -137,7 +138,7 @@ class PhotosFragment : Fragment() {
      * Retrieves the App Theme
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
     private val viewComposeCoordinator = PhotosViewComposeCoordinator()
 
     /**
@@ -201,7 +202,7 @@ class PhotosFragment : Fragment() {
         timelineViewModel.showingFilterPage(false)
         return ComposeView(requireContext()).apply {
             setContent {
-                val mode by getThemeMode()
+                val mode by monitorThemeModeUseCase()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 OriginalTheme(isDark = mode.isDarkMode()) {
                     PhotosScreen(

@@ -6,22 +6,27 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.repository.SettingsRepository
 import javax.inject.Inject
 
+
 /**
- * Default implementation of [GetThemeMode]
- *
- * @property settingsRepository
+ * Get theme mode preference
  */
-class DefaultGetThemeMode @Inject constructor(
+class MonitorThemeModeUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository,
-) : GetThemeMode {
-    override fun invoke() =
+) {
+
+    /**
+     * Invoke
+     *
+     * @return Current Theme mode and any subsequent changes as a flow
+     */
+    operator fun invoke() =
         settingsRepository.monitorStringPreference(
             key = KEY_APPEARANCE_COLOR_THEME,
             defaultValue = ThemeMode.DEFAULT.name
         ).map { it?.let { asTheme(it) } ?: ThemeMode.DEFAULT }
             .distinctUntilChanged()
 
-    private fun asTheme(preference: String) = ThemeMode.values()
+    private fun asTheme(preference: String) = ThemeMode.entries
         .find { it.name.equals(preference, true) }
 }
 

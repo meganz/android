@@ -14,7 +14,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerFragment.Companion.INTENT_KEY_SUBTITLE_FILE_INFO
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AddSubtitlePressedEvent
@@ -27,10 +27,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SelectSubtitleFileActivity : PasscodeActivity() {
     /**
-     * [GetThemeMode] injection
+     * [MonitorThemeModeUseCase] injection
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * [SelectSubtitleFileViewModel] injection
@@ -56,7 +56,7 @@ class SelectSubtitleFileActivity : PasscodeActivity() {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         setContent {
-            val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
+            val themeMode by monitorThemeModeUseCase().collectAsState(initial = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 SelectSubtitleComposeView(
                     viewModel = viewModel,

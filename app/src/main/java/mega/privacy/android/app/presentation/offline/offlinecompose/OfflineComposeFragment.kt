@@ -43,7 +43,7 @@ import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -58,7 +58,7 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
      * getThemeMode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * fileTypeIconMapper [FileTypeIconMapper]
@@ -93,7 +93,7 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
         )
         return ComposeView(requireContext()).apply {
             setContent {
-                val themeMode by getThemeMode()
+                val themeMode by monitorThemeModeUseCase()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDarkMode = themeMode.isDarkMode()
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()

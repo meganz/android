@@ -17,7 +17,7 @@ import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
@@ -30,7 +30,7 @@ import javax.inject.Inject
 class ArchivedChatsActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
@@ -53,7 +53,7 @@ class ArchivedChatsActivity : AppCompatActivity() {
         }
 
         setContent {
-            val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val state by viewModel.getState().collectAsStateWithLifecycle()
             val noteToSelfState by noteToSelfChatViewModel.state.collectAsStateWithLifecycle()
 

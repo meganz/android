@@ -12,14 +12,14 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class AddToAlbumActivity : BaseActivity() {
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val addToAlbumViewModel: AddToAlbumViewModel by viewModels()
 
@@ -30,7 +30,7 @@ internal class AddToAlbumActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
+            val themeMode by monitorThemeModeUseCase().collectAsState(initial = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 AddToAlbumScreen(
                     addToAlbumViewModel = addToAlbumViewModel,

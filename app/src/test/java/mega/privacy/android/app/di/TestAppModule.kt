@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
@@ -39,7 +39,7 @@ object TestAppModule {
     fun providePreferences(): SharedPreferences = mock()
 
     @Provides
-    fun provideGetThemeModePreference(): GetThemeMode =
+    fun provideGetThemeModePreference(): MonitorThemeModeUseCase =
         mock { on { invoke() }.thenReturn(emptyFlow()) }
 
     @Provides

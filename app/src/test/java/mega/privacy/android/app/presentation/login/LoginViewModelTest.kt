@@ -33,7 +33,7 @@ import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
@@ -139,7 +139,7 @@ internal class LoginViewModelTest {
     private val checkIfTransfersShouldBePausedUseCase =
         mock<CheckIfTransfersShouldBePausedUseCase>()
     private val isFirstLaunchUseCase = mock<IsFirstLaunchUseCase>()
-    private val getThemeMode = mock<GetThemeMode>()
+    private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
     private val resendVerificationEmailUseCase = mock<ResendVerificationEmailUseCase>()
     private val resumeCreateAccountUseCase = mock<ResumeCreateAccountUseCase>()
     private val checkRecoveryKeyUseCase = mock<CheckRecoveryKeyUseCase>()
@@ -197,7 +197,7 @@ internal class LoginViewModelTest {
             monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase,
             checkIfTransfersShouldBePausedUseCase = checkIfTransfersShouldBePausedUseCase,
             isFirstLaunchUseCase = isFirstLaunchUseCase,
-            getThemeMode = getThemeMode,
+            monitorThemeModeUseCase = monitorThemeModeUseCase,
             resendVerificationEmailUseCase = resendVerificationEmailUseCase,
             resumeCreateAccountUseCase = resumeCreateAccountUseCase,
             checkRecoveryKeyUseCase = checkRecoveryKeyUseCase,
@@ -225,7 +225,7 @@ internal class LoginViewModelTest {
         whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
         whenever(isFirstLaunchUseCase()).thenReturn(false)
         whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
-        whenever(getThemeMode()).thenReturn(flowOf(ThemeMode.System))
+        whenever(monitorThemeModeUseCase()).thenReturn(flowOf(ThemeMode.System))
     }
 
     @AfterEach

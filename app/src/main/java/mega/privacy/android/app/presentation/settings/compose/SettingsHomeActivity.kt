@@ -20,7 +20,7 @@ import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectF
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.compose.home.SettingsHomeDestinationWrapper
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
 import javax.inject.Inject
 
@@ -28,7 +28,7 @@ import javax.inject.Inject
 class SettingsHomeActivity : FragmentActivity() {
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
@@ -39,7 +39,7 @@ class SettingsHomeActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         val initialRoot = intent.getStringExtra(INITIAL_PREFERENCE_ROOT_KEY)
         setContent {
-            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
             val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
                 {

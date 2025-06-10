@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.photos.compose.photosfilter.PhotosF
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import javax.inject.Inject
 
 /**
@@ -29,7 +29,7 @@ class PhotosFilterFragment : Fragment() {
     private val timelineViewModel: TimelineViewModel by activityViewModels()
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     companion object {
         @JvmStatic
@@ -49,7 +49,7 @@ class PhotosFilterFragment : Fragment() {
         mManagerActivity.hideFabButton()
         return ComposeView(requireContext()).apply {
             setContent {
-                val mode by getThemeMode()
+                val mode by monitorThemeModeUseCase()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 OriginalTheme(isDark = mode.isDarkMode()) {
                     PhotosFilterScreen(

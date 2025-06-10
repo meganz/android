@@ -30,7 +30,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.SetNotificationPermissionShownUseCase
@@ -48,7 +48,7 @@ class PermissionsViewModel @Inject constructor(
     private val defaultAccountRepository: AccountRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getThemeModeUseCase: GetThemeMode,
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val setNotificationPermissionShownUseCase: SetNotificationPermissionShownUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
@@ -72,7 +72,7 @@ class PermissionsViewModel @Inject constructor(
 
     private fun getThemeMode() {
         viewModelScope.launch {
-            getThemeModeUseCase()
+            monitorThemeModeUseCase()
                 .catch { Timber.e(it) }
                 .collect { themeMode ->
                     uiState.update { it.copy(themeMode = themeMode) }

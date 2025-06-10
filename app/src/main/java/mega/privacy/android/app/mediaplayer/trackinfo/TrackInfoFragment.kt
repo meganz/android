@@ -26,7 +26,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywall
 import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -42,10 +42,10 @@ class TrackInfoFragment : Fragment() {
     private val audioPlayerViewModel by activityViewModels<MediaPlayerViewModel>()
 
     /**
-     * [GetThemeMode] injection
+     * [MonitorThemeModeUseCase] injection
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * Mega navigator
@@ -66,7 +66,7 @@ class TrackInfoFragment : Fragment() {
                 val metadata =
                     audioPlayerViewModel.metadataState.collectAsStateWithLifecycle().value
                 val uiState = viewModel.state.collectAsStateWithLifecycle().value
-                val mode by getThemeMode()
+                val mode by monitorThemeModeUseCase()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val snackbarHostState = remember { SnackbarHostState() }
                 OriginalTheme(isDark = mode.isDarkMode()) {

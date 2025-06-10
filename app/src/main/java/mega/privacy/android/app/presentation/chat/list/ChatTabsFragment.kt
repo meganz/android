@@ -63,7 +63,7 @@ import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatStatus
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -108,7 +108,7 @@ class ChatTabsFragment : Fragment() {
     }
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
 
     private val showMeetingTab by lazy {
@@ -207,7 +207,7 @@ class ChatTabsFragment : Fragment() {
     ): View =
         ComposeView(requireContext()).apply {
             setContent {
-                val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val chatsTabState by viewModel.getState().collectAsStateWithLifecycle()
                 val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
                 val noteToSelfChatState by noteToSelfChatViewModel.state.collectAsStateWithLifecycle()

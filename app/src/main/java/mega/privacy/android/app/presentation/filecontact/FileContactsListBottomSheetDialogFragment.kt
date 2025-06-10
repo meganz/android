@@ -31,7 +31,7 @@ import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.repository.ContactsRepository
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -55,7 +55,7 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
      * Get theme mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * Contacts repository
@@ -146,7 +146,7 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
                         Timber.Forest.e("Contact item not found ${contact?.handle}")
                     }
                 }
-                val themeMode by getThemeMode()
+                val themeMode by monitorThemeModeUseCase()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 OriginalTheme(isDark = themeMode.isDarkMode()) {
                     Column(

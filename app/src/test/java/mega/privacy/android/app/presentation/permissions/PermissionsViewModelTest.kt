@@ -19,7 +19,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.SetNotificationPermissionShownUseCase
@@ -48,7 +48,7 @@ class PermissionsViewModelTest {
 
     private val defaultAccountRepository: AccountRepository = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
-    private val getThemeModeUseCase: GetThemeMode = mock()
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val setNotificationPermissionShownUseCase: SetNotificationPermissionShownUseCase =
         mock()
@@ -69,7 +69,7 @@ class PermissionsViewModelTest {
             defaultAccountRepository,
             getFeatureFlagValueUseCase,
             setNotificationPermissionShownUseCase,
-            getThemeModeUseCase,
+            monitorThemeModeUseCase,
             checkEnableCameraUploadsStatusUseCase,
             startCameraUploadUseCase,
             enableCameraUploadsInPhotosUseCase
@@ -82,7 +82,7 @@ class PermissionsViewModelTest {
             defaultAccountRepository = defaultAccountRepository,
             ioDispatcher = testDispatcher,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            getThemeModeUseCase = getThemeModeUseCase,
+            monitorThemeModeUseCase = monitorThemeModeUseCase,
             setNotificationPermissionShownUseCase = setNotificationPermissionShownUseCase,
             checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
             startCameraUploadUseCase = startCameraUploadUseCase,
@@ -109,7 +109,7 @@ class PermissionsViewModelTest {
     @ParameterizedTest
     @EnumSource(ThemeMode::class)
     fun `test that theme mode is set correctly`(value: ThemeMode) = runTest {
-        whenever(getThemeModeUseCase()).thenReturn(flowOf(value))
+        whenever(monitorThemeModeUseCase()).thenReturn(flowOf(value))
 
         init()
 

@@ -17,7 +17,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -38,7 +38,7 @@ class FeatureFlagForQuickSettingsTileActivity : BaseActivity() {
      * Current theme
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * On create
@@ -48,7 +48,7 @@ class FeatureFlagForQuickSettingsTileActivity : BaseActivity() {
         setContentView(
             ComposeView(this).apply {
                 setContent {
-                    val mode by getThemeMode()
+                    val mode by monitorThemeModeUseCase()
                         .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                     val uiState by featureFlagForQuickSettingsTileViewModel.state.collectAsStateWithLifecycle()
                     OriginalTheme(isDark = mode.isDarkMode()) {

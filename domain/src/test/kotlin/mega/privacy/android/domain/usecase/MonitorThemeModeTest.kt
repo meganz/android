@@ -16,14 +16,14 @@ import org.mockito.kotlin.whenever
 import java.util.Locale
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetThemeModeTest {
-    private lateinit var underTest: GetThemeMode
+class MonitorThemeModeTest {
+    private lateinit var underTest: MonitorThemeModeUseCase
 
     private val settingsRepository = mock<SettingsRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetThemeMode(settingsRepository = settingsRepository)
+        underTest = MonitorThemeModeUseCase(settingsRepository = settingsRepository)
     }
 
     @Test
@@ -38,8 +38,11 @@ class DefaultGetThemeModeTest {
 
     @Test
     fun `test that default value is returned if unknown value is returned`() = runTest {
-        whenever(settingsRepository.monitorStringPreference(any(),
-            any())).thenReturn(flowOf("Not a valid value"))
+        whenever(
+            settingsRepository.monitorStringPreference(
+                any(), any()
+            )
+        ).thenReturn(flowOf("Not a valid value"))
 
         underTest().test {
             assertThat(awaitItem()).isEqualTo(ThemeMode.DEFAULT)
@@ -49,30 +52,36 @@ class DefaultGetThemeModeTest {
 
     @Test
     fun `test that theme values are returned if the names match exactly`() = runTest {
-        whenever(settingsRepository.monitorStringPreference(any(),
-            any())).thenReturn(ThemeMode.values()
-            .map { it.name }.asFlow())
+        whenever(
+            settingsRepository.monitorStringPreference(
+                any(), any()
+            )
+        ).thenReturn(
+            ThemeMode.entries.map { it.name }.asFlow()
+        )
 
         underTest().test {
-            ThemeMode.values()
-                .forEach {
-                    assertThat(awaitItem()).isEqualTo(it)
-                }
+            ThemeMode.entries.forEach {
+                assertThat(awaitItem()).isEqualTo(it)
+            }
             awaitComplete()
         }
     }
 
     @Test
     fun `test that theme values are returned if the names match ignoring case`() = runTest {
-        whenever(settingsRepository.monitorStringPreference(any(),
-            any())).thenReturn(ThemeMode.values()
-            .map { it.name.uppercase(Locale.getDefault()) }.asFlow())
+        whenever(
+            settingsRepository.monitorStringPreference(
+                any(), any()
+            )
+        ).thenReturn(
+            ThemeMode.entries.map { it.name.uppercase(Locale.getDefault()) }.asFlow()
+        )
 
         underTest().test {
-            ThemeMode.values()
-                .forEach {
-                    assertThat(awaitItem()).isEqualTo(it)
-                }
+            ThemeMode.entries.forEach {
+                assertThat(awaitItem()).isEqualTo(it)
+            }
             awaitComplete()
         }
     }

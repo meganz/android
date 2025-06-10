@@ -26,7 +26,7 @@ import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingInfoVi
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.EditSingleOccurrenceMeetingMaxDurationReachedEvent
@@ -41,7 +41,7 @@ import javax.inject.Inject
  * Activity which shows occurrences of recurring meeting.
  *
  * @property getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
- * @property getThemeMode               [GetThemeMode]
+ * @property monitorThemeModeUseCase               [MonitorThemeModeUseCase]
  */
 @AndroidEntryPoint
 class RecurringMeetingInfoActivity : PasscodeActivity() {
@@ -49,7 +49,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
     private val viewModel by viewModels<RecurringMeetingInfoViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
     private var materialDatePicker: MaterialDatePicker<Long>? = null
@@ -99,7 +99,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
 
     @Composable
     private fun View() {
-        val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()

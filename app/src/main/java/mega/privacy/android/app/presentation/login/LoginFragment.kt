@@ -76,7 +76,7 @@ import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.support.SupportEmailTicket
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -88,7 +88,7 @@ import javax.inject.Inject
 /**
  * Login fragment.
  *
- * @property getThemeMode [GetThemeMode]
+ * @property getThemeMode [MonitorThemeModeUseCase]
  */
 @AndroidEntryPoint
 class LoginFragment : Fragment() {

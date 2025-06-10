@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.devicecenter.navigation.deviceCenterInfoNavGraph
 import mega.privacy.android.feature.devicecenter.navigation.deviceCenterRoute
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
@@ -59,7 +59,7 @@ class DeviceCenterFragment : Fragment() {
      * Retrieves the Device Theme Mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * Allows navigation to specific features in the monolith :app
@@ -83,7 +83,7 @@ class DeviceCenterFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
-                val themeMode by getThemeMode()
+                val themeMode by monitorThemeModeUseCase()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val snackbarHostState = remember { SnackbarHostState() }
 

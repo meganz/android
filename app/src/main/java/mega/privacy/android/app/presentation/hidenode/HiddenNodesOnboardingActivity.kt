@@ -14,7 +14,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.HiddenNodeOnboardingCloseButtonPressedEvent
 import mega.privacy.mobile.analytics.event.HiddenNodeOnboardingContinueButtonPressedEvent
@@ -25,7 +25,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class HiddenNodesOnboardingActivity : AppCompatActivity() {
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val isOnboarding: Boolean by lazy(LazyThreadSafetyMode.NONE) {
         intent.getBooleanExtra(IS_ONBOARDING, false)
@@ -39,7 +39,7 @@ class HiddenNodesOnboardingActivity : AppCompatActivity() {
         if (isOnboarding) viewModel.setHiddenNodesOnboarded()
 
         setContent {
-            val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
+            val themeMode by monitorThemeModeUseCase().collectAsState(initial = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 HiddenNodesOnboardingScreen(
                     viewModel = viewModel,

@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VideoToPlaylistScreen
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -26,10 +26,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class VideoToPlaylistActivity : ComponentActivity() {
     /**
-     * [GetThemeMode] injection
+     * [MonitorThemeModeUseCase] injection
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * PasscodeCryptObjectFactory injection
@@ -46,7 +46,7 @@ class VideoToPlaylistActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val themeMode by getThemeMode().collectAsStateWithLifecycle(
+            val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(
                 initialValue = ThemeMode.System
             )
             SessionContainer {

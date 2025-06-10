@@ -28,7 +28,7 @@ import mega.privacy.android.app.presentation.settings.model.StorageTargetPrefere
 import mega.privacy.android.app.presentation.transfers.preview.view.navigation.fakePreviewViewNavigationGraph
 import mega.privacy.android.app.presentation.transfers.preview.view.navigation.navigateToFakePreviewViewGraph
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
@@ -37,7 +37,7 @@ import javax.inject.Inject
 class FakePreviewFragment : Fragment() {
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
@@ -56,7 +56,7 @@ class FakePreviewFragment : Fragment() {
     ): View = ComposeView(requireContext()).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
-            val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             SessionContainer {
                 ChatSessionContainer {
                     OriginalTheme(isDark = mode.isDarkMode()) {

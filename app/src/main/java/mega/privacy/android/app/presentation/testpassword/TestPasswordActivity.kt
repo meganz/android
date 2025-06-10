@@ -31,7 +31,7 @@ import mega.privacy.android.app.presentation.testpassword.view.TestPasswordCompo
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -46,7 +46,7 @@ class TestPasswordActivity : PasscodeActivity() {
      * Application Theme Mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val activity = this@TestPasswordActivity
     private val viewModel: TestPasswordViewModel by viewModels()
@@ -113,7 +113,7 @@ class TestPasswordActivity : PasscodeActivity() {
      */
     @Composable
     fun TestPasswordScreen() {
-        val themeMode by getThemeMode()
+        val themeMode by monitorThemeModeUseCase()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         var logoutDialog by rememberSaveable { mutableStateOf(false) }

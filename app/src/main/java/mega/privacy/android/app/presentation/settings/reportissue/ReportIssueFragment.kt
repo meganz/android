@@ -34,7 +34,7 @@ import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIs
 import mega.privacy.android.app.presentation.settings.reportissue.view.DiscardReportDialog
 import mega.privacy.android.app.presentation.settings.reportissue.view.ReportIssueView
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -49,7 +49,7 @@ class ReportIssueFragment : Fragment() {
     private val viewModel: ReportIssueViewModel by viewModels()
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,7 +57,7 @@ class ReportIssueFragment : Fragment() {
     ) = ComposeView(requireContext()).apply {
         Timber.d("ReportIssueFragment: onCreateView")
         setContent {
-            val themeMode by getThemeMode()
+            val themeMode by monitorThemeModeUseCase()
                 .collectAsState(initial = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 ReportIssueView(viewModel)

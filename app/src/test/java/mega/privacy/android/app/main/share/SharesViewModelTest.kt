@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,16 +21,16 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SharesViewModelTest {
     private lateinit var underTest: SharesViewModel
-    private val getThemeMode = mock<GetThemeMode>()
+    private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
 
     @BeforeAll
     fun setUp() {
-        underTest = SharesViewModel(getThemeMode)
+        underTest = SharesViewModel(monitorThemeModeUseCase)
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(getThemeMode)
+        reset(monitorThemeModeUseCase)
     }
 
     @Test
@@ -43,8 +43,8 @@ class SharesViewModelTest {
 
     @Test
     fun `themeMode is set from GetThemeMode use case`() = runTest {
-        whenever(getThemeMode()).thenReturn(flowOf(ThemeMode.Dark))
-        underTest = SharesViewModel(getThemeMode)
+        whenever(monitorThemeModeUseCase()).thenReturn(flowOf(ThemeMode.Dark))
+        underTest = SharesViewModel(monitorThemeModeUseCase)
         underTest.themeMode.test {
             assertThat(awaitItem()).isEqualTo(ThemeMode.Dark)
             awaitComplete()

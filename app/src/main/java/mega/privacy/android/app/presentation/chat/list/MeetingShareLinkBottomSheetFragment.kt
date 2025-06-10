@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.ShareLinkOption
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -45,7 +45,7 @@ class MeetingShareLinkBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>(
         { requireParentFragment() })
@@ -59,7 +59,7 @@ class MeetingShareLinkBottomSheetFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
         setContent {
-            val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             OriginalTheme(isDark = mode.isDarkMode()) {
                 MeetingLinkView(
                     modifier = Modifier.verticalScroll(rememberScrollState()),

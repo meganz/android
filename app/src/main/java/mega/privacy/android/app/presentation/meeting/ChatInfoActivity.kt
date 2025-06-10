@@ -68,7 +68,7 @@ import mega.privacy.android.app.utils.ScheduledMeetingDateUtil
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -90,7 +90,7 @@ import javax.inject.Inject
  * Activity which shows scheduled meeting info screen.
  *
  * @property passCodeFacade [PasscodeCheck]
- * @property getThemeMode   [GetThemeMode]
+ * @property monitorThemeModeUseCase   [MonitorThemeModeUseCase]
  * @property addContactLauncher
  * @property sendToChatLauncher
  * @property editSchedMeetLauncher
@@ -105,7 +105,7 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
     lateinit var navigator: MegaNavigator
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val viewModel by viewModels<ChatInfoViewModel>()
     private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
@@ -541,7 +541,7 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun MainComposeView() {
-        val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()

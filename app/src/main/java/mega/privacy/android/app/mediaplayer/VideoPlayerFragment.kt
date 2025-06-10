@@ -73,7 +73,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
@@ -93,7 +93,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class VideoPlayerFragment : Fragment() {
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * Inject [GetFeatureFlagValueUseCase] to the Fragment
@@ -756,7 +756,7 @@ class VideoPlayerFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val state by viewModel.uiState.collectAsStateWithLifecycle()
-                val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.Dark)
+                val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.Dark)
                 OriginalTheme(isDark = mode.isDarkMode()) {
                     AddSubtitlesDialog(
                         isShown = state.subtitleDisplayState.isSubtitleDialogShown,

@@ -24,7 +24,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.TERMS_OF_SERVICE_URL
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -38,7 +38,7 @@ class CreateAccountComposeFragment : Fragment() {
      * Current theme
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val viewModel: CreateAccountViewModel by viewModels()
     private val activityViewModel: LoginViewModel by activityViewModels()
@@ -51,7 +51,7 @@ class CreateAccountComposeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
-        val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         if (uiState.isNewRegistrationUiEnabled == true) {

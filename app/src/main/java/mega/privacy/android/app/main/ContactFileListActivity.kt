@@ -90,7 +90,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -135,7 +135,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
      * The Application Theme Mode
      */
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
     lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
@@ -440,7 +440,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         findViewById<ComposeView>(R.id.leave_shares_dialog)?.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
                 OriginalTheme(isDark = isDark) {
                     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -461,7 +461,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     private fun setComposeProperties() {
         documentScanningErrorDialogComposeView.apply {
             setContent {
-                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
                 val state by viewModel.state.collectAsStateWithLifecycle()
 

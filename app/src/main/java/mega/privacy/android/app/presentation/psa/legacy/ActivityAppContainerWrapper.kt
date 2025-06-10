@@ -23,7 +23,7 @@ import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.psa.Psa
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import timber.log.Timber
 import java.security.InvalidParameterException
 import javax.inject.Inject
@@ -33,11 +33,11 @@ import javax.inject.Inject
  * Legacy psa handler
  *
  * @property context
- * @property getThemeMode
+ * @property monitorThemeModeUseCase
  */
 class ActivityAppContainerWrapper @Inject constructor(
     @ActivityContext private val context: Context,
-    private val getThemeMode: GetThemeMode,
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val psaGlobalState: LegacyPsaGlobalState,
     private val passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
 ) : AppContainerWrapper, LifecycleEventObserver {
@@ -74,7 +74,7 @@ class ActivityAppContainerWrapper @Inject constructor(
                         LaunchedEffect(Unit) {
                             Timber.d("LegacyMegaAppContainer view added for activity $activity")
                         }
-                        val themeMode by getThemeMode()
+                        val themeMode by monitorThemeModeUseCase()
                             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                         val viewModel: PsaViewModel = hiltViewModel()
                         val psaState by psaGlobalState.state.collectAsStateWithLifecycle((context as LifecycleOwner))

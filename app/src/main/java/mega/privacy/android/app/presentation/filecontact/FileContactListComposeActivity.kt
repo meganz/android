@@ -18,7 +18,7 @@ import mega.privacy.android.app.presentation.filecontact.navigation.fileContacts
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,7 +26,7 @@ import javax.inject.Inject
 internal class FileContactListComposeActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
@@ -43,7 +43,7 @@ internal class FileContactListComposeActivity : AppCompatActivity() {
         val nodeName = intent.getStringExtra(FILE_NAME) ?: "Unknown"
 
         setContent {
-            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
             SharedAppContainer(
                 themeMode = themeMode,

@@ -39,7 +39,7 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
@@ -53,7 +53,7 @@ import javax.inject.Inject
 class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShower {
 
     @Inject
-    lateinit var getThemeMode: GetThemeMode
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
      * [MegaNavigator] injection
@@ -87,7 +87,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         super.onCreate(savedInstanceState)
         checkLoginStatus()
         setContent {
-            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 MediaDiscoveryScreen(
                     mediaDiscoveryGlobalStateViewModel = mediaDiscoveryGlobalStateViewModel,

@@ -59,7 +59,7 @@ import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
@@ -151,7 +151,7 @@ class LoginViewModel @Inject constructor(
     private val monitorRequestStatusProgressEventUseCase: MonitorRequestStatusProgressEventUseCase,
     private val checkIfTransfersShouldBePausedUseCase: CheckIfTransfersShouldBePausedUseCase,
     private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
-    private val getThemeMode: GetThemeMode,
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val resendVerificationEmailUseCase: ResendVerificationEmailUseCase,
     private val resumeCreateAccountUseCase: ResumeCreateAccountUseCase,
     private val checkRecoveryKeyUseCase: CheckRecoveryKeyUseCase,
@@ -299,7 +299,7 @@ class LoginViewModel @Inject constructor(
                         state.copy(isFirstTimeLaunch = isFirstLaunch)
                     }
                 },
-                getThemeMode().catch { Timber.e(it) }.map { themeMode ->
+                monitorThemeModeUseCase().catch { Timber.e(it) }.map { themeMode ->
                     { state: LoginState ->
                         state.copy(themeMode = themeMode)
                     }

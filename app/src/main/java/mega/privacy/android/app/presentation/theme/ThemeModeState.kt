@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,13 +19,13 @@ import javax.inject.Singleton
 /**
  * ThemeModeState - Monitors the theme mode preference and updates the ui accordingly
  *
- * @property getThemeMode use case to monitor theme mode preference
+ * @property monitorThemeModeUseCase use case to monitor theme mode preference
  * @property coroutineScope
  * @property ioDispatcher
  */
 @Singleton
 class ThemeModeState @Inject constructor(
-    private val getThemeMode: GetThemeMode,
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     @ApplicationScope private val coroutineScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -40,7 +40,7 @@ class ThemeModeState @Inject constructor(
      *
      */
     fun initialise() = coroutineScope.launch(ioDispatcher) {
-        getThemeMode()
+        monitorThemeModeUseCase()
             .collect {
                 Timber.d("Theme mode updated to $it")
                 themeMode.value = it
