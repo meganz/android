@@ -7,6 +7,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.constant.SortOrderSource
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -37,6 +39,7 @@ internal class SearchRepositoryImpl @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
     private val getCloudSortOrder: GetCloudSortOrder,
+    private val getOthersSortOrder: GetOthersSortOrder,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SearchRepository {
@@ -119,15 +122,19 @@ internal class SearchRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getInShares() = withContext(ioDispatcher) {
-        megaApiGateway.getInShares(sortOrderIntMapper(getCloudSortOrder())).let { list ->
+        megaApiGateway.getInShares(sortOrderIntMapper(getOthersSortOrder())).let { list ->
             list.map { nodeMapper(it) }
         }
     }
 
     override suspend fun getOutShares() = withContext(ioDispatcher) {
         val searchNodes = ArrayList<MegaNode>()
-        val outShares =
-            megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(getCloudSortOrder()))
+        val outShares = megaApiGateway.getOutgoingSharesNode(
+            sortOrderIntMapper(
+                sortOrder = getCloudSortOrder(),
+                source = SortOrderSource.OutgoingShares
+            )
+        )
         val addedHandles = mutableSetOf<Long>()
         for (outShare in outShares) {
             if (!addedHandles.contains(outShare.nodeHandle)) {

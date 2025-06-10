@@ -67,6 +67,12 @@ data class SearchViewState(
     val hiddenNodeEnabled: Boolean = false,
 ) {
     /**
+     * Returns true if in root directory with an empty search query.
+     */
+    val isAtRootWithEmptyQuery: Boolean
+        get() = navigationLevel.isEmpty() && searchQuery.isEmpty()
+
+    /**
      * Current parent handle based on the last item in the navigation level.
      */
     val currentParentHandle = navigationLevel.lastOrNull()?.first ?: rootParentHandle

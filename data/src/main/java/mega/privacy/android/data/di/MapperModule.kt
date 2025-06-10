@@ -28,8 +28,6 @@ import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.PaymentMethodTypeMapper
 import mega.privacy.android.data.mapper.PricingMapper
-import mega.privacy.android.data.mapper.SortOrderIntMapper
-import mega.privacy.android.data.mapper.SortOrderIntMapperImpl
 import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.data.mapper.SortOrderMapperImpl
 import mega.privacy.android.data.mapper.StartScreenMapper
@@ -97,9 +95,6 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindSortOrderMapper(implementation: SortOrderMapperImpl): SortOrderMapper
-
-    @Binds
-    abstract fun bindSortOrderIntMapper(implementation: SortOrderIntMapperImpl): SortOrderIntMapper
 
     /**
      * Provides PasswordStrength Mapper

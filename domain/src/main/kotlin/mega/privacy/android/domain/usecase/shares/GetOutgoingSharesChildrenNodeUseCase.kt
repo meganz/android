@@ -5,7 +5,6 @@ import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import javax.inject.Inject
 
@@ -15,7 +14,6 @@ import javax.inject.Inject
  * @property getNodeByHandle
  * @property getChildrenNode
  * @property getCloudSortOrder
- * @property getOthersSortOrder
  * @property nodeRepository
  */
 class GetOutgoingSharesChildrenNodeUseCase @Inject constructor(
@@ -23,7 +21,6 @@ class GetOutgoingSharesChildrenNodeUseCase @Inject constructor(
     private val getChildrenNode: GetTypedChildrenNodeUseCase,
     private val mapNodeToShareUseCase: MapNodeToShareUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val getOthersSortOrder: GetOthersSortOrder,
     private val nodeRepository: NodeRepository,
 ) {
 
@@ -32,7 +29,7 @@ class GetOutgoingSharesChildrenNodeUseCase @Inject constructor(
      */
     suspend operator fun invoke(parentHandle: Long): List<ShareNode> {
         return if (parentHandle == -1L) {
-            nodeRepository.getAllOutgoingShares(getOthersSortOrder()).mapNotNull { shareData ->
+            nodeRepository.getAllOutgoingShares(getCloudSortOrder()).mapNotNull { shareData ->
                 getNodeByHandle(NodeId(shareData.nodeHandle))?.let { node ->
                     runCatching {
                         mapNodeToShareUseCase(node, shareData)

@@ -446,7 +446,7 @@ class OutgoingSharesComposeFragment : Fragment() {
      */
     private fun showSortByPanel() {
         val orderType = when (viewModel.getCurrentNodeHandle()) {
-            -1L -> Constants.ORDER_OTHERS
+            -1L -> Constants.ORDER_OUTGOING_SHARES
             else -> Constants.ORDER_CLOUD
         }
         (requireActivity() as ManagerActivity).showNewSortByPanel(orderType)

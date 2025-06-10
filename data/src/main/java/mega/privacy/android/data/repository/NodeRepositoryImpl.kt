@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.constant.SortOrderSource
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.toException
@@ -151,20 +152,32 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getAllOutgoingShares(
         order: SortOrder,
     ) = withContext(ioDispatcher) {
-        megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(order))
+        megaApiGateway.getOutgoingSharesNode(
+            sortOrderIntMapper(
+                sortOrder = order,
+                source = SortOrderSource.OutgoingShares
+            )
+        )
             .filter { it.user != null }
             .let { outgoingShares ->
-                val (verifiedShares, unverifiedShares) = outgoingShares.partition { it.isVerified }
+                val verifiedShares = outgoingShares.filter { it.isVerified }
                 val shareCount = verifiedShares
                     .groupBy { it.nodeHandle }
                     .mapValues { it.value.size }
                 // Set count to 0, so that UI can show unverified icon based on it
-                val unverifiedSharesMapped = unverifiedShares
-                    .filter { isValidNode(NodeId(it.nodeHandle)) }
-                    .map { shareDataMapper(it, 0) }
-                unverifiedSharesMapped + outgoingShares
+                outgoingShares
                     .distinctBy { it.nodeHandle }
-                    .map { shareDataMapper(it, shareCount.getOrDefault(it.nodeHandle, 1)) }
+                    .filter { it.isVerified || isValidNode(NodeId(it.nodeHandle)) }
+                    .map {
+                        shareDataMapper(
+                            share = it,
+                            shareCount = if (it.isVerified) {
+                                shareCount.getOrDefault(it.nodeHandle, 1)
+                            } else {
+                                0
+                            }
+                        )
+                    }
             }
     }
 

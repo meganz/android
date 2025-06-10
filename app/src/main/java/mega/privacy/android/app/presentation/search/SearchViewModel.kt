@@ -58,6 +58,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.sortorder.GetSortOrderByNodeSourceTypeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -94,6 +95,7 @@ class SearchViewModel @Inject constructor(
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
+    private val getSortOrderByNodeSourceTypeUseCase: GetSortOrderByNodeSourceTypeUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
@@ -274,13 +276,18 @@ class SearchViewModel @Inject constructor(
                     isSelected = false,
                 )
             }
-            val cloudSortOrder =
-                runCatching { getCloudSortOrder() }.getOrDefault(SortOrder.ORDER_NONE)
+            val sortOrder = runCatching {
+                if (state.value.isAtRootWithEmptyQuery) {
+                    getSortOrderByNodeSourceTypeUseCase(nodeSourceType)
+                } else {
+                    getCloudSortOrder()
+                }
+            }.getOrDefault(SortOrder.ORDER_NONE)
             _state.update { state ->
                 state.copy(
                     searchItemList = nodeUIItems,
                     isSearching = false,
-                    sortOrder = cloudSortOrder
+                    sortOrder = sortOrder
                 )
             }
         }

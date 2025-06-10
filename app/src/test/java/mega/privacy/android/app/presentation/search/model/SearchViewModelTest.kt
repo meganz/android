@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.sortorder.GetSortOrderByNodeSourceTypeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import org.junit.jupiter.api.AfterEach
@@ -58,6 +59,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -77,6 +79,7 @@ class SearchViewModelTest {
     private val setViewType: SetViewType = mock()
     private val monitorViewType: MonitorViewType = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
+    private val getSortOrderByNodeSourceTypeUseCase: GetSortOrderByNodeSourceTypeUseCase = mock()
     private val typeFilterStringMapper: TypeFilterOptionStringResMapper = mock()
     private val dateFilterStringMapper: DateFilterOptionStringResMapper = mock()
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase = mock()
@@ -108,6 +111,7 @@ class SearchViewModelTest {
             monitorViewType = monitorViewType,
             stateHandle = stateHandle,
             getCloudSortOrder = getCloudSortOrder,
+            getSortOrderByNodeSourceTypeUseCase = getSortOrderByNodeSourceTypeUseCase,
             cancelCancelTokenUseCase = cancelCancelTokenUseCase,
             searchFilterMapper = searchFilterMapper,
             nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
@@ -128,7 +132,7 @@ class SearchViewModelTest {
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorViewType()).thenReturn(emptyFlow())
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
-
+        whenever(getSortOrderByNodeSourceTypeUseCase(nodeSourceType)).thenReturn(SortOrder.ORDER_SIZE_ASC)
         whenever(stateHandle.get<NodeSourceType>(SearchActivity.SEARCH_TYPE)).thenReturn(
             NodeSourceType.CLOUD_DRIVE
         )
@@ -356,8 +360,39 @@ class SearchViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.searchQuery).isEqualTo(query)
+                assertThat(state.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
                 assertThat(state.searchItemList.size).isEqualTo(nodeList.size)
             }
+        }
+
+    @Test
+    fun `test that sort order is updated by node source type when search is empty`() =
+        runTest {
+            val query = ""
+            val typedFolderNode = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(345L))
+                on { name }.thenReturn("folder node")
+            }
+            whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
+            nodeList.add(typedFolderNode)
+            whenever(
+                searchUseCase(
+                    parentHandle = NodeId(123456L),
+                    nodeSourceType = nodeSourceType,
+                    searchParameters = SearchParameters(
+                        query = query,
+                    ),
+                )
+            ).thenReturn(nodeList)
+            whenever(getSortOrderByNodeSourceTypeUseCase(nodeSourceType)).thenReturn(SortOrder.ORDER_SIZE_ASC)
+            underTest.updateSearchQuery("xyz") // Trigger search with a non-empty query first
+            underTest.updateSearchQuery(query)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.searchQuery).isEqualTo(query)
+                assertThat(state.sortOrder).isEqualTo(SortOrder.ORDER_SIZE_ASC)
+            }
+            verify(getSortOrderByNodeSourceTypeUseCase, times(1)).invoke(nodeSourceType)
         }
 
     @Test

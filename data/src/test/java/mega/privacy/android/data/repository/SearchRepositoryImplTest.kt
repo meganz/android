@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSearchFilter
@@ -42,6 +43,7 @@ class SearchRepositoryImplTest {
     private val getLinksSortOrder: GetLinksSortOrder = mock()
     private val sortOrderIntMapper: SortOrderIntMapper = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
+    private val getOthersSortOrder: GetOthersSortOrder = mock()
     private val megaCancelToken: MegaCancelToken = mock()
     private val megsSearchFilterMapper: MegaSearchFilterMapper = mock()
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
@@ -64,13 +66,14 @@ class SearchRepositoryImplTest {
             sortOrderIntMapper = sortOrderIntMapper,
             megaSearchFilterMapper = megsSearchFilterMapper,
             megaLocalRoomGateway = megaLocalRoomGateway,
-            getCloudSortOrder = getCloudSortOrder
+            getCloudSortOrder = getCloudSortOrder,
+            getOthersSortOrder = getOthersSortOrder
         )
     }
 
     @Test
     fun `test that when search called with empty query calls getNodeChildren() once`() = runTest {
-        whenever(sortOrderIntMapper(any())).thenReturn(0)
+        whenever(sortOrderIntMapper(any(), any())).thenReturn(0)
         val nodeID = NodeId(-1L)
         val megaNode: MegaNode = mock()
         val query = "Some query"
@@ -106,7 +109,7 @@ class SearchRepositoryImplTest {
 
     @Test
     fun `test that when search called with some query calls search() once`() = runTest {
-        whenever(sortOrderIntMapper(any())).thenReturn(0)
+        whenever(sortOrderIntMapper(any(), any())).thenReturn(0)
         val nodeID = NodeId(-1L)
         val megaNode: MegaNode = mock()
         val query = "Some query"

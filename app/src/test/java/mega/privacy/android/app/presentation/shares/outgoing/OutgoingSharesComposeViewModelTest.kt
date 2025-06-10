@@ -86,7 +86,6 @@ class OutgoingSharesComposeViewModelTest {
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val monitorContactUpdatesUseCase = mock<MonitorContactUpdates>()
-    private val getOthersSortOrder = mock<GetOthersSortOrder>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
 
@@ -115,7 +114,6 @@ class OutgoingSharesComposeViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             monitorContactUpdatesUseCase = monitorContactUpdatesUseCase,
-            getOthersSortOrder = getOthersSortOrder,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase
         )
@@ -558,7 +556,6 @@ class OutgoingSharesComposeViewModelTest {
         whenever(getOutgoingSharesChildrenNodeUseCase(any())).thenReturn(emptyList())
         whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(null)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
-        whenever(getOthersSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
         whenever(fileDurationMapper(any())).thenReturn(1.seconds)
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
@@ -573,7 +570,7 @@ class OutgoingSharesComposeViewModelTest {
             getParentNodeUseCase,
             getOutgoingSharesChildrenNodeUseCase,
             getCloudSortOrder,
-            getOthersSortOrder,
+            getOutgoingSharesChildrenNodeUseCase,
             monitorContactUpdatesUseCase,
             handleOptionClickMapper,
             monitorViewType,

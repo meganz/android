@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.data.constant.SortOrderSource
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -410,7 +411,7 @@ internal class NodeRepositoryImplTest {
     fun `test that getUnverifiedIncomingShares calls api gateway getUnverifiedIncomingShares with mapped sort order`() =
         runTest {
             val sortOrder = SortOrder.ORDER_NONE
-            whenever(sortOrderIntMapper(any())).thenReturn(0)
+            whenever(sortOrderIntMapper(any(), any())).thenReturn(0)
             whenever(megaApiGateway.getUnverifiedIncomingShares(any())).thenReturn(listOf(mock()))
 
             underTest.getUnverifiedIncomingShares(sortOrder)
@@ -421,7 +422,8 @@ internal class NodeRepositoryImplTest {
     @Test
     fun `test that getUnverifiedIncomingShares returns mapped result from api gateway`() =
         runTest {
-            whenever(sortOrderIntMapper(any())).thenReturn(0)
+            val sortOrder = SortOrder.ORDER_NONE
+            whenever(sortOrderIntMapper(any(), any())).thenReturn(0)
             val megaShare1 = mock<MegaShare>()
             val megaShare2 = mock<MegaShare>()
             val megaShares = listOf(megaShare1, megaShare2)
@@ -432,7 +434,7 @@ internal class NodeRepositoryImplTest {
             whenever(shareDataMapper(megaShare2)).thenReturn(share2)
 
             val expected = listOf(share1, share2)
-            val actual = underTest.getUnverifiedIncomingShares(any())
+            val actual = underTest.getUnverifiedIncomingShares(sortOrder)
 
             assertThat(actual).isEqualTo(expected)
         }
@@ -441,7 +443,7 @@ internal class NodeRepositoryImplTest {
     fun `test that getUnverifiedOutgoingShares calls api gateway getOutgoingSharesNode`() =
         runTest {
             val sortOrder = SortOrder.ORDER_NONE
-            whenever(sortOrderIntMapper(any())).thenReturn(0)
+            whenever(sortOrderIntMapper(any(), any())).thenReturn(0)
             whenever(megaApiGateway.getOutgoingSharesNode(any())).thenReturn(listOf(mock()))
 
             underTest.getUnverifiedOutgoingShares(sortOrder)
@@ -452,7 +454,8 @@ internal class NodeRepositoryImplTest {
     @Test
     fun `test that getUnverifiedOutgoingShares returns mapped result from api gateway with filtered result`() =
         runTest {
-            whenever(sortOrderIntMapper(any())).thenReturn(0)
+            val sortOrder = SortOrder.ORDER_NONE
+            whenever(sortOrderIntMapper(any(), any())).thenReturn(0)
             val megaShare1 = mock<MegaShare> {
                 on { isVerified }.thenReturn(true)
             }
@@ -467,7 +470,7 @@ internal class NodeRepositoryImplTest {
             whenever(shareDataMapper(megaShare2)).thenReturn(share2)
 
             val expected = listOf(share2)
-            val actual = underTest.getUnverifiedOutgoingShares(any())
+            val actual = underTest.getUnverifiedOutgoingShares(sortOrder)
 
             assertThat(actual).isEqualTo(expected)
         }
@@ -477,7 +480,12 @@ internal class NodeRepositoryImplTest {
         runTest {
             val sortOrder = SortOrder.ORDER_NONE
             val sortOrderInt = 0
-            whenever(sortOrderIntMapper(sortOrder)).thenReturn(sortOrderInt)
+            whenever(
+                sortOrderIntMapper(
+                    eq(sortOrder),
+                    eq(SortOrderSource.OutgoingShares)
+                )
+            ).thenReturn(sortOrderInt)
 
             val megaShare1 = mock<MegaShare> {
                 on { isVerified } doReturn false
@@ -515,11 +523,10 @@ internal class NodeRepositoryImplTest {
             val share2 = mock<ShareData>()
             val share3 = mock<ShareData>()
             whenever(shareDataMapper(megaShare1, 0)).thenReturn(share1)
-            whenever(shareDataMapper(megaShare1, 1)).thenReturn(share1)
             whenever(shareDataMapper(megaShare2, 2)).thenReturn(share2)
             whenever(shareDataMapper(megaShare3, 1)).thenReturn(share3)
 
-            val expected = listOf(share1, share1, share2, share3)
+            val expected = listOf(share1, share2, share3)
             val actual = underTest.getAllOutgoingShares(sortOrder)
 
             assertThat(actual).isEqualTo(expected)

@@ -10,7 +10,6 @@ import mega.privacy.android.domain.entity.node.shares.ShareFileNode
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -23,7 +22,6 @@ class GetOutgoingSharesChildrenNodeUseCaseTest {
     private val mapNodeToShareUseCase: MapNodeToShareUseCase = mock()
     private val getChildrenNode: GetTypedChildrenNodeUseCase = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
-    private val getOthersSortOrder: GetOthersSortOrder = mock()
     private val nodeRepository: NodeRepository = mock()
 
     private val underTest = GetOutgoingSharesChildrenNodeUseCase(
@@ -31,7 +29,6 @@ class GetOutgoingSharesChildrenNodeUseCaseTest {
         getChildrenNode,
         mapNodeToShareUseCase,
         getCloudSortOrder,
-        getOthersSortOrder,
         nodeRepository
     )
 
@@ -45,7 +42,7 @@ class GetOutgoingSharesChildrenNodeUseCaseTest {
                 on { id }.thenReturn(NodeId(1L))
             }
             val shareFileNode = mock<ShareFileNode>()
-            whenever(getOthersSortOrder.invoke()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(getCloudSortOrder.invoke()).thenReturn(SortOrder.ORDER_NONE)
             whenever(mapNodeToShareUseCase.invoke(node, shareData)).thenReturn(shareFileNode)
             whenever(nodeRepository.getAllOutgoingShares(SortOrder.ORDER_NONE)).thenReturn(
                 listOf(shareData)

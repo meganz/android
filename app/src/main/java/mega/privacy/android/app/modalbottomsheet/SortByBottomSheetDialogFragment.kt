@@ -26,11 +26,14 @@ import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.Constants.ORDER_FAVOURITES
 import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
 import mega.privacy.android.app.utils.Constants.ORDER_OTHERS
+import mega.privacy.android.app.utils.Constants.ORDER_OUTGOING_SHARES
 import mega.privacy.android.app.utils.Constants.ORDER_VIDEO_PLAYLIST
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import java.util.Locale
 import javax.inject.Inject
+
 
 /**
  * A [BaseBottomSheetDialogFragment] that displays a list of Sort Options
@@ -48,10 +51,34 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         fun newInstance(orderType: Int): SortByBottomSheetDialogFragment {
             val fragment = SortByBottomSheetDialogFragment()
             val args = Bundle()
-
             args.putInt(ORDER_TYPE, orderType)
             fragment.arguments = args
+            return fragment
+        }
 
+        @JvmStatic
+        fun newInstance(sourceType: NodeSourceType): SortByBottomSheetDialogFragment {
+            val fragment = SortByBottomSheetDialogFragment()
+            val args = Bundle()
+            args.putInt(
+                ORDER_TYPE, when (sourceType) {
+                    NodeSourceType.CLOUD_DRIVE,
+                    NodeSourceType.HOME,
+                    NodeSourceType.LINKS,
+                    NodeSourceType.RUBBISH_BIN,
+                    NodeSourceType.BACKUPS,
+                    NodeSourceType.DOCUMENTS,
+                    NodeSourceType.AUDIO,
+                        -> ORDER_CLOUD
+
+                    NodeSourceType.FAVOURITES -> ORDER_FAVOURITES
+                    NodeSourceType.OUTGOING_SHARES -> ORDER_OUTGOING_SHARES
+                    NodeSourceType.INCOMING_SHARES,
+                    NodeSourceType.OTHER,
+                        -> ORDER_OTHERS
+                }
+            )
+            fragment.arguments = args
             return fragment
         }
     }
@@ -237,6 +264,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 ORDER_FAVOURITES,
                 ORDER_CLOUD,
                 ORDER_VIDEO_PLAYLIST,
+                ORDER_OUTGOING_SHARES,
                     -> {
                     sortByHeaderViewModel.setOrderCloud(order).join()
                     sortByHeaderViewModel.updateWhenOrderChanged(

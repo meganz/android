@@ -30,7 +30,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -57,7 +56,6 @@ import javax.inject.Inject
  * @param isNodeInRubbishBinUseCase [IsNodeInRubbishBinUseCase] To get current node is in rubbish
  * @param getOutgoingSharesChildrenNodeUseCase [GetOutgoingSharesChildrenNodeUseCase] To get children of current node
  * @param getCloudSortOrder [GetCloudSortOrder] To get cloud sort order
- * @param getOthersSortOrder [GetOthersSortOrder] To get others sort order
  * @param monitorViewType [MonitorViewType] Check view type
  * @param setViewType [SetViewType] To set view type
  * @param handleOptionClickMapper [HandleOptionClickMapper] Handle option click click mapper
@@ -76,7 +74,6 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val getOutgoingSharesChildrenNodeUseCase: GetOutgoingSharesChildrenNodeUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val getOthersSortOrder: GetOthersSortOrder,
     private val monitorViewType: MonitorViewType,
     private val setViewType: SetViewType,
     private val handleOptionClickMapper: HandleOptionClickMapper,
@@ -286,7 +283,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
 
         val childrenNodes = getOutgoingSharesChildrenNodeUseCase(currentHandle)
         val nodeUIItems = getNodeUiItems(childrenNodes)
-        val sortOrder = if (isRootNode) getOthersSortOrder() else getCloudSortOrder()
+        val sortOrder = getCloudSortOrder()
 
         _state.update {
             it.copy(

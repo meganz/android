@@ -629,8 +629,15 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     }
 
     private fun showSortOrderBottomSheet() {
+        val nodeSourceType = viewModel.state.value.let {
+            if (it.isAtRootWithEmptyQuery) {
+                it.nodeSourceType
+            } else {
+                NodeSourceType.CLOUD_DRIVE
+            }
+        }
         val bottomSheetDialogFragment =
-            SortByBottomSheetDialogFragment.newInstance(Constants.ORDER_CLOUD)
+            SortByBottomSheetDialogFragment.newInstance(nodeSourceType)
         bottomSheetDialogFragment.show(
             supportFragmentManager,
             bottomSheetDialogFragment.tag
