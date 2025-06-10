@@ -21,7 +21,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -46,7 +45,6 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
-import mega.privacy.android.app.presentation.extensions.canBeHandled
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.extensions.serializable
@@ -73,7 +71,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountBlockedType
-import mega.privacy.android.domain.entity.support.SupportEmailTicket
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -1021,8 +1018,8 @@ class LoginFragment : Fragment() {
     private fun showAlertIncorrectRK() {
         Timber.d("showAlertIncorrectRK")
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.incorrect_MK_title))
-            .setMessage(getString(R.string.incorrect_MK))
+            .setTitle(getString(sharedR.string.recovery_key_error_title))
+            .setMessage(getString(sharedR.string.recovery_key_error_description))
             .setCancelable(false)
             .setPositiveButton(getString(R.string.general_ok), null)
             .show()
@@ -1054,40 +1051,6 @@ class LoginFragment : Fragment() {
 
     private fun onLostAuthenticationDevice() {
         context.launchUrl(RECOVERY_URL)
-    }
-
-    private fun sendSupportEmail(ticket: SupportEmailTicket) {
-        val fileUri = getLogFileUri(ticket)
-        val emailIntent = getEmailIntent(ticket, fileUri)
-        if (emailIntent.canBeHandled(requireContext())) {
-            startActivity(emailIntent)
-        }
-    }
-
-    private fun getLogFileUri(
-        ticket: SupportEmailTicket,
-    ) = ticket.logs?.let { file ->
-        context?.let {
-            FileProvider.getUriForFile(
-                it,
-                Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                file
-            )
-        }
-    }
-
-    private fun getEmailIntent(
-        ticket: SupportEmailTicket,
-        fileUri: Uri?,
-    ) = Intent(Intent.ACTION_SEND).apply {
-        type = "message/rfc822"
-        putExtra(Intent.EXTRA_EMAIL, arrayOf(ticket.email))
-        putExtra(Intent.EXTRA_SUBJECT, ticket.subject)
-        putExtra(Intent.EXTRA_TEXT, ticket.ticket)
-        fileUri?.let<Uri, Unit> {
-            putExtra(Intent.EXTRA_STREAM, it)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
     }
 
     companion object {

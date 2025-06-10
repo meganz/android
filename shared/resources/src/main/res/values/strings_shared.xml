@@ -1277,4 +1277,8 @@
     <string name="free_plan_card_existing_button">Continue with free plan</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">%1$s of storage</string>
+    <!-- Title for recovery key error dialog -->
+    <string name="recovery_key_error_title">Recovery key error</string>
+    <!-- Description for recovery key error dialog -->
+    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
 </resources>
