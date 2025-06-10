@@ -12,6 +12,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.ElementsIntoSet
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.LegacyDatabaseMigrationImpl
 import mega.privacy.android.app.MegaApplication
@@ -24,6 +25,8 @@ import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.DefaultGetThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.MainNavItem
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Singleton
@@ -115,4 +118,13 @@ class AppModule {
     @Provides
     internal fun provideLegacyDatabaseMigration(databaseMigration: LegacyDatabaseMigrationImpl): LegacyDatabaseMigration =
         databaseMigration
+
+    @Provides
+    @ElementsIntoSet
+    fun provideMainNavItems(): Set<@JvmSuppressWildcards MainNavItem> = emptySet<MainNavItem>()
+
+    @Provides
+    @ElementsIntoSet
+    fun provideFeatureDestinations(): Set<@JvmSuppressWildcards FeatureDestination> =
+        emptySet<FeatureDestination>()
 }
