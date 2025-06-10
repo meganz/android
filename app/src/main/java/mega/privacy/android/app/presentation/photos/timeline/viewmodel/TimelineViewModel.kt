@@ -653,29 +653,7 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Perform actions when clicking a Photo
-     *
-     * @param photo The Photo being clicked
-     */
-    fun onClick(photo: Photo) {
-        if (selectedPhotosIds.size == 0) {
-            _state.update {
-                it.copy(selectedPhoto = photo)
-            }
-        } else {
-            onLongPress(photo)
-        }
-    }
-
-    /**
-     * Invalidates the selected Photo in the UI State
-     */
-    fun onNavigateToSelectedPhoto() {
-        _state.update {
-            it.copy(selectedPhoto = null)
-        }
-    }
+    fun getSelectedPhotosCount(): Int = selectedPhotosIds.size
 
     /**
      * Perform actions when clicking a DateCard

@@ -28,7 +28,6 @@ import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMe
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
@@ -37,7 +36,6 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
-import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -47,6 +45,7 @@ import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
+import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -251,8 +250,6 @@ internal class TimelineViewModelTest {
                 .isFalse()
             assertWithMessage("selectedPhotoCount value is incorrect").that(initialState.selectedPhotoCount)
                 .isEqualTo(0)
-            assertWithMessage("selectedPhoto value is incorrect").that(initialState.selectedPhoto)
-                .isNull()
             assertWithMessage("shouldTriggerCameraUploads value is incorrect").that(initialState.shouldTriggerCameraUploads)
                 .isFalse()
             assertWithMessage("shouldShowBusinessAccountPrompt value is incorrect").that(

@@ -6,6 +6,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalContext
@@ -14,6 +15,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.PhotosViewComposeCoordinator
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
@@ -26,12 +31,17 @@ import mega.privacy.android.app.presentation.photos.timeline.view.EnableCameraUp
 import mega.privacy.android.app.presentation.photos.timeline.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.timeline.view.TimelineView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getCurrentSort
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getFilterType
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getMediaSource
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.mobile.analytics.event.AlbumSelected
 import mega.privacy.mobile.analytics.event.AlbumSelectedEvent
 
@@ -69,6 +79,27 @@ fun PhotosScreen(
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val onPhotoClick = remember {
+        { photo: Photo ->
+            if (timelineViewModel.getSelectedPhotosCount() == 0) {
+                val intent = ImagePreviewActivity.createIntent(
+                    context = context,
+                    imageSource = ImagePreviewFetcherSource.TIMELINE,
+                    menuOptionsSource = ImagePreviewMenuSource.TIMELINE,
+                    anchorImageNodeId = NodeId(photo.id),
+                    params = mapOf(
+                        TimelineImageNodeFetcher.TIMELINE_SORT_TYPE to timelineViewModel.getCurrentSort(),
+                        TimelineImageNodeFetcher.TIMELINE_FILTER_TYPE to timelineViewModel.getFilterType(),
+                        TimelineImageNodeFetcher.TIMELINE_MEDIA_SOURCE to timelineViewModel.getMediaSource(),
+                    ),
+                    enableAddToAlbum = true,
+                )
+                context.startActivity(intent)
+            } else {
+                timelineViewModel.onLongPress(photo)
+            }
+        }
+    }
 
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -109,7 +140,7 @@ fun PhotosScreen(
                         timelineViewState = timelineViewState,
                         downloadPhoto = photoDownloaderViewModel::downloadPhoto,
                         lazyGridState = timelineLazyGridState,
-                        onClick = timelineViewModel::onClick,
+                        onClick = onPhotoClick,
                         onLongPress = timelineViewModel::onLongPress,
                         onEnableCameraUploads = onNavigateCameraUploadsSettings,
                         onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,

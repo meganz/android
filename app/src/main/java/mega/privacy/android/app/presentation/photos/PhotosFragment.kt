@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.photos
 
-import mega.privacy.android.shared.resources.R as SharedR
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
@@ -48,10 +47,6 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
-import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
-import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
-import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActionModeCallback
@@ -72,8 +67,6 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewS
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getCurrentSort
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getFilterType
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getMediaSource
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCurrentSort
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingFilterPage
@@ -93,10 +86,10 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.PhotoScreenEvent
 import javax.inject.Inject
 
@@ -306,11 +299,6 @@ class PhotosFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 launch {
                     timelineViewModel.state.collect { state ->
-                        state.selectedPhoto?.let {
-                            openPhoto(it).also {
-                                timelineViewModel.onNavigateToSelectedPhoto()
-                            }
-                        }
                         handleOptionsMenu(state)
                         handleActionMode(state)
                         handleActionsForCameraUploads(state)
@@ -715,24 +703,6 @@ class PhotosFragment : Fragment() {
         albumsActionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
             albumsActionModeCallback
         )
-    }
-
-    private fun openPhoto(photo: Photo) {
-        lifecycleScope.launch {
-            val intent = ImagePreviewActivity.createIntent(
-                context = requireContext(),
-                imageSource = ImagePreviewFetcherSource.TIMELINE,
-                menuOptionsSource = ImagePreviewMenuSource.TIMELINE,
-                anchorImageNodeId = NodeId(photo.id),
-                params = mapOf(
-                    TimelineImageNodeFetcher.TIMELINE_SORT_TYPE to timelineViewModel.getCurrentSort(),
-                    TimelineImageNodeFetcher.TIMELINE_FILTER_TYPE to timelineViewModel.getFilterType(),
-                    TimelineImageNodeFetcher.TIMELINE_MEDIA_SOURCE to timelineViewModel.getMediaSource(),
-                ),
-                enableAddToAlbum = true,
-            )
-            startActivity(intent)
-        }
     }
 
     /**
