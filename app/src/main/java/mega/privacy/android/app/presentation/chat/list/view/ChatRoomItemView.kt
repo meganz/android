@@ -8,6 +8,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -36,36 +38,34 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
 import androidx.core.graphics.toColorInt
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.meeting.chat.view.NOTE_TO_SELF_ITEM_NEW_LABEL
+import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfAvatarView
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.GroupChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem.NoteToSelfChatRoomItem
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
+import mega.privacy.android.icon.pack.R as iconR
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.MessageText
-import mega.privacy.android.shared.original.core.ui.controls.chip.IconBadge
-import mega.privacy.android.shared.original.core.ui.controls.chip.CounterBadge
 import mega.privacy.android.shared.original.core.ui.controls.chip.BadgeSize
+import mega.privacy.android.shared.original.core.ui.controls.chip.CounterBadge
+import mega.privacy.android.shared.original.core.ui.controls.chip.IconBadge
+import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
+import mega.privacy.android.shared.original.core.ui.controls.chip.TagChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.meetings.CallChronometer
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
-import mega.privacy.android.icon.pack.R as iconR
-import mega.privacy.android.shared.resources.R as sharedR
-import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.Alignment
-import mega.privacy.android.app.presentation.meeting.chat.view.NOTE_TO_SELF_ITEM_NEW_LABEL
-import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfAvatarView
-import mega.privacy.android.domain.entity.chat.ChatRoomItem.NoteToSelfChatRoomItem
-import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
-import mega.privacy.android.shared.original.core.ui.controls.chip.TagChipStyle
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Chat room item view
@@ -86,7 +86,7 @@ internal fun ChatRoomItemView(
     item: ChatRoomItem,
     isSelected: Boolean,
     isSelectionEnabled: Boolean,
-    onItemClick: (Long) -> Unit,
+    onItemClick: (Long, Boolean) -> Unit,
     onItemMoreClick: (ChatRoomItem) -> Unit,
     onItemSelected: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -114,7 +114,7 @@ internal fun ChatRoomItemView(
                         hapticFeedback.performHapticFeedback(LongPress)
                         onItemSelected(item.chatId)
                     } else {
-                        onItemClick(item.chatId)
+                        onItemClick(item.chatId, isNoteToSelfChat)
                     }
                 },
                 onLongClick = {
@@ -162,13 +162,14 @@ internal fun ChatRoomItemView(
             }
 
             isNoteToSelfChat -> {
-                Box(modifier = Modifier
-                    .size(40.dp)
-                    .constrainAs(avatarImage) {
-                        start.linkTo(parent.start, 16.dp)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                    }) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .constrainAs(avatarImage) {
+                            start.linkTo(parent.start, 16.dp)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        }) {
                     NoteToSelfAvatarView(
                         isHint = isEmptyNoteToSelfChat,
                         modifier = Modifier
@@ -583,7 +584,7 @@ private fun PreviewIndividualChatRoomItem(
             item = itemToSelected.first,
             isSelected = itemToSelected.second,
             isSelectionEnabled = itemToSelected.second,
-            onItemClick = {},
+            onItemClick = { _, _ -> },
             onItemMoreClick = {},
             onItemSelected = {},
         )
@@ -601,7 +602,7 @@ private fun PreviewNoteToSelfChatRoomItem(
             isSelected = itemToSelected.second,
             isNew = true,
             isSelectionEnabled = itemToSelected.second,
-            onItemClick = {},
+            onItemClick = { _, _ -> },
             onItemMoreClick = {},
             onItemSelected = {},
         )

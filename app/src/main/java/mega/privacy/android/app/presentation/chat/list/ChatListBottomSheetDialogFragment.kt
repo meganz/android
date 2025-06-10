@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.chat.list
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -27,9 +26,9 @@ import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottom
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.meeting.ChatInfoActivity
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity
-import mega.privacy.android.app.presentation.meeting.ChatInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
@@ -40,6 +39,8 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ArchiveNoteToSelfButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingCancelMenuItemEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuItemEvent
 import javax.inject.Inject
@@ -226,7 +227,10 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
         dismissAllowingStateLoss()
     }
 
-    private fun onArchiveClick() {
+    private fun onArchiveClick(isNoteToSelfChat: Boolean) {
+        if (isNoteToSelfChat) {
+            Analytics.tracker.trackEvent(ArchiveNoteToSelfButtonPressedEvent)
+        }
         viewModel.archiveChats(chatId)
         dismissAllowingStateLoss()
     }

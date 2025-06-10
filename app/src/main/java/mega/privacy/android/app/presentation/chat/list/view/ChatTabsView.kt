@@ -71,7 +71,7 @@ fun ChatTabsView(
     noteToSelfChatState: NoteToSelfChatUIState,
     showMeetingTab: Boolean = false,
     onTabSelected: (ChatTab) -> Unit = {},
-    onItemClick: (Long) -> Unit = {},
+    onItemClick: (Long, Boolean) -> Unit = { _, _ -> },
     onItemMoreClick: (ChatRoomItem) -> Unit = {},
     onItemSelected: (Long) -> Unit = {},
     onResetStateSnackbarMessage: () -> Unit = {},

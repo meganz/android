@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.chat.dialog.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -48,12 +46,14 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.NoteToSelfChatRoomItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.resources.R as sharedR
 import kotlin.random.Random
 
 /**
@@ -70,7 +70,7 @@ internal fun ChatRoomItemBottomSheetView(
     onClearChatClick: () -> Unit = {},
     onMuteClick: () -> Unit = {},
     onUnmuteClick: () -> Unit = {},
-    onArchiveClick: () -> Unit = {},
+    onArchiveClick: (Boolean) -> Unit = {},
     onUnarchiveClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
     onLeaveClick: () -> Unit = {},
@@ -121,13 +121,14 @@ internal fun ChatRoomItemBottomSheetView(
             }
 
             if (isNoteToSelf) {
-                Box(modifier = Modifier
-                    .size(40.dp)
-                    .constrainAs(avatarImage) {
-                        start.linkTo(parent.start)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                    }) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .constrainAs(avatarImage) {
+                            start.linkTo(parent.start)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        }) {
                     NoteToSelfAvatarView(
                         isHint = item.isEmptyNoteToSelfChatRoom,
                         modifier = Modifier
@@ -302,7 +303,9 @@ internal fun ChatRoomItemBottomSheetView(
                     res = R.drawable.ic_chat_archive,
                     text = R.string.general_archive,
                     description = "Archive",
-                    onClick = onArchiveClick
+                    onClick = {
+                        onArchiveClick(isNoteToSelf)
+                    }
                 )
 
                 when {

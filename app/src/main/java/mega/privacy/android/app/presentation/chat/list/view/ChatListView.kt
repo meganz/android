@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.chat.list.view
 
-import mega.privacy.android.icon.pack.R as IconR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -43,10 +41,12 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.collectLatest
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
+import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedWithoutBackgroundMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -59,7 +59,7 @@ import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeTabletLandscapePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.InviteFriendsLearnMorePressedEvent
 
 /**
@@ -91,7 +91,7 @@ fun ChatListView(
     hasAnyContact: Boolean = false,
     isLoading: Boolean = false,
     tooltip: MeetingTooltipItem = MeetingTooltipItem.NONE,
-    onItemClick: (Long) -> Unit = {},
+    onItemClick: (Long, Boolean) -> Unit = { _, _ -> },
     onItemMoreClick: (ChatRoomItem) -> Unit = {},
     onItemSelected: (Long) -> Unit = {},
     onFirstItemVisible: (Boolean) -> Unit = {},
@@ -148,7 +148,7 @@ private fun ListView(
     selectedIds: List<Long>,
     scrollToTop: Boolean,
     tooltip: MeetingTooltipItem,
-    onItemClick: (Long) -> Unit,
+    onItemClick: (Long, Boolean) -> Unit,
     onItemMoreClick: (ChatRoomItem) -> Unit,
     onItemSelected: (Long) -> Unit,
     onFirstItemVisible: (Boolean) -> Unit,

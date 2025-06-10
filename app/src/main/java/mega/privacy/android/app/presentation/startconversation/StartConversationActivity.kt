@@ -30,10 +30,10 @@ import mega.privacy.android.app.presentation.startconversation.view.StartConvers
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.mobile.analytics.event.CreateNoteToSelfButtonPressedEvent
 import mega.privacy.mobile.analytics.event.GroupChatPressedEvent
 import mega.privacy.mobile.analytics.event.InviteContactsPressedEvent
 import javax.inject.Inject
-import kotlin.getValue
 
 /**
  * Activity which allows to start a new chat conversation.
@@ -134,7 +134,10 @@ class StartConversationActivity : ComponentActivity() {
                 onBackPressed = { finish() },
                 onSearchClicked = viewModel::onSearchTap,
                 onInviteContactsClicked = { onInviteContacts() },
-                onNoteToSelfClicked = viewModel::openNoteToSelf
+                onNoteToSelfClicked = {
+                    Analytics.tracker.trackEvent(CreateNoteToSelfButtonPressedEvent)
+                    viewModel::openNoteToSelf
+                }
             )
         }
     }

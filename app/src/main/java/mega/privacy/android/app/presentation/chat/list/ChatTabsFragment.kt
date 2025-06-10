@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.chat.list
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
@@ -67,11 +66,13 @@ import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ChatScreenEvent
 import mega.privacy.mobile.analytics.event.ChatTabFABPressedEvent
 import mega.privacy.mobile.analytics.event.ChatsTabEvent
 import mega.privacy.mobile.analytics.event.InviteFriendsPressedEvent
 import mega.privacy.mobile.analytics.event.MeetingsTabEvent
+import mega.privacy.mobile.analytics.event.OpenNoteToSelfButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ScheduleMeetingPressedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingShareMeetingLinkButtonEvent
 import mega.privacy.mobile.analytics.event.SendMeetingLinkToChatScheduledMeetingEvent
@@ -425,7 +426,10 @@ class ChatTabsFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-    private fun onItemClick(chatId: Long) {
+    private fun onItemClick(chatId: Long, isNoteToSelfChat: Boolean) {
+        if (isNoteToSelfChat) {
+            Analytics.tracker.trackEvent(OpenNoteToSelfButtonPressedEvent)
+        }
         viewModel.signalChatPresence()
         viewModel.cancelCallUpdate()
 

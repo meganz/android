@@ -38,7 +38,7 @@ class ChatRoomItemViewTest {
         userChatStatus = UserChatStatus.Online,
     )
 
-    private val onItemClick: (Long) -> Unit = mock()
+    private val onItemClick: (Long, Boolean) -> Unit = mock()
     private val onItemMoreClick: (ChatRoomItem) -> Unit = mock()
     private val onItemSelected: (Long) -> Unit = mock()
 
@@ -58,7 +58,7 @@ class ChatRoomItemViewTest {
         composeTestRule.onNodeWithTag("chat_room_item:avatar_image", useUnmergedTree = true)
             .performClick()
 
-        verify(onItemClick).invoke(individualChatRoomItem.chatId)
+        verify(onItemClick).invoke(individualChatRoomItem.chatId, false)
     }
 
     @Test

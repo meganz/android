@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -69,7 +70,8 @@ class ArchivedChatsActivity : AppCompatActivity() {
         }
     }
 
-    private fun onItemClick(chatId: Long) {
+    private fun onItemClick(chatId: Long, isNoteToSelfChat: Boolean) {
+        Timber.d("ArchivedChatsActivity onItemClick: chatId=$chatId, isNoteToSelfChat=$isNoteToSelfChat")
         navigator.openChat(
             context = this,
             chatId = chatId,

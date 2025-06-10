@@ -54,7 +54,7 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 fun ArchivedChatsView(
     state: ArchivedChatsState,
     noteToSelfState: NoteToSelfChatUIState,
-    onItemClick: (Long) -> Unit = {},
+    onItemClick: (Long, Boolean) -> Unit = { _, _ -> },
     onItemUnarchived: (Long) -> Unit = {},
     onBackPressed: () -> Unit = {},
     onSnackBarDismiss: () -> Unit = {},
