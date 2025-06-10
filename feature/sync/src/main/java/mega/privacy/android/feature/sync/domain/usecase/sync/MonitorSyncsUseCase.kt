@@ -3,10 +3,13 @@ package mega.privacy.android.feature.sync.domain.usecase.sync
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import javax.inject.Inject
 
@@ -29,20 +32,29 @@ class MonitorSyncsUseCaseImpl @Inject constructor(
     override operator fun invoke(): Flow<List<FolderPair>> = channelFlow {
         launch {
             syncRepository.monitorFolderPairChanges()
+                .distinctUntilChanged()
+                .map { pairs ->
+                    pairs.partition { it.syncError != SyncError.MISMATCH_OF_ROOT_FSID }
+                }
                 .conflate()
-                .collect { folderPairs ->
-                    val (validSyncs, notResumedSyncs) = processFolderPairs(folderPairs)
-                    send(validSyncs + notResumedSyncs)
+                .collect { (validSyncs, invalidSyncs) ->
+                    val pausedSyncs = invalidSyncs.map {
+                        it.copy(
+                            syncError = SyncError.NO_SYNC_ERROR,
+                            syncStatus = SyncStatus.PAUSED
+                        )
+                    }
+                    if (pausedSyncs.isNotEmpty()) {
+                        send(validSyncs + pausedSyncs)
+                        val notResumedSyncs = handleInvalidSyncs(invalidSyncs)
+                        val totalSyncs =
+                            validSyncs + pausedSyncs.minus(notResumedSyncs) + notResumedSyncs
+                        send(totalSyncs)
+                    } else {
+                        send(validSyncs)
+                    }
                 }
         }
-    }
-
-    private suspend fun processFolderPairs(folderPairs: List<FolderPair>): Pair<List<FolderPair>, List<FolderPair>> {
-        val (validSyncs, invalidSyncs) = folderPairs.partition { it.syncError != SyncError.MISMATCH_OF_ROOT_FSID }
-        // we need to retry resuming the syncs that have a mismatch of root fsId
-        // fsId might change for an existing sync if the device is restarted and SD card will no longer point to the same fsId
-        val notResumedSyncs = handleInvalidSyncs(invalidSyncs)
-        return validSyncs to notResumedSyncs
     }
 
     private suspend fun handleInvalidSyncs(invalidSyncs: List<FolderPair>): List<FolderPair> {

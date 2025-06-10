@@ -4,7 +4,9 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
@@ -21,11 +23,13 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -148,8 +152,71 @@ class MonitorSyncsUseCaseTest {
             val result = awaitItem()
             verify(changeSyncLocalRootUseCase, never()).invoke(any(), any())
             verify(resumeSyncUseCase, never()).invoke(any())
-            Truth.assertThat(result)
-                .containsExactlyElementsIn(validFolderPairs + invalidFolderPairs)
+            val expectedFolderPairs = validFolderPairs + invalidFolderPairs.map {
+                it.copy(syncStatus = SyncStatus.PAUSED, syncError = SyncError.NO_SYNC_ERROR)
+            }
+            Truth.assertThat(result).containsExactlyElementsIn(expectedFolderPairs)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that duplicate emissions are filtered and rapid emissions are conflated`() = runTest {
+        val folderPair = validFolderPairs.first()
+        val invalidFolderPair = invalidFolderPairs.first()
+        val emissions = listOf(
+            listOf(
+                folderPair,
+                invalidFolderPair
+            ), // emit 1
+            listOf(folderPair), // emit 2
+            listOf(folderPair.copy(syncStatus = SyncStatus.PAUSED)), // new, should emit
+            listOf(folderPair.copy(syncStatus = SyncStatus.PAUSED)), // duplicate, should be filtered
+        )
+
+        whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+            flow {
+                emissions.forEach {
+                    emit(it)
+                    delay(100)
+                }
+                awaitCancellation()
+            }
+        )
+
+        wheneverBlocking { canReadUriUseCase(any()) }.doSuspendableAnswer {
+            delay(300)
+            true // Simulate that the URI is readable
+        }
+
+        underTest().test {
+            // First emission: SYNCING
+            val first = awaitItem()
+            Truth.assertThat(first).containsExactlyElementsIn(
+                listOf(
+                    folderPair,
+                    invalidFolderPair.copy(
+                        syncStatus = SyncStatus.PAUSED,
+                        syncError = SyncError.NO_SYNC_ERROR
+                    )
+                )
+            )
+            awaitItem() // Consume the second emission after changing the root and resuming the sync
+            advanceTimeBy(300)
+
+
+            // Second emission: PAUSED (after processing by use case)
+            val second = awaitItem()
+            Truth.assertThat(second).containsExactlyElementsIn(
+                listOf(
+                    folderPair.copy(
+                        syncStatus = SyncStatus.PAUSED,
+                    )
+                )
+            )
+
+            // No more emissions
+            expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }
