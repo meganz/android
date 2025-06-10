@@ -14,18 +14,25 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
+import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 import java.text.SimpleDateFormat
@@ -41,8 +48,8 @@ const val DATE_FORMAT_MONTH_WITH_DAY = "MMMM"
 
 @Composable
 fun PhotosGridView(
-    modifier: Modifier,
     downloadPhoto: PhotoDownload,
+    modifier: Modifier = Modifier,
     timelineViewState: TimelineViewState = TimelineViewState(),
     lazyGridState: LazyGridState = rememberLazyGridState(),
     onClick: (Photo) -> Unit = {},
@@ -50,6 +57,8 @@ fun PhotosGridView(
     onEnableCameraUploads: () -> Unit = {},
     onChangeCameraUploadsPermissions: () -> Unit = {},
     onCloseCameraUploadsLimitedAccess: () -> Unit = {},
+    onZoomIn: () -> Unit = {},
+    onZoomOut: () -> Unit = {},
 ) {
     val configuration = LocalConfiguration.current
     val spanCount = remember(configuration.orientation, timelineViewState.currentZoomLevel) {
@@ -72,11 +81,29 @@ fun PhotosGridView(
     val potentialItems =
         if (enableCameraUploadsBanner) 1 else 0 + if (isCameraUploadsLimitedAccess) 1 else 0
     val totalItems = potentialItems + uiPhotoList.size + 1
+    var userScrollEnabled by remember { mutableStateOf(true) }
+    var coroutineScope = rememberCoroutineScope()
+    val onZoom = remember(coroutineScope) {
+        { zoomAction: () -> Unit ->
+            coroutineScope.launch {
+                userScrollEnabled = false
+                zoomAction()
+                // Delay to disable user scrolling while the grid is being updated
+                delay(250)
+                userScrollEnabled = true
+            }
+        }
+    }
 
     FastScrollLazyVerticalGrid(
         totalItems = totalItems,
         columns = GridCells.Fixed(spanCount),
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .photosZoomGestureDetector(
+                onZoomIn = { onZoom(onZoomIn) },
+                onZoomOut = { onZoom(onZoomOut) }
+            ),
         state = lazyGridState,
         tooltipText = { index ->
             val item = uiPhotoList.getOrNull(index)
@@ -92,6 +119,7 @@ fun PhotosGridView(
                 )
             } ?: ""
         },
+        userScrollEnabled = userScrollEnabled
     ) {
         if (isCameraUploadsLimitedAccess) {
             item(
@@ -128,6 +156,7 @@ fun PhotosGridView(
 
             if (item is PhotoListItem.PhotoGridItem) {
                 PhotoView(
+                    modifier = Modifier.animateItem(),
                     photo = item.photo,
                     isSelected = item.isSelected,
                     currentZoomLevel = timelineViewState.currentZoomLevel,

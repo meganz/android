@@ -8,7 +8,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -29,7 +28,6 @@ import mega.privacy.android.app.presentation.photos.timeline.view.TimelineView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
-import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.photos.Album
@@ -108,11 +106,6 @@ fun PhotosScreen(
                 },
                 photosGridView = {
                     PhotosGridView(
-                        modifier = Modifier
-                            .photosZoomGestureDetector(
-                                onZoomIn = onZoomIn,
-                                onZoomOut = onZoomOut,
-                            ),
                         timelineViewState = timelineViewState,
                         downloadPhoto = photoDownloaderViewModel::downloadPhoto,
                         lazyGridState = timelineLazyGridState,
@@ -122,7 +115,9 @@ fun PhotosScreen(
                         onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
                         onCloseCameraUploadsLimitedAccess = {
                             timelineViewModel.setCameraUploadsLimitedAccess(false)
-                        }
+                        },
+                        onZoomIn = onZoomIn,
+                        onZoomOut = onZoomOut,
                     )
                 },
                 emptyView = {
