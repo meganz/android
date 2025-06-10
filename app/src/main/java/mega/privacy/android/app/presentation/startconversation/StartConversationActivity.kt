@@ -136,7 +136,7 @@ class StartConversationActivity : ComponentActivity() {
                 onInviteContactsClicked = { onInviteContacts() },
                 onNoteToSelfClicked = {
                     Analytics.tracker.trackEvent(CreateNoteToSelfButtonPressedEvent)
-                    viewModel::openNoteToSelf
+                    viewModel.openNoteToSelf()
                 }
             )
         }
