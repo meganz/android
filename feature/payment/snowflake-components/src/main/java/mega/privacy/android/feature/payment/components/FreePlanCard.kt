@@ -41,13 +41,18 @@ import mega.privacy.android.shared.resources.R as shareR
 fun FreePlanCard(
     modifier: Modifier = Modifier,
     onContinue: () -> Unit,
+    isNewCreationAccount: Boolean,
+    storageFormatted: String,
 ) {
     val context = LocalContext.current
     val features = remember {
         listOf(
             PlanFeature(
                 icon = IconPackR.drawable.ic_cloud,
-                title = context.getString(shareR.string.free_plan_card_storage_feature)
+                title = context.getString(
+                    shareR.string.free_plan_card_storage_feature_for_existing_user,
+                    storageFormatted
+                )
             ),
             PlanFeature(
                 icon = IconPackR.drawable.ic_arrows_up_down,
@@ -68,19 +73,23 @@ fun FreePlanCard(
         horizontalAlignment = Alignment.Start,
     ) {
         MegaText(
-            text = stringResource(id = shareR.string.free_plan_card_title),
+            text = stringResource(
+                id = if (isNewCreationAccount) shareR.string.free_plan_card_title else shareR.string.free_plan_card_existing_title
+            ),
             style = MaterialTheme.typography.titleMedium,
             textColor = TextColor.Primary,
             modifier = Modifier.testTag(TEST_TAG_FREE_PLAN_CARD_TITLE)
         )
-        MegaText(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .testTag(TEST_TAG_FREE_PLAN_CARD_DESCRIPTION),
-            text = stringResource(id = shareR.string.free_plan_card_description),
-            style = MaterialTheme.typography.bodySmall,
-            textColor = TextColor.Secondary
-        )
+        if (isNewCreationAccount) {
+            MegaText(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .testTag(TEST_TAG_FREE_PLAN_CARD_DESCRIPTION),
+                text = stringResource(id = shareR.string.free_plan_card_description),
+                style = MaterialTheme.typography.bodySmall,
+                textColor = TextColor.Secondary
+            )
+        }
         Spacer(modifier = Modifier.height(8.dp))
         features.forEach { feature ->
             Row(
@@ -103,7 +112,9 @@ fun FreePlanCard(
             }
         }
         SecondaryFilledButton(
-            text = stringResource(id = shareR.string.free_plan_card_button),
+            text = stringResource(
+                id = if (isNewCreationAccount) shareR.string.free_plan_card_button else shareR.string.free_plan_card_existing_button
+            ),
             onClick = onContinue,
             modifier = Modifier
                 .padding(top = 16.dp, bottom = 8.dp)
@@ -119,7 +130,22 @@ private fun FreePlanCardPreview() {
     AndroidTheme(isSystemInDarkTheme()) {
         FreePlanCard(
             modifier = Modifier.padding(16.dp),
-            onContinue = {}
+            onContinue = {},
+            isNewCreationAccount = false,
+            storageFormatted = "100"
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun FreePlanCardExistingUserPreview() {
+    AndroidTheme(isSystemInDarkTheme()) {
+        FreePlanCard(
+            modifier = Modifier.padding(16.dp),
+            onContinue = {},
+            isNewCreationAccount = true,
+            storageFormatted = "100"
         )
     }
 }

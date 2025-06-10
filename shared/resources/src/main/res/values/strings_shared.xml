@@ -1271,4 +1271,10 @@
     <string name="text_received_mega_pass_free_trial">You have received %1$s storage space for starting a MEGA&#160;Pass free trial</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
+    <!-- Title for the free plan card when the user is an existing account -->
+    <string name="free_plan_card_existing_title">Continue with your free plan</string>
+    <!-- Button text for existing users to continue with the free plan -->
+    <string name="free_plan_card_existing_button">Continue with free plan</string>
+    <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
+    <string name="free_plan_card_storage_feature_for_existing_user">%1$s of storage</string>
 </resources>

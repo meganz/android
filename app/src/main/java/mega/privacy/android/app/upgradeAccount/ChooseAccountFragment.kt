@@ -105,6 +105,8 @@ class ChooseAccountFragment : Fragment() {
     fun ChooseAccountBody() {
         val uiState by chooseAccountViewModel.state.collectAsStateWithLifecycle()
         val accountStorageUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()
+        val isNewCreationAccount =
+            arguments?.getBoolean(ManagerActivity.NEW_CREATION_ACCOUNT, false) ?: false
 
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -121,6 +123,8 @@ class ChooseAccountFragment : Fragment() {
             ) {
                 NewChooseAccountScreen(
                     uiState = uiState,
+                    accountStorageUiState = accountStorageUiState,
+                    isNewCreationAccount = isNewCreationAccount,
                     onFreePlanClicked = {
                         Analytics.tracker.trackEvent(
                             GetStartedForFreeUpgradePlanButtonPressedEvent

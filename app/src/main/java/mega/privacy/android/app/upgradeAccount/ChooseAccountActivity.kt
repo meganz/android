@@ -22,7 +22,14 @@ open class ChooseAccountActivity : AppCompatActivity() {
         setContentView(R.layout.activity_choose_account)
 
         if (savedInstanceState == null) {
-            val fragment = ChooseAccountFragment()
+            val fragment = ChooseAccountFragment().apply {
+                arguments = Bundle().apply {
+                    putBoolean(
+                        ManagerActivity.NEW_CREATION_ACCOUNT,
+                        intent.getBooleanExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
+                    )
+                }
+            }
             supportFragmentManager.beginTransaction()
                 .add(R.id.choose_account_container, fragment)
                 .commit()

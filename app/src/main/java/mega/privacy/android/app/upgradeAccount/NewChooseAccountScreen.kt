@@ -53,6 +53,7 @@ import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.ProFeature
 import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
@@ -71,6 +72,8 @@ import java.util.Locale
 @Composable
 internal fun NewChooseAccountScreen(
     uiState: ChooseAccountState = ChooseAccountState(),
+    accountStorageUiState: AccountStorageUIState = AccountStorageUIState(),
+    isNewCreationAccount: Boolean = false,
     onBuyPlanClick: (AccountType, Boolean) -> Unit,
     maybeLaterClicked: () -> Unit,
     onFreePlanClicked: () -> Unit,
@@ -324,6 +327,8 @@ internal fun NewChooseAccountScreen(
                         .padding(16.dp)
                         .testTag(TEST_TAG_FREE_PLAN_CARD),
                     onContinue = onFreePlanClicked,
+                    isNewCreationAccount = isNewCreationAccount,
+                    storageFormatted = accountStorageUiState.baseStorageFormatted,
                 )
             }
 
@@ -399,6 +404,10 @@ internal fun NewChooseAccountScreenPreview(
     AndroidTheme(isSystemInDarkTheme()) {
         NewChooseAccountScreen(
             uiState = state,
+            accountStorageUiState = AccountStorageUIState(
+                baseStorageFormatted = "20 GB",
+            ),
+            isNewCreationAccount = false,
             onBuyPlanClick = { _, _ -> },
             onFreePlanClicked = {},
             maybeLaterClicked = {}
