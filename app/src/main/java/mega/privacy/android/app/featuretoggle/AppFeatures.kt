@@ -77,7 +77,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     NewVideoPlayer(
         "Enable new video player",
-        false,
+        true,
     ),
 
     /**
