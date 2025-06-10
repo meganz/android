@@ -512,7 +512,11 @@ class VideoPlayerViewModel @Inject constructor(
             .setMediaId(currentPlayingHandle.toString())
             .build()
 
-        updateStateWithMediaItem(currentPlayingMediaItem, currentPlayingFileName)
+        updateStateWithMediaItem(
+            mediaItem = currentPlayingMediaItem,
+            fileName = currentPlayingFileName,
+            currentPlayingHandle = currentPlayingHandle
+        )
 
         if (!intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
             setPlayingItem(currentPlayingHandle, currentPlayingFileName, currentLaunchSources)
@@ -584,13 +588,22 @@ class VideoPlayerViewModel @Inject constructor(
             else -> uri
         }
 
-    private fun updateStateWithMediaItem(mediaItem: MediaItem, fileName: String) {
+    private fun updateStateWithMediaItem(
+        mediaItem: MediaItem,
+        fileName: String,
+        currentPlayingHandle: Long,
+    ) {
         MediaPlaySources(
             mediaItems = listOf(mediaItem),
             newIndexForCurrentItem = INVALID_VALUE,
             nameToDisplay = fileName
         ).also { sources ->
-            uiState.update { it.copy(mediaPlaySources = sources) }
+            uiState.update {
+                it.copy(
+                    mediaPlaySources = sources,
+                    currentPlayingHandle = currentPlayingHandle
+                )
+            }
             buildPlaybackSourcesForPlayer(sources)
         }
     }
@@ -2055,11 +2068,11 @@ class VideoPlayerViewModel @Inject constructor(
                 showSubtitleDialog = false,
                 matchedSubtitleInfo = info,
                 addedSubtitleInfo = null,
-                subtitleSelectedStatus =
-                if (info?.url == null)
+                subtitleSelectedStatus = if (info?.url == null) {
                     SubtitleSelectedStatus.Off
-                else
+                } else {
                     SubtitleSelectedStatus.SelectMatchedItem
+                }
             )
         }
     }
