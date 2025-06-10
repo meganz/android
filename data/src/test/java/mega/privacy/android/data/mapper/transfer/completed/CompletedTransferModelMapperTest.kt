@@ -3,8 +3,14 @@ package mega.privacy.android.data.mapper.transfer.completed
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
+import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
+import mega.privacy.android.data.mapper.transfer.TransferStateMapper
+import mega.privacy.android.data.mapper.transfer.TransferTypeMapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.TransferType
 import nz.mega.sdk.MegaError
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -21,22 +27,45 @@ internal class CompletedTransferModelMapperTest {
     private lateinit var underTest: CompletedTransferModelMapper
 
     private val stringWrapper = mock<StringWrapper>()
+    private val transferTypeMapper = mock<TransferTypeMapper>()
+    private val transferStateMapper = mock<TransferStateMapper>()
+    private val transferAppDataMapper = mock<TransferAppDataMapper>()
 
     @BeforeAll
     fun setup() {
-        underTest = CompletedTransferModelMapper(stringWrapper)
+        underTest = CompletedTransferModelMapper(
+            stringWrapper,
+            transferTypeMapper,
+            transferStateMapper,
+            transferAppDataMapper,
+        )
     }
 
     @BeforeEach
     fun cleanUp() {
-        reset(stringWrapper)
+        reset(
+            stringWrapper,
+            transferTypeMapper,
+            transferStateMapper,
+            transferAppDataMapper,
+        )
+        whenever(
+            transferTypeMapper(transferType.second, transferAppData.first)
+        ) doReturn transferType.first
+        whenever(transferStateMapper(transferState.second)) doReturn transferState.first
+        whenever(transferAppDataMapper(transferAppData.second)) doReturn transferAppData.first
     }
+
+    private val transferAppData = listOf(TransferAppData.CameraUpload) to "appData"
+    private val transferType = TransferType.DOWNLOAD to 56
+    private val transferState = TransferState.STATE_COMPLETED to 54
+
 
     private val entity = CompletedTransferEntity(
         id = 0,
         fileName = "2023-03-24 00.13.20_1.jpg",
-        type = 1,
-        state = 6,
+        type = transferType.second,
+        state = transferState.second,
         size = "3.57 MB",
         handle = 27169983390750L,
         path = "Cloud drive/Camera uploads",
@@ -47,7 +76,7 @@ internal class CompletedTransferModelMapperTest {
         errorCode = null,
         originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
         parentHandle = 11622336899311L,
-        appData = "appData",
+        appData = transferAppData.second,
     )
 
     @Test
@@ -55,8 +84,8 @@ internal class CompletedTransferModelMapperTest {
         val expected = CompletedTransfer(
             id = entity.id,
             fileName = entity.fileName,
-            type = entity.type,
-            state = entity.state,
+            type = transferType.first,
+            state = transferState.first,
             size = entity.size,
             handle = entity.handle,
             path = entity.path,
@@ -67,7 +96,7 @@ internal class CompletedTransferModelMapperTest {
             errorCode = entity.errorCode,
             originalPath = entity.originalPath,
             parentHandle = entity.parentHandle,
-            appData = entity.appData,
+            appData = transferAppData.first,
         )
 
         Truth.assertThat(underTest(entity)).isEqualTo(expected)

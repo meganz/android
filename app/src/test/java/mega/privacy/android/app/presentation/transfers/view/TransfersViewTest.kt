@@ -31,9 +31,9 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
-import nz.mega.sdk.MegaTransfer
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -82,11 +82,11 @@ class TransfersViewTest {
         getActiveTransfer(tag = tag2),
     ).toImmutableList()
     private val completedTransfers = listOf(
-        getCompletedTransfer(tag1, MegaTransfer.STATE_COMPLETED),
+        getCompletedTransfer(tag1, TransferState.STATE_COMPLETED),
     ).toImmutableList()
     private val failedTransfers = listOf(
-        getCompletedTransfer(tag2, MegaTransfer.STATE_FAILED),
-        getCompletedTransfer(tag3, MegaTransfer.STATE_FAILED),
+        getCompletedTransfer(tag2, TransferState.STATE_FAILED),
+        getCompletedTransfer(tag3, TransferState.STATE_FAILED),
     ).toImmutableList()
 
     @Test
@@ -348,10 +348,10 @@ class TransfersViewTest {
         nodeId = NodeId(1),
     )
 
-    private fun getCompletedTransfer(id: Int, state: Int) = CompletedTransfer(
+    private fun getCompletedTransfer(id: Int, state: TransferState) = CompletedTransfer(
         id = id,
         fileName = "$id-fileName",
-        type = 1,
+        type = TransferType.DOWNLOAD,
         state = state,
         size = "3.57 MB",
         handle = 27169983390750L + id,
@@ -361,7 +361,7 @@ class TransfersViewTest {
         error = "Error",
         originalPath = "/data/user/0/mega.privacy.android.app/DCIM/Camera/$id-fileName",
         parentHandle = 11622336899311L,
-        appData = "appData",
+        appData = emptyList(),
         displayPath = null,
         errorCode = null,
     )

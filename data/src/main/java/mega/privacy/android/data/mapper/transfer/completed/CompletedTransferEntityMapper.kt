@@ -1,15 +1,22 @@
 package mega.privacy.android.data.mapper.transfer.completed
 
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
+import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
+import mega.privacy.android.data.mapper.transfer.TransferStateIntMapper
+import mega.privacy.android.data.mapper.transfer.TransferTypeIntMapper
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import javax.inject.Inject
 
-internal class CompletedTransferEntityMapper @Inject constructor() {
+internal class CompletedTransferEntityMapper @Inject constructor(
+    private val transferTypeMapper: TransferTypeIntMapper,
+    private val transferStateMapper: TransferStateIntMapper,
+    private val transferAppDataMapper: TransferAppDataStringMapper,
+) {
     suspend operator fun invoke(completedTransfer: CompletedTransfer) = CompletedTransferEntity(
         id = completedTransfer.id?.takeIf { it > 0 },
         fileName = completedTransfer.fileName,
-        type = completedTransfer.type,
-        state = completedTransfer.state,
+        type = transferTypeMapper(completedTransfer.type),
+        state = transferStateMapper(completedTransfer.state),
         size = completedTransfer.size,
         handle = completedTransfer.handle,
         path = completedTransfer.path,
@@ -20,6 +27,6 @@ internal class CompletedTransferEntityMapper @Inject constructor() {
         errorCode = completedTransfer.errorCode,
         originalPath = completedTransfer.originalPath,
         parentHandle = completedTransfer.parentHandle,
-        appData = completedTransfer.appData,
+        appData = transferAppDataMapper(completedTransfer.appData),
     )
 }

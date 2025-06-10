@@ -34,9 +34,10 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
 
@@ -98,7 +99,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         val openWith = contentView.findViewById<TextView>(R.id.option_open_with)
         openWith.setOnClickListener(this)
         val openWithSeparator = contentView.findViewById<View>(R.id.separator_open_with)
-        if (transfer.type == MegaTransfer.TYPE_DOWNLOAD && fileUri != null) {
+        if (transfer.type == TransferType.DOWNLOAD && fileUri != null) {
             openWith.visibility = View.VISIBLE
             openWithSeparator.visibility =
                 if (viewInFolderOption.isGone) View.GONE else View.VISIBLE
@@ -129,14 +130,14 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         val retryOptionSeparator = contentView.findViewById<View>(R.id.separator_retry)
         retryOption.setOnClickListener(this)
         name.text = transfer.fileName
-        if (transfer.type == MegaTransfer.TYPE_DOWNLOAD) {
+        if (transfer.type.isDownloadType()) {
             type.setImageResource(R.drawable.ic_download_transfers)
-        } else if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
+        } else if (transfer.type.isUploadType()) {
             type.setImageResource(R.drawable.ic_upload_transfers)
         }
         location.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey_054_white_054))
         when (transfer.state) {
-            MegaTransfer.STATE_COMPLETED -> {
+            TransferState.STATE_COMPLETED -> {
                 location.text = uiState.parentFilePath ?: transfer.path
                 stateIcon.setColorFilter(
                     ContextCompat.getColor(
@@ -150,7 +151,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
                 stateIcon.isVisible = true
             }
 
-            MegaTransfer.STATE_FAILED -> {
+            TransferState.STATE_FAILED -> {
                 location.setTextColor(
                     ColorUtils.getThemeColor(
                         requireContext(),
@@ -167,7 +168,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
                 getLinkOption.visibility = View.GONE
             }
 
-            MegaTransfer.STATE_CANCELLED -> {
+            TransferState.STATE_CANCELLED -> {
                 location.setText(R.string.transfer_cancelled)
                 stateIcon.isVisible = false
                 viewInFolderOption.visibility = View.GONE
@@ -217,7 +218,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
 
         val id = v.id
         if (id == R.id.option_view) {
-            if (transfer.type == MegaTransfer.TYPE_UPLOAD && !Util.isOnline(requireContext())) {
+            if (transfer.type.isUploadType() && !Util.isOnline(requireContext())) {
                 managerActivity.showSnackbar(
                     Constants.SNACKBAR_TYPE,
                     getString(R.string.error_server_connection_problem),

@@ -22,12 +22,12 @@ import mega.privacy.android.app.extensions.matchOrderWithNewAtEnd
 import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.view.navigation.TransfersInfo
-import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -49,7 +49,6 @@ import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOv
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
-import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -79,7 +78,6 @@ class TransfersViewModel @Inject constructor(
     private val deleteCompletedTransfersUseCase: DeleteCompletedTransfersUseCase,
     private val deleteCompletedTransfersByIdUseCase: DeleteCompletedTransfersByIdUseCase,
     private val isUriPathInCacheUseCase: IsUriPathInCacheUseCase,
-    private val transferAppDataMapper: TransferAppDataMapper,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -162,7 +160,7 @@ class TransfersViewModel @Inject constructor(
     private fun monitorCompletedTransfers() {
         viewModelScope.launch {
             monitorCompletedTransfersUseCase().conflate().collect { completedTransfers ->
-                val (completed, failed) = completedTransfers.partition { it.state == MegaTransfer.STATE_COMPLETED }
+                val (completed, failed) = completedTransfers.partition { it.state == TransferState.STATE_COMPLETED }
 
                 _uiState.update { state ->
                     state.copy(
@@ -305,8 +303,8 @@ class TransfersViewModel @Inject constructor(
 
     internal suspend fun getStartTransferEventByFailedTransfer(failedTransfer: CompletedTransfer): StartTransferEvent? {
         with(failedTransfer) {
-            when (type) {
-                MegaTransfer.TYPE_DOWNLOAD -> {
+            when {
+                type.isDownloadType() -> {
                     getNodeByIdUseCase(NodeId(handle))?.let { typedNode ->
                         if (isOffline == true) {
                             TransferTriggerEvent.StartDownloadForOffline(
@@ -324,8 +322,7 @@ class TransfersViewModel @Inject constructor(
                     }
                 }
 
-                MegaTransfer.TYPE_UPLOAD -> {
-                    val appData = appData?.let { transferAppDataMapper(it) }
+                type.isUploadType() -> {
                     val isChatUpload =
                         appData?.any { it is TransferAppData.ChatUpload } == true
                     val path = appData?.getOriginalContentUri() ?: originalPath
@@ -378,8 +375,8 @@ class TransfersViewModel @Inject constructor(
     }
 
     private suspend fun canReadTransferUri(transfer: CompletedTransfer) =
-        if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
-            val appData = transfer.appData?.let { transferAppDataMapper(it) }
+        if (transfer.type.isUploadType()) {
+            val appData = transfer.appData
             val originalUriPath = UriPath(appData?.getOriginalContentUri() ?: transfer.originalPath)
             val isChatUpload = appData?.any { it is TransferAppData.ChatUpload } == true
             val isCacheUpload = isUriPathInCacheUseCase(originalUriPath)

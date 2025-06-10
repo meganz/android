@@ -1911,21 +1911,4 @@ class DefaultTransfersRepositoryTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
-
-    private fun getCompletedTransfer(fileName: String) = CompletedTransfer(
-        fileName = fileName,
-        type = 0,
-        state = 6,
-        size = "234Kb",
-        handle = 1L,
-        path = "parentPath",
-        isOffline = false,
-        timestamp = 123L,
-        error = "error",
-        originalPath = "localPath",
-        parentHandle = 2L,
-        appData = null,
-        displayPath = null,
-        errorCode = null,
-    )
 }

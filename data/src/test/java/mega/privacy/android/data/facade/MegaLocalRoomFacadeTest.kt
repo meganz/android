@@ -59,6 +59,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
@@ -454,8 +455,8 @@ internal class MegaLocalRoomFacadeTest {
                     CompletedTransfer(
                         id = entity.id,
                         fileName = entity.fileName,
-                        type = entity.type,
-                        state = entity.state,
+                        type = TransferType.DOWNLOAD,
+                        state = TransferState.STATE_COMPLETED,
                         size = entity.size,
                         handle = entity.handle,
                         path = entity.path,
@@ -466,7 +467,7 @@ internal class MegaLocalRoomFacadeTest {
                         errorCode = entity.errorCode,
                         originalPath = entity.originalPath,
                         parentHandle = entity.parentHandle,
-                        appData = entity.appData,
+                        appData = emptyList(),
                     )
                 )
             }

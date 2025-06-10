@@ -3,12 +3,16 @@ package mega.privacy.android.data.mapper.transfer.completed
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.DecryptData
+import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.TransferType
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -18,23 +22,28 @@ internal class CompletedTransferLegacyModelMapperTest {
     private lateinit var underTest: CompletedTransferLegacyModelMapper
 
     private val decryptData: DecryptData = mock()
+    private val completedTransferModelMapper = mock<CompletedTransferModelMapper>()
 
 
     @BeforeAll
     fun setup() {
-        underTest = CompletedTransferLegacyModelMapper(decryptData)
+        underTest = CompletedTransferLegacyModelMapper(
+            decryptData,
+            completedTransferModelMapper,
+        )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
             decryptData,
+            completedTransferModelMapper,
         )
     }
 
     @Test
     fun `test that mapper returns model correctly when invoke function`() = runTest {
-        val entity = CompletedTransferEntityLegacy(
+        val legacy = CompletedTransferEntityLegacy(
             id = 0,
             fileName = "2023-03-24 00.13.20_1.jpg",
             type = "1",
@@ -49,11 +58,30 @@ internal class CompletedTransferLegacyModelMapperTest {
             parentHandle = "11622336899311",
             appData = "appData",
         )
+        val entity = with(legacy) {
+            CompletedTransferEntity(
+                id = id,
+                fileName = fileName.orEmpty(),
+                type = 1,
+                state = 6,
+                size = size.orEmpty(),
+                handle = handle?.toLongOrNull() ?: -1L,
+                path = path.orEmpty(),
+                displayPath = null,
+                isOffline = isOffline?.toBoolean(),
+                timestamp = timestamp?.toLongOrNull() ?: -1L,
+                error = error.orEmpty(),
+                errorCode = null,
+                originalPath = originalPath.orEmpty(),
+                parentHandle = parentHandle?.toLongOrNull() ?: -1,
+                appData = appData
+            )
+        }
         val expected = CompletedTransfer(
             id = 0,
             fileName = "2023-03-24 00.13.20_1.jpg",
-            type = 1,
-            state = 6,
+            type = TransferType.DOWNLOAD,
+            state = TransferState.STATE_FAILED,
             size = "3.57 MB",
             handle = 27169983390750L,
             path = "Cloud drive/Camera uploads",
@@ -62,28 +90,30 @@ internal class CompletedTransferLegacyModelMapperTest {
             error = "No error",
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             parentHandle = 11622336899311L,
-            appData = "appData",
+            appData = null,
             displayPath = null,
             errorCode = null,
         )
-        whenever(decryptData(entity.fileName)).thenReturn(entity.fileName)
-        whenever(decryptData(entity.type)).thenReturn(entity.type)
-        whenever(decryptData(entity.state)).thenReturn(entity.state)
-        whenever(decryptData(entity.size)).thenReturn(entity.size)
-        whenever(decryptData(entity.handle)).thenReturn(entity.handle)
-        whenever(decryptData(entity.path)).thenReturn(entity.path)
-        whenever(decryptData(entity.isOffline)).thenReturn(entity.isOffline)
-        whenever(decryptData(entity.timestamp)).thenReturn(entity.timestamp)
-        whenever(decryptData(entity.error)).thenReturn(entity.error)
-        whenever(decryptData(entity.originalPath)).thenReturn(entity.originalPath)
-        whenever(decryptData(entity.parentHandle)).thenReturn(entity.parentHandle)
-        whenever(decryptData(entity.appData)).thenReturn(entity.appData)
 
-        Truth.assertThat(underTest(entity)).isEqualTo(expected)
+        whenever(completedTransferModelMapper(entity)) doReturn expected
+        whenever(decryptData(legacy.fileName)).thenReturn(legacy.fileName)
+        whenever(decryptData(legacy.type)).thenReturn(legacy.type)
+        whenever(decryptData(legacy.state)).thenReturn(legacy.state)
+        whenever(decryptData(legacy.size)).thenReturn(legacy.size)
+        whenever(decryptData(legacy.handle)).thenReturn(legacy.handle)
+        whenever(decryptData(legacy.path)).thenReturn(legacy.path)
+        whenever(decryptData(legacy.isOffline)).thenReturn(legacy.isOffline)
+        whenever(decryptData(legacy.timestamp)).thenReturn(legacy.timestamp)
+        whenever(decryptData(legacy.error)).thenReturn(legacy.error)
+        whenever(decryptData(legacy.originalPath)).thenReturn(legacy.originalPath)
+        whenever(decryptData(legacy.parentHandle)).thenReturn(legacy.parentHandle)
+        whenever(decryptData(legacy.appData)).thenReturn(legacy.appData)
+
+        Truth.assertThat(underTest(legacy)).isEqualTo(expected)
     }
 
     @Test
-    fun `test that mapper returns default value when decrypt fails`() = runTest {
+    fun `test that mapper returns null when decrypt fails`() = runTest {
         val entity = CompletedTransferEntityLegacy(
             id = 0,
             fileName = "2023-03-24 00.13.20_1.jpg",
@@ -99,23 +129,7 @@ internal class CompletedTransferLegacyModelMapperTest {
             parentHandle = "11622336899311",
             appData = "appData",
         )
-        val expected = CompletedTransfer(
-            id = 0,
-            fileName = "",
-            type = -1,
-            state = -1,
-            size = "",
-            handle = -1L,
-            path = "",
-            isOffline = null,
-            timestamp = -1L,
-            error = null,
-            originalPath = "",
-            parentHandle = -1L,
-            appData = null,
-            displayPath = null,
-            errorCode = null,
-        )
+
         whenever(decryptData(entity.fileName)).thenReturn(null)
         whenever(decryptData(entity.type)).thenReturn(null)
         whenever(decryptData(entity.state)).thenReturn(null)
@@ -129,57 +143,6 @@ internal class CompletedTransferLegacyModelMapperTest {
         whenever(decryptData(entity.parentHandle)).thenReturn(null)
         whenever(decryptData(entity.appData)).thenReturn(null)
 
-        Truth.assertThat(underTest(entity)).isEqualTo(expected)
+        Truth.assertThat(underTest(entity)).isNull()
     }
-
-    @Test
-    fun `test that mapper returns default value when parsing the string to specific types fails`() =
-        runTest {
-            val entity = CompletedTransferEntityLegacy(
-                id = 0,
-                fileName = "2023-03-24 00.13.20_1.jpg",
-                type = "nonIntValue",
-                state = "nonIntValue",
-                size = "3.57 MB",
-                handle = "nonLongValue",
-                path = "Cloud drive/Camera uploads",
-                isOffline = "false",
-                timestamp = "nonLongValue",
-                error = "No error",
-                originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
-                parentHandle = "nonLongValue",
-                appData = "appData",
-            )
-            val expected = CompletedTransfer(
-                id = 0,
-                fileName = "2023-03-24 00.13.20_1.jpg",
-                type = -1,
-                state = -1,
-                size = "3.57 MB",
-                handle = -1L,
-                path = "Cloud drive/Camera uploads",
-                isOffline = false,
-                timestamp = -1L,
-                error = "No error",
-                originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
-                parentHandle = -1L,
-                appData = "appData",
-                displayPath = null,
-                errorCode = null,
-            )
-            whenever(decryptData(entity.fileName)).thenReturn(entity.fileName)
-            whenever(decryptData(entity.type)).thenReturn(entity.type)
-            whenever(decryptData(entity.state)).thenReturn(entity.state)
-            whenever(decryptData(entity.size)).thenReturn(entity.size)
-            whenever(decryptData(entity.handle)).thenReturn(entity.handle)
-            whenever(decryptData(entity.path)).thenReturn(entity.path)
-            whenever(decryptData(entity.isOffline)).thenReturn(entity.isOffline)
-            whenever(decryptData(entity.timestamp)).thenReturn(entity.timestamp)
-            whenever(decryptData(entity.error)).thenReturn(entity.error)
-            whenever(decryptData(entity.originalPath)).thenReturn(entity.originalPath)
-            whenever(decryptData(entity.parentHandle)).thenReturn(entity.parentHandle)
-            whenever(decryptData(entity.appData)).thenReturn(entity.appData)
-
-            Truth.assertThat(underTest(entity)).isEqualTo(expected)
-        }
 }

@@ -10,14 +10,11 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.data.mapper.transfer.TransferStateMapper
-import mega.privacy.android.data.mapper.transfer.TransferTypeMapper
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.icon.pack.R
-import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -37,8 +34,6 @@ class CompletedTransferImageViewModelTest {
 
     private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
-    private val transferStateMapper = mock<TransferStateMapper>()
-    private val transferTypeMapper = mock<TransferTypeMapper>()
 
     private val id = 1
     private val extension = "txt"
@@ -50,16 +45,15 @@ class CompletedTransferImageViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(getThumbnailUseCase, fileTypeIconMapper, transferStateMapper, transferTypeMapper)
+        reset(getThumbnailUseCase, fileTypeIconMapper)
     }
 
     private fun initTestClass() {
         underTest = CompletedTransferImageViewModel(
             getThumbnailUseCase = getThumbnailUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
-            transferStateMapper = transferStateMapper,
-            transferTypeMapper = transferTypeMapper,
-        )
+
+            )
     }
 
     @Test
@@ -73,11 +67,8 @@ class CompletedTransferImageViewModelTest {
     @Test
     fun `test that addTransfer invokes FileTypeIconMapper and GetThumbnailUseCase when ads a new completed download`() =
         runTest {
-            val state = MegaTransfer.STATE_COMPLETED
-            val type = MegaTransfer.TYPE_DOWNLOAD
-
-            whenever(transferStateMapper(state)).thenReturn(TransferState.STATE_COMPLETED)
-            whenever(transferTypeMapper(type, emptyList())).thenReturn(TransferType.DOWNLOAD)
+            val state = TransferState.STATE_COMPLETED
+            val type = TransferType.GENERAL_UPLOAD
 
             initTestClass()
 
@@ -95,11 +86,8 @@ class CompletedTransferImageViewModelTest {
     @Test
     fun `test that addTransfer invokes FileTypeIconMapper and GetThumbnailUseCase when ads a new cancelled download`() =
         runTest {
-            val state = MegaTransfer.STATE_CANCELLED
-            val type = MegaTransfer.TYPE_DOWNLOAD
-
-            whenever(transferStateMapper(state)).thenReturn(TransferState.STATE_COMPLETED)
-            whenever(transferTypeMapper(type, emptyList())).thenReturn(TransferType.DOWNLOAD)
+            val state = TransferState.STATE_CANCELLED
+            val type = TransferType.DOWNLOAD
 
             initTestClass()
 
@@ -118,11 +106,8 @@ class CompletedTransferImageViewModelTest {
     @Test
     fun `test that addTransfer invokes FileTypeIconMapper and GetThumbnailUseCase when ads a new failed download`() =
         runTest {
-            val state = MegaTransfer.STATE_FAILED
-            val type = MegaTransfer.TYPE_DOWNLOAD
-
-            whenever(transferStateMapper(state)).thenReturn(TransferState.STATE_COMPLETED)
-            whenever(transferTypeMapper(type, emptyList())).thenReturn(TransferType.DOWNLOAD)
+            val state = TransferState.STATE_FAILED
+            val type = TransferType.DOWNLOAD
 
             initTestClass()
 
@@ -140,12 +125,10 @@ class CompletedTransferImageViewModelTest {
     @Test
     fun `test that addTransfer adds a new completed download transfer to the UI state`() =
         runTest {
-            val state = MegaTransfer.STATE_COMPLETED
-            val type = MegaTransfer.TYPE_DOWNLOAD
+            val state = TransferState.STATE_COMPLETED
+            val type = TransferType.GENERAL_UPLOAD
             val file = File("file")
 
-            whenever(transferStateMapper(state)).thenReturn(TransferState.STATE_COMPLETED)
-            whenever(transferTypeMapper(type, emptyList())).thenReturn(TransferType.DOWNLOAD)
             whenever(fileTypeIconMapper(extension)).thenReturn(fileTypeResId)
             whenever(getThumbnailUseCase(nodeHandle, true)).thenReturn(file)
 
@@ -170,11 +153,8 @@ class CompletedTransferImageViewModelTest {
     @Test
     fun `test that addTransfer invokes FileTypeIconMapper and GetThumbnailUseCase when adds a new completed upload`() =
         runTest {
-            val state = MegaTransfer.STATE_COMPLETED
-            val type = MegaTransfer.TYPE_UPLOAD
-
-            whenever(transferStateMapper(state)).thenReturn(TransferState.STATE_COMPLETED)
-            whenever(transferTypeMapper(type, emptyList())).thenReturn(TransferType.GENERAL_UPLOAD)
+            val state = TransferState.STATE_COMPLETED
+            val type = TransferType.DOWNLOAD
 
             initTestClass()
 
@@ -192,11 +172,8 @@ class CompletedTransferImageViewModelTest {
     @Test
     fun `test that addTransfer invokes FileTypeIconMapper and does not invoke GetThumbnailUseCase when adds a new cancelled upload`() =
         runTest {
-            val state = MegaTransfer.STATE_CANCELLED
-            val type = MegaTransfer.TYPE_UPLOAD
-
-            whenever(transferStateMapper(state)).thenReturn(TransferState.STATE_CANCELLED)
-            whenever(transferTypeMapper(type, emptyList())).thenReturn(TransferType.GENERAL_UPLOAD)
+            val state = TransferState.STATE_CANCELLED
+            val type = TransferType.GENERAL_UPLOAD
 
             initTestClass()
 
@@ -214,11 +191,8 @@ class CompletedTransferImageViewModelTest {
     @Test
     fun `test that addTransfer invokes FileTypeIconMapper and does not invoke GetThumbnailUseCase when adds a new failed upload`() =
         runTest {
-            val state = MegaTransfer.STATE_FAILED
-            val type = MegaTransfer.TYPE_UPLOAD
-
-            whenever(transferStateMapper(state)).thenReturn(TransferState.STATE_FAILED)
-            whenever(transferTypeMapper(type, emptyList())).thenReturn(TransferType.GENERAL_UPLOAD)
+            val state = TransferState.STATE_FAILED
+            val type = TransferType.GENERAL_UPLOAD
 
             initTestClass()
 
@@ -236,11 +210,9 @@ class CompletedTransferImageViewModelTest {
     @Test
     fun `test that addTransfer adds a new completed upload transfer to the UI state`() =
         runTest {
-            val state = MegaTransfer.STATE_COMPLETED
-            val type = MegaTransfer.TYPE_UPLOAD
+            val state = TransferState.STATE_COMPLETED
+            val type = TransferType.DOWNLOAD
 
-            whenever(transferStateMapper(state)).thenReturn(TransferState.STATE_COMPLETED)
-            whenever(transferTypeMapper(type, emptyList())).thenReturn(TransferType.GENERAL_UPLOAD)
             whenever(fileTypeIconMapper(extension)).thenReturn(fileTypeResId)
 
             initTestClass()
@@ -261,7 +233,7 @@ class CompletedTransferImageViewModelTest {
             }
         }
 
-    private fun getCompletedTransfer(type: Int, state: Int) = CompletedTransfer(
+    private fun getCompletedTransfer(type: TransferType, state: TransferState) = CompletedTransfer(
         id = id,
         fileName = name,
         type = type,

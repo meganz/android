@@ -339,7 +339,6 @@ import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
-import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -6979,8 +6978,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * @param transfer the transfer to open its location
      */
     fun openTransferLocation(transfer: CompletedTransfer, path: String) {
-        when (transfer.type) {
-            MegaTransfer.TYPE_DOWNLOAD -> {
+        when {
+            transfer.type.isDownloadType() -> {
                 val fileNames = arrayListOf(transfer.fileName)
                 when (transfer.isOffline) {
                     true -> {
@@ -7007,7 +7006,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 }
             }
 
-            MegaTransfer.TYPE_UPLOAD -> {
+            transfer.type.isUploadType() -> {
                 megaApi.getNodeByHandle(transfer.handle)
                     ?.let { viewNodeInFolder(it) } ?: run {
                     showSnackbar(

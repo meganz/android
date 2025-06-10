@@ -19,10 +19,7 @@ import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import nz.mega.sdk.MegaTransfer.STATE_CANCELLED
-import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
-import nz.mega.sdk.MegaTransfer.STATE_FAILED
-import nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD
+import mega.privacy.android.domain.entity.transfer.TransferState
 import timber.log.Timber
 
 /**
@@ -91,7 +88,7 @@ class MegaCompletedTransfersAdapter(
                     }
                 }
                 iconDownloadUploadView.setImageResource(
-                    if (completedTransfer.type == TYPE_DOWNLOAD)
+                    if (completedTransfer.type.isDownloadType())
                         R.drawable.ic_download_transfers
                     else
                         R.drawable.ic_upload_transfers
@@ -106,7 +103,7 @@ class MegaCompletedTransfersAdapter(
                 val stateParams = imageViewCompleted.layoutParams as RelativeLayout.LayoutParams
                 stateParams.marginEnd = dp2px(5f, context.resources.displayMetrics)
                 when (completedTransfer.state) {
-                    STATE_COMPLETED -> {
+                    TransferState.STATE_COMPLETED -> {
                         textViewCompleted.text = getFilePath(completedTransfer)
                         imageViewCompleted.setColorFilter(
                             ContextCompat.getColor(
@@ -118,7 +115,7 @@ class MegaCompletedTransfersAdapter(
                         imageViewCompleted.setImageResource(R.drawable.ic_transfers_completed)
                     }
 
-                    STATE_FAILED -> {
+                    TransferState.STATE_FAILED -> {
                         textViewCompleted.setTextColor(
                             getThemeColor(
                                 context,
@@ -134,7 +131,7 @@ class MegaCompletedTransfersAdapter(
                         imageViewCompleted.setImageBitmap(null)
                     }
 
-                    STATE_CANCELLED -> {
+                    TransferState.STATE_CANCELLED -> {
                         textViewCompleted.text = context.getString(R.string.transfer_cancelled)
                         stateParams.marginEnd = 0
                         imageViewCompleted.setImageBitmap(null)

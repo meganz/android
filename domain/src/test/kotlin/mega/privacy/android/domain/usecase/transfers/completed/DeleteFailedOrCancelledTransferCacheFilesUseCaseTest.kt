@@ -2,6 +2,8 @@ package mega.privacy.android.domain.usecase.transfers.completed
 
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -53,8 +55,8 @@ class DeleteFailedOrCancelledTransferCacheFilesUseCaseTest {
             val completed = CompletedTransfer(
                 id = 0,
                 fileName = "2023-03-24 00.13.20_1.jpg",
-                type = 1,
-                state = 6,
+                type = TransferType.DOWNLOAD,
+                state = TransferState.STATE_COMPLETED,
                 size = "3.57 MB",
                 handle = 27169983390750L,
                 path = "Cloud drive/Camera uploads",
@@ -65,7 +67,7 @@ class DeleteFailedOrCancelledTransferCacheFilesUseCaseTest {
                 errorCode = null,
                 originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
                 parentHandle = 11622336899311L,
-                appData = "appData",
+                appData = emptyList(),
             )
             val failedOrCanceledTransfers = listOf(completed)
 

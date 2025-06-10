@@ -19,7 +19,6 @@ import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
@@ -28,6 +27,8 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -49,7 +50,6 @@ import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOv
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
-import nz.mega.sdk.MegaTransfer
 import okhttp3.internal.immutableListOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -95,44 +95,42 @@ class TransfersViewModelTest {
     private val deleteCompletedTransfersUseCase = mock<DeleteCompletedTransfersUseCase>()
     private val deleteCompletedTransfersByIdUseCase = mock<DeleteCompletedTransfersByIdUseCase>()
     private val isUriPathInCacheUseCase = mock<IsUriPathInCacheUseCase>()
-    private val transferAppDataMapper = mock<TransferAppDataMapper>()
     private val cancelTransferByTagUseCase = mock<CancelTransferByTagUseCase>()
 
     private val originalPath = "originalPath"
-    private val appDataString = "appDataString"
     private val chatAppData = listOf<TransferAppData>(TransferAppData.ChatUpload(1))
     private val originalUriPathAppData =
         listOf<TransferAppData>(TransferAppData.OriginalUriPath(UriPath(originalPath)))
     private val failedOfflineDownload = mock<CompletedTransfer> {
         on { id } doReturn 1
-        on { state } doReturn MegaTransfer.STATE_FAILED
+        on { state } doReturn TransferState.STATE_FAILED
         on { timestamp } doReturn 1L
         on { handle } doReturn 1L
-        on { type } doReturn MegaTransfer.TYPE_DOWNLOAD
+        on { type } doReturn TransferType.DOWNLOAD
         on { isOffline } doReturn true
     }
     private val cancelledDownload = mock<CompletedTransfer> {
         on { id } doReturn 2
-        on { state } doReturn MegaTransfer.STATE_CANCELLED
+        on { state } doReturn TransferState.STATE_CANCELLED
         on { timestamp } doReturn 2L
         on { handle } doReturn 2L
-        on { type } doReturn MegaTransfer.TYPE_DOWNLOAD
+        on { type } doReturn TransferType.DOWNLOAD
     }
     private val cancelledChatUpload = mock<CompletedTransfer> {
         on { id } doReturn 3
-        on { state } doReturn MegaTransfer.STATE_CANCELLED
+        on { state } doReturn TransferState.STATE_CANCELLED
         on { timestamp } doReturn 3L
-        on { type } doReturn MegaTransfer.TYPE_UPLOAD
-        on { this.appData } doReturn appDataString
+        on { type } doReturn TransferType.GENERAL_UPLOAD
+        on { this.appData } doReturn chatAppData
         on { this.originalPath } doReturn originalPath
     }
     private val failedUpload = mock<CompletedTransfer> {
         on { id } doReturn 4
-        on { state } doReturn MegaTransfer.STATE_FAILED
+        on { state } doReturn TransferState.STATE_FAILED
         on { timestamp } doReturn 4L
         on { parentHandle } doReturn 4L
-        on { type } doReturn MegaTransfer.TYPE_UPLOAD
-        on { this.appData } doReturn appDataString
+        on { type } doReturn TransferType.GENERAL_UPLOAD
+        on { this.appData } doReturn originalUriPathAppData
         on { this.originalPath } doReturn originalPath
     }
     private val typedNode = mock<TypedNode>()
@@ -164,7 +162,6 @@ class TransfersViewModelTest {
             deleteCompletedTransfersUseCase,
             deleteCompletedTransfersByIdUseCase,
             isUriPathInCacheUseCase,
-            transferAppDataMapper,
             cancelTransferByTagUseCase,
             cancelTransfersUseCase,
             monitorCompletedTransfersUseCase,
@@ -200,7 +197,6 @@ class TransfersViewModelTest {
             deleteCompletedTransfersUseCase = deleteCompletedTransfersUseCase,
             deleteCompletedTransfersByIdUseCase = deleteCompletedTransfersByIdUseCase,
             isUriPathInCacheUseCase = isUriPathInCacheUseCase,
-            transferAppDataMapper = transferAppDataMapper,
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
             savedStateHandle = savedStateHandle,
         )
@@ -386,19 +382,19 @@ class TransfersViewModelTest {
         runTest {
             val flow = MutableSharedFlow<List<CompletedTransfer>>()
             val transfer1 = mock<CompletedTransfer> {
-                on { state } doReturn MegaTransfer.STATE_COMPLETED
+                on { state } doReturn TransferState.STATE_COMPLETED
                 on { timestamp } doReturn 1L
             }
             val transfer2 = mock<CompletedTransfer> {
-                on { state } doReturn MegaTransfer.STATE_FAILED
+                on { state } doReturn TransferState.STATE_FAILED
                 on { timestamp } doReturn 2L
             }
             val transfer3 = mock<CompletedTransfer> {
-                on { state } doReturn MegaTransfer.STATE_COMPLETED
+                on { state } doReturn TransferState.STATE_COMPLETED
                 on { timestamp } doReturn 3L
             }
             val transfer4 = mock<CompletedTransfer> {
-                on { state } doReturn MegaTransfer.STATE_CANCELLED
+                on { state } doReturn TransferState.STATE_CANCELLED
                 on { timestamp } doReturn 4L
             }
             val list = listOf(transfer1, transfer4, transfer3, transfer2)
@@ -426,11 +422,11 @@ class TransfersViewModelTest {
         runTest {
             val flow = MutableSharedFlow<List<CompletedTransfer>>()
             val transfer1 = mock<CompletedTransfer> {
-                on { state } doReturn MegaTransfer.STATE_COMPLETED
+                on { state } doReturn TransferState.STATE_COMPLETED
                 on { timestamp } doReturn 1L
             }
             val transfer2 = mock<CompletedTransfer> {
-                on { state } doReturn MegaTransfer.STATE_COMPLETED
+                on { state } doReturn TransferState.STATE_COMPLETED
                 on { timestamp } doReturn 2L
             }
             val list = listOf(transfer1, transfer2)
@@ -457,11 +453,11 @@ class TransfersViewModelTest {
         runTest {
             val flow = MutableSharedFlow<List<CompletedTransfer>>()
             val transfer1 = mock<CompletedTransfer> {
-                on { state } doReturn MegaTransfer.STATE_CANCELLED
+                on { state } doReturn TransferState.STATE_CANCELLED
                 on { timestamp } doReturn 1L
             }
             val transfer2 = mock<CompletedTransfer> {
-                on { state } doReturn MegaTransfer.STATE_FAILED
+                on { state } doReturn TransferState.STATE_FAILED
                 on { timestamp } doReturn 2L
             }
             val list = listOf(transfer1, transfer2)
@@ -620,7 +616,6 @@ class TransfersViewModelTest {
     @Test
     fun `test that retryFailedTransfer updates readRetryError in state correctly when cannot read the transfer Uri when the transfer is a failed upload`() =
         runTest {
-            whenever(transferAppDataMapper(appDataString)) doReturn originalUriPathAppData
             whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
             whenever(canReadUriUseCase(originalPath)) doReturn false
 
@@ -640,10 +635,10 @@ class TransfersViewModelTest {
         runTest {
             val unknownTransfer = mock<CompletedTransfer> {
                 on { id } doReturn 4
-                on { state } doReturn MegaTransfer.STATE_FAILED
+                on { state } doReturn TransferState.STATE_FAILED
                 on { timestamp } doReturn 4L
                 on { parentHandle } doReturn 4L
-                on { type } doReturn 3
+                on { type } doReturn TransferType.NONE
                 on { this.originalPath } doReturn originalPath
             }
 
@@ -699,7 +694,6 @@ class TransfersViewModelTest {
         runTest {
             whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
             whenever(canReadUriUseCase(originalPath)) doReturn true
-            whenever(transferAppDataMapper(appDataString)) doReturn chatAppData
             whenever(retryChatUploadUseCase(chatAppData.mapNotNull { it as? TransferAppData.ChatUpload })) doReturn Unit
 
             initTestClass()
@@ -729,7 +723,6 @@ class TransfersViewModelTest {
 
             whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
             whenever(canReadUriUseCase(originalPath)) doReturn true
-            whenever(transferAppDataMapper(appDataString)) doReturn chatAppData
             whenever(retryChatUploadUseCase(chatData)) doThrow ChatUploadNotRetriedException()
 
             initTestClass()
@@ -799,8 +792,6 @@ class TransfersViewModelTest {
             )
 
             whenever(monitorCompletedTransfersUseCase()) doReturn flow
-            whenever(transferAppDataMapper(appDataString))
-                .thenReturn(chatAppData, originalUriPathAppData)
             whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
             whenever(canReadUriUseCase(originalPath)) doReturn false
 
@@ -838,7 +829,6 @@ class TransfersViewModelTest {
             val expected = TransferTriggerEvent.RetryTransfers(notNullStartEvents)
 
             whenever(monitorCompletedTransfersUseCase()) doReturn flow
-            whenever(transferAppDataMapper(appDataString)) doReturn chatAppData
             whenever(getNodeByIdUseCase(NodeId(failedOfflineDownload.handle))) doReturn typedNode
             whenever(getNodeByIdUseCase(NodeId(cancelledDownload.handle))) doReturn typedNode
             whenever(retryChatUploadUseCase(chatAppData.mapNotNull { it as? TransferAppData.ChatUpload })) doReturn Unit
@@ -883,7 +873,6 @@ class TransfersViewModelTest {
             val expected = TransferTriggerEvent.RetryTransfers(notNullStartEvents)
 
             whenever(monitorCompletedTransfersUseCase()) doReturn flow
-            whenever(transferAppDataMapper(appDataString)) doReturn originalUriPathAppData
             whenever(getNodeByIdUseCase(NodeId(failedOfflineDownload.handle))) doReturn typedNode
             whenever(getNodeByIdUseCase(NodeId(cancelledDownload.handle))) doReturn typedNode
             whenever(retryChatUploadUseCase(chatAppData.mapNotNull { it as? TransferAppData.ChatUpload })) doReturn Unit
@@ -1054,7 +1043,7 @@ class TransfersViewModelTest {
                 val completedTransfers = (1..10).map { index ->
                     mock<CompletedTransfer> {
                         on { this.id } doReturn index
-                        on { it.state } doReturn MegaTransfer.STATE_COMPLETED
+                        on { it.state } doReturn TransferState.STATE_COMPLETED
                     }
                 }
                 whenever(monitorCompletedTransfersUseCase()) doReturn completedTransfers.asHotFlow()
@@ -1075,7 +1064,7 @@ class TransfersViewModelTest {
                 val completedTransfers = (1..10).map { index ->
                     mock<CompletedTransfer> {
                         on { this.id } doReturn index
-                        on { it.state } doReturn MegaTransfer.STATE_COMPLETED
+                        on { it.state } doReturn TransferState.STATE_COMPLETED
                     }
                 }
                 whenever(monitorCompletedTransfersUseCase()) doReturn completedTransfers.asHotFlow()
@@ -1096,7 +1085,7 @@ class TransfersViewModelTest {
             val completedTransfers = (1..10).map { index ->
                 mock<CompletedTransfer> {
                     on { this.id } doReturn index
-                    on { it.state } doReturn MegaTransfer.STATE_COMPLETED
+                    on { it.state } doReturn TransferState.STATE_COMPLETED
                 }
             }
             whenever(monitorCompletedTransfersUseCase()) doReturn completedTransfers.asHotFlow()
@@ -1141,7 +1130,7 @@ class TransfersViewModelTest {
                 val failedTransfers = (1..10).map { index ->
                     mock<CompletedTransfer> {
                         on { this.id } doReturn index
-                        on { it.state } doReturn MegaTransfer.STATE_FAILED
+                        on { it.state } doReturn TransferState.STATE_FAILED
                     }
                 }
                 whenever(monitorCompletedTransfersUseCase()) doReturn failedTransfers.asHotFlow()
@@ -1162,7 +1151,7 @@ class TransfersViewModelTest {
                 val failedTransfers = (1..10).map { index ->
                     mock<CompletedTransfer> {
                         on { this.id } doReturn index
-                        on { it.state } doReturn MegaTransfer.STATE_FAILED
+                        on { it.state } doReturn TransferState.STATE_FAILED
                     }
                 }
                 whenever(monitorCompletedTransfersUseCase()) doReturn failedTransfers.asHotFlow()
@@ -1183,7 +1172,7 @@ class TransfersViewModelTest {
             val failedTransfers = (1..10).map { index ->
                 mock<CompletedTransfer> {
                     on { this.id } doReturn index
-                    on { it.state } doReturn MegaTransfer.STATE_FAILED
+                    on { it.state } doReturn TransferState.STATE_FAILED
                 }
             }
             whenever(monitorCompletedTransfersUseCase()) doReturn failedTransfers.asHotFlow()

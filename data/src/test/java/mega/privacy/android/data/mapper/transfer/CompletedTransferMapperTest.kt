@@ -20,7 +20,6 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -47,9 +46,6 @@ class CompletedTransferMapperTest {
     private val deviceGateway: DeviceGateway = mock()
     private val fileGateway: FileGateway = mock()
     private val stringWrapper: StringWrapper = mock()
-    private val transferTypeIntMapper: TransferTypeIntMapper = mock()
-    private val transferStateIntMapper: TransferStateIntMapper = mock()
-    private val transferAppDataStringMapper = mock<TransferAppDataStringMapper>()
     private val documentFileWrapper = mock<DocumentFileWrapper>()
 
     @BeforeAll
@@ -60,9 +56,6 @@ class CompletedTransferMapperTest {
             fileGateway = fileGateway,
             documentFileWrapper = documentFileWrapper,
             stringWrapper = stringWrapper,
-            transferTypeIntMapper = transferTypeIntMapper,
-            transferStateIntMapper = transferStateIntMapper,
-            transferAppDataStringMapper = transferAppDataStringMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
         )
     }
@@ -75,9 +68,6 @@ class CompletedTransferMapperTest {
             fileGateway,
             documentFileWrapper,
             stringWrapper,
-            transferTypeIntMapper,
-            transferStateIntMapper,
-            transferAppDataStringMapper,
         )
     }
 
@@ -88,12 +78,10 @@ class CompletedTransferMapperTest {
         val now = 123L
         whenever(deviceGateway.now).thenReturn(now)
         whenever(stringWrapper.getSizeString(any())).thenReturn(size)
-        whenever(transferTypeIntMapper(TransferType.GENERAL_UPLOAD)).thenReturn(MegaTransfer.TYPE_UPLOAD)
-        whenever(transferStateIntMapper(TransferState.STATE_COMPLETED)).thenReturn(MegaTransfer.STATE_COMPLETED)
         val actual = underTest(transfer, null)
         assertThat(actual.fileName).isEqualTo(transfer.fileName)
-        assertThat(actual.type).isEqualTo(MegaTransfer.TYPE_UPLOAD)
-        assertThat(actual.state).isEqualTo(MegaTransfer.STATE_COMPLETED)
+        assertThat(actual.type).isEqualTo(transfer.transferType)
+        assertThat(actual.state).isEqualTo(transfer.state)
         assertThat(actual.size).isEqualTo(size)
         assertThat(actual.handle).isEqualTo(transfer.nodeHandle)
         assertThat(actual.timestamp).isEqualTo(now)
@@ -220,7 +208,7 @@ class CompletedTransferMapperTest {
             whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
             whenever(fileGateway.getOfflineFilesRootPath()).thenReturn("$offlineDirectoryPath/$offlineDirectory")
             val actual = underTest(transfer, null)
-            assertThat(actual.type).isEqualTo(MegaTransfer.TYPE_DOWNLOAD)
+            assertThat(actual.type).isEqualTo(transfer.transferType)
             assertThat(actual.path).isEqualTo(directoryPath)
         }
 
@@ -248,8 +236,6 @@ class CompletedTransferMapperTest {
                 on { handle }.thenReturn(rootNodeHandle)
             }
             whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
-            whenever(transferTypeIntMapper(TransferType.GENERAL_UPLOAD))
-                .thenReturn(MegaTransfer.TYPE_UPLOAD)
 
             whenever(megaApiGateway.getMegaNodeByHandle(transfer.parentHandle)).thenReturn(node1)
             whenever(megaApiGateway.getNodePath(node1)).thenReturn(path)
@@ -271,7 +257,7 @@ class CompletedTransferMapperTest {
             whenever(stringWrapper.getTitleIncomingSharesExplorer()).thenReturn("Incoming shares")
 
             val actual = underTest(transfer, null)
-            assertThat(actual.type).isEqualTo(MegaTransfer.TYPE_UPLOAD)
+            assertThat(actual.type).isEqualTo(transfer.transferType)
             assertThat(actual.path).isEqualTo(expected)
         }
 

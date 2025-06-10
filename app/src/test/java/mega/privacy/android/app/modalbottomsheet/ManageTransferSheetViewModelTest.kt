@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -128,7 +129,7 @@ internal class ManageTransferSheetViewModelTest {
             val path = "content://some/path"
             val completedTransfer = mock<CompletedTransfer> {
                 on { isContentUriDownload } doReturn true
-                on { type } doReturn 0
+                on { type } doReturn TransferType.NONE
                 on { this.path } doReturn path
             }
             val uriPath = UriPath(path)
@@ -160,7 +161,7 @@ internal class ManageTransferSheetViewModelTest {
             val path = "content://some/path"
             val completedTransfer = mock<CompletedTransfer> {
                 on { isContentUriDownload } doReturn true
-                on { type } doReturn 0
+                on { type } doReturn TransferType.NONE
                 on { this.path } doReturn path
             }
             val uriPath = UriPath(path)
@@ -198,7 +199,7 @@ internal class ManageTransferSheetViewModelTest {
             val fileName = "file.txt"
             val completedTransfer = mock<CompletedTransfer> {
                 on { isContentUriDownload } doReturn true
-                on { type } doReturn 0
+                on { type } doReturn TransferType.NONE
                 on { this.path } doReturn path
                 on { this.fileName } doReturn fileName
             }
@@ -230,7 +231,7 @@ internal class ManageTransferSheetViewModelTest {
         runTest {
             val completedTransfer = mock<CompletedTransfer> {
                 on { isContentUriDownload } doReturn false
-                on { type } doReturn 1
+                on { type } doReturn TransferType.DOWNLOAD
             }
 
             whenever(savedStateHandle.get<Int>(ManageTransferBottomSheetDialogFragment.TRANSFER_ID)) doReturn 1

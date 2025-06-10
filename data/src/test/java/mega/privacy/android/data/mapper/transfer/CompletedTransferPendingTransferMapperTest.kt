@@ -7,11 +7,11 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import mega.privacy.android.domain.entity.uri.UriPath
-import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -29,8 +29,6 @@ class CompletedTransferPendingTransferMapperTest {
 
     private val deviceGateway = mock<DeviceGateway>()
     private val fileGateway = mock<FileGateway>()
-    private val transferTypeIntMapper = mock<TransferTypeIntMapper>()
-    private val transferAppDataStringMapper = mock<TransferAppDataStringMapper>()
     private val stringWrapper = mock<StringWrapper>()
 
     @BeforeAll
@@ -38,8 +36,6 @@ class CompletedTransferPendingTransferMapperTest {
         underTest = CompletedTransferPendingTransferMapper(
             deviceGateway,
             fileGateway,
-            transferTypeIntMapper,
-            transferAppDataStringMapper,
             stringWrapper,
         )
     }
@@ -49,8 +45,6 @@ class CompletedTransferPendingTransferMapperTest {
         reset(
             deviceGateway,
             fileGateway,
-            transferTypeIntMapper,
-            transferAppDataStringMapper,
             stringWrapper,
         )
     }
@@ -68,7 +62,6 @@ class CompletedTransferPendingTransferMapperTest {
         val offlinePath = "/offlinePath/"
         val path = if (offline) offlinePath else "/path/"
         val fullPath = "$path$fileName"
-        val appDataString = "appData"
         val appData = listOf(mock<TransferAppData.ChatUpload>())
         val exceptionMessage = "Some Exception"
         val exception = RuntimeException(exceptionMessage)
@@ -82,14 +75,12 @@ class CompletedTransferPendingTransferMapperTest {
         }
         whenever(deviceGateway.now) doReturn (now)
         whenever(stringWrapper.getSizeString(size)) doReturn (sizeString)
-        whenever(transferTypeIntMapper(TransferType.DOWNLOAD)) doReturn (MegaTransfer.TYPE_DOWNLOAD)
         whenever(fileGateway.getOfflineFilesRootPath()) doReturn offlinePath
-        whenever(transferAppDataStringMapper(appData)) doReturn appDataString
         val actual = underTest(pendingTransfer, size, exception)
         assertAll(
             { assertThat(actual.fileName).isEqualTo(fileName) },
-            { assertThat(actual.type).isEqualTo(MegaTransfer.TYPE_DOWNLOAD) },
-            { assertThat(actual.state).isEqualTo(MegaTransfer.STATE_FAILED) },
+            { assertThat(actual.type).isEqualTo(TransferType.DOWNLOAD) },
+            { assertThat(actual.state).isEqualTo(TransferState.STATE_FAILED) },
             { assertThat(actual.size).isEqualTo(sizeString) },
             { assertThat(actual.handle).isEqualTo(nodeHandle) },
             { assertThat(actual.path).isEqualTo(fullPath) },
@@ -97,7 +88,7 @@ class CompletedTransferPendingTransferMapperTest {
             { assertThat(actual.timestamp).isEqualTo(now) },
             { assertThat(actual.error).isEqualTo(exceptionMessage) },
             { assertThat(actual.originalPath).isEqualTo(fullPath) },
-            { assertThat(actual.appData).isEqualTo(appDataString) }
+            { assertThat(actual.appData).isEqualTo(appData) }
         )
     }
 }

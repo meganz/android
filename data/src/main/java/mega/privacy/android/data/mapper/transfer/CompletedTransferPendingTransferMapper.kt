@@ -4,9 +4,9 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
-import nz.mega.sdk.MegaTransfer
 import javax.inject.Inject
 
 /**
@@ -18,8 +18,6 @@ import javax.inject.Inject
 class CompletedTransferPendingTransferMapper @Inject constructor(
     private val deviceGateway: DeviceGateway,
     private val fileGateway: FileGateway,
-    private val transferTypeIntMapper: TransferTypeIntMapper,
-    private val transferAppDataStringMapper: TransferAppDataStringMapper,
     private val stringWrapper: StringWrapper,
 ) {
 
@@ -36,7 +34,7 @@ class CompletedTransferPendingTransferMapper @Inject constructor(
         sizeInBytes: Long,
         error: Throwable,
     ) = CompletedTransfer(
-        appData = transferAppDataStringMapper(pendingTransfer.appData),
+        appData = pendingTransfer.appData,
         error = error.localizedMessage ?: error::class.simpleName,
         errorCode = null,
         fileName = pendingTransfer.fileName ?: "",
@@ -48,8 +46,8 @@ class CompletedTransferPendingTransferMapper @Inject constructor(
         displayPath = null,
         size = stringWrapper.getSizeString(sizeInBytes),
         timestamp = deviceGateway.now,
-        state = MegaTransfer.STATE_FAILED,
-        type = transferTypeIntMapper(pendingTransfer.transferType),
+        state = TransferState.STATE_FAILED,
+        type = pendingTransfer.transferType,
     )
 
     private suspend fun isOffline(pendingTransfer: PendingTransfer) =

@@ -2,8 +2,6 @@ package mega.privacy.android.app.presentation.transfers.model.image
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.data.mapper.transfer.TransferStateMapper
-import mega.privacy.android.data.mapper.transfer.TransferTypeMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -19,8 +17,6 @@ import javax.inject.Inject
 class CompletedTransferImageViewModel @Inject constructor(
     getThumbnailUseCase: GetThumbnailUseCase,
     fileTypeIconMapper: FileTypeIconMapper,
-    private val transferStateMapper: TransferStateMapper,
-    private val transferTypeMapper: TransferTypeMapper,
 ) : AbstractTransferImageViewModel(
     getThumbnailUseCase = getThumbnailUseCase,
     fileTypeIconMapper = fileTypeIconMapper,
@@ -32,8 +28,8 @@ class CompletedTransferImageViewModel @Inject constructor(
     override fun <T> addTransfer(transfer: T) {
         with(transfer as CompletedTransfer) {
             id?.let {
-                if (transferStateMapper(state) == TransferState.STATE_COMPLETED
-                    || transferTypeMapper(type, emptyList()) == TransferType.DOWNLOAD
+                if (state == TransferState.STATE_COMPLETED
+                    || type == TransferType.DOWNLOAD
                 ) {
                     addNodeTransfer(it, fileName, NodeId(handle))
                 } else {

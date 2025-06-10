@@ -32,9 +32,6 @@ class CompletedTransferMapper @Inject constructor(
     private val fileGateway: FileGateway,
     private val documentFileWrapper: DocumentFileWrapper,
     private val stringWrapper: StringWrapper,
-    private val transferTypeIntMapper: TransferTypeIntMapper,
-    private val transferStateIntMapper: TransferStateIntMapper,
-    private val transferAppDataStringMapper: TransferAppDataStringMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -53,8 +50,8 @@ class CompletedTransferMapper @Inject constructor(
             val isOffline = isOffline(transfer)
             CompletedTransfer(
                 fileName = transfer.fileName,
-                type = transferTypeIntMapper(transfer.transferType),
-                state = transferStateIntMapper(transfer.state),
+                type = transfer.transferType,
+                state = transfer.state,
                 size = getSizeString(transfer.totalBytes),
                 handle = transfer.nodeHandle,
                 isOffline = isOffline,
@@ -64,7 +61,7 @@ class CompletedTransferMapper @Inject constructor(
                 errorCode = error?.let { getErrorCode(transfer, it) },
                 originalPath = transfer.localPath,
                 parentHandle = transfer.parentHandle,
-                appData = transferAppDataStringMapper(transfer.appData),
+                appData = transfer.appData,
                 displayPath = documentFileWrapper.getDocumentFile(transfer.parentPath)?.let {
                     documentFileWrapper.getAbsolutePathFromContentUri(it.uri)
                 }?.takeIf { it.isNotBlank() },

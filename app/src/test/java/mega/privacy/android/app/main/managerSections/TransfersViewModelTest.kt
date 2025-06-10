@@ -17,7 +17,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -26,6 +25,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -48,7 +48,6 @@ import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedT
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
-import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -79,7 +78,6 @@ internal class TransfersViewModelTest {
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase = mock()
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase = mock()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
-    private val transferAppDataMapper = mock<TransferAppDataMapper>()
     private val retryChatUploadUseCase = mock<RetryChatUploadUseCase>()
     private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase> {
         onBlocking { invoke() } doReturn emptyFlow()
@@ -113,7 +111,6 @@ internal class TransfersViewModelTest {
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
-            transferAppDataMapper = transferAppDataMapper,
             retryChatUploadUseCase = retryChatUploadUseCase,
             monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
             deleteFailedOrCancelledTransferCacheFilesUseCase = deleteFailedOrCancelledTransferCacheFilesUseCase,
@@ -332,7 +329,7 @@ internal class TransfersViewModelTest {
         runTest {
             val nodeHandle = 564L
             val transfer = mock<CompletedTransfer> {
-                on { type } doReturn MegaTransfer.TYPE_DOWNLOAD
+                on { type } doReturn TransferType.DOWNLOAD
                 on { isOffline } doReturn true
                 on { handle } doReturn nodeHandle
             }
@@ -354,7 +351,7 @@ internal class TransfersViewModelTest {
         runTest {
             val nodeHandle = 569L
             val transfer = mock<CompletedTransfer> {
-                on { type } doReturn MegaTransfer.TYPE_DOWNLOAD
+                on { type } doReturn TransferType.DOWNLOAD
                 on { isOffline } doReturn false
                 on { handle } doReturn nodeHandle
             }
@@ -376,7 +373,7 @@ internal class TransfersViewModelTest {
             val path = "path"
             val parentHandle = 123L
             val transfer = mock<CompletedTransfer> {
-                on { type } doReturn MegaTransfer.TYPE_UPLOAD
+                on { type } doReturn TransferType.GENERAL_UPLOAD
                 on { this.parentHandle } doReturn parentHandle
                 on { originalPath } doReturn path
             }
@@ -402,21 +399,17 @@ internal class TransfersViewModelTest {
             val path = "path"
             val contentUri = "content://foo"
             val parentHandle = 123L
-            val appDataString = "appDataStringRaw"
             val transfer = mock<CompletedTransfer> {
-                on { type } doReturn MegaTransfer.TYPE_UPLOAD
+                on { type } doReturn TransferType.GENERAL_UPLOAD
                 on { this.parentHandle } doReturn parentHandle
                 on { originalPath } doReturn path
-                on { appData } doReturn appDataString
+                on { appData } doReturn listOf(TransferAppData.OriginalUriPath(UriPath(contentUri)))
             }
             val expected = triggered(
                 TransferTriggerEvent.StartUpload.Files(
                     mapOf(contentUri to null),
                     NodeId(parentHandle)
                 )
-            )
-            whenever(transferAppDataMapper(appDataString)) doReturn listOf(
-                TransferAppData.OriginalUriPath(UriPath(contentUri))
             )
             whenever(canReadUriUseCase(contentUri)) doReturn true
 
@@ -455,16 +448,14 @@ internal class TransfersViewModelTest {
     fun `test that retryTransfer resend messages when it is an upload and is a chat upload`() =
         runTest {
             val path = "path"
-            val appData = "appData"
             val chatUpload = TransferAppData.ChatUpload(1L)
             val chatUploadAppData = listOf(chatUpload)
             val transfer = mock<CompletedTransfer> {
-                on { type } doReturn MegaTransfer.TYPE_UPLOAD
-                on { this.appData } doReturn appData
+                on { type } doReturn TransferType.GENERAL_UPLOAD
+                on { this.appData } doReturn chatUploadAppData
                 on { originalPath } doReturn path
             }
 
-            whenever(transferAppDataMapper(appData)).thenReturn(chatUploadAppData)
             whenever(canReadUriUseCase(path)) doReturn true
 
             underTest.retryTransfer(transfer)
@@ -478,15 +469,14 @@ internal class TransfersViewModelTest {
         runTest {
             val path = "path"
             val parentHandle = 123L
-            val appData = "appData"
+            val chatUpload = TransferAppData.ChatUpload(1L)
+            val chatUploadAppData = listOf(chatUpload)
             val transfer = mock<CompletedTransfer> {
-                on { type } doReturn MegaTransfer.TYPE_UPLOAD
-                on { this.appData } doReturn appData
+                on { type } doReturn TransferType.CHAT_UPLOAD
+                on { this.appData } doReturn chatUploadAppData
                 on { this.parentHandle } doReturn parentHandle
                 on { originalPath } doReturn path
             }
-            val chatUpload = TransferAppData.ChatUpload(1L)
-            val chatUploadAppData = listOf(chatUpload)
             val expected = triggered(
                 TransferTriggerEvent.StartUpload.Files(
                     mapOf(path to null),
@@ -494,7 +484,6 @@ internal class TransfersViewModelTest {
                 )
             )
 
-            whenever(transferAppDataMapper(appData)).thenReturn(chatUploadAppData)
             whenever(canReadUriUseCase(path)) doReturn true
             whenever(retryChatUploadUseCase(chatUploadAppData))
                 .thenThrow(ChatUploadNotRetriedException())
@@ -536,7 +525,7 @@ internal class TransfersViewModelTest {
             val path = "path"
             val parentHandle = 123L
             val transfer = mock<CompletedTransfer> {
-                on { type } doReturn MegaTransfer.TYPE_UPLOAD
+                on { type } doReturn TransferType.GENERAL_UPLOAD
                 on { this.parentHandle } doReturn parentHandle
                 on { originalPath } doReturn path
             }
@@ -595,7 +584,7 @@ internal class TransfersViewModelTest {
             }
             val completedDownload = mock<CompletedTransfer> {
                 on { isContentUriDownload } doReturn true
-                on { type } doReturn MegaTransfer.TYPE_DOWNLOAD
+                on { type } doReturn TransferType.DOWNLOAD
                 on { isOffline } doReturn false
                 on { this.path } doReturn pathAsUri
             }
@@ -604,7 +593,7 @@ internal class TransfersViewModelTest {
                 on { this.path } doReturn "offline"
             }
             val completedUpload = mock<CompletedTransfer> {
-                on { type } doReturn MegaTransfer.TYPE_UPLOAD
+                on { type } doReturn TransferType.GENERAL_UPLOAD
                 on { this.path } doReturn "Cloud/to/file"
             }
             val completedTransfers = listOf(completedDownload, completedOffline, completedUpload)

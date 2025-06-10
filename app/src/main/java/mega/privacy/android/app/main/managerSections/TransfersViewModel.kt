@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -76,7 +75,6 @@ class TransfersViewModel @Inject constructor(
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
-    private val transferAppDataMapper: TransferAppDataMapper,
     private val retryChatUploadUseCase: RetryChatUploadUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val deleteFailedOrCancelledTransferCacheFilesUseCase: DeleteFailedOrCancelledTransferCacheFilesUseCase,
@@ -446,7 +444,7 @@ class TransfersViewModel @Inject constructor(
      * Has failed or cancelled transfer
      */
     fun hasFailedOrCancelledTransfer() =
-        completedTransfers.value.any { it.state == MegaTransfer.STATE_FAILED || it.state == MegaTransfer.STATE_CANCELLED }
+        completedTransfers.value.any { it.state == TransferState.STATE_FAILED || it.state == TransferState.STATE_CANCELLED }
 
     /**
      * Pause or resume transfer
@@ -525,9 +523,8 @@ class TransfersViewModel @Inject constructor(
     }
 
     private suspend fun canReadTransferUri(transfer: CompletedTransfer) =
-        if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
-            val appData = transfer.appData?.let { transferAppDataMapper(it) }
-            val path = appData?.getOriginalContentUri() ?: transfer.originalPath
+        if (transfer.type.isUploadType()) {
+            val path = transfer.appData?.getOriginalContentUri() ?: transfer.originalPath
 
             canReadUriUseCase(path)
         } else {
@@ -557,8 +554,8 @@ class TransfersViewModel @Inject constructor(
      */
     private suspend fun retryCompletedTransfer(transfer: CompletedTransfer) {
         with(transfer) {
-            when (type) {
-                MegaTransfer.TYPE_DOWNLOAD -> {
+            when {
+                type.isDownloadType() -> {
                     getNodeByIdUseCase(NodeId(handle))?.let { typedNode ->
                         if (isOffline == true) {
                             TransferTriggerEvent.StartDownloadForOffline(
@@ -576,8 +573,7 @@ class TransfersViewModel @Inject constructor(
                     }
                 }
 
-                MegaTransfer.TYPE_UPLOAD -> {
-                    val appData = appData?.let { transferAppDataMapper(it) }
+                type.isUploadType() -> {
                     val isChatUpload =
                         appData?.any { it is TransferAppData.ChatUpload } == true
                     val path = appData?.getOriginalContentUri() ?: originalPath

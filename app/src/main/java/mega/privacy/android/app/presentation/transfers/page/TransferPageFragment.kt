@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.page
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -40,9 +39,9 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -417,8 +416,8 @@ internal class TransferPageFragment : Fragment() {
      * @param transfer the transfer to retry
      */
     fun retryTransfer(transfer: CompletedTransfer) {
-        when (transfer.type) {
-            MegaTransfer.TYPE_DOWNLOAD, MegaTransfer.TYPE_UPLOAD -> {
+        when {
+            transfer.type.isUploadType() || transfer.type.isDownloadType() -> {
                 lifecycleScope.launch {
                     transfersViewModel.retryTransfer(transfer)
                 }

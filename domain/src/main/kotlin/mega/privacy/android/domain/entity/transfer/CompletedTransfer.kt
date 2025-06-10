@@ -24,8 +24,8 @@ import java.io.File
 data class CompletedTransfer(
     val id: Int? = null,
     val fileName: String,
-    val type: Int,
-    val state: Int,
+    val type: TransferType,
+    val state: TransferState,
     val size: String,
     val handle: Long,
     var path: String,
@@ -36,10 +36,10 @@ data class CompletedTransfer(
     val errorCode: Int?,
     val originalPath: String,
     val parentHandle: Long,
-    val appData: String?,
+    val appData: List<TransferAppData>?,
 ) {
     val isContentUriDownload
         get() = isOffline == false
-                && type == 0 // Assuming 0 represents MegaTransfer.TYPE_DOWNLOAD
+                && type == TransferType.DOWNLOAD // Assuming 0 represents MegaTransfer.TYPE_DOWNLOAD
                 && path.startsWith(File.separator).not()
 }
