@@ -80,7 +80,7 @@ internal fun FailedTransferItem(
         }
 
         FailedTransferItem(
-            isDownload = true,
+            isDownload = type.isDownloadType(),
             fileTypeResId = uiState.fileTypeResId,
             previewUri = uiState.previewUri,
             fileName = fileName,

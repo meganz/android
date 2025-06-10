@@ -90,7 +90,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         val viewInFolderOption = contentView.findViewById<TextView>(R.id.option_view)
         viewInFolderOption.setOnClickListener(this)
 
-        if (transfer.isContentUriDownload && fileUri != null) {
+        if ((transfer.isContentUriDownload && fileUri != null) || transfer.isContentUriDownload.not()) {
             viewInFolderOption.visibility = View.VISIBLE
         } else {
             viewInFolderOption.visibility = View.GONE

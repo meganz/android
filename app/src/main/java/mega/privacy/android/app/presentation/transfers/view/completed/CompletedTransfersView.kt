@@ -1,15 +1,20 @@
 package mega.privacy.android.app.presentation.transfers.view.completed
 
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -18,22 +23,30 @@ import kotlinx.collections.immutable.ImmutableList
 import mega.privacy.android.app.presentation.transfers.model.image.CompletedTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_COMPLETED_TAB
+import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTransferActionsBottomSheet
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.feature.transfers.components.CompletedTransferItem
 import mega.privacy.android.shared.resources.R as sharedR
 import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CompletedTransfersView(
     completedTransfers: ImmutableList<CompletedTransfer>,
     selectedCompletedTransfersIds: ImmutableList<Int>?,
     onCompletedTransferSelected: (CompletedTransfer) -> Unit,
+    onViewInFolder: () -> Unit,
+    onOpenWith: () -> Unit,
+    onShareLink: (Long) -> Unit,
+    onClearTransfer: (Int) -> Unit,
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
     val selectMode =
         remember(selectedCompletedTransfersIds) { selectedCompletedTransfersIds != null }
+    var completedItemSelected by rememberSaveable { mutableStateOf<CompletedItemSelected?>(null) }
+
     if (completedTransfers.isEmpty()) {
         EmptyTransfersView(
             emptyStringId = sharedR.string.transfers_no_completed_transfers_empty_text,
@@ -60,8 +73,24 @@ internal fun CompletedTransfersView(
                             )
                         }
                     ),
+                    onMoreClicked = { completedItemSelected = it }
                 )
             }
+        }
+    }
+
+    completedItemSelected?.let { completedItem ->
+        with(completedItem) {
+            CompletedTransferActionsBottomSheet(
+                completedTransfer = completedTransfer,
+                fileTypeResId = fileTypeResId,
+                previewUri = previewUri,
+                onViewInFolder = onViewInFolder,
+                onOpenWith = onOpenWith,
+                onShareLink = { onShareLink(completedTransfer.handle) },
+                onClearTransfer = { completedTransfer.id?.let { id -> onClearTransfer(id) } },
+                onDismissSheet = { completedItemSelected = null },
+            )
         }
     }
 }
@@ -71,6 +100,7 @@ internal fun CompletedTransferItem(
     completedTransfer: CompletedTransfer,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
+    onMoreClicked: (CompletedItemSelected) -> Unit,
     viewModel: CompletedTransferImageViewModel = hiltViewModel(),
 ) = with(completedTransfer) {
     id?.let {
@@ -81,7 +111,7 @@ internal fun CompletedTransferItem(
         }
 
         CompletedTransferItem(
-            isDownload = true,
+            isDownload = type.isDownloadType(),
             fileTypeResId = uiState.fileTypeResId,
             previewUri = uiState.previewUri,
             fileName = fileName,
@@ -89,10 +119,23 @@ internal fun CompletedTransferItem(
             sizeString = size,
             date = TimeUtils.formatLongDateTime(timestamp.milliseconds.inWholeSeconds),
             isSelected = isSelected,
-            modifier = modifier
+            modifier = modifier,
+            onMoreClicked = {
+                CompletedItemSelected(
+                    completedTransfer = completedTransfer,
+                    fileTypeResId = uiState.fileTypeResId,
+                    previewUri = uiState.previewUri
+                ).let { item -> onMoreClicked(item) }
+            },
         )
     }
 }
+
+internal class CompletedItemSelected(
+    val completedTransfer: CompletedTransfer,
+    val fileTypeResId: Int?,
+    val previewUri: Uri?,
+)
 
 internal const val TEST_TAG_COMPLETED_TRANSFERS_VIEW = "$TEST_TAG_COMPLETED_TAB:view"
 internal const val TEST_TAG_COMPLETED_TRANSFERS_EMPTY_VIEW = "$TEST_TAG_COMPLETED_TAB:empty_view"

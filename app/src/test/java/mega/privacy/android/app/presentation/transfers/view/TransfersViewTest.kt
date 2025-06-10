@@ -302,6 +302,8 @@ class TransfersViewTest {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
                 TransfersView(
                     onBackPress = {},
+                    onNavigateToStorageSettings = {},
+                    onNavigateToUpgradeAccount = {},
                     uiState = uiState,
                     onTabSelected = {},
                     onPlayPauseTransfer = onPlayPauseTransfer,
@@ -314,7 +316,6 @@ class TransfersViewTest {
                     onActiveTransfersReorderPreview = { _, _ -> },
                     onActiveTransfersReorderConfirmed = {},
                     onConsumeStartEvent = {},
-                    onNavigateToStorageSettings = {},
                     onSelectActiveTransfers = {},
                     onSelectCompletedTransfers = {},
                     onSelectFailedTransfers = {},
@@ -329,7 +330,10 @@ class TransfersViewTest {
                     onSelectAllActiveTransfers = {},
                     onSelectAllCompletedTransfers = {},
                     onSelectAllFailedTransfers = {},
-                    onNavigateToUpgradeAccount = {},
+                    onViewInFolder = {},
+                    onOpenWith = {},
+                    onShareLink = {},
+                    onClearTransfer = {},
                 )
             }
         }

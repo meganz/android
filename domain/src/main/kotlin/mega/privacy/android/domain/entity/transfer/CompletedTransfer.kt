@@ -38,8 +38,23 @@ data class CompletedTransfer(
     val parentHandle: Long,
     val appData: List<TransferAppData>?,
 ) {
+    /**
+     * Whether the transfer is a download to the local storage and the download location is a content URI.
+     */
     val isContentUriDownload
         get() = isOffline == false
                 && type == TransferType.DOWNLOAD // Assuming 0 represents MegaTransfer.TYPE_DOWNLOAD
                 && path.startsWith(File.separator).not()
+
+    /**
+     * Whether the transfer finished with an error.
+     */
+    val isError
+        get() = state == TransferState.STATE_FAILED
+
+    /**
+     * Whether the transfer was cancelled.
+     */
+    val isCancelled
+        get() = state == TransferState.STATE_CANCELLED
 }

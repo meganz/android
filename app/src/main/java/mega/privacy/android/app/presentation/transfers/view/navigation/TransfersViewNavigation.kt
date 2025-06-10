@@ -54,6 +54,10 @@ internal fun NavGraphBuilder.transfersScreen(
             onSelectAllActiveTransfers = viewModel::selectAllActiveTransfers,
             onSelectAllCompletedTransfers = viewModel::selectAllCompletedTransfers,
             onSelectAllFailedTransfers = viewModel::selectAllFailedTransfers,
+            onViewInFolder = {},
+            onOpenWith = {},
+            onShareLink = {},
+            onClearTransfer = {},
         )
     }
 }

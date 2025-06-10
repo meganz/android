@@ -80,6 +80,10 @@ internal fun TransfersView(
     onSelectAllActiveTransfers: () -> Unit,
     onSelectAllCompletedTransfers: () -> Unit,
     onSelectAllFailedTransfers: () -> Unit,
+    onViewInFolder: () -> Unit,
+    onOpenWith: () -> Unit,
+    onShareLink: (Long) -> Unit,
+    onClearTransfer: (Int) -> Unit,
 ) = with(uiState) {
     var showActiveTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
@@ -185,6 +189,10 @@ internal fun TransfersView(
                             lazyListState = listState,
                             onCompletedTransferSelected = onCompletedTransferSelected,
                             selectedCompletedTransfersIds = selectedCompletedTransfersIds,
+                            onViewInFolder = onViewInFolder,
+                            onOpenWith = onOpenWith,
+                            onShareLink = onShareLink,
+                            onClearTransfer = onClearTransfer,
                             modifier = modifier,
                         )
                     }
@@ -325,6 +333,8 @@ private fun TransfersViewPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         TransfersView(
             onBackPress = {},
+            onNavigateToStorageSettings = {},
+            onNavigateToUpgradeAccount = {},
             uiState = TransfersUiState(),
             onTabSelected = {},
             onPlayPauseTransfer = {},
@@ -337,7 +347,6 @@ private fun TransfersViewPreview() {
             onActiveTransfersReorderPreview = { _, _ -> },
             onActiveTransfersReorderConfirmed = {},
             onConsumeStartEvent = {},
-            onNavigateToStorageSettings = {},
             onSelectActiveTransfers = {},
             onSelectCompletedTransfers = {},
             onSelectFailedTransfers = {},
@@ -352,7 +361,10 @@ private fun TransfersViewPreview() {
             onSelectAllActiveTransfers = {},
             onSelectAllCompletedTransfers = {},
             onSelectAllFailedTransfers = {},
-            onNavigateToUpgradeAccount = {},
+            onViewInFolder = {},
+            onOpenWith = {},
+            onShareLink = {},
+            onClearTransfer = {},
         )
     }
 }
