@@ -435,7 +435,7 @@
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">Di komputer</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Visit [A]www.mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website">1. Visit [A]https://mega.nz[/A] in your web browser.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Masuk ke akun MEGA anda.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -1264,4 +1264,18 @@
     <string name="text_received_mega_pass_free_trial">Anda telah menerima %1$s ruang penyimpanan untuk memulai MEGA&#160;Lulus uji coba gratis</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
+    <!-- Title for the free plan card when the user is an existing account -->
+    <string name="free_plan_card_existing_title">Continue with your free plan</string>
+    <!-- Button text for existing users to continue with the free plan -->
+    <string name="free_plan_card_existing_button">Continue with free plan</string>
+    <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
+    <string name="free_plan_card_storage_feature_for_existing_user">%1$s penyimpanan</string>
+    <!-- Sort by newest shares -->
+    <string name="general_sort_newest_shares">Newest shares</string>
+    <!-- Sort by oldest shares -->
+    <string name="general_sort_oldest_shares">Oldest shares</string>
+    <!-- Title for recovery key error dialog -->
+    <string name="recovery_key_error_title">Recovery key error</string>
+    <!-- Description for recovery key error dialog -->
+    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
 </resources>

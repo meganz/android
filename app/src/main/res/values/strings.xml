@@ -5071,4 +5071,6 @@
     <string name="filestorage_snackbar_file_manager_is_not_available">A suitable file manager app is not available on this device</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_success_message">Camera uploads enabled</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">This location no longer exists.</string>
 </resources>

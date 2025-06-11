@@ -899,7 +899,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">Datenschutz</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">Sie sind in einem anderen MEGA-Account eingeloggt. Loggen Sie sich aus und öffnen Sie den Link zum Zurücksetzen des Passworts erneut.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">Dieser Stornolink ist abgelaufen – bitte versuchen Sie es erneut.</string>
     <!-- Text shown after searching and no results found -->
@@ -5065,4 +5065,6 @@
     <string name="filestorage_snackbar_file_manager_is_not_available">Auf diesem Gerät ist keine geeignete Dateimanager-App verfügbar</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_success_message">Kamera-Uploads aktiviert</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">Dieser Speicherort existiert nicht mehr.</string>
 </resources>

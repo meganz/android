@@ -35,7 +35,7 @@
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">Harici sürücüdeki klasör bulunamıyor.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="general_sync_active_sync_same_path">Aynı konumda zaten senkronize edilen bir klasör var</string>
+    <string name="general_sync_active_sync_same_path">Aynı konumda zaten senkronize edilen bir klasör mevcut</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="general_sync_could_not_move_cloud_nodes">Yeniden adlandırma başarısız oldu</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
@@ -441,7 +441,7 @@
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">Bir bilgisayardan</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Web tarayıcınızda [A]www.mega.nz[/A] adresini ziyaret edin.</string>
+    <string name="account_cancellation_instructions_visit_website">1. Tarayıcınızdan [A]https://mega.nz[/A] adresine gidin.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. MEGA hesabınıza giriş yapın.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -475,7 +475,7 @@
     <!-- Create new folder dialog error message shown when the user tries to an empty folder name -->
     <string name="create_new_folder_dialog_error_message_empty_folder_name">Bir klasör adı girin</string>
     <!-- Create new folder dialog error message shown when folder cannot be created because there is already one with the same name -->
-    <string name="create_new_folder_dialog_error_existing_folder">Aynı ada sahip bir klasör zaten var</string>
+    <string name="create_new_folder_dialog_error_existing_folder">Aynı ada sahip bir klasör zaten mevcut</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
     <string name="general_invalid_characters_defined">Şu karakterlere izin verilmez: %1$s</string>
     <!-- Sync settings section title-->
@@ -1193,7 +1193,7 @@
     <!-- Benefit: Links with expiry dates -->
     <string name="pro_plan_benefit_links_with_expiry_dates">Son kullanma tarihi olan bağlantılar</string>
     <!-- Benefit: Transfer quota sharing -->
-    <string name="pro_plan_benefit_transfer_quota_sharing">Transfer quota sharing</string>
+    <string name="pro_plan_benefit_transfer_quota_sharing">Transfer kotası paylaşımı</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">Mobil cihazınızdaki klasörleri otomatik olarak senkronize edin</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
@@ -1271,4 +1271,18 @@
     <string name="text_received_mega_pass_free_trial">MEGA&#160;Pass ücretsiz deneme sürümünü başlattığınız için %1$s depolama alanı aldınız</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Bazı klasörler senkronize edilemez veya yedeklenemez çünkü MEGA uygulaması, yerel klasörlere erişim izinlerini kaybetti. Her etkilenen klasör için izinleri yeniden eklemek üzere Devam ettir\’e dokunun.</string>
+    <!-- Title for the free plan card when the user is an existing account -->
+    <string name="free_plan_card_existing_title">Ücretsiz planınızla devam edin</string>
+    <!-- Button text for existing users to continue with the free plan -->
+    <string name="free_plan_card_existing_button">Ücretsiz planla devam et</string>
+    <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
+    <string name="free_plan_card_storage_feature_for_existing_user">%1$s depolama</string>
+    <!-- Sort by newest shares -->
+    <string name="general_sort_newest_shares">Yeni paylaşımlar</string>
+    <!-- Sort by oldest shares -->
+    <string name="general_sort_oldest_shares">Eski paylaşımlar</string>
+    <!-- Title for recovery key error dialog -->
+    <string name="recovery_key_error_title">Recovery key error</string>
+    <!-- Description for recovery key error dialog -->
+    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
 </resources>

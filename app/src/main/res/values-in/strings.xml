@@ -4838,4 +4838,6 @@
     <string name="filestorage_snackbar_file_manager_is_not_available">Aplikasi pengelola file yang sesuai tidak tersedia di perangkat ini</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_success_message">Unggahan Kamera teraktifkan</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">Lokasi ini tidak ada lagi.</string>
 </resources>

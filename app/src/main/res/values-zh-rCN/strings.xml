@@ -4838,4 +4838,6 @@
     <string name="filestorage_snackbar_file_manager_is_not_available">此设备上没有合适的文件管理器应用程序</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_success_message">相机上传已启用</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">此位置已不存在。</string>
 </resources>

@@ -885,7 +885,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">비밀 보장</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">다른 MEGA 계정으로 로그인 하셨습니다. 로그아웃 하고 암호 재설정 링크를 다시 여세요.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">이 취소 링크가 만료되었습니다, 다시 시도하세요.</string>
     <!-- Text shown after searching and no results found -->
@@ -4838,4 +4838,6 @@
     <string name="filestorage_snackbar_file_manager_is_not_available">이 장치에 이용 가능한 적합한 파일 관리자 앱이 없습니다</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_success_message">카메라 업로드 활성화됨</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">이 위치가 더 이상 존재하지 않습니다.</string>
 </resources>

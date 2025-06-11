@@ -1685,7 +1685,7 @@
         <item quantity="other">%1$d bekleyen kişi isteği</item>
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
-    <string name="title_new_contact_request_notification">Yeni kişiler isteği</string>
+    <string name="title_new_contact_request_notification">Yeni kişi isteği</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
     <string name="transfers_empty_new">[B]Aktif aktarım[/B][A] yok[/A]</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
@@ -2791,9 +2791,9 @@
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
     <string name="file_extension_change_warning">Uzantısını değiştirirseniz bu dosyayı açamayabilirsiniz.</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
-    <string name="same_file_name_warning">Aynı ada sahip bir dosya zaten var</string>
+    <string name="same_file_name_warning">Aynı ada sahip bir dosya zaten mevcut</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
-    <string name="same_item_name_warning">Aynı ada sahip bir öğe zaten var</string>
+    <string name="same_item_name_warning">Aynı ada sahip bir öğe zaten mevcut</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Bilgi</string>
     <!-- settings of the Media section -->
@@ -3238,7 +3238,7 @@
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
     <string name="title_duplicated_items">Benzer öğeler</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
-    <string name="file_already_exists_in_location">Bu hedefte [B]%1$s[/B] adlı bir dosya zaten mevcut.</string>
+    <string name="file_already_exists_in_location">Hedefte [B]%1$s[/B] adlı bir dosya zaten mevcut.</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
     <string name="choose_file">Tutmak istediğiniz dosyayı seçin</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose. -->
@@ -4484,7 +4484,7 @@
         <item quantity="other">Her %3$d haftada bir %1$s ve %2$s</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Bu plan için zaten yinelenen bir aboneliğiniz var</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Bu plan için zaten yinelenen bir aboneliğiniz mevcut</string>
     <!-- Album import storage exceeded title -->
     <string name="album_import_storage_exceeded_title">Albüm kaydedilemiyor</string>
     <!-- Album import storage exceeded description -->
@@ -4943,7 +4943,7 @@
         <item quantity="other">Ücretsiz aramanız %d dakika içinde sona erecek</item>
     </plurals>
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
-    <string name="notifications_screen_notification_promo_expiration_time">%1$s tarihinde, %2$s saatinden itibaren sona eriyor</string>
+    <string name="notifications_screen_notification_promo_expiration_time">%1$s tarihinde, %2$s saatinden itibaren süresi doluyor</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
     <string name="meetings_free_call_organiser_number_of_participants_warning">Aramaya yalnızca 100 katılımcı katılabilir. Ek katılımcılar yalnızca mesaj gönderip alabilir. Yönetici, bu kısıtlamaları kaldırmak için Pro\’ya yükseltebilir.</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
@@ -5065,4 +5065,6 @@
     <string name="filestorage_snackbar_file_manager_is_not_available">Bu cihazda uygun bir dosya yöneticisi uygulaması bulunmuyor</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_success_message">Kamera yüklemeleri etkinleştirildi</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">Bu konum artık mevcut değil.</string>
 </resources>

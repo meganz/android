@@ -433,7 +433,7 @@
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">Trên máy tính</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Ghé trang [A]www.mega.nz[/A] trong trình&#160;duyệt web của bạn.</string>
+    <string name="account_cancellation_instructions_visit_website">1. Visit [A]https://mega.nz[/A] in your web browser.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Đăng&#160;nhập vào tài&#160;khoản MEGA của bạn.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -1234,11 +1234,11 @@
     <!-- title of the section for start mega vpn free trial in achivements section -->
     <string name="title_start_mega_vpn_free_trial">Bắt&#160;đầu hạn dùng thử MEGA&#160;VPN miễn&#160;phí</string>
     <!-- Text of the section for start mega vpn free trial in achivements section -->
-    <string name="text_start_mega_vpn_free_trial">%1$s vào không gian lưu trữ. Có hiệu lực vĩnh viễn.</string>
+    <string name="text_start_mega_vpn_free_trial">%1$s thêm cho lưu trữ. Có hiệu lực vĩnh viễn.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
     <string name="title_start_mega_pass_free_trial">Bắt&#160;đầu hạn dùng thử MEGA&#160;Pass miễn&#160;phí</string>
     <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s vào không gian lưu trữ. Có hiệu lực vĩnh viễn.</string>
+    <string name="text_start_mega_pass_free_trial">%1$s thêm cho lưu trữ. Có hiệu lực vĩnh viễn.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
     <string name="button_text_install_mega_vpn">Cài MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
@@ -1255,4 +1255,18 @@
     <string name="text_received_mega_pass_free_trial">Bạn đã nhận được %1$s cho không&#160;gian lưu&#160;trữ khi dùng thử MEGA&#160;Pass miễn&#160;phí</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
+    <!-- Title for the free plan card when the user is an existing account -->
+    <string name="free_plan_card_existing_title">Continue with your free plan</string>
+    <!-- Button text for existing users to continue with the free plan -->
+    <string name="free_plan_card_existing_button">Continue with free plan</string>
+    <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
+    <string name="free_plan_card_storage_feature_for_existing_user">%1$s không&#160;gian lưu&#160;trữ</string>
+    <!-- Sort by newest shares -->
+    <string name="general_sort_newest_shares">Newest shares</string>
+    <!-- Sort by oldest shares -->
+    <string name="general_sort_oldest_shares">Oldest shares</string>
+    <!-- Title for recovery key error dialog -->
+    <string name="recovery_key_error_title">Chìa&#160;khóa phục&#160;hồi bị lỗi</string>
+    <!-- Description for recovery key error dialog -->
+    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
 </resources>

@@ -5519,4 +5519,6 @@
     <string name="filestorage_snackbar_file_manager_is_not_available">Odpowiednia aplikacja do zarządzania plikami nie jest dostępna na tym urządzeniu</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->
     <string name="onboarding_camera_upload_permission_enabled_success_message">Przesyłanie z kamery odblokowane</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">Ta lokalizacja już nie istnieje.</string>
 </resources>
