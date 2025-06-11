@@ -9,15 +9,18 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.usecase.GetDeviceCurrentNanoTimeUseCase
+import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -26,12 +29,14 @@ internal class CameraUploadsRecordMapperTest {
 
     private val getFingerprintUseCase = mock<GetFingerprintUseCase>()
     private val getDeviceCurrentNanoTimeUseCase = mock<GetDeviceCurrentNanoTimeUseCase>()
+    private val getFileByPathUseCase = mock<GetFileByPathUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = CameraUploadsRecordMapper(
             getFingerprintUseCase = getFingerprintUseCase,
             getDeviceCurrentNanoTimeUseCase = getDeviceCurrentNanoTimeUseCase,
+            getFileByPathUseCase = getFileByPathUseCase,
         )
     }
 
@@ -60,6 +65,11 @@ internal class CameraUploadsRecordMapperTest {
             whenever(getFingerprintUseCase(media.filePath)).thenReturn(fingerprint)
             val currentNanoTime = 1111L
             whenever(getDeviceCurrentNanoTimeUseCase()).thenReturn(currentNanoTime)
+            val fileSize = 12345L
+            val mockFile = mock<File> {
+                on { length() }.thenReturn(fileSize)
+            }
+            whenever(getFileByPathUseCase(any())).thenReturn(mockFile)
 
             val actual = underTest(
                 media = media,
@@ -78,7 +88,8 @@ internal class CameraUploadsRecordMapperTest {
                 uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
                 originalFingerprint = fingerprint,
                 generatedFingerprint = null,
-                tempFilePath = "$tempRoot$currentNanoTime.jpeg"
+                tempFilePath = "$tempRoot$currentNanoTime.jpeg",
+                fileSize = fileSize
             )
             assertThat(actual).isEqualTo(expected)
         }

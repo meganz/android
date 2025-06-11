@@ -38,7 +38,8 @@ class CameraUploadsRecordModelMapperTest {
             uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
             originalFingerprint = "originalFingerprint",
             generatedFingerprint = null,
-            tempFilePath = "tempFilePath"
+            tempFilePath = "tempFilePath",
+            fileSize = 10000L
         )
 
         val expected = CameraUploadsRecord(
@@ -51,7 +52,8 @@ class CameraUploadsRecordModelMapperTest {
             uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
             originalFingerprint = "originalFingerprint",
             generatedFingerprint = null,
-            tempFilePath = "tempFilePath"
+            tempFilePath = "tempFilePath",
+            fileSize = 10000L
         )
 
         val actual = underTest(entity)

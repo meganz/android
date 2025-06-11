@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property existsInTargetNode true if the file already exists in the target Node. This value is computed during upload process
  * @property existingNodeId nodeId that corresponds to the parent folder This value is computed during upload process
  * @property generatedFileName the name of the file after renaming process. This value is computed during upload process
+ * @property fileSize the size of the file in bytes
  */
 data class CameraUploadsRecord(
     val mediaId: Long,
@@ -40,4 +41,5 @@ data class CameraUploadsRecord(
     val existsInTargetNode: Boolean? = null,
     val existingNodeId: NodeId? = null,
     val generatedFileName: String? = null,
+    val fileSize: Long = 0L,
 )

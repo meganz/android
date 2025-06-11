@@ -22,6 +22,7 @@ internal class CameraUploadsRecordModelMapper @Inject constructor() {
                 originalFingerprint = originalFingerprint,
                 generatedFingerprint = generatedFingerprint,
                 tempFilePath = tempFilePath,
+                fileSize = fileSize ?: 0
             )
         }
     }

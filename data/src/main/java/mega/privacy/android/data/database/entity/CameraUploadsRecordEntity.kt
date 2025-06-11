@@ -39,4 +39,5 @@ internal data class CameraUploadsRecordEntity(
     @ColumnInfo(name = "original_fingerprint") val originalFingerprint: String,
     @ColumnInfo(name = "generated_fingerprint") val generatedFingerprint: String?,
     @ColumnInfo(name = "temp_file_path") val tempFilePath: String,
+    @ColumnInfo(name = "file_size") val fileSize: Long?
 )

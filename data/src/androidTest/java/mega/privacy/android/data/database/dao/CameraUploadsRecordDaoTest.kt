@@ -51,6 +51,7 @@ class CameraUploadsRecordDaoTest {
             originalFingerprint = "encryptedOriginalFingerprint$it",
             generatedFingerprint = "encryptedGeneratedFingerprint$it",
             tempFilePath = "encryptedTempFilePath$it",
+            fileSize = it.toLong()
         )
         entity
     }
@@ -180,5 +181,16 @@ class CameraUploadsRecordDaoTest {
             val expected = generateEntities()
             insertEntities(expected)
             assertThat(cameraUploadsRecordDao.getAllCameraUploadsRecords()).isEqualTo(expected)
+        }
+
+    @Test
+    fun test_that_getAllCameraUploadsRecords_returns_all_the_corresponding_file_sizes() =
+        runTest {
+            val expected = generateEntities()
+            insertEntities(expected)
+            val result = cameraUploadsRecordDao.getAllCameraUploadsRecords()
+            result.forEachIndexed { index, entity ->
+                assertThat(entity.fileSize).isEqualTo(expected[index].fileSize)
+            }
         }
 }

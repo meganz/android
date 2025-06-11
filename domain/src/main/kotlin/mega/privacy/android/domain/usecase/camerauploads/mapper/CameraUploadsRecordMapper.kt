@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.usecase.GetDeviceCurrentNanoTimeUseCase
+import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import javax.inject.Inject
 
@@ -14,6 +15,7 @@ import javax.inject.Inject
  */
 class CameraUploadsRecordMapper @Inject constructor(
     private val getFingerprintUseCase: GetFingerprintUseCase,
+    private val getFileByPathUseCase: GetFileByPathUseCase,
     private val getDeviceCurrentNanoTimeUseCase: GetDeviceCurrentNanoTimeUseCase,
 ) {
 
@@ -33,7 +35,7 @@ class CameraUploadsRecordMapper @Inject constructor(
         tempRoot: String,
     ): CameraUploadsRecord? {
         val fingerprint = getFingerprintUseCase(media.filePath) ?: return null
-
+        val fileSize = getFileByPathUseCase(media.filePath)?.length() ?: 0
         val extension = media.displayName.substringAfterLast('.', "")
 
         return CameraUploadsRecord(
@@ -46,7 +48,8 @@ class CameraUploadsRecordMapper @Inject constructor(
             uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
             originalFingerprint = fingerprint,
             generatedFingerprint = null,
-            tempFilePath = "$tempRoot${getDeviceCurrentNanoTimeUseCase()}.$extension"
+            tempFilePath = "$tempRoot${getDeviceCurrentNanoTimeUseCase()}.$extension",
+            fileSize = fileSize,
         )
     }
 }

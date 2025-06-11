@@ -22,6 +22,7 @@ internal class CameraUploadsRecordEntityMapper @Inject constructor() {
                 originalFingerprint = cameraUploadsRecord.originalFingerprint,
                 generatedFingerprint = cameraUploadsRecord.generatedFingerprint,
                 tempFilePath = cameraUploadsRecord.tempFilePath,
+                fileSize = cameraUploadsRecord.fileSize
             )
 
         }

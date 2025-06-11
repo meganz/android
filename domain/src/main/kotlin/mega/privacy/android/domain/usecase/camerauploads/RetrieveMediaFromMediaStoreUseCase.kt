@@ -57,9 +57,9 @@ class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
                             val exists = checkCameraUploadsRecordAlreadyExists(
                                 cameraUploadsMedia = it,
                                 recordsToCheck =
-                                if (folderType == CameraUploadFolderType.Primary)
-                                    recordsInPrimaryFolder
-                                else recordsInSecondaryFolder,
+                                    if (folderType == CameraUploadFolderType.Primary)
+                                        recordsInPrimaryFolder
+                                    else recordsInSecondaryFolder,
                             )
                             if (!exists) {
                                 cameraUploadsRecordMapper(
