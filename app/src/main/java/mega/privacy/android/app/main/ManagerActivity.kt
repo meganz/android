@@ -294,6 +294,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
@@ -5967,13 +5968,23 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             ) + Constants.SEPARATOR
             openFullscreenOfflineFragment(offlinePath, fileNames)
         } else {
-            Intent(this, FileStorageActivity::class.java).apply {
-                action = FileStorageActivity.Mode.BROWSE_FILES.action
-                putExtra(FileStorageActivity.EXTRA_PATH, path)
-                fileNames?.let {
-                    putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, it)
+            lifecycleScope.launch {
+                if (!fileBrowserViewModel.doesUriPathExists(UriPath(path))) {
+                    showSnackbar(
+                        SNACKBAR_TYPE,
+                        getString(R.string.location_not_exist),
+                        MEGACHAT_INVALID_HANDLE
+                    )
+                    return@launch
                 }
-                startActivity(this)
+                Intent(this@ManagerActivity, FileStorageActivity::class.java).apply {
+                    action = FileStorageActivity.Mode.BROWSE_FILES.action
+                    putExtra(FileStorageActivity.EXTRA_PATH, path)
+                    fileNames?.let {
+                        putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, it)
+                    }
+                    startActivity(this)
+                }
             }
         }
     }

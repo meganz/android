@@ -42,6 +42,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
@@ -55,6 +56,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.DoesUriPathExistsUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -123,6 +125,7 @@ class FileBrowserViewModel @Inject constructor(
     private val monitorAlmostFullStorageBannerClosingTimestampUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
     private val storageCapacityMapper: StorageCapacityMapper,
     private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase,
+    private val doesUriPathExistsUseCase: DoesUriPathExistsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -1012,4 +1015,7 @@ class FileBrowserViewModel @Inject constructor(
     fun onTabChanged(tab: CloudDriveTab) {
         _state.update { it.copy(selectedTab = tab) }
     }
+
+    suspend fun doesUriPathExists(uriPath: UriPath) =
+        doesUriPathExistsUseCase(uriPath)
 }

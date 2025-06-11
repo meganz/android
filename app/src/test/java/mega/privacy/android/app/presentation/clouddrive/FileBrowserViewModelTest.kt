@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.DoesUriPathExistsUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -135,6 +136,7 @@ class FileBrowserViewModelTest {
     private val monitorAlmostFullStorageBannerClosingTimestampUseCase =
         mock<MonitorAlmostFullStorageBannerVisibilityUseCase>()
     private val isInTransferOverQuotaUseCase = mock<IsInTransferOverQuotaUseCase>()
+    private val doesUriPathExistsUseCase = mock<DoesUriPathExistsUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -176,6 +178,7 @@ class FileBrowserViewModelTest {
             monitorAlmostFullStorageBannerClosingTimestampUseCase = monitorAlmostFullStorageBannerClosingTimestampUseCase,
             storageCapacityMapper = storageCapacityMapper,
             isInTransferOverQuotaUseCase = isInTransferOverQuotaUseCase,
+            doesUriPathExistsUseCase = doesUriPathExistsUseCase,
         )
     }
 
@@ -609,7 +612,7 @@ class FileBrowserViewModelTest {
             assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
             assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
                 .isInstanceOf(TransferTriggerEvent.StartDownloadForOffline::class.java)
-            assertThat((state.downloadEvent.content as TransferTriggerEvent.StartDownloadForOffline).withStartMessage)
+            assertThat(((state.downloadEvent as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadForOffline).withStartMessage)
                 .isEqualTo(withStartMessage)
         }
     }
@@ -629,7 +632,7 @@ class FileBrowserViewModelTest {
             assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
             assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
                 .isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
-            assertThat((state.downloadEvent.content as TransferTriggerEvent.StartDownloadNode).withStartMessage)
+            assertThat(((state.downloadEvent as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode).withStartMessage)
                 .isEqualTo(withStartMessage)
         }
     }
@@ -797,6 +800,7 @@ class FileBrowserViewModelTest {
             setAlmostFullStorageBannerClosingTimestampUseCase,
             monitorAlmostFullStorageBannerClosingTimestampUseCase,
             storageCapacityMapper,
+            doesUriPathExistsUseCase,
         )
     }
 }
