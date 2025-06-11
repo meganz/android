@@ -21,7 +21,6 @@ import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
-import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
@@ -38,7 +37,6 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
-    private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val accountInfoFacade: AccountInfoFacade,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
@@ -51,8 +49,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     }
 
     private suspend fun transferOverQuotaNotification(): Notification {
-        val isLoggedIn =
-            isUserLoggedInUseCase() && hasCredentialsUseCase()
+        val isLoggedIn = isUserLoggedInUseCase()
         var isFreeAccount = false
         val intent = if (isLoggedIn) {
             isFreeAccount = accountInfoFacade.accountTypeId == MegaAccountDetails.ACCOUNT_TYPE_FREE

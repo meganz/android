@@ -1069,7 +1069,8 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.setFileVersionsOption(disable, listener)
     }
 
-    override fun isUserLoggedIn(): Int = megaApi.isLoggedIn
+    override fun isMegaApiLoggedIn(): Int = megaApi.isLoggedIn
+
     override fun cancelTransferByTag(transferTag: Int, listener: MegaRequestListenerInterface?) {
         megaApi.cancelTransferByTag(transferTag, listener)
     }

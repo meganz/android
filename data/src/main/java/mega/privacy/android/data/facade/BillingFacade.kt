@@ -113,7 +113,7 @@ internal class BillingFacade @Inject constructor(
             if (skusCache.get().isNullOrEmpty()) {
                 querySkus()
             }
-            if (accountRepository.isUserLoggedIn()) {
+            if (accountRepository.isMegaApiLoggedIn()) {
                 queryPurchase()
             }
         }

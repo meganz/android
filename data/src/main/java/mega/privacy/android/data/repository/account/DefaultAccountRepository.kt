@@ -567,9 +567,9 @@ internal class DefaultAccountRepository @Inject constructor(
     override fun monitorAccountDetail(): Flow<AccountDetail> =
         myAccountInfoFacade.monitorAccountDetail()
 
-    override suspend fun isUserLoggedIn(): Boolean =
+    override suspend fun isMegaApiLoggedIn(): Boolean =
         withContext(ioDispatcher) {
-            megaApiGateway.isUserLoggedIn() > 0
+            megaApiGateway.isMegaApiLoggedIn() > 0
         }
 
     override suspend fun isEphemeralPlusPlus(): Boolean =

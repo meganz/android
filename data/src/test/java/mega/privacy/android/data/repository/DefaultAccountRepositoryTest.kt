@@ -867,9 +867,9 @@ class DefaultAccountRepositoryTest {
     }
 
     @Test
-    fun `test that MegaApiGateway method is invoked when calling isUserLoggedIn`() = runTest {
-        underTest.isUserLoggedIn()
-        verify(megaApiGateway).isUserLoggedIn()
+    fun `test that MegaApiGateway method is invoked when calling isMegaApiLoggedIn`() = runTest {
+        underTest.isMegaApiLoggedIn()
+        verify(megaApiGateway).isMegaApiLoggedIn()
     }
 
     @Test

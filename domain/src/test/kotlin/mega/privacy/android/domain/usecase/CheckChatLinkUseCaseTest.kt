@@ -4,9 +4,9 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRequestType
-import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.chat.InitGuestChatSessionUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -15,14 +15,18 @@ import org.mockito.kotlin.whenever
 
 class CheckChatLinkUseCaseTest {
     private val chatRepository: ChatRepository = mock()
-    private val accountRepository: AccountRepository = mock()
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase = mock()
     private val initGuestChatSessionUseCase: InitGuestChatSessionUseCase = mock()
 
     private lateinit var underTest: CheckChatLinkUseCase
 
     @Before
     fun setup() {
-        underTest = CheckChatLinkUseCase(chatRepository, accountRepository, initGuestChatSessionUseCase)
+        underTest = CheckChatLinkUseCase(
+            chatRepository,
+            isUserLoggedInUseCase,
+            initGuestChatSessionUseCase,
+        )
     }
 
     @Test
@@ -47,7 +51,7 @@ class CheckChatLinkUseCaseTest {
                 paramType = null
             )
 
-            whenever(accountRepository.isUserLoggedIn()).thenReturn(false)
+            whenever(isUserLoggedInUseCase()).thenReturn(false)
             whenever(chatRepository.checkChatLink(chatLink)).thenReturn(chatRequest)
 
             val result = underTest.invoke(chatLink)
@@ -79,7 +83,7 @@ class CheckChatLinkUseCaseTest {
                 paramType = null
             )
 
-            whenever(accountRepository.isUserLoggedIn()).thenReturn(true)
+            whenever(isUserLoggedInUseCase()).thenReturn(true)
             whenever(chatRepository.checkChatLink(chatLink)).thenReturn(chatRequest)
 
             val result = underTest.invoke(chatLink)

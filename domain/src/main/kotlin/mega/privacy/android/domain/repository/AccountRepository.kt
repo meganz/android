@@ -217,9 +217,13 @@ interface AccountRepository {
     fun monitorAccountDetail(): Flow<AccountDetail>
 
     /**
-     * Checks if User is Logged In
+     * Check if the MegaApi object is logged in
+     *
+     * NOTE: Executing a fastLogin while fetching the isLoggedIn can return 0.
+     *
+     * @return 0 if not logged in, Otherwise a number > 0
      */
-    suspend fun isUserLoggedIn(): Boolean
+    suspend fun isMegaApiLoggedIn(): Boolean
 
     /**
      * Check if is ephemeral plus plus account
