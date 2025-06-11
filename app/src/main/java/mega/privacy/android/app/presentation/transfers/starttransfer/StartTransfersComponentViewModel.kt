@@ -701,7 +701,12 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     }
 
     fun previewFile(file: File) {
-        _uiState.update { state -> state.copy(previewFileToOpen = file) }
+        _uiState.update { state ->
+            state.copy(
+                previewFileToOpen = file,
+                jobInProgressState = null,
+            )
+        }
     }
 
     /**
@@ -827,12 +832,23 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             ?.let { notFinishedSlowGroups ->
                 //as this is responding an user action, usually only one group at a time, but
                 alreadySlowNotifiedGroups.addAll(notFinishedSlowGroups.map { it.groupId })
-                notFinishedSlowGroups.first().singleTransferTag?.let { tag ->
-                    viewModelScope.launch {
-                        getTransferByTagUseCase(tag)?.let { transfer ->
-                            _uiState.updateEventAndClearProgress(
-                                SlowDownloadPreviewInProgress(transfer.uniqueId)
-                            )
+                notFinishedSlowGroups.first().let { group ->
+                    group.singleTransferTag?.let { tag ->
+                        viewModelScope.launch {
+                            getTransferByTagUseCase(tag)?.let { transfer ->
+                                _uiState.updateEventAndClearProgress(
+                                    SlowDownloadPreviewInProgress(
+                                        transferUniqueId = transfer.uniqueId,
+                                        transferPath = transfer.localPath
+                                    )
+                                )
+                            } ?: run {
+                                File(group.destination + group.singleFileName).let {
+                                    if (it.exists()) {
+                                        previewFile(it)
+                                    }
+                                }
+                            }
                         }
                     }
                 }

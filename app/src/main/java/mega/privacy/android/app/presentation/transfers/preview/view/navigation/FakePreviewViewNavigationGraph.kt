@@ -6,17 +6,23 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 
+internal const val transferPathArg = "transferPath"
 internal const val transferUniqueIdArg = "transferUniqueId"
 internal const val transferTagToCancelArg = "transferTagToCancel"
 internal const val fakePreviewNavigationRoutePattern =
-    "fakePreview/?transferUniqueIdArg={$transferUniqueIdArg}?transferTagToCancel={$transferTagToCancelArg}"
+    "fakePreview/?transferPathArg={$transferPathArg}" +
+            "?transferUniqueIdArg={$transferUniqueIdArg}" +
+            "?transferTagToCancel={$transferTagToCancelArg}"
 
-internal fun fakePreviewNavigationRoutePattern(transferUniqueId: Long?, transferTagToCancel: Int?) =
-    "fakePreview/?transferUniqueIdArg=$transferUniqueId?transferTagToCancel=$transferTagToCancel"
+internal fun fakePreviewNavigationRoutePattern(
+    transferPath: String?,
+    transferUniqueId: Long?,
+    transferTagToCancel: Int?,
+) = "fakePreview/?transferPathArg=$transferPath" +
+        "?transferUniqueIdArg=$transferUniqueId" +
+        "?transferTagToCancel=$transferTagToCancel"
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.fakePreviewViewNavigationGraph(
     navHostController: NavHostController,
     scaffoldState: ScaffoldState,
@@ -37,19 +43,27 @@ internal fun NavGraphBuilder.fakePreviewViewNavigationGraph(
 }
 
 internal fun NavHostController.navigateToFakePreviewViewGraph(
+    transferPath: String? = null,
     transferUniqueId: Long? = null,
     transferTagToCancel: Int? = null,
     navOptions: NavOptions? = null,
 ) {
-    navigate(fakePreviewNavigationRoutePattern(transferUniqueId, transferTagToCancel), navOptions)
+    navigate(
+        fakePreviewNavigationRoutePattern(transferPath, transferUniqueId, transferTagToCancel),
+        navOptions
+    )
 }
 
-internal class FakePreviewArgs(val transferUniqueId: Long?, val transferTagToCancel: Int?) {
-    constructor(savedStateHandle: SavedStateHandle) :
-            this(
-                transferUniqueId = savedStateHandle.get<String>(transferUniqueIdArg)
-                    ?.toLongOrNull()?.takeUnless { it == -1L },
-                transferTagToCancel = savedStateHandle.get<String>(transferTagToCancelArg)
-                    ?.toIntOrNull().takeUnless { it == -1 }
-            )
+internal class FakePreviewArgs(
+    val transferPath: String?,
+    val transferUniqueId: Long?,
+    val transferTagToCancel: Int?,
+) {
+    constructor(savedStateHandle: SavedStateHandle) : this(
+        transferPath = savedStateHandle.get<String>(transferPathArg),
+        transferUniqueId = savedStateHandle.get<String>(transferUniqueIdArg)
+            ?.toLongOrNull()?.takeUnless { it == -1L },
+        transferTagToCancel = savedStateHandle.get<String>(transferTagToCancelArg)
+            ?.toIntOrNull().takeUnless { it == -1 }
+    )
 }

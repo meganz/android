@@ -53,9 +53,9 @@ import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
 import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewActivity
-import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_ERROR
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_FILE_PATH
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_TRANSFER_UNIQUE_ID
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
@@ -372,10 +372,8 @@ private fun StartTransferComponent(
                 is StartTransferEvent.SlowDownloadPreviewInProgress -> {
                     fakePreviewLauncher.launch(
                         Intent(context, FakePreviewActivity::class.java).also {
-                            it.putExtra(
-                                FakePreviewFragment.EXTRA_TRANSFER_UNIQUE_ID,
-                                event.transferUniqueId,
-                            )
+                            it.putExtra(EXTRA_TRANSFER_UNIQUE_ID, event.transferUniqueId)
+                            it.putExtra(EXTRA_FILE_PATH, event.transferPath)
                         }
                     )
                 }

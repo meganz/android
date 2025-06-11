@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCas
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.previews.BroadcastTransferTagToCancelUseCase
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -73,8 +74,21 @@ class FakePreviewViewModel @Inject constructor(
                         )
                     }
                 } ?: run {
-                    Timber.e("Transfer not found")
-                    _uiState.update { state -> state.copy(error = TransferNotFoundException()) }
+                    fakePreviewArgs.transferPath?.let { path ->
+                        if (File(path).exists()) {
+                            _uiState.update { state ->
+                                state.copy(
+                                    progress = Progress(1f),
+                                    previewFilePathToOpen = path,
+                                )
+                            }
+                        } else {
+                            null
+                        }
+                    } ?: run {
+                        Timber.e("Transfer not found")
+                        _uiState.update { state -> state.copy(error = TransferNotFoundException()) }
+                    }
                 }
             }
         }

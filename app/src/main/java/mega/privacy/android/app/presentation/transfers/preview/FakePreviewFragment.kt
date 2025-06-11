@@ -16,10 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.components.chatsession.ChatSessionContainer
-import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
@@ -48,7 +45,6 @@ class FakePreviewFragment : Fragment() {
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
-    @OptIn(ExperimentalMaterialNavigationApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -57,56 +53,56 @@ class FakePreviewFragment : Fragment() {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
             val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            SessionContainer {
-                ChatSessionContainer {
-                    OriginalTheme(isDark = mode.isDarkMode()) {
-                        PasscodeContainer(
-                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                            content = {
-                                PsaContainer {
-                                    val navHostController = rememberNavController()
-                                    val scaffoldState = rememberScaffoldState()
-                                    val transferUniqueId =
-                                        arguments?.getLong(EXTRA_TRANSFER_UNIQUE_ID, -1)
-                                            .takeUnless { it == -1L }
-                                    val transferTagToCancel =
-                                        arguments?.getInt(EXTRA_TRANSFER_TAG, -1)
-                                            .takeUnless { it == -1 }
+            OriginalTheme(isDark = mode.isDarkMode()) {
+                PasscodeContainer(
+                    passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                    content = {
+                        PsaContainer {
+                            val navHostController = rememberNavController()
+                            val scaffoldState = rememberScaffoldState()
+                            val transferPath =
+                                arguments?.getString(EXTRA_FILE_PATH)
+                                    .takeUnless { it.isNullOrEmpty() }
+                            val transferUniqueId =
+                                arguments?.getLong(EXTRA_TRANSFER_UNIQUE_ID, -1)
+                                    .takeUnless { it == -1L }
+                            val transferTagToCancel =
+                                arguments?.getInt(EXTRA_TRANSFER_TAG, -1)
+                                    .takeUnless { it == -1 }
 
-                                    NavHost(
-                                        navController = navHostController,
-                                        startDestination = "start",
-                                        modifier = Modifier.navigationBarsPadding(),
-                                    ) {
-                                        composable("start") {
-                                            navHostController.navigateToFakePreviewViewGraph(
-                                                transferUniqueId = transferUniqueId,
-                                                transferTagToCancel = transferTagToCancel,
-                                                navOptions = navOptions {
-                                                    popUpTo("start") {
-                                                        inclusive = true
-                                                    }
-                                                },
-                                            )
-                                        }
-
-                                        fakePreviewViewNavigationGraph(
-                                            navHostController = navHostController,
-                                            scaffoldState = scaffoldState,
-                                            onBackPress = { requireActivity().supportFinishAfterTransition() },
-                                            navigateToStorageSettings = {
-                                                megaNavigator.openSettings(
-                                                    requireActivity(),
-                                                    StorageTargetPreference
-                                                )
-                                            },
-                                        )
-                                    }
+                            NavHost(
+                                navController = navHostController,
+                                startDestination = "start",
+                                modifier = Modifier.navigationBarsPadding(),
+                            ) {
+                                composable("start") {
+                                    navHostController.navigateToFakePreviewViewGraph(
+                                        transferPath = transferPath,
+                                        transferUniqueId = transferUniqueId,
+                                        transferTagToCancel = transferTagToCancel,
+                                        navOptions = navOptions {
+                                            popUpTo("start") {
+                                                inclusive = true
+                                            }
+                                        },
+                                    )
                                 }
+
+                                fakePreviewViewNavigationGraph(
+                                    navHostController = navHostController,
+                                    scaffoldState = scaffoldState,
+                                    onBackPress = { requireActivity().supportFinishAfterTransition() },
+                                    navigateToStorageSettings = {
+                                        megaNavigator.openSettings(
+                                            requireActivity(),
+                                            StorageTargetPreference
+                                        )
+                                    },
+                                )
                             }
-                        )
+                        }
                     }
-                }
+                )
             }
         }
     }

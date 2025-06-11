@@ -8,7 +8,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.presentation.transfers.preview.view.navigation.transferPathArg
 import mega.privacy.android.app.presentation.transfers.preview.view.navigation.transferTagToCancelArg
 import mega.privacy.android.app.presentation.transfers.preview.view.navigation.transferUniqueIdArg
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -29,12 +31,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.io.TempDir
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.io.File
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -51,6 +55,8 @@ class FakePreviewViewModelTest {
     private val broadcastTransferTagToCancelUseCase = mock<BroadcastTransferTagToCancelUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
 
+    @TempDir
+    lateinit var temporaryFolder: File
     private val transferUniqueId = 12L
     private val fileName = "test.txt"
     private val savedStateHandle = SavedStateHandle(
@@ -111,6 +117,32 @@ class FakePreviewViewModelTest {
     }
 
     @Test
+    fun `test that when transfer is not found but file is, state is updated with path`() =
+        runTest {
+            val transferPath = temporaryFolder.absolutePath + File.separator + fileName
+            val savedStateHandle = SavedStateHandle(
+                mapOf(
+                    transferUniqueIdArg to transferUniqueId.toString(),
+                    transferPathArg to transferPath,
+                )
+            )
+            val progress = Progress(1f)
+            val file = File(temporaryFolder, fileName)
+            file.createNewFile()
+
+            commonStub(transfer = null)
+
+            initTest(savedStateHandle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.progress).isEqualTo(progress)
+                assertThat(actual.previewFilePathToOpen).isEqualTo(transferPath)
+            }
+        }
+
+    @Test
     fun `test that when transfer is found, then file name and file typeRes are set but not the error`() =
         runTest {
             val extension = "txt"
@@ -134,7 +166,7 @@ class FakePreviewViewModelTest {
         }
 
     @Test
-    fun `test that when transfer is not found, then file name and file typeRes are not set but error is`() =
+    fun `test that when transfer nor file are found, then file name and file typeRes are not set but error is`() =
         runTest {
             commonStub(transfer = null)
 

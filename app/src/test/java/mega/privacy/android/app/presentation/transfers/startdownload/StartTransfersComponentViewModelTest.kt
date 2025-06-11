@@ -1417,7 +1417,9 @@ class StartTransfersComponentViewModelTest {
         underTest.previewFile(file)
 
         underTest.uiState.test {
-            assertThat(awaitItem().previewFileToOpen).isEqualTo(file)
+            val actual = awaitItem()
+            assertThat(actual.previewFileToOpen).isEqualTo(file)
+            assertThat(actual.jobInProgressState).isNull()
         }
     }
 

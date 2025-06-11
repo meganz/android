@@ -13,7 +13,9 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
+import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
@@ -200,7 +202,10 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         isOfflineDownload: Boolean,
         actionGroup: ActiveTransferTotals.ActionGroup,
     ) = if (isPreviewDownload) {
-        previewIntent(actionGroup)
+        previewIntent(
+            isLoggedIn = isLoggedIn,
+            actionGroup = actionGroup,
+        )
     } else {
         actionIntent(
             isLoggedIn = isLoggedIn,
@@ -211,6 +216,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
     }
 
     private fun previewIntent(
+        isLoggedIn: Boolean,
         actionGroup: ActiveTransferTotals.ActionGroup,
     ): Intent {
         val previewFile = actionGroup.singleFileName?.let {
@@ -232,9 +238,15 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         } else null
         return when {
             previewFile?.exists() == true && isZipFile -> {
-                Intent(context, ManagerActivity::class.java).apply {
-                    action = Constants.ACTION_EXPLORE_ZIP
-                    putExtra(Constants.EXTRA_PATH_ZIP, previewFile.absolutePath)
+                if (isLoggedIn) {
+                    Intent(context, ManagerActivity::class.java).apply {
+                        action = Constants.ACTION_EXPLORE_ZIP
+                        putExtra(EXTRA_PATH_ZIP, previewFile.absolutePath)
+                    }
+                } else {
+                    Intent(context, ZipBrowserComposeActivity::class.java).apply {
+                        putExtra(EXTRA_PATH_ZIP, previewFile.absolutePath)
+                    }
                 }
             }
 

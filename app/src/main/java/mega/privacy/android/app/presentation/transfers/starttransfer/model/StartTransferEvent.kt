@@ -52,8 +52,9 @@ sealed interface StartTransferEvent {
      * Slow download preview in progress
      *
      * @param transferUniqueId Unique transfer Id of the preview that is being processed
+     * @param transferPath Path where the preview is being downloaded
      */
-    data class SlowDownloadPreviewInProgress(val transferUniqueId: Long) :
+    data class SlowDownloadPreviewInProgress(val transferUniqueId: Long, val transferPath: String) :
         StartTransferEvent
 
     /**
