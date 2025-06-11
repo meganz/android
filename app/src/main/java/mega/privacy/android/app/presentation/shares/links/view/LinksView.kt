@@ -63,7 +63,7 @@ fun LinksView(
     if (!uiState.isLoading) {
         if (uiState.nodesList.isNotEmpty()) {
             NodesView(
-                listContentPadding = PaddingValues(top = 17.dp),
+                listContentPadding = PaddingValues(top = 16.dp, bottom = 86.dp),
                 nodeUIItems = uiState.nodesList,
                 onMenuClick = onMenuClick,
                 onItemClicked = onItemClick,

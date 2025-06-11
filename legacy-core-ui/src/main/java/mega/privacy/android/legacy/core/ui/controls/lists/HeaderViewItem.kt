@@ -1,7 +1,5 @@
 package mega.privacy.android.legacy.core.ui.controls.lists
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
@@ -10,21 +8,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 const val MEDIA_DISCOVERY_TAG = "header_view_item:image_media_discovery"
 
@@ -58,14 +57,14 @@ fun HeaderViewItem(
                     onSortOrderClick()
                 }
             ) {
-                Text(
+                MegaText(
                     style = MaterialTheme.typography.body2,
-                    color = MaterialTheme.colors.textColorPrimary,
+                    textColor = TextColor.Primary,
                     text = sortOrder
                 )
-                Image(
+                MegaIcon(
                     painter = painterResource(id = R.drawable.ic_down),
-                    colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textColorSecondary),
+                    tint = IconColor.Secondary,
                     contentDescription = "DropDown arrow",
                     modifier = Modifier.align(CenterVertically),
                 )
@@ -73,7 +72,7 @@ fun HeaderViewItem(
         }
         Spacer(modifier = Modifier.weight(1f))
         if (showMediaDiscoveryButton) {
-            Image(
+            MegaIcon(
                 modifier = Modifier
                     .align(CenterVertically)
                     .padding(end = 16.dp)
@@ -81,12 +80,12 @@ fun HeaderViewItem(
                     .clickable { onEnterMediaDiscoveryClick() }
                     .testTag(MEDIA_DISCOVERY_TAG),
                 painter = painterResource(id = iconPackR.drawable.ic_image_01_small_regular_outline),
-                colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textColorSecondary),
+                tint = IconColor.Secondary,
                 contentDescription = "Enter media discovery"
             )
         }
         if (showChangeViewType) {
-            Image(
+            MegaIcon(
                 modifier = Modifier
                     .align(CenterVertically)
                     .size(16.dp)
@@ -98,7 +97,7 @@ fun HeaderViewItem(
                 } else {
                     painterResource(id = iconPackR.drawable.ic_list_small_small_regular_outline)
                 },
-                colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textColorSecondary),
+                tint = IconColor.Secondary,
                 contentDescription = "Toggle grid list"
             )
         }

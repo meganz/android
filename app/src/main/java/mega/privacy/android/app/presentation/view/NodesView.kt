@@ -22,6 +22,7 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 
 /**
@@ -79,6 +80,7 @@ fun <T : TypedNode> NodesView(
     onEnterMediaDiscoveryClick: () -> Unit = {},
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    legacyBackgroundColor: Boolean = true,
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val orientation = LocalConfiguration.current.orientation
@@ -97,7 +99,10 @@ fun <T : TypedNode> NodesView(
     }
     if (isListView) {
         NodeListView(
-            modifier = modifier.background(MaterialTheme.colors.background),
+            modifier = modifier
+                .conditional(legacyBackgroundColor) {
+                    background(MaterialTheme.colors.background)
+                },
             listContentPadding = listContentPadding,
             nodeUIItemList = nodeUIItems,
             onMenuClick = onMenuClick,

@@ -89,7 +89,7 @@ fun <T : TypedNode> NodeGridView(
                 }
             ) {
                 HeaderViewItem(
-                    modifier = modifier.padding(bottom = 4.dp),
+                    modifier = modifier.padding(bottom = 12.dp),
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,

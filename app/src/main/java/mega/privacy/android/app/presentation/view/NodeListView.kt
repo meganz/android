@@ -94,7 +94,7 @@ fun <T : TypedNode> NodeListView(
                 key = "header"
             ) {
                 HeaderViewItem(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,

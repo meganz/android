@@ -1,9 +1,8 @@
 package mega.privacy.android.app.presentation.search.view
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
@@ -90,7 +89,6 @@ fun SearchComposeView(
         navigationHandles = listOf(state.rootParentHandle) + state.navigationLevel.map { it.first },
     )
     val scaffoldState = rememberScaffoldState()
-    var topBarPadding by remember { mutableStateOf(0.dp) }
     var searchQuery by rememberSaveable {
         mutableStateOf(state.searchQuery)
     }
@@ -106,8 +104,6 @@ fun SearchComposeView(
             searchQuery.takeIf { state.navigationLevel.isEmpty() }.orEmpty()
         }
     }
-
-    topBarPadding = if (state.navigationLevel.isNotEmpty()) 8.dp else 0.dp
 
     state.errorMessageId?.let {
         val errorMessage = stringResource(id = it)
@@ -143,11 +139,7 @@ fun SearchComposeView(
         },
         scaffoldState = scaffoldState,
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colors.background)
-                .padding(top = topBarPadding)
-        ) {
+        Column {
             if ((state.nodeSourceType == NodeSourceType.CLOUD_DRIVE || state.nodeSourceType == NodeSourceType.HOME) && state.navigationLevel.isEmpty()) {
                 FilterChipsView(
                     state = state,
@@ -176,12 +168,17 @@ fun SearchComposeView(
                         listState = currentListState.lazyListState,
                         gridState = currentListState.lazyGridState,
                         modifier = Modifier.padding(padding),
+                        listContentPadding = PaddingValues(
+                            top = if (state.navigationLevel.isEmpty()) 8.dp else 16.dp,
+                            bottom = 86.dp
+                        ),
                         fileTypeIconMapper = fileTypeIconMapper,
                         inSelectionMode = state.selectedNodes.isNotEmpty(),
                         shouldApplySensitiveMode = state.hiddenNodeEnabled
                                 && state.accountType?.isPaid == true
                                 && !state.isBusinessAccountExpired,
                         nodeSourceType = nodeSourceType,
+                        legacyBackgroundColor = false
                     )
                 } else {
                     LegacyMegaEmptyViewForSearch(

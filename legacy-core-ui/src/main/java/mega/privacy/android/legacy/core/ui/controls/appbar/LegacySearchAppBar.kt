@@ -215,6 +215,7 @@ fun ExpandedSearchAppBar(
     isHideAfterSearch: Boolean = false,
     windowInsets: WindowInsets = WindowInsets.statusBars,
     overwriteText: Boolean = false,
+    transparentBackground: Boolean = false,
 ) {
     var textFieldValue by remember(text.takeIf { overwriteText } ?: Unit) {
         mutableStateOf(
@@ -227,7 +228,7 @@ fun ExpandedSearchAppBar(
             .windowInsetsPadding(windowInsets)
             .height(56.dp),
         elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp,
-        color = MaterialTheme.colors.surface
+        color = if (transparentBackground) Color.Transparent else MaterialTheme.colors.surface
     ) {
         val initialLaunch = rememberSaveable { mutableStateOf(true) }
         val keyboardVisibleInPreviousConfiguration by keyboardAsState()
@@ -238,7 +239,7 @@ fun ExpandedSearchAppBar(
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 5.dp, end = 5.dp)
+                .padding(start = 4.dp, end = 4.dp)
                 .focusRequester(focusRequester)
                 .testTag(SEARCH_TOOLBAR_TEXT_VIEW_TEST_TAG),
             value = textFieldValue,
@@ -257,7 +258,10 @@ fun ExpandedSearchAppBar(
                     color = iconColor
                 )
             },
-            textStyle = TextStyle(fontSize = MaterialTheme.typography.subtitle1.fontSize),
+            textStyle = TextStyle(
+                fontSize = MaterialTheme.typography.subtitle1.fontSize,
+                color = MaterialTheme.colors.onPrimary
+            ),
             singleLine = true,
             leadingIcon = {
                 IconButton(
@@ -268,7 +272,7 @@ fun ExpandedSearchAppBar(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                        imageVector = ImageVector.vectorResource(mega.privacy.android.core.R.drawable.ic_back),
                         contentDescription = "Search Icon",
                         tint = iconColor
                     )

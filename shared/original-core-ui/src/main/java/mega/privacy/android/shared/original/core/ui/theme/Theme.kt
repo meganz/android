@@ -41,6 +41,7 @@ internal fun OriginalThemeForPreviews(
 @Composable
 fun OriginalTheme(
     isDark: Boolean,
+    useLegacyStatusBarColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val legacyColors = if (isDark) {
@@ -50,7 +51,7 @@ fun OriginalTheme(
     }
     AndroidTheme(
         isDark = isDark,
-        useLegacyStatusBarColor = false,
+        useLegacyStatusBarColor = useLegacyStatusBarColor,
     ) {
         //we need to keep `MaterialTheme` for now as not all the components are migrated to our Design System.
         MaterialTheme(

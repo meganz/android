@@ -232,7 +232,10 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             val navHostController = rememberNavController(bottomSheetNavigator)
             val coroutineScope = rememberCoroutineScope()
             SessionContainer {
-                OriginalTheme(isDark = themeMode.isDarkMode()) {
+                OriginalTheme(
+                    isDark = themeMode.isDarkMode(),
+                    useLegacyStatusBarColor = true
+                ) {
                     MegaScaffold(
                         modifier = Modifier
                             .fillMaxSize()

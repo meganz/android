@@ -115,7 +115,7 @@ fun IncomingSharesView(
                     onDisputeTakeDownClicked = { },
                     showMediaDiscoveryButton = false,
                     onEnterMediaDiscoveryClick = { },
-                    listContentPadding = PaddingValues(top = 18.dp),
+                    listContentPadding = PaddingValues(top = 16.dp, bottom = 86.dp),
                     fileTypeIconMapper = fileTypeIconMapper,
                     isContactVerificationOn = uiState.isContactVerificationOn,
                     inSelectionMode = uiState.isInSelection
