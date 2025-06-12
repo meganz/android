@@ -499,11 +499,7 @@ class SettingsViewModelTest {
             onBlocking { invoke(any()) }.thenReturn(isEnabled)
         }
         advanceUntilIdle()
-        underTest.uiState.map { it.cookiePolicyLink }
-            .distinctUntilChanged()
-            .test {
-                assertThat(awaitItem()).isEqualTo(expected)
-            }
+        assertThat(underTest.getCookiePolicyLink()).isEqualTo(expected)
     }
 
     private fun provideCookiePolicyLinkParameters(): Stream<Arguments> {

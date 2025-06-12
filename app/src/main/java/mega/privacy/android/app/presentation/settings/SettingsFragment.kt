@@ -174,7 +174,6 @@ class SettingsFragment :
 
                         isChecked = state.showHiddenItems
                     }
-                    cookiePolicyLink = state.cookiePolicyLink
                 }
             }
         }
@@ -347,18 +346,11 @@ class SettingsFragment :
             }
 
             KEY_CANCEL_ACCOUNT -> deleteAccountClicked()
-            KEY_ABOUT_COOKIE_POLICY -> {
-                if (cookiePolicyLink == null) {
-                    view?.let {
-                        Snackbar.make(
-                            it,
-                            R.string.general_something_went_wrong_error,
-                            Snackbar.LENGTH_SHORT
-                        ).show()
-                    }
-                } else {
-                    context.launchUrl(cookiePolicyLink)
+            KEY_ABOUT_COOKIE_POLICY -> viewLifecycleOwner.lifecycleScope.launch {
+                if (cookiePolicyLink.isNullOrEmpty()) {
+                    cookiePolicyLink = viewModel.getCookiePolicyLink()
                 }
+                context.launchUrl(cookiePolicyLink)
             }
 
             KEY_COOKIE_SETTINGS -> startActivity(

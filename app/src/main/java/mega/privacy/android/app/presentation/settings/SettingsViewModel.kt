@@ -108,7 +108,6 @@ class SettingsViewModel @Inject constructor(
             accountType = "",
             passcodeLock = false,
             subFolderMediaDiscoveryChecked = true,
-            cookiePolicyLink = null,
             isHiddenNodesEnabled = null,
             showHiddenItems = false,
             accountDetail = null,
@@ -211,7 +210,6 @@ class SettingsViewModel @Inject constructor(
                 }
             }
         }
-        getCookiePolicyLink()
     }
 
     private suspend fun isHiddenNodesActive(): Boolean {
@@ -224,16 +222,14 @@ class SettingsViewModel @Inject constructor(
     /**
      * Get link for Cookie policy page
      */
-    private fun getCookiePolicyLink() = viewModelScope.launch {
-        runCatching {
-            val isAdsFeatureEnabled = getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
-            val url =
-                if (isAdsFeatureEnabled) getSessionTransferURLUseCase("cookie") else COOKIES_URI
-            state.update { it.copy(cookiePolicyLink = url) }
-        }.onFailure {
-            Timber.e("Failed to fetch session transfer URL for Cookie Policy page: ${it.message}")
-        }
-    }
+    suspend fun getCookiePolicyLink() = runCatching {
+        val isAdsFeatureEnabled = getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
+        val url =
+            if (isAdsFeatureEnabled) getSessionTransferURLUseCase("cookie") else COOKIES_URI
+        url
+    }.onFailure {
+        Timber.e("Failed to fetch session transfer URL for Cookie Policy page: ${it.message}")
+    }.getOrDefault(COOKIES_URI)
 
     private fun monitorPasscodePreference() =
         monitorPasscodeLockPreferenceUseCase().map { enabled ->
