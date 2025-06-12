@@ -210,7 +210,7 @@ internal fun PhotoViewContainer(
                 .fillMaxSize()
                 .padding(all = 1.5.dp)
 
-            ZoomLevel.Grid_5 -> modifier
+            else -> modifier
                 .fillMaxSize()
                 .padding(all = 1.dp)
         }.isSelected(isSelected)

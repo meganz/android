@@ -21,7 +21,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,6 +31,7 @@ import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
+import mega.privacy.android.app.presentation.photos.view.isDownloadPreview
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
@@ -45,6 +45,11 @@ const val DATE_FORMAT_YEAR_WITH_MONTH = "yyyy"
 const val DATE_FORMAT_MONTH = "LLLL"
 const val DATE_FORMAT_DAY = "dd"
 const val DATE_FORMAT_MONTH_WITH_DAY = "MMMM"
+
+private enum class PhotoContentType {
+    Photo,
+    Separator
+}
 
 @Composable
 fun PhotosGridView(
@@ -74,8 +79,6 @@ fun PhotosGridView(
                 && !timelineViewState.showCameraUploadsWarning
                 && timelineViewState.selectedPhotoCount == 0
     val isCameraUploadsLimitedAccess = timelineViewState.isCameraUploadsLimitedAccess
-
-    val context = LocalContext.current
     val uiPhotoList = timelineViewState.photosListItems
     val currentZoomLevel = timelineViewState.currentZoomLevel
     val potentialItems =
@@ -93,6 +96,9 @@ fun PhotosGridView(
                 userScrollEnabled = true
             }
         }
+    }
+    val isDownloadPreview = remember(configuration, currentZoomLevel) {
+        isDownloadPreview(configuration, currentZoomLevel)
     }
 
     FastScrollLazyVerticalGrid(
@@ -115,9 +121,9 @@ fun PhotosGridView(
                 dateText(
                     modificationTime = modificationTime,
                     currentZoomLevel = currentZoomLevel,
-                    locale = context.resources.configuration.locales[0],
+                    locale = configuration.locales[0],
                 )
-            } ?: ""
+            }.orEmpty()
         },
         userScrollEnabled = userScrollEnabled
     ) {
@@ -144,8 +150,13 @@ fun PhotosGridView(
 
         this.items(
             items = uiPhotoList,
-            key = {
-                it.key
+            key = { it.key },
+            contentType = {
+                if (it is PhotoListItem.PhotoGridItem) {
+                    PhotoContentType.Photo
+                } else {
+                    PhotoContentType.Separator
+                }
             },
             span = {
                 if (it is PhotoListItem.Separator)
@@ -153,7 +164,6 @@ fun PhotosGridView(
                 else GridItemSpan(1)
             },
         ) { item ->
-
             if (item is PhotoListItem.PhotoGridItem) {
                 PhotoView(
                     modifier = Modifier.animateItem(),
@@ -166,13 +176,14 @@ fun PhotosGridView(
                     onClick = onClick,
                     onLongPress = onLongPress,
                     downloadPhoto = downloadPhoto,
+                    isPreview = isDownloadPreview,
                 )
             } else if (item is PhotoListItem.Separator) {
                 Text(
                     text = dateText(
                         modificationTime = item.modificationTime,
                         currentZoomLevel = timelineViewState.currentZoomLevel,
-                        locale = context.resources.configuration.locales[0],
+                        locale = configuration.locales[0],
                     ),
                     textAlign = TextAlign.Start,
                     color = colorResource(id = R.color.grey_087_white_087),
