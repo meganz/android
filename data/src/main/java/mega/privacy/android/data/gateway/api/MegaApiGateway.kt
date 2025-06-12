@@ -20,6 +20,7 @@ import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRecentActionBucketList
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSearchFilter
+import nz.mega.sdk.MegaSearchPage
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
@@ -2290,6 +2291,7 @@ interface MegaApiGateway {
         filter: MegaSearchFilter,
         order: Int,
         megaCancelToken: MegaCancelToken,
+        megaSearchPage: MegaSearchPage? = null
     ): List<MegaNode>
 
     /**
@@ -2302,6 +2304,7 @@ interface MegaApiGateway {
         filter: MegaSearchFilter,
         order: Int,
         megaCancelToken: MegaCancelToken,
+        megaSearchPage: MegaSearchPage? = null
     ): List<MegaNode>
 
     /**

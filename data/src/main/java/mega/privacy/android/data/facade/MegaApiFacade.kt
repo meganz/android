@@ -40,6 +40,7 @@ import nz.mega.sdk.MegaRecentActionBucketListAndroid
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSearchFilter
+import nz.mega.sdk.MegaSearchPage
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaSetElementList
@@ -1131,17 +1132,25 @@ internal class MegaApiFacade @Inject constructor(
         filter: MegaSearchFilter,
         order: Int,
         megaCancelToken: MegaCancelToken,
+        megaSearchPage: MegaSearchPage?
     ): List<MegaNode> = megaApi.search(
         filter,
         order,
-        megaCancelToken
+        megaCancelToken,
+        megaSearchPage
     )
 
     override suspend fun getChildren(
         filter: MegaSearchFilter,
         order: Int,
         megaCancelToken: MegaCancelToken,
-    ): List<MegaNode> = megaApi.getChildren(filter, order, megaCancelToken, null)
+        megaSearchPage: MegaSearchPage?,
+    ): List<MegaNode> = megaApi.getChildren(
+        filter,
+        order,
+        megaCancelToken,
+        megaSearchPage
+    )
 
     override fun openShareDialog(
         megaNode: MegaNode,
@@ -1587,9 +1596,14 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.setRubbishBinAutopurgePeriod(days, listener)
     }
 
-    override suspend fun serverSideRubbishBinAutopurgeEnabled(): Boolean = megaApi.serverSideRubbishBinAutopurgeEnabled()
+    override suspend fun serverSideRubbishBinAutopurgeEnabled(): Boolean =
+        megaApi.serverSideRubbishBinAutopurgeEnabled()
 
-    override fun checkRecoveryKey(link: String, recoveryKey: String, listener: MegaRequestListenerInterface) {
+    override fun checkRecoveryKey(
+        link: String,
+        recoveryKey: String,
+        listener: MegaRequestListenerInterface,
+    ) {
         megaApi.checkRecoveryKey(link, recoveryKey, listener)
     }
 }
