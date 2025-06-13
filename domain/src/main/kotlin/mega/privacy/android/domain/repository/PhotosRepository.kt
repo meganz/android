@@ -15,6 +15,21 @@ import java.io.File
  */
 interface PhotosRepository {
     /**
+     * Loads the next page of photos from the local database.
+     *
+     * This function retrieves the next set of [Photo] items based on the current pagination state.
+     * It is intended to be called when additional photos need to be loaded (e.g. on scroll).
+     */
+    suspend fun loadNextPageOfPhotos()
+
+    /**
+     * Monitor paginated photos
+     *
+     * @return Flow of List of [Photo]
+     */
+    fun monitorPaginatedPhotos(): Flow<List<Photo>>
+
+    /**
      * Monitor photos
      */
     fun monitorPhotos(): Flow<List<Photo>>

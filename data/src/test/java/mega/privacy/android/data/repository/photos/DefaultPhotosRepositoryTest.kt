@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository.photos
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,6 +26,7 @@ import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesRetriever
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
+import mega.privacy.android.data.mapper.search.MegaSearchPageMapper
 import mega.privacy.android.data.repository.CancelTokenProvider
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -49,6 +51,7 @@ import nz.mega.sdk.MegaStringMap
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -89,6 +92,7 @@ class DefaultPhotosRepositoryTest {
     private val success = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
     private val cancelTokenProvider = mock<CancelTokenProvider>()
     private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
+    private val megaSearchPageMapper = mock<MegaSearchPageMapper>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase> {
         onBlocking { invoke() }.thenReturn(emptyFlow())
     }
@@ -323,6 +327,7 @@ class DefaultPhotosRepositoryTest {
         sensitivesRetriever = megaStringMapSensitivesRetriever,
         cancelTokenProvider = cancelTokenProvider,
         megaSearchFilterMapper = megaSearchFilterMapper,
+        megaSearchPageMapper = megaSearchPageMapper,
         monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
         uiPreferencesGateway = uiPreferencesGateway,
     )
@@ -646,4 +651,116 @@ class DefaultPhotosRepositoryTest {
             )
             assertThat(actualPhotos).isNotEmpty()
         }
+
+    @Test
+    fun `test that loadNextPageOfPhotos adds new photos to cache and emits them`() = runTest {
+        val imageNode = mock<MegaNode> {
+            on { handle }.thenReturn(-1L)
+            on { name }.thenReturn("image.jpg")
+            on { hasThumbnail() }.thenReturn(true)
+        }
+        val videoNode = mock<MegaNode> {
+            on { handle }.thenReturn(-2L)
+            on { name }.thenReturn("video.mp4")
+            on { hasThumbnail() }.thenReturn(true)
+        }
+        val imageFilter = mock<MegaSearchFilter>()
+        val videoFilter = mock<MegaSearchFilter>()
+        val token = mock<MegaCancelToken>()
+
+        whenever(
+            megaSearchFilterMapper(
+                parentHandle = null,
+                searchQuery = "",
+                searchTarget = SearchTarget.ROOT_NODES,
+                searchCategory = SearchCategory.IMAGES,
+            )
+        ).thenReturn(imageFilter)
+        whenever(
+            megaSearchFilterMapper(
+                parentHandle = null,
+                searchQuery = "",
+                searchTarget = SearchTarget.ROOT_NODES,
+                searchCategory = SearchCategory.VIDEO,
+            )
+        ).thenReturn(videoFilter)
+        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+        whenever(
+            megaApiGateway.searchWithFilter(
+                filter = eq(imageFilter),
+                order = eq(MegaApiJava.ORDER_MODIFICATION_DESC),
+                megaCancelToken = eq(token),
+                megaSearchPage = anyOrNull()
+            )
+        ).thenReturn(listOf(imageNode))
+        whenever(
+            megaApiGateway.searchWithFilter(
+                filter = eq(videoFilter),
+                order = eq(MegaApiJava.ORDER_MODIFICATION_DESC),
+                megaCancelToken = eq(token),
+                megaSearchPage = anyOrNull()
+            )
+        ).thenReturn(listOf(videoNode))
+        whenever(nodeRepository.isNodeInRubbishBin(any())).thenReturn(false)
+        initFileTypeInfoMapperReturnedValue(imageNode, videoNode)
+
+        underTest = createUnderTest(this)
+
+        underTest.loadNextPageOfPhotos()
+
+        underTest.monitorPaginatedPhotos().test {
+            val state = awaitItem()
+            assertThat(state).hasSize(2)
+            assertThat(state.map { it.name }).containsExactly("image.jpg", "video.mp4")
+        }
+    }
+
+    @Test
+    fun `test that loadNextPageOfPhotos returns empty list when no photos found`() = runTest {
+        val imageFilter = mock<MegaSearchFilter>()
+        val videoFilter = mock<MegaSearchFilter>()
+        val token = mock<MegaCancelToken>()
+
+        whenever(
+            megaSearchFilterMapper(
+                parentHandle = null,
+                searchQuery = "",
+                searchTarget = SearchTarget.ROOT_NODES,
+                searchCategory = SearchCategory.IMAGES,
+            )
+        ).thenReturn(imageFilter)
+        whenever(
+            megaSearchFilterMapper(
+                parentHandle = null,
+                searchQuery = "",
+                searchTarget = SearchTarget.ROOT_NODES,
+                searchCategory = SearchCategory.VIDEO,
+            )
+        ).thenReturn(videoFilter)
+        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+        whenever(
+            megaApiGateway.searchWithFilter(
+                filter = eq(imageFilter),
+                order = eq(MegaApiJava.ORDER_MODIFICATION_DESC),
+                megaCancelToken = eq(token),
+                megaSearchPage = anyOrNull()
+            )
+        ).thenReturn(emptyList())
+        whenever(
+            megaApiGateway.searchWithFilter(
+                filter = eq(videoFilter),
+                order = eq(MegaApiJava.ORDER_MODIFICATION_DESC),
+                megaCancelToken = eq(token),
+                megaSearchPage = anyOrNull()
+            )
+        ).thenReturn(emptyList())
+
+        underTest = createUnderTest(this)
+
+        underTest.loadNextPageOfPhotos()
+
+        underTest.monitorPaginatedPhotos().test {
+            ensureAllEventsConsumed()
+        }
+    }
 }

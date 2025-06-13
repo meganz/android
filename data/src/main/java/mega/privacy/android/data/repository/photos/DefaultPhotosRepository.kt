@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -46,6 +47,7 @@ import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesRetriever
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
+import mega.privacy.android.data.mapper.search.MegaSearchPageMapper
 import mega.privacy.android.data.repository.CancelTokenProvider
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -67,6 +69,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
@@ -78,6 +81,7 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSearchFilter
+import nz.mega.sdk.MegaSearchPage
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -110,12 +114,19 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val megaNodeMapper: MegaNodeMapper,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
+    private val megaSearchPageMapper: MegaSearchPageMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val uiPreferencesGateway: UIPreferencesGateway,
 ) : PhotosRepository {
     @Volatile
     private var isInitialized: Boolean = false
+
+    private var page = 0L
+
+    private val paginatedPhotosCache: LinkedHashMap<NodeId, Photo> = LinkedHashMap()
+
+    private val paginatedPhotosFlow: MutableStateFlow<List<Photo>?> = MutableStateFlow(null)
 
     private var thumbnailFolderPath: String? = null
 
@@ -156,6 +167,69 @@ internal class DefaultPhotosRepository @Inject constructor(
             }
         }
     }
+
+    private fun getCategoryFilter(category: SearchCategory) =
+        megaSearchFilterMapper(
+            parentHandle = null,
+            searchQuery = "",
+            searchTarget = SearchTarget.ROOT_NODES,
+            searchCategory = category,
+        )
+
+    /**
+     * TODO: Not perfect.
+     *
+     * This pagination logic still needs further improvements:
+     * 1. Managing offset shifts when new photos are added or removed
+     * 2. Handling cases where photos are deleted or moved
+     * 3. Implementing a more robust pagination mechanism
+     * 4. Stopping further fetches when no new photos are found
+     */
+    override suspend fun loadNextPageOfPhotos() {
+        withContext(ioDispatcher) {
+            Timber.d("DefaultPhotosRepository::Loading page $page, Current photos: ${paginatedPhotosCache.size}")
+            val offset = page * PHOTOS_FETCH_LIMIT
+            val searchPage = megaSearchPageMapper(offset, PHOTOS_FETCH_LIMIT)
+            var newPhotosAvailable = false
+            awaitAll(
+                async {
+                    getNodeByCategorySearch(
+                        recursive = true,
+                        filter = getCategoryFilter(SearchCategory.IMAGES),
+                        token = cancelTokenProvider.getOrCreateCancelToken(),
+                        megaSearchPage = searchPage
+                    ).mapAsync { mapMegaNodeToImage(it) }
+                },
+                async {
+                    getNodeByCategorySearch(
+                        recursive = true,
+                        filter = getCategoryFilter(SearchCategory.VIDEO),
+                        token = cancelTokenProvider.getOrCreateCancelToken(),
+                        megaSearchPage = searchPage
+                    ).mapAsync { mapMegaNodeToVideo(it) }
+                }
+            ).flatten()
+                .filterNot { NodeId(it.id) in paginatedPhotosCache.keys }
+                .forEach { photo ->
+                    paginatedPhotosCache[NodeId(photo.id)] = photo
+                    newPhotosAvailable = true
+                }
+
+            if (newPhotosAvailable) {
+                Timber.d("DefaultPhotosRepository::Updated photos count: ${paginatedPhotosCache.size}")
+                paginatedPhotosFlow
+                    .update { paginatedPhotosCache.values.toList() }
+                    .also { page++ }
+            } else {
+                Timber.d("DefaultPhotosRepository::no new photos found.")
+            }
+        }
+    }
+
+    override fun monitorPaginatedPhotos(): Flow<List<Photo>> =
+        paginatedPhotosFlow
+            .filterNotNull()
+            .flowOn(ioDispatcher)
 
     override fun monitorPhotos(): Flow<List<Photo>> {
         initialize()
@@ -508,17 +582,20 @@ internal class DefaultPhotosRepository @Inject constructor(
         recursive: Boolean,
         filter: MegaSearchFilter,
         token: MegaCancelToken,
+        megaSearchPage: MegaSearchPage? = null,
     ) = if (recursive) {
         megaApiFacade.searchWithFilter(
             filter = filter,
             order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-            megaCancelToken = token
+            megaCancelToken = token,
+            megaSearchPage = megaSearchPage
         )
     } else {
         megaApiFacade.getChildren(
             filter = filter,
             order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-            megaCancelToken = token
+            megaCancelToken = token,
+            megaSearchPage = megaSearchPage
         )
     }
 
@@ -1034,5 +1111,9 @@ internal class DefaultPhotosRepository @Inject constructor(
         imageNodesFlow.value = null
 
         appScope.launch { uiPreferencesGateway.setPhotosRecentQueries(listOf()) }
+    }
+
+    companion object {
+        private const val PHOTOS_FETCH_LIMIT = 500L
     }
 }
