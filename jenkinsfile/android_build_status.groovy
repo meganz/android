@@ -306,6 +306,24 @@ pipeline {
                                         UNIT_TEST_RESULT_LINK_MAP.put("legacy-core-ui", unitTestArchiveLink("legacy-core-ui/$buildReportPath", "unit_test_result_legacy_core_ui.zip"))
                                     }
 
+                                    try {
+                                        sh "./gradlew --no-daemon feature:payment:snowflake-components:testDebugUnitTestCoverage"
+                                    } finally {
+                                        UNIT_TEST_RESULT_LINK_MAP.put("feature/payment-snowflake-components", unitTestArchiveLink("feature/payment-snowflake-components/$buildReportPath", "unit_test_result_feature_payment_snowflake_components.zip"))
+                                    }
+
+                                    try {
+                                        sh "./gradlew --no-daemon feature:shared:snowflake-components:testDebugUnitTestCoverage"
+                                    } finally {
+                                        UNIT_TEST_RESULT_LINK_MAP.put("feature/shared-snowflake-components", unitTestArchiveLink("feature/shared-snowflake-components/$buildReportPath", "unit_test_result_feature_shared_snowflake_components.zip"))
+                                    }
+
+                                    try {
+                                        sh "./gradlew --no-daemon feature:chat:testDebugUnitTestCoverage"
+                                    } finally {
+                                        UNIT_TEST_RESULT_LINK_MAP.put("feature/chat", unitTestArchiveLink("feature/chat/$buildReportPath", "unit_test_result_feature_chat.zip"))
+                                    }
+
                                     String htmlOutput = "coverage.html"
                                     sh "./gradlew --no-daemon collectCoverage --modules \"${MODULE_LIST.join(",")}\" --html-output ${htmlOutput}"
                                     COVERAGE_SUMMARY = getHtmlReport(htmlOutput, "No coverage report found")
