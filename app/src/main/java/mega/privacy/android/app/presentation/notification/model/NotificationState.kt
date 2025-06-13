@@ -13,4 +13,5 @@ data class NotificationState(
     val notifications: List<Notification> = emptyList(),
     val promoNotifications: List<PromoNotification> = emptyList(),
     val scrollToTop: Boolean = false,
+    val isLoading: Boolean = false,
 )

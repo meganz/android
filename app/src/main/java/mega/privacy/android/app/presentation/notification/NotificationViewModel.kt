@@ -6,7 +6,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.notification.model.Notification
@@ -44,17 +46,23 @@ class NotificationViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            monitorUserAlertsUseCase().mapLatest { list ->
-                list.map { notificationMapper(it) }
-            }.collect { userAlerts ->
-                _state.update { state ->
-                    state.copy(
-                        notifications = userAlerts,
-                        promoNotifications = getPromoNotifications(),
-                        scrollToTop = areNewItemsAdded(userAlerts, state.notifications)
-                    )
+            monitorUserAlertsUseCase()
+                .mapLatest { list -> list.map { notificationMapper(it) } }
+                .onStart { _state.update { it.copy(isLoading = true) } }
+                .catch { e ->
+                    Timber.e("Failed to monitor user alerts: ${e.message}")
+                    _state.update { it.copy(isLoading = false) }
+                }.collect { userAlerts ->
+                    val promoNotifications = getPromoNotifications()
+                    _state.update { state ->
+                        state.copy(
+                            notifications = userAlerts,
+                            promoNotifications = promoNotifications,
+                            scrollToTop = areNewItemsAdded(userAlerts, state.notifications),
+                            isLoading = false
+                        )
+                    }
                 }
-            }
         }
     }
 

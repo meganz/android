@@ -126,7 +126,7 @@ class NotificationViewModelTest {
 
         initViewModel()
 
-        underTest.state.drop(1).test {
+        underTest.state.drop(2).test {
             val state = awaitItem()
             assertWithMessage("Expected returned user alerts").that(state.notifications)
                 .containsExactly(expectedNotification)
@@ -163,7 +163,7 @@ class NotificationViewModelTest {
 
         initViewModel()
 
-        underTest.state.drop(1).test {
+        underTest.state.drop(2).test {
             val (_, _, scrollToTop) = awaitItem()
             assertWithMessage("Initial scroll value should be false").that(scrollToTop).isFalse()
             val (_, _, scrollUpdate) = awaitItem()

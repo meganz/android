@@ -51,7 +51,8 @@ class NotificationViewTest {
         uiState: NotificationState,
     ) {
         composeRule.setContent {
-            NotificationView(state = uiState,
+            NotificationView(
+                state = uiState,
                 onNotificationClick = {},
                 onPromoNotificationClick = {},
                 onNotificationsLoaded = {})
@@ -61,7 +62,7 @@ class NotificationViewTest {
     @Test
     fun `test that no notifications displays empty view`() {
         setupRule(NotificationState(notifications = emptyList(), promoNotifications = emptyList()))
-        composeRule.onNodeWithTag("NotificationEmptyView").assertIsDisplayed()
+        composeRule.onNodeWithTag(NOTIFICATION_EMPTY_VIEW_TEST_TAG).assertIsDisplayed()
     }
 
     @Test
@@ -72,7 +73,7 @@ class NotificationViewTest {
                 promoNotifications = listOf(promoNotification)
             )
         )
-        composeRule.onNodeWithTag("NotificationListView").assertIsDisplayed()
+        composeRule.onNodeWithTag(NOTIFICATION_LIST_VIEW_TEST_TAG).assertIsDisplayed()
     }
 
     @Test
@@ -112,5 +113,29 @@ class NotificationViewTest {
             )
         )
         composeRule.onNodeWithTag(NOTIFICATION_GREEN_ICON_TEST_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that loading view is displayed when isLoading is true`() {
+        setupRule(
+            NotificationState(
+                notifications = emptyList(),
+                promoNotifications = emptyList(),
+                isLoading = true
+            )
+        )
+        composeRule.onNodeWithTag(NOTIFICATION_LOADING_VIEW_TEST_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that loading view is not displayed when isLoading is false`() {
+        setupRule(
+            NotificationState(
+                notifications = emptyList(),
+                promoNotifications = emptyList(),
+                isLoading = false
+            )
+        )
+        composeRule.onNodeWithTag(NOTIFICATION_LOADING_VIEW_TEST_TAG).assertDoesNotExist()
     }
 }
