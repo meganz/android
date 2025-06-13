@@ -100,6 +100,7 @@ import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusPro
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
+import mega.privacy.android.domain.usecase.transfers.ResumeTransfersForNotLoggedInInstanceUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShouldBePausedUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.mobile.analytics.event.AccountRegistrationEvent
@@ -161,6 +162,7 @@ class LoginViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val shouldShowUpgradeAccountUseCase: ShouldShowUpgradeAccountUseCase,
     private val ephemeralCredentialManager: EphemeralCredentialManager,
+    private val resumeTransfersForNotLoggedInInstanceUseCase: ResumeTransfersForNotLoggedInInstanceUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -252,6 +254,8 @@ class LoginViewModel @Inject constructor(
             merge(
                 flow { emit(getSessionUseCase()) }.map { session ->
                     { state: LoginState ->
+                        resumeTransfersForNotLoggedInInstance(session)
+
                         state.copy(
                             intentState = LoginIntentState.ReadyForInitialSetup,
                             accountSession = state.accountSession?.copy(session = session)
@@ -338,6 +342,15 @@ class LoginViewModel @Inject constructor(
                 .collectLatest {
                     if (it.type == AccountBlockedType.VERIFICATION_EMAIL) resetLoginState() else stopLogin()
                 }
+        }
+    }
+
+    private fun resumeTransfersForNotLoggedInInstance(session: String?) {
+        if (session == null) {
+            viewModelScope.launch {
+                runCatching { resumeTransfersForNotLoggedInInstanceUseCase() }
+                    .onFailure { Timber.e(it) }
+            }
         }
     }
 

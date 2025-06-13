@@ -80,6 +80,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
@@ -1911,4 +1912,14 @@ class DefaultTransfersRepositoryTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that resumeTransfersForNotLoggedInInstance invokes megaApi method`() = runTest {
+        whenever(megaApiGateway.resumeTransfersForNotLoggedInInstance()) doReturn Unit
+
+        underTest.resumeTransfersForNotLoggedInInstance()
+
+        verify(megaApiGateway).resumeTransfersForNotLoggedInInstance()
+        verifyNoMoreInteractions(megaApiGateway)
+    }
 }

@@ -3809,4 +3809,21 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun checkRecoveryKey(link: String, recoveryKey: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Resume incomplete transfers started while not logged in
+     *
+     * This method resumes transfers that were cached while using a non-logged-in MegaApi
+     * instance
+     *
+     * This method can be called when the app detects that there is no session to resume.
+     * If a valid session exists, the app should proceed with resuming it, and calling
+     * this method will have no effect.
+     *
+     * @note If there are transfers in progress and the app logs in,
+     * any incomplete transfers will be aborted immediately.
+     *
+     * Please avoid calling this method when logged in.
+     */
+    suspend fun resumeTransfersForNotLoggedInInstance()
 }

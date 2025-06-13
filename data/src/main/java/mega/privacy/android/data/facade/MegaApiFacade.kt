@@ -1606,4 +1606,8 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.checkRecoveryKey(link, recoveryKey, listener)
     }
+
+    override suspend fun resumeTransfersForNotLoggedInInstance() {
+        megaApi.resumeTransfersForNotLoggedInInstance()
+    }
 }

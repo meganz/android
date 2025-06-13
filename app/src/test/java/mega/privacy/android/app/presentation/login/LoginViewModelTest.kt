@@ -73,6 +73,7 @@ import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusPro
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
+import mega.privacy.android.domain.usecase.transfers.ResumeTransfersForNotLoggedInInstanceUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShouldBePausedUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.AfterEach
@@ -154,6 +155,8 @@ internal class LoginViewModelTest {
         mock<ShouldShowNotificationReminderUseCase>()
     private val shouldShowUpgradeAccountUseCase = mock<ShouldShowUpgradeAccountUseCase>()
     private val ephemeralCredentialManager = mock<EphemeralCredentialManager>()
+    private val resumeTransfersForNotLoggedInInstanceUseCase =
+        mock<ResumeTransfersForNotLoggedInInstanceUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -206,7 +209,8 @@ internal class LoginViewModelTest {
             savedStateHandle = savedStateHandle,
             shouldShowNotificationReminderUseCase = shouldShowNotificationReminderUseCase,
             shouldShowUpgradeAccountUseCase = shouldShowUpgradeAccountUseCase,
-            ephemeralCredentialManager = ephemeralCredentialManager
+            ephemeralCredentialManager = ephemeralCredentialManager,
+            resumeTransfersForNotLoggedInInstanceUseCase = resumeTransfersForNotLoggedInInstanceUseCase,
         )
     }
 
@@ -239,7 +243,8 @@ internal class LoginViewModelTest {
             setLoggedOutFromAnotherLocationUseCase,
             savedStateHandle,
             shouldShowNotificationReminderUseCase,
-            shouldShowUpgradeAccountUseCase
+            shouldShowUpgradeAccountUseCase,
+            resumeTransfersForNotLoggedInInstanceUseCase,
         )
     }
 
@@ -651,6 +656,27 @@ internal class LoginViewModelTest {
             assertThat(item.shouldShowUpgradeAccount).isEqualTo(value)
         }
     }
+
+    @Test
+    fun `test that resumeTransfersForNotLoggedInInstanceUseCase is invoked when there is no session`() =
+        runTest {
+            whenever(getSessionUseCase()) doReturn null
+            stubCommon()
+
+            advanceUntilIdle()
+
+            verify(resumeTransfersForNotLoggedInInstanceUseCase).invoke()
+        }
+
+    @Test
+    fun `test that resumeTransfersForNotLoggedInInstanceUseCase is not invoked when there is session`() =
+        runTest {
+            whenever(getSessionUseCase()) doReturn "session"
+
+            advanceUntilIdle()
+
+            verifyNoInteractions(resumeTransfersForNotLoggedInInstanceUseCase)
+        }
 
     companion object {
         private val scheduler = TestCoroutineScheduler()

@@ -430,6 +430,10 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override fun monitorPausedTransfers() = monitorPausedTransfers.asStateFlow()
 
+    override suspend fun resumeTransfersForNotLoggedInInstance() = withContext(ioDispatcher) {
+        megaApiGateway.resumeTransfersForNotLoggedInInstance()
+    }
+
     override suspend fun getInProgressTransfers(): List<Transfer> = withContext(ioDispatcher) {
         val transfers = mutableListOf<Transfer>()
         megaApiGateway.getTransferData()?.let { data ->
