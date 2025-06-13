@@ -619,7 +619,7 @@ class LoginFragment : Fragment() {
             !loginActivity.intent.getStringExtra(Constants.EXTRA_CONFIRMATION).isNullOrEmpty()
                     && uiState.isAccountConfirmed
                     && uiState.accountSession?.email == uiState.temporalEmail
-        if (!isLoggedInToConfirmedAccount) {
+        if (!(isLoggedInToConfirmedAccount && uiState.shouldShowUpgradeAccount)) {
             if (getChatManagement().isPendingJoinLink()) {
                 LoginActivity.isBackFromLoginPage = false
                 getChatManagement().pendingJoinLink = null
