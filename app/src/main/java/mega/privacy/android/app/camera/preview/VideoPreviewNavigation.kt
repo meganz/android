@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
  */
 fun NavGraphBuilder.videoPreviewScreen(
     title: String,
+    buttonText: String,
     onBackPressed: () -> Unit,
     onSendVideo: (Uri) -> Unit,
 ) {
@@ -28,6 +29,7 @@ fun NavGraphBuilder.videoPreviewScreen(
         VideoPreviewScreen(
             uri = uri,
             title = title,
+            buttonText = buttonText,
             onBackPressed = onBackPressed,
             onSendVideo = onSendVideo
         )

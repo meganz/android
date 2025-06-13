@@ -36,6 +36,7 @@ import mega.privacy.android.app.databinding.SimpleVideoPlayerBinding
 internal fun VideoPreviewScreen(
     uri: Uri,
     title: String,
+    buttonText: String,
     onBackPressed: () -> Unit,
     onSendVideo: (Uri) -> Unit,
     viewModel: PreviewViewModel = hiltViewModel(),
@@ -43,6 +44,7 @@ internal fun VideoPreviewScreen(
     CameraPreviewScreen(
         uri = uri,
         title = title,
+        buttonText = buttonText,
         onBackPressed = onBackPressed,
         onSend = onSendVideo,
         viewModel = viewModel,

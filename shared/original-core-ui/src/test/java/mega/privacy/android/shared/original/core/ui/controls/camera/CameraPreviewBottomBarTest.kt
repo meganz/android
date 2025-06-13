@@ -6,7 +6,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.core.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,12 +17,12 @@ class CameraPreviewBottomBarTest {
 
     @Test
     fun `test that button is displayed`() {
+        val buttonText = "Send"
         composeTestRule.setContent {
-            CameraPreviewBottomBar(onSendVideo = {})
+            CameraPreviewBottomBar(onSendVideo = {}, buttonText = buttonText)
         }
 
         composeTestRule.onNodeWithTag(TEST_TAG_CAMERA_PREVIEW_BOTTOM_BAR_BUTTON).assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.context_send))
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(buttonText).assertIsDisplayed()
     }
 }

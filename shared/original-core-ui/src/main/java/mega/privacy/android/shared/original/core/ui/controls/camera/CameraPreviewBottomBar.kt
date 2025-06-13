@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
@@ -24,6 +23,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPrevie
  */
 @Composable
 fun CameraPreviewBottomBar(
+    buttonText: String,
     modifier: Modifier = Modifier,
     onSendVideo: () -> Unit,
 ) {
@@ -39,7 +39,7 @@ fun CameraPreviewBottomBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag(TEST_TAG_CAMERA_PREVIEW_BOTTOM_BAR_BUTTON),
-            textId = R.string.context_send,
+            text = buttonText,
             onClick = onSendVideo,
         )
     }
@@ -49,7 +49,10 @@ fun CameraPreviewBottomBar(
 @Composable
 private fun VideoPreviewBottomBarPreview() {
     OriginalThemeForPreviews {
-        CameraPreviewBottomBar(onSendVideo = {})
+        CameraPreviewBottomBar(
+            onSendVideo = {},
+            buttonText = "Send Video"
+        )
     }
 }
 

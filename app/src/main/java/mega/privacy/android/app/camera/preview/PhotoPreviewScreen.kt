@@ -14,6 +14,7 @@ import mega.privacy.android.app.camera.PreviewViewModel
 internal fun PhotoPreviewScreen(
     uri: Uri,
     title: String,
+    buttonText: String,
     onBackPressed: () -> Unit,
     onSendPhoto: (Uri) -> Unit,
     viewModel: PreviewViewModel = hiltViewModel(),
@@ -21,6 +22,7 @@ internal fun PhotoPreviewScreen(
     CameraPreviewScreen(
         uri = uri,
         title = title,
+        buttonText = buttonText,
         onBackPressed = onBackPressed,
         onSend = onSendPhoto,
         viewModel = viewModel,

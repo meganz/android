@@ -195,7 +195,12 @@ fun ChatToolbarBottomSheet(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissionsResult ->
         if (permissionsResult[Manifest.permission.CAMERA] == true) {
-            takePictureLauncher.launch(CameraArg(uiState.title.orEmpty()))
+            takePictureLauncher.launch(
+                CameraArg(
+                    title = context.getString(R.string.camera_send_to, uiState.title.orEmpty()),
+                    buttonText = context.getString(R.string.context_send)
+                )
+            )
         } else {
             onCameraPermissionDenied()
         }

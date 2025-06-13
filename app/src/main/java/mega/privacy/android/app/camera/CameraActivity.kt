@@ -1,6 +1,5 @@
 package mega.privacy.android.app.camera
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -26,6 +25,7 @@ import mega.privacy.android.app.camera.setting.navigateCameraSettingModal
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 
 @AndroidEntryPoint
 internal class CameraActivity : AppCompatActivity() {
@@ -62,11 +62,13 @@ internal class CameraActivity : AppCompatActivity() {
                     )
                     videoPreviewScreen(
                         title = args.title,
+                        buttonText = args.buttonText,
                         onBackPressed = navController::popBackStack,
                         onSendVideo = ::setResult
                     )
                     photoPreviewScreen(
                         title = args.title,
+                        buttonText = args.buttonText,
                         onBackPressed = navController::popBackStack,
                         onSendPhoto = ::setResult
                     )

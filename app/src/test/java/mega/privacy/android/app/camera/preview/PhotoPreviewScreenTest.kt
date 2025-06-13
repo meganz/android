@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.R
 import mega.privacy.android.app.camera.PreviewViewModel
 import org.junit.Rule
 import org.junit.Test
@@ -18,7 +17,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import mega.privacy.android.app.fromId
 
 @RunWith(AndroidJUnit4::class)
 class PhotoPreviewScreenTest {
@@ -45,18 +43,16 @@ class PhotoPreviewScreenTest {
     fun `test that title shows correctly`() {
         val uri = mock<Uri>()
         val title = "Title"
-        initComposeRuleContent(uri = uri, title = title)
-        composeTestRule.onNodeWithText(
-            fromId(
-                R.string.camera_send_to,
-                title
-            )
-        ).assertIsDisplayed()
+        val buttonText = "Send"
+        initComposeRuleContent(uri = uri, title = title, buttonText = buttonText)
+        composeTestRule.onNodeWithText(title).assertIsDisplayed()
+        composeTestRule.onNodeWithText(buttonText).assertIsDisplayed()
     }
 
     private fun initComposeRuleContent(
         uri: Uri,
         title: String = "",
+        buttonText: String = "",
         onBackPressed: () -> Unit = {},
         onSendPhoto: (Uri) -> Unit = {},
     ) {
@@ -67,6 +63,7 @@ class PhotoPreviewScreenTest {
                 PhotoPreviewScreen(
                     uri = uri,
                     title = title,
+                    buttonText = buttonText,
                     onBackPressed = onBackPressed,
                     onSendPhoto = onSendPhoto,
                     viewModel = previewViewModel,
