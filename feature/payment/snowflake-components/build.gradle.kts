@@ -15,7 +15,7 @@ android {
     val targetSdkVersion: Int by rootProject.extra
     testOptions {
         unitTests {
-            targetSdk = targetSdkVersion
+            targetSdk = 34
         }
     }
 }

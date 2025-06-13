@@ -19,7 +19,7 @@ class FreePlanCardTest {
     @Test
     fun `test that FreePlanCard shows all key UI elements and texts`() {
         composeRule.setContent {
-            FreePlanCard(onContinue = {})
+            FreePlanCard(storageFormatted = "20GB", isNewCreationAccount = true, onContinue = {})
         }
         composeRule.onNodeWithTag(TEST_TAG_FREE_PLAN_CARD).assertExists()
         composeRule.onNodeWithTag(TEST_TAG_FREE_PLAN_CARD_TITLE).assertExists()
@@ -29,7 +29,12 @@ class FreePlanCardTest {
             .assertExists()
         composeRule.onNodeWithText(composeRule.activity.getString(shareR.string.free_plan_card_description))
             .assertExists()
-        composeRule.onNodeWithText(composeRule.activity.getString(shareR.string.free_plan_card_storage_feature))
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(
+                shareR.string.free_plan_card_storage_feature_for_existing_user,
+                "20GB"
+            )
+        )
             .assertExists()
         composeRule.onNodeWithText(composeRule.activity.getString(shareR.string.free_plan_card_transfer_feature))
             .assertExists()

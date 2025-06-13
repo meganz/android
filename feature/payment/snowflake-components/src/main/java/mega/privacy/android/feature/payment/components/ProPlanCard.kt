@@ -42,6 +42,7 @@ fun ProPlanCard(
     price: String,
     priceUnit: String,
     billingInfo: String,
+    isCurrentPlan: Boolean = false,
     onSelected: () -> Unit = {},
 ) {
     Column(
@@ -66,13 +67,27 @@ fun ProPlanCard(
                 textColor = TextColor.Primary,
                 modifier = Modifier.testTag(TEST_TAG_PRO_PLAN_CARD_TITLE)
             )
-            if (isRecommended) {
+            if (isCurrentPlan) {
+                MegaText(
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .background(
+                            color = DSTokens.colors.notifications.notificationWarning,
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                        .testTag(TEST_TAG_PRO_PLAN_CARD_CURRENT_PLAN),
+                    text = stringResource(shareR.string.account_upgrade_account_pro_plan_info_current_plan_label),
+                    style = MaterialTheme.typography.bodySmall,
+                    textColor = TextColor.Warning
+                )
+            } else if (isRecommended) {
                 MegaText(
                     modifier = Modifier
                         .padding(start = 8.dp)
                         .background(
                             color = DSTokens.colors.notifications.notificationInfo,
-                            shape = RoundedCornerShape(6.dp)
+                            shape = RoundedCornerShape(4.dp)
                         )
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                         .testTag(TEST_TAG_PRO_PLAN_CARD_RECOMMENDED),
@@ -85,7 +100,9 @@ fun ProPlanCard(
             MegaRadioButton(
                 selected = isSelected,
                 onOptionSelected = { onSelected() },
-                modifier = Modifier.size(20.dp).testTag(TEST_TAG_PRO_PLAN_CARD_RADIO),
+                modifier = Modifier
+                    .size(20.dp)
+                    .testTag(TEST_TAG_PRO_PLAN_CARD_RADIO),
                 identifier = planName
             )
         }
@@ -129,7 +146,9 @@ fun ProPlanCard(
                             text = "/${priceUnit}",
                             style = MaterialTheme.typography.bodyMedium,
                             textColor = TextColor.Secondary,
-                            modifier = Modifier.padding(start = 2.dp, bottom = 2.dp).testTag(TEST_TAG_PRO_PLAN_CARD_PRICE_UNIT)
+                            modifier = Modifier
+                                .padding(start = 2.dp, bottom = 2.dp)
+                                .testTag(TEST_TAG_PRO_PLAN_CARD_PRICE_UNIT)
                         )
                     }
                 }
@@ -137,7 +156,9 @@ fun ProPlanCard(
                     text = billingInfo,
                     style = MaterialTheme.typography.bodySmall,
                     textColor = TextColor.Secondary,
-                    modifier = Modifier.padding(top = 2.dp).testTag(TEST_TAG_PRO_PLAN_CARD_BILLING_INFO)
+                    modifier = Modifier
+                        .padding(top = 2.dp)
+                        .testTag(TEST_TAG_PRO_PLAN_CARD_BILLING_INFO)
                 )
             }
         }
@@ -158,7 +179,8 @@ private fun ProPlanCardPreview() {
                 transfer = "96 TB transfer",
                 price = "€16.67",
                 priceUnit = "month",
-                billingInfo = "€199.99 billed yearly"
+                billingInfo = "€199.99 billed yearly",
+                isCurrentPlan = false
             )
 
             ProPlanCard(
@@ -170,7 +192,8 @@ private fun ProPlanCardPreview() {
                 transfer = "96 TB transfer",
                 price = "€16.67",
                 priceUnit = "",
-                billingInfo = "EUR per month"
+                billingInfo = "EUR per month",
+                isCurrentPlan = true
             )
         }
     }
@@ -180,35 +203,48 @@ private fun ProPlanCardPreview() {
  * Tag for the ProPlanCard root container
  */
 const val TEST_TAG_PRO_PLAN_CARD = "pro_plan_card"
+
 /**
  * Tag for the ProPlanCard title text
  */
 const val TEST_TAG_PRO_PLAN_CARD_TITLE = "pro_plan_card:title"
+
 /**
  * Tag for the ProPlanCard recommended label
  */
 const val TEST_TAG_PRO_PLAN_CARD_RECOMMENDED = "pro_plan_card:recommended"
+
 /**
  * Tag for the ProPlanCard radio button
  */
 const val TEST_TAG_PRO_PLAN_CARD_RADIO = "pro_plan_card:radio"
+
 /**
  * Tag for the ProPlanCard storage text
  */
 const val TEST_TAG_PRO_PLAN_CARD_STORAGE = "pro_plan_card:storage"
+
 /**
  * Tag for the ProPlanCard transfer text
  */
 const val TEST_TAG_PRO_PLAN_CARD_TRANSFER = "pro_plan_card:transfer"
+
 /**
  * Tag for the ProPlanCard price text
  */
 const val TEST_TAG_PRO_PLAN_CARD_PRICE = "pro_plan_card:price"
+
 /**
  * Tag for the ProPlanCard price unit text
  */
 const val TEST_TAG_PRO_PLAN_CARD_PRICE_UNIT = "pro_plan_card:price_unit"
+
 /**
  * Tag for the ProPlanCard billing info text
  */
 const val TEST_TAG_PRO_PLAN_CARD_BILLING_INFO = "pro_plan_card:billing_info"
+
+/**
+ * Tag for the ProPlanCard current plan label
+ */
+const val TEST_TAG_PRO_PLAN_CARD_CURRENT_PLAN = "pro_plan_card:current_plan"
