@@ -8,10 +8,12 @@ package mega.privacy.android.domain.entity.camerauploads
  * @property filePath File path retrieved from media store
  * @property timestamp Timestamp retrieved from media store
  *                     It corresponds to the max between the DATE_ADDED and DATE_MODIFIED attributes
+ * @property fileSize Size of the media file in bytes
  */
 data class CameraUploadsMedia(
     val mediaId: Long,
     val displayName: String,
     val filePath: String,
     val timestamp: Long,
+    val fileSize: Long,
 )

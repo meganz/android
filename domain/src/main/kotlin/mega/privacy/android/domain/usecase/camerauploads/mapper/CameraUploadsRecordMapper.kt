@@ -35,7 +35,13 @@ class CameraUploadsRecordMapper @Inject constructor(
         tempRoot: String,
     ): CameraUploadsRecord? {
         val fingerprint = getFingerprintUseCase(media.filePath) ?: return null
-        val fileSize = getFileByPathUseCase(media.filePath)?.length() ?: 0
+
+        val fileSize = if (media.fileSize == 0L) {
+            getFileByPathUseCase(media.filePath)?.length() ?: 0L
+        } else {
+            media.fileSize
+        }
+
         val extension = media.displayName.substringAfterLast('.', "")
 
         return CameraUploadsRecord(

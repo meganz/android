@@ -57,6 +57,7 @@ internal class CameraUploadsMediaFacade @Inject constructor(
         MediaStore.MediaColumns.DATE_ADDED,
         MediaStore.MediaColumns.DATE_MODIFIED,
         MediaStore.MediaColumns.DATA,
+        MediaStore.MediaColumns.SIZE
     )
 
     /**
@@ -70,7 +71,7 @@ internal class CameraUploadsMediaFacade @Inject constructor(
     private fun createMediaCursor(
         uri: Uri,
         selectionQuery: String?,
-        isVideo: Boolean
+        isVideo: Boolean,
     ): Cursor? {
         val projection = getProjection(isVideo)
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -107,12 +108,14 @@ internal class CameraUploadsMediaFacade @Inject constructor(
                     val addedDate = getLongValue(MediaStore.MediaColumns.DATE_ADDED) * 1000
                     val modifiedDate = getLongValue(MediaStore.MediaColumns.DATE_MODIFIED) * 1000
                     val timestamp = max(addedDate, modifiedDate)
+                    val fileSize = getLongValue(MediaStore.MediaColumns.SIZE)
 
                     val cameraUploadsMedia = CameraUploadsMedia(
                         mediaId = mediaId,
                         displayName = displayName,
                         filePath = filePath,
-                        timestamp = timestamp
+                        timestamp = timestamp,
+                        fileSize = fileSize
                     )
                     add(cameraUploadsMedia)
                 } while (moveToNext())
@@ -139,11 +142,11 @@ internal class CameraUploadsMediaFacade @Inject constructor(
     private fun Uri.isVideoUri() = when (this) {
         MediaStore.Images.Media.INTERNAL_CONTENT_URI,
         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-        -> false
+            -> false
 
         MediaStore.Video.Media.INTERNAL_CONTENT_URI,
         MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-        -> true
+            -> true
 
         else -> false
     }

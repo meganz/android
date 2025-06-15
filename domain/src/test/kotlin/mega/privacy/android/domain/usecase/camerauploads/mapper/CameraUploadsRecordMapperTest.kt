@@ -11,7 +11,6 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploa
 import mega.privacy.android.domain.usecase.GetDeviceCurrentNanoTimeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -51,11 +50,55 @@ internal class CameraUploadsRecordMapperTest {
     @Test
     fun `test that the camera uploads media is mapped correctly to a camera uploads media record`() =
         runTest {
+            val fileSize = 12345L
             val media = CameraUploadsMedia(
                 mediaId = 1234L,
                 displayName = "displayName.jpeg",
                 filePath = "filePath",
-                timestamp = 1L
+                timestamp = 1L,
+                fileSize = fileSize
+            )
+            val cameraUploadFolderType = mock<CameraUploadFolderType>()
+            val type = mock<CameraUploadsRecordType>()
+            val tempRoot = "tempRoot"
+
+            val fingerprint = "fingerprint"
+            whenever(getFingerprintUseCase(media.filePath)).thenReturn(fingerprint)
+            val currentNanoTime = 1111L
+            whenever(getDeviceCurrentNanoTimeUseCase()).thenReturn(currentNanoTime)
+
+            val actual = underTest(
+                media = media,
+                folderType = cameraUploadFolderType,
+                fileType = type,
+                tempRoot = tempRoot
+            )
+
+            val expected = CameraUploadsRecord(
+                mediaId = media.mediaId,
+                fileName = media.displayName,
+                filePath = media.filePath,
+                timestamp = media.timestamp,
+                folderType = cameraUploadFolderType,
+                type = type,
+                uploadStatus = CameraUploadsRecordUploadStatus.PENDING,
+                originalFingerprint = fingerprint,
+                generatedFingerprint = null,
+                tempFilePath = "$tempRoot$currentNanoTime.jpeg",
+                fileSize = fileSize
+            )
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that the camera uploads media is mapped correctly  to a camera uploads media record when media fileSize is 0`() =
+        runTest {
+            val media = CameraUploadsMedia(
+                mediaId = 1234L,
+                displayName = "displayName.jpeg",
+                filePath = "filePath",
+                timestamp = 1L,
+                fileSize = 0
             )
             val cameraUploadFolderType = mock<CameraUploadFolderType>()
             val type = mock<CameraUploadsRecordType>()
@@ -101,7 +144,8 @@ internal class CameraUploadsRecordMapperTest {
                 mediaId = 1234L,
                 displayName = "displayName.jpeg",
                 filePath = "filePath",
-                timestamp = 1L
+                timestamp = 1L,
+                fileSize = 12345L
             )
             val cameraUploadFolderType = mock<CameraUploadFolderType>()
             val type = mock<CameraUploadsRecordType>()

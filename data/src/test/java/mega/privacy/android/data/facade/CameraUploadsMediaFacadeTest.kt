@@ -52,19 +52,22 @@ class CameraUploadsMediaFacadeTest {
             val filePath = "file path"
             val addedDate = 0L
             val modifiedDate = 1L
+            val fileSize = 1000L
 
             val id2 = 5678L
             val displayName2 = "display name 2"
             val filePath2 = "file path 2"
             val addedDate2 = 2L
             val modifiedDate2 = 3L
+            val fileSize2 = 2000L
 
             val projection = arrayOf(
                 "_id",
                 "_display_name",
                 "_data",
                 "date_added",
-                "date_modified"
+                "date_modified",
+                "_size"
             )
             val mockCursor = mock<Cursor> {
                 on { getColumnIndexOrThrow(projection[0]) }.thenReturn(0)
@@ -72,12 +75,14 @@ class CameraUploadsMediaFacadeTest {
                 on { getColumnIndexOrThrow(projection[2]) }.thenReturn(2)
                 on { getColumnIndexOrThrow(projection[3]) }.thenReturn(3)
                 on { getColumnIndexOrThrow(projection[4]) }.thenReturn(4)
+                on { getColumnIndexOrThrow(projection[5]) }.thenReturn(5)
 
                 on { getLong(0) }.thenReturn(id, id2)
                 on { getString(1) }.thenReturn(displayName, displayName2)
                 on { getString(2) }.thenReturn(filePath, filePath2)
                 on { getLong(3) }.thenReturn(addedDate, addedDate2)
                 on { getLong(4) }.thenReturn(modifiedDate, modifiedDate2)
+                on { getLong(5) }.thenReturn(fileSize, fileSize2)
 
                 on { moveToFirst() }.thenReturn(true)
                 on { moveToNext() }.thenReturn(true, false)
@@ -102,12 +107,14 @@ class CameraUploadsMediaFacadeTest {
                     displayName = displayName,
                     filePath = filePath,
                     timestamp = modifiedDate * 1000,
+                    fileSize = fileSize,
                 ),
                 CameraUploadsMedia(
                     mediaId = id2,
                     displayName = displayName2,
                     filePath = filePath2,
                     timestamp = modifiedDate2 * 1000,
+                    fileSize = fileSize2,
                 )
             )
             assertThat(underTest.getMediaList(uri, selectionQuery)).isEqualTo(expected)

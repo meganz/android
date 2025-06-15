@@ -205,7 +205,17 @@ class CameraUploadsRepositoryImplTest {
         fun `test that the correct media queues are retrieved by media store file type`() =
             runTest {
                 val result =
-                    LinkedList(listOf(CameraUploadsMedia(1234L, "displayName", "filePath", 1)))
+                    LinkedList(
+                        listOf(
+                            CameraUploadsMedia(
+                                1234L,
+                                "displayName",
+                                "filePath",
+                                1,
+                                1000L
+                            )
+                        )
+                    )
 
                 whenever(
                     cameraUploadsMediaGateway.getMediaList(
