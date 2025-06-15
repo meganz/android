@@ -89,6 +89,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadFileSizeDifferenceUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
@@ -108,7 +109,6 @@ import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBack
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
-import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -142,7 +142,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
-import java.io.File
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -225,7 +224,7 @@ internal class CameraUploadsWorkerTest {
         mock()
     private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase = mock()
     private val disableCameraUploadsUseCase: DisableCameraUploadsUseCase = mock()
-    private val getFileByPathUseCase: GetFileByPathUseCase = mock()
+    private val getUploadFileSizeDifferenceUseCase: GetUploadFileSizeDifferenceUseCase = mock()
     private val loginMutex: Mutex = mock()
     private val crashReporter: CrashReporter = mock()
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
@@ -318,19 +317,18 @@ internal class CameraUploadsWorkerTest {
                 uploadCameraUploadsRecordsUseCase = uploadCameraUploadsRecordsUseCase,
                 doesCameraUploadsRecordExistsInTargetNodeUseCase = doesCameraUploadsRecordExistsInTargetNodeUseCase,
                 extractGpsCoordinatesUseCase = extractGpsCoordinatesUseCase,
-                fileSystemRepository = fileSystemRepository,
                 timeSystemRepository = timeSystemRepository,
                 initializeBackupsUseCase = initializeBackupsUseCase,
                 areCameraUploadsFoldersInRubbishBinUseCase = areCameraUploadsFoldersInRubbishBinUseCase,
                 getUploadVideoQualityUseCase = getUploadVideoQualityUseCase,
                 disableCameraUploadsUseCase = disableCameraUploadsUseCase,
-                getFileByPathUseCase = getFileByPathUseCase,
                 crashReporter = crashReporter,
                 monitorTransferEventsUseCase = monitorTransferEventsUseCase,
                 handleTransferEventUseCase = handleTransferEventUseCase,
                 correctActiveTransfersUseCase = correctActiveTransfersUseCase,
                 clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
-                checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase
+                checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
+                getUploadFileSizeDifferenceUseCase = getUploadFileSizeDifferenceUseCase
             )
         )
     }
@@ -380,6 +378,7 @@ internal class CameraUploadsWorkerTest {
         whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
             EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
         )
+        whenever(getUploadFileSizeDifferenceUseCase(any())).thenReturn(null)
     }
 
     /**
@@ -563,17 +562,14 @@ internal class CameraUploadsWorkerTest {
     fun `test that the state is updated and emitted properly when an event ToUpload, UploadInProgress TransferUpdate, and Uploaded are received`() =
         runTest {
             setupDefaultCheckConditionMocks()
+            val size = 2L // in MB
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
             val list = listOf(record)
-            val size = 2L // in MB
-            val file = mock<File> {
-                on { length() }.thenReturn(size * 1024 * 1024)
-            }
             setupDefaultProcessingFilesConditionMocks(list)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
-            whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
 
             val toUploadEvent = CameraUploadsTransferProgress.ToUpload(
                 record = record,
@@ -655,17 +651,14 @@ internal class CameraUploadsWorkerTest {
     fun `test that the worker is broadcasting quota exceeded event when an event UploadInProgress TransferTemporaryError is received with error QuotaExceededMegaException`() =
         runTest {
             setupDefaultCheckConditionMocks()
+            val size = 2L // in MB
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
             val list = listOf(record)
-            val size = 2L // in MB
-            val file = mock<File> {
-                on { length() }.thenReturn(size * 1024 * 1024)
-            }
             setupDefaultProcessingFilesConditionMocks(list)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
-            whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
 
             val transferTemporaryErrorEvent =
                 CameraUploadsTransferProgress.UploadInProgress.TransferTemporaryError(
@@ -696,17 +689,14 @@ internal class CameraUploadsWorkerTest {
     fun `test that the worker is broadcasting quota exceeded event when an event Uploaded is received with error QuotaExceededMegaException`() =
         runTest {
             setupDefaultCheckConditionMocks()
+            val size = 2L // in MB
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
             val list = listOf(record)
-            val size = 2L // in MB
-            val file = mock<File> {
-                on { length() }.thenReturn(size * 1024 * 1024)
-            }
             setupDefaultProcessingFilesConditionMocks(list)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
-            whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
 
             val uploadedEvent = CameraUploadsTransferProgress.Uploaded(
                 record = record,
@@ -740,17 +730,14 @@ internal class CameraUploadsWorkerTest {
     fun `test that the state is updated and emitted properly when an event ToCopy and Copied is received`() =
         runTest {
             setupDefaultCheckConditionMocks()
+            val size = 2L // in MB
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
             val list = listOf(record)
-            val size = 2L // in MB
-            val file = mock<File> {
-                on { length() }.thenReturn(size * 1024 * 1024)
-            }
             setupDefaultProcessingFilesConditionMocks(list)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
-            whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
 
             val toCopyEvent = CameraUploadsTransferProgress.ToCopy(
                 record = record,
@@ -805,18 +792,15 @@ internal class CameraUploadsWorkerTest {
     fun `test that the compression progress is emitted properly when an event Compressing Progress and Compressing Successful is received`() =
         runTest {
             setupDefaultCheckConditionMocks()
+            val size = 2L // in MB
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_VIDEO)
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
             val list = listOf(record)
-            val size = 2L // in MB
-            val file = mock<File> {
-                on { length() }.thenReturn(size * 1024 * 1024)
-            }
             setupDefaultProcessingFilesConditionMocks(list)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
-            whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
 
             val progress = 0.5f
             val progress2 = progress + 0.2f
@@ -866,18 +850,15 @@ internal class CameraUploadsWorkerTest {
     fun `test that the worker returns failure and an error notification is displayed when an event Compressing InsufficientStorage is received`() =
         runTest {
             setupDefaultCheckConditionMocks()
+            val size = 2L // in MB
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_VIDEO)
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
             val list = listOf(record)
-            val size = 2L // in MB
-            val file = mock<File> {
-                on { length() }.thenReturn(size * 1024 * 1024)
-            }
             setupDefaultProcessingFilesConditionMocks(list)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
-            whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
 
             val insufficientStorageEvent =
                 CameraUploadsTransferProgress.Compressing.InsufficientStorage(
@@ -912,18 +893,15 @@ internal class CameraUploadsWorkerTest {
     fun `test that an error notification is displayed when an event Compressing Cancel is received`() =
         runTest {
             setupDefaultCheckConditionMocks()
+            val size = 2L // in MB
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_VIDEO)
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
             val list = listOf(record)
-            val size = 2L // in MB
-            val file = mock<File> {
-                on { length() }.thenReturn(size * 1024 * 1024)
-            }
             setupDefaultProcessingFilesConditionMocks(list)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
-            whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
 
             val cancelEvent =
                 CameraUploadsTransferProgress.Compressing.Cancel(
@@ -951,17 +929,14 @@ internal class CameraUploadsWorkerTest {
     fun `test that the worker returns failure and an error notification is displayed when an event Error is received with error NotEnoughStorageException`() =
         runTest {
             setupDefaultCheckConditionMocks()
+            val size = 2L // in MB
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
             val list = listOf(record)
-            val size = 2L // in MB
-            val file = mock<File> {
-                on { length() }.thenReturn(size * 1024 * 1024)
-            }
             setupDefaultProcessingFilesConditionMocks(list)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
-            whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
 
             val errorEvent = CameraUploadsTransferProgress.Error(
                 record = record,
@@ -1017,23 +992,21 @@ internal class CameraUploadsWorkerTest {
     fun `test that video files are filtered out and error notification is shown if video quality is not original and video compression requirement are not met and device not charging`() =
         runTest {
             setupDefaultCheckConditionMocks()
+            val size = 2L // in MB
             val photoRecord = mock<CameraUploadsRecord> {
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_PHOTO)
                 on { filePath }.thenReturn("photoRecordPath")
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
             val videoRecord = mock<CameraUploadsRecord> {
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_VIDEO)
                 on { filePath }.thenReturn("videoRecordPath")
-            }
-            val size = 2L // in MB
-            val videoFile = mock<File> {
-                on { length() }.thenReturn(size * 1024 * 1024)
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
 
             val list = listOf(photoRecord, videoRecord)
             whenever(getPendingCameraUploadsRecordsUseCase()).thenReturn(list)
             whenever(getUploadVideoQualityUseCase()).thenReturn(VideoQuality.LOW)
-            whenever(getFileByPathUseCase(videoRecord.filePath)).thenReturn(videoFile)
             whenever(isChargingRequiredUseCase(size)).thenReturn(true)
             whenever(monitorBatteryInfoUseCase()).thenReturn(
                 flowOf(BatteryInfo(100, false))
@@ -1052,23 +1025,21 @@ internal class CameraUploadsWorkerTest {
     fun `test that video files are not filtered out if video quality is not original and video compression requirement are not met and device charging`() =
         runTest {
             setupDefaultCheckConditionMocks()
+            val size = 2L // in MB
             val photoRecord = mock<CameraUploadsRecord> {
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_PHOTO)
                 on { filePath }.thenReturn("photoRecordPath")
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
             val videoRecord = mock<CameraUploadsRecord> {
                 on { type }.thenReturn(CameraUploadsRecordType.TYPE_VIDEO)
                 on { filePath }.thenReturn("videoRecordPath")
-            }
-            val size = 2L // in MB
-            val videoFile = mock<File> {
-                on { length() }.thenReturn(size * 1024 * 1024)
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
 
             val expected = listOf(photoRecord, videoRecord)
             whenever(getPendingCameraUploadsRecordsUseCase()).thenReturn(expected)
             whenever(getUploadVideoQualityUseCase()).thenReturn(VideoQuality.LOW)
-            whenever(getFileByPathUseCase(videoRecord.filePath)).thenReturn(videoFile)
             whenever(isChargingRequiredUseCase(size)).thenReturn(true)
             whenever(monitorBatteryInfoUseCase()).thenReturn(
                 flowOf(BatteryInfo(100, true))
@@ -1668,17 +1639,14 @@ internal class CameraUploadsWorkerTest {
         runTest {
             setupDefaultCheckConditionMocks()
             val fakeFlow = MutableStateFlow(true)
+            val size = 2L // in MB
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
             val list = listOf(record)
-            val size = 2L // in MB
-            val file = mock<File> {
-                on { length() }.thenReturn(size * 1024 * 1024)
-            }
             setupDefaultProcessingFilesConditionMocks(list)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
-            whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
 
             val uploadTag = 100
             val transfer = mock<Transfer> {
@@ -1801,17 +1769,14 @@ internal class CameraUploadsWorkerTest {
         runTest {
             setupDefaultCheckConditionMocks()
             val fakeFlow = MutableStateFlow(true)
+            val size = 2L // in MB
             val record = mock<CameraUploadsRecord> {
                 on { folderType }.thenReturn(CameraUploadFolderType.Primary)
+                on { fileSize }.thenReturn(size * 1024 * 1024)
             }
             val list = listOf(record)
-            val size = 2L // in MB
-            val file = mock<File> {
-                on { length() }.thenReturn(size * 1024 * 1024)
-            }
             setupDefaultProcessingFilesConditionMocks(list)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
-            whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
 
             val uploadTag = 100
             val transfer = mock<Transfer> {

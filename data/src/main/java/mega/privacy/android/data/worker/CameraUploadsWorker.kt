@@ -80,7 +80,6 @@ import mega.privacy.android.domain.extension.collectChunked
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
@@ -97,6 +96,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadFileSizeDifferenceUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
@@ -116,7 +116,6 @@ import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBack
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
-import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -192,8 +191,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val areCameraUploadsFoldersInRubbishBinUseCase: AreCameraUploadsFoldersInRubbishBinUseCase,
     private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
     private val disableCameraUploadsUseCase: DisableCameraUploadsUseCase,
-    private val getFileByPathUseCase: GetFileByPathUseCase,
-    private val fileSystemRepository: FileSystemRepository,
+    private val getUploadFileSizeDifferenceUseCase: GetUploadFileSizeDifferenceUseCase,
     private val timeSystemRepository: TimeSystemRepository,
     private val crashReporter: CrashReporter,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
@@ -853,12 +851,54 @@ class CameraUploadsWorker @AssistedInject constructor(
                     it?.filter { record -> record.existsInTargetNode == false && record.existingNodeId != null }?.size
                 val doesNotExistInCloudDriveCount =
                     it?.filter { record -> record.existingNodeId == null }?.size
+                it?.let { records ->
+                    updateUploadTotalCount(records)
+                }
                 Timber.d("$existsInTargetNodeCount files already exist in target node")
                 Timber.d("$existsInCloudDriveCount files already exists in cloud drive")
                 Timber.d("$doesNotExistInCloudDriveCount files does not exist in target node")
                 if (it == null) Timber.d("No pending files to upload")
             }
     }
+
+    private fun updateUploadTotalCount(records: List<CameraUploadsRecord>) {
+        val primaryRecords = records.filter {
+            it.folderType == CameraUploadFolderType.Primary && it.isAvailableToUpload()
+        }
+        val secondaryRecords = records.filter {
+            it.folderType == CameraUploadFolderType.Secondary && it.isAvailableToUpload()
+        }
+
+        val primaryCount = primaryRecords.size
+        val primaryBytes = primaryRecords.sumOf { it.fileSize }
+
+        val secondaryCount = secondaryRecords.size
+        val secondaryBytes = secondaryRecords.sumOf { it.fileSize }
+
+        Timber.d("Primary Camera Uploads: $primaryCount files, $primaryBytes bytes")
+        Timber.d("Secondary Camera Uploads: $secondaryCount files, $secondaryBytes bytes")
+
+        _state.update { currentState ->
+            currentState.copy(
+                primaryCameraUploadsState = if (primaryCount > 0 || primaryBytes > 0) {
+                    currentState.primaryCameraUploadsState.copy(
+                        toUploadCount = primaryCount,
+                        bytesToUploadCount = primaryBytes
+                    )
+                } else currentState.primaryCameraUploadsState,
+
+                secondaryCameraUploadsState = if (secondaryCount > 0 || secondaryBytes > 0) {
+                    currentState.secondaryCameraUploadsState.copy(
+                        toUploadCount = secondaryCount,
+                        bytesToUploadCount = secondaryBytes
+                    )
+                } else currentState.secondaryCameraUploadsState
+            )
+        }
+    }
+
+    private fun CameraUploadsRecord.isAvailableToUpload(): Boolean =
+        existingNodeId == null || existsInTargetNode == false
 
     /**
      * Upload the [CameraUploadsRecord]
@@ -910,7 +950,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         } else {
             totalVideoSize = records
                 .filter { it.type == CameraUploadsRecordType.TYPE_VIDEO }
-                .mapNotNull { getFileByPathUseCase(it.filePath)?.length() }
+                .map { it.fileSize }
                 .sumOf { it / (1024 * 1024) } // Convert to MB
 
             if (totalVideoSize == 0L || canCompressVideo(totalVideoSize)) {
@@ -1039,15 +1079,13 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun processToUploadEvent(
         progressEvent: CameraUploadsTransferProgress.ToUpload,
     ) {
+        val bytesDifference = getUploadFileSizeDifferenceUseCase(progressEvent.record)
         updateToUploadCount(
-            filePath = progressEvent.record.tempFilePath
-                .takeIf { fileSystemRepository.doesFileExist(it) }
-                ?: progressEvent.record.filePath,
+            bytesDifference = bytesDifference,
             folderType = progressEvent.record.folderType,
             tag = progressEvent.transferEvent.transfer.tag,
         )
     }
-
 
     /**
      * Process a progress event of type [CameraUploadsTransferProgress.ToCopy]
@@ -1059,10 +1097,9 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun processToCopyEvent(
         progressEvent: CameraUploadsTransferProgress.ToCopy,
     ) {
+        val bytesDifference = getUploadFileSizeDifferenceUseCase(progressEvent.record)
         updateToUploadCount(
-            filePath = progressEvent.record.tempFilePath
-                .takeIf { fileSystemRepository.doesFileExist(it) }
-                ?: progressEvent.record.filePath,
+            bytesDifference = bytesDifference,
             folderType = progressEvent.record.folderType,
         )
     }
@@ -1079,7 +1116,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     ) {
         updateUploadedCountAfterCopy(
             folderType = progressEvent.record.folderType,
-            filePath = progressEvent.record.filePath,
+            fileSize = progressEvent.record.fileSize,
             id = progressEvent.record.mediaId,
             nodeId = progressEvent.nodeId
         )
@@ -1363,19 +1400,18 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      *  Update total to upload count
      *
-     *  @param filePath
-     *  @param folderType
+     *  @param bytesDifference the difference in bytes between the original file and the temporary file.
+     *  @param folderType [CameraUploadFolderType]
      *  @param tag the tag associated to the transfer, null if no transfer (ie. copy)
      */
     private suspend fun updateToUploadCount(
-        filePath: String,
+        bytesDifference: Long?,
         folderType: CameraUploadFolderType,
         tag: Int? = null,
     ) {
-        val bytes = getFileByPathUseCase(filePath)?.length() ?: 0
-        increaseTotalToUpload(
+        adjustBytesToUploadCount(
             cameraUploadFolderType = folderType,
-            bytesToUpload = bytes,
+            bytesDifference = bytesDifference,
             tag = tag,
         )
         displayUploadProgress()
@@ -1386,13 +1422,13 @@ class CameraUploadsWorker @AssistedInject constructor(
      *
      *  @param folderType
      *  @param id
-     *  @param filePath
+     *  @param fileSize
      *  @param nodeId
      */
     private suspend fun updateUploadedCountAfterCopy(
         folderType: CameraUploadFolderType,
         id: Long,
-        filePath: String,
+        fileSize: Long,
         nodeId: NodeId,
     ) {
         updateUploadedCount(
@@ -1400,7 +1436,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             isFinished = true,
             nodeHandle = nodeId.longValue,
             recordId = id,
-            bytesUploaded = getFileByPathUseCase(filePath)?.length() ?: 0,
+            bytesUploaded = fileSize,
         )
     }
 
@@ -1724,26 +1760,24 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     * Increase by 1 the total to upload count for the given [CameraUploadFolderType]
-     * Add the [bytesToUpload] to the total bytes to upload count
+     * Adjust the bytes to upload count for the given [CameraUploadFolderType]
      *
      * @param cameraUploadFolderType the type of the CU folder
-     * @param bytesToUpload bytes to be added to the total bytes to upload count
      * @param tag the tag associated to the transfer
      */
-    private suspend fun increaseTotalToUpload(
+    private suspend fun adjustBytesToUploadCount(
         cameraUploadFolderType: CameraUploadFolderType,
-        bytesToUpload: Long,
+        bytesDifference: Long?,
         tag: Int?,
     ) = stateUpdateMutex.withLock {
         when (cameraUploadFolderType) {
             CameraUploadFolderType.Primary -> state.value.primaryCameraUploadsState
             CameraUploadFolderType.Secondary -> state.value.secondaryCameraUploadsState
         }.let { state ->
+            val newBytes = state.bytesToUploadCount - (bytesDifference ?: 0L)
             updateState(
                 cameraUploadFolderType = cameraUploadFolderType,
-                toUploadCount = state.toUploadCount + 1,
-                bytesToUploadCount = state.bytesToUploadCount + bytesToUpload,
+                bytesToUploadCount = newBytes,
                 tag = tag
             )
         }
