@@ -51,6 +51,8 @@ import java.io.File
 import java.io.InputStream
 import kotlin.test.assertFailsWith
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Test class for [FileSystemRepositoryImpl]
@@ -593,4 +595,15 @@ internal class FileSystemRepositoryImplTest {
                     .isEqualTo(expected)
             }
         }
+
+    @Test
+    @OptIn(ExperimentalTime::class)
+    fun `test that getLastModifiedTime invokes and returs correctly`() = runTest {
+        val uriPath = UriPath("filePath")
+        val lastModifiedTime = Instant.fromEpochMilliseconds(123456789L)
+
+        whenever(fileGateway.getLastModifiedTime(uriPath)) doReturn lastModifiedTime
+
+        assertThat(underTest.getLastModifiedTime(uriPath)).isEqualTo(lastModifiedTime)
+    }
 }

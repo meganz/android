@@ -9,6 +9,8 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 import java.io.IOException
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * File System repository
@@ -549,4 +551,13 @@ interface FileSystemRepository {
      * @return The [DocumentEntity] of the file.
      */
     suspend fun getDocumentFileIfContentUri(uriString: String, fileName: String): DocumentEntity?
+
+    /**
+     * Get the last modified time of a file [UriPath]
+     *
+     * @param uriPath [UriPath] to be obtained from
+     * @return the last modified time in milliseconds since epoch, or null if the time cannot be get
+     */
+    @OptIn(ExperimentalTime::class)
+    suspend fun getLastModifiedTime(uriPath: UriPath): Instant?
 }

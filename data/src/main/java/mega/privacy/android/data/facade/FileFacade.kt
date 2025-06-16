@@ -64,10 +64,15 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.attribute.BasicFileAttributes
 import java.util.Stack
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 import kotlin.math.sqrt
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Intent extra data for node handle
@@ -1112,6 +1117,26 @@ internal class FileFacade @Inject constructor(
             if (writePermission) Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION else Intent.FLAG_GRANT_READ_URI_PERMISSION
         )
     }
+
+    @ExperimentalTime
+    override suspend fun getLastModifiedTime(uriPath: UriPath) = withContext(Dispatchers.IO) {
+        getLastModifiedTimeSync(uriPath)
+    }
+
+    @ExperimentalTime
+    override fun getLastModifiedTimeSync(uriPath: UriPath) =
+        if (uriPath.isPath()) {
+            uriPath.value.let { path ->
+                File(path).takeIf { file -> file.exists() }?.lastModified()?.takeIf { it > 0 }
+                    ?: Files.readAttributes(Paths.get(path), BasicFileAttributes::class.java)
+                        .lastModifiedTime().toMillis().takeIf { it > 0 }
+            }
+        } else {
+            uriPath.toUri().let { uri ->
+                getDocumentFileFromUri(uri)?.lastModified()?.takeIf { it > 0 }
+                    ?: getLastModifiedFromContentResolver(uri).takeIf { it > 0 }
+            }
+        }?.let { Instant.fromEpochMilliseconds(it) }
 
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"

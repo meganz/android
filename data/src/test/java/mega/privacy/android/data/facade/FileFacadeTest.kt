@@ -1,5 +1,6 @@
 package mega.privacy.android.data.facade
 
+import android.content.ContentProviderClient
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -12,6 +13,9 @@ import android.os.ParcelFileDescriptor
 import android.os.storage.StorageManager
 import android.os.storage.StorageVolume
 import android.provider.DocumentsContract
+import android.provider.MediaStore.MediaColumns.DATE_ADDED
+import android.provider.MediaStore.MediaColumns.DATE_MODIFIED
+import android.provider.MediaStore.MediaColumns.DATE_TAKEN
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.documentfile.provider.DocumentFile
@@ -47,8 +51,11 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 import java.io.File
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @ExperimentalCoroutinesApi
+@OptIn(ExperimentalTime::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class FileFacadeTest {
 
@@ -934,6 +941,155 @@ internal class FileFacadeTest {
                         Intent.FLAG_GRANT_READ_URI_PERMISSION
                     )
                 }
+            }
+        }
+
+    @Test
+    fun `test that getLastModifiedTime returns the last modified time for path from File`() =
+        runTest {
+            val fileName = "file.txt"
+            val uriPath = UriPath("${temporaryFolder.absolutePath}/$fileName")
+            val file = File(temporaryFolder, fileName)
+            file.createNewFile()
+            val expected = Instant.fromEpochMilliseconds(file.lastModified())
+
+            assertThat(underTest.getLastModifiedTime(uriPath)).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that getLastModifiedTime returns the last modified time for uri from DocumentFile`() =
+        runTest {
+            mockStatic(Uri::class.java).use {
+                val expectedTime = 123456789L
+                val expected = Instant.fromEpochMilliseconds(expectedTime)
+                val documentFile = mock<DocumentFile> {
+                    on { this.exists() } doReturn true
+                    on { lastModified() } doReturn expectedTime
+                }
+                val uri = stubGetDocumentFileFromUri(documentFile)
+                val uriPath = UriPath("content://foo")
+
+                whenever(Uri.parse(uriPath.value)) doReturn uri
+
+                assertThat(underTest.getLastModifiedTimeSync(uriPath)).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that getLastModifiedTime returns correct result for uri from content resolver and DATE_MODIFIED`() =
+        runTest {
+            mockStatic(Uri::class.java).use { _ ->
+                val expectedTime = 123456789L
+                val expected = Instant.fromEpochMilliseconds(expectedTime * 1000)
+                val documentFile = mock<DocumentFile> {
+                    on { this.exists() } doReturn true
+                    on { lastModified() } doReturn 0
+                }
+                val uri = stubGetDocumentFileFromUri(documentFile)
+                val uriPath = UriPath("content://foo")
+                val contentResolver = mock<ContentResolver>()
+                val cursor = mock<Cursor>()
+                val client = mock<ContentProviderClient>()
+                val sizeColumn = 2
+
+                whenever(Uri.parse("content://foo")).thenReturn(uri)
+                whenever(context.contentResolver) doReturn contentResolver
+                whenever(contentResolver.acquireContentProviderClient(uri)) doReturn client
+                whenever(client.query(uri, null, null, null, null)) doReturn cursor
+                whenever(cursor.moveToFirst()) doReturn true
+                whenever(cursor.getColumnIndex(DATE_MODIFIED)) doReturn sizeColumn
+                whenever(cursor.getLong(sizeColumn)) doReturn expectedTime
+
+                assertThat(underTest.getLastModifiedTimeSync(uriPath)).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that getLastModifiedTime returns correct result for uri from content resolver and DATE_ADDED`() =
+        runTest {
+            mockStatic(Uri::class.java).use { _ ->
+                val expectedTime = 123456789L
+                val expected = Instant.fromEpochMilliseconds(expectedTime * 1000)
+                val documentFile = mock<DocumentFile> {
+                    on { this.exists() } doReturn true
+                    on { lastModified() } doReturn 0
+                }
+                val uri = stubGetDocumentFileFromUri(documentFile)
+                val uriPath = UriPath("content://foo")
+                val contentResolver = mock<ContentResolver>()
+                val cursor = mock<Cursor>()
+                val client = mock<ContentProviderClient>()
+                val sizeColumn = 2
+
+                whenever(Uri.parse("content://foo")).thenReturn(uri)
+                whenever(context.contentResolver) doReturn contentResolver
+                whenever(contentResolver.acquireContentProviderClient(uri)) doReturn client
+                whenever(client.query(uri, null, null, null, null)) doReturn cursor
+                whenever(cursor.moveToFirst()) doReturn true
+                whenever(cursor.getColumnIndex(DATE_MODIFIED)) doReturn -1
+                whenever(cursor.getColumnIndex(DATE_ADDED)) doReturn sizeColumn
+                whenever(cursor.getLong(sizeColumn)) doReturn expectedTime
+
+                assertThat(underTest.getLastModifiedTimeSync(uriPath)).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that getLastModifiedTime returns correct result for uri from content resolver and DATE_TAKEN`() =
+        runTest {
+            mockStatic(Uri::class.java).use { _ ->
+                val expectedTime = 123456789L
+                val expected = Instant.fromEpochMilliseconds(expectedTime)
+                val documentFile = mock<DocumentFile> {
+                    on { this.exists() } doReturn true
+                    on { lastModified() } doReturn 0
+                }
+                val uri = stubGetDocumentFileFromUri(documentFile)
+                val uriPath = UriPath("content://foo")
+                val contentResolver = mock<ContentResolver>()
+                val cursor = mock<Cursor>()
+                val client = mock<ContentProviderClient>()
+                val sizeColumn = 2
+
+                whenever(Uri.parse("content://foo")).thenReturn(uri)
+                whenever(context.contentResolver) doReturn contentResolver
+                whenever(contentResolver.acquireContentProviderClient(uri)) doReturn client
+                whenever(client.query(uri, null, null, null, null)) doReturn cursor
+                whenever(cursor.moveToFirst()) doReturn true
+                whenever(cursor.getColumnIndex(DATE_MODIFIED)) doReturn -1
+                whenever(cursor.getColumnIndex(DATE_ADDED)) doReturn -1
+                whenever(cursor.getColumnIndex(DATE_TAKEN)) doReturn sizeColumn
+                whenever(cursor.getLong(sizeColumn)) doReturn expectedTime
+
+                assertThat(underTest.getLastModifiedTimeSync(uriPath)).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that getLastModifiedTime returns null for uri`() =
+        runTest {
+            mockStatic(Uri::class.java).use { _ ->
+                val expectedTime = 123456789L
+                val documentFile = mock<DocumentFile> {
+                    on { this.exists() } doReturn true
+                    on { lastModified() } doReturn 0
+                }
+                val uri = stubGetDocumentFileFromUri(documentFile)
+                val uriPath = UriPath("content://foo")
+                val contentResolver = mock<ContentResolver>()
+                val cursor = mock<Cursor>()
+                val client = mock<ContentProviderClient>()
+
+                whenever(Uri.parse("content://foo")).thenReturn(uri)
+                whenever(context.contentResolver) doReturn contentResolver
+                whenever(contentResolver.acquireContentProviderClient(uri)) doReturn client
+                whenever(client.query(uri, null, null, null, null)) doReturn cursor
+                whenever(cursor.moveToFirst()) doReturn true
+                whenever(cursor.getColumnIndex(DATE_MODIFIED)) doReturn -1
+                whenever(cursor.getColumnIndex(DATE_ADDED)) doReturn -1
+                whenever(cursor.getColumnIndex(DATE_TAKEN)) doReturn -1
+
+                assertThat(underTest.getLastModifiedTimeSync(uriPath)).isNull()
             }
         }
 

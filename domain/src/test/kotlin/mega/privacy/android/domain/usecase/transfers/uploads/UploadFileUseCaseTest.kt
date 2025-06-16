@@ -13,7 +13,9 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
 import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
+import mega.privacy.android.domain.usecase.file.GetLastModifiedTimeUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -30,7 +32,10 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UploadFileUseCaseTest {
 
@@ -39,14 +44,18 @@ class UploadFileUseCaseTest {
     private val transferRepository = mock<TransferRepository>()
     private val cacheRepository = mock<CacheRepository>()
     private val getGPSCoordinatesUseCase = mock<GetGPSCoordinatesUseCase>()
+    private val getLastModifiedTimeUseCase = mock<GetLastModifiedTimeUseCase>()
+    private val getCurrentTimeInMillisUseCase = mock<GetCurrentTimeInMillisUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest =
             UploadFileUseCase(
-                transferRepository,
-                cacheRepository,
-                getGPSCoordinatesUseCase,
+                transferRepository = transferRepository,
+                cacheRepository = cacheRepository,
+                getGPSCoordinatesUseCase = getGPSCoordinatesUseCase,
+                getLastModifiedTimeUseCase = getLastModifiedTimeUseCase,
+                getCurrentTimeInMillisUseCase = getCurrentTimeInMillisUseCase,
             )
     }
 
@@ -56,6 +65,8 @@ class UploadFileUseCaseTest {
             transferRepository,
             cacheRepository,
             getGPSCoordinatesUseCase,
+            getLastModifiedTimeUseCase,
+            getCurrentTimeInMillisUseCase,
         )
     }
 
@@ -69,14 +80,15 @@ class UploadFileUseCaseTest {
         ) = runTest {
             whenever(cacheRepository.isFileInCacheDirectory(File(uriPath.value))) doReturn isSourceTemporary
             whenever(getGPSCoordinatesUseCase(uriPath)) doReturn null
+            whenever(getLastModifiedTimeUseCase(uriPath)) doReturn modifiedTimeInstant
             stubStartUpload()
 
             underTest(
                 uriPath = uriPath,
-                fileName = fileName,
+                fileName = FILE_NAME,
                 appData = ordinaryAppData,
                 parentFolderId = parentFolderId,
-                isHighPriority = isHighPriority
+                isHighPriority = IS_HIGH_PRIORITY
             ).test {
                 awaitComplete()
             }
@@ -84,11 +96,43 @@ class UploadFileUseCaseTest {
             verify(transferRepository).startUpload(
                 localPath = uriPath.value,
                 parentNodeId = parentFolderId,
-                fileName = fileName,
-                modificationTime = null,
+                fileName = FILE_NAME,
+                modificationTime = MODIFIED_TIME,
                 appData = ordinaryAppData,
                 isSourceTemporary = isSourceTemporary,
-                shouldStartFirst = isHighPriority,
+                shouldStartFirst = IS_HIGH_PRIORITY,
+            )
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = [true, false])
+        fun `test that upload is started with the correct parameters when file last modified time is null`(
+            isSourceTemporary: Boolean,
+        ) = runTest {
+            whenever(cacheRepository.isFileInCacheDirectory(File(uriPath.value))) doReturn isSourceTemporary
+            whenever(getGPSCoordinatesUseCase(uriPath)) doReturn null
+            whenever(getLastModifiedTimeUseCase(uriPath)) doReturn null
+            whenever(getCurrentTimeInMillisUseCase()) doReturn MODIFIED_TIME * 1000L
+            stubStartUpload()
+
+            underTest(
+                uriPath = uriPath,
+                fileName = FILE_NAME,
+                appData = ordinaryAppData,
+                parentFolderId = parentFolderId,
+                isHighPriority = IS_HIGH_PRIORITY
+            ).test {
+                awaitComplete()
+            }
+
+            verify(transferRepository).startUpload(
+                localPath = uriPath.value,
+                parentNodeId = parentFolderId,
+                fileName = FILE_NAME,
+                modificationTime = MODIFIED_TIME,
+                appData = ordinaryAppData,
+                isSourceTemporary = isSourceTemporary,
+                shouldStartFirst = IS_HIGH_PRIORITY,
             )
         }
 
@@ -109,10 +153,10 @@ class UploadFileUseCaseTest {
 
             underTest(
                 uriPath = uriPath,
-                fileName = fileName,
+                fileName = FILE_NAME,
                 appData = ordinaryAppData,
                 parentFolderId = parentFolderId,
-                isHighPriority = isHighPriority
+                isHighPriority = IS_HIGH_PRIORITY
             ).test {
                 events.forEach {
                     assertThat(awaitItem()).isEqualTo(it)
@@ -125,16 +169,18 @@ class UploadFileUseCaseTest {
         fun `test that gps coordinates are added to app data when it is a temporary upload`() =
             runTest {
                 whenever(cacheRepository.isFileInCacheDirectory(File(uriPath.value))) doReturn true
-                whenever(getGPSCoordinatesUseCase(uriPath)) doReturn Pair(latitude, longitude)
+                whenever(getGPSCoordinatesUseCase(uriPath)) doReturn Pair(LATITUDE, LONGITUDE)
+                whenever(getLastModifiedTimeUseCase(uriPath)) doReturn modifiedTimeInstant
                 stubStartUpload()
-                val expectedAppData = ordinaryAppData + TransferAppData.Geolocation(latitude, longitude)
+                val expectedAppData =
+                    ordinaryAppData + TransferAppData.Geolocation(LATITUDE, LONGITUDE)
 
                 underTest(
                     uriPath = uriPath,
-                    fileName = fileName,
+                    fileName = FILE_NAME,
                     appData = ordinaryAppData,
                     parentFolderId = parentFolderId,
-                    isHighPriority = isHighPriority
+                    isHighPriority = IS_HIGH_PRIORITY
                 ).test {
                     awaitComplete()
                 }
@@ -142,11 +188,11 @@ class UploadFileUseCaseTest {
                 verify(transferRepository).startUpload(
                     localPath = uriPath.value,
                     parentNodeId = parentFolderId,
-                    fileName = fileName,
-                    modificationTime = null,
-                    appData = expectedAppData ,
+                    fileName = FILE_NAME,
+                    modificationTime = MODIFIED_TIME,
+                    appData = expectedAppData,
                     isSourceTemporary = true,
-                    shouldStartFirst = isHighPriority,
+                    shouldStartFirst = IS_HIGH_PRIORITY,
                 )
             }
 
@@ -175,24 +221,27 @@ class UploadFileUseCaseTest {
         ) = runTest {
             whenever(cacheRepository.isFileInCacheDirectory(File(uriPath.value))) doReturn isSourceTemporary
             whenever(getGPSCoordinatesUseCase(uriPath)) doReturn null
+            whenever(getLastModifiedTimeUseCase(uriPath)) doReturn modifiedTimeInstant
             stubStartUpload()
 
             underTest(
                 uriPath = uriPath,
-                fileName = fileName,
+                fileName = FILE_NAME,
                 appData = chatAppData,
                 parentFolderId = parentFolderId,
-                isHighPriority = isHighPriority
+                isHighPriority = IS_HIGH_PRIORITY
             ).test {
                 awaitComplete()
             }
 
-            verify(transferRepository).startUploadForChat(
+            verify(transferRepository).startUpload(
                 localPath = uriPath.value,
                 parentNodeId = parentFolderId,
-                fileName = fileName,
+                fileName = FILE_NAME,
+                modificationTime = MODIFIED_TIME,
                 appData = chatAppData,
                 isSourceTemporary = isSourceTemporary,
+                shouldStartFirst = true
             )
         }
 
@@ -213,10 +262,10 @@ class UploadFileUseCaseTest {
 
             underTest(
                 uriPath = uriPath,
-                fileName = fileName,
+                fileName = FILE_NAME,
                 appData = chatAppData,
                 parentFolderId = parentFolderId,
-                isHighPriority = isHighPriority
+                isHighPriority = IS_HIGH_PRIORITY
             ).test {
                 events.forEach {
                     assertThat(awaitItem()).isEqualTo(it)
@@ -229,36 +278,41 @@ class UploadFileUseCaseTest {
         fun `test that gps coordinates are added to app data when it is a temporary upload`() =
             runTest {
                 whenever(cacheRepository.isFileInCacheDirectory(File(uriPath.value))) doReturn true
-                whenever(getGPSCoordinatesUseCase(uriPath)) doReturn Pair(latitude, longitude)
+                whenever(getGPSCoordinatesUseCase(uriPath)) doReturn Pair(LATITUDE, LONGITUDE)
+                whenever(getLastModifiedTimeUseCase(uriPath)) doReturn modifiedTimeInstant
                 stubStartUpload()
-                val expectedAppData = chatAppData + TransferAppData.Geolocation(latitude, longitude)
+                val expectedAppData = chatAppData + TransferAppData.Geolocation(LATITUDE, LONGITUDE)
 
                 underTest(
                     uriPath = uriPath,
-                    fileName = fileName,
+                    fileName = FILE_NAME,
                     appData = chatAppData,
                     parentFolderId = parentFolderId,
-                    isHighPriority = isHighPriority
+                    isHighPriority = IS_HIGH_PRIORITY
                 ).test {
                     awaitComplete()
                 }
 
-                verify(transferRepository).startUploadForChat(
+                verify(transferRepository).startUpload(
                     localPath = uriPath.value,
                     parentNodeId = parentFolderId,
-                    fileName = fileName,
-                    appData = expectedAppData ,
+                    fileName = FILE_NAME,
+                    modificationTime = MODIFIED_TIME,
+                    appData = expectedAppData,
                     isSourceTemporary = true,
+                    shouldStartFirst = true,
                 )
             }
 
         private fun stubStartUpload(transferEventsFlow: Flow<TransferEvent> = emptyFlow()) {
             whenever(
-                transferRepository.startUploadForChat(
+                transferRepository.startUpload(
                     any(),
                     anyValueClass(),
                     any(),
+                    any(),
                     anyOrNull(),
+                    any(),
                     any(),
                 )
             ) doReturn transferEventsFlow
@@ -267,12 +321,14 @@ class UploadFileUseCaseTest {
 
     private companion object {
         val uriPath = UriPath("foo")
-        const val fileName = "newFileName.txt"
+        const val FILE_NAME = "newFileName.txt"
         val ordinaryAppData = listOf(mock<TransferGroup>())
         val chatAppData = listOf(mock<TransferAppData.ChatUpload>())
         val parentFolderId = NodeId(353L)
-        const val isHighPriority = false
-        const val latitude = 44.565
-        const val longitude = 2.5454
+        const val IS_HIGH_PRIORITY = false
+        const val LATITUDE = 44.565
+        const val LONGITUDE = 2.5454
+        const val MODIFIED_TIME = 123456L
+        val modifiedTimeInstant = Instant.fromEpochMilliseconds(MODIFIED_TIME * 1000L)
     }
 }

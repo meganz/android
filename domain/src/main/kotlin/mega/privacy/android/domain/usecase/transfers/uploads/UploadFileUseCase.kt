@@ -9,9 +9,12 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
 import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
+import mega.privacy.android.domain.usecase.file.GetLastModifiedTimeUseCase
 import java.io.File
 import javax.inject.Inject
+import kotlin.time.ExperimentalTime
 
 /**
  * Uploads a list of files to the specified destination folder and returns a Flow to monitor the progress
@@ -20,6 +23,8 @@ class UploadFileUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
     private val cacheRepository: CacheRepository,
     private val getGPSCoordinatesUseCase: GetGPSCoordinatesUseCase,
+    private val getLastModifiedTimeUseCase: GetLastModifiedTimeUseCase,
+    private val getCurrentTimeInMillisUseCase: GetCurrentTimeInMillisUseCase,
 ) {
 
     /**
@@ -33,6 +38,7 @@ class UploadFileUseCase @Inject constructor(
      *
      * @return a flow of [TransferEvent]s to monitor the download state and progress
      */
+    @OptIn(ExperimentalTime::class)
     operator fun invoke(
         uriPath: UriPath,
         fileName: String?,
@@ -40,10 +46,9 @@ class UploadFileUseCase @Inject constructor(
         parentFolderId: NodeId,
         isHighPriority: Boolean,
     ): Flow<TransferEvent> = flow {
-
         val isSourceTemporary =
             cacheRepository.isFileInCacheDirectory(File(uriPath.value))
-        val appData = buildList<TransferAppData> {
+        val finalAppData = buildList {
             appData?.let { addAll(it) }
             if (isSourceTemporary) {
                 getGPSCoordinatesUseCase(uriPath)?.let {
@@ -51,27 +56,21 @@ class UploadFileUseCase @Inject constructor(
                 }
             }
         }.takeIf { it.isNotEmpty() }
+        val shouldStartFirst = isHighPriority
+                || finalAppData?.any { it is TransferAppData.ChatUploadAppData } == true
+        val modificationTime = getLastModifiedTimeUseCase(uriPath)?.epochSeconds
+            ?: (getCurrentTimeInMillisUseCase() / 1000L)
+
         emitAll(
-            if (appData?.any { it is TransferAppData.ChatUploadAppData } == true) {
-                @Suppress("UNCHECKED_CAST")
-                transferRepository.startUploadForChat(
-                    localPath = uriPath.value,
-                    parentNodeId = parentFolderId,
-                    fileName = fileName,
-                    appData = appData,
-                    isSourceTemporary = isSourceTemporary,
-                )
-            } else {
-                transferRepository.startUpload(
-                    localPath = uriPath.value,
-                    parentNodeId = parentFolderId,
-                    fileName = fileName,
-                    modificationTime = null,
-                    appData = appData,
-                    isSourceTemporary = isSourceTemporary,
-                    shouldStartFirst = isHighPriority,
-                )
-            }
+            transferRepository.startUpload(
+                localPath = uriPath.value,
+                parentNodeId = parentFolderId,
+                fileName = fileName,
+                modificationTime = modificationTime,
+                appData = finalAppData,
+                isSourceTemporary = isSourceTemporary,
+                shouldStartFirst = shouldStartFirst,
+            )
         )
     }
 }

@@ -12,6 +12,8 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * File gateway
@@ -596,4 +598,22 @@ interface FileGateway {
      * Takes persisted permission of the given Uri, this may throw security exception if the permission has not been granted or it's outdated
      */
     fun takePersistablePermission(uri: Uri, writePermission: Boolean)
+
+    /**
+     * Get the last modified time of a file [UriPath]
+     *
+     * @param uriPath [UriPath] to be obtained from
+     * @return the last modified time in milliseconds since epoch, or null if the time cannot be get
+     */
+    @ExperimentalTime
+    suspend fun getLastModifiedTime(uriPath: UriPath): Instant?
+
+    /**
+     * Get the last modified time of a file [UriPath]
+     *
+     * @param uriPath [UriPath] to be obtained from
+     * @return the last modified time in milliseconds since epoch, or null if the time cannot be get
+     */
+    @ExperimentalTime
+    fun getLastModifiedTimeSync(uriPath: UriPath): Instant?
 }

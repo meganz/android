@@ -33,6 +33,7 @@ import java.net.URI
 import java.net.URLConnection
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.ExperimentalTime
 
 /**
 
@@ -466,4 +467,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                     )
                 }
         }
+
+    @OptIn(ExperimentalTime::class)
+    override suspend fun getLastModifiedTime(uriPath: UriPath) = withContext(ioDispatcher) {
+        fileGateway.getLastModifiedTime(uriPath)
+    }
 }
