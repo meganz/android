@@ -19,6 +19,7 @@ dependencies {
     testRuntimeOnly(testlib.junit.jupiter.engine)
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.junit5.api)
+    implementation(lib.kotlinpoet)
 }
 
 tasks.withType<Test> {

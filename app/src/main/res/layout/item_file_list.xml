@@ -123,7 +123,7 @@
             app:layout_constraintStart_toEndOf="@id/img_favourite"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:src="@drawable/ic_link01_medium_regular_outline"
+            android:src="@drawable/ic_link_01_medium_regular_solid"
             app:tint="?android:attr/textColorSecondary"
             tools:ignore="ContentDescription" />
 

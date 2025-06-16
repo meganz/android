@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.extensions
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ChatInfoAction
+import mega.privacy.android.icon.pack.R as IconPackR
 
 internal val ChatInfoAction.title: Int
     get() = when (this) {
@@ -50,7 +50,7 @@ internal val ChatInfoAction.icon: Int?
         ChatInfoAction.WaitingRoom -> R.drawable.waiting_room_ic
         ChatInfoAction.AllowNonHostAddParticipants -> R.drawable.ic_users
         ChatInfoAction.ShareFiles, ChatInfoAction.Files -> R.drawable.ic_share_files
-        ChatInfoAction.ShareMeetingLinkNonHosts -> IconPackR.drawable.ic_link01_medium_regular_outline
+        ChatInfoAction.ShareMeetingLinkNonHosts -> IconPackR.drawable.ic_link_01_medium_regular_solid
         ChatInfoAction.ManageChatHistory, ChatInfoAction.ManageMeetingHistory -> R.drawable.ic_clear_chat_history
         ChatInfoAction.EnableEncryptedKeyRotation -> null
         ChatInfoAction.EnabledEncryptedKeyRotation -> null

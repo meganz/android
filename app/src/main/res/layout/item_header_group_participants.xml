@@ -273,7 +273,7 @@
                 android:id="@+id/chat_group_contact_properties_chat_link_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_link01_medium_regular_outline"
+                android:src="@drawable/ic_link_01_medium_regular_solid"
                 app:tint="?android:attr/textColorSecondary" />
 
         </RelativeLayout>

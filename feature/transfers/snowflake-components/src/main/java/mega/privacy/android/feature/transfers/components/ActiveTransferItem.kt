@@ -23,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -38,8 +37,8 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Core component for a active transfer item.
@@ -146,13 +145,7 @@ fun ActiveTransferItem(
                 .testTag(if (isPaused) TEST_TAG_PLAY_ICON else TEST_TAG_PAUSE_ICON)
         ) {
             MegaIcon(
-                painter = painterResource(
-                    id = if (isPaused) iconPackR.drawable.ic_play_medium_regular_outline
-                    else iconPackR.drawable.ic_pause_medium_regular_outline
-                ),
-                contentDescription = if (isPaused) stringResource(id = sharedR.string.transfers_section_action_play)
-                else stringResource(id = sharedR.string.transfers_section_action_pause),
-                tint = if (areTransfersPaused) IconColor.Disabled else IconColor.Secondary,
+                painter = if (isPaused) IconPack.Medium.Regular.Outline.Play else IconPack.Medium.Regular.Outline.Pause,
             )
         }
     }

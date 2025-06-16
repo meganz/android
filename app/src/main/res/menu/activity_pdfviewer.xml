@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/pdf_viewer_get_link"
-        android:icon="@drawable/ic_link01_medium_regular_outline"
+        android:icon="@drawable/ic_link_01_medium_regular_solid"
         android:orderInCategory="115"
         android:title="@string/context_get_link"
         android:visible="true"

@@ -387,7 +387,7 @@
             <TextView
                 android:id="@+id/link_option"
                 style="@style/BottomSheetOption"
-                app:drawableStartCompat="@drawable/ic_link01_medium_regular_outline"/>
+                app:drawableStartCompat="@drawable/ic_link_01_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/remove_link_option"

@@ -1,12 +1,12 @@
 package mega.privacy.android.app.presentation.fileinfo.model
 
-import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionPlural
 import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
+import mega.privacy.android.shared.resources.R as sharedR
 
 internal sealed interface FileInfoMenuAction : MenuAction {
 
@@ -25,7 +25,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     ), FileInfoMenuAction
 
     object GetLink : MenuActionPlural(
-        IconPackR.drawable.ic_link01_medium_regular_outline,
+        IconPackR.drawable.ic_link_01_medium_regular_solid,
         sharedR.plurals.label_share_links, 1,
         TEST_TAG_GET_LINK_ACTION,
     ), FileInfoMenuAction

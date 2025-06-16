@@ -1,8 +1,5 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
-import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Typeface
@@ -73,7 +70,6 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
@@ -81,22 +77,24 @@ import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.view.AlbumListSkeletonView
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Util.dp2px
-import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.button
 import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.subtitle1
-import mega.privacy.android.shared.original.core.ui.theme.accent_050
-import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CreateAlbumDialogButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CreateAlbumFABEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
@@ -374,7 +372,7 @@ fun AlbumsView(
                                     .matchParentSize()
                             )
                             Icon(
-                                painter = painterResource(id = iconPackR.drawable.ic_link01_medium_regular_outline),
+                                painter = painterResource(id = iconPackR.drawable.ic_link_01_medium_regular_solid),
                                 contentDescription = "${(album.title as AlbumTitle.StringTitle).title} Exported",
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)

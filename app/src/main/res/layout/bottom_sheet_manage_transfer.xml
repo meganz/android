@@ -131,7 +131,7 @@
                 android:id="@+id/option_get_link"
                 style="@style/BottomSheetOption"
                 tools:text="Share Link"
-                app:drawableStartCompat="@drawable/ic_link01_medium_regular_outline" />
+                app:drawableStartCompat="@drawable/ic_link_01_medium_regular_outline" />
 
             <View
                 android:id="@+id/separator_retry"

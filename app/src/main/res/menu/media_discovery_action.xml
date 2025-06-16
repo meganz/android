@@ -11,7 +11,7 @@
 
     <item
         android:id="@+id/cab_menu_share_link"
-        android:icon="@drawable/ic_link01_medium_regular_outline"
+        android:icon="@drawable/ic_link_01_medium_regular_solid"
         android:orderInCategory="160"
         android:title="@string/context_get_link"
         app:iconTint="?attr/colorSecondary"

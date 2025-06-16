@@ -1,6 +1,5 @@
 package mega.privacy.android.legacy.core.ui.controls.lists
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -42,15 +41,16 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.legacy.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.color_button_brand
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.utils.isScreenOrientationLandscape
-import mega.privacy.android.legacy.core.ui.controls.text.MiddleEllipsisText
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import java.io.File
 
 /**
@@ -312,7 +312,7 @@ fun NodeListViewItem(
                             modifier = iconModifier
                                 .size(16.dp)
                                 .testTag(EXPORTED_TEST_TAG),
-                            painter = painterResource(id = IconPackR.drawable.ic_link01_medium_regular_outline),
+                            painter = painterResource(id = IconPackR.drawable.ic_link_01_medium_regular_solid),
                             contentDescription = "Link",
                             colorFilter = ColorFilter.tint(
                                 MaterialTheme.colors.textColorSecondary

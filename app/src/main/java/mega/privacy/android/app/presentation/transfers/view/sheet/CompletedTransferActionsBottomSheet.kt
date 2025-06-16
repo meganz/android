@@ -82,7 +82,7 @@ fun CompletedTransferActionsBottomSheet(
         }
         BottomSheetAction(
             modifier = Modifier.testTag(TEST_TAG_SHARE_LINK_ACTION),
-            iconId = iconPackR.drawable.ic_link01_medium_regular_outline,
+            iconId = iconPackR.drawable.ic_link_01_medium_regular_solid,
             name = stringResource(id = R.string.context_get_link),
             onClick = {
                 onShareLink()

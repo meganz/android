@@ -52,9 +52,6 @@ dependencies {
     implementation(lib.mega.core.ui.tokens)
     implementation(lib.kotlinx.collections.immutable)
 
-    debugImplementation(google.gson)
-    debugImplementation(lib.kotlinpoet)
-
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
 }
