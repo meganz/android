@@ -390,13 +390,15 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
         if (participant.handle == megaChatApi.myUserHandle) {
             val pos = participants.size - 1
-            participants[pos]?.fullName =
-                getString(
-                    R.string.chat_me_text_bracket,
-                    megaChatApi.myFullname
-                )
+            if (pos in participants.indices) {
+                participants[pos]?.fullName =
+                    getString(
+                        R.string.chat_me_text_bracket,
+                        megaChatApi.myFullname
+                    )
 
-            adapter?.updateParticipant(pos, participants)
+                adapter?.updateParticipant(pos, participants)
+            }
             return
         }
 
