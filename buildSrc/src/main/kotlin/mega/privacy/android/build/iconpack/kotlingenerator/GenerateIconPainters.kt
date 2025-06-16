@@ -78,7 +78,7 @@ object GenerateIconPainters {
                 for ((style, iconsInGroup) in byStyle) {
                     val styleObject = TypeSpec.objectBuilder(style)
 
-                    for (icon in iconsInGroup) {
+                    for (icon in iconsInGroup.sortedBy { it.name }) {
                         val property = PropertySpec.builder(
                             icon.name,
                             ClassName("androidx.compose.ui.graphics.painter", "Painter")
