@@ -440,7 +440,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             // Always try to start the video using the front camera
             binding.mask.visibility = View.VISIBLE
             bCameraOpen = true
-            sharedModel.setChatVideoInDevice(null)
 
             // Hide avatar when camera open
             triggerAvatar(View.GONE)
