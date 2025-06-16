@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
@@ -121,6 +122,7 @@ class NodeOptionsViewModelTest {
     private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
 
     private val isNodeSyncedUseCase = mock<IsNodeSyncedUseCase>()
+    private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -142,6 +144,7 @@ class NodeOptionsViewModelTest {
             getMyChatsFilesFolderIdUseCase = getMyChatsFilesFolderIdUseCase,
             isNodeSyncedUseCase = isNodeSyncedUseCase,
             savedStateHandle = savedStateHandle,
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase
         )
     }
 

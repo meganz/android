@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUI
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
 import mega.privacy.android.app.utils.wrapper.LegacyNodeWrapper
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
@@ -81,6 +83,7 @@ class NodeOptionsViewModel @Inject constructor(
     private val getMediaUploadsFolderHandleUseCase: GetSecondaryFolderNodeUseCase,
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
     private val isNodeSyncedUseCase: IsNodeSyncedUseCase,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -250,7 +253,9 @@ class NodeOptionsViewModel @Inject constructor(
     fun isFilePreviewOnline(node: MegaNode): Boolean =
         MimeTypeList.typeForName(node.name).let {
             it.isAudio || it.isVideoMimeType
-        }
+        } && runCatching {
+            (monitorStorageStateEventUseCase().value.storageState != StorageState.PayWall)
+        }.getOrDefault(false)
 
 
     /**
