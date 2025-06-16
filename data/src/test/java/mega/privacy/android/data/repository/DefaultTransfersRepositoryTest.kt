@@ -207,25 +207,6 @@ class DefaultTransfersRepositoryTest {
                 shouldStartFirst = false,
             )
 
-        private fun mockStartChatUpload() = megaApiGateway.startUploadForChat(
-            localPath = any(),
-            parentNode = any(),
-            fileName = anyOrNull(),
-            appData = anyOrNull(),
-            isSourceTemporary = any(),
-            listener = any(),
-        )
-
-        private fun startChatUploadFlow(appData: List<TransferAppData.ChatUploadAppData> = chatAppData) =
-            underTest.startUploadForChat(
-                localPath = "test local path",
-                parentNodeId = NodeId(1L),
-                fileName = "test filename",
-                appData = appData,
-                isSourceTemporary = false,
-            )
-
-        private val chatAppData = listOf(TransferAppData.ChatUpload(1L))
         private val appData = listOf(TransferAppData.CameraUpload)
 
         private fun mockStartDownload() = megaApiGateway.startDownload(
@@ -254,9 +235,6 @@ class DefaultTransfersRepositoryTest {
             ),
             Arguments.of(
                 { mockStartDownload() }, { startDownloadFlow() }, false
-            ),
-            Arguments.of(
-                { mockStartChatUpload() }, { startChatUploadFlow() }, true
             ),
         )
 
@@ -463,54 +441,6 @@ class DefaultTransfersRepositoryTest {
                 any()
             )
         }
-
-        @Test
-        fun `test that app data is sent to gateway when upload to chat is started`() = runTest {
-            whenever(mockStartChatUpload()).thenAnswer {
-                (it.arguments.last() as OptionalMegaTransferListenerInterface).onTransferData(
-                    api = mock(),
-                    transfer = mock(),
-                    buffer = byteArrayOf(),
-                )
-            }
-            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
-            whenever(transferEventMapper.invoke(any())).thenReturn(mock<TransferEvent.TransferDataEvent>())
-            val expected = "appData"
-            whenever(transferAppDataStringMapper.invoke(chatAppData)).thenReturn(expected)
-
-            startChatUploadFlow().test {
-                assertThat(awaitItem()).isNotNull()
-            }
-
-            verify(megaApiGateway).startUploadForChat(
-                any(),
-                any(),
-                anyOrNull(),
-                eq(expected),
-                any(),
-                any()
-            )
-        }
-
-        @Test
-        fun `test that an exception is thrown when upload to chat is started with empty app data`() =
-            runTest {
-                whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
-
-                startChatUploadFlow(emptyList()).test {
-                    awaitError()
-                }
-            }
-
-        @Test
-        fun `test that an exception is thrown when upload to chat is started and node is not found`() =
-            runTest {
-                whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(null)
-
-                startChatUploadFlow().test {
-                    awaitError()
-                }
-            }
     }
 
     @Test
