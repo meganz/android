@@ -586,7 +586,7 @@ class CreateAccountViewModelTest {
                     StateEventWithContentTriggered::class.java
                 )
                 if (item.createAccountStatusEvent is StateEventWithContentTriggered) {
-                    assertThat(item.createAccountStatusEvent.content)
+                    assertThat((item.createAccountStatusEvent as StateEventWithContentTriggered<CreateAccountStatus>).content)
                         .isInstanceOf(CreateAccountStatus.Success::class.java)
                 }
                 assertThat(item.isLoading).isFalse()
@@ -624,7 +624,7 @@ class CreateAccountViewModelTest {
                     StateEventWithContentTriggered::class.java
                 )
                 if (item.createAccountStatusEvent is StateEventWithContentTriggered) {
-                    assertThat(item.createAccountStatusEvent.content)
+                    assertThat((item.createAccountStatusEvent as StateEventWithContentTriggered<CreateAccountStatus>).content)
                         .isInstanceOf(CreateAccountStatus.UnknownError::class.java)
                 }
                 assertThat(item.isLoading).isFalse()
@@ -661,7 +661,7 @@ class CreateAccountViewModelTest {
                     StateEventWithContentTriggered::class.java
                 )
                 if (item.createAccountStatusEvent is StateEventWithContentTriggered) {
-                    assertThat(item.createAccountStatusEvent.content)
+                    assertThat((item.createAccountStatusEvent as StateEventWithContentTriggered<CreateAccountStatus>).content)
                         .isInstanceOf(CreateAccountStatus.AccountAlreadyExists::class.java)
                 }
                 assertThat(item.isLoading).isFalse()

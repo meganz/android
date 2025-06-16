@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailUiState
-import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.account.CancelCreateAccountUseCase
 import mega.privacy.android.domain.usecase.createaccount.MonitorAccountConfirmationUseCase
@@ -48,7 +47,7 @@ class ConfirmEmailViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             monitorAccountConfirmationUseCase().collectLatest {
-                _uiState.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.Login) }
+                _uiState.update { state -> state.copy(isAccountConfirmed = true) }
             }
         }
 

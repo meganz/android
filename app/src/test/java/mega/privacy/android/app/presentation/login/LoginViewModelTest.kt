@@ -82,9 +82,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -678,6 +681,59 @@ internal class LoginViewModelTest {
             verifyNoInteractions(resumeTransfersForNotLoggedInInstanceUseCase)
         }
 
+    @Test
+    fun `test that checkTemporalCredentials returns true and performs login when valid credentials exist`() =
+        runTest {
+            val email = "test@example.com"
+            val password = "password123"
+            val ephemeralCredentials = EphemeralCredentials(
+                email = email,
+                password = password,
+                session = "session",
+                firstName = "John",
+                lastName = "Doe"
+            )
+
+            whenever(ephemeralCredentialManager.getEphemeralCredential()).thenReturn(
+                ephemeralCredentials
+            )
+
+            val result = underTest.checkTemporalCredentials()
+
+            assertTrue(result)
+            advanceUntilIdle()
+            verify(loginUseCase).invoke(
+                eq(email),
+                eq(password),
+                any()
+            )
+        }
+
+    @Test
+    fun `test that checkTemporalCredentials returns false when ephemeral credentials are null`() =
+        runTest {
+            whenever(ephemeralCredentialManager.getEphemeralCredential()).thenReturn(null)
+
+            val result = underTest.checkTemporalCredentials()
+
+            assertFalse(result)
+            verifyNoInteractions(loginUseCase)
+        }
+
+    @ParameterizedTest(name = "test that checkTemporalCredentials returns false when credentials are invalid: {0}")
+    @MethodSource("provideInvalidCredentials")
+    fun `test that checkTemporalCredentials returns false when credentials are invalid`(
+        credentials: EphemeralCredentials,
+        description: String,
+    ) = runTest {
+        whenever(ephemeralCredentialManager.getEphemeralCredential()).thenReturn(credentials)
+
+        val result = underTest.checkTemporalCredentials()
+
+        assertFalse(result)
+        verifyNoInteractions(loginUseCase)
+    }
+
     companion object {
         private val scheduler = TestCoroutineScheduler()
 
@@ -688,5 +744,49 @@ internal class LoginViewModelTest {
         @JvmField
         @RegisterExtension
         val analyticsExtension = AnalyticsTestExtension()
+
+        @JvmStatic
+        fun provideInvalidCredentials() = listOf(
+            Arguments.of(
+                EphemeralCredentials(
+                    email = null,
+                    password = "password123",
+                    session = "session",
+                    firstName = "John",
+                    lastName = "Doe"
+                ),
+                "email is null"
+            ),
+            Arguments.of(
+                EphemeralCredentials(
+                    email = "",
+                    password = "password123",
+                    session = "session",
+                    firstName = "John",
+                    lastName = "Doe"
+                ),
+                "email is empty"
+            ),
+            Arguments.of(
+                EphemeralCredentials(
+                    email = "test@example.com",
+                    password = null,
+                    session = "session",
+                    firstName = "John",
+                    lastName = "Doe"
+                ),
+                "password is null"
+            ),
+            Arguments.of(
+                EphemeralCredentials(
+                    email = "test@example.com",
+                    password = "",
+                    session = "session",
+                    firstName = "John",
+                    lastName = "Doe"
+                ),
+                "password is empty"
+            )
+        )
     }
 }

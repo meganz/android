@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -19,12 +20,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.view.ConfirmEmailRoute
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -40,6 +42,7 @@ class ConfirmEmailFragment : Fragment() {
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val viewModel: ConfirmEmailViewModel by viewModels()
+    private val activityViewModel: LoginViewModel by activityViewModels()
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -58,6 +61,13 @@ class ConfirmEmailFragment : Fragment() {
                 if (uiState.isCreatingAccountCancelled) {
                     onCancelConfirmationAccount()
                     viewModel.onHandleCancelCreateAccount()
+                }
+            }
+
+            LaunchedEffect(uiState.isAccountConfirmed) {
+                if (uiState.isAccountConfirmed) {
+                    onShowPendingFragment(LoginFragmentType.Login)
+                    activityViewModel.checkTemporalCredentials()
                 }
             }
 
@@ -90,15 +100,16 @@ class ConfirmEmailFragment : Fragment() {
     }
 
     private fun onShowPendingFragment(fragmentType: LoginFragmentType) {
-        (activity as? LoginActivity)?.showFragment(fragmentType)
+        activityViewModel.setPendingFragmentToShow(fragmentType)
     }
 
     private fun onSetTemporalEmail(email: String) {
-        (activity as? LoginActivity)?.setTemporalEmail(email)
+        activityViewModel.setTemporalEmail(email)
     }
 
     private fun onCancelConfirmationAccount() {
-        (activity as? LoginActivity)?.cancelConfirmationAccount()
+        Timber.d("cancelConfirmationAccount")
+        activityViewModel.cancelCreateAccount()
     }
 
     private fun sendFeedbackEmail(email: String) {

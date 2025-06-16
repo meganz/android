@@ -488,7 +488,7 @@ class LoginViewModel @Inject constructor(
     /**
      * True if there is a not null email and a not null password, false otherwise.
      */
-    private fun checkTemporalCredentials(): Boolean {
+    fun checkTemporalCredentials(): Boolean {
         val ephemeralCredentials = ephemeralCredentialManager.getEphemeralCredential()
         return if (ephemeralCredentials != null && !ephemeralCredentials.email.isNullOrEmpty() && !ephemeralCredentials.password.isNullOrEmpty()) {
             performLogin(ephemeralCredentials.email, ephemeralCredentials.password)

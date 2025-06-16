@@ -316,35 +316,6 @@ class LoginActivity : BaseActivity() {
             .show()
     }
 
-    /**
-     * Sets the received string as temporal email.
-     *
-     * @param emailTemp The temporal email.
-     */
-    fun setTemporalEmail(emailTemp: String) {
-        viewModel.setTemporalEmail(emailTemp)
-    }
-
-    /**
-     * Cancels the account confirmation.
-     */
-    fun cancelConfirmationAccount() {
-        Timber.d("cancelConfirmationAccount")
-        viewModel.cancelCreateAccount()
-    }
-
-    /**
-     * Sets temporal data for account creation.
-     *
-     * @param email    Email.
-     */
-    fun setTemporalDataForAccountCreation(
-        email: String,
-    ) {
-        setTemporalEmail(email)
-        viewModel.setIsWaitingForConfirmAccount()
-    }
-
     fun showAccountBlockedDialog(accountBlockedDetail: AccountBlockedDetail) {
         viewModel.triggerAccountBlockedEvent(accountBlockedDetail)
     }

@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.login.model.LoginFragmentType
  * @property message The message that should be displayed to the user.
  * @property isNewRegistrationUiEnabled True if the new registration UI is enabled, false otherwise.
  * @property isCreatingAccountCancelled True if the account creation was cancelled, false otherwise.
+ * @property isAccountConfirmed True if the account has been confirmed, false otherwise.
  */
 data class ConfirmEmailUiState(
     val isLoading: Boolean = false,
@@ -25,4 +26,5 @@ data class ConfirmEmailUiState(
     val message: String? = null,
     val isNewRegistrationUiEnabled: Boolean? = null,
     val isCreatingAccountCancelled: Boolean = false,
+    val isAccountConfirmed: Boolean = false,
 )
