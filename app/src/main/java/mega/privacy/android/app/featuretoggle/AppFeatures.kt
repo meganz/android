@@ -17,6 +17,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Single activity
+     */
+    SingleActivity(
+        "Enable single activity rewrite",
+        false,
+    ),
+
+    /**
      * Achievements Free Trial Reward
      */
     AchievementsFreeTrialReward(
