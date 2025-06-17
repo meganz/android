@@ -12,6 +12,7 @@ import android.provider.Settings
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
 import javax.inject.Inject
@@ -39,16 +40,20 @@ class SyncPermissionsManager @Inject constructor(@ApplicationContext private val
     /**
      * Checks if external storage permission is granted
      */
-    fun isManageExternalStoragePermissionGranted(): Boolean = true
+    fun isManageExternalStoragePermissionGranted(): Boolean = if (isSDKAboveOrEqualToR())
+        true
+    else
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
 
     /**
      * Get manage external storage permission intent
      */
     private fun getManageExternalStoragePermissionIntent() =
         Intent(
-            if (isSDKAboveOrEqualToR())
-                Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
-            else Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS
         )
             .addCategory("android.intent.category.DEFAULT")
             .setData(Uri.parse("package:${context.packageName}"))
