@@ -13,6 +13,7 @@ import androidx.media3.common.Player
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
+import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
@@ -218,7 +219,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      */
     fun setupSpeedPlaybackButton(default: SpeedPlaybackItem?, callback: (View) -> Unit) {
         speedPlaybackButton.setOnClickListener(callback)
-        updateSpeedPlaybackIcon(default ?: SpeedPlaybackItem.PLAYBACK_SPEED_1_X)
+        updateSpeedPlaybackIcon(default ?: AudioSpeedPlaybackItem.PLAYBACK_SPEED_1_X)
     }
 
     /**
@@ -231,7 +232,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
             setImageResource(speedPlaybackItem.iconId)
             setColorFilter(
                 context.getColor(
-                    if (speedPlaybackItem != SpeedPlaybackItem.PLAYBACK_SPEED_1_X) {
+                    if (speedPlaybackItem != AudioSpeedPlaybackItem.PLAYBACK_SPEED_1_X) {
                         R.color.color_button_brand
                     } else {
                         R.color.dark_grey_white

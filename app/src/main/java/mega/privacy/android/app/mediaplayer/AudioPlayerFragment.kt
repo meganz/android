@@ -27,6 +27,7 @@ import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
@@ -54,7 +55,7 @@ class AudioPlayerFragment : Fragment() {
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
-     * MediaPlayerGateway for video player
+     * MediaPlayerGateway for audio player
      */
     @AudioPlayer
     @Inject
@@ -228,7 +229,7 @@ class AudioPlayerFragment : Fragment() {
                     }
                 }
 
-                val defaultSpeedItem = SpeedPlaybackItem.entries.find {
+                val defaultSpeedItem = AudioSpeedPlaybackItem.entries.find {
                     it == mediaPlayerGateway.getCurrentSpeedPlaybackItem()
                 }
                 viewHolder.setupSpeedPlaybackButton(
@@ -246,14 +247,15 @@ class AudioPlayerFragment : Fragment() {
     }
 
     private fun addAudioSpeedPlaybackEvent(item: SpeedPlaybackItem) {
-        Analytics.tracker.trackEvent(
-            when (item) {
-                SpeedPlaybackItem.PLAYBACK_SPEED_0_5_X -> AudioPlayerSpeedChangeHalfXEvent
-                SpeedPlaybackItem.PLAYBACK_SPEED_1_X -> AudioPlayerSpeedChange1XEvent
-                SpeedPlaybackItem.PLAYBACK_SPEED_1_5_X -> AudioPlayerSpeedChangeOneAndHalfXEvent
-                SpeedPlaybackItem.PLAYBACK_SPEED_2_X -> AudioPlayerSpeedChange2XEvent
-            }
-        )
+        when (item) {
+            AudioSpeedPlaybackItem.PLAYBACK_SPEED_0_5_X -> AudioPlayerSpeedChangeHalfXEvent
+            AudioSpeedPlaybackItem.PLAYBACK_SPEED_1_X -> AudioPlayerSpeedChange1XEvent
+            AudioSpeedPlaybackItem.PLAYBACK_SPEED_1_5_X -> AudioPlayerSpeedChangeOneAndHalfXEvent
+            AudioSpeedPlaybackItem.PLAYBACK_SPEED_2_X -> AudioPlayerSpeedChange2XEvent
+            else -> null
+        }?.let {
+            Analytics.tracker.trackEvent(it)
+        }
     }
 
     private fun setupPlayerView(
@@ -312,9 +314,9 @@ class AudioPlayerFragment : Fragment() {
     }
 
     private fun getNextSpeedPlaybackItem(speed: Float): SpeedPlaybackItem {
-        val speedPlaybackList = SpeedPlaybackItem.entries
+        val speedPlaybackList = AudioSpeedPlaybackItem.entries
         val currentIndex = speedPlaybackList.indexOfFirst { it.speed == speed }
         return speedPlaybackList.getOrNull((currentIndex + 1) % speedPlaybackList.size)
-            ?: SpeedPlaybackItem.PLAYBACK_SPEED_1_X
+            ?: AudioSpeedPlaybackItem.PLAYBACK_SPEED_1_X
     }
 }

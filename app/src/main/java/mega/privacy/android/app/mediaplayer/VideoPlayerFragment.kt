@@ -56,7 +56,7 @@ import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
-import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
+import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoOptionItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
@@ -81,6 +81,9 @@ import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LoopButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SnapshotButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SpeedOption0_5XPressedEvent
+import mega.privacy.mobile.analytics.event.SpeedOption1_5XPressedEvent
+import mega.privacy.mobile.analytics.event.SpeedOption2XPressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
@@ -689,11 +692,19 @@ class VideoPlayerFragment : Fragment() {
             setContent {
                 val state by viewModel.uiState.collectAsStateWithLifecycle()
                 SpeedSelectedPopup(
-                    items = SpeedPlaybackItem.entries,
+                    items = VideoSpeedPlaybackItem.entries,
                     isShown = state.isSpeedPopupShown,
                     currentPlaybackSpeed = state.currentSpeedPlayback,
                     onDismissRequest = { viewModel.updateIsSpeedPopupShown(false) }
                 ) { speedPlaybackItem ->
+                    when (speedPlaybackItem) {
+                        VideoSpeedPlaybackItem.PLAYBACK_SPEED_0_5_X -> SpeedOption0_5XPressedEvent
+                        VideoSpeedPlaybackItem.PLAYBACK_SPEED_1_5_X -> SpeedOption1_5XPressedEvent
+                        VideoSpeedPlaybackItem.PLAYBACK_SPEED_2_X -> SpeedOption2XPressedEvent
+                        else -> null
+                    }?.let { eventIdentifier ->
+                        Analytics.tracker.trackEvent(eventIdentifier)
+                    }
                     viewModel.updateCurrentSpeedPlaybackItem(speedPlaybackItem)
                     viewModel.updateIsSpeedPopupShown(false)
                 }

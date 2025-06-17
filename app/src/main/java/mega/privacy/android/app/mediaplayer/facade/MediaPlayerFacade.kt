@@ -40,6 +40,7 @@ import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMa
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
+import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -290,7 +291,7 @@ class MediaPlayerFacade @Inject constructor(
         player?.playWhenReady = playWhenReady
     }
 
-    override fun getPlayWhenReady(): Boolean = player?.playWhenReady ?: false
+    override fun getPlayWhenReady(): Boolean = player?.playWhenReady == true
 
     override fun mediaItemRemoved(index: Int): String? =
         player?.let { player ->
@@ -453,7 +454,7 @@ class MediaPlayerFacade @Inject constructor(
             } else {
                 false
             }
-        } ?: false
+        } == true
 
 
     override fun showSubtitle() {
@@ -485,8 +486,8 @@ class MediaPlayerFacade @Inject constructor(
     }
 
     override fun getCurrentSpeedPlaybackItem(): SpeedPlaybackItem =
-        SpeedPlaybackItem.entries.find { it.speed == player?.playbackParameters?.speed }
-            ?: SpeedPlaybackItem.PLAYBACK_SPEED_1_X
+        VideoSpeedPlaybackItem.entries.find { it.speed == player?.playbackParameters?.speed }
+            ?: VideoSpeedPlaybackItem.PLAYBACK_SPEED_1_X
 
     override fun playNext() {
         player?.seekToNext()

@@ -22,7 +22,7 @@ import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
-import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
+import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
@@ -1490,19 +1490,20 @@ class VideoPlayerViewModelTest {
 
     @ParameterizedTest(name = "when item is {0}")
     @MethodSource("provideSpeedPlaybackItem")
-    fun `test that currentSpeedPlayback is updated correctly`(item: SpeedPlaybackItem) = runTest {
-        initViewModel()
-        underTest.updateCurrentSpeedPlaybackItem(item)
-        testScheduler.advanceUntilIdle()
-        verify(mediaPlayerGateway).updatePlaybackSpeed(item)
-        underTest.uiState.test {
-            val actual = awaitItem()
-            assertThat(actual.currentSpeedPlayback.speed).isEqualTo(item.speed)
-            assertThat(actual.currentSpeedPlayback.iconId).isEqualTo(item.iconId)
+    fun `test that currentSpeedPlayback is updated correctly`(item: VideoSpeedPlaybackItem) =
+        runTest {
+            initViewModel()
+            underTest.updateCurrentSpeedPlaybackItem(item)
+            testScheduler.advanceUntilIdle()
+            verify(mediaPlayerGateway).updatePlaybackSpeed(item)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.currentSpeedPlayback.speed).isEqualTo(item.speed)
+                assertThat(actual.currentSpeedPlayback.iconId).isEqualTo(item.iconId)
+            }
         }
-    }
 
-    private fun provideSpeedPlaybackItem() = SpeedPlaybackItem.entries
+    private fun provideSpeedPlaybackItem() = VideoSpeedPlaybackItem.entries
 
     @Test
     internal fun `test that copy complete snack bar message is shown when node is copied to different directory`() =

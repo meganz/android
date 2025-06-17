@@ -26,10 +26,8 @@ import androidx.compose.ui.window.PopupProperties
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
+import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.mobile.analytics.event.SpeedOption0_5XPressedEvent
-import mega.privacy.mobile.analytics.event.SpeedOption1_5XPressedEvent
-import mega.privacy.mobile.analytics.event.SpeedOption2XPressedEvent
 import mega.privacy.mobile.analytics.event.SpeedSelectedDialogEvent
 
 /**
@@ -71,14 +69,6 @@ fun SpeedSelectedPopup(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                when (item) {
-                                    SpeedPlaybackItem.PLAYBACK_SPEED_0_5_X -> SpeedOption0_5XPressedEvent
-                                    SpeedPlaybackItem.PLAYBACK_SPEED_1_5_X -> SpeedOption1_5XPressedEvent
-                                    SpeedPlaybackItem.PLAYBACK_SPEED_2_X -> SpeedOption2XPressedEvent
-                                    else -> null
-                                }?.let { eventIdentifier ->
-                                    Analytics.tracker.trackEvent(eventIdentifier)
-                                }
                                 onItemClick(item)
                             }
                     ) {
@@ -112,9 +102,9 @@ fun SpeedSelectedPopup(
 private fun PreviewSpeedSelectedPopup() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         SpeedSelectedPopup(
-            items = SpeedPlaybackItem.entries,
+            items = VideoSpeedPlaybackItem.entries,
             isShown = true,
-            currentPlaybackSpeed = SpeedPlaybackItem.PLAYBACK_SPEED_1_X,
+            currentPlaybackSpeed = VideoSpeedPlaybackItem.PLAYBACK_SPEED_1_X,
             onDismissRequest = {},
             onItemClick = {}
         )

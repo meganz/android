@@ -30,10 +30,12 @@ import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.SpeedSelectedPopup
 import mega.privacy.android.app.mediaplayer.VideoOptionPopup
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
+import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoOptionItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
@@ -44,6 +46,9 @@ import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.mobile.analytics.event.SpeedOption0_5XPressedEvent
+import mega.privacy.mobile.analytics.event.SpeedOption1_5XPressedEvent
+import mega.privacy.mobile.analytics.event.SpeedOption2XPressedEvent
 import timber.log.Timber
 import javax.inject.Singleton
 
@@ -304,7 +309,7 @@ class VideoPlayerController(
     private fun initSpeedPlaybackPopup(composeView: ComposeView) {
         composeView.setupComposeView(context) {
             SpeedSelectedPopup(
-                items = SpeedPlaybackItem.entries,
+                items = VideoSpeedPlaybackItem.entries,
                 isShown = isSpeedPopupShown.value,
                 currentPlaybackSpeed = currentSpeedPlayback.value,
                 onDismissRequest = {
@@ -312,6 +317,14 @@ class VideoPlayerController(
                     isSpeedPopupShown.value = false
                 }
             ) { speedPlaybackItem ->
+                when (speedPlaybackItem) {
+                    VideoSpeedPlaybackItem.PLAYBACK_SPEED_0_5_X -> SpeedOption0_5XPressedEvent
+                    VideoSpeedPlaybackItem.PLAYBACK_SPEED_1_5_X -> SpeedOption1_5XPressedEvent
+                    VideoSpeedPlaybackItem.PLAYBACK_SPEED_2_X -> SpeedOption2XPressedEvent
+                    else -> null
+                }?.let { eventIdentifier ->
+                    Analytics.tracker.trackEvent(eventIdentifier)
+                }
                 speedPlaybackItemSelected(speedPlaybackItem)
                 updateIsSpeedPopupShown(false)
                 currentSpeedPlayback.value = speedPlaybackItem

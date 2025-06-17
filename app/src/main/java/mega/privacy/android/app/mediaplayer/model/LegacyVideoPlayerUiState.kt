@@ -16,7 +16,7 @@ data class LegacyVideoPlayerUiState(
     val subtitleDisplayState: SubtitleDisplayState = SubtitleDisplayState(),
     val isFullScreen: Boolean = false,
     val isSpeedPopupShown: Boolean = false,
-    val currentSpeedPlayback: SpeedPlaybackItem = SpeedPlaybackItem.PLAYBACK_SPEED_1_X,
+    val currentSpeedPlayback: SpeedPlaybackItem = VideoSpeedPlaybackItem.PLAYBACK_SPEED_1_X,
     val isVideoOptionPopupShown: Boolean = false,
     val videoRepeatToggleMode: RepeatToggleMode = RepeatToggleMode.REPEAT_NONE,
 )
