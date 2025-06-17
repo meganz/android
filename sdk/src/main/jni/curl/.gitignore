@@ -1,5 +1,6 @@
 /ares
 /curl
+/zstd
 /c-ares-*
 /curl-*
 !/c-ares-*.sha1

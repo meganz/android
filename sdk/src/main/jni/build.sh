@@ -98,6 +98,12 @@ ARES_CONFIGURED=${CURL}/${ARES_SOURCE_FOLDER}/Makefile.inc
 ARES_DOWNLOAD_URL=https://github.com/c-ares/c-ares/releases/download/cares-${C_ARES_VERSION2}/${ARES_SOURCE_FILE}
 ARES_SHA1="99566278e4ed4b261891aa62c8b88227bf1a2823"
 
+ZSTD_VERSION=1.5.7
+ZSTD_SOURCE_FILE=zstd-${ZSTD_VERSION}.tar.gz
+ZSTD_SOURCE_FOLDER=zstd-${ZSTD_VERSION}
+ZSTD_DOWNLOAD_URL=https://github.com/facebook/zstd/releases/download/v${ZSTD_VERSION}/${ZSTD_SOURCE_FILE}
+ZSTD_SHA1="6c7dd9c829561ac5475b72592a079a01ab7f3eab"
+
 CRASHLYTICS=crashlytics
 CRASHLYTICS_DOWNLOAD_URL=https://raw.githubusercontent.com/firebase/firebase-android-sdk/master/firebase-crashlytics-ndk/src/main/jni/libcrashlytics/include/crashlytics/external/crashlytics.h
 CRASHLYTICS_DOWNLOAD_URL_C=https://raw.githubusercontent.com/firebase/firebase-android-sdk/8f02834e94f8b24a7cf0f777562cad73c6b9a40f/firebase-crashlytics-ndk/src/main/jni/libcrashlytics/include/crashlytics/external/crashlytics.h
@@ -387,6 +393,7 @@ if [ "$1" == "clean" ]; then
     rm -rf ${CURL}/${CURL}
     rm -rf ${CURL}/${ARES_SOURCE_FOLDER}
     rm -rf ${CURL}/ares
+    rm -rf ${CURL}/zstd
     rm -rf ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE}
     rm -rf ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C}
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FOLDER}
@@ -577,8 +584,6 @@ else
     echo "* WebRTC is not needed"
 fi
 
-
-
 echo "* Setting up crashlytics"
 if [ ! -f ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready ]; then
     wget ${CRASHLYTICS_DOWNLOAD_URL} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE} &>> ${LOG_FILE} || \
@@ -600,10 +605,33 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${ARES_DOWNLOAD_URL} ${CURL}/${ARES_SOURCE_FILE} ${ARES_SHA1} ${CURL}
     ln -sf ${ARES_SOURCE_FOLDER} ${CURL}/ares
 
-#    echo "* Patching c-ares to include crashlytics"
-#    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/src/lib/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}; then
-#        patch -p0 ${CURL}/ares/src/lib/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}
-#    fi
+    echo "* Setting up zstd"
+    mkdir -p ${CURL}/zstd
+    if [ ! -f ${CURL}/zstd/${ZSTD_SOURCE_FILE}.ready ]; then
+        downloadCheckAndUnpack ${ZSTD_DOWNLOAD_URL} ${CURL}/zstd/${ZSTD_SOURCE_FILE} ${ZSTD_SHA1} ${CURL}/zstd
+        ln -sf ${ZSTD_SOURCE_FOLDER} ${CURL}/zstd/zstd
+        for ABI in ${BUILD_ARCHS}; do
+            echo "* Prebuilding zstd for ${ABI}"
+            setupEnv "${ABI}"
+            pushd ${CURL}/zstd/zstd/build/cmake &>> ${LOG_FILE}
+            rm -rf build-android-${ABI}
+            mkdir build-android-${ABI}
+            cd build-android-${ABI}
+            cmake -DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake \
+                  -DANDROID_ABI=${ABI} \
+                  -DANDROID_PLATFORM=${APP_PLATFORM} \
+                  -DZSTD_BUILD_PROGRAMS=OFF \
+                  -DZSTD_BUILD_SHARED=OFF \
+                  -DZSTD_BUILD_STATIC=ON \
+                  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+                  ..
+            make -j${JOBS}
+            popd &>> ${LOG_FILE}
+        done
+        cleanEnv
+        touch ${CURL}/zstd/${ZSTD_SOURCE_FILE}.ready
+    fi
+    echo "* zstd is ready"
 
     for ABI in ${BUILD_ARCHS}; do
         echo "* Prebuilding cURL for ${ABI}"
@@ -617,6 +645,9 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
         else
             WEBRTC_SUFFIX=${ABI}
         fi
+
+        ZSTD_INCLUDE="${BASE_PATH}/${CURL}/zstd/zstd/lib"
+        ZSTD_LIB="${BASE_PATH}/${CURL}/zstd/zstd/build/cmake/build-android-${ABI}/lib"
 
         pushd ${CURL}/ares &>> ${LOG_FILE}
         LDFLAGS+="-Wl,-z,max-page-size=16384" ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} &>> ${LOG_FILE}
@@ -633,7 +664,11 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
         ln -s ${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a boringssl/lib/libssl.a
 
         LIBS=-lc++ ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}/${CURL}"/curl-android-${ABI} --with-ssl="${PWD}"/boringssl/ \
-          --disable-ares --enable-threaded-resolver ${CURL_EXTRA} &>> ${LOG_FILE}
+          --disable-ares --enable-threaded-resolver ${CURL_EXTRA} \
+          --with-zstd="${ZSTD_LIB}" \
+          CPPFLAGS="-I${ZSTD_INCLUDE}" \
+          LDFLAGS="-L${ZSTD_LIB} -lzstd $LDFLAGS" \
+          &>> ${LOG_FILE}
         make clean &>> ${LOG_FILE}
         make -j${JOBS} &>> ${LOG_FILE}
         make install &>> ${LOG_FILE}
