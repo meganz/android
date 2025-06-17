@@ -15,7 +15,7 @@ pluginManagement {
                 "mega.android.release",
                 "mega.android.cicd",
                 "mega.artifactory.publish.convention",
-                -> useModule("mega.privacy:megagradle:${requested.version}")
+                    -> useModule("mega.privacy:megagradle:${requested.version}")
 
                 else -> {}
             }
@@ -61,6 +61,9 @@ include(":feature:chat")
 include(":feature:transfers:snowflake-components")
 include(":feature:payment:snowflake-components")
 include(":feature:shared:snowflake-components")
+include(":feature:example")
+include(":core:navigation-contract")
+include(":core:navigation-snowflake-components")
 
 // Configure modules to use their own name as the build file name
 // app/build.gradle.kts -> app/app.gradle.kts
@@ -76,6 +79,7 @@ rootProject.children.forEach { project ->
 }
 
 println("isServerBuild = ${isServerBuild()}")
+
 buildCache {
     local {
         isEnabled = !isServerBuild()
@@ -96,5 +100,4 @@ buildCache {
 
 fun shouldUsePrebuiltSdk(): Boolean =
     System.getenv("USE_PREBUILT_SDK")?.let { it != "false" } ?: true
-
 fun isServerBuild(): Boolean = System.getenv("BUILD_NUMBER") != null
