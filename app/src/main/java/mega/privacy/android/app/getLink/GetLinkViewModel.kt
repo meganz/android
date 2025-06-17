@@ -1,6 +1,5 @@
 package mega.privacy.android.app.getLink
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LiveData
@@ -16,6 +15,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
+import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_FOLDER
+import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_LINKS
 import mega.privacy.android.app.main.model.SendToChatResult
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
@@ -23,8 +25,10 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -32,6 +36,7 @@ import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -61,6 +66,7 @@ class GetLinkViewModel @Inject constructor(
     private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
@@ -428,17 +434,22 @@ class GetLinkViewModel @Inject constructor(
     }
 
     fun checkSensitiveItem(handle: Long) = viewModelScope.launch {
-        val node = megaApi.getNodeByHandle(handle)
-        val nodeId = node?.let { NodeId(it.handle) }
+        val nodeId = NodeId(handle)
+        val typedNode = getNodeByIdUseCase(nodeId) ?: return@launch
 
-        if (node == null || nodeId == null || node.isExported) {
-            _hasSensitiveItems.value = 0
-        } else if (node.isMarkedSensitive || hasSensitiveInheritedUseCase(nodeId)) {
-            _hasSensitiveItems.value = 1
-        } else if (node.isFolder && hasSensitiveDescendantUseCase(nodeId)) {
-            _hasSensitiveItems.value = 2
-        } else {
-            _hasSensitiveItems.value = 0
+        if (typedNode.exportedData != null) {
+            _hasSensitiveItems.value = HIDDEN_NODE_NONE_SENSITIVE
+            return@launch
+        }
+
+        _hasSensitiveItems.value = when {
+            typedNode.isMarkedSensitive || hasSensitiveInheritedUseCase(typedNode.id) ->
+                HIDDEN_NODE_WARNING_TYPE_LINKS
+
+            (typedNode is FolderNode) && hasSensitiveDescendantUseCase(typedNode.id) ->
+                HIDDEN_NODE_WARNING_TYPE_FOLDER
+
+            else -> HIDDEN_NODE_NONE_SENSITIVE
         }
     }
 

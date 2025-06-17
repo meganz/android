@@ -31,6 +31,10 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         private const val TYPE_LIST = 2
 
         private const val VIEW_TYPE = "VIEW_TYPE"
+
+        internal const val HIDDEN_NODE_WARNING_TYPE_LINKS = 1
+        internal const val HIDDEN_NODE_WARNING_TYPE_FOLDER = 2
+        internal const val HIDDEN_NODE_NONE_SENSITIVE = 0
     }
 
     private val viewModelNode: GetLinkViewModel by viewModels()

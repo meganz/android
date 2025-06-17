@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.model.AddContactState
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -157,7 +156,7 @@ class AddContactViewModel @Inject constructor(
 
     fun checkSensitiveItems(handles: List<Long>) = viewModelScope.launch {
         if (isHiddenNodesActive()) {
-            var sensitiveType = 0
+            var sensitiveType = HIDDEN_NODE_NONE_SENSITIVE
 
             for (handle in handles) {
                 val nodeId = NodeId(handle)
@@ -165,15 +164,23 @@ class AddContactViewModel @Inject constructor(
 
                 if (node !is FolderNode || node.isOutShare()) continue
 
-                if (node.isMarkedSensitive || node.isSensitiveInherited || hasSensitiveDescendantUseCase(nodeId)) {
-                    sensitiveType = if (handles.size == 1) 3 else 4
+                if (node.isMarkedSensitive ||
+                    node.isSensitiveInherited ||
+                    hasSensitiveDescendantUseCase(node.id)
+                ) {
+                    sensitiveType =
+                        if (handles.size == 1) {
+                            HIDDEN_NODE_WARNING_TYPE_FOLDER
+                        } else {
+                            HIDDEN_NODE_WARNING_TYPE_FOLDERS
+                        }
                     break
                 }
             }
 
             _sensitiveItemsCount.value = sensitiveType
         } else {
-            _sensitiveItemsCount.value = 0
+            _sensitiveItemsCount.value = HIDDEN_NODE_NONE_SENSITIVE
         }
     }
 
@@ -181,7 +188,7 @@ class AddContactViewModel @Inject constructor(
         val result = runCatching {
             getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
         }
-        return result.getOrNull() ?: false
+        return result.getOrNull() == true
     }
 
     fun clearSensitiveItemsCheck() {
@@ -206,5 +213,13 @@ class AddContactViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
+    }
+
+    companion object {
+        internal const val HIDDEN_NODE_WARNING_TYPE_LINK = 1
+        internal const val HIDDEN_NODE_WARNING_TYPE_LINKS = 2
+        internal const val HIDDEN_NODE_WARNING_TYPE_FOLDER = 3
+        internal const val HIDDEN_NODE_WARNING_TYPE_FOLDERS = 4
+        internal const val HIDDEN_NODE_NONE_SENSITIVE = 0
     }
 }

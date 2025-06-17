@@ -1,7 +1,5 @@
 package mega.privacy.android.app.getLink
 
-import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.graphics.PorterDuff
@@ -39,6 +37,8 @@ import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
+import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_LINKS
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -60,6 +60,8 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -289,7 +291,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         viewModel.hasSensitiveItemsFlow
             .filterNotNull()
             .onEach { sensitiveType ->
-                if (isPaid && !isBusinessAccountExpired && sensitiveType > 0) {
+                if (isPaid && !isBusinessAccountExpired && sensitiveType > HIDDEN_NODE_NONE_SENSITIVE) {
                     showSharingSensitiveItemsWarningDialog(sensitiveType)
                 } else {
                     initNode()
@@ -685,7 +687,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             .setTitle(getString(sharedR.string.hidden_item))
             .setMessage(
                 getString(sharedR.string.share_hidden_item_link_description).takeIf {
-                    type == 1
+                    type == HIDDEN_NODE_WARNING_TYPE_LINKS
                 } ?: getString(sharedR.string.share_hidden_folder_description)
             )
             .setCancelable(false)

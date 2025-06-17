@@ -1,6 +1,5 @@
 package mega.privacy.android.app.getLink
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -25,6 +24,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentGetSeveralLinksBinding
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
 import mega.privacy.android.app.getLink.adapter.LinksAdapter
 import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -37,6 +37,7 @@ import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import java.util.UUID
 import javax.inject.Inject
 
@@ -120,7 +121,7 @@ class GetSeveralLinksFragment : Fragment() {
         viewModel.hasSensitiveItemsFlow
             .filterNotNull()
             .onEach { sensitiveType ->
-                if (sensitiveType > 0) {
+                if (sensitiveType > HIDDEN_NODE_NONE_SENSITIVE) {
                     showSharingSensitiveItemsWarningDialog(sensitiveType)
                 } else {
                     initNodes()
@@ -141,7 +142,7 @@ class GetSeveralLinksFragment : Fragment() {
             .setTitle(getString(sharedR.string.hidden_items))
             .setMessage(
                 getString(sharedR.string.share_hidden_item_links_description).takeIf {
-                    sensitiveType == 1
+                    sensitiveType == HIDDEN_NODE_NONE_SENSITIVE
                 } ?: getString(sharedR.string.share_hidden_folders_description)
             )
             .setCancelable(false)

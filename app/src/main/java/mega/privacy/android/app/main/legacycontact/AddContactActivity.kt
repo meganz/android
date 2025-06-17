@@ -66,6 +66,11 @@ import mega.privacy.android.app.main.adapters.MegaContactsAdapter
 import mega.privacy.android.app.main.adapters.PhoneContactsAdapter
 import mega.privacy.android.app.main.adapters.ShareContactsAdapter
 import mega.privacy.android.app.main.adapters.ShareContactsHeaderAdapter
+import mega.privacy.android.app.main.legacycontact.AddContactViewModel.Companion.HIDDEN_NODE_NONE_SENSITIVE
+import mega.privacy.android.app.main.legacycontact.AddContactViewModel.Companion.HIDDEN_NODE_WARNING_TYPE_FOLDER
+import mega.privacy.android.app.main.legacycontact.AddContactViewModel.Companion.HIDDEN_NODE_WARNING_TYPE_FOLDERS
+import mega.privacy.android.app.main.legacycontact.AddContactViewModel.Companion.HIDDEN_NODE_WARNING_TYPE_LINK
+import mega.privacy.android.app.main.legacycontact.AddContactViewModel.Companion.HIDDEN_NODE_WARNING_TYPE_LINKS
 import mega.privacy.android.app.main.model.AddContactState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsLimitWarningView
@@ -1019,7 +1024,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
             val isPaid = viewModel.state.value.accountType?.isPaid ?: false
             val isBusinessAccountExpired = viewModel.state.value.isBusinessAccountExpired
             if (type != null) {
-                if (type == 0 || !isPaid || isBusinessAccountExpired) {
+                if (type == HIDDEN_NODE_NONE_SENSITIVE || !isPaid || isBusinessAccountExpired) {
                     initialize(savedInstanceState)
                 } else {
                     showSharingSensitiveItemsWarningDialog(savedInstanceState, type)
@@ -1326,46 +1331,31 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     }
 
     private fun showSharingSensitiveItemsWarningDialog(bundle: Bundle?, type: Int) {
-        val builder = MaterialAlertDialogBuilder(this@AddContactActivity)
-
-        val title =
-            if (type % 2 == 1) getString(mega.privacy.android.shared.resources.R.string.hidden_item) else getString(
-                mega.privacy.android.shared.resources.R.string.hidden_items
-            )
-        builder.setTitle(title)
-
-        var message = ""
-        when (type) {
-            1 -> {
-                message =
-                    getString(mega.privacy.android.shared.resources.R.string.share_hidden_item_link_description)
-            }
-
-            2 -> {
-                message =
-                    getString(mega.privacy.android.shared.resources.R.string.share_hidden_item_links_description)
-            }
-
-            3 -> {
-                message =
-                    getString(mega.privacy.android.shared.resources.R.string.share_hidden_folder_description)
-            }
-
-            4 -> {
-                message =
-                    getString(mega.privacy.android.shared.resources.R.string.share_hidden_folders_description)
-            }
+        val titleRes = if (type % 2 == 1) {
+            sharedR.string.hidden_item
+        } else {
+            sharedR.string.hidden_items
         }
-        builder.setMessage(message)
 
-        builder.setCancelable(false)
-        builder.setPositiveButton(getString(R.string.button_continue)) { _: DialogInterface?, _: Int ->
-            initialize(
-                bundle
-            )
+        val messageRes = when (type) {
+            HIDDEN_NODE_WARNING_TYPE_LINK -> sharedR.string.share_hidden_item_link_description
+            HIDDEN_NODE_WARNING_TYPE_LINKS -> sharedR.string.share_hidden_item_links_description
+            HIDDEN_NODE_WARNING_TYPE_FOLDER -> sharedR.string.share_hidden_folder_description
+            HIDDEN_NODE_WARNING_TYPE_FOLDERS -> sharedR.string.share_hidden_folders_description
+            else -> null
         }
-        builder.setNegativeButton(getString(sharedR.string.general_dialog_cancel_button)) { _: DialogInterface?, _: Int -> finish() }
-        builder.show()
+
+        MaterialAlertDialogBuilder(this@AddContactActivity)
+            .setTitle(getString(titleRes))
+            .setMessage(messageRes?.let { getString(it) } ?: "")
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.button_continue)) { _, _ ->
+                initialize(bundle)
+            }
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button)) { _, _ ->
+                finish()
+            }
+            .show()
     }
 
     private fun setEmptyStateVisibility(visible: Boolean) {
@@ -2349,7 +2339,8 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         builder.setMessage(getString(R.string.confirmation_delete_contact, contact.fullName))
         builder.setOnDismissListener { isConfirmDeleteShown = false }
         builder.setPositiveButton(R.string.context_remove, dialogClickListener)
-            .setNegativeButton(sharedR.string.general_dialog_cancel_button, dialogClickListener).show()
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, dialogClickListener)
+            .show()
         isConfirmDeleteShown = true
     }
 

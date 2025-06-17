@@ -10,12 +10,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
+import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_FOLDER
+import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_LINKS
 import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
@@ -40,6 +45,7 @@ class GetSeveralLinksViewModel @Inject constructor(
     private val exportNodesUseCase: ExportNodesUseCase,
     private val hasSensitiveDescendantUseCase: HasSensitiveDescendantUseCase,
     private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
@@ -186,21 +192,22 @@ class GetSeveralLinksViewModel @Inject constructor(
         ?.joinToString(separator = "\n", postfix = "\n") ?: ""
 
     fun checkSensitiveItems(handles: List<Long>) = viewModelScope.launch {
-        var sensitiveType = 0
+        var sensitiveType = HIDDEN_NODE_NONE_SENSITIVE
 
         for (handle in handles) {
-            val node = megaApi.getNodeByHandle(handle)
-            val nodeId = node?.let { NodeId(it.handle) }
+            val nodeId = NodeId(handle)
+            val typedNode = getNodeByIdUseCase(nodeId) ?: continue
+            if (typedNode.exportedData != null) continue
 
-            if (node == null || nodeId == null || node.isExported) continue
+            when {
+                typedNode.isMarkedSensitive || hasSensitiveInheritedUseCase(typedNode.id) -> {
+                    sensitiveType = HIDDEN_NODE_WARNING_TYPE_LINKS
+                    break
+                }
 
-            if (node.isMarkedSensitive || hasSensitiveInheritedUseCase(nodeId)) {
-                sensitiveType = 1
-                break
-            }
-
-            if (node.isFolder && hasSensitiveDescendantUseCase(nodeId)) {
-                sensitiveType = 2
+                (typedNode is FolderNode) && hasSensitiveDescendantUseCase(typedNode.id) -> {
+                    sensitiveType = HIDDEN_NODE_WARNING_TYPE_FOLDER
+                }
             }
         }
 
