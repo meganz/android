@@ -8,7 +8,7 @@ import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Subscription
-import mega.privacy.android.domain.usecase.billing.GetCheapestSubscriptionUseCase
+import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -23,27 +23,27 @@ import org.mockito.kotlin.whenever
 class AdsFreeIntroViewModelTest {
 
     private lateinit var viewModel: AdsFreeIntroViewModel
-    private val getCheapestSubscriptionUseCase: GetCheapestSubscriptionUseCase = mock()
+    private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase = mock()
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper = mock()
 
     @BeforeEach
     fun reset() {
         reset(
-            getCheapestSubscriptionUseCase,
+            getRecommendedSubscriptionUseCase,
             localisedSubscriptionMapper
         )
     }
 
     private fun initViewModel() {
         viewModel =
-            AdsFreeIntroViewModel(getCheapestSubscriptionUseCase, localisedSubscriptionMapper)
+            AdsFreeIntroViewModel(getRecommendedSubscriptionUseCase, localisedSubscriptionMapper)
     }
 
     @Test
     fun `cheapest subscription is updated on success`() = runTest {
         val subscription = mock<Subscription>()
         val localisedSubscription = mock<LocalisedSubscription>()
-        whenever(getCheapestSubscriptionUseCase()).thenReturn(subscription)
+        whenever(getRecommendedSubscriptionUseCase()).thenReturn(subscription)
         whenever(localisedSubscriptionMapper(subscription, subscription)).thenReturn(
             localisedSubscription
         )
@@ -58,7 +58,7 @@ class AdsFreeIntroViewModelTest {
     @Test
     fun `cheapest subscription is null on failure`() = runTest {
         val exception = RuntimeException("Error")
-        whenever(getCheapestSubscriptionUseCase()).thenThrow(exception)
+        whenever(getRecommendedSubscriptionUseCase()).thenThrow(exception)
         initViewModel()
         viewModel.state.test {
             val item = awaitItem()

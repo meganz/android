@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.upgradeAccount.ChooseAccountViewModel
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
@@ -20,7 +19,7 @@ import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.billing.GetCheapestSubscriptionUseCase
+import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
@@ -57,8 +56,8 @@ class ChooseAccountViewModelTest {
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
         )
-    private val getCheapestSubscriptionUseCase =
-        mock<GetCheapestSubscriptionUseCase>()
+    private val getRecommendedSubscriptionUseCase =
+        mock<GetRecommendedSubscriptionUseCase>()
     private val getFeatureFlagValueUseCase =
         mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(true) }
     private val isBillingAvailableUseCase = mock<IsBillingAvailableUseCase>()
@@ -72,7 +71,7 @@ class ChooseAccountViewModelTest {
             localisedPriceStringMapper,
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
-            getCheapestSubscriptionUseCase,
+            getRecommendedSubscriptionUseCase,
             getPricing,
             getFeatureFlagValueUseCase,
             getPaymentMethodUseCase,
@@ -86,7 +85,7 @@ class ChooseAccountViewModelTest {
             getMonthlySubscriptionsUseCase = getMonthlySubscriptionsUseCase,
             getYearlySubscriptionsUseCase = getYearlySubscriptionsUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
-            getCheapestSubscriptionUseCase = getCheapestSubscriptionUseCase,
+            getRecommendedSubscriptionUseCase = getRecommendedSubscriptionUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPaymentMethodUseCase = getPaymentMethodUseCase,
             isBillingAvailableUseCase = isBillingAvailableUseCase,
@@ -134,7 +133,7 @@ class ChooseAccountViewModelTest {
             formattedSize = formattedSizeMapper,
         )
         whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-        whenever(getCheapestSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
+        whenever(getRecommendedSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
         whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
         whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
@@ -148,7 +147,7 @@ class ChooseAccountViewModelTest {
     fun `test that initial state has a feature flag for Variant A set properly if it's enabled`() =
         runTest {
             whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-            whenever(getCheapestSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
+            whenever(getRecommendedSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
             whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
             whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
             whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
@@ -163,7 +162,7 @@ class ChooseAccountViewModelTest {
     fun `test that initial state has a feature flag for Variant B set properly if it's enabled`() =
         runTest {
             whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-            whenever(getCheapestSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
+            whenever(getRecommendedSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
             whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
             whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
             whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
@@ -178,7 +177,7 @@ class ChooseAccountViewModelTest {
     fun `test that initial state has a feature flag for Ads feature set properly if it's enabled`() =
         runTest {
             whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-            whenever(getCheapestSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
+            whenever(getRecommendedSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
             whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
             whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
             whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)

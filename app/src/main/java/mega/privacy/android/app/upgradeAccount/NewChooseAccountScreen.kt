@@ -1,5 +1,9 @@
 package mega.privacy.android.app.upgradeAccount
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -10,7 +14,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,6 +40,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
@@ -67,6 +71,7 @@ import mega.privacy.android.feature.payment.components.NewFeatureRow
 import mega.privacy.android.feature.payment.components.ProPlanCard
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import timber.log.Timber
 import java.util.Locale
 
 @Composable
@@ -79,7 +84,7 @@ internal fun NewChooseAccountScreen(
     onFreePlanClicked: () -> Unit,
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
-    var isMonthly by remember { mutableStateOf(true) }
+    var isMonthly by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     val lazyListState = rememberLazyListState()
@@ -138,11 +143,11 @@ internal fun NewChooseAccountScreen(
                 )
             }
         }
-    ) {
+    ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .testTag(TEST_TAG_LAZY_COLUMN)
-                .navigationBarsPadding()
+                .padding(bottom = innerPadding.calculateBottomPadding())
                 .fillMaxSize(),
             state = lazyListState,
         ) {
@@ -230,12 +235,7 @@ internal fun NewChooseAccountScreen(
 
             itemsIndexed(uiState.localisedSubscriptionsList) { index, subscription ->
                 val isRecommended =
-                    when (uiState.cheapestSubscriptionAvailable?.accountType) {
-                        AccountType.PRO_LITE -> subscription.accountType == AccountType.PRO_I
-                        AccountType.PRO_I -> subscription.accountType == AccountType.PRO_II
-                        AccountType.PRO_II -> subscription.accountType == AccountType.PRO_III
-                        else -> false
-                    }
+                    uiState.cheapestSubscriptionAvailable?.accountType == subscription.accountType
 
                 val storageValueString =
                     stringResource(
@@ -364,6 +364,7 @@ internal fun NewChooseAccountScreen(
                     baseTextColor = TextColor.Secondary,
                     baseStyle = AppTheme.typography.bodySmall,
                     onAnnotationClick = {
+                        context.navigateToPlayStoreAccountSubscription()
                     }
                 )
                 LinkSpannedText(
@@ -389,10 +390,32 @@ internal fun NewChooseAccountScreen(
                     ),
                     baseStyle = AppTheme.typography.labelLarge,
                     onAnnotationClick = {
+                        context.navigateToLearnMoreHowToManagerYourSubscription()
                     }
                 )
             }
         }
+    }
+}
+
+private const val PLAY_STORE_ACCOUNT_SUBSCRIPTION_URL =
+    "https://play.google.com/store/account/subscriptions"
+private const val LEARN_MORE_HOW_TO_MANAGER_YOUR_SUBSCRIPTION =
+    "https://support.google.com/googleplay/answer/7018481?hl=en&co=GENIE.Platform%3DAndroid"
+
+private fun Context.navigateToPlayStoreAccountSubscription() {
+    try {
+        startActivity(Intent(ACTION_VIEW, PLAY_STORE_ACCOUNT_SUBSCRIPTION_URL.toUri()))
+    } catch (e: ActivityNotFoundException) {
+        Timber.e(e, "Play Store Subscription Page Not Found!")
+    }
+}
+
+private fun Context.navigateToLearnMoreHowToManagerYourSubscription() {
+    try {
+        startActivity(Intent(ACTION_VIEW, LEARN_MORE_HOW_TO_MANAGER_YOUR_SUBSCRIPTION.toUri()))
+    } catch (e: ActivityNotFoundException) {
+        Timber.e(e, "Learn More How To Manager Your Subscription Page Not Found!")
     }
 }
 
