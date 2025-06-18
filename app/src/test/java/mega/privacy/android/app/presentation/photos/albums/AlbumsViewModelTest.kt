@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
@@ -46,6 +45,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
@@ -95,7 +95,7 @@ class AlbumsViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf()))
+        whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(listOf()))
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         initUnderTest()
     }
@@ -144,7 +144,12 @@ class AlbumsViewModelTest {
 
     @Test
     fun `test that an error would return an empty list`() = runTest {
-        whenever(getDefaultAlbumPhotos(listOf())).thenReturn(flow { throw Exception("Error") })
+        whenever(
+            getDefaultAlbumPhotos(
+                false,
+                listOf()
+            )
+        ).thenReturn(flow { throw Exception("Error") })
 
         underTest.state.test {
             assertEquals(emptyList(), awaitItem().albums)
@@ -161,7 +166,7 @@ class AlbumsViewModelTest {
             )
 
             whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
-            whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf(createImage())))
+            whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(listOf(createImage())))
             initUnderTest()
 
             underTest.state.drop(1).test {
@@ -178,7 +183,7 @@ class AlbumsViewModelTest {
         )
 
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
-        whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf(createImage())))
+        whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(listOf(createImage())))
 
         initUnderTest()
 
@@ -197,7 +202,7 @@ class AlbumsViewModelTest {
         )
 
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
-        whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
+        whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(emptyList()))
 
         initUnderTest()
 
@@ -216,7 +221,7 @@ class AlbumsViewModelTest {
         )
 
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
-        whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
+        whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(emptyList()))
         initUnderTest()
         underTest.state.drop(1).test {
             val albums = awaitItem().albums
@@ -241,7 +246,7 @@ class AlbumsViewModelTest {
         )
 
         whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
-        whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(testPhotosList))
+        whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(testPhotosList))
         initUnderTest()
         underTest.state.drop(1).test {
             assertThat(awaitItem().albums.map { it.coverPhoto?.id }.firstOrNull()).isEqualTo(1L)
@@ -397,7 +402,7 @@ class AlbumsViewModelTest {
 
             whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
             whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
-            whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
+            whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(emptyList()))
 
             underTest.state.test {
                 awaitItem()
@@ -424,7 +429,7 @@ class AlbumsViewModelTest {
 
             whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
             whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
-            whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
+            whenever(getDefaultAlbumPhotos(any(), any())).thenReturn(flowOf(emptyList()))
 
             underTest.state.test {
                 awaitItem()
@@ -662,7 +667,9 @@ class AlbumsViewModelTest {
     @Test
     fun `test that showHiddenItems and accountDetail are fetched properly`() = runTest {
         // given
-        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(true)
+        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(
+            true
+        )
         initUnderTest()
         advanceUntilIdle()
 
@@ -673,6 +680,30 @@ class AlbumsViewModelTest {
             assertThat(underTest.showHiddenItems).isTrue()
         }
     }
+
+    @Test
+    fun `test that on pagination enabled should invoke use case with correct parameters`() =
+        runTest {
+            val isPaginationEnabled = true
+            val defaultAlbums: Map<Album, PhotoPredicate> = mapOf(
+                Album.FavouriteAlbum to { false },
+                Album.GifAlbum to { false },
+                Album.RawAlbum to { false },
+            )
+
+            whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)).thenReturn(
+                isPaginationEnabled
+            )
+
+            initUnderTest()
+            advanceUntilIdle()
+
+            verify(getDefaultAlbumPhotos).invoke(
+                isPaginationEnabled,
+                defaultAlbums.values.toList()
+            )
+        }
 
     private fun createUserAlbum(
         id: AlbumId = AlbumId(0L),

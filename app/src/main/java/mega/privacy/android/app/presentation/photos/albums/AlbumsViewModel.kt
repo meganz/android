@@ -21,12 +21,12 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.photos.PhotosCache.updateAlbums
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
-import mega.privacy.android.app.presentation.photos.PhotosCache.updateAlbums
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -117,8 +117,13 @@ class AlbumsViewModel @Inject constructor(
     private fun loadAlbums() {
         viewModelScope.launch {
             val includedSystemAlbums = getDefaultAlbumsMapUseCase()
+            val isPaginationEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
+            }.getOrDefault(false)
+
             runCatching {
                 getDefaultAlbumPhotos(
+                    isPaginationEnabled,
                     includedSystemAlbums.values.toList()
                 ).mapLatest { photos ->
                     val showHiddenItems = showHiddenItems ?: true

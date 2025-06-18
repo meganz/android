@@ -12,11 +12,13 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
 import mega.privacy.android.app.presentation.photos.PhotosCache.updatePhotos
 import mega.privacy.android.app.presentation.photos.model.DateCard
@@ -69,6 +71,8 @@ import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.photos.LoadNextPageOfPhotosUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorPaginatedTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -125,6 +129,8 @@ class TimelineViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val monitorPaginatedTimelinePhotosUseCase: MonitorPaginatedTimelinePhotosUseCase,
+    private val loadNextPageOfPhotosUseCase: LoadNextPageOfPhotosUseCase,
 ) : ViewModel() {
 
     internal val _state = MutableStateFlow(TimelineViewState(loadPhotosDone = false))
@@ -139,6 +145,7 @@ class TimelineViewModel @Inject constructor(
     private var isCameraUploadsFirstSyncTriggered = false
     private var isCameraUploadsUploading = false
     private var showHiddenItems: Boolean? = null
+    private var isPaginationEnabled: Boolean = false
 
     init {
         monitorPhotos()
@@ -160,6 +167,14 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
+    private suspend fun isPaginationEnabled(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
+        }
+
+        return result.getOrNull() ?: false
+    }
+
     private suspend fun isHiddenNodesActive(): Boolean {
         val result = runCatching {
             getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
@@ -167,11 +182,35 @@ class TimelineViewModel @Inject constructor(
         return result.getOrNull() ?: false
     }
 
+    internal fun loadPhotos() {
+        if (!isPaginationEnabled) return
+
+        viewModelScope.launch {
+            runCatching {
+                loadNextPageOfPhotosUseCase()
+            }.onFailure {
+                Timber.e(it, "Error loading next page of photos")
+            }.onSuccess {
+                Timber.d("Next page of photos loaded successfully")
+            }
+        }
+    }
+
     private fun monitorPhotos() = viewModelScope.launch {
-        getTimelinePhotosUseCase()
+        isPaginationEnabled = isPaginationEnabled()
+
+        val monitorPhotos = if (isPaginationEnabled) {
+            monitorPaginatedTimelinePhotosUseCase()
+        } else {
+            getTimelinePhotosUseCase()
+        }
+
+        monitorPhotos
             .catch { throwable ->
                 Timber.e(throwable)
-            }.collectLatest(::handlePhotos)
+            }
+            .onStart { loadPhotos() }
+            .collectLatest(::handlePhotos)
     }
 
     private fun monitorCameraUploadsStatus() = viewModelScope.launch {
@@ -520,10 +559,14 @@ class TimelineViewModel @Inject constructor(
     }
 
     private fun sortPhotos(photos: List<Photo>): List<Photo> {
-        return if (_state.value.currentSort == Sort.NEWEST) {
-            photos.sortedWith(compareByDescending<Photo> { it.modificationTime }.thenByDescending { it.id })
+        return if (isPaginationEnabled) {
+            photos
         } else {
-            photos.sortedWith(compareBy<Photo> { it.modificationTime }.thenByDescending { it.id })
+            if (_state.value.currentSort == Sort.NEWEST) {
+                photos.sortedWith(compareByDescending<Photo> { it.modificationTime }.thenByDescending { it.id })
+            } else {
+                photos.sortedWith(compareBy<Photo> { it.modificationTime }.thenByDescending { it.id })
+            }
         }
     }
 
@@ -758,11 +801,11 @@ class TimelineViewModel @Inject constructor(
         _state.update {
             it.copy(
                 rememberFilter =
-                (preferences[TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value] as RememberPreferences).value,
+                    (preferences[TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value] as RememberPreferences).value,
                 currentMediaSource =
-                (preferences[TimelinePreferencesJSON.JSON_KEY_LOCATION.value] as LocationPreference).value,
+                    (preferences[TimelinePreferencesJSON.JSON_KEY_LOCATION.value] as LocationPreference).value,
                 currentFilterMediaType =
-                (preferences[TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value] as MediaTypePreference).value,
+                    (preferences[TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value] as MediaTypePreference).value,
             )
         }
 

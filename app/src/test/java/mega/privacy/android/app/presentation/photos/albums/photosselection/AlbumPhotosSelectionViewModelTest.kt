@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.ALL_PHOTOS
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CAMERA_UPLOAD
@@ -28,7 +29,9 @@ import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorPaginatedTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -51,6 +54,9 @@ class AlbumPhotosSelectionViewModelTest {
     private val filterCameraUploadPhotos = mock<FilterCameraUploadPhotos>()
     private val addPhotosToAlbum = mock<AddPhotosToAlbum>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val monitorPaginatedTimelinePhotosUseCase =
+        mock<MonitorPaginatedTimelinePhotosUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -180,6 +186,27 @@ class AlbumPhotosSelectionViewModelTest {
         }
     }
 
+    @Test
+    fun `test that on pagination enabled should monitor paginated photos`() = runTest {
+        val images = listOf(
+            createImage(id = 1L),
+            createImage(id = 2L),
+            createImage(id = 3L),
+        )
+        whenever(getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)).thenReturn(true)
+        whenever(monitorPaginatedTimelinePhotosUseCase()).thenReturn(flowOf(images))
+        whenever(filterCloudDrivePhotos(any())).thenReturn(images)
+        whenever(filterCameraUploadPhotos(any())).thenReturn(images)
+
+        underTest = createSUT()
+        advanceUntilIdle()
+
+        underTest?.state?.test {
+            val actualPhotos = awaitItem().photos
+            assertThat(actualPhotos.size).isEqualTo(3)
+        }
+    }
+
     private fun createSUT() = AlbumPhotosSelectionViewModel(
         savedStateHandle = savedStateHandle,
         getUserAlbum = getUserAlbum,
@@ -190,13 +217,12 @@ class AlbumPhotosSelectionViewModelTest {
         filterCameraUploadPhotos = filterCameraUploadPhotos,
         addPhotosToAlbum = addPhotosToAlbum,
         defaultDispatcher = UnconfinedTestDispatcher(),
-        mock {
-            onBlocking { invoke(any()) }.thenReturn(false)
-        },
         monitorShowHiddenItemsUseCase = mock(),
         monitorAccountDetailUseCase = mock(),
         getBusinessStatusUseCase = getBusinessStatusUseCase,
         durationInSecondsTextMapper = DurationInSecondsTextMapper(),
+        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+        monitorPaginatedTimelinePhotosUseCase = monitorPaginatedTimelinePhotosUseCase,
     )
 
     private fun createUserAlbum(

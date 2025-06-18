@@ -11,5 +11,8 @@ interface GetDefaultAlbumPhotos {
     /**
      * Get Default Album(Favourite GIF RAW) Photos
      */
-    operator fun invoke(list: List<suspend (Photo) -> Boolean>): Flow<List<Photo>>
+    operator fun invoke(
+        isPaginationEnabled: Boolean,
+        list: List<suspend (Photo) -> Boolean>
+    ): Flow<List<Photo>>
 }

@@ -110,5 +110,5 @@ data class TimelineViewState(
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
     val isBusinessAccountExpired: Boolean = false,
-    val hiddenNodeEnabled: Boolean = false
+    val hiddenNodeEnabled: Boolean = false,
 )

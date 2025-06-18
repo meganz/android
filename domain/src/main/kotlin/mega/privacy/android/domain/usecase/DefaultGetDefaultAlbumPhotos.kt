@@ -19,9 +19,16 @@ class DefaultGetDefaultAlbumPhotos @Inject constructor(
     private val photosRepository: PhotosRepository,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : GetDefaultAlbumPhotos {
-    override fun invoke(list: List<suspend (Photo) -> Boolean>) =
-        photosRepository.monitorPhotos()
+    override fun invoke(isPaginationEnabled: Boolean, list: List<suspend (Photo) -> Boolean>) =
+        getPhotos(isPaginationEnabled)
             .mapLatest { filterPhotos(list, it) }
+
+    private fun getPhotos(isPaginationEnabled: Boolean) =
+        if (isPaginationEnabled) {
+            photosRepository.monitorPaginatedPhotos()
+        } else {
+            photosRepository.monitorPhotos()
+        }
 
     private suspend fun filterPhotos(
         filters: List<suspend (Photo) -> Boolean>,

@@ -189,9 +189,12 @@ internal class AlbumContentViewModel @Inject constructor(
     private fun fetchSystemPhotos(systemAlbum: Album) {
         viewModelScope.launch {
             val filter = getDefaultAlbumsMapUseCase()[systemAlbum] ?: return@launch
+            val isPaginationEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
+            }.getOrDefault(false)
 
             runCatching {
-                getDefaultAlbumPhotos(listOf(filter))
+                getDefaultAlbumPhotos(isPaginationEnabled, listOf(filter))
                     .onEach { sourcePhotos = it }
                     .map(::filterNonSensitivePhotos)
                     .onEach(::updateSelection)

@@ -181,6 +181,7 @@ fun PhotosScreen(
                 clearCameraUploadsCompletedMessage = {
                     timelineViewModel.setCameraUploadsCompletedMessage(false)
                 },
+                loadPhotos = timelineViewModel::loadPhotos
             )
         },
         albumsView = {

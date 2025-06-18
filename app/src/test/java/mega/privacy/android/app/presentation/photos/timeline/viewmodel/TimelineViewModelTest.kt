@@ -53,6 +53,8 @@ import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.photos.LoadNextPageOfPhotosUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorPaginatedTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -138,6 +140,11 @@ internal class TimelineViewModelTest {
 
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
+    private val monitorPaginatedTimelinePhotosUseCase =
+        mock<MonitorPaginatedTimelinePhotosUseCase>()
+
+    private val loadNextPageOfPhotosUseCase = mock<LoadNextPageOfPhotosUseCase>()
+
     @BeforeEach
     fun setUp() {
         getTimelinePhotosUseCase.stub {
@@ -188,6 +195,8 @@ internal class TimelineViewModelTest {
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            monitorPaginatedTimelinePhotosUseCase = monitorPaginatedTimelinePhotosUseCase,
+            loadNextPageOfPhotosUseCase = loadNextPageOfPhotosUseCase,
         )
     }
 

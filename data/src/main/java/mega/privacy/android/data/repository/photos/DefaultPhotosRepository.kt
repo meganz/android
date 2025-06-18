@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -210,6 +211,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                 }
             ).flatten()
                 .filterNot { NodeId(it.id) in paginatedPhotosCache.keys }
+                .sortedByDescending { it.modificationTime }
                 .forEach { photo ->
                     paginatedPhotosCache[NodeId(photo.id)] = photo
                     newPhotosAvailable = true
@@ -217,8 +219,12 @@ internal class DefaultPhotosRepository @Inject constructor(
 
             if (newPhotosAvailable) {
                 Timber.d("DefaultPhotosRepository::Updated photos count: ${paginatedPhotosCache.size}")
+                val sortedPhotos = paginatedPhotosCache
+                    .values
+                    .toList()
+
                 paginatedPhotosFlow
-                    .update { paginatedPhotosCache.values.toList() }
+                    .update { sortedPhotos }
                     .also { page++ }
             } else {
                 Timber.d("DefaultPhotosRepository::no new photos found.")
@@ -229,9 +235,11 @@ internal class DefaultPhotosRepository @Inject constructor(
     override fun monitorPaginatedPhotos(): Flow<List<Photo>> =
         paginatedPhotosFlow
             .filterNotNull()
+            .onStart { Timber.d("DefaultPhotosRepository::monitorPaginatedPhotos") }
             .flowOn(ioDispatcher)
 
     override fun monitorPhotos(): Flow<List<Photo>> {
+        Timber.d("DefaultPhotosRepository::monitorPhotos")
         initialize()
         return photosFlow.filterNotNull()
     }

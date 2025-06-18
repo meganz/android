@@ -9,9 +9,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_FLOW
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.app.presentation.photos.model.MediaListItem
@@ -44,6 +47,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorPaginatedTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import timber.log.Timber
@@ -57,6 +61,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     private val getUserAlbum: GetUserAlbum,
     private val getAlbumPhotos: GetAlbumPhotos,
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
+    private val monitorPaginatedTimelinePhotosUseCase: MonitorPaginatedTimelinePhotosUseCase,
     private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
     private val filterCloudDrivePhotos: FilterCloudDrivePhotos,
     private val filterCameraUploadPhotos: FilterCameraUploadPhotos,
@@ -133,7 +138,20 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun fetchPhotos() = getTimelinePhotosUseCase()
+    private fun getPhotos() = flow {
+        val isPaginationEnabled = runCatching {
+            getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
+        }.getOrDefault(false)
+
+        if (isPaginationEnabled) {
+            emitAll(monitorPaginatedTimelinePhotosUseCase())
+        } else {
+            emitAll(getTimelinePhotosUseCase())
+        }
+    }
+
+
+    private fun fetchPhotos() = getPhotos()
         .mapLatest(::sortPhotos)
         .mapLatest(::saveSourcePhotos)
         .mapLatest(::filterNonSensitivePhotos)

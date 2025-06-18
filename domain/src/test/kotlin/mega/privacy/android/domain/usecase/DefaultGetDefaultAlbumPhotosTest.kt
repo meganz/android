@@ -38,7 +38,23 @@ class DefaultGetDefaultAlbumPhotosTest {
             )
         )
 
-        underTest(listOf()).test {
+        underTest(false, listOf()).test {
+            awaitItem()
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that current photos are returned with pagination enabled`() = runTest {
+        whenever(photosRepository.monitorPaginatedPhotos()).thenReturn(
+            flowOf(
+                listOf(
+                    createVideo(id = 1L)
+                )
+            )
+        )
+
+        underTest(true, listOf()).test {
             awaitItem()
             awaitComplete()
         }

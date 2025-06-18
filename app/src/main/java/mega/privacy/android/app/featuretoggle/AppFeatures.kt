@@ -203,6 +203,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     UpdateAccountRevamp(
         "Update Account Revamp with new components",
         false,
+    ),
+
+    /**
+     *  Enable pagination in timeline photos
+     */
+    TimelinePhotosPagination(
+        "Enable pagination in timeline photos",
+        false,
     );
 
     companion object : FeatureFlagValueProvider {

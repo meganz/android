@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
@@ -44,6 +46,7 @@ import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorPaginatedTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
@@ -70,6 +73,7 @@ internal class AddToAlbumViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorPaginatedTimelinePhotosUseCase: MonitorPaginatedTimelinePhotosUseCase,
     @ApplicationScope private val appScope: CoroutineScope,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -120,7 +124,7 @@ internal class AddToAlbumViewModel @Inject constructor(
                 isHiddenNodesVisible = true
             }
 
-            getTimelinePhotosUseCase()
+            getPhotos()
                 .onEach { handlePhotos() }
                 .launchIn(viewModelScope)
 
@@ -132,6 +136,18 @@ internal class AddToAlbumViewModel @Inject constructor(
                     .onEach { loadVideoPlaylists() }
                     .launchIn(viewModelScope)
             }
+        }
+    }
+
+    private suspend fun getPhotos(): Flow<List<Photo>> {
+        val isPaginationEnabled = runCatching {
+            getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
+        }.getOrDefault(false)
+
+        return if (isPaginationEnabled) {
+            monitorPaginatedTimelinePhotosUseCase()
+        } else {
+            getTimelinePhotosUseCase()
         }
     }
 

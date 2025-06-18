@@ -90,6 +90,7 @@ fun TimelineView(
     clearCameraUploadsMessage: () -> Unit = {},
     clearCameraUploadsChangePermissionsMessage: () -> Unit = {},
     clearCameraUploadsCompletedMessage: () -> Unit = {},
+    loadPhotos: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val isBarVisible by remember {
@@ -148,6 +149,12 @@ fun TimelineView(
                 SnackbarResult.ActionPerformed -> onChangeCameraUploadsPermissions()
             }
             clearCameraUploadsChangePermissionsMessage()
+        }
+    }
+
+    LaunchedEffect(isScrolledToEnd) {
+        if (isScrolledToEnd) {
+            loadPhotos()
         }
     }
 
