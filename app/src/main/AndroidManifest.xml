@@ -58,7 +58,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" /> <!-- For apps targeting Android 13 (API level 33) -->
@@ -170,16 +170,20 @@
             android:value="true" />
 
         <activity
-            android:name=".presentation.login.LoginActivity"
-            android:exported="true"
+            android:name="mega.privacy.android.app.appstate.RerouteActivity"
+            android:exported="true" />
+        <activity
+            android:name=".appstate.MegaActivity"
             android:configChanges="screenSize"
+            android:exported="true"
             android:theme="@style/Theme.Mega.Starting"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name=".presentation.login.LoginActivity"
+            android:configChanges="screenSize"
+            android:exported="true"
+            android:theme="@style/Theme.Mega.Starting"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name=".activities.WebViewActivity"
             android:configChanges="orientation|screenSize"
@@ -266,7 +270,7 @@
             android:configChanges="orientation|screenSize"
             android:exported="false"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustNothing"></activity>
+            android:windowSoftInputMode="adjustNothing" />
         <activity android:name=".main.megachat.chat.explorer.ChatExplorerActivity" />
         <activity android:name=".main.megachat.NodeAttachmentHistoryActivity" />
         <activity android:name=".main.CountryCodePickerActivity" />
@@ -492,7 +496,7 @@
         <activity
             android:name=".textEditor.TextEditorActivity"
             android:launchMode="singleTop"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".contacts.ContactsActivity"
             android:launchMode="singleTop" />
@@ -513,7 +517,6 @@
         <activity
             android:name=".presentation.transfers.TransfersActivity"
             android:launchMode="singleTask" />
-
         <activity
             android:name=".presentation.transfers.preview.FakePreviewActivity"
             android:launchMode="singleTask" />
@@ -558,12 +561,10 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".presentation.transfers.notification.DefaultTransfersActionGroupProgressNotificationBuilder$ResumeTransfersReceiver"
             android:enabled="true"
-            android:exported="false">
-        </receiver>
+            android:exported="false"></receiver>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -614,15 +615,15 @@
         <provider
             android:name=".providers.OfflineDocumentProvider"
             android:authorities="${offlineDocumentProviderAuthority}"
-            android:exported="true"
             android:enabled="false"
+            android:exported="true"
             android:grantUriPermissions="true"
             android:permission="android.permission.MANAGE_DOCUMENTS">
             <intent-filter>
                 <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
             </intent-filter>
         </provider>
-        
+
         <activity
             android:name=".main.megachat.MapsActivity"
             android:configChanges="orientation|screenSize"
@@ -710,9 +711,9 @@
             android:launchMode="singleTop" />
         <activity
             android:name=".presentation.imagepreview.ImagePreviewActivity"
-            android:theme="@style/Theme.Mega.ImagePreview"
             android:label=""
             android:launchMode="singleTop"
+            android:theme="@style/Theme.Mega.ImagePreview"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name=".presentation.imagepreview.slideshow.SlideshowActivity"
@@ -735,12 +736,14 @@
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".presentation.photos.albums.add.AddToAlbumActivity" />
-        <activity android:name="mega.privacy.android.app.presentation.settings.compose.SettingsHomeActivity" />
-        <activity android:name="mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity" />
+        <activity android:name=".presentation.settings.compose.SettingsHomeActivity" />
+        <activity android:name=".presentation.filecontact.FileContactListComposeActivity" />
+
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-2135147798858967~2157690671" />
+
         <property
             android:name="android.adservices.AD_SERVICES_CONFIG"
             android:resource="@xml/gma_ad_services_config"

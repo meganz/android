@@ -208,6 +208,9 @@ dependencies {
     implementation(project(":feature:transfers:snowflake-components"))
     implementation(project(":feature:payment:snowflake-components"))
     implementation(project(":feature:shared:snowflake-components"))
+    implementation(project(":core:navigation-snowflake-components"))
+    implementation(project(":core:navigation-contract"))
+    "qaImplementation"(project(":feature:example"))
     preBuiltSdkDependency(rootProject.extra)
 
     //Test Modules
@@ -267,6 +270,7 @@ dependencies {
     implementation(androidx.material3.adaptive)
     implementation(androidx.material3.adaptive.layout)
     implementation(androidx.material3.adaptive.navigation)
+    implementation(androidx.material3.adaptive.navigation.suite)
 
     // Google
     implementation(google.gson)
