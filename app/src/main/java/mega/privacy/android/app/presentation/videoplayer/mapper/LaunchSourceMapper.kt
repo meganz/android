@@ -91,15 +91,15 @@ class LaunchSourceMapper @Inject constructor(
             }
 
 
-        launchSource == FROM_CHAT ->
-            if (videoNode == null) emptyList()
-            else buildList {
-                add(VideoPlayerDownloadAction)
-                add(VideoPlayerChatImportAction)
-                add(VideoPlayerSaveForOfflineAction)
-                if (canRemoveFromChat() && !isNodeInBackup(videoNode)) add(VideoPlayerRemoveAction)
-                if (shouldShowAddTo) add(VideoPlayerAddToAction)
+        launchSource == FROM_CHAT -> buildList {
+            add(VideoPlayerDownloadAction)
+            add(VideoPlayerChatImportAction)
+            add(VideoPlayerSaveForOfflineAction)
+            if (videoNode != null && canRemoveFromChat() && !isNodeInBackup(videoNode)) {
+                add(VideoPlayerRemoveAction)
             }
+            if (shouldShowAddTo) add(VideoPlayerAddToAction)
+        }
 
 
         launchSource == FILE_LINK_ADAPTER || launchSource == ZIP_ADAPTER -> {

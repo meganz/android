@@ -181,6 +181,32 @@ class LaunchSourceMapperTest {
         )
     }
 
+    @ParameterizedTest(name = "and should show add: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that chat source returns correct actions when node is null`(
+        showAdd: Boolean,
+    ) = runTest {
+        val actual: List<VideoPlayerMenuAction> = underTest(
+            launchSource = FROM_CHAT,
+            videoNode = null,
+            shouldShowAddTo = showAdd,
+            canRemoveFromChat = { true },
+            isPaidUser = false,
+            isExpiredBusinessUser = false,
+        )
+
+        val expected = buildList {
+            add(VideoPlayerDownloadAction)
+            add(VideoPlayerChatImportAction)
+            add(VideoPlayerSaveForOfflineAction)
+            if (showAdd) {
+                add(VideoPlayerAddToAction)
+            }
+        }
+
+        assertThat(actual).containsExactlyElementsIn(expected)
+    }
+
     private fun provideChatSourceParams() = listOf(
         Arguments.of(true, true, true),
         Arguments.of(true, false, false),
@@ -420,7 +446,7 @@ class LaunchSourceMapperTest {
                 isExpiredBusinessUser = false,
             )
 
-            val expected = listOf (
+            val expected = listOf(
                 VideoPlayerDownloadAction,
                 VideoPlayerFileInfoAction,
                 VideoPlayerSendToChatAction,
@@ -494,9 +520,9 @@ class LaunchSourceMapperTest {
         }
 
     @ParameterizedTest(name = "and launchSource is {0}")
-    @ValueSource(ints = [FILE_BROWSER_ADAPTER, RUBBISH_BIN_ADAPTER, FROM_CHAT, FROM_IMAGE_VIEWER])
+    @ValueSource(ints = [FILE_BROWSER_ADAPTER, RUBBISH_BIN_ADAPTER, FROM_IMAGE_VIEWER])
     fun `test that action is empty when node is null`(
-        launchSource: Int
+        launchSource: Int,
     ) = runTest {
         val actual: List<VideoPlayerMenuAction> = underTest(
             launchSource = launchSource,
