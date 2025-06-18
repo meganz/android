@@ -16,6 +16,11 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
 
+    CameraActivityInCloudDrive(
+        "Enable Camera Activity in Cloud Drive to capture photos and videos",
+        true,
+    ),
+
     /**
      * Single activity
      */

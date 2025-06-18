@@ -15,10 +15,16 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.R
+import mega.privacy.android.app.camera.CameraArg
+import mega.privacy.android.app.camera.InAppCameraLauncher
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.main.CameraPermissionManager
 import mega.privacy.android.app.main.DrawerItem
@@ -43,6 +49,8 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog
 import mega.privacy.android.app.utils.Util.checkTakePicture
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
+import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
 import timber.log.Timber
 import javax.inject.Inject
@@ -54,6 +62,7 @@ import javax.inject.Inject
 internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
     activity: Activity,
     private val permissionUtilWrapper: PermissionUtilWrapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : DefaultLifecycleObserver,
     UploadFilesActionListener,
     UploadFolderActionListener,
@@ -208,7 +217,51 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
         }
     }
 
+    private val inAppCameraLauncher = managerActivity.registerForActivityResult(
+        InAppCameraLauncher()
+    ) {
+        it?.let { uri ->
+            managerActivity.handleFileUris(listOf(uri))
+        }
+    }
+
+    private val cameraPermissionLauncher: ActivityResultLauncher<Array<String>> =
+        managerActivity.registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            if (permissions[Manifest.permission.CAMERA] == true) {
+                inAppCameraLauncher.launch(
+                    CameraArg("", activity.getString(R.string.context_upload))
+                )
+            } else {
+                managerActivity.showSnackbar(
+                    type = Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE,
+                    content = managerActivity.getString(R.string.chat_attach_pick_from_camera_deny_permission),
+                    chatId = -1L
+                )
+            }
+        }
+
     override fun takePictureAndUpload() {
+        managerActivity.lifecycleScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CameraActivityInCloudDrive)
+            }.onSuccess { enabled ->
+                if (enabled) {
+                    cameraPermissionLauncher.launch(
+                        arrayOf(
+                            PermissionUtils.getCameraPermission(),
+                            PermissionUtils.getRecordAudioPermission()
+                        )
+                    )
+                } else {
+                    startLegacyCameraIntent()
+                }
+            }
+        }
+    }
+
+    private fun startLegacyCameraIntent() {
         if (!permissionUtilWrapper.hasPermissions(Manifest.permission.CAMERA)) {
             cameraPermissionManager.setTypesCameraPermission(Constants.TAKE_PICTURE_OPTION)
             ActivityCompat.requestPermissions(
