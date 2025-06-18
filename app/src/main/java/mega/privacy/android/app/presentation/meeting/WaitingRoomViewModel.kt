@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,35 +23,35 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomState
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
-import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
+import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.meeting.WaitingRoomStatus
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
-import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
+import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatLocalVideoUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.InitGuestChatSessionUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.JoinGuestChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
-import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
-import mega.privacy.android.domain.usecase.login.LogoutUseCase
-import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
-import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.login.ChatLogoutUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
+import mega.privacy.android.domain.usecase.login.LogoutUseCase
+import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
 import mega.privacy.android.domain.usecase.meeting.JoinMeetingAsGuestUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.meeting.waitingroom.IsValidWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.mobile.analytics.event.WaitingRoomTimeoutEvent
@@ -121,6 +122,7 @@ class WaitingRoomViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(WaitingRoomState())
     private var shouldAnswerCall = AtomicBoolean(true)
+    private var joinMeetingAsGuestJob: Job? = null
 
     /**
      * Waiting room state
@@ -186,7 +188,7 @@ class WaitingRoomViewModel @Inject constructor(
             when {
                 !chatLink.isNullOrBlank() -> {
                     if (isValidWaitingRoom(chatLink)) {
-                        retrieveChatLinkDetails()
+                        launch { retrieveChatLinkDetails() }
                         retrieveMeetingDetails()
                         if (userLoggedIn) {
                             joinCurrentCall()
@@ -280,36 +282,33 @@ class WaitingRoomViewModel @Inject constructor(
     /**
      * Retrieve Chat Room link details
      */
-    private fun retrieveChatLinkDetails(
+    private suspend fun retrieveChatLinkDetails(
         shouldJoinMeetingAsGuest: Boolean = false,
     ) {
-        viewModelScope.launch {
-            runCatching {
-                checkChatLinkUseCase(
-                    chatLink = requireNotNull(_state.value.chatLink)
-                ).also { requireNotNull(it.chatHandle) }
-            }.onSuccess { chatRequest ->
-                val isMeetingEnded = isMeetingEnded(chatRequest.handleList)
-                _state.update {
-                    it.copy(
-                        isMeetingEnded = isMeetingEnded,
-                        chatId = requireNotNull(chatRequest.chatHandle),
-                        title = chatRequest.text,
-                    )
-                }
-
-                if (shouldJoinMeetingAsGuest) {
-                    state.value.chatLink?.let { link ->
-                        state.value.guestFirstName?.let { firstName ->
-                            state.value.guestLastName?.let { lastName ->
-                                joinMeetingAsGuest(link, firstName, lastName)
-                            }
+        runCatching {
+            checkChatLinkUseCase(
+                chatLink = requireNotNull(_state.value.chatLink)
+            )
+        }.onSuccess { chatRequest ->
+            val isMeetingEnded = isMeetingEnded(chatRequest.handleList)
+            _state.update {
+                it.copy(
+                    isMeetingEnded = isMeetingEnded,
+                    chatId = chatRequest.chatHandle,
+                    title = chatRequest.text,
+                )
+            }
+            if (shouldJoinMeetingAsGuest) {
+                state.value.chatLink?.let { link ->
+                    state.value.guestFirstName?.let { firstName ->
+                        state.value.guestLastName?.let { lastName ->
+                            joinMeetingAsGuest(link, firstName, lastName)
                         }
                     }
                 }
-            }.onFailure { exception ->
-                Timber.e(exception)
             }
+        }.onFailure { exception ->
+            Timber.e(exception)
         }
     }
 
@@ -494,7 +493,7 @@ class WaitingRoomViewModel @Inject constructor(
             ChatCallStatus.Connecting,
             ChatCallStatus.Joining,
             ChatCallStatus.InProgress,
-            -> true
+                -> true
 
             else -> false
         }
@@ -566,16 +565,23 @@ class WaitingRoomViewModel @Inject constructor(
      * @param lastName
      */
     fun setGuestName(firstName: String, lastName: String) {
-        _state.update {
-            it.copy(
-                guestFirstName = firstName,
-                guestLastName = lastName,
-            )
+        if (joinMeetingAsGuestJob == null || joinMeetingAsGuestJob?.isCompleted == true) {
+            Timber.d("Joining meeting as guest with link: ${_state.value.chatLink}")
+            joinMeetingAsGuestJob = viewModelScope.launch {
+                _state.update {
+                    it.copy(
+                        guestFirstName = firstName,
+                        guestLastName = lastName,
+                    )
+                }
+                retrieveChatLinkDetails(
+                    shouldJoinMeetingAsGuest = true
+                )
+            }
+        } else {
+            Timber.w("Already joining meeting as guest, skipping new request.")
+            return
         }
-
-        retrieveChatLinkDetails(
-            shouldJoinMeetingAsGuest = true
-        )
     }
 
     /**
@@ -585,21 +591,28 @@ class WaitingRoomViewModel @Inject constructor(
      * @param firstName     Guest first name
      * @param lastName      Guest last name
      */
-    private fun joinMeetingAsGuest(meetingLink: String, firstName: String, lastName: String) {
-        viewModelScope.launch {
-            runCatching {
-                joinMeetingAsGuestUseCase(meetingLink, firstName, lastName)
-            }.onSuccess {
-                chatManagement
-                    .setOpeningMeetingLink(
-                        state.value.chatId,
-                        true
-                    )
-                autoJoinPublicChat()
-            }.onFailure { exception ->
-                Timber.e(exception)
-                chatLogout()
-            }
+    private suspend fun joinMeetingAsGuest(
+        meetingLink: String,
+        firstName: String,
+        lastName: String,
+    ) {
+        runCatching {
+            startVideoDeviceUseCase(enable = false)
+            joinMeetingAsGuestUseCase(
+                meetingLink = meetingLink,
+                firstName = firstName,
+                lastName = lastName
+            )
+        }.onSuccess {
+            chatManagement
+                .setOpeningMeetingLink(
+                    state.value.chatId,
+                    true
+                )
+            autoJoinPublicChat()
+        }.onFailure { exception ->
+            Timber.e(exception)
+            chatLogout()
         }
     }
 
@@ -616,7 +629,6 @@ class WaitingRoomViewModel @Inject constructor(
                     chatManagement.removeJoiningChatId(state.value.chatId)
                     chatManagement.broadcastJoinedSuccessfully()
                     _state.update { it.copy(guestMode = false) }
-                    setChatVideoDevice()
                     retrieveMeetingDetails()
                     retrieveCallDetails()
                     retrieveUserAvatar()
