@@ -912,7 +912,9 @@ class LoginFragment : Fragment() {
             .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
             .setView(layout)
             .setOnDismissListener {
-                Util.hideKeyboard(requireActivity(), InputMethodManager.HIDE_NOT_ALWAYS)
+                activity?.let {
+                    Util.hideKeyboard(it, InputMethodManager.HIDE_NOT_ALWAYS)
+                }
             }
         insertMKDialog = builder.create().apply {
             show()
