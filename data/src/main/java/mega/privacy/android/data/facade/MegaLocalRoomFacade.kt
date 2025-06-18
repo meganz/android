@@ -190,9 +190,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun addCompletedTransfers(transfers: List<CompletedTransfer>) {
         transfers.map { completedTransferEntityMapper(it) }.let { mappedTransfers ->
-            completedTransferDao.get().insertOrUpdateCompletedTransfers(
-                mappedTransfers,
-                MAX_INSERT_LIST_SIZE
+            completedTransferDao.get().insertOrUpdateAndPruneCompletedTransfers(
+                entities = mappedTransfers,
+                maxPerState = MAX_COMPLETED_TRANSFER_ROWS,
             )
         }
     }
@@ -586,7 +586,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
         .deleteCompletedTransfersByPath(path)
 
     companion object {
-        private const val MAX_COMPLETED_TRANSFER_ROWS = 100
+        internal const val MAX_COMPLETED_TRANSFER_ROWS = 100
         internal const val MAX_INSERT_LIST_SIZE = 200
     }
 }

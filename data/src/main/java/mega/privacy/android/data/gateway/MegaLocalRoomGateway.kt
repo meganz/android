@@ -144,7 +144,7 @@ interface MegaLocalRoomGateway {
     suspend fun addCompletedTransfer(transfer: CompletedTransfer)
 
     /**
-     * Add a list of completed transfer
+     * Add a list of completed transfer. Please note that completed transfers are pruned to prevent them from growing without limit.
      *
      * @param transfers the completed transfers to add
      */

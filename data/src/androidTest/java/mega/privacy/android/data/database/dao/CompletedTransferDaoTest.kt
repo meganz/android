@@ -103,18 +103,45 @@ class CompletedTransferDaoTest {
     }
 
     @Test
-    fun test_that_insertOrUpdateCompletedTransfers_chunked_insert_the_corresponding_items() =
+    fun test_that_insertOrUpdateAndPruneCompletedTransfers_insert_the_corresponding_items() =
         runTest {
             val expected = (1..15).map {
                 createCompletedTransferEntity(
                     fileName = "2023-03-24 00.13.20_$it.jpg",
                 )
             }
-            completedTransferDao.insertOrUpdateCompletedTransfers(expected, 10)
+            completedTransferDao.insertOrUpdateAndPruneCompletedTransfers(
+                expected,
+                maxPerState = 100,
+                chunkSize = 10
+            )
 
             assertThat(
                 completedTransferDao.getAllCompletedTransfers().first().map { it.copy(id = null) }
             ).isEqualTo(expected)
+        }
+
+    @Test
+    fun test_that_insertOrUpdateAndPruneCompletedTransfers_prunes_the_entities_after_insert() =
+        runTest {
+            val maxPerState = 10
+            val entities = (1..25).map {
+                createCompletedTransferEntity(
+                    fileName = "2023-03-24 00.13.20_$it.jpg",
+                    timeStamp = it.toLong()
+                )
+            }
+            completedTransferDao.insertOrUpdateAndPruneCompletedTransfers(
+                entities,
+                chunkSize = 5,
+                maxPerState = maxPerState,
+            )
+
+            val expected = entities.sortedByDescending { it.timestamp }.take(maxPerState)
+
+            assertThat(
+                completedTransferDao.getAllCompletedTransfers().first().map { it.copy(id = null) }
+            ).containsAtLeastElementsIn(expected)
         }
 
     @Test
@@ -190,7 +217,10 @@ class CompletedTransferDaoTest {
         assertThat(completedTransferDao.getCompletedTransfersCount()).isEqualTo(0)
     }
 
-    private fun createCompletedTransferEntity(fileName: String = "2023-03-24 00.13.20_1.jpg") =
+    private fun createCompletedTransferEntity(
+        fileName: String = "2023-03-24 00.13.20_1.jpg",
+        timeStamp: Long = 1684228012974L,
+    ) =
         CompletedTransferEntity(
             fileName = fileName,
             type = 1,
@@ -200,7 +230,7 @@ class CompletedTransferDaoTest {
             path = "Cloud drive/Camera uploads",
             displayPath = null,
             isOffline = false,
-            timestamp = 1684228012974L,
+            timestamp = timeStamp,
             error = "No error",
             errorCode = null,
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",

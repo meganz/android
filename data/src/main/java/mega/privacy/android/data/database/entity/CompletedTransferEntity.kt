@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import mega.privacy.android.data.database.MegaDatabaseConstant
 
@@ -24,7 +25,10 @@ import mega.privacy.android.data.database.MegaDatabaseConstant
  * @property parentHandle
  *
  */
-@Entity(MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS)
+@Entity(
+    MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS,
+    indices = [Index(value = ["transferstate", "transfertimestamp"])]
+)
 internal data class CompletedTransferEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id") val id: Int? = null,

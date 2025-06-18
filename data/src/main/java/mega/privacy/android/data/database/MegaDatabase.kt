@@ -259,6 +259,15 @@ internal abstract class MegaDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_107_108 = object : Migration(107, 108) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS}_transferstate_transfertimestamp " +
+                            "ON ${MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS} (transferstate, transfertimestamp)"
+                )
+            }
+        }
+
 
         val MIGRATIONS = arrayOf(
             MIGRATION_67_68,
@@ -270,6 +279,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
             MIGRATION_76_77,
             MIGRATION_77_78,
             MIGRATION_85_86,
+            MIGRATION_107_108,
         )
     }
 }

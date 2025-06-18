@@ -215,7 +215,7 @@ interface TransferRepository {
     fun monitorCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
 
     /**
-     * Add a list of completed transfer to local storage
+     * Add a list of completed transfer to local storage. Please note that completed transfers are pruned to prevent them from growing without limit.
      *
      * @param finishEvents
      */

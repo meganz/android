@@ -28,16 +28,28 @@ internal interface CompletedTransferDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateCompletedTransfers(entities: List<CompletedTransferEntity>)
 
+    @Query("DELETE FROM $TABLE_COMPLETED_TRANSFERS WHERE id NOT IN (SELECT id FROM $TABLE_COMPLETED_TRANSFERS WHERE transferstate = :transferState ORDER BY transfertimestamp DESC LIMIT :limit)")
+    suspend fun deleteOldCompletedTransfersByState(transferState: Int, limit: Int)
+
     /**
-     * Transaction to insert a list of entities but splitting the insert to avoid SQLiteException too many SQL variables
+     * Inserts or updates a list of completed transfer entities in chunks to avoid SQLite variable limits,
+     * and prunes old entries to keep only the [maxPerState] most recent transfers per state.
+     *
+     * @param entities The list of completed transfer entities to insert or update.
+     * @param maxPerState The maximum number of entities of each state.
+     * @param chunkSize The maximum number of entities to insert in a single chunk.
      */
     @Transaction
-    suspend fun insertOrUpdateCompletedTransfers(
+    suspend fun insertOrUpdateAndPruneCompletedTransfers(
         entities: List<CompletedTransferEntity>,
-        chunkSize: Int,
+        maxPerState: Int,
+        chunkSize: Int = maxPerState,
     ) {
         entities.chunked(chunkSize).forEach {
             insertOrUpdateCompletedTransfers(it)
+        }
+        entities.map { it.state }.distinct().forEach {
+            deleteOldCompletedTransfersByState(it, maxPerState)
         }
     }
 

@@ -26,6 +26,7 @@ import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
+import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_COMPLETED_TRANSFER_ROWS
 import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_INSERT_LIST_SIZE
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
@@ -629,9 +630,10 @@ internal class MegaLocalRoomFacadeTest {
 
         underTest.addCompletedTransfers(completedTransfers)
 
-        verify(completedTransferDao).insertOrUpdateCompletedTransfers(
+        verify(completedTransferDao).insertOrUpdateAndPruneCompletedTransfers(
             expected,
-            MAX_INSERT_LIST_SIZE
+            MAX_COMPLETED_TRANSFER_ROWS,
+            MAX_COMPLETED_TRANSFER_ROWS,
         )
     }
 
@@ -667,7 +669,11 @@ internal class MegaLocalRoomFacadeTest {
             underTest.migrateLegacyCompletedTransfers()
 
             assertThat(expected).hasSize(legacyTransfers.size)
-            verify(completedTransferDao).insertOrUpdateCompletedTransfers(eq(expected), any())
+            verify(completedTransferDao).insertOrUpdateAndPruneCompletedTransfers(
+                eq(expected),
+                any(),
+                any()
+            )
         }
 
     @Test
@@ -688,9 +694,10 @@ internal class MegaLocalRoomFacadeTest {
             underTest.migrateLegacyCompletedTransfers()
 
             assertThat(expected).hasSize(100)
-            verify(completedTransferDao).insertOrUpdateCompletedTransfers(
+            verify(completedTransferDao).insertOrUpdateAndPruneCompletedTransfers(
                 eq(expected),
-                any()
+                any(),
+                any(),
             )
         }
 
