@@ -87,6 +87,11 @@ import mega.privacy.mobile.analytics.event.SpeedOption2XPressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
+import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_0_25XEvent
+import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_0_75XEvent
+import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_1XEvent
+import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_1_25XEvent
+import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_1_75XEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -698,8 +703,13 @@ class VideoPlayerFragment : Fragment() {
                     onDismissRequest = { viewModel.updateIsSpeedPopupShown(false) }
                 ) { speedPlaybackItem ->
                     when (speedPlaybackItem) {
+                        VideoSpeedPlaybackItem.PlaybackSpeed_0_25X -> VideoSpeedOptionPressed_0_25XEvent
                         VideoSpeedPlaybackItem.PlaybackSpeed_0_5X -> SpeedOption0_5XPressedEvent
+                        VideoSpeedPlaybackItem.PlaybackSpeed_0_75X -> VideoSpeedOptionPressed_0_75XEvent
+                        VideoSpeedPlaybackItem.PlaybackSpeed_1X -> VideoSpeedOptionPressed_1XEvent
+                        VideoSpeedPlaybackItem.PlaybackSpeed_1_25X -> VideoSpeedOptionPressed_1_25XEvent
                         VideoSpeedPlaybackItem.PlaybackSpeed_1_5X -> SpeedOption1_5XPressedEvent
+                        VideoSpeedPlaybackItem.PlaybackSpeed_1_75X -> VideoSpeedOptionPressed_1_75XEvent
                         VideoSpeedPlaybackItem.PlaybackSpeed_2X -> SpeedOption2XPressedEvent
                         else -> null
                     }?.let { eventIdentifier ->

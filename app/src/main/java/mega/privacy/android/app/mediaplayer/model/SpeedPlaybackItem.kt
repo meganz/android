@@ -1,7 +1,5 @@
 package mega.privacy.android.app.mediaplayer.model
 
-import androidx.annotation.DrawableRes
-
 /**
  * The interface for playback speed
  *

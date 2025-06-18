@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,7 +63,8 @@ fun SpeedSelectedPopup(
             Column(
                 modifier = Modifier
                     .width(110.dp)
-                    .background(color = colorResource(id = R.color.dark_grey)),
+                    .background(color = colorResource(id = R.color.white_dark_grey))
+                    .verticalScroll(rememberScrollState()),
             ) {
                 items.map { item ->
                     Row(
