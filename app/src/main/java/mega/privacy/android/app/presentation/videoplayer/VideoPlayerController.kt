@@ -102,14 +102,7 @@ class VideoPlayerController(
             screenshotButtonClicked()
         }
         setupFullscreen(uiState.isFullscreen)
-
-        lockButton.setOnClickListener {
-            updateLockState(true)
-        }
-
-        unlockButton.setOnClickListener {
-            updateLockState(false)
-        }
+        setupLockButton()
         setupSpeedPlaybackButton()
         setupGestures()
         setupSubtitleButton()
@@ -275,6 +268,16 @@ class VideoPlayerController(
                 R.drawable.ic_full_screen
             }
         )
+
+    private fun setupLockButton() {
+        updateLockState(uiState.isLocked)
+        lockButton.setOnClickListener {
+            updateLockState(true)
+        }
+        unlockButton.setOnClickListener {
+            updateLockState(false)
+        }
+    }
 
     private fun updateLockState(isLock: Boolean) {
         controllerView.isVisible = !isLock
