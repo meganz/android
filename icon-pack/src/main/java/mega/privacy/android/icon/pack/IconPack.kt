@@ -363,6 +363,52 @@ public object IconPack {
                     @Composable
                     get() = painterResource(R.drawable.ic_phone_01_medium_thin_solid)
             }
+
+            public object Outline {
+                public val CheckStack: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_check_stack_medium_thin_outline)
+
+                public val Eraser: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_eraser_medium_thin_outline)
+
+                public val ExternalLink: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_external_link_medium_thin_outline)
+
+                public val FileSearch02: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_file_search_02_medium_thin_outline)
+
+                public val Link01: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_link_01_medium_thin_outline)
+
+                public val MinusCircle: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_minus_circle_medium_thin_outline)
+
+                public val MoreVertical: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_more_vertical_medium_thin_outline)
+
+                public val Pause: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_pause_medium_thin_outline)
+
+                public val Play: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_play_medium_thin_outline)
+
+                public val RotateCcw: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_rotate_ccw_medium_thin_outline)
+
+                public val Square: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_square_medium_thin_outline)
+            }
         }
     }
 
@@ -422,6 +468,20 @@ public object IconPack {
         }
 
         public object Thin {
+            public object Outline {
+                public val ArrowDown: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_arrow_down_small_thin_outline)
+
+                public val ArrowUp: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_arrow_up_small_thin_outline)
+
+                public val QueueLine: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_queue_line_small_thin_outline)
+            }
+
             public object Solid {
                 public val ArrowDownCircle: Painter
                     @Composable

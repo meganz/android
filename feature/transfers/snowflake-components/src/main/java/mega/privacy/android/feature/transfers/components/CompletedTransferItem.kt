@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.transfers.components
 
 import android.net.Uri
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -28,6 +27,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -43,7 +43,7 @@ fun CompletedTransferItem(
     location: String,
     sizeString: String?,
     date: String?,
-    isSelected: Boolean,
+    isSelected: Boolean?,
     modifier: Modifier = Modifier,
     onMoreClicked: () -> Unit = {},
 ) = CompletedTransferItem(
@@ -71,7 +71,7 @@ internal fun CompletedTransferItem(
     date: String?,
     error: String?,
     modifier: Modifier = Modifier,
-    isSelected: Boolean = false,
+    isSelected: Boolean? = null,
     onMoreClicked: () -> Unit = {},
 ) = Box {
     Row(
@@ -83,32 +83,26 @@ internal fun CompletedTransferItem(
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val details = if (location != null) {
-            listOf(sizeString, date).joinToString(" · ")
+        val info = if (location != null) {
+            joinInfoText(sizeString, date)
         } else {
             error ?: stringResource(id = sharedR.string.transfers_section_cancelled)
         }
-        AnimatedContent(targetState = isSelected, label = "node thumbnail") {
-            if (it) {
-                SelectedTransferIcon()
-            } else {
-                TransferImage(
-                    fileTypeResId = fileTypeResId,
-                    previewUri = previewUri,
-                    modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE),
-                )
-            }
-        }
+        TransferImage(
+            fileTypeResId = fileTypeResId,
+            previewUri = previewUri,
+            modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE),
+        )
         Column(
             Modifier
-                .padding(horizontal = 8.dp)
+                .padding(start = 12.dp, end = 8.dp)
                 .weight(1f)
         ) {
             MegaText(
                 text = fileName,
                 maxLines = 1,
                 overflow = TextOverflow.MiddleEllipsis,
-                style = AppTheme.typography.titleMedium,
+                style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.W400),
                 textColor = TextColor.Primary,
                 modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_NAME),
             )
@@ -133,7 +127,7 @@ internal fun CompletedTransferItem(
                     isError = error != null,
                 )
                 MegaText(
-                    text = details,
+                    text = info,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = AppTheme.typography.bodySmall,
@@ -142,17 +136,19 @@ internal fun CompletedTransferItem(
                 )
             }
         }
-        IconButton(
-            onClick = onMoreClicked,
-            modifier = Modifier.size(24.dp)
-        ) {
-            MegaIcon(
-                painter = painterResource(
-                    id = iconPackR.drawable.ic_more_vertical_medium_regular_outline
-                ),
-                contentDescription = "",
-                tint = IconColor.Secondary,
-            )
+        if (isSelected == null) {
+            IconButton(
+                onClick = onMoreClicked,
+                modifier = Modifier.size(24.dp)
+            ) {
+                MegaIcon(
+                    painter = IconPack.Medium.Thin.Outline.MoreVertical,
+                    contentDescription = "",
+                    tint = IconColor.Secondary,
+                )
+            }
+        } else {
+            SelectedTransferIcon(isSelected)
         }
     }
 }
@@ -187,7 +183,7 @@ internal data class CompletedTransferUI(
     val error: String?,
     val sizeString: String?,
     val date: String?,
-    val isSelected: Boolean = false,
+    val isSelected: Boolean? = null,
 )
 
 private class CompletedTransferItemProvider : PreviewParameterProvider<CompletedTransferUI> {
@@ -205,10 +201,21 @@ private class CompletedTransferItemProvider : PreviewParameterProvider<Completed
             error = null,
             sizeString = sizeString,
             date = date,
-            isSelected = false,
+            isSelected = null,
         ),
         CompletedTransferUI(
             isDownload = true,
+            fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
+            previewUri = null,
+            fileName = name,
+            location = "Cloud Drive",
+            error = null,
+            sizeString = sizeString,
+            date = date,
+            isSelected = false,
+        ),
+        CompletedTransferUI(
+            isDownload = false,
             fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
             previewUri = null,
             fileName = name,
@@ -220,6 +227,9 @@ private class CompletedTransferItemProvider : PreviewParameterProvider<Completed
         ),
     ).asSequence()
 }
+
+internal fun joinInfoText(sizeString: String?, date: String?) =
+    listOfNotNull(sizeString, date).joinToString(" · ")
 
 /**
  * Tag for the completed transfer item.

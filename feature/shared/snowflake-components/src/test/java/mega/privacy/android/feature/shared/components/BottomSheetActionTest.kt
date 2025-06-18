@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,7 +45,7 @@ class BottomSheetActionTest {
     private fun initComposeRuleContent() =
         composeRule.setContent {
             BottomSheetAction(
-                iconId = iconPackR.drawable.ic_external_link_medium_regular_outline,
+                iconPainter = IconPack.Medium.Thin.Outline.ExternalLink,
                 name = fileName,
                 onClick = onClick,
             )

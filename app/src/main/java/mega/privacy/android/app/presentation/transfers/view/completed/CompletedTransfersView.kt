@@ -64,7 +64,7 @@ internal fun CompletedTransfersView(
             items(items = completedTransfers, key = { it.id ?: 0 }) { item ->
                 CompletedTransferItem(
                     completedTransfer = item,
-                    isSelected = selectedCompletedTransfersIds?.contains(item.id) == true,
+                    isSelected = selectedCompletedTransfersIds?.contains(item.id),
                     modifier = Modifier.then(
                         if (selectMode) {
                             Modifier.clickable { onCompletedTransferSelected(item) }
@@ -103,10 +103,10 @@ internal fun CompletedTransfersView(
 @Composable
 internal fun CompletedTransferItem(
     completedTransfer: CompletedTransfer,
-    isSelected: Boolean,
+    isSelected: Boolean?,
     modifier: Modifier = Modifier,
-    onMoreClicked: (CompletedItemSelected) -> Unit,
     viewModel: CompletedTransferImageViewModel = hiltViewModel(),
+    onMoreClicked: (CompletedItemSelected) -> Unit,
 ) = with(completedTransfer) {
     id?.let {
         val uiState by viewModel.getUiStateFlow(it).collectAsStateWithLifecycle()

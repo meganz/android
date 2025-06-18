@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.shared.components
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,8 +9,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
@@ -22,14 +21,14 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 
 /**
  * Composable function to display a card for the Pro plan.
  */
 @Composable
 fun BottomSheetAction(
-    @DrawableRes iconId: Int,
+    iconPainter: Painter,
     name: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -47,7 +46,7 @@ fun BottomSheetAction(
         modifier = Modifier
             .testTag(TEST_TAG_ICON)
             .size(24.dp),
-        painter = painterResource(iconId),
+        painter = iconPainter,
         contentDescription = "",
         tint = IconColor.Secondary,
     )
@@ -67,7 +66,7 @@ fun BottomSheetAction(
 private fun BottomSheetActionPreview() {
     AndroidThemeForPreviews {
         BottomSheetAction(
-            iconId = iconPackR.drawable.ic_external_link_medium_regular_outline,
+            iconPainter = IconPack.Medium.Thin.Outline.ExternalLink,
             name = "Action Name",
             onClick = {},
         )

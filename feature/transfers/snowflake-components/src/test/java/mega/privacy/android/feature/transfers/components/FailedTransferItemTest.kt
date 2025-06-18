@@ -134,7 +134,7 @@ class FailedTransferItemTest {
         )
         with(composeRule) {
             onNodeWithTag(TEST_TAG_TRANSFER_SELECTED).assertIsDisplayed()
-            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE).assertDoesNotExist()
+            onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE).assertIsDisplayed()
         }
     }
 

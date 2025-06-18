@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.transfers.components
 
 import android.net.Uri
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
@@ -22,8 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -62,7 +61,7 @@ fun ActiveTransferItem(
     onPlayPauseClicked: () -> Unit,
     modifier: Modifier = Modifier,
     isDraggable: Boolean = true,
-    isSelected: Boolean = false,
+    isSelected: Boolean? = null,
     isBeingDragged: Boolean = false,
 ) = Box(
     modifier = modifier
@@ -88,7 +87,7 @@ fun ActiveTransferItem(
             exit = fadeOut() + shrinkHorizontally(),
         ) {
             MegaIcon(
-                painter = painterResource(id = iconPackR.drawable.ic_queue_line_small_regular_outline),
+                painter = IconPack.Small.Thin.Outline.QueueLine,
                 contentDescription = "Reorder icon",
                 tint = IconColor.Secondary,
                 modifier = Modifier
@@ -97,27 +96,21 @@ fun ActiveTransferItem(
                     .testTag(TEST_TAG_QUEUE_ICON)
             )
         }
-        AnimatedContent(targetState = isSelected, label = "node thumbnail") {
-            if (it) {
-                SelectedTransferIcon()
-            } else {
-                TransferImage(
-                    fileTypeResId = fileTypeResId,
-                    previewUri = previewUri,
-                    modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE),
-                )
-            }
-        }
+        TransferImage(
+            fileTypeResId = fileTypeResId,
+            previewUri = previewUri,
+            modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_IMAGE),
+        )
         Column(
             Modifier
-                .padding(horizontal = 8.dp)
+                .padding(start = 12.dp, end = 8.dp)
                 .weight(1f)
         ) {
             MegaText(
                 text = fileName,
                 maxLines = 1,
                 overflow = TextOverflow.MiddleEllipsis,
-                style = AppTheme.typography.titleMedium,
+                style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.W400),
                 textColor = TextColor.Primary,
                 modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_NAME),
             )
@@ -141,16 +134,26 @@ fun ActiveTransferItem(
                 )
             }
         }
-        IconButton(
-            onClick = onPlayPauseClicked, modifier = Modifier
-                .padding(start = 8.dp)
-                .testTag(if (isPaused) TEST_TAG_PLAY_ICON else TEST_TAG_PAUSE_ICON)
-        ) {
-            MegaIcon(
-                painter = if (isPaused) IconPack.Medium.Regular.Outline.Play else IconPack.Medium.Regular.Outline.Pause,
-                contentDescription = if (isPaused) stringResource(id = sharedR.string.transfers_section_action_play)
-                else stringResource(id = sharedR.string.transfers_section_action_pause),
-                tint = if (areTransfersPaused) IconColor.Disabled else IconColor.Secondary,
+        if (isSelected == null) {
+            IconButton(
+                onClick = onPlayPauseClicked,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .size(24.dp)
+                    .testTag(if (isPaused) TEST_TAG_PLAY_ICON else TEST_TAG_PAUSE_ICON)
+            ) {
+
+                MegaIcon(
+                    painter = if (isPaused) IconPack.Medium.Thin.Outline.Play else IconPack.Medium.Thin.Outline.Pause,
+                    contentDescription = if (isPaused) stringResource(id = sharedR.string.transfers_section_action_play)
+                    else stringResource(id = sharedR.string.transfers_section_action_pause),
+                    tint = if (areTransfersPaused) IconColor.Disabled else IconColor.Secondary,
+                )
+            }
+        } else {
+            SelectedTransferIcon(
+                isSelected,
+                modifier = Modifier.padding(start = 8.dp),
             )
         }
     }
@@ -193,6 +196,7 @@ private fun Preview(activeTransferUI: ActiveTransferUI) {
                 isPaused = isPaused,
                 isOverQuota = isOverQuota,
                 areTransfersPaused = areTransfersPaused,
+                isSelected = isSelected,
                 onPlayPauseClicked = {},
             )
         }
@@ -212,7 +216,7 @@ internal data class ActiveTransferUI(
     val isOverQuota: Boolean,
     val areTransfersPaused: Boolean,
     val isDraggable: Boolean = true,
-    val isSelected: Boolean = false,
+    val isSelected: Boolean? = null,
 )
 
 private const val NAME = "File name.pdf"

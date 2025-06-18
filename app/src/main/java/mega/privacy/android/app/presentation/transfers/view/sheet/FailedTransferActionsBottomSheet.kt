@@ -20,7 +20,8 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.feature.shared.components.BottomSheetAction
-import mega.privacy.android.feature.transfers.components.CompletedTransferBottomSheetHeader
+import mega.privacy.android.feature.transfers.components.FailedTransferBottomSheetHeader
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -49,7 +50,7 @@ fun FailedTransferActionsBottomSheet(
             .fillMaxWidth(),
         sheetState = sheetState,
     ) {
-        CompletedTransferBottomSheetHeader(
+        FailedTransferBottomSheetHeader(
             fileName = fileName,
             info = if (isError) {
                 String.format(
@@ -60,7 +61,6 @@ fun FailedTransferActionsBottomSheet(
             } else {
                 stringResource(R.string.transfer_cancelled)
             },
-            isDownload = type.isDownloadType(),
             isError = isError,
             fileTypeResId = fileTypeResId,
             previewUri = previewUri,
@@ -68,7 +68,7 @@ fun FailedTransferActionsBottomSheet(
         )
         BottomSheetAction(
             modifier = Modifier.testTag(TEST_TAG_RETRY_ACTION),
-            iconId = iconPackR.drawable.ic_rotate_ccw_medium_regular_outline,
+            iconPainter = IconPack.Medium.Thin.Outline.RotateCcw,
             name = stringResource(id = R.string.general_retry),
             onClick = {
                 onRetryTransfer()
@@ -77,7 +77,7 @@ fun FailedTransferActionsBottomSheet(
         )
         BottomSheetAction(
             modifier = Modifier.testTag(TEST_TAG_CLEAR_FAILED_TRANSFER_ACTION),
-            iconId = iconPackR.drawable.ic_eraser_medium_regular_outline,
+            iconPainter = IconPack.Medium.Thin.Outline.Eraser,
             name = stringResource(id = R.string.general_clear),
             onClick = {
                 onClearTransfer()

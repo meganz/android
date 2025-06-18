@@ -14,8 +14,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -31,8 +29,26 @@ import mega.privacy.android.icon.pack.R
 @Composable
 fun CompletedTransferBottomSheetHeader(
     fileName: String,
-    info: String,
-    isDownload: Boolean,
+    size: String,
+    date: String,
+    fileTypeResId: Int?,
+    previewUri: Uri?,
+    modifier: Modifier = Modifier,
+) = CompletedTransferBottomSheetHeader(
+    fileName = fileName,
+    info1 = size,
+    info2 = date,
+    fileTypeResId = fileTypeResId,
+    previewUri = previewUri,
+    modifier = modifier,
+    isError = false
+)
+
+@Composable
+internal fun CompletedTransferBottomSheetHeader(
+    fileName: String,
+    info1: String,
+    info2: String?,
     fileTypeResId: Int?,
     previewUri: Uri?,
     modifier: Modifier = Modifier,
@@ -65,40 +81,26 @@ fun CompletedTransferBottomSheetHeader(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_NAME),
             )
-            Row(
-                modifier = Modifier.padding(top = 2.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                LeadingIndicator(
-                    modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_ICON_TYPE),
-                    isDownload = isDownload,
-                    isError = isError,
-                )
-                MegaText(
-                    text = info,
-                    textColor = if (isError) TextColor.Error else TextColor.Secondary,
-                    style = AppTheme.typography.bodySmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.MiddleEllipsis
-                )
-            }
+            MegaText(
+                text = joinInfoText(info1, info2),
+                textColor = if (isError) TextColor.Error else TextColor.Secondary,
+                style = AppTheme.typography.bodySmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
 
 @CombinedThemePreviews
 @Composable
-private fun CompletedTransferBottomSheetHeaderPreview(
-    @PreviewParameter(CompletedTransferBottomSheetHeaderProvider::class) completedTransferHeaderUI: CompletedTransferHeaderUI,
-) {
+private fun CompletedTransferBottomSheetHeaderPreview() {
     AndroidThemeForPreviews {
-        with(completedTransferHeaderUI) {
+        with(CompletedTransferHeaderUI.default) {
             CompletedTransferBottomSheetHeader(
                 fileName = fileName,
-                info = info,
-                isDownload = isDownload,
-                isError = isError,
+                size = size,
+                date = date,
                 fileTypeResId = fileTypeResId,
                 previewUri = null,
             )
@@ -107,59 +109,25 @@ private fun CompletedTransferBottomSheetHeaderPreview(
 }
 
 internal data class CompletedTransferHeaderUI(
-    val isDownload: Boolean,
-    val isError: Boolean,
     val fileTypeResId: Int?,
     val previewUri: Uri?,
     val fileName: String,
-    val info: String,
-)
-
-private class CompletedTransferBottomSheetHeaderProvider :
-    PreviewParameterProvider<CompletedTransferHeaderUI> {
-    private val name = "File name.pdf"
-
-    override val values = listOf(
-        CompletedTransferHeaderUI(
-            isDownload = true,
-            isError = false,
+    val size: String,
+    val date: String,
+) {
+    companion object {
+        val default = CompletedTransferHeaderUI(
             fileTypeResId = R.drawable.ic_pdf_medium_solid,
             previewUri = null,
-            fileName = name,
-            info = "/storage/emulated/0/Downloads",
-        ),
-        CompletedTransferHeaderUI(
-            isDownload = false,
-            isError = false,
-            fileTypeResId = R.drawable.ic_pdf_medium_solid,
-            previewUri = null,
-            fileName = name,
-            info = "Cloud Drive",
-        ),
-        CompletedTransferHeaderUI(
-            isDownload = true,
-            isError = true,
-            fileTypeResId = R.drawable.ic_pdf_medium_solid,
-            previewUri = null,
-            fileName = name,
-            info = "Failed",
-        ),
-        CompletedTransferHeaderUI(
-            isDownload = false,
-            isError = false,
-            fileTypeResId = R.drawable.ic_pdf_medium_solid,
-            previewUri = null,
-            fileName = name,
-            info = "Cancelled",
-        ),
-    ).asSequence()
+            fileName = "File name.pdf",
+            size = "10MB",
+            date = "10 Aug 2024 19:09",
+        )
+    }
 }
 
 /**
  * Tag for the completed transfer item sheet header.
  */
-const val TEST_TAG_COMPLETED_TRANSFER_SHEET_HEADER =
+internal const val TEST_TAG_COMPLETED_TRANSFER_SHEET_HEADER =
     "transfers_view:tab_completed:transfer_item_sheet_header"
-
-const val TEST_TAG_COMPLETED_TRANSFER_ICON_TYPE =
-    "$TEST_TAG_COMPLETED_TRANSFER_SHEET_HEADER:icon_type"

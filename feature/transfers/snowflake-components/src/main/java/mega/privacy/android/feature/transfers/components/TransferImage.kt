@@ -24,6 +24,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
 
 
@@ -90,10 +91,7 @@ internal fun LeadingIndicator(
             else TEST_TAG_UPLOAD_LEADING_INDICATOR
         )
         .size(16.dp),
-    painter = painterResource(
-        id = if (isDownload) R.drawable.ic_arrow_down_small_regular_outline
-        else R.drawable.ic_arrow_up_small_regular_outline
-    ),
+    painter = if (isDownload) IconPack.Small.Thin.Outline.ArrowDown else IconPack.Small.Thin.Outline.ArrowUp,
     contentDescription = null,
     tint = when {
         isOverQuota -> DSTokens.colors.indicator.yellow

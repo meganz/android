@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.transfers.model
 
+import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.model.TopAppBarAction
-import mega.android.core.ui.model.TopAppBarActionString
 import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 
 /**
  * Transfer menu action.
@@ -14,65 +16,91 @@ sealed interface TransferMenuAction : TopAppBarAction {
     /**
      * Resume transfers
      */
-    data object Resume : TopAppBarActionString(
-        iconRes = iconPackR.drawable.ic_play_medium_regular_outline,
+    data object Resume : TransferTopAppBarActionString(
         descriptionRes = R.string.action_play,
         testTag = TEST_TAG_RESUME_ACTION,
-    ), TransferMenuAction
+    ), TransferMenuAction {
+        @Composable
+        override fun getIconPainter() = IconPack.Medium.Thin.Outline.Play
+    }
 
     /**
      * Pause transfers
      */
-    data object Pause : TopAppBarActionString(
-        iconRes = iconPackR.drawable.ic_pause_medium_regular_outline,
+    data object Pause : TransferTopAppBarActionString(
         descriptionRes = R.string.action_pause,
         testTag = TEST_TAG_PAUSE_ACTION,
-    ), TransferMenuAction
+    ), TransferMenuAction {
+        @Composable
+        override fun getIconPainter() = IconPack.Medium.Thin.Outline.Pause
+    }
 
     /**
      * More
      */
-    data object More : TopAppBarActionString(
-        iconRes = iconPackR.drawable.ic_more_vertical_medium_regular_outline,
+    data object More : TransferTopAppBarActionString(
         descriptionRes = mega.privacy.android.core.R.string.label_more,
         testTag = TEST_TAG_MORE_ACTION,
-    ), TransferMenuAction
+    ), TransferMenuAction {
+        @Composable
+        override fun getIconPainter() = IconPack.Medium.Thin.Outline.MoreVertical
+    }
 
     /**
      * Select all
      */
-    data object SelectAll : TopAppBarActionString(
-        iconRes = iconPackR.drawable.ic_check_stack_medium_regular_outline,
+    data object SelectAll : TransferTopAppBarActionString(
         descriptionRes = R.string.action_select_all,
         testTag = TEST_TAG_SELECT_ALL_ACTION,
-    ), TransferMenuAction
+    ), TransferMenuAction {
+        @Composable
+        override fun getIconPainter() = IconPack.Medium.Thin.Outline.CheckStack
+    }
 
     /**
      * Cancel selected
      */
-    data object CancelSelected : TopAppBarActionString(
-        iconRes = iconPackR.drawable.ic_minus_circle_medium_regular_outline,
+    data object CancelSelected : TransferTopAppBarActionString(
         descriptionRes = R.string.cancel_transfers,
         testTag = TEST_TAG_CANCEL_ACTION,
-    ), TransferMenuAction
+    ), TransferMenuAction {
+        @Composable
+        override fun getIconPainter() = IconPack.Medium.Thin.Outline.MinusCircle
+    }
 
     /**
      * Clear selected
      */
-    data object ClearSelected : TopAppBarActionString(
-        iconRes = iconPackR.drawable.ic_eraser_medium_regular_outline,
+    data object ClearSelected : TransferTopAppBarActionString(
         descriptionRes = R.string.general_clear,
         testTag = TEST_TAG_CLEAR_ACTION,
-    ), TransferMenuAction
+    ), TransferMenuAction {
+        @Composable
+        override fun getIconPainter() = IconPack.Medium.Thin.Outline.Eraser
+    }
 
     /**
      * Retry selected
      */
-    data object RetrySelected : TopAppBarActionString(
-        iconRes = iconPackR.drawable.ic_rotate_ccw_medium_regular_outline,
+    data object RetrySelected : TransferTopAppBarActionString(
         descriptionRes = R.string.general_retry,
         testTag = TEST_TAG_RETRY_ACTION,
-    ), TransferMenuAction
+    ), TransferMenuAction {
+        @Composable
+        override fun getIconPainter() = IconPack.Medium.Thin.Outline.RotateCcw
+    }
+
+    /**
+     * Helper class to build Transfer TopAppBarAction
+     * @property descriptionRes
+     */
+    abstract class TransferTopAppBarActionString(
+        @StringRes val descriptionRes: Int,
+        override val testTag: String,
+    ) : TopAppBarAction {
+        @Composable
+        override fun getDescription() = stringResource(id = descriptionRes)
+    }
 
     companion object {
         /**

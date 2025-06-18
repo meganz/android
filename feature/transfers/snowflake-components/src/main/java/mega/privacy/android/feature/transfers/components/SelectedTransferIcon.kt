@@ -4,19 +4,26 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.theme.values.IconColor
-import mega.privacy.android.icon.pack.R
+import mega.privacy.android.icon.pack.IconPack
 
+/**
+ * Selected Transfer Icon
+ * @param isSelected
+ */
 @Composable
-fun SelectedTransferIcon() =
+fun SelectedTransferIcon(
+    isSelected: Boolean,
+    modifier: Modifier = Modifier,
+) =
     MegaIcon(
-        painterResource(id = R.drawable.ic_check_square_medium_thin_solid),
+        if (isSelected) IconPack.Medium.Thin.Solid.CheckSquare else IconPack.Medium.Thin.Outline.Square,
+        contentDescription = if (isSelected) "Selected" else "Unselected",
         tint = IconColor.Primary,
-        modifier = Modifier
-            .size(32.dp)
+        modifier = modifier
+            .size(24.dp)
             .testTag(TEST_TAG_TRANSFER_SELECTED)
     )
 

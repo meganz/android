@@ -80,7 +80,7 @@ internal fun ActiveTransfersView(
                     isOverQuota = isOverQuota,
                     areTransfersPaused = areTransfersPaused,
                     onPlayPauseClicked = onPlayPauseClicked,
-                    isSelected = selectedActiveTransfersIds?.contains(item.uniqueId) == true,
+                    isSelected = selectedActiveTransfersIds?.contains(item.uniqueId),
                     isDraggable = selectedActiveTransfersIds == null,
                     isBeingDragged = item == draggedTransfer,
                     modifier = Modifier.clickable(enabled = selectMode) {
@@ -98,7 +98,7 @@ internal fun ActiveTransferItem(
     isOverQuota: Boolean,
     areTransfersPaused: Boolean,
     onPlayPauseClicked: (Int) -> Unit,
-    isSelected: Boolean,
+    isSelected: Boolean?,
     isDraggable: Boolean,
     isBeingDragged: Boolean,
     modifier: Modifier = Modifier,

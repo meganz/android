@@ -19,7 +19,7 @@ fun FailedTransferItem(
     previewUri: Uri?,
     fileName: String,
     error: String?,
-    isSelected: Boolean,
+    isSelected: Boolean?,
     modifier: Modifier = Modifier,
     onMoreClicked: () -> Unit = {},
 ) = CompletedTransferItem(

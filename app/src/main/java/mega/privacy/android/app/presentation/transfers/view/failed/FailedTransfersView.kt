@@ -63,7 +63,7 @@ internal fun FailedTransfersView(
             items(items = failedTransfers, key = { it.id ?: 0 }) { item ->
                 FailedTransferItem(
                     failedTransfer = item,
-                    isSelected = selectedFailedTransfersIds?.contains(item.id) == true,
+                    isSelected = selectedFailedTransfersIds?.contains(item.id),
                     modifier = Modifier.then(
                         if (selectMode) {
                             Modifier.clickable { onFailedTransferSelected(item) }
@@ -100,10 +100,10 @@ internal fun FailedTransfersView(
 @Composable
 internal fun FailedTransferItem(
     failedTransfer: CompletedTransfer,
-    isSelected: Boolean,
+    isSelected: Boolean?,
     modifier: Modifier = Modifier,
-    onMoreClicked: (FailedItemSelected) -> Unit,
     viewModel: CompletedTransferImageViewModel = hiltViewModel(),
+    onMoreClicked: (FailedItemSelected) -> Unit,
 ) = with(failedTransfer) {
     id?.let {
         val uiState by viewModel.getUiStateFlow(it).collectAsStateWithLifecycle()

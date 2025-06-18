@@ -16,14 +16,17 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.view.completed.TEST_TAG_COMPLETED_TRANSFERS_VIEW
+import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.feature.shared.components.BottomSheetAction
 import mega.privacy.android.feature.transfers.components.CompletedTransferBottomSheetHeader
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Bottom sheet for a completed transfer actions.
@@ -53,16 +56,15 @@ fun CompletedTransferActionsBottomSheet(
     ) {
         CompletedTransferBottomSheetHeader(
             fileName = fileName,
-            info = displayPath ?: path,
-            isDownload = type.isDownloadType(),
-            isError = isError,
+            size = size,
+            date = TimeUtils.formatLongDateTime(timestamp.milliseconds.inWholeSeconds),
             fileTypeResId = fileTypeResId,
             previewUri = previewUri,
             modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER),
         )
         BottomSheetAction(
             modifier = Modifier.testTag(TEST_TAG_VIEW_IN_FOLDER_ACTION),
-            iconId = iconPackR.drawable.ic_file_search02_medium_regular_outline,
+            iconPainter = IconPack.Medium.Thin.Outline.FileSearch02,
             name = stringResource(id = R.string.view_in_folder_label),
             onClick = {
                 onViewInFolder()
@@ -72,7 +74,7 @@ fun CompletedTransferActionsBottomSheet(
         if (type.isDownloadType()) {
             BottomSheetAction(
                 modifier = Modifier.testTag(TEST_TAG_OPEN_WITH_ACTION),
-                iconId = iconPackR.drawable.ic_external_link_medium_regular_outline,
+                iconPainter = IconPack.Medium.Thin.Outline.ExternalLink,
                 name = stringResource(id = R.string.external_play),
                 onClick = {
                     onOpenWith()
@@ -82,7 +84,7 @@ fun CompletedTransferActionsBottomSheet(
         }
         BottomSheetAction(
             modifier = Modifier.testTag(TEST_TAG_SHARE_LINK_ACTION),
-            iconId = iconPackR.drawable.ic_link_01_medium_regular_solid,
+            iconPainter = IconPack.Medium.Thin.Outline.Link01,
             name = stringResource(id = R.string.context_get_link),
             onClick = {
                 onShareLink()
@@ -91,7 +93,7 @@ fun CompletedTransferActionsBottomSheet(
         )
         BottomSheetAction(
             modifier = Modifier.testTag(TEST_TAG_CLEAR_ACTION),
-            iconId = iconPackR.drawable.ic_eraser_medium_regular_outline,
+            iconPainter = IconPack.Medium.Thin.Outline.Eraser,
             name = stringResource(id = R.string.general_clear),
             onClick = {
                 onClearTransfer()

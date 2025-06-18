@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -21,6 +22,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
+import kotlin.time.Duration.Companion.milliseconds
 
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w1080dp-h1920dp")
@@ -78,9 +80,11 @@ class CompletedTransferActionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_ACTIONS_PANEL).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER).assertIsDisplayed()
             onNodeWithText(fileName).assertIsDisplayed()
-            completedDownload.displayPath?.let {
-                onNodeWithText(it).assertIsDisplayed()
-            }
+            onNodeWithText(completedDownload.size, substring = true).assertIsDisplayed()
+            onNodeWithText(
+                TimeUtils.formatLongDateTime(completedDownload.timestamp.milliseconds.inWholeSeconds),
+                substring = true
+            ).assertIsDisplayed()
             onNodeWithText(completedDownload.path).assertIsNotDisplayed()
             onNodeWithTag(TEST_TAG_VIEW_IN_FOLDER_ACTION).assertIsDisplayed()
             onNodeWithText(R.string.view_in_folder_label).assertIsDisplayed()
@@ -101,7 +105,11 @@ class CompletedTransferActionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_ACTIONS_PANEL).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER).assertIsDisplayed()
             onNodeWithText(fileName).assertIsDisplayed()
-            onNodeWithText(completedUpload.path).assertIsDisplayed()
+            onNodeWithText(completedDownload.size, substring = true).assertIsDisplayed()
+            onNodeWithText(
+                TimeUtils.formatLongDateTime(completedDownload.timestamp.milliseconds.inWholeSeconds),
+                substring = true
+            ).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_VIEW_IN_FOLDER_ACTION).assertIsDisplayed()
             onNodeWithText(R.string.view_in_folder_label).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_OPEN_WITH_ACTION).assertIsNotDisplayed()
