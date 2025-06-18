@@ -164,14 +164,19 @@
         app:layout_constraintEnd_toStartOf="@id/speed_playback"
         app:layout_constraintStart_toEndOf="@id/exo_shuffle" />
 
-    <ImageButton
+    <TextView
         android:id="@id/speed_playback"
-        style="@style/AudioPlayerButton"
-        android:src="@drawable/ic_playback_1x"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:background="?selectableItemBackground"
+        android:gravity="center"
+        android:textColor="@color/dark_grey_white"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/playlist"
         app:layout_constraintStart_toEndOf="@+id/exo_repeat_toggle"
-        app:tint="@color/dark_grey_white"/>
+        tools:text="1.25x" />
 
     <ImageButton
         android:id="@+id/playlist"

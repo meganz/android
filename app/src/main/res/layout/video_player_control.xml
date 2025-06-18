@@ -168,17 +168,20 @@
                 app:tint="@color/white"
                 android:visibility="gone"/>
 
-            <ImageButton
+            <TextView
                 android:id="@+id/speed_playback"
-                style="@style/VideoPlayerButton"
-                android:enabled="false"
-                android:src="@drawable/ic_playback_1x"
-                android:padding="6dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:background="?selectableItemBackground"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.06"
                 app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/white"/>
+                tools:text="1.75x" />
 
             <ImageButton
                 android:id="@+id/playlist"

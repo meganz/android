@@ -56,8 +56,8 @@ import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
-import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoOptionItem
+import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.videoplayer.view.AddSubtitlesDialog
@@ -370,7 +370,7 @@ class VideoPlayerFragment : Fragment() {
                 viewLifecycleOwner.collectFlow(
                     uiState.map { it.currentSpeedPlayback }.distinctUntilChanged()
                 ) { item ->
-                    playerViewHolder?.updateSpeedPlaybackIcon(item.iconId)
+                    playerViewHolder?.updateSpeedPlaybackIcon(item.text)
                     mediaPlayerGateway.updatePlaybackSpeed(item)
                 }
 
@@ -698,9 +698,9 @@ class VideoPlayerFragment : Fragment() {
                     onDismissRequest = { viewModel.updateIsSpeedPopupShown(false) }
                 ) { speedPlaybackItem ->
                     when (speedPlaybackItem) {
-                        VideoSpeedPlaybackItem.PLAYBACK_SPEED_0_5_X -> SpeedOption0_5XPressedEvent
-                        VideoSpeedPlaybackItem.PLAYBACK_SPEED_1_5_X -> SpeedOption1_5XPressedEvent
-                        VideoSpeedPlaybackItem.PLAYBACK_SPEED_2_X -> SpeedOption2XPressedEvent
+                        VideoSpeedPlaybackItem.PlaybackSpeed_0_5X -> SpeedOption0_5XPressedEvent
+                        VideoSpeedPlaybackItem.PlaybackSpeed_1_5X -> SpeedOption1_5XPressedEvent
+                        VideoSpeedPlaybackItem.PlaybackSpeed_2X -> SpeedOption2XPressedEvent
                         else -> null
                     }?.let { eventIdentifier ->
                         Analytics.tracker.trackEvent(eventIdentifier)

@@ -1,36 +1,33 @@
 package mega.privacy.android.app.mediaplayer.model
 
-import androidx.annotation.DrawableRes
-import mega.privacy.android.app.R
-
 /**
  * The enum class for audio playback speed
  *
  * @property speed playback speed
- * @property iconId speed icon resource id
+ * @property text speed text
  */
 enum class AudioSpeedPlaybackItem(
     override val speed: Float,
-    @DrawableRes override val iconId: Int,
+    override val text: String,
 ) : SpeedPlaybackItem {
     /**
      * 0.5x playback speed
      */
-    PLAYBACK_SPEED_0_5_X(speed = 0.5F, iconId = R.drawable.ic_playback_0_5x),
+    PlaybackSpeed_0_5X(speed = 0.5F, text = "0.5x"),
 
     /**
      * 1x playback speed
      */
-    PLAYBACK_SPEED_1_X(speed = 1F, iconId = R.drawable.ic_playback_1x),
+    PlaybackSpeed_1X(speed = 1F, text = "1x"),
 
     /**
      * 1.5x playback speed
      */
-    PLAYBACK_SPEED_1_5_X(speed = 1.5F, iconId = R.drawable.ic_playback_1_5x),
+    PlaybackSpeed_1_5X(speed = 1.5F, text = "1.5x"),
 
 
     /**
      * 2x playback speed
      */
-    PLAYBACK_SPEED_2_X(speed = 2F, iconId = R.drawable.ic_playback_2x),
+    PlaybackSpeed_2X(speed = 2F, text = "2x"),
 }

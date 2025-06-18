@@ -6,11 +6,9 @@ import androidx.annotation.DrawableRes
  * The interface for playback speed
  *
  * @property speed playback speed
- * @property iconId speed icon resource id
+ * @property text speed text
  */
 interface SpeedPlaybackItem {
     val speed: Float
-
-    @get: DrawableRes
-    val iconId: Int
+    val text: String
 }

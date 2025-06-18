@@ -89,7 +89,7 @@ data class VideoPlayerUiState(
     val searchedItems: List<VideoPlayerItem> = emptyList(),
     val isLocked: Boolean = false,
     val isSpeedPopupShown: Boolean = false,
-    val currentSpeedPlayback: SpeedPlaybackItem = VideoSpeedPlaybackItem.PLAYBACK_SPEED_1_X,
+    val currentSpeedPlayback: SpeedPlaybackItem = VideoSpeedPlaybackItem.PlaybackSpeed_1X,
     val showPlaybackDialog: Boolean = false,
     val playbackPosition: Long? = null,
     val currentPlayingItemName: String? = null,

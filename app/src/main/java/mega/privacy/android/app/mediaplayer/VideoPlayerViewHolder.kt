@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
 import androidx.compose.ui.platform.ComposeView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -36,7 +35,7 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
     private val screenshotButton = container.findViewById<ImageButton>(R.id.image_screenshot)
     private val subtitleButton = container.findViewById<ImageButton>(R.id.subtitle)
     private val fullScreenButton = container.findViewById<ImageButton>(R.id.full_screen)
-    internal val speedPlaybackButton = container.findViewById<ImageButton>(R.id.speed_playback)
+    internal val speedPlaybackButton = container.findViewById<TextView>(R.id.speed_playback)
     internal val moreOptionButton = container.findViewById<ImageButton>(R.id.more_option)
     internal val playerView = container.findViewById<PlayerView>(R.id.player_view)
     internal val speedPlaybackPopup = container.findViewById<ComposeView>(R.id.speed_playback_popup)
@@ -135,10 +134,10 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
     /**
      * Update the speed playback icon according to the playback speed
      *
-     * @param iconId icon resources id
+     * @param text speed text
      */
-    fun updateSpeedPlaybackIcon(@DrawableRes iconId: Int) {
-        speedPlaybackButton.setImageResource(iconId)
+    fun updateSpeedPlaybackIcon(text: String) {
+        speedPlaybackButton.text = text
     }
 
     /**

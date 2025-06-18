@@ -210,10 +210,8 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.io.File
 import java.time.Instant
-import kotlin.Boolean
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import kotlin.use
 
 @ExtendWith(
     value = [
@@ -1499,7 +1497,7 @@ class VideoPlayerViewModelTest {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.currentSpeedPlayback.speed).isEqualTo(item.speed)
-                assertThat(actual.currentSpeedPlayback.iconId).isEqualTo(item.iconId)
+                assertThat(actual.currentSpeedPlayback.text).isEqualTo(item.text)
             }
         }
 

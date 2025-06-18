@@ -487,7 +487,7 @@ class MediaPlayerFacade @Inject constructor(
 
     override fun getCurrentSpeedPlaybackItem(): SpeedPlaybackItem =
         VideoSpeedPlaybackItem.entries.find { it.speed == player?.playbackParameters?.speed }
-            ?: VideoSpeedPlaybackItem.PLAYBACK_SPEED_1_X
+            ?: VideoSpeedPlaybackItem.PlaybackSpeed_1X
 
     override fun playNext() {
         player?.seekToNext()

@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
@@ -35,8 +34,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.SpeedSelectedPopup
 import mega.privacy.android.app.mediaplayer.VideoOptionPopup
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
-import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoOptionItem
+import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
@@ -82,7 +81,7 @@ class VideoPlayerController(
     private val controllerView = container.findViewById<View>(R.id.layout_player)
     private val unlockView = container.findViewById<View>(R.id.layout_unlock)
     private val unlockButton = container.findViewById<ImageButton>(R.id.image_button_unlock)
-    private val speedPlaybackButton = container.findViewById<ImageButton>(R.id.speed_playback)
+    private val speedPlaybackButton = container.findViewById<TextView>(R.id.speed_playback)
     private val speedPlaybackPopup = container.findViewById<ComposeView>(R.id.speed_playback_popup)
     private val subtitleButton = container.findViewById<ImageButton>(R.id.subtitle)
 
@@ -296,13 +295,13 @@ class VideoPlayerController(
         unlockView.isVisible = isLock
     }
 
-    internal fun updateSpeedPlaybackButtonIcon(@DrawableRes icon: Int) {
-        speedPlaybackButton.setImageResource(icon)
+    internal fun updateSpeedPlaybackButtonIcon(text: String) {
+        speedPlaybackButton.text = text
     }
 
     private fun setupSpeedPlaybackButton() {
         initSpeedPlaybackPopup(speedPlaybackPopup)
-        speedPlaybackButton.setImageResource(uiState.currentSpeedPlayback.iconId)
+        speedPlaybackButton.text = uiState.currentSpeedPlayback.text
         speedPlaybackButton.setOnClickListener {
             updateIsSpeedPopupShown(true)
             isSpeedPopupShown.value = true
@@ -321,9 +320,9 @@ class VideoPlayerController(
                 }
             ) { speedPlaybackItem ->
                 when (speedPlaybackItem) {
-                    VideoSpeedPlaybackItem.PLAYBACK_SPEED_0_5_X -> SpeedOption0_5XPressedEvent
-                    VideoSpeedPlaybackItem.PLAYBACK_SPEED_1_5_X -> SpeedOption1_5XPressedEvent
-                    VideoSpeedPlaybackItem.PLAYBACK_SPEED_2_X -> SpeedOption2XPressedEvent
+                    VideoSpeedPlaybackItem.PlaybackSpeed_0_5X -> SpeedOption0_5XPressedEvent
+                    VideoSpeedPlaybackItem.PlaybackSpeed_1_5X -> SpeedOption1_5XPressedEvent
+                    VideoSpeedPlaybackItem.PlaybackSpeed_2X -> SpeedOption2XPressedEvent
                     else -> null
                 }?.let { eventIdentifier ->
                     Analytics.tracker.trackEvent(eventIdentifier)

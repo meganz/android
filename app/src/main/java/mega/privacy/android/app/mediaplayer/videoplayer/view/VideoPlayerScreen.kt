@@ -182,7 +182,7 @@ internal fun VideoPlayerScreen(
     }
 
     LaunchedEffect(uiState.currentSpeedPlayback) {
-        videoPlayerController?.updateSpeedPlaybackButtonIcon(uiState.currentSpeedPlayback.iconId)
+        videoPlayerController?.updateSpeedPlaybackButtonIcon(uiState.currentSpeedPlayback.text)
     }
 
     LaunchedEffect(uiState.subtitleSelectedStatus) {

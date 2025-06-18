@@ -248,10 +248,10 @@ class AudioPlayerFragment : Fragment() {
 
     private fun addAudioSpeedPlaybackEvent(item: SpeedPlaybackItem) {
         when (item) {
-            AudioSpeedPlaybackItem.PLAYBACK_SPEED_0_5_X -> AudioPlayerSpeedChangeHalfXEvent
-            AudioSpeedPlaybackItem.PLAYBACK_SPEED_1_X -> AudioPlayerSpeedChange1XEvent
-            AudioSpeedPlaybackItem.PLAYBACK_SPEED_1_5_X -> AudioPlayerSpeedChangeOneAndHalfXEvent
-            AudioSpeedPlaybackItem.PLAYBACK_SPEED_2_X -> AudioPlayerSpeedChange2XEvent
+            AudioSpeedPlaybackItem.PlaybackSpeed_0_5X -> AudioPlayerSpeedChangeHalfXEvent
+            AudioSpeedPlaybackItem.PlaybackSpeed_1X -> AudioPlayerSpeedChange1XEvent
+            AudioSpeedPlaybackItem.PlaybackSpeed_1_5X -> AudioPlayerSpeedChangeOneAndHalfXEvent
+            AudioSpeedPlaybackItem.PlaybackSpeed_2X -> AudioPlayerSpeedChange2XEvent
             else -> null
         }?.let {
             Analytics.tracker.trackEvent(it)
@@ -317,6 +317,6 @@ class AudioPlayerFragment : Fragment() {
         val speedPlaybackList = AudioSpeedPlaybackItem.entries
         val currentIndex = speedPlaybackList.indexOfFirst { it.speed == speed }
         return speedPlaybackList.getOrNull((currentIndex + 1) % speedPlaybackList.size)
-            ?: AudioSpeedPlaybackItem.PLAYBACK_SPEED_1_X
+            ?: AudioSpeedPlaybackItem.PlaybackSpeed_1X
     }
 }

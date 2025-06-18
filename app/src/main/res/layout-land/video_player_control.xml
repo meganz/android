@@ -145,16 +145,19 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginEnd="30dp">
 
-            <ImageButton
+            <TextView
                 android:id="@+id/speed_playback"
-                style="@style/VideoPlayerButton"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:layout_marginEnd="5dp"
-                android:enabled="false"
-                android:padding="6dp"
-                android:src="@drawable/ic_playback_1x"
+                android:background="?selectableItemBackground"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/repeat_toggle"
-                app:tint="@color/white" />
+                tools:text="1.25x" />
 
             <ImageButton
                 android:id="@+id/repeat_toggle"

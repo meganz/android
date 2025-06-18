@@ -36,7 +36,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
     private val shuffle =
         binding.root.findViewById<ImageView>(androidx.media3.ui.R.id.exo_shuffle)
-    private val speedPlaybackButton = binding.root.findViewById<ImageButton>(R.id.speed_playback)
+    private val speedPlaybackButton = binding.root.findViewById<TextView>(R.id.speed_playback)
 
     /**
      * Update the layout param of artwork of player view.
@@ -219,7 +219,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      */
     fun setupSpeedPlaybackButton(default: SpeedPlaybackItem?, callback: (View) -> Unit) {
         speedPlaybackButton.setOnClickListener(callback)
-        updateSpeedPlaybackIcon(default ?: AudioSpeedPlaybackItem.PLAYBACK_SPEED_1_X)
+        updateSpeedPlaybackIcon(default ?: AudioSpeedPlaybackItem.PlaybackSpeed_1X)
     }
 
     /**
@@ -229,10 +229,10 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      */
     fun updateSpeedPlaybackIcon(speedPlaybackItem: SpeedPlaybackItem) =
         with(speedPlaybackButton) {
-            setImageResource(speedPlaybackItem.iconId)
-            setColorFilter(
+            text = speedPlaybackItem.text
+            setTextColor(
                 context.getColor(
-                    if (speedPlaybackItem != AudioSpeedPlaybackItem.PLAYBACK_SPEED_1_X) {
+                    if (speedPlaybackItem != AudioSpeedPlaybackItem.PlaybackSpeed_1X) {
                         R.color.color_button_brand
                     } else {
                         R.color.dark_grey_white
