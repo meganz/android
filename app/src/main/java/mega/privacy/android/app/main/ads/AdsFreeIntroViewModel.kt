@@ -8,13 +8,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
-import mega.privacy.android.domain.usecase.billing.GetCheapestSubscriptionUseCase
+import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 internal class AdsFreeIntroViewModel @Inject constructor(
-    private val getCheapestSubscriptionUseCase: GetCheapestSubscriptionUseCase,
+    private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AdsFreeIntroUiState())
@@ -27,7 +27,7 @@ internal class AdsFreeIntroViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             runCatching {
-                getCheapestSubscriptionUseCase().let {
+                getRecommendedSubscriptionUseCase()?.let {
                     localisedSubscriptionMapper(it, it)
                 }
             }.onSuccess { cheapestSubscription ->

@@ -16,9 +16,9 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.billing.GetCheapestSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
+import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -33,7 +33,7 @@ import javax.inject.Inject
  * @param getMonthlySubscriptionsUseCase use case to get the list of monthly subscriptions available in the app
  * @param getYearlySubscriptionsUseCase use case to get the list of yearly subscriptions available in the app
  * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
- * @param getCheapestSubscriptionUseCase use case to get the cheapest subscription available in the app
+ * @param getRecommendedSubscriptionUseCase use case to get the cheapest subscription available in the app
  * @param getFeatureFlagValueUseCase use case to get the value of a feature flag
  * @param isBillingAvailableUseCase use case to check if billing is available
  * @param getPaymentMethodUseCase use case to to get available payment method (Google Wallet)
@@ -46,7 +46,7 @@ internal class ChooseAccountViewModel @Inject constructor(
     private val getMonthlySubscriptionsUseCase: GetMonthlySubscriptionsUseCase,
     private val getYearlySubscriptionsUseCase: GetYearlySubscriptionsUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
-    private val getCheapestSubscriptionUseCase: GetCheapestSubscriptionUseCase,
+    private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
     private val isBillingAvailableUseCase: IsBillingAvailableUseCase,
@@ -79,7 +79,7 @@ internal class ChooseAccountViewModel @Inject constructor(
         }
         viewModelScope.launch {
             val cheapestSubscriptionAvailable =
-                runCatching { getCheapestSubscriptionUseCase() }.getOrElse {
+                runCatching { getRecommendedSubscriptionUseCase() }.getOrElse {
                     Timber.e(it)
                     null
                 }
