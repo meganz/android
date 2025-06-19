@@ -69,13 +69,16 @@ object GenerateIconPainters {
                     }
             }
 
-        for ((size, bySize) in groupedBySizeWeightStyle) {
+        // Sort by size to ensure deterministic ordering
+        for ((size, bySize) in groupedBySizeWeightStyle.toSortedMap()) {
             val sizeObject = TypeSpec.objectBuilder(size)
 
-            for ((weight, byStyle) in bySize) {
+            // Sort by weight to ensure deterministic ordering
+            for ((weight, byStyle) in bySize.toSortedMap()) {
                 val weightObject = TypeSpec.objectBuilder(weight)
 
-                for ((style, iconsInGroup) in byStyle) {
+                // Sort by style to ensure deterministic ordering
+                for ((style, iconsInGroup) in byStyle.toSortedMap()) {
                     val styleObject = TypeSpec.objectBuilder(style)
 
                     for (icon in iconsInGroup.sortedBy { it.name }) {

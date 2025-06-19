@@ -354,16 +354,6 @@ public object IconPack {
         }
 
         public object Thin {
-            public object Solid {
-                public val CheckSquare: Painter
-                    @Composable
-                    get() = painterResource(R.drawable.ic_check_square_medium_thin_solid)
-
-                public val Phone01: Painter
-                    @Composable
-                    get() = painterResource(R.drawable.ic_phone_01_medium_thin_solid)
-            }
-
             public object Outline {
                 public val CheckStack: Painter
                     @Composable
@@ -408,6 +398,16 @@ public object IconPack {
                 public val Square: Painter
                     @Composable
                     get() = painterResource(R.drawable.ic_square_medium_thin_outline)
+            }
+
+            public object Solid {
+                public val CheckSquare: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_check_square_medium_thin_solid)
+
+                public val Phone01: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_phone_01_medium_thin_solid)
             }
         }
     }
