@@ -188,4 +188,10 @@
         app:layout_constraintStart_toEndOf="@id/speed_playback"
         app:tint="@color/dark_grey_white" />
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/speed_playback_popup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/speed_playback"
+        app:layout_constraintBottom_toBottomOf="@id/speed_playback"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -40,7 +40,6 @@ import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMa
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
-import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -485,9 +484,7 @@ class MediaPlayerFacade @Inject constructor(
         exoPlayer.setVideoSurface(surface)
     }
 
-    override fun getCurrentSpeedPlaybackItem(): SpeedPlaybackItem =
-        VideoSpeedPlaybackItem.entries.find { it.speed == player?.playbackParameters?.speed }
-            ?: VideoSpeedPlaybackItem.PlaybackSpeed_1X
+    override fun getCurrentPlaybackSpeed(): Float = player?.playbackParameters?.speed ?: 1f
 
     override fun playNext() {
         player?.seekToNext()

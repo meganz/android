@@ -11,13 +11,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -36,10 +44,14 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIS
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChange1XEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChange2XEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeHalfXEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeOneAndHalfXEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeTo_0_75XEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeTo_1_25XEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeTo_1_75XEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -60,6 +72,8 @@ class AudioPlayerFragment : Fragment() {
     @AudioPlayer
     @Inject
     lateinit var mediaPlayerGateway: MediaPlayerGateway
+
+    private val audioViewModel by viewModels<AudioPlayerViewModel>()
 
     private var playerViewHolder: AudioPlayerViewHolder? = null
 
@@ -205,6 +219,13 @@ class AudioPlayerFragment : Fragment() {
                 }
             }
         }
+
+        viewLifecycleOwner.collectFlow(
+            audioViewModel.uiState.map { it.currentSpeedPlayback }.distinctUntilChanged()
+        ) { speedPlaybackItem ->
+            playerViewHolder?.updateSpeedPlaybackText(speedPlaybackItem)
+            mediaPlayerGateway.updatePlaybackSpeed(speedPlaybackItem)
+        }
     }
 
     private fun setupPlayer() {
@@ -229,19 +250,31 @@ class AudioPlayerFragment : Fragment() {
                     }
                 }
 
-                val defaultSpeedItem = AudioSpeedPlaybackItem.entries.find {
-                    it == mediaPlayerGateway.getCurrentSpeedPlaybackItem()
+                initSpeedPlaybackPopup(viewHolder.speedPlaybackPopup)
+                viewHolder.speedPlaybackButton.setOnClickListener {
+                    audioViewModel.updateIsSpeedPopupShown(true)
                 }
-                viewHolder.setupSpeedPlaybackButton(
-                    default = defaultSpeedItem,
-                    callback = {
-                        val currentPlaybackItem = mediaPlayerGateway.getCurrentSpeedPlaybackItem()
-                        val nextItem = getNextSpeedPlaybackItem(currentPlaybackItem.speed)
-                        addAudioSpeedPlaybackEvent(nextItem)
-                        mediaPlayerGateway.updatePlaybackSpeed(nextItem)
-                        viewHolder.updateSpeedPlaybackIcon(nextItem)
+            }
+        }
+    }
+
+    private fun initSpeedPlaybackPopup(composeView: ComposeView) {
+        composeView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val state by audioViewModel.uiState.collectAsStateWithLifecycle()
+                OriginalTheme(isDark = isSystemInDarkTheme()) {
+                    SpeedSelectedPopup(
+                        items = AudioSpeedPlaybackItem.entries,
+                        isShown = state.isSpeedPopupShown,
+                        currentPlaybackSpeed = state.currentSpeedPlayback,
+                        onDismissRequest = { audioViewModel.updateIsSpeedPopupShown(false) }
+                    ) { speedPlaybackItem ->
+                        addAudioSpeedPlaybackEvent(speedPlaybackItem)
+                        audioViewModel.updateCurrentSpeedPlaybackItem(speedPlaybackItem)
+                        audioViewModel.updateIsSpeedPopupShown(false)
                     }
-                )
+                }
             }
         }
     }
@@ -249,8 +282,11 @@ class AudioPlayerFragment : Fragment() {
     private fun addAudioSpeedPlaybackEvent(item: SpeedPlaybackItem) {
         when (item) {
             AudioSpeedPlaybackItem.PlaybackSpeed_0_5X -> AudioPlayerSpeedChangeHalfXEvent
+            AudioSpeedPlaybackItem.PlaybackSpeed_0_75X -> AudioPlayerSpeedChangeTo_0_75XEvent
             AudioSpeedPlaybackItem.PlaybackSpeed_1X -> AudioPlayerSpeedChange1XEvent
+            AudioSpeedPlaybackItem.PlaybackSpeed_1_25X -> AudioPlayerSpeedChangeTo_1_25XEvent
             AudioSpeedPlaybackItem.PlaybackSpeed_1_5X -> AudioPlayerSpeedChangeOneAndHalfXEvent
+            AudioSpeedPlaybackItem.PlaybackSpeed_1_75X -> AudioPlayerSpeedChangeTo_1_75XEvent
             AudioSpeedPlaybackItem.PlaybackSpeed_2X -> AudioPlayerSpeedChange2XEvent
             else -> null
         }?.let {
@@ -311,12 +347,5 @@ class AudioPlayerFragment : Fragment() {
             delayHideToolbarCanceled = true
             hideToolbar(animate = false)
         }
-    }
-
-    private fun getNextSpeedPlaybackItem(speed: Float): SpeedPlaybackItem {
-        val speedPlaybackList = AudioSpeedPlaybackItem.entries
-        val currentIndex = speedPlaybackList.indexOfFirst { it.speed == speed }
-        return speedPlaybackList.getOrNull((currentIndex + 1) % speedPlaybackList.size)
-            ?: AudioSpeedPlaybackItem.PlaybackSpeed_1X
     }
 }

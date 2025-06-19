@@ -47,6 +47,7 @@ import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelG
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
+import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
@@ -484,6 +485,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         viewModelGateway.clear()
         mediaPlayerGateway.clearPlayerForNotification()
         mediaPlayerGateway.playerRelease()
+        mediaPlayerGateway.updatePlaybackSpeed(AudioSpeedPlaybackItem.PlaybackSpeed_1X)
         // Remove observer when the service is destroyed to avoid the memory leak, causing Service cannot be stopped.
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
         unregisterReceiver(headsetPlugReceiver)

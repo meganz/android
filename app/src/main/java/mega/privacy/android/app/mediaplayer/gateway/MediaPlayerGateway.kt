@@ -254,11 +254,11 @@ interface MediaPlayerGateway {
     fun setSurface(surface: Surface)
 
     /**
-     * Get current SpeedPlaybackItem
+     * Get current playback speed
      *
-     * @return current [SpeedPlaybackItem]
+     * @return current playback speed
      */
-    fun getCurrentSpeedPlaybackItem(): SpeedPlaybackItem
+    fun getCurrentPlaybackSpeed(): Float
 
     /**
      * Media player plays next item

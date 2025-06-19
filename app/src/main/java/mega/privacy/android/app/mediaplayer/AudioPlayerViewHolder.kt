@@ -7,13 +7,13 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.compose.ui.platform.ComposeView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.media3.common.Player
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
-import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
@@ -29,14 +29,15 @@ import mega.privacy.mobile.analytics.event.AudioPlayerQueueButtonPressedEvent
  * @property binding [FragmentAudioPlayerBinding]
  */
 class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
-
     private val artworkContainer = binding.root.findViewById<FrameLayout>(R.id.artwork_container)
     private val trackName = binding.root.findViewById<TextView>(R.id.track_name)
     private val artistName = binding.root.findViewById<TextView>(R.id.artist_name)
     private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
     private val shuffle =
         binding.root.findViewById<ImageView>(androidx.media3.ui.R.id.exo_shuffle)
-    private val speedPlaybackButton = binding.root.findViewById<TextView>(R.id.speed_playback)
+    internal val speedPlaybackButton = binding.root.findViewById<TextView>(R.id.speed_playback)
+    internal val speedPlaybackPopup =
+        binding.root.findViewById<ComposeView>(R.id.speed_playback_popup)
 
     /**
      * Update the layout param of artwork of player view.
@@ -212,32 +213,11 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     }
 
     /**
-     * Setup speed playback button.
-     *
-     * @param default default SpeedPlaybackItem
-     * @param callback the callback when speed playback button is clicked
-     */
-    fun setupSpeedPlaybackButton(default: SpeedPlaybackItem?, callback: (View) -> Unit) {
-        speedPlaybackButton.setOnClickListener(callback)
-        updateSpeedPlaybackIcon(default ?: AudioSpeedPlaybackItem.PlaybackSpeed_1X)
-    }
-
-    /**
-     * Update the speed playback icon according to the playback speed
+     * Update the speed playback text according to the playback speed
      *
      * @param speedPlaybackItem SpeedPlaybackItem
      */
-    fun updateSpeedPlaybackIcon(speedPlaybackItem: SpeedPlaybackItem) =
-        with(speedPlaybackButton) {
-            text = speedPlaybackItem.text
-            setTextColor(
-                context.getColor(
-                    if (speedPlaybackItem != AudioSpeedPlaybackItem.PlaybackSpeed_1X) {
-                        R.color.color_button_brand
-                    } else {
-                        R.color.dark_grey_white
-                    }
-                )
-            )
-        }
+    fun updateSpeedPlaybackText(speedPlaybackItem: SpeedPlaybackItem) {
+        speedPlaybackButton.text = speedPlaybackItem.text
+    }
 }
