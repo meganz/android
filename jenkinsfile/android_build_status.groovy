@@ -307,13 +307,13 @@ pipeline {
                                     }
 
                                     try {
-                                        sh "./gradlew --no-daemon feature:payment:snowflake-components:testDebugUnitTestCoverage"
+                                        sh "./gradlew --no-daemon feature:payment:payment-snowflake-components:testDebugUnitTestCoverage"
                                     } finally {
                                         UNIT_TEST_RESULT_LINK_MAP.put("feature/payment-snowflake-components", unitTestArchiveLink("feature/payment-snowflake-components/$buildReportPath", "unit_test_result_feature_payment_snowflake_components.zip"))
                                     }
 
                                     try {
-                                        sh "./gradlew --no-daemon feature:shared:snowflake-components:testDebugUnitTestCoverage"
+                                        sh "./gradlew --no-daemon feature:shared:shared-snowflake-components:testDebugUnitTestCoverage"
                                     } finally {
                                         UNIT_TEST_RESULT_LINK_MAP.put("feature/shared-snowflake-components", unitTestArchiveLink("feature/shared-snowflake-components/$buildReportPath", "unit_test_result_feature_shared_snowflake_components.zip"))
                                     }
