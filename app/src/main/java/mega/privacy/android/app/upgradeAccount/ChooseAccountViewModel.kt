@@ -1,10 +1,15 @@
 package mega.privacy.android.app.upgradeAccount
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
@@ -16,6 +21,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPricing
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
@@ -50,10 +56,15 @@ internal class ChooseAccountViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
     private val isBillingAvailableUseCase: IsBillingAvailableUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChooseAccountState())
     val state: StateFlow<ChooseAccountState> = _state
+
+    private val isUpgradeAccountFlow =
+        savedStateHandle.get<Boolean>(ChooseAccountActivity.EXTRA_IS_UPGRADE_ACCOUNT) ?: false
 
     init {
         viewModelScope.launch {
@@ -143,7 +154,30 @@ internal class ChooseAccountViewModel @Inject constructor(
                 Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
             }
         }
+        if (isUpgradeAccountFlow) {
+            loadCurrentSubscriptionPlan()
+        }
         refreshPricing()
+    }
+
+    /**
+     * Load current subscription plan information.
+     */
+    private fun loadCurrentSubscriptionPlan() {
+        viewModelScope.launch {
+            monitorAccountDetailUseCase()
+                .catch { Timber.e(it) }
+                .mapNotNull { it.levelDetail }
+                .distinctUntilChanged()
+                .collectLatest { levelDetail ->
+                    _state.update {
+                        it.copy(
+                            subscriptionCycle = levelDetail.accountSubscriptionCycle,
+                            currentSubscriptionPlan = levelDetail.accountType
+                        )
+                    }
+                }
+        }
     }
 
     /**

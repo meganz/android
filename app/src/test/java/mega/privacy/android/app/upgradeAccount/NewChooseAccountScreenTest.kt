@@ -137,7 +137,14 @@ class NewChooseAccountScreenTest {
             .assertExists()
     }
 
+    @Test
+    fun `test that free plan card is not shown in upgrade account flow`() {
+        setContent(isUpgradeAccount = true)
+        composeRule.onNodeWithTag(TEST_TAG_FREE_PLAN_CARD).assertDoesNotExist()
+    }
+
     private fun setContent(
+        isUpgradeAccount: Boolean = false,
         onBuyPlanClick: (AccountType, Boolean) -> Unit = { _, _ -> },
         onFreePlanClick: () -> Unit = {},
         maybeLaterClicked: () -> Unit = {},
@@ -147,8 +154,10 @@ class NewChooseAccountScreenTest {
             onFreePlanClicked = onFreePlanClick,
             maybeLaterClicked = maybeLaterClicked,
             uiState = ChooseAccountState(
-                localisedSubscriptionsList = expectedLocalisedSubscriptionsList
-            )
+                localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
+            ),
+            onBack = {},
+            isUpgradeAccount = isUpgradeAccount
         )
     }
 }

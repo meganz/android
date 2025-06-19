@@ -1,5 +1,6 @@
 package mega.privacy.android.app.upgradeAccount.model
 
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product
 
@@ -16,6 +17,8 @@ import mega.privacy.android.domain.entity.Product
  * @property isMonthlySelected boolean to determine if monthly plan was selected
  * @property showAdsFeature boolean to determine if Ad-free feature should be shown or hidden (part of the In-App Advertisement experiment)
  * @property isProPromoRevampEnabled boolean to determine if Pro Promo Revamp feature should be shown or hidden
+ * @property currentSubscriptionPlan current subscribed plan, default Free plan
+ * @property subscriptionCycle current subscription cycle (monthly/yearly), default UNKNOWN
  * @constructor Create default Upgrade Account state
  */
 data class ChooseAccountState(
@@ -29,4 +32,6 @@ data class ChooseAccountState(
     val isMonthlySelected: Boolean = false,
     val showAdsFeature: Boolean = false,
     val isProPromoRevampEnabled: Boolean = false,
+    val currentSubscriptionPlan: AccountType? = null,
+    val subscriptionCycle: AccountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
 )

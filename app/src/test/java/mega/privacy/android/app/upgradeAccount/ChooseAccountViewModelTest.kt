@@ -3,6 +3,7 @@ package mega.privacy.android.app.upgradeAccount
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
@@ -11,17 +12,21 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurren
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
+import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -62,6 +67,7 @@ class ChooseAccountViewModelTest {
         mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(true) }
     private val isBillingAvailableUseCase = mock<IsBillingAvailableUseCase>()
     private val getPaymentMethodUseCase = mock<GetPaymentMethodUseCase>()
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
 
     @BeforeEach
     fun setUp() {
@@ -76,6 +82,7 @@ class ChooseAccountViewModelTest {
             getFeatureFlagValueUseCase,
             getPaymentMethodUseCase,
             isBillingAvailableUseCase,
+            monitorAccountDetailUseCase,
         )
     }
 
@@ -89,6 +96,8 @@ class ChooseAccountViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPaymentMethodUseCase = getPaymentMethodUseCase,
             isBillingAvailableUseCase = isBillingAvailableUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            savedStateHandle = mock { on { get<Boolean>(any()) }.thenReturn(true) }
         )
     }
 
@@ -201,6 +210,33 @@ class ChooseAccountViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.isPaymentMethodAvailable).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that loadCurrentSubscriptionPlan updates state with current plan and subscription cycle`() =
+        runTest {
+            val expectedPlan = AccountType.PRO_I
+            val expectedCycle = AccountSubscriptionCycle.MONTHLY
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(expectedPlan)
+                on { accountSubscriptionCycle }.thenReturn(expectedCycle)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
+            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
+
+            initViewModel()
+
+            underTest.state.test {
+                val initialState = awaitItem()
+                assertThat(initialState.currentSubscriptionPlan).isEqualTo(expectedPlan)
+                assertThat(initialState.subscriptionCycle).isEqualTo(expectedCycle)
             }
         }
 

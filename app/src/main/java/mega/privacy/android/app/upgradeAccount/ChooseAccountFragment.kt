@@ -27,6 +27,7 @@ import mega.privacy.android.app.presentation.account.AccountStorageViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.container.SharedAppContainer
+import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel.Companion.getProductId
@@ -40,6 +41,8 @@ import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AdsUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.BuyProIEvent
 import mega.privacy.mobile.analytics.event.BuyProIIEvent
 import mega.privacy.mobile.analytics.event.BuyProIIIEvent
@@ -77,6 +80,14 @@ class ChooseAccountFragment : Fragment() {
 
     private lateinit var chooseAccountActivity: ChooseAccountActivity
 
+    private val openFromSource by lazy {
+        arguments?.serializable(ChooseAccountActivity.EXTRA_SOURCE)
+            ?: UpgradeAccountSource.UNKNOWN
+    }
+
+    private val isUpgradeAccount by lazy {
+        arguments?.getBoolean(ChooseAccountActivity.EXTRA_IS_UPGRADE_ACCOUNT, false) ?: false
+    }
 
     @Inject
     lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
@@ -125,6 +136,7 @@ class ChooseAccountFragment : Fragment() {
                     uiState = uiState,
                     accountStorageUiState = accountStorageUiState,
                     isNewCreationAccount = isNewCreationAccount,
+                    isUpgradeAccount = isUpgradeAccount,
                     onFreePlanClicked = {
                         Analytics.tracker.trackEvent(
                             GetStartedForFreeUpgradePlanButtonPressedEvent
@@ -143,6 +155,9 @@ class ChooseAccountFragment : Fragment() {
                             chooseAccountActivity,
                             getProductId(isMonthly, accountType),
                         )
+                    },
+                    onBack = {
+                        requireActivity().finish()
                     }
                 )
             }
@@ -208,6 +223,13 @@ class ChooseAccountFragment : Fragment() {
     }
 
     private fun sendAccountTypeAnalytics(planType: AccountType) {
+        if (isUpgradeAccount) {
+            if (openFromSource == UpgradeAccountSource.ADS_FREE_SCREEN) {
+                Analytics.tracker.trackEvent(AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent)
+            } else if (accountStorageViewModel.isUpgradeAccountDueToAds()) {
+                Analytics.tracker.trackEvent(AdsUpgradeAccountPlanPageBuyButtonPressedEvent)
+            }
+        }
         when (planType) {
             AccountType.PRO_I -> Analytics.tracker.trackEvent(BuyProIEvent)
 

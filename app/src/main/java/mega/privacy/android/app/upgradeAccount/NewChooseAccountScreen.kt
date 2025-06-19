@@ -62,6 +62,7 @@ import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.ProFeature
 import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
 import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
 import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
@@ -79,9 +80,11 @@ internal fun NewChooseAccountScreen(
     uiState: ChooseAccountState = ChooseAccountState(),
     accountStorageUiState: AccountStorageUIState = AccountStorageUIState(),
     isNewCreationAccount: Boolean = false,
+    isUpgradeAccount: Boolean = false,
     onBuyPlanClick: (AccountType, Boolean) -> Unit,
     maybeLaterClicked: () -> Unit,
     onFreePlanClicked: () -> Unit,
+    onBack: () -> Unit,
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
     var isMonthly by remember { mutableStateOf(false) }
@@ -131,7 +134,9 @@ internal fun NewChooseAccountScreen(
         topBar = {
             ChooseAccountScreenTopBar(
                 alpha = alpha,
-                onClick = maybeLaterClicked
+                isUpgradeAccount = isUpgradeAccount,
+                maybeLaterClicked = maybeLaterClicked,
+                onBack = onBack
             )
         },
         bottomBar = {
@@ -237,17 +242,13 @@ internal fun NewChooseAccountScreen(
                 val isRecommended =
                     uiState.cheapestSubscriptionAvailable?.accountType == subscription.accountType
 
+                val storageFormattedSize = subscription.formatStorageSize()
                 val storageValueString =
-                    stringResource(
-                        id = subscription.formatStorageSize().unit,
-                        subscription.formatStorageSize().size
-                    )
-                val transferValueString =
+                    stringResource(id = storageFormattedSize.unit, storageFormattedSize.size)
 
-                    stringResource(
-                        id = subscription.formatTransferSize(isMonthly).unit,
-                        subscription.formatTransferSize(isMonthly).size
-                    )
+                val transferFormattedSize = subscription.formatTransferSize(isMonthly)
+                val transferValueString =
+                    stringResource(id = transferFormattedSize.unit, transferFormattedSize.size)
 
                 val uiAccountType = subscription.accountType.toUIAccountType()
 
@@ -280,6 +281,13 @@ internal fun NewChooseAccountScreen(
                     )
                 }
 
+                // in case subscriptionCycle is UNKNOWN and currentSubscriptionPlan is PRO level, we show it as current plan for both monthly and yearly
+                val isCurrentPlan = uiState.currentSubscriptionPlan == subscription.accountType
+                        && isUpgradeAccount
+                        && (uiState.subscriptionCycle == AccountSubscriptionCycle.UNKNOWN
+                        || (isMonthly && uiState.subscriptionCycle == AccountSubscriptionCycle.MONTHLY)
+                        || (!isMonthly && uiState.subscriptionCycle == AccountSubscriptionCycle.YEARLY))
+
                 ProPlanCard(
                     modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp)
@@ -293,16 +301,11 @@ internal fun NewChooseAccountScreen(
                     priceUnit = stringResource(sharedR.string.general_month).takeIf { !isMonthly }
                         .orEmpty(),
                     billingInfo = billingInfo,
+                    isCurrentPlan = isCurrentPlan,
                     onSelected = { chosenPlan = subscription.accountType },
                 )
 
-                if (index < uiState.localisedSubscriptionsList.lastIndex) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-            }
-
-            item("pro_plans_bottom_space") {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             item("additional_benefits") {
@@ -322,19 +325,22 @@ internal fun NewChooseAccountScreen(
             }
 
             item("free_plan_card") {
-                FreePlanCard(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .testTag(TEST_TAG_FREE_PLAN_CARD),
-                    onContinue = onFreePlanClicked,
-                    isNewCreationAccount = isNewCreationAccount,
-                    storageFormatted = accountStorageUiState.baseStorageFormatted,
-                )
+                if (!isUpgradeAccount) {
+                    FreePlanCard(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .testTag(TEST_TAG_FREE_PLAN_CARD),
+                        onContinue = onFreePlanClicked,
+                        isNewCreationAccount = isNewCreationAccount,
+                        storageFormatted = accountStorageUiState.baseStorageFormatted,
+                    )
+                }
             }
 
             item("subscription_info") {
                 MegaText(
                     modifier = Modifier
+                        .padding(top = LocalSpacing.current.x16)
                         .padding(horizontal = 16.dp)
                         .testTag(TEST_TAG_SUBSCRIPTION_INFO_TITLE),
                     text = stringResource(id = sharedR.string.choose_account_screen_subscription_information_title),
@@ -431,9 +437,11 @@ internal fun NewChooseAccountScreenPreview(
                 baseStorageFormatted = "20 GB",
             ),
             isNewCreationAccount = false,
+            isUpgradeAccount = false,
             onBuyPlanClick = { _, _ -> },
             onFreePlanClicked = {},
-            maybeLaterClicked = {}
+            maybeLaterClicked = {},
+            onBack = {}
         )
     }
 }

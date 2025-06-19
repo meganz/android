@@ -1,5 +1,6 @@
 package mega.privacy.android.app.upgradeAccount
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -9,6 +10,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 
@@ -27,6 +29,14 @@ open class ChooseAccountActivity : AppCompatActivity() {
                     putBoolean(
                         ManagerActivity.NEW_CREATION_ACCOUNT,
                         intent.getBooleanExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
+                    )
+                    putBoolean(
+                        EXTRA_IS_UPGRADE_ACCOUNT,
+                        intent.getBooleanExtra(EXTRA_IS_UPGRADE_ACCOUNT, false)
+                    )
+                    putSerializable(
+                        EXTRA_SOURCE,
+                        intent.serializable(EXTRA_SOURCE)
                     )
                 }
             }
@@ -80,6 +90,38 @@ open class ChooseAccountActivity : AppCompatActivity() {
             AccountType.PRO_II -> Constants.PRO_II
             AccountType.PRO_III -> Constants.PRO_III
             else -> Constants.FREE
+        }
+    }
+
+    companion object {
+        /**
+         * Extra key to indicate if the activity is for upgrading an account.
+         */
+        const val EXTRA_IS_UPGRADE_ACCOUNT = "EXTRA_IS_UPGRADE_ACCOUNT"
+
+        /**
+         * Extra key to indicate the source of the upgrade account action.
+         */
+        const val EXTRA_SOURCE = "EXTRA_SOURCE"
+
+        /**
+         * Navigates to the Upgrade Account screen.
+         *
+         * @param context The context to use for navigation.
+         */
+        fun navigateToUpgradeAccount(
+            context: Context,
+            isFromAdsFree: Boolean = false,
+        ) {
+            val intent = Intent(context, ChooseAccountActivity::class.java).apply {
+                putExtra(EXTRA_IS_UPGRADE_ACCOUNT, true)
+                putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, false)
+                putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, false)
+                if (isFromAdsFree) {
+                    putExtra(EXTRA_SOURCE, UpgradeAccountSource.ADS_FREE_SCREEN)
+                }
+            }
+            context.startActivity(intent)
         }
     }
 }
