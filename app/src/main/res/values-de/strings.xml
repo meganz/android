@@ -745,10 +745,6 @@
     <string name="choose_photo_avatar_panel">Bild auswählen</string>
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">Bild löschen</string>
-    <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">Der Rettungsschlüssel passt nicht zu diesem Account. Bitte stellen Sie sicher, dass Sie den richtigen Rettungsschlüssel eingegeben haben, und versuchen Sie es noch einmal.</string>
-    <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">Ungültiger Rettungsschlüssel</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Informationen werden angefordert&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->

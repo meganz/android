@@ -377,7 +377,7 @@
     <!-- Feature indicating transfer sharing, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_transfer_sharing">Aktarım paylaşımı</string>
     <!-- Row label for rewind feature in the comparison table -->
-    <string name="account_cancel_account_screen_plan_rewind">Geri Sarma</string>
+    <string name="account_cancel_account_screen_plan_rewind">Geri sarma</string>
     <!-- Rewind duration available in the free plan -->
     <string name="account_cancel_account_screen_plan_rewind_free">30 güne kadar (yalnızca görüntüleme)</string>
     <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
@@ -857,7 +857,7 @@
         <item quantity="other">Bu dosyalar “%1$s” albümünde zaten mevcut ve tekrar eklenemez</item>
     </plurals>
     <!--Content on the Multi-Factor Authentication Login page -->
-    <string name="multi_factor_auth_login_verification_content">Kimlik doğrulayıcı uygulamanızdan 6 basamaklı kodu girin.</string>
+    <string name="multi_factor_auth_login_verification_content">Kimlik doğrulayıcı uygulamanızdaki 6 haneli kodu girin.</string>
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">Yanlış doğrulama kodu</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
@@ -1282,7 +1282,11 @@
     <!-- Sort by oldest shares -->
     <string name="general_sort_oldest_shares">Eski paylaşımlar</string>
     <!-- Title for recovery key error dialog -->
-    <string name="recovery_key_error_title">Recovery key error</string>
+    <string name="recovery_key_error_title">Kurtarma anahtarı hatası</string>
     <!-- Description for recovery key error dialog -->
-    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
+    <string name="recovery_key_error_description">Sağladığınız kurtarma anahtarı ya geçersiz ya da bu hesap için değil. Doğru anahtarı kullanıp kullanmadığınızı kontrol edin ve tekrar deneyin.</string>
+    <!-- Label for the current plan badge in the pro plan card -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">Mevcut plan</string>
+    <!-- Error message when achievements status is unavailable -->
+    <string name="achievement_status_unavailable">Başarılarınızın durumu şu anda kullanılamıyor. Daha sonra tekrar deneyin.</string>
 </resources>

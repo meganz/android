@@ -949,7 +949,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Inattivo</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
-    <string name="device_center_list_view_item_status_attention_needed">Attention needed</string>
+    <string name="device_center_list_view_item_status_attention_needed">Attenzione necessaria</string>
     <!--General Unable to log in-->
     <string name="general_unable_to_login">Impossibile effettuare il login</string>
     <!--General check inbox-->
@@ -1298,5 +1298,9 @@
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">Recovery key error</string>
     <!-- Description for recovery key error dialog -->
-    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
+    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again.</string>
+    <!-- Label for the current plan badge in the pro plan card -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">Piano corrente</string>
+    <!-- Error message when achievements status is unavailable -->
+    <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
 </resources>

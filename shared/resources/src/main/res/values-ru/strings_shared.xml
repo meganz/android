@@ -457,7 +457,7 @@
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">На компьютере</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Visit [A]https://mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website">1. Откройте [A]https://mega.nz[/A] в веб-браузере.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Войдите в свой аккаунт MEGA.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -1306,9 +1306,9 @@
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Для некоторых папок невозможно выполнить синхронизацию или резервное копирование, так как приложение MEGA потеряло разрешения на доступ к локальным папкам. Нажмите «Возобновить», чтобы повторно добавить разрешения для каждой затронутой папки.</string>
     <!-- Title for the free plan card when the user is an existing account -->
-    <string name="free_plan_card_existing_title">Continue with your free plan</string>
+    <string name="free_plan_card_existing_title">Продолжайте с бесплатным планом</string>
     <!-- Button text for existing users to continue with the free plan -->
-    <string name="free_plan_card_existing_button">Continue with free plan</string>
+    <string name="free_plan_card_existing_button">Продолжить</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">%1$s на диске</string>
     <!-- Sort by newest shares -->
@@ -1318,5 +1318,9 @@
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">Ошибка ключа восстановления</string>
     <!-- Description for recovery key error dialog -->
-    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
+    <string name="recovery_key_error_description">Предоставленный вами ключ восстановления недействителен или не относится к этому аккаунту. Проверьте, что ключ правильный, и попробуйте снова.</string>
+    <!-- Label for the current plan badge in the pro plan card -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">Текущий план</string>
+    <!-- Error message when achievements status is unavailable -->
+    <string name="achievement_status_unavailable">Статус ваших достижений в настоящее время недоступен. Попробуйте позже.</string>
 </resources>

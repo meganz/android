@@ -1267,5 +1267,9 @@
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">還原金鑰錯誤</string>
     <!-- Description for recovery key error dialog -->
-    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
+    <string name="recovery_key_error_description">您提供的還原金鑰無效，或不適用於此帳戶。檢查您使用的金鑰是否正確，然後重試。</string>
+    <!-- Label for the current plan badge in the pro plan card -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">目前方案</string>
+    <!-- Error message when achievements status is unavailable -->
+    <string name="achievement_status_unavailable">您的成就狀態目前無法顯示。請稍後重試。</string>
 </resources>

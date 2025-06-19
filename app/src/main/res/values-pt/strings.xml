@@ -752,10 +752,6 @@
     <string name="choose_photo_avatar_panel">Escolher foto</string>
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">Deletar foto</string>
-    <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">A chave proporcionada não coincide com esta conta. Por favor, comprove que você está usando a chave de recuperação correta e tente novamente.</string>
-    <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">Chave de recuperação inválida</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Obtendo informação&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->

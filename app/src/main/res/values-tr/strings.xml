@@ -163,7 +163,7 @@
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">[B]Şifremi kaybedersem verilerimi de kaybedebileceğimi[/B] anlıyorum. [A]MEGA\’nın uçtan uca şifrelemesi[/A] hakkında daha fazlasını öğrenin.</string>
     <!-- warning dialog -->
-    <string name="create_account_no_terms">Hizmet Koşullarımızı kabul etmelisiniz</string>
+    <string name="create_account_no_terms">Hizmet Şartlarımızı kabul etmelisiniz</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Şifrenizi kaybetme riskini anladığınızı kabul etmelisiniz</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
@@ -745,10 +745,6 @@
     <string name="choose_photo_avatar_panel">Fotoğraf seç</string>
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">Fotoğrafı sil</string>
-    <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">Sağladığınız anahtar bu hesapla eşleşmiyor. Lütfen doğru kurtarma anahtarını kullandığınızdan emin olun ve tekrar deneyin.</string>
-    <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">Geçersiz kurtarma anahtarı</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Bilgiler alınıyor&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
@@ -2072,7 +2068,7 @@
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">İptal</string>
     <!-- dialog option continue in alert dialog -->
-    <string name="button_continue">Devam</string>
+    <string name="button_continue">Devam et</string>
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (abonelik)</string>
     <!-- Input field description in the create file dialog. -->

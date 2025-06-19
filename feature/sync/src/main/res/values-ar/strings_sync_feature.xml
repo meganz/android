@@ -147,7 +147,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">خطأ محلي يمنع الوصول إلى المجلد</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">خطأ في نظام الملفات يمنع الوصول إلى المجلد.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">المًستهدف عميق جدًا في بنية المجلد.\nانقله إلى موقع يقل عمقه عن 64 مجلدًا.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -165,5 +165,5 @@
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">في انتظار انتهاء الفحص لتحديد ما إذا كان الملف قد تم نقله أو حذفه.</string>
     <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
+    <string name="sync_change_root_uri_warning_title">بعض المجلدات غير قادرة على المزامنة أو النسخ الاحتياطي لأن تطبيق ميغا MEGA فقد الأذونات للوصول إلى المجلدات المحلية. انقر فوق استئناف لإعادة إضافة الأذونات لكل مجلد متأثر.</string>
 </resources>

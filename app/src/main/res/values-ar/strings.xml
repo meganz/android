@@ -773,10 +773,6 @@
     <string name="choose_photo_avatar_panel">اختر صورة</string>
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">حذف الصورة</string>
-    <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">لا يتطابق المفتاح الذي أدخلته مع هذا الحساب. الرجاء التأكد من استخدام مفتاح الاستعادة الصحيح والمحاولة مرة أخرى.</string>
-    <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">مفتاح الاستعادة غير صالح</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">جاري الحصول على المعلومات&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
@@ -955,7 +951,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">السرية</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">لقد قمت بتسجيل الدخول إلى حساب ميغا MEGA مختلف. قم بتسجيل الخروج وفتح رابط إعادة تعيين كلمة المرور مرة أخرى.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">صلاحية رابط الإلغاء قد انتهت، الرجاء إعادة المحاولة.</string>
     <!-- Text shown after searching and no results found -->
@@ -3891,9 +3887,9 @@
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">عرض المعرض</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
+    <string name="settings_media_discovery_view_context">افتح المجلدات التي تحتوي على صور أو مقاطع فيديو فقط في شبكة مرئية. تصفح الوسائط حسب الصور المصغرة وقم بالفلترة حسب التاريخ.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in gallery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">نظرًا لأن هذا المجلد يحتوي فقط على الصور ومقاطع الفيديو فقد فتحناه تلقائيًا في عرض المعرض. يمكنك الاستمتاع بالمحتوى المرئي الخاص بك بتصميم أكثر شمولاً. يمكنك تعطيل هذا في الإعدادات.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">الإعدادات</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -5582,9 +5578,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">الأصلي</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Gallery view in subfolders</string>
+    <string name="settings_media_discovery_sub_folder_title">عرض المعرض في المجلدات الفرعية</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in gallery view</string>
+    <string name="settings_media_discovery_sub_folder_context">سيتم أيضًا تضمين الصور ومقاطع الفيديو من المجلدات الفرعية في عرض المعرض</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">لا يوجد نتائج</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -5760,7 +5756,7 @@
     <!-- Camera uploads updated info in Photos screen. -->
     <string name="photos_camera_uploads_updated">تم تحديث ترفيعات الكاميرا</string>
     <!-- Camera uploads no internet info in Photos screen. -->
-    <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
+    <string name="photos_camera_uploads_no_internet">تم إيقاف الترفيع مؤقتًا بسبب عدم وجود اتصال بالإنترنت</string>
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">تم إيقاف الترفيع مؤقتًا لأن البطارية أقل من %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
