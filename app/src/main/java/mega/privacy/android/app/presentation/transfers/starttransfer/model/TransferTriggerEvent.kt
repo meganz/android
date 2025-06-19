@@ -152,6 +152,22 @@ sealed interface TransferTriggerEvent {
     ) : DownloadTriggerEvent
 
     /**
+     * Event to retry downloading a node
+     *
+     * @param node the node to be retried
+     * @param downloadLocation the location where the node should be downloaded
+     */
+    data class RetryDownloadNode(
+        val node: TypedNode?,
+        val downloadLocation: String,
+        override val isHighPriority: Boolean = false,
+        override val waitNotificationPermissionResponseToStart: Boolean = false,
+        override val withStartMessage: Boolean = false,
+    ) : DownloadTriggerEvent {
+        override val nodes = node?.let { listOf(node) } ?: emptyList()
+    }
+
+    /**
      * Copy offline node
      *
      * @property nodeIds

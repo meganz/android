@@ -43,10 +43,6 @@ class CompletedTransfersViewTest {
                 lazyListState = mock(),
                 selectedCompletedTransfersIds = mock(),
                 onCompletedTransferSelected = mock(),
-                onViewInFolder = {},
-                onOpenWith = {},
-                onShareLink = {},
-                onClearTransfer = {},
                 modifier = mock(),
             )
         }

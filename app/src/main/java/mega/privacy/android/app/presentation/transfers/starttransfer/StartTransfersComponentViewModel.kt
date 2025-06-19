@@ -210,15 +210,28 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private suspend fun retryTransfers(transferTriggerEvent: TransferTriggerEvent.RetryTransfers) {
         var retryUploads = false
         var retryDownloads = false
+        var shouldPromptToSaveDestination = false
+        var defaultLocation: String? = null
 
         runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
+
+        if (transferTriggerEvent.idsAndEvents.values.any { it is TransferTriggerEvent.RetryDownloadNode }) {
+            shouldPromptToSaveDestination = runCatching { shouldPromptToSaveDestinationUseCase() }
+                .getOrDefault(false)
+
+            if (shouldPromptToSaveDestination.not()) {
+                defaultLocation = runCatching { getOrCreateStorageDownloadLocationUseCase() }
+                    .onFailure { Timber.e(it) }
+                    .getOrNull()
+            }
+        }
 
         buildList {
             for ((id, event) in transferTriggerEvent.idsAndEvents) {
                 when (event) {
                     is TransferTriggerEvent.DownloadTriggerEvent -> {
-                        if (event is TransferTriggerEvent.StartDownloadForOffline) {
+                        (if (event is TransferTriggerEvent.StartDownloadForOffline) {
                             if (event.node == null) {
                                 Timber.e("Node in $event must exist")
                                 null
@@ -227,16 +240,19 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                                     .onFailure { Timber.e(it) }
                                     .getOrNull()
                             }
-                        } else {
-                            if (event.nodes.firstOrNull() == null) {
-                                Timber.e("Node in $event must exist")
-                                null
-                            } else {
-                                runCatching { getOrCreateStorageDownloadLocationUseCase() }
-                                    .onFailure { Timber.e(it) }
-                                    .getOrNull()
+                        } else if (event is TransferTriggerEvent.RetryDownloadNode) {
+                            when {
+                                event.node == null -> {
+                                    Timber.e("Node in $event must exist")
+                                    null
+                                }
+
+                                shouldPromptToSaveDestination -> event.downloadLocation
+                                else -> defaultLocation
                             }
-                        }?.let { location ->
+                        } else {
+                            null
+                        })?.let { location ->
                             retryDownloads = true
                             add(id)
                             insertPendingDownloadsForNodesUseCase(
@@ -343,6 +359,11 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 is TransferTriggerEvent.StartDownloadForPreview -> {
                     _uiState.update { it.copy(isOpenWithAction = transferTriggerEvent.isOpenWith) }
                     startDownloadNodeForPreview(transferTriggerEvent)
+                }
+
+                is TransferTriggerEvent.RetryDownloadNode -> {
+                    /* No actions required. Execution should not reach here as this event
+                    is only used for [TransferTriggerEvent.RetryTransfers] */
                 }
             }
         }

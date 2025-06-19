@@ -8,9 +8,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -21,6 +23,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.robolectric.annotation.Config
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -31,10 +34,9 @@ class CompletedTransferActionsBottomSheetTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val onViewInFolder = mock<() -> Unit>()
-    private val onOpenWith = mock<() -> Unit>()
-    private val onShareLink = mock<() -> Unit>()
-    private val onClearTransfer = mock<() -> Unit>()
+    private val onOpenWith = mock<(CompletedTransfer) -> Unit>()
+    private val onShareLink = mock<(Long) -> Unit>()
+    private val onClearTransfer = mock<(CompletedTransfer) -> Unit>()
     private val onDismissSheet = mock<() -> Unit>()
     private val fileName = "2023-03-24 00.13.20_1.pdf"
     private val completedDownload = CompletedTransfer(
@@ -74,7 +76,13 @@ class CompletedTransferActionsBottomSheetTest {
 
     @Test
     fun `test that sheet is correctly shown for a download`() {
-        initComposeTestRule(completedDownload)
+        initComposeTestRule(
+            completedDownload, CompletedTransferActionsUiState(
+                completedTransfer = completedDownload,
+                fileUri = "fileUri".toUri(),
+                amINodeOwner = true,
+            )
+        )
 
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_ACTIONS_PANEL).assertIsDisplayed()
@@ -99,7 +107,12 @@ class CompletedTransferActionsBottomSheetTest {
 
     @Test
     fun `test that sheet is correctly shown for an upload`() {
-        initComposeTestRule(completedUpload)
+        initComposeTestRule(
+            completedUpload, CompletedTransferActionsUiState(
+                completedTransfer = completedUpload,
+                amINodeOwner = true,
+            )
+        )
 
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_COMPLETED_TRANSFER_ACTIONS_PANEL).assertIsDisplayed()
@@ -123,67 +136,95 @@ class CompletedTransferActionsBottomSheetTest {
 
     @Test
     fun `test that click on view in folder invokes correctly`() {
-        initComposeTestRule(completedUpload)
+        initComposeTestRule(
+            completedUpload, CompletedTransferActionsUiState(
+                completedTransfer = completedUpload,
+                amINodeOwner = true,
+                isOnline = true,
+            )
+        )
 
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_VIEW_IN_FOLDER_ACTION)
                 .performSemanticsAction(SemanticsActions.OnClick)
 
-            verify(onViewInFolder).invoke()
             verify(onDismissSheet).invoke()
         }
     }
 
     @Test
     fun `test that click on open with invokes correctly`() {
-        initComposeTestRule(completedDownload)
+        initComposeTestRule(
+            completedDownload, CompletedTransferActionsUiState(
+                completedTransfer = completedDownload,
+                fileUri = "fileUri".toUri(),
+                amINodeOwner = true,
+            )
+        )
 
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_OPEN_WITH_ACTION)
                 .performSemanticsAction(SemanticsActions.OnClick)
 
-            verify(onOpenWith).invoke()
-            verify(onDismissSheet).invoke()
+            verify(onOpenWith).invoke(completedDownload)
+            verifyNoInteractions(onDismissSheet)
         }
     }
 
     @Test
     fun `test that click on share link invokes correctly`() {
-        initComposeTestRule(completedDownload)
+        initComposeTestRule(
+            completedDownload, CompletedTransferActionsUiState(
+                completedTransfer = completedDownload,
+                fileUri = "fileUri".toUri(),
+                amINodeOwner = true,
+                isOnline = true,
+            )
+        )
 
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_SHARE_LINK_ACTION)
                 .performSemanticsAction(SemanticsActions.OnClick)
 
-            verify(onShareLink).invoke()
-            verify(onDismissSheet).invoke()
+            verify(onShareLink).invoke(completedDownload.handle)
+            verifyNoInteractions(onDismissSheet)
         }
     }
 
     @Test
     fun `test that click on clear invokes correctly`() {
-        initComposeTestRule(completedUpload)
+        initComposeTestRule(
+            completedUpload, CompletedTransferActionsUiState(
+                completedTransfer = completedUpload,
+                amINodeOwner = true,
+            )
+        )
 
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_CLEAR_ACTION)
                 .performSemanticsAction(SemanticsActions.OnClick)
 
-            verify(onClearTransfer).invoke()
+            verify(onClearTransfer).invoke(completedUpload)
             verify(onDismissSheet).invoke()
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    private fun initComposeTestRule(completedTransfer: CompletedTransfer) {
+    private fun initComposeTestRule(
+        completedTransfer: CompletedTransfer,
+        uiState: CompletedTransferActionsUiState,
+    ) {
         composeTestRule.setContent {
             CompletedTransferActionsBottomSheet(
                 completedTransfer = completedTransfer,
                 fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
                 previewUri = null,
-                onViewInFolder = onViewInFolder,
+                uiState = uiState,
                 onOpenWith = onOpenWith,
                 onShareLink = onShareLink,
                 onClearTransfer = onClearTransfer,
+                onConsumeOpenWithEvent = {},
+                onConsumeShareLinkEvent = {},
                 onDismissSheet = onDismissSheet,
             )
         }

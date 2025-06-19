@@ -1045,14 +1045,18 @@ class StartTransfersComponentViewModelTest {
         private val firstId = 1
         private val secondId = 2
         private val retriedTransferIds = listOf(firstId, secondId)
+        private val retryDownloadEvent = TransferTriggerEvent.RetryDownloadNode(
+            node = nodes.first(),
+            downloadLocation = "downloadLocation",
+        )
         private val retryUploadsEvent = TransferTriggerEvent.RetryTransfers(
             mapOf(firstId to startUploadFilesEvent, secondId to startUploadFilesEvent)
         )
         private val retryDownloadsEvent = TransferTriggerEvent.RetryTransfers(
-            mapOf(firstId to startDownloadEvent, secondId to startOfflineDownloadEvent)
+            mapOf(firstId to retryDownloadEvent, secondId to startOfflineDownloadEvent)
         )
         private val retryUploadAndDownloadEvent = TransferTriggerEvent.RetryTransfers(
-            mapOf(firstId to startDownloadEvent, secondId to startUploadFilesEvent)
+            mapOf(firstId to retryDownloadEvent, secondId to startUploadFilesEvent)
         )
 
         @Test
@@ -1159,15 +1163,15 @@ class StartTransfersComponentViewModelTest {
                 commonStub()
 
                 whenever(getOfflinePathForNodeUseCase(any())) doReturn DESTINATION
-                whenever(getOrCreateStorageDownloadLocationUseCase()) doReturn DESTINATION
+                whenever(shouldPromptToSaveDestinationUseCase()) doReturn true
 
                 underTest.startTransfer(retryDownloadsEvent)
 
                 verify(insertPendingDownloadsForNodesUseCase)(
-                    startDownloadEvent.nodes,
-                    UriPath(DESTINATION),
-                    startDownloadEvent.isHighPriority,
-                    startDownloadEvent.appData,
+                    retryDownloadEvent.nodes,
+                    UriPath(retryDownloadEvent.downloadLocation),
+                    retryDownloadEvent.isHighPriority,
+                    retryDownloadEvent.appData,
                 )
 
                 verify(insertPendingDownloadsForNodesUseCase)(

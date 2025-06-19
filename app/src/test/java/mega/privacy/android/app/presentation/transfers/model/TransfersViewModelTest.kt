@@ -115,6 +115,7 @@ class TransfersViewModelTest {
         on { timestamp } doReturn 2L
         on { handle } doReturn 2L
         on { type } doReturn TransferType.DOWNLOAD
+        on { path } doReturn "downloadLocation"
     }
     private val cancelledChatUpload = mock<CompletedTransfer> {
         on { id } doReturn 3
@@ -138,9 +139,9 @@ class TransfersViewModelTest {
         node = typedNode,
         withStartMessage = false
     )
-    private val downloadStartEvent = TransferTriggerEvent.StartDownloadNode(
-        nodes = listOf(typedNode),
-        withStartMessage = false
+    private val downloadRetryEvent = TransferTriggerEvent.RetryDownloadNode(
+        node = typedNode,
+        downloadLocation = "downloadLocation",
     )
     private val uploadStartEvent = TransferTriggerEvent.StartUpload.Files(
         mapOf(originalPath to null),
@@ -650,8 +651,11 @@ class TransfersViewModelTest {
         }
 
     @Test
-    fun `test that retryFailedTransfer updates startEvent with StartDownloadForOffline and invokes DeleteCompletedTransfersByIdUseCase when the transfer is an offline download transfer`() =
+    fun `test that retryFailedTransfer behaves correctly when the transfer is an offline download transfer`() =
         runTest {
+            val idAndEvent = mapOf(failedOfflineDownload.id!! to offlineStartEvent)
+            val expectedStartEvent = triggered(TransferTriggerEvent.RetryTransfers(idAndEvent))
+
             whenever(canReadUriUseCase(originalPath)) doReturn true
             whenever(getNodeByIdUseCase(NodeId(failedOfflineDownload.handle))) doReturn typedNode
 
@@ -661,17 +665,18 @@ class TransfersViewModelTest {
                 retryFailedTransfer(failedOfflineDownload)
                 advanceUntilIdle()
                 uiState.map { it.startEvent }.test {
-                    assertThat(awaitItem()).isEqualTo(triggered(offlineStartEvent))
+                    assertThat(awaitItem()).isEqualTo(expectedStartEvent)
                 }
             }
-            failedOfflineDownload.id?.let {
-                verify(deleteCompletedTransfersByIdUseCase).invoke(listOf(it))
-            }
+            verifyNoInteractions(deleteCompletedTransfersByIdUseCase)
         }
 
     @Test
-    fun `test that retryFailedTransfer updates startEvent with StartDownloadNode and invokes DeleteCompletedTransfersByIdUseCase when the transfer is a general download transfer`() =
+    fun `test that retryFailedTransfer behaves correctly when the transfer is a general download transfer`() =
         runTest {
+            val idAndEvent = mapOf(cancelledDownload.id!! to downloadRetryEvent)
+            val expectedStartEvent = triggered(TransferTriggerEvent.RetryTransfers(idAndEvent))
+
             whenever(canReadUriUseCase(originalPath)) doReturn true
             whenever(getNodeByIdUseCase(NodeId(cancelledDownload.handle))) doReturn typedNode
 
@@ -681,12 +686,10 @@ class TransfersViewModelTest {
                 retryFailedTransfer(cancelledDownload)
                 advanceUntilIdle()
                 uiState.map { it.startEvent }.test {
-                    assertThat(awaitItem()).isEqualTo(triggered(downloadStartEvent))
+                    assertThat(awaitItem()).isEqualTo(expectedStartEvent)
                 }
             }
-            cancelledDownload.id?.let {
-                verify(deleteCompletedTransfersByIdUseCase).invoke(listOf(it))
-            }
+            verifyNoInteractions(deleteCompletedTransfersByIdUseCase)
         }
 
     @Test
@@ -711,15 +714,15 @@ class TransfersViewModelTest {
         }
 
     @Test
-    fun `test that retryFailedTransfer updates startEvent with StartUpload and invokes DeleteCompletedTransfersByIdUseCase when the transfer is a chat upload transfer`() =
+    fun `test that retryFailedTransfer updates startEvent with StartUpload and does not invoke DeleteCompletedTransfersByIdUseCase when the transfer is a chat upload transfer`() =
         runTest {
             val chatData = chatAppData.mapNotNull { it as? TransferAppData.ChatUpload }
-            val uploadStartEvent = triggered(
-                TransferTriggerEvent.StartUpload.Files(
-                    mapOf(originalPath to null),
-                    NodeId(cancelledChatUpload.parentHandle)
-                )
+            val uploadStartEvent = TransferTriggerEvent.StartUpload.Files(
+                mapOf(originalPath to null),
+                NodeId(cancelledChatUpload.parentHandle)
             )
+            val idAndEvent = mapOf(cancelledChatUpload.id!! to uploadStartEvent)
+            val expectedStartEvent = triggered(TransferTriggerEvent.RetryTransfers(idAndEvent))
 
             whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
             whenever(canReadUriUseCase(originalPath)) doReturn true
@@ -731,17 +734,19 @@ class TransfersViewModelTest {
                 retryFailedTransfer(cancelledChatUpload)
                 advanceUntilIdle()
                 uiState.map { it.startEvent }.test {
-                    assertThat(awaitItem()).isEqualTo(uploadStartEvent)
+                    assertThat(awaitItem()).isEqualTo(expectedStartEvent)
                 }
             }
-            cancelledChatUpload.id?.let {
-                verify(deleteCompletedTransfersByIdUseCase).invoke(listOf(it))
-            }
+
+            verifyNoInteractions(deleteCompletedTransfersByIdUseCase)
         }
 
     @Test
-    fun `test that retryFailedTransfer updates startEvent with StartUpload and invokes DeleteCompletedTransfersByIdUseCase when the transfer is a general upload`() =
+    fun `test that retryFailedTransfer updates startEvent with StartUpload and does not invoke DeleteCompletedTransfersByIdUseCase when the transfer is a general upload`() =
         runTest {
+            val idAndEvent = mapOf(failedUpload.id!! to uploadStartEvent)
+            val expectedStartEvent = triggered(TransferTriggerEvent.RetryTransfers(idAndEvent))
+
             whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
             whenever(canReadUriUseCase(originalPath)) doReturn true
             whenever(getNodeByIdUseCase(NodeId(failedUpload.handle))) doReturn typedNode
@@ -752,17 +757,19 @@ class TransfersViewModelTest {
                 retryFailedTransfer(failedUpload)
                 advanceUntilIdle()
                 uiState.map { it.startEvent }.test {
-                    assertThat(awaitItem()).isEqualTo(triggered(uploadStartEvent))
+                    assertThat(awaitItem()).isEqualTo(expectedStartEvent)
                 }
             }
-            failedUpload.id?.let {
-                verify(deleteCompletedTransfersByIdUseCase).invoke(listOf(it))
-            }
+
+            verifyNoInteractions(deleteCompletedTransfersByIdUseCase)
         }
 
     @Test
-    fun `test that retryFailedTransfer updates startEvent with StartUpload and invokes DeleteCompletedTransfersByIdUseCase when the transfer is a general upload from cache`() =
+    fun `test that retryFailedTransfer updates startEvent with StartUpload and does not invoke DeleteCompletedTransfersByIdUseCase when the transfer is a general upload from cache`() =
         runTest {
+            val idAndEvent = mapOf(failedUpload.id!! to uploadStartEvent)
+            val expectedStartEvent = triggered(TransferTriggerEvent.RetryTransfers(idAndEvent))
+
             whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn true
             whenever(getNodeByIdUseCase(NodeId(failedUpload.handle))) doReturn typedNode
 
@@ -772,12 +779,10 @@ class TransfersViewModelTest {
                 retryFailedTransfer(failedUpload)
                 advanceUntilIdle()
                 uiState.map { it.startEvent }.test {
-                    assertThat(awaitItem()).isEqualTo(triggered(uploadStartEvent))
+                    assertThat(awaitItem()).isEqualTo(expectedStartEvent)
                 }
             }
-            failedUpload.id?.let {
-                verify(deleteCompletedTransfersByIdUseCase).invoke(listOf(it))
-            }
+            verifyNoInteractions(deleteCompletedTransfersByIdUseCase)
         }
 
     @Test
@@ -818,7 +823,7 @@ class TransfersViewModelTest {
             )
             val startTransferEvents = listOf(
                 StartTransferEvent(failedOfflineDownload.id, offlineStartEvent),
-                StartTransferEvent(cancelledDownload.id, downloadStartEvent),
+                StartTransferEvent(cancelledDownload.id, downloadRetryEvent),
                 StartTransferEvent(cancelledChatUpload.id, null),
             )
 
@@ -862,7 +867,7 @@ class TransfersViewModelTest {
             )
             val startTransferEvents = listOf(
                 StartTransferEvent(failedOfflineDownload.id, offlineStartEvent),
-                StartTransferEvent(cancelledDownload.id, downloadStartEvent),
+                StartTransferEvent(cancelledDownload.id, downloadRetryEvent),
                 StartTransferEvent(failedUpload.id, uploadStartEvent),
             )
 
@@ -883,8 +888,8 @@ class TransfersViewModelTest {
 
             with(underTest) {
                 flow.emit(transfersList)
-                retryAllFailedTransfers()
                 advanceUntilIdle()
+                retryAllFailedTransfers()
                 uiState.map { it.startEvent }.test {
                     assertThat(awaitItem()).isEqualTo(triggered(expected))
                 }

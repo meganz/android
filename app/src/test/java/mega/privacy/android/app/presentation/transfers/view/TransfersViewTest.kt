@@ -330,10 +330,6 @@ class TransfersViewTest {
                     onSelectAllActiveTransfers = {},
                     onSelectAllCompletedTransfers = {},
                     onSelectAllFailedTransfers = {},
-                    onViewInFolder = {},
-                    onOpenWith = {},
-                    onShareLink = {},
-                    onClearTransfer = {},
                     onRetryTransfer = {},
                 )
             }

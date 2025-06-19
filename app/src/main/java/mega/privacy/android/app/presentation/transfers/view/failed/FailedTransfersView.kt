@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,14 +32,12 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.feature.transfers.components.FailedTransferItem
 import mega.privacy.android.shared.resources.R as sharedR
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun FailedTransfersView(
     failedTransfers: ImmutableList<CompletedTransfer>,
     selectedFailedTransfersIds: ImmutableList<Int>?,
     onFailedTransferSelected: (CompletedTransfer) -> Unit,
     onRetryTransfer: (CompletedTransfer) -> Unit,
-    onClearTransfer: (Int) -> Unit,
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
@@ -89,8 +86,7 @@ internal fun FailedTransfersView(
                 failedTransfer = failedTransfer,
                 fileTypeResId = fileTypeResId,
                 previewUri = previewUri,
-                onRetryTransfer = { onRetryTransfer(failedTransfer) },
-                onClearTransfer = { failedTransfer.id?.let { id -> onClearTransfer(id) } },
+                onRetryTransfer = onRetryTransfer,
                 onDismissSheet = { failedItemSelected = null },
             )
         }

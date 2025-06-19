@@ -7,14 +7,23 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
+import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsViewModel
 import mega.privacy.android.app.presentation.transfers.view.failed.TEST_TAG_FAILED_TRANSFERS_VIEW
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -35,12 +44,48 @@ fun FailedTransferActionsBottomSheet(
     failedTransfer: CompletedTransfer,
     fileTypeResId: Int?,
     previewUri: Uri?,
-    onRetryTransfer: () -> Unit,
-    onClearTransfer: () -> Unit,
+    onRetryTransfer: (CompletedTransfer) -> Unit,
+    onDismissSheet: () -> Unit,
+) {
+    val viewModel = hiltViewModel<CompletedTransferActionsViewModel>()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = failedTransfer.id) {
+        viewModel.checkCompletedTransferActions(failedTransfer)
+    }
+
+    FailedTransferActionsBottomSheet(
+        failedTransfer = failedTransfer,
+        fileTypeResId = fileTypeResId,
+        previewUri = previewUri,
+        uiState = uiState,
+        onRetryTransfer = onRetryTransfer,
+        onClearTransfer = viewModel::clearTransfer,
+        onDismissSheet = onDismissSheet,
+        modifier = Modifier,
+    )
+}
+
+/**
+ * Bottom sheet for a failed transfer actions.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FailedTransferActionsBottomSheet(
+    failedTransfer: CompletedTransfer,
+    fileTypeResId: Int?,
+    previewUri: Uri?,
+    uiState: CompletedTransferActionsUiState,
+    onRetryTransfer: (CompletedTransfer) -> Unit,
+    onClearTransfer: (CompletedTransfer) -> Unit,
     onDismissSheet: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
 ) = with(failedTransfer) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackBarHostState.current
+
     MegaModalBottomSheet(
         bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
         onDismissRequest = onDismissSheet,
@@ -71,7 +116,9 @@ fun FailedTransferActionsBottomSheet(
             iconPainter = IconPack.Medium.Thin.Outline.RotateCcw,
             name = stringResource(id = R.string.general_retry),
             onClick = {
-                onRetryTransfer()
+                if (uiState.isOnline(coroutineScope, snackbarHostState, context)) {
+                    onRetryTransfer(failedTransfer)
+                }
                 onDismissSheet()
             },
         )
@@ -80,7 +127,7 @@ fun FailedTransferActionsBottomSheet(
             iconPainter = IconPack.Medium.Thin.Outline.Eraser,
             name = stringResource(id = R.string.general_clear),
             onClick = {
-                onClearTransfer()
+                onClearTransfer(failedTransfer)
                 onDismissSheet()
             },
         )
@@ -112,6 +159,7 @@ private fun FailedTransferActionsBottomSheetPreview() {
             ),
             fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
             previewUri = null,
+            uiState = CompletedTransferActionsUiState(),
             onRetryTransfer = {},
             onClearTransfer = {},
             onDismissSheet = {},

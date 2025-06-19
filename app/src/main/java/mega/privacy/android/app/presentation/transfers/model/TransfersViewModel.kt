@@ -240,8 +240,14 @@ class TransfersViewModel @Inject constructor(
         viewModelScope.launch {
             if (canReadTransferUri(transfer)) {
                 getStartTransferEventByFailedTransfer(transfer)?.let { startTransferEvent ->
-                    startTransferEvent.event?.let { event -> setStartEvent(event) }
-                    startTransferEvent.id?.let { id -> deleteCompletedTransfersByIdUseCase(listOf(id)) }
+                    startTransferEvent.event?.let { event ->
+                        val idAndEvent = mapOf(transfer.id!! to event)
+                        setStartEvent(TransferTriggerEvent.RetryTransfers(idAndEvent))
+                    } ?: run {
+                        startTransferEvent.id?.let { id ->
+                            deleteCompletedTransfersByIdUseCase(listOf(id))
+                        }
+                    }
                 }
             } else {
                 _uiState.update { state -> state.copy(readRetryError = 1) }
@@ -306,17 +312,20 @@ class TransfersViewModel @Inject constructor(
             when {
                 type.isDownloadType() -> {
                     getNodeByIdUseCase(NodeId(handle))?.let { typedNode ->
-                        if (isOffline == true) {
-                            TransferTriggerEvent.StartDownloadForOffline(
-                                node = typedNode,
-                                withStartMessage = false
-                            )
-                        } else {
-                            TransferTriggerEvent.StartDownloadNode(
-                                nodes = listOf(typedNode),
-                                withStartMessage = false
-                            )
-                        }
+                        return StartTransferEvent(
+                            id = failedTransfer.id,
+                            event = if (isOffline == true) {
+                                TransferTriggerEvent.StartDownloadForOffline(
+                                    node = typedNode,
+                                    withStartMessage = false
+                                )
+                            } else {
+                                TransferTriggerEvent.RetryDownloadNode(
+                                    node = typedNode,
+                                    downloadLocation = path,
+                                )
+                            },
+                        )
                     } ?: run {
                         Timber.e("Node not found for this transfer")
                     }
@@ -345,18 +354,17 @@ class TransfersViewModel @Inject constructor(
                             )
                         }
                     } else {
-                        TransferTriggerEvent.StartUpload.Files(
-                            mapOf(path to null),
-                            NodeId(parentHandle)
+                        return StartTransferEvent(
+                            id = failedTransfer.id,
+                            event = TransferTriggerEvent.StartUpload.Files(
+                                mapOf(path to null),
+                                NodeId(parentHandle)
+                            ),
                         )
                     }
                 }
 
                 else -> throw IllegalArgumentException("This transfer type cannot be retried here for now")
-            }.let { event ->
-                if (event is TransferTriggerEvent.CloudTransfer) {
-                    return StartTransferEvent(id = failedTransfer.id, event = event)
-                }
             }
         }
 

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,16 +31,11 @@ import mega.privacy.android.feature.transfers.components.CompletedTransferItem
 import mega.privacy.android.shared.resources.R as sharedR
 import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CompletedTransfersView(
     completedTransfers: ImmutableList<CompletedTransfer>,
     selectedCompletedTransfersIds: ImmutableList<Int>?,
     onCompletedTransferSelected: (CompletedTransfer) -> Unit,
-    onViewInFolder: () -> Unit,
-    onOpenWith: () -> Unit,
-    onShareLink: (Long) -> Unit,
-    onClearTransfer: (Int) -> Unit,
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
@@ -90,10 +84,6 @@ internal fun CompletedTransfersView(
                 completedTransfer = completedTransfer,
                 fileTypeResId = fileTypeResId,
                 previewUri = previewUri,
-                onViewInFolder = onViewInFolder,
-                onOpenWith = onOpenWith,
-                onShareLink = { onShareLink(completedTransfer.handle) },
-                onClearTransfer = { completedTransfer.id?.let { id -> onClearTransfer(id) } },
                 onDismissSheet = { completedItemSelected = null },
             )
         }

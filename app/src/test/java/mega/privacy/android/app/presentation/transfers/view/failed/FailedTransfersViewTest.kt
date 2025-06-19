@@ -43,7 +43,6 @@ class FailedTransfersViewTest {
                 selectedFailedTransfersIds = mock(),
                 onFailedTransferSelected = mock(),
                 onRetryTransfer = mock(),
-                onClearTransfer = mock(),
             )
         }
     }

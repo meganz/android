@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -29,8 +30,8 @@ class FailedTransferActionsBottomSheetTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val onRetryTransfer = mock<() -> Unit>()
-    private val onClearTransfer = mock<() -> Unit>()
+    private val onRetryTransfer = mock<(CompletedTransfer) -> Unit>()
+    private val onClearTransfer = mock<(CompletedTransfer) -> Unit>()
     private val onDismissSheet = mock<() -> Unit>()
     private val fileName = "2023-03-24 00.13.20_1.pdf"
     private val failedDownload = CompletedTransfer(
@@ -112,7 +113,7 @@ class FailedTransferActionsBottomSheetTest {
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_RETRY_ACTION).performSemanticsAction(SemanticsActions.OnClick)
 
-            verify(onRetryTransfer).invoke()
+            verify(onRetryTransfer).invoke(failedDownload)
             verify(onDismissSheet).invoke()
         }
     }
@@ -125,7 +126,7 @@ class FailedTransferActionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_CLEAR_FAILED_TRANSFER_ACTION)
                 .performSemanticsAction(SemanticsActions.OnClick)
 
-            verify(onClearTransfer).invoke()
+            verify(onClearTransfer).invoke(cancelledUpload)
             verify(onDismissSheet).invoke()
         }
     }
@@ -137,6 +138,7 @@ class FailedTransferActionsBottomSheetTest {
                 failedTransfer = failedTransfer,
                 fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
                 previewUri = null,
+                uiState = CompletedTransferActionsUiState(),
                 onRetryTransfer = onRetryTransfer,
                 onClearTransfer = onClearTransfer,
                 onDismissSheet = onDismissSheet,
