@@ -28,7 +28,7 @@ internal interface CompletedTransferDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateCompletedTransfers(entities: List<CompletedTransferEntity>)
 
-    @Query("DELETE FROM $TABLE_COMPLETED_TRANSFERS WHERE id NOT IN (SELECT id FROM $TABLE_COMPLETED_TRANSFERS WHERE transferstate = :transferState ORDER BY transfertimestamp DESC LIMIT :limit)")
+    @Query("DELETE FROM $TABLE_COMPLETED_TRANSFERS WHERE transferstate = :transferState AND id NOT IN (SELECT id FROM $TABLE_COMPLETED_TRANSFERS WHERE transferstate = :transferState ORDER BY transfertimestamp DESC LIMIT :limit)")
     suspend fun deleteOldCompletedTransfersByState(transferState: Int, limit: Int)
 
     /**
