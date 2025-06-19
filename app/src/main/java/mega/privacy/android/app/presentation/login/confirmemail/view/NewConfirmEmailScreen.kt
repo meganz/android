@@ -61,7 +61,6 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.spacing.LocalSpacing
-import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -253,9 +252,9 @@ internal fun NewConfirmEmailScreen(
                         ),
                         spanStyles = hashMapOf(
                             SpanIndicator('A') to SpanStyleWithAnnotation(
-                                MegaSpanStyle.LinkColorStyle(
+                                MegaSpanStyle.TextColorStyle(
                                     SpanStyle(),
-                                    LinkColor.Primary
+                                    TextColor.Secondary
                                 ), MAIL_SUPPORT
                             ),
                             SpanIndicator('P') to SpanStyleWithAnnotation(
@@ -267,11 +266,7 @@ internal fun NewConfirmEmailScreen(
                         ),
                         baseStyle = AppTheme.typography.bodyLarge,
                         baseTextColor = TextColor.Secondary,
-                        onAnnotationClick = {
-                            if (it == MAIL_SUPPORT) {
-                                sendFeedbackEmail(it)
-                            }
-                        }
+                        onAnnotationClick = {}
                     )
                 } else {
                     ContentLoading()
