@@ -78,15 +78,6 @@ pipeline {
                         }
                     }
                 }
-                stage('macmini6') {
-                    agent { label 'macmini6' }
-                    steps {
-                        script {
-                            cleanCache()
-                            buildProject()
-                        }
-                    }
-                }
                 stage('macstudio1') {
                     agent { label 'macstudio1' }
                     steps {
@@ -107,15 +98,6 @@ pipeline {
                 }
                 stage('macstudio5') {
                     agent { label 'macstudio5' }
-                    steps {
-                        script {
-                            cleanCache()
-                            buildProject()
-                        }
-                    }
-                }
-                stage('macstudio6') {
-                    agent { label 'macstudio6' }
                     steps {
                         script {
                             cleanCache()
