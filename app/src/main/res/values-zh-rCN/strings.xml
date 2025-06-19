@@ -738,10 +738,6 @@
     <string name="choose_photo_avatar_panel">选择图片</string>
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">删除图片</string>
-    <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">您提供的密钥与此帐户不匹配。请确保您使用正确的恢复密钥并重试。</string>
-    <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">恢复密钥无效</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">正在获取信息&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->

@@ -738,10 +738,6 @@
     <string name="choose_photo_avatar_panel">사진 선택</string>
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">사진 삭제</string>
-    <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">입력한 키가 이 계정에 맞지 않습니다. 올바른 복구 키를 사용하였는지 확인하고 다시 시도하세요.</string>
-    <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">잘못된 복구 키</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">정보 받는 중&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->

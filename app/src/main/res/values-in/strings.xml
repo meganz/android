@@ -738,10 +738,6 @@
     <string name="choose_photo_avatar_panel">Pilih gambar</string>
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">Hapus gambar</string>
-    <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">Kunci yang anda berikan tidak sesuai dengan akun ini. Pastikan anda menggunakan Kunci pemulihan yang benar dan coba lagi.</string>
-    <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">Kunci pemulihan salah</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Mendapatkan info&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->

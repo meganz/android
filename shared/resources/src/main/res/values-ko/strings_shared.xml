@@ -433,7 +433,7 @@
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">컴퓨터에서</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Visit [A]https://mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website">1. 웹 브라우저에서 [A]https://mega.nz[/A]를 방문합니다.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. MEGA 계정에 로그인합니다.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -1255,9 +1255,9 @@
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">일부 폴더는 MEGA 앱이 로컬 폴더에 대한 접근 권한을 상실하여 동기화하거나 백업할 수 없습니다. 재개를 탭하여 영향 받은 각 폴더의 권한을 다시 추가하세요.</string>
     <!-- Title for the free plan card when the user is an existing account -->
-    <string name="free_plan_card_existing_title">Continue with your free plan</string>
+    <string name="free_plan_card_existing_title">무료 요금제로 계속</string>
     <!-- Button text for existing users to continue with the free plan -->
-    <string name="free_plan_card_existing_button">Continue with free plan</string>
+    <string name="free_plan_card_existing_button">무료 요금제로 계속</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">%1$s 저장소</string>
     <!-- Sort by newest shares -->
@@ -1267,5 +1267,9 @@
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">복구 키 오류</string>
     <!-- Description for recovery key error dialog -->
-    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
+    <string name="recovery_key_error_description">입력한 복구 키가 잘못 되었거나, 이 계정의 것이 아닙니다. 올바른 키를 이용했는지 확인하고 다시 시도하세요.</string>
+    <!-- Label for the current plan badge in the pro plan card -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">현재 요금제</string>
+    <!-- Error message when achievements status is unavailable -->
+    <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
 </resources>

@@ -7,11 +7,11 @@
     <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
     <string name="api_eargs">잘못된 인수</string>
     <!-- Label to show that a request error occurs during a SDK operation. -->
-    <string name="api_eagain">요청이 실패함, 재시도중</string>
+    <string name="api_eagain">요청 실패, 재시도 중</string>
     <!-- Label to show that the rate limit has been reached during a SDK operation. -->
     <string name="api_eratelimit">비율 제한 초과</string>
     <!-- Label to show that a SDK operation has failed permanently. -->
-    <string name="api_efailed">영구적으로 실패함</string>
+    <string name="api_efailed">영구적으로 실패</string>
     <!-- Error shown when terms of service are breached during download. -->
     <string name="api_etoomany_ec_download">이용 약관 침해됨</string>
     <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
@@ -23,23 +23,23 @@
     <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
     <string name="api_enoent">발견되지 않음</string>
     <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
-    <string name="api_ecircular">순환 연결 감지</string>
+    <string name="api_ecircular">순환 연결 감지됨</string>
     <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-    <string name="api_eaccess">접근이 거부됨</string>
+    <string name="api_eaccess">접근 거부됨</string>
     <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
-    <string name="api_eexist">이미 존재합니다</string>
+    <string name="api_eexist">이미 존재함</string>
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
-    <string name="api_eincomplete">완료되지 않음</string>
+    <string name="api_eincomplete">미완료</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
     <string name="api_ekey">복호화 오류</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
-    <string name="api_esid">세션 ID 오류</string>
+    <string name="api_esid">잘못된 세션 ID</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">차단됨</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
     <string name="api_eoverquota">할당량 초과</string>
     <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
-    <string name="api_etempunavail">일시적으로 이용이 불가능합니다</string>
+    <string name="api_etempunavail">일시적으로 이용 불가</string>
     <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
     <string name="api_etoomanyconnections">연결 초과</string>
     <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
@@ -51,7 +51,7 @@
     <!-- Error shown when SSL check has failed -->
     <string name="api_essl">SSL 인증 실패</string>
     <!-- Label shown when current account does not have enough quota to complete the operation -->
-    <string name="api_egoingoverquota">충분하지 않은 할당량</string>
+    <string name="api_egoingoverquota">할당량 불충분</string>
     <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
     <string name="api_emfarequired">2단계 인증이 필요합니다.</string>
     <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
@@ -73,5 +73,5 @@
     <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
     <string name="api_error_http">HTTP 오류</string>
     <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->
-    <string name="api_ecircular_ec_upload">재귀적 디렉토리 구조로 인하여 전송을 실패하였습니다</string>
+    <string name="api_ecircular_ec_upload">재귀적 디렉토리 구조로 인하여 전송 실패</string>
 </resources>

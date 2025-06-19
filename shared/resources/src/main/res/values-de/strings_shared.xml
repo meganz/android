@@ -1284,5 +1284,9 @@
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">Fehlerhafter Rettungsschlüssel</string>
     <!-- Description for recovery key error dialog -->
-    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
+    <string name="recovery_key_error_description">Der von Ihnen eingegebene Rettungsschlüssel ist entweder ungültig oder gehört nicht zu diesem Account. Vergewissern Sie sich, dass Sie den richtigen Schlüssel verwenden und versuchen Sie es erneut.</string>
+    <!-- Label for the current plan badge in the pro plan card -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">Aktiv</string>
+    <!-- Error message when achievements status is unavailable -->
+    <string name="achievement_status_unavailable">Der Status Ihrer Boni ist derzeit nicht verfügbar. Versuchen Sie es später erneut.</string>
 </resources>

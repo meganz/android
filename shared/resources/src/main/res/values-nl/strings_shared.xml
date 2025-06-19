@@ -441,7 +441,7 @@
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">Op een computer</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Visit [A]https://mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website">1. Bezoek [A]https://mega.nz[/A] in uw webbrowser.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Log in op uw MEGA-account.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -1272,9 +1272,9 @@
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Sommige mappen kunnen niet worden gesynchroniseerd of er kan geen back-up van worden gemaakt omdat de MEGA-applicatie geen rechten meer heeft om toegang te krijgen tot de lokale mappen. Tik op Hervatten om machtigingen opnieuw toe te voegen voor elke betreffende map.</string>
     <!-- Title for the free plan card when the user is an existing account -->
-    <string name="free_plan_card_existing_title">Continue with your free plan</string>
+    <string name="free_plan_card_existing_title">Ga verder met uw gratis abonnement</string>
     <!-- Button text for existing users to continue with the free plan -->
-    <string name="free_plan_card_existing_button">Continue with free plan</string>
+    <string name="free_plan_card_existing_button">Ga verder met een gratis abonnement</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">%1$s opslag</string>
     <!-- Sort by newest shares -->
@@ -1284,5 +1284,9 @@
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">Fout met de herstelsleutel</string>
     <!-- Description for recovery key error dialog -->
-    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
+    <string name="recovery_key_error_description">De herstelsleutel die u hebt opgegeven is ongeldig of niet voor dit account. Controleer of je de juiste sleutel gebruikt en probeer het opnieuw.</string>
+    <!-- Label for the current plan badge in the pro plan card -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">Huidige abonnement</string>
+    <!-- Error message when achievements status is unavailable -->
+    <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
 </resources>

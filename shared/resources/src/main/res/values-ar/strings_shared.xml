@@ -473,7 +473,7 @@
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">على الحاسوب</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Visit [A]https://mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website">1. قم بزيارة [A]https://mega.nz[/A] في متصفح الويب الخاص بك.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. قم بتسجيل الدخول إلى حساب ميغا MEGA الخاص بك.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -991,7 +991,7 @@
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">جاري حفظ %1$s إلى السواقة السحابية...</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">سيتم محاسبتك %1$s على الفور ولكن لن يتم تجديد اشتراكك تلقائيًا بعد 12 شهرًا بسبب اللوائح الحكومية. تقع على عاتقك مسؤولية تجديد اشتراكك بعد انتهاء صلاحيته. يمكنك إدارة أو إلغاء اشتراكك في أي وقت عبر الاشتراكات في غوغل بلاي [A]Google&#160;Play[/A]. من خلال ترقية حسابك، فإنك توافق على [B]شروط الخدمة[/B] و [C]سياسة الخصوصية[/C] الخاصين بميغا MEGA.\n&#160;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">جاري الرفع\u2026</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -1049,7 +1049,7 @@
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
     <string name="general_sync_notification_generic_error_title">تم إيقاف المزامنة</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Check your syncs in the app to resolve this.</string>
+    <string name="general_sync_notification_generic_error_text">تحقق من عمليات المزامنة في التطبيق لحل هذه المشكلة.</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
     <string name="general_sync_notification_stalled_issues_title">تم اكتشاف مشاكل المزامنة</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
@@ -1101,7 +1101,7 @@
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_text">لن تتمكن بعد الآن من عرض هذا الملف</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again</string>
+    <string name="transfers_fake_preview_screen_general_error">فشل تحميل العرض، حاول مرة أخرى</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_preview_download">حدث خطأ ما. لم يتم إلغاء العرض. راجع الإشعار للحصول على التفاصيل.</string>
     <!-- Title of the Rename and Create Backup Dialog -->
@@ -1113,21 +1113,21 @@
     <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_positive_button">تغيير الاسم</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">أدخل اسم النسخة الاحتياطية</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
     <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">توجد نسخة احتياطية بهذا الاسم بالفعل. أدخل اسمًا مختلفًا.</string>
     <!-- USP Carousel page 1 title-->
     <string name="carousel_page_title_slide_1">انت تحتفظ بالمفاتيح</string>
     <!-- USP Carousel page 1 description-->
-    <string name="carousel_page_description_slide_1">User controlled, zero-knowledge encryption means no one can see your data unless you want them to - not even us!</string>
+    <string name="carousel_page_description_slide_1">يعني تشفير المعرفة الصفرية المتحكم به من قبل المستخدم أنه لا يمكن لأي شخص رؤية بياناتك إلا إذا كنت ترغب في ذلك - ولا حتى نحن!</string>
     <!-- USP Carousel page 2 title-->
-    <string name="carousel_page_title_slide_2">Keep every moment safe</string>
+    <string name="carousel_page_title_slide_2">حافظ على كل لحظة آمنة</string>
     <!-- USP Carousel page 2 description-->
-    <string name="carousel_page_description_slide_2">With automatic camera uploads to MEGA Cloud, and generous storage, you’ll never lose a precious memory</string>
+    <string name="carousel_page_description_slide_2">مع ترفيعات الكاميرا التلقائية إلى سحابة ميغا MEGA والتخزين السخي لن تفقد أبدًا ذكرى ثمينة</string>
     <!-- USP Carousel page 3 title-->
-    <string name="carousel_page_title_slide_3">Your data. Your space.</string>
+    <string name="carousel_page_title_slide_3">البيانات الخاصة بك. المساحة الخاصة بك.</string>
     <!-- USP Carousel page 3 description-->
-    <string name="carousel_page_description_slide_3">Ample storage and easy ways to transfer, share, and organise your files means you can safely use MEGA for whatever you choose</string>
+    <string name="carousel_page_description_slide_3">مساحة تخزين واسعة وطرق سهلة لنقل ملفاتك ومشاركتها وتنظيمها تعني أنه يمكنك استخدام ميغا MEGA بأمان لأي شيء تختاره</string>
     <!-- USP Carousel page 4 title-->
     <string name="carousel_page_title_slide_4">قلها على انفراد</string>
     <!-- USP Carousel page 4 description-->
@@ -1149,7 +1149,7 @@
     <!-- Hidden nodes description: shared files stay visible feature -->
     <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
     <!--Camera backup permission screen title-->
-    <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
+    <string name="camera_backup_permission_screen_title">حافظ على صورك آمنة دائمًا</string>
     <!--Camera backup permission screen description-->
     <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
@@ -1157,9 +1157,9 @@
     <!--Button text to request camera backup permission-->
     <string name="camera_backup_permission_enable_button_text">تفعيل ترفيعات الكاميرا</string>
     <!--Permission screen skip requesting permission button text-->
-    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <string name="permission_screen_skip_permission_request_button_text">تجاهل الآن</string>
     <!--Notification permission screen title-->
-    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <string name="notification_permission_screen_title">لا تفوت أي تحديث مهم</string>
     <!--Notification permission screen description-->
     <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
     <!--Button text to request Notification permission-->
@@ -1223,7 +1223,7 @@
     <!-- Feature text for Free Plan storage -->
     <string name="free_plan_card_storage_feature">20 GB of storage</string>
     <!-- Feature text for Free Plan transfer quota -->
-    <string name="free_plan_card_transfer_feature">Limited transfers</string>
+    <string name="free_plan_card_transfer_feature">حجم تراسل معطيات محدود</string>
     <!-- Button text for Free Plan card -->
     <string name="free_plan_card_button">ابدأ مجاناً</string>
     <!-- Section title for the features list -->
@@ -1243,7 +1243,7 @@
     <!-- Title for MEGA Pass feature -->
     <string name="pro_plan_feature_pass_title">MEGA&#160;Pass</string>
     <!-- Description for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager</string>
+    <string name="pro_plan_feature_pass_desc">قم بتنظيم جميع كلمات المرور الخاصة بك واحتفظ بها آمنة مع مدير كلمات المرور الخاص بنا</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">موصي به</string>
     <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
@@ -1251,7 +1251,7 @@
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">رق حسابك الآن</string>
     <!-- Section title for additional benefits of Pro plans -->
-    <string name="pro_plan_additional_benefits_section_title">Additional benefits of Pro plans</string>
+    <string name="pro_plan_additional_benefits_section_title">مزايا إضافية لباقات برو Pro</string>
     <!-- Benefit: Password-protected links -->
     <string name="pro_plan_benefit_password_protected_links">روابط محمية بكلمة مرور</string>
     <!-- Benefit: Links with expiry dates -->
@@ -1273,7 +1273,7 @@
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.\n\nYou can cancel your plan subscription any time but no later than 24 hours before your next subscription payment is due. [A]Learn how to manage your subscription in your settings[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]Terms of Service and Privacy Policy[/A]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]شروط الخدمة وسياسة الخصوصية[/A]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">احصل على المزيد مع باقة برو Pro</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1334,7 +1334,7 @@
     <!-- text of received mega pass free trial in achivements section -->
     <string name="text_received_mega_pass_free_trial">لقد استلمت %1$s من مساحة التخزين لبدء تشغيل الفترة التجريبية المجانية من ميغا باس MEGA&#160;Pass</string>
     <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
+    <string name="sync_change_root_uri_warning_title">بعض المجلدات غير قادرة على المزامنة أو النسخ الاحتياطي لأن تطبيق ميغا MEGA فقد الأذونات للوصول إلى المجلدات المحلية. انقر فوق استئناف لإعادة إضافة الأذونات لكل مجلد متأثر.</string>
     <!-- Title for the free plan card when the user is an existing account -->
     <string name="free_plan_card_existing_title">Continue with your free plan</string>
     <!-- Button text for existing users to continue with the free plan -->
@@ -1346,7 +1346,11 @@
     <!-- Sort by oldest shares -->
     <string name="general_sort_oldest_shares">Oldest shares</string>
     <!-- Title for recovery key error dialog -->
-    <string name="recovery_key_error_title">Recovery key error</string>
+    <string name="recovery_key_error_title">خطأ مفتاح الاستعادة</string>
     <!-- Description for recovery key error dialog -->
-    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
+    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again.</string>
+    <!-- Label for the current plan badge in the pro plan card -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">الباقة الحالية</string>
+    <!-- Error message when achievements status is unavailable -->
+    <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
 </resources>

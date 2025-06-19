@@ -1301,5 +1301,9 @@
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">Erro da chave de recuperação</string>
     <!-- Description for recovery key error dialog -->
-    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again. Please use flow above</string>
+    <string name="recovery_key_error_description">A chave de recuperação que você proporcionou é inválida ou não coincide com esta conta. Comprove que você está usando a chave de recuperação correta e tente novamente.</string>
+    <!-- Label for the current plan badge in the pro plan card -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">Plano atual</string>
+    <!-- Error message when achievements status is unavailable -->
+    <string name="achievement_status_unavailable">O status das suas Conquistas não está disponível no momento. Tente novamente mais tarde.</string>
 </resources>

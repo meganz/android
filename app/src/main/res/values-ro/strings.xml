@@ -752,10 +752,6 @@
     <string name="choose_photo_avatar_panel">Alegeți poza</string>
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">Ștergeți poza</string>
-    <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">Cheia pe care ați furnizat-o nu se potrivește cu acest cont. Asigurați-vă că folosiți cheia de recuperare corectă și încercați din nou.</string>
-    <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">Cheie de recuperare nevalidă</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Se obțin informații&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
@@ -913,7 +909,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">Confidențialitate</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">Sunteți conectat la un alt cont MEGA. Deconectați-vă și deschideți din nou linkul de resetare a parolei.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">Acest link de anulare a expirat, încercați din nou.</string>
     <!-- Text shown after searching and no results found -->
