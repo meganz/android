@@ -3287,12 +3287,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             DrawerItem.RUBBISH_BIN -> {
                 supportActionBar?.subtitle = null
                 val node =
-                    megaApi.getNodeByHandle(rubbishBinViewModel.state().rubbishBinHandle)
+                    megaApi.getNodeByHandle(rubbishBinViewModel.state().currentHandle)
                 val rubbishNode = megaApi.rubbishNode
                 if (rubbishNode == null) {
                     rubbishBinViewModel.setRubbishBinHandle(INVALID_HANDLE)
                     viewModel.setIsFirstNavigationLevel(true)
-                } else if (rubbishBinViewModel.state().rubbishBinHandle == INVALID_HANDLE || node == null || node.handle == rubbishNode.handle) {
+                } else if (rubbishBinViewModel.state().currentHandle == INVALID_HANDLE || node == null || node.handle == rubbishNode.handle) {
                     supportActionBar?.title = getString(R.string.section_rubbish_bin)
                     viewModel.setIsFirstNavigationLevel(true)
                 } else {
@@ -3924,7 +3924,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             DrawerItem.RUBBISH_BIN -> {
                 showHideBottomNavigationView(true)
                 setAppBarVisibility(true)
-
                 rubbishBinComposeFragment = getRubbishBinComposeFragment()
                     ?: RubbishBinComposeFragment.newInstance()
                 rubbishBinComposeFragment?.let {
@@ -4117,7 +4116,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         searchExpand = false
         val parentHandle = viewModel.getParentHandleForSearch(
             browserParentHandle = fileBrowserViewModel.state.value.fileBrowserHandle,
-            rubbishBinParentHandle = rubbishBinViewModel.state.value.rubbishBinHandle,
+            rubbishBinParentHandle = rubbishBinViewModel.state.value.currentHandle,
             backupsParentHandle = backupsFragment?.getCurrentBackupsFolderHandle() ?: -1L,
             incomingParentHandle = getHandleFromIncomingSharesViewModel(),
             outgoingParentHandle = getHandleFromOutgoingSharesViewModel(),
@@ -4675,6 +4674,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 if (isFirstNavigationLevel) {
                     when (drawerItem) {
                         DrawerItem.RUBBISH_BIN, DrawerItem.TRANSFERS -> {
+                            rubbishBinViewModel.resetScrollPosition()
                             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
                         }
 
@@ -5537,7 +5537,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     backupsFragment?.getCurrentBackupsFolderHandle() ?: -1L
 
                 DrawerItem.RUBBISH_BIN -> parentHandle =
-                    rubbishBinViewModel.state().rubbishBinHandle
+                    rubbishBinViewModel.state().currentHandle
 
                 DrawerItem.SHARED_ITEMS -> {
                     when {
@@ -6541,7 +6541,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 //Rubbish
                 drawerItem = DrawerItem.RUBBISH_BIN
                 openFolderRefresh = true
-                comesFromNotificationHandleSaved = rubbishBinViewModel.state().rubbishBinHandle
+                comesFromNotificationHandleSaved = rubbishBinViewModel.state().currentHandle
                 rubbishBinViewModel.setRubbishBinHandle(nodeHandle)
                 selectDrawerItem(drawerItem)
             }

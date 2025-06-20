@@ -2,6 +2,9 @@ package mega.privacy.android.app.presentation.rubbishbin
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -11,7 +14,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
@@ -22,6 +24,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -107,7 +110,7 @@ class RubbishBinViewModelTest {
     fun `test that initial state is returned`() = runTest {
         underTest.state.test {
             val initial = awaitItem()
-            Truth.assertThat(initial.rubbishBinHandle).isEqualTo(-1L)
+            Truth.assertThat(initial.currentHandle).isEqualTo(-1L)
             Truth.assertThat(initial.parentHandle).isNull()
             Truth.assertThat(initial.nodeList).isEmpty()
             Truth.assertThat(initial.selectedFileNodes).isEqualTo(0)
@@ -118,7 +121,6 @@ class RubbishBinViewModelTest {
             Truth.assertThat(initial.selectedNodeHandles).isEmpty()
             Truth.assertThat(initial.selectedMegaNodes).isNull()
             Truth.assertThat(initial.isPendingRefresh).isFalse()
-            Truth.assertThat(initial.isRubbishBinEmpty).isTrue()
             Truth.assertThat(initial.restoreType).isNull()
             Truth.assertThat(initial.accountType).isNull()
             Truth.assertThat(initial.isBusinessAccountExpired).isFalse()
@@ -128,7 +130,7 @@ class RubbishBinViewModelTest {
 
     @Test
     fun `test that rubbish bin handle is updated if new value provided`() = runTest {
-        underTest.state.map { it.rubbishBinHandle }.distinctUntilChanged()
+        underTest.state.map { it.currentHandle }.distinctUntilChanged()
             .test {
                 val newValue = 123456789L
                 Truth.assertThat(awaitItem()).isEqualTo(-1L)
@@ -176,13 +178,60 @@ class RubbishBinViewModelTest {
         }
 
     @Test
+    fun `test that item is popped from openedFolderNodeHandles when back pressed`() =
+        runTest {
+            val newValue = 123456789L
+            val parentHandle = 987654321L
+            whenever(getRubbishBinNodeChildrenUseCase(newValue)).thenReturn(emptyList())
+            val mockParentNode = mock<FolderNode>().apply {
+                whenever(id).thenReturn(NodeId(parentHandle))
+            }
+            whenever(getParentNodeUseCase(NodeId(newValue))).thenReturn(mockParentNode)
+            underTest.setRubbishBinHandle(newValue)
+            underTest.onBackPressed()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.openedFolderNodeHandles).containsExactly(-1L)
+            }
+        }
+
+    @Test
+    fun `test that currentNodeHandle is replaced with -1L if matched with rubbish bin folder handle`() =
+        runTest {
+            val newValue = 123456789L
+            val rubbishBinHandle = 987654321L
+
+            val mockRubbishBinFolder = mock<FolderNode>()
+            whenever(mockRubbishBinFolder.id.longValue).thenReturn(rubbishBinHandle)
+            whenever(getRubbishBinFolderUseCase()).thenReturn(mockRubbishBinFolder)
+
+            // Re-initialize the ViewModel with the new mock
+            initViewModel()
+
+            whenever(getRubbishBinNodeChildrenUseCase(newValue)).thenReturn(emptyList())
+            whenever(getRubbishBinNodeChildrenUseCase(-1L)).thenReturn(emptyList())
+
+            val mockParentNode = mock<FolderNode>()
+            whenever(mockParentNode.id).thenReturn(NodeId(rubbishBinHandle))
+            whenever(getParentNodeUseCase(NodeId(newValue))).thenReturn(mockParentNode)
+
+            underTest.setRubbishBinHandle(newValue)
+            underTest.onBackPressed()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.currentHandle).isEqualTo(-1L)
+            }
+        }
+
+    @Test
     fun `test when when nodeUIItem is long clicked, then it updates selected item by 1`() =
         runTest {
             val nodesListItem1 = mock<TypedFolderNode>()
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.currentHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -209,7 +258,7 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.currentHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -244,7 +293,7 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFolderNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.currentHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -286,7 +335,7 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.currentHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -308,7 +357,7 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.currentHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -344,7 +393,7 @@ class RubbishBinViewModelTest {
             whenever(megaNode1.handle).thenReturn(1L)
             whenever(megaNode2.handle).thenReturn(2L)
 
-            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.currentHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -374,7 +423,7 @@ class RubbishBinViewModelTest {
             whenever(megaNode1.handle).thenReturn(1L)
             whenever(megaNode2.handle).thenReturn(2L)
 
-            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.currentHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -404,7 +453,7 @@ class RubbishBinViewModelTest {
             whenever(megaNode2.handle).thenReturn(2L)
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
+            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.currentHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -453,6 +502,23 @@ class RubbishBinViewModelTest {
                 .isEqualTo(newAccountDetail.levelDetail?.accountType)
         }
     }
+
+    @Test
+    fun `test that resetScrollPosition sets resetScrollPositionEvent to triggered`() = runTest {
+        underTest.resetScrollPosition()
+        underTest.state.test {
+            Truth.assertThat(awaitItem().resetScrollPositionEvent).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that onResetScrollPositionEventConsumed sets resetScrollPositionEvent to consumed`() =
+        runTest {
+            underTest.onResetScrollPositionEventConsumed()
+            underTest.state.test {
+                Truth.assertThat(awaitItem().resetScrollPositionEvent).isEqualTo(consumed)
+            }
+        }
 
     private suspend fun stubCommon() {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)

@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.rubbishbin.model
 
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
@@ -8,7 +10,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
 /**
- *  @property rubbishBinHandle The current RubbishBin Handle
+ *  @property currentHandle The current Handle
+ *  @property rubbishBinHandle rubbish bin folder handle
  *  @property parentHandle parent handle of the current node
  *  @property nodeList List of [NodeUIItem]
  *  @property selectedFileNodes number of selected file [NodeUIItem] on Compose
@@ -19,14 +22,15 @@ import nz.mega.sdk.MegaNode
  *  @property isPendingRefresh
  *  @property selectedNodeHandles List of selected node handles
  *  @property selectedMegaNodes List of selected [MegaNode]
- *  @property isRubbishBinEmpty If parent rubbish is empty or not
  *  @property restoreType Determines the specific "Restore" behavior
  *  @property accountType
  *  @property isBusinessAccountExpired
  *  @property hiddenNodeEnabled
+ *  @property openedFolderNodeHandles List of opened folder node handles
  */
 data class RubbishBinState(
     val rubbishBinHandle: Long = -1L,
+    val currentHandle: Long = -1L,
     val parentHandle: Long? = null,
     val nodeList: List<NodeUIItem<TypedNode>> = emptyList(),
     val selectedFileNodes: Int = 0,
@@ -37,9 +41,13 @@ data class RubbishBinState(
     val selectedNodeHandles: List<Long> = emptyList(),
     val selectedMegaNodes: List<MegaNode>? = null,
     val isPendingRefresh: Boolean = false,
-    val isRubbishBinEmpty: Boolean = false,
     val restoreType: RestoreType? = null,
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
-    val hiddenNodeEnabled: Boolean = false
-)
+    val hiddenNodeEnabled: Boolean = false,
+    val openedFolderNodeHandles: List<Long> = listOf(-1L),
+    val isLoading: Boolean = true,
+    val resetScrollPositionEvent: StateEvent = consumed
+) {
+    val isRootDirectory get() = currentHandle == -1L || currentHandle == rubbishBinHandle
+}

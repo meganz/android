@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.rubbishbin
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -16,7 +18,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
@@ -41,6 +42,9 @@ import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.shared.original.core.ui.utils.pop
+import mega.privacy.android.shared.original.core.ui.utils.push
+import mega.privacy.android.shared.original.core.ui.utils.toMutableArrayDeque
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -87,11 +91,26 @@ class RubbishBinViewModel @Inject constructor(
     val state: StateFlow<RubbishBinState> = _state
 
     init {
+        setRubbishBinFolderHandle()
         nodeUpdates()
         checkViewType()
         viewModelScope.launch {
             if (isHiddenNodesActive()) {
                 monitorAccountDetail()
+            }
+        }
+    }
+
+    private fun setRubbishBinFolderHandle() {
+        viewModelScope.launch {
+            runCatching {
+                getRubbishBinFolderUseCase()?.id?.longValue ?: INVALID_HANDLE
+            }.onSuccess { handle ->
+                _state.update {
+                    it.copy(rubbishBinHandle = handle)
+                }
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }
@@ -161,8 +180,32 @@ class RubbishBinViewModel @Inject constructor(
      * @param handle the id of the current rubbish bin parent handle to set
      */
     fun setRubbishBinHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(rubbishBinHandle = handle) }
+        val nodeHandle = if (handle == _state.value.rubbishBinHandle) INVALID_HANDLE else handle
+        val handleStack =
+            _state.value.openedFolderNodeHandles
+                .toMutableArrayDeque()
+                .apply { push(nodeHandle) }
+        _state.update {
+            it.copy(
+                openedFolderNodeHandles = handleStack,
+                currentHandle = nodeHandle,
+                isLoading = true,
+                nodeList = emptyList(),
+            )
+        }
         refreshNodes()
+    }
+
+    fun resetScrollPosition() {
+        _state.update {
+            it.copy(
+                resetScrollPositionEvent = triggered
+            )
+        }
+    }
+
+    fun onResetScrollPositionEventConsumed() {
+        _state.update { it.copy(resetScrollPositionEvent = consumed) }
     }
 
     /**
@@ -173,16 +216,21 @@ class RubbishBinViewModel @Inject constructor(
      */
     fun refreshNodes() {
         viewModelScope.launch {
-            val nodeList =
-                getNodeUiItems(getRubbishBinNodeChildrenUseCase(_state.value.rubbishBinHandle))
-            _state.update {
-                it.copy(
-                    parentHandle = getParentNodeUseCase(NodeId(_state.value.rubbishBinHandle))?.id?.longValue,
-                    nodeList = nodeList,
-                    sortOrder = getCloudSortOrder(),
-                    isRubbishBinEmpty = INVALID_HANDLE == _state.value.rubbishBinHandle ||
-                            getRubbishBinFolderUseCase()?.id?.longValue == _state.value.rubbishBinHandle
-                )
+            runCatching {
+                val nodeList =
+                    getNodeUiItems(getRubbishBinNodeChildrenUseCase(_state.value.currentHandle))
+                val parentHandle =
+                    getParentNodeUseCase(NodeId(_state.value.currentHandle))?.id?.longValue
+                _state.update {
+                    it.copy(
+                        parentHandle = parentHandle,
+                        nodeList = nodeList,
+                        isLoading = false,
+                        sortOrder = getCloudSortOrder(),
+                    )
+                }
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }
@@ -218,9 +266,18 @@ class RubbishBinViewModel @Inject constructor(
      * Handles back click of rubbishBinFragment
      */
     fun onBackPressed() {
-        _state.value.parentHandle?.let {
-            setRubbishBinHandle(it)
+        val parentHandle = _state.value.parentHandle ?: return
+        val handleStack = _state.value.openedFolderNodeHandles
+            .toMutableArrayDeque()
+            .apply { pop() }
+        _state.update {
+            it.copy(
+                isLoading = true,
+                currentHandle = if (parentHandle == _state.value.rubbishBinHandle) INVALID_HANDLE else parentHandle,
+                openedFolderNodeHandles = handleStack,
+            )
         }
+        refreshNodes()
     }
 
     /**
@@ -239,10 +296,10 @@ class RubbishBinViewModel @Inject constructor(
      */
     private fun checkForDeletedNodes(changes: Map<Node, List<NodeChanges>>) {
         changes.forEach { (key, value) ->
-            if (value.contains(NodeChanges.Remove) && _state.value.rubbishBinHandle == key.id.longValue) {
+            if (value.contains(NodeChanges.Remove) && _state.value.currentHandle == key.id.longValue) {
                 setRubbishBinHandle(key.parentId.longValue)
                 return@forEach
-            } else if (value.contains(NodeChanges.Parent) && _state.value.rubbishBinHandle == key.id.longValue) {
+            } else if (value.contains(NodeChanges.Parent) && _state.value.currentHandle == key.id.longValue) {
                 setRubbishBinHandle(-1)
                 return@forEach
             }

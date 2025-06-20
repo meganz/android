@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.rubbishbin
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -51,6 +50,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -161,10 +161,11 @@ class RubbishBinComposeFragment : Fragment() {
                                 SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
                                     ?: R.string.sortby_name
                             ),
-                            emptyState = getEmptyFolderDrawable(uiState.isRubbishBinEmpty),
+                            emptyState = getEmptyFolderDrawable(uiState.isRootDirectory),
                             onLinkClicked = context::launchUrl,
                             onDisputeTakeDownClicked = context::launchUrl,
-                            fileTypeIconMapper = fileTypeIconMapper
+                            fileTypeIconMapper = fileTypeIconMapper,
+                            onResetScrollPositionEventConsumed = viewModel::onResetScrollPositionEventConsumed,
                         )
                     }
                     StartTransferComponent(
@@ -317,7 +318,7 @@ class RubbishBinComposeFragment : Fragment() {
      */
     fun onBackPressed(): Int {
         return with(requireActivity() as ManagerActivity) {
-            if (comesFromNotifications && comesFromNotificationHandle == rubbishBinViewModel.state.value.rubbishBinHandle) {
+            if (comesFromNotifications && comesFromNotificationHandle == rubbishBinViewModel.state.value.currentHandle) {
                 restoreRubbishAfterComingFromNotification()
                 2
             } else {
@@ -327,6 +328,7 @@ class RubbishBinComposeFragment : Fragment() {
                     setToolbarTitle()
                     2
                 } ?: run {
+                    rubbishBinViewModel.resetScrollPosition()
                     0
                 }
             }
