@@ -42,14 +42,21 @@ class ProPlanCardTest {
             )
         }
         composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD).assertExists()
-        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_TITLE, useUnmergedTree = true).assertExists()
-        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_RECOMMENDED, useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_TITLE, useUnmergedTree = true)
+            .assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_RECOMMENDED, useUnmergedTree = true)
+            .assertExists()
         composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_RADIO).assertExists()
-        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_STORAGE, useUnmergedTree = true).assertExists()
-        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_TRANSFER, useUnmergedTree = true).assertExists()
-        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_PRICE, useUnmergedTree = true).assertExists()
-        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_PRICE_UNIT, useUnmergedTree = true).assertExists()
-        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_BILLING_INFO, useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_STORAGE, useUnmergedTree = true)
+            .assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_TRANSFER, useUnmergedTree = true)
+            .assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_PRICE, useUnmergedTree = true)
+            .assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_PRICE_UNIT, useUnmergedTree = true)
+            .assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_BILLING_INFO, useUnmergedTree = true)
+            .assertExists()
         composeRule.onNodeWithText(planName).assertExists()
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.account_upgrade_account_pro_plan_info_recommended_label))
             .assertExists()
@@ -83,9 +90,36 @@ class ProPlanCardTest {
                 onSelected = {}
             )
         }
-        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_CURRENT_PLAN, useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_CURRENT_PLAN, useUnmergedTree = true)
+            .assertExists()
         composeRule.onNodeWithText(
             composeRule.activity.getString(R.string.account_upgrade_account_pro_plan_info_current_plan_label)
         ).assertExists()
+    }
+
+    @Test
+    fun `test that ProPlanCard does not billing info when billingInfo is null`() {
+        val planName = "Pro II"
+        val storage = "8 TB storage"
+        val transfer = "96 TB transfer"
+        val price = "€16.67"
+        val priceUnit = "month"
+        composeRule.setContent {
+            ProPlanCard(
+                modifier = Modifier.fillMaxWidth(),
+                planName = planName,
+                isRecommended = false,
+                isSelected = false,
+                storage = storage,
+                transfer = transfer,
+                price = price,
+                priceUnit = priceUnit,
+                billingInfo = null,
+                isCurrentPlan = true,
+                onSelected = {}
+            )
+        }
+        composeRule.onNodeWithTag(TEST_TAG_PRO_PLAN_CARD_BILLING_INFO, useUnmergedTree = true)
+            .assertDoesNotExist()
     }
 } 

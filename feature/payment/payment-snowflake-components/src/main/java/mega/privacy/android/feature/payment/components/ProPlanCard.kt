@@ -41,7 +41,7 @@ fun ProPlanCard(
     transfer: String,
     price: String,
     priceUnit: String,
-    billingInfo: String,
+    billingInfo: String?,
     isCurrentPlan: Boolean = false,
     onSelected: () -> Unit = {},
 ) {
@@ -152,14 +152,16 @@ fun ProPlanCard(
                         )
                     }
                 }
-                MegaText(
-                    text = billingInfo,
-                    style = MaterialTheme.typography.bodySmall,
-                    textColor = TextColor.Secondary,
-                    modifier = Modifier
-                        .padding(top = 2.dp)
-                        .testTag(TEST_TAG_PRO_PLAN_CARD_BILLING_INFO)
-                )
+                if (!billingInfo.isNullOrEmpty()) {
+                    MegaText(
+                        text = billingInfo,
+                        style = MaterialTheme.typography.bodySmall,
+                        textColor = TextColor.Secondary,
+                        modifier = Modifier
+                            .padding(top = 2.dp)
+                            .testTag(TEST_TAG_PRO_PLAN_CARD_BILLING_INFO)
+                    )
+                }
             }
         }
     }
@@ -191,8 +193,8 @@ private fun ProPlanCardPreview() {
                 storage = "8 TB storage",
                 transfer = "96 TB transfer",
                 price = "€16.67",
-                priceUnit = "",
-                billingInfo = "EUR per month",
+                priceUnit = "month",
+                billingInfo = null,
                 isCurrentPlan = true
             )
         }

@@ -269,17 +269,12 @@ internal fun NewChooseAccountScreen(
                     )
                 } else null
 
-                val billingInfo = if (isMonthly) {
-                    stringResource(
-                        sharedR.string.choose_account_screen_currency_per_month,
-                        totalPrice.currencyCode
-                    )
-                } else {
+                val billingInfo = if (!isMonthly) {
                     stringResource(
                         sharedR.string.choose_account_screen_billed_yearly,
                         totalPrice.price
                     )
-                }
+                } else null
 
                 // in case subscriptionCycle is UNKNOWN and currentSubscriptionPlan is PRO level, we show it as current plan for both monthly and yearly
                 val isCurrentPlan = uiState.currentSubscriptionPlan == subscription.accountType
@@ -298,8 +293,7 @@ internal fun NewChooseAccountScreen(
                     storage = storageString,
                     transfer = transferString,
                     price = yearlyPricePerMonth?.price ?: totalPrice.price,
-                    priceUnit = stringResource(sharedR.string.general_month).takeIf { !isMonthly }
-                        .orEmpty(),
+                    priceUnit = stringResource(sharedR.string.general_month),
                     billingInfo = billingInfo,
                     isCurrentPlan = isCurrentPlan,
                     onSelected = { chosenPlan = subscription.accountType },

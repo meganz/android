@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -68,14 +69,20 @@ internal class ChooseAccountViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val monthlySubscriptions = runCatching { getMonthlySubscriptionsUseCase() }.getOrElse {
-                Timber.e(it)
-                emptyList()
+            val monthlySubscriptionsDeferred = async {
+                runCatching { getMonthlySubscriptionsUseCase() }.getOrElse {
+                    Timber.e(it)
+                    emptyList()
+                }
             }
-            val yearlySubscriptions = runCatching { getYearlySubscriptionsUseCase() }.getOrElse {
-                Timber.e(it)
-                emptyList()
+            val yearlySubscriptionsDeferred = async {
+                runCatching { getYearlySubscriptionsUseCase() }.getOrElse {
+                    Timber.e(it)
+                    emptyList()
+                }
             }
+            val monthlySubscriptions = monthlySubscriptionsDeferred.await()
+            val yearlySubscriptions = yearlySubscriptionsDeferred.await()
             val localisedSubscriptions = monthlySubscriptions.associateWith { monthlySubscription ->
                 yearlySubscriptions.firstOrNull { it.accountType == monthlySubscription.accountType }
             }.mapNotNull { (monthlySubscription, yearlySubscription) ->
