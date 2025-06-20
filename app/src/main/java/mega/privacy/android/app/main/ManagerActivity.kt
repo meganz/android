@@ -242,7 +242,6 @@ import mega.privacy.android.app.service.push.MegaMessageService
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -5996,7 +5995,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         ) {
             drawerLayout.closeDrawer(GravityCompat.START)
         }
-        startActivity(Intent(this, UpgradeAccountActivity::class.java))
+        megaNavigator.openUpgradeAccount(this)
         myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.MANAGER
     }
 

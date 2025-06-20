@@ -91,7 +91,7 @@ interface AppNavigator {
      * Open upgrade account screen.
      * This screen allows users to upgrade to a paid plan
      */
-    fun openUpgradeAccount(context: Context)
+    fun openUpgradeAccount(context: Context, isFromAdsFree: Boolean = false)
 
     /**
      * Navigates to the Syncs page

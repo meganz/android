@@ -23,13 +23,13 @@ import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -37,6 +37,9 @@ import javax.inject.Inject
 internal class StorageStatusDialogFragment : DialogFragment() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel by viewModels<StorageStatusViewModel>()
 
@@ -92,11 +95,8 @@ internal class StorageStatusDialogFragment : DialogFragment() {
             }
 
             else -> {
-                requireContext().startActivity(
-                    Intent(
-                        context,
-                        UpgradeAccountActivity::class.java
-                    )
+                megaNavigator.openUpgradeAccount(
+                    context = requireContext(),
                 )
             }
         }

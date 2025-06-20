@@ -39,7 +39,6 @@ import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
@@ -189,7 +188,7 @@ internal class ManagerDrawerFragment : Fragment() {
         }
         binding.upgradeNavigationView.setOnClickListener {
             drawerManager.closeDrawer()
-            startActivity(Intent(requireActivity(), UpgradeAccountActivity::class.java))
+            megaNavigator.openUpgradeAccount(requireActivity())
             myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.MANAGER
         }
         binding.contactsSection.setOnClickListener {

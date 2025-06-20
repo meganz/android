@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -29,8 +28,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.nav.megaNavigator
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -100,11 +99,8 @@ fun UpgradeProPlanBottomSheet(
             textId = R.string.meetings_upgrade_pro_plan_button,
             onClick = {
                 Analytics.tracker.trackEvent(MaxCallDurationReachedModalEvent)
-                context.startActivity(
-                    Intent(
-                        context,
-                        UpgradeAccountActivity::class.java
-                    )
+                context.megaNavigator.openUpgradeAccount(
+                    context = context,
                 )
                 hideSheet()
             }

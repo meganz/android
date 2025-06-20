@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.ads
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -28,10 +27,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountSource
+import mega.privacy.android.app.nav.megaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.ads.AdsFreeItem
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -39,7 +38,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.FullScreenD
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AdFreeDialogScreenEvent
 import mega.privacy.mobile.analytics.event.AdFreeDialogScreenSkipButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AdFreeDialogScreenViewProPlansButtonPressedEvent
@@ -180,9 +179,9 @@ internal fun AdsFreeIntroContent(
                         Analytics.tracker.trackEvent(
                             AdFreeDialogScreenViewProPlansButtonPressedEvent
                         )
-                        UpgradeAccountActivity.navigate(
+                        context.megaNavigator.openUpgradeAccount(
                             context = context,
-                            source = UpgradeAccountSource.ADS_FREE_SCREEN
+                            isFromAdsFree = true
                         )
                         onDismiss()
                     },
