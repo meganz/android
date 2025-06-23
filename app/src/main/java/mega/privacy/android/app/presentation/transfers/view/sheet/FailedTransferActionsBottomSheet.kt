@@ -21,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsViewModel
@@ -34,6 +35,8 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.mobile.analytics.event.FailedTransfersItemClearMenuItemEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersItemRetryMenuItemEvent
 
 /**
  * Bottom sheet for a failed transfer actions.
@@ -116,6 +119,7 @@ fun FailedTransferActionsBottomSheet(
             iconPainter = IconPack.Medium.Thin.Outline.RotateCcw,
             name = stringResource(id = R.string.general_retry),
             onClick = {
+                Analytics.tracker.trackEvent(FailedTransfersItemRetryMenuItemEvent)
                 if (uiState.isOnline(coroutineScope, snackbarHostState, context)) {
                     onRetryTransfer(failedTransfer)
                 }
@@ -127,6 +131,7 @@ fun FailedTransferActionsBottomSheet(
             iconPainter = IconPack.Medium.Thin.Outline.Eraser,
             name = stringResource(id = R.string.general_clear),
             onClick = {
+                Analytics.tracker.trackEvent(FailedTransfersItemClearMenuItemEvent)
                 onClearTransfer(failedTransfer)
                 onDismissSheet()
             },

@@ -22,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.parcelize.Parcelize
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.image.CompletedTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
@@ -31,6 +32,8 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.feature.transfers.components.FailedTransferItem
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.FailedTransfersItemMoreOptionsMenuItemEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersItemTapAndHoldSelectedEvent
 
 @Composable
 internal fun FailedTransfersView(
@@ -67,11 +70,19 @@ internal fun FailedTransfersView(
                         } else {
                             Modifier.combinedClickable(
                                 onClick = { },
-                                onLongClick = { onFailedTransferSelected(item) },
+                                onLongClick = {
+                                    Analytics.tracker.trackEvent(
+                                        FailedTransfersItemTapAndHoldSelectedEvent
+                                    )
+                                    onFailedTransferSelected(item)
+                                },
                             )
                         }
                     ),
-                    onMoreClicked = { failedItemSelected = it }
+                    onMoreClicked = {
+                        Analytics.tracker.trackEvent(FailedTransfersItemMoreOptionsMenuItemEvent)
+                        failedItemSelected = it
+                    }
                 )
             }
         }

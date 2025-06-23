@@ -9,15 +9,20 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
+import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.mobile.analytics.event.FailedTransfersItemClearMenuItemEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersItemRetryMenuItemEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -27,8 +32,12 @@ import org.robolectric.annotation.Config
 @Config(qualifiers = "w1080dp-h1920dp")
 class FailedTransferActionsBottomSheetTest {
 
-    @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    private val analyticsRule = AnalyticsTestRule()
+
+    @get:Rule
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val onRetryTransfer = mock<(CompletedTransfer) -> Unit>()
     private val onClearTransfer = mock<(CompletedTransfer) -> Unit>()
@@ -129,6 +138,26 @@ class FailedTransferActionsBottomSheetTest {
             verify(onClearTransfer).invoke(cancelledUpload)
             verify(onDismissSheet).invoke()
         }
+    }
+
+    @Test
+    fun `test that retry analytics event is tracked when retry action is clicked`() {
+        initComposeTestRule(failedDownload)
+
+        composeTestRule.onNodeWithTag(TEST_TAG_RETRY_ACTION)
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        assertThat(analyticsRule.events).contains(FailedTransfersItemRetryMenuItemEvent)
+    }
+
+    @Test
+    fun `test that clear analytics event is tracked when clear action is clicked`() {
+        initComposeTestRule(cancelledUpload)
+
+        composeTestRule.onNodeWithTag(TEST_TAG_CLEAR_FAILED_TRANSFER_ACTION)
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        assertThat(analyticsRule.events).contains(FailedTransfersItemClearMenuItemEvent)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

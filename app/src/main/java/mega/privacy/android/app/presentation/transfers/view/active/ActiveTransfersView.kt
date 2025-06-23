@@ -16,6 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
 import mega.android.core.ui.components.list.MegaReorderableLazyColumn
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressPercentString
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressSizeString
 import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
@@ -27,6 +28,8 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.feature.transfers.components.ActiveTransferItem
 import mega.privacy.android.feature.transfers.components.OverQuotaBanner
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPauseButtonButtonPressedEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPlayButtonButtonPressedEvent
 
 @Composable
 internal fun ActiveTransfersView(
@@ -36,7 +39,7 @@ internal fun ActiveTransfersView(
     isStorageOverQuota: Boolean,
     quotaWarning: QuotaWarning?,
     areTransfersPaused: Boolean,
-    onPlayPauseClicked: (Int) -> Unit,
+    onPlayPauseClicked: (tag: Int) -> Unit,
     onReorderPreview: suspend (from: Int, to: Int) -> Unit,
     onReorderConfirmed: (InProgressTransfer) -> Unit,
     onActiveTransferSelected: (InProgressTransfer) -> Unit,
@@ -105,7 +108,7 @@ internal fun ActiveTransferItem(
     isTransferOverQuota: Boolean,
     isStorageOverQuota: Boolean,
     areTransfersPaused: Boolean,
-    onPlayPauseClicked: (Int) -> Unit,
+    onPlayPauseClicked: (tag: Int) -> Unit,
     isSelected: Boolean?,
     isDraggable: Boolean,
     isBeingDragged: Boolean,
@@ -136,7 +139,13 @@ internal fun ActiveTransferItem(
         isPaused = isPaused,
         isOverQuota = (isDownload && isTransferOverQuota) || (isDownload.not() && isStorageOverQuota),
         areTransfersPaused = areTransfersPaused,
-        onPlayPauseClicked = { onPlayPauseClicked(tag) },
+        onPlayPauseClicked = {
+            onPlayPauseClicked(tag)
+            Analytics.tracker.trackEvent(
+                if (isPaused) ActiveTransfersIndividualPlayButtonButtonPressedEvent
+                else ActiveTransfersIndividualPauseButtonButtonPressedEvent
+            )
+        },
         modifier = modifier,
         isSelected = isSelected,
         isDraggable = isDraggable,

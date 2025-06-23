@@ -12,10 +12,13 @@ import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.list.OneLineListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.view.completed.TEST_TAG_COMPLETED_TRANSFERS_VIEW
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.mobile.analytics.event.CompletedTransfersClearAllMenuItemEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersSelectMenuItemEvent
 
 /**
  * Bottom sheet for completed transfers actions.
@@ -40,6 +43,7 @@ fun CompletedTransfersActionsBottomSheet(
         modifier = Modifier.testTag(TEST_TAG_SELECT_ACTION),
         text = stringResource(id = mega.privacy.android.shared.resources.R.string.general_select),
         onClickListener = {
+            Analytics.tracker.trackEvent(CompletedTransfersSelectMenuItemEvent)
             onSelectTransfers()
             onDismissSheet()
         },
@@ -48,6 +52,7 @@ fun CompletedTransfersActionsBottomSheet(
         modifier = Modifier.testTag(TEST_TAG_CLEAR_ALL_COMPLETED_ACTION),
         text = stringResource(id = R.string.option_to_clear_transfers),
         onClickListener = {
+            Analytics.tracker.trackEvent(CompletedTransfersClearAllMenuItemEvent)
             onClearAllTransfers()
             onDismissSheet()
         },

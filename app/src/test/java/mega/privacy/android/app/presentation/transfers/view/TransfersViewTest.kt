@@ -11,8 +11,10 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_CANCEL_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_CLEAR_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_MORE_ACTION
@@ -26,6 +28,7 @@ import mega.privacy.android.app.presentation.transfers.model.image.CompletedTran
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
+import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -34,8 +37,23 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ActiveTransfersCancelSelectedMenuItemEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersGlobalPauseMenuItemEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersGlobalPlayMenuItemEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersMoreOptionsMenuItemEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersSelectAllMenuItemEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersTabEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersMoreOptionsMenuItemEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersTabEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersClearSelectedMenuItemEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersMoreOptionsMenuItemEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersRetrySelectedMenuItemEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersSelectAllMenuItemEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersTabEvent
+import mega.privacy.mobile.analytics.event.TransfersSectionScreenEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
@@ -46,8 +64,12 @@ import java.math.BigInteger
 @RunWith(AndroidJUnit4::class)
 class TransfersViewTest {
 
-    @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    private val analyticsRule = AnalyticsTestRule()
+
+    @get:Rule
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val onPlayPauseTransfer: (Int) -> Unit = mock()
     private val onResumeTransfers: () -> Unit = mock()
@@ -297,7 +319,266 @@ class TransfersViewTest {
         composeTestRule.onNodeWithTag(TEST_TAG_RETRY_ACTION).assertIsDisplayed()
     }
 
-    private fun initComposeTestRule(uiState: TransfersUiState) {
+
+    @Test
+    fun `test that screen view event is tracked when view is displayed`() {
+        initComposeTestRule(uiState = TransfersUiState())
+
+        assertThat(analyticsRule.events).contains(TransfersSectionScreenEvent)
+    }
+
+    @Test
+    fun `test that global pause event is tracked when pause action is clicked`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                activeTransfers = inProgressTransfers,
+                areTransfersPaused = false
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_PAUSE_ACTION).performClick()
+
+        assertThat(analyticsRule.events).contains(ActiveTransfersGlobalPauseMenuItemEvent)
+    }
+
+    @Test
+    fun `test that global play event is tracked when resume action is clicked`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                activeTransfers = inProgressTransfers,
+                areTransfersPaused = true
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_RESUME_ACTION).performClick()
+
+        assertThat(analyticsRule.events).contains(ActiveTransfersGlobalPlayMenuItemEvent)
+    }
+
+    @Test
+    fun `test that active transfers more options event is tracked when more action is clicked in active tab`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = ACTIVE_TAB_INDEX,
+                activeTransfers = inProgressTransfers
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).performClick()
+
+        assertThat(analyticsRule.events).contains(ActiveTransfersMoreOptionsMenuItemEvent)
+    }
+
+    @Test
+    fun `test that completed transfers more options event is tracked when more action is clicked in completed tab`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = COMPLETED_TAB_INDEX,
+                completedTransfers = completedTransfers
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).performClick()
+
+        assertThat(analyticsRule.events).contains(CompletedTransfersMoreOptionsMenuItemEvent)
+    }
+
+    @Test
+    fun `test that failed transfers more options event is tracked when more action is clicked in failed tab`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = FAILED_TAB_INDEX,
+                failedTransfers = failedTransfers
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).performClick()
+
+        assertThat(analyticsRule.events).contains(FailedTransfersMoreOptionsMenuItemEvent)
+    }
+
+    @Test
+    fun `test that active transfers select all event is tracked when select all action is clicked in active tab`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = ACTIVE_TAB_INDEX,
+                activeTransfers = inProgressTransfers,
+                selectedActiveTransfersIds = inProgressTransfers
+                    .take(1)
+                    .map { it.uniqueId }
+                    .toImmutableList(),
+            ),
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SELECT_ALL_ACTION).performClick()
+
+        assertThat(analyticsRule.events).contains(ActiveTransfersSelectAllMenuItemEvent)
+    }
+
+    @Test
+    fun `test that active transfers cancel selected event is tracked when cancel selected action is clicked in active tab`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = ACTIVE_TAB_INDEX,
+                activeTransfers = inProgressTransfers,
+                selectedActiveTransfersIds = inProgressTransfers
+                    .take(1)
+                    .map { it.uniqueId }
+                    .toImmutableList(),
+            ),
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_CANCEL_ACTION).performClick()
+
+        assertThat(analyticsRule.events).contains(ActiveTransfersCancelSelectedMenuItemEvent)
+    }
+
+    @Test
+    fun `test that completed transfers clear selected event is tracked when clear selected action is clicked in completed tab`() {
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = COMPLETED_TAB_INDEX,
+                completedTransfers = completedTransfers,
+                selectedCompletedTransfersIds = completedTransfers
+                    .take(1)
+                    .mapNotNull { it.id }
+                    .toImmutableList(),
+            ),
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_CLEAR_ACTION).performClick()
+    }
+
+    @Test
+    fun `test that failed transfers select all event is tracked when select all action is clicked in failed tab`() {
+        val onSelectAllFailedTransfers: () -> Unit = mock()
+
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = FAILED_TAB_INDEX,
+                failedTransfers = failedTransfers,
+                selectedFailedTransfersIds = failedTransfers
+                    .take(1)
+                    .mapNotNull { it.id }
+                    .toImmutableList(),
+            ),
+            onSelectAllFailedTransfers = onSelectAllFailedTransfers
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SELECT_ALL_ACTION).performClick()
+
+        assertThat(analyticsRule.events).contains(FailedTransfersSelectAllMenuItemEvent)
+    }
+
+    @Test
+    fun `test that failed transfers clear selected event is tracked when clear selected action is clicked in failed tab`() {
+        val onClearSelectedFailedTransfers: () -> Unit = mock()
+
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = FAILED_TAB_INDEX,
+                failedTransfers = failedTransfers,
+                selectedFailedTransfersIds = failedTransfers
+                    .take(1)
+                    .mapNotNull { it.id }
+                    .toImmutableList(),
+            ),
+            onClearSelectedFailedTransfers = onClearSelectedFailedTransfers
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_CLEAR_ACTION).performClick()
+
+        assertThat(analyticsRule.events).contains(FailedTransfersClearSelectedMenuItemEvent)
+    }
+
+    @Test
+    fun `test that failed transfers retry selected event is tracked when retry selected action is clicked in failed tab`() {
+        val onRetrySelectedFailedTransfers: () -> Unit = mock()
+
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = FAILED_TAB_INDEX,
+                failedTransfers = failedTransfers,
+                selectedFailedTransfersIds = failedTransfers
+                    .take(1)
+                    .mapNotNull { it.id }
+                    .toImmutableList(),
+            ),
+            onRetrySelectedFailedTransfers = onRetrySelectedFailedTransfers
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_RETRY_ACTION).performClick()
+
+        assertThat(analyticsRule.events).contains(FailedTransfersRetrySelectedMenuItemEvent)
+    }
+
+    @Test
+    fun `test that active transfers tab selected event is tracked when active transfers tab is selected`() {
+
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = FAILED_TAB_INDEX,
+                failedTransfers = failedTransfers,
+                completedTransfers = completedTransfers,
+            ),
+        )
+
+        with(composeTestRule) {
+            onNodeWithText(activity.getString(sharedR.string.transfers_section_tab_title_active_transfers))
+                .performClick()
+        }
+
+        assertThat(analyticsRule.events).contains(ActiveTransfersTabEvent)
+    }
+
+    @Test
+    fun `test that completed transfers tab selected event is tracked when completed transfers tab is selected`() {
+
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = FAILED_TAB_INDEX,
+                failedTransfers = failedTransfers,
+                completedTransfers = completedTransfers,
+            ),
+        )
+
+        with(composeTestRule) {
+            onNodeWithText(activity.getString(R.string.title_tab_completed_transfers))
+                .performClick()
+        }
+
+        assertThat(analyticsRule.events).contains(CompletedTransfersTabEvent)
+    }
+
+    @Test
+    fun `test that failed transfers tab selected event is tracked when failed transfers tab is selected`() {
+
+        initComposeTestRule(
+            uiState = TransfersUiState(
+                selectedTab = COMPLETED_TAB_INDEX,
+                failedTransfers = failedTransfers,
+                completedTransfers = completedTransfers,
+            ),
+        )
+
+        with(composeTestRule) {
+            onNodeWithText(activity.getString(sharedR.string.transfers_section_tab_title_failed_transfers))
+                .performClick()
+        }
+
+        assertThat(analyticsRule.events).contains(FailedTransfersTabEvent)
+    }
+
+    private fun initComposeTestRule(
+        uiState: TransfersUiState,
+        onSelectAllActiveTransfers: () -> Unit = {},
+        onCancelSelectedActiveTransfers: () -> Unit = {},
+        onSelectAllCompletedTransfers: () -> Unit = {},
+        onClearSelectedCompletedTransfers: () -> Unit = {},
+        onSelectAllFailedTransfers: () -> Unit = {},
+        onClearSelectedFailedTransfers: () -> Unit = {},
+        onRetrySelectedFailedTransfers: () -> Unit = {},
+    ) {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
                 TransfersView(
@@ -323,13 +604,13 @@ class TransfersViewTest {
                     onActiveTransferSelected = {},
                     onCompletedTransferSelected = {},
                     onFailedTransferSelected = {},
-                    onCancelSelectedActiveTransfers = {},
-                    onClearSelectedCompletedTransfers = {},
-                    onClearSelectedFailedTransfers = {},
-                    onRetrySelectedFailedTransfers = {},
-                    onSelectAllActiveTransfers = {},
-                    onSelectAllCompletedTransfers = {},
-                    onSelectAllFailedTransfers = {},
+                    onCancelSelectedActiveTransfers = onCancelSelectedActiveTransfers,
+                    onClearSelectedCompletedTransfers = onClearSelectedCompletedTransfers,
+                    onClearSelectedFailedTransfers = onClearSelectedFailedTransfers,
+                    onRetrySelectedFailedTransfers = onRetrySelectedFailedTransfers,
+                    onSelectAllActiveTransfers = onSelectAllActiveTransfers,
+                    onSelectAllCompletedTransfers = onSelectAllCompletedTransfers,
+                    onSelectAllFailedTransfers = onSelectAllFailedTransfers,
                     onRetryTransfer = {},
                     onConsumeQuotaWarning = {},
                 )

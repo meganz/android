@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -31,6 +32,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
@@ -47,6 +49,23 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ActiveTransferPriorityChangedEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersCancelSelectedMenuItemEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersGlobalPauseMenuItemEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersGlobalPlayMenuItemEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersMoreOptionsMenuItemEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersSelectAllMenuItemEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersTabEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersClearSelectedMenuItemEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersMoreOptionsMenuItemEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersSelectAllMenuItemEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersTabEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersClearSelectedMenuItemEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersMoreOptionsMenuItemEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersRetrySelectedMenuItemEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersSelectAllMenuItemEvent
+import mega.privacy.mobile.analytics.event.FailedTransfersTabEvent
+import mega.privacy.mobile.analytics.event.TransfersSectionScreenEvent
 
 @Composable
 internal fun TransfersView(
@@ -88,6 +107,11 @@ internal fun TransfersView(
     var showCancelAllTransfersDialog by rememberSaveable { mutableStateOf(false) }
     var showConfirmCancelTransfersDialog by rememberSaveable { mutableStateOf(false) }
 
+    // Track screen view event
+    LaunchedEffect(Unit) {
+        Analytics.tracker.trackEvent(TransfersSectionScreenEvent)
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
@@ -99,13 +123,38 @@ internal fun TransfersView(
             if (!isInSelectTransfersMode) {
                 TransfersTopBar(onBackPress, getTransferActions(uiState)) { action ->
                     when (action) {
-                        TransferMenuAction.Pause -> onPauseTransfers()
-                        TransferMenuAction.Resume -> onResumeTransfers()
+                        TransferMenuAction.Pause -> {
+                            Analytics.tracker.trackEvent(ActiveTransfersGlobalPauseMenuItemEvent)
+                            onPauseTransfers()
+                        }
+
+                        TransferMenuAction.Resume -> {
+                            Analytics.tracker.trackEvent(ActiveTransfersGlobalPlayMenuItemEvent)
+                            onResumeTransfers()
+                        }
+
                         TransferMenuAction.More -> {
                             when (selectedTab) {
-                                ACTIVE_TAB_INDEX -> showActiveTransfersModal = true
-                                COMPLETED_TAB_INDEX -> showCompletedTransfersModal = true
-                                FAILED_TAB_INDEX -> showFailedTransfersModal = true
+                                ACTIVE_TAB_INDEX -> {
+                                    Analytics.tracker.trackEvent(
+                                        ActiveTransfersMoreOptionsMenuItemEvent
+                                    )
+                                    showActiveTransfersModal = true
+                                }
+
+                                COMPLETED_TAB_INDEX -> {
+                                    Analytics.tracker.trackEvent(
+                                        CompletedTransfersMoreOptionsMenuItemEvent
+                                    )
+                                    showCompletedTransfersModal = true
+                                }
+
+                                FAILED_TAB_INDEX -> {
+                                    Analytics.tracker.trackEvent(
+                                        FailedTransfersMoreOptionsMenuItemEvent
+                                    )
+                                    showFailedTransfersModal = true
+                                }
                             }
                         }
                     }
@@ -119,21 +168,56 @@ internal fun TransfersView(
                     when (action) {
                         TransferMenuAction.SelectAll -> {
                             when (selectedTab) {
-                                ACTIVE_TAB_INDEX -> onSelectAllActiveTransfers()
-                                COMPLETED_TAB_INDEX -> onSelectAllCompletedTransfers()
-                                FAILED_TAB_INDEX -> onSelectAllFailedTransfers()
+                                ACTIVE_TAB_INDEX -> {
+                                    Analytics.tracker.trackEvent(
+                                        ActiveTransfersSelectAllMenuItemEvent
+                                    )
+                                    onSelectAllActiveTransfers()
+                                }
+
+                                COMPLETED_TAB_INDEX -> {
+                                    Analytics.tracker.trackEvent(
+                                        CompletedTransfersSelectAllMenuItemEvent
+                                    )
+                                    onSelectAllCompletedTransfers()
+                                }
+
+                                FAILED_TAB_INDEX -> {
+                                    Analytics.tracker.trackEvent(
+                                        FailedTransfersSelectAllMenuItemEvent
+                                    )
+                                    onSelectAllFailedTransfers()
+                                }
                             }
                         }
 
                         TransferMenuAction.CancelSelected, TransferMenuAction.ClearSelected -> {
                             when (selectedTab) {
-                                ACTIVE_TAB_INDEX -> showConfirmCancelTransfersDialog = true
-                                COMPLETED_TAB_INDEX -> onClearSelectedCompletedTransfers()
-                                FAILED_TAB_INDEX -> onClearSelectedFailedTransfers()
+                                ACTIVE_TAB_INDEX -> {
+                                    Analytics.tracker.trackEvent(
+                                        ActiveTransfersCancelSelectedMenuItemEvent
+                                    )
+                                    showConfirmCancelTransfersDialog = true
+                                }
+
+                                COMPLETED_TAB_INDEX -> {
+                                    Analytics.tracker.trackEvent(
+                                        CompletedTransfersClearSelectedMenuItemEvent
+                                    )
+                                    onClearSelectedCompletedTransfers()
+                                }
+
+                                FAILED_TAB_INDEX -> {
+                                    Analytics.tracker.trackEvent(
+                                        FailedTransfersClearSelectedMenuItemEvent
+                                    )
+                                    onClearSelectedFailedTransfers()
+                                }
                             }
                         }
 
                         TransferMenuAction.RetrySelected -> {
+                            Analytics.tracker.trackEvent(FailedTransfersRetrySelectedMenuItemEvent)
                             onRetrySelectedFailedTransfers()
                         }
                     }
@@ -169,9 +253,14 @@ internal fun TransfersView(
                             isStorageOverQuota = isStorageOverQuota,
                             quotaWarning = quotaWarning,
                             areTransfersPaused = areTransfersPaused,
-                            onPlayPauseClicked = onPlayPauseTransfer,
+                            onPlayPauseClicked = { tag ->
+                                onPlayPauseTransfer(tag)
+                            },
                             onReorderPreview = onActiveTransfersReorderPreview,
-                            onReorderConfirmed = onActiveTransfersReorderConfirmed,
+                            onReorderConfirmed = {
+                                Analytics.tracker.trackEvent(ActiveTransferPriorityChangedEvent)
+                                onActiveTransfersReorderConfirmed(it)
+                            },
                             onActiveTransferSelected = onActiveTransferSelected,
                             selectedActiveTransfersIds = selectedActiveTransfersIds,
                             onUpgradeClick = onNavigateToUpgradeAccount,
@@ -206,6 +295,14 @@ internal fun TransfersView(
                 },
                 initialSelectedIndex = selectedTab,
                 onTabSelected = {
+                    when (it) {
+                        ACTIVE_TAB_INDEX -> ActiveTransfersTabEvent
+                        COMPLETED_TAB_INDEX -> CompletedTransfersTabEvent
+                        FAILED_TAB_INDEX -> FailedTransfersTabEvent
+                        else -> null
+                    }?.let { tabSelectedEvent ->
+                        Analytics.tracker.trackEvent(tabSelectedEvent)
+                    }
                     onTabSelected(it)
                     true
                 },
@@ -215,7 +312,9 @@ internal fun TransfersView(
         if (showActiveTransfersModal) {
             ActiveTransfersActionsBottomSheet(
                 onSelectTransfers = onSelectActiveTransfers,
-                onCancelAllTransfers = { showCancelAllTransfersDialog = true },
+                onCancelAllTransfers = {
+                    showCancelAllTransfersDialog = true
+                },
                 onDismissSheet = { showActiveTransfersModal = false },
             )
         }

@@ -1,25 +1,33 @@
 package mega.privacy.android.app.presentation.transfers.view.sheet
 
+import androidx.activity.ComponentActivity
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.mobile.analytics.event.CompletedTransfersItemClearMenuItemEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersItemOpenMenuItemEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersItemShareMenuItemEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersItemViewInFolderMenuItemEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -31,8 +39,12 @@ import kotlin.time.Duration.Companion.milliseconds
 @Config(qualifiers = "w1080dp-h1920dp")
 class CompletedTransferActionsBottomSheetTest {
 
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val onOpenWith = mock<(CompletedTransfer) -> Unit>()
     private val onShareLink = mock<(Long) -> Unit>()
@@ -206,6 +218,79 @@ class CompletedTransferActionsBottomSheetTest {
 
             verify(onClearTransfer).invoke(completedUpload)
             verify(onDismissSheet).invoke()
+        }
+    }
+
+
+    @Test
+    fun `test that view in folder analytics event is tracked when view in folder action is clicked`() {
+        initComposeTestRule(
+            completedUpload, CompletedTransferActionsUiState(
+                completedTransfer = completedUpload,
+                amINodeOwner = true,
+                isOnline = true,
+            )
+        )
+
+        with(composeTestRule) {
+            onNodeWithTag(TEST_TAG_VIEW_IN_FOLDER_ACTION)
+                .performSemanticsAction(SemanticsActions.OnClick)
+
+            assertThat(analyticsRule.events).contains(
+                CompletedTransfersItemViewInFolderMenuItemEvent
+            )
+        }
+    }
+
+    @Test
+    fun `test that open with analytics event is tracked when open with action is clicked`() {
+        initComposeTestRule(
+            completedDownload, CompletedTransferActionsUiState(
+                completedTransfer = completedDownload,
+                fileUri = "fileUri".toUri(),
+                amINodeOwner = true,
+            )
+        )
+
+        with(composeTestRule) {
+            onNodeWithTag(TEST_TAG_OPEN_WITH_ACTION)
+                .performSemanticsAction(SemanticsActions.OnClick)
+
+            assertThat(analyticsRule.events).contains(CompletedTransfersItemOpenMenuItemEvent)
+        }
+    }
+
+    @Test
+    fun `test that share link analytics event is tracked when share link action is clicked`() {
+        initComposeTestRule(
+            completedDownload, CompletedTransferActionsUiState(
+                completedTransfer = completedDownload,
+                fileUri = "fileUri".toUri(),
+                amINodeOwner = true,
+                isOnline = true,
+            )
+        )
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SHARE_LINK_ACTION)
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        assertThat(analyticsRule.events).contains(CompletedTransfersItemShareMenuItemEvent)
+    }
+
+    @Test
+    fun `test that clear analytics event is tracked when clear action is clicked`() {
+        initComposeTestRule(
+            completedUpload, CompletedTransferActionsUiState(
+                completedTransfer = completedUpload,
+                amINodeOwner = true,
+            )
+        )
+
+        with(composeTestRule) {
+            onNodeWithTag(TEST_TAG_CLEAR_ACTION)
+                .performSemanticsAction(SemanticsActions.OnClick)
+
+            assertThat(analyticsRule.events).contains(CompletedTransfersItemClearMenuItemEvent)
         }
     }
 

@@ -218,7 +218,7 @@ class ActiveTransfersViewTest {
                     isStorageOverQuota = isOverQuota,
                     quotaWarning = quotaWarning,
                     areTransfersPaused = areTransfersPaused,
-                    onPlayPauseClicked = {},
+                    onPlayPauseClicked = { },
                     onReorderPreview = onReorderPreview,
                     onReorderConfirmed = onReorderConfirmed,
                     selectedActiveTransfersIds = null,

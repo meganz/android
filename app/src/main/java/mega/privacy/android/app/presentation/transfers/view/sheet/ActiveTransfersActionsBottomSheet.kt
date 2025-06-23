@@ -12,11 +12,14 @@ import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.list.OneLineListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_ACTIVE_TAB
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ActiveTransfersCancelAllMenuItemEvent
+import mega.privacy.mobile.analytics.event.ActiveTransfersSelectMenuItemEvent
 
 /**
  * Bottom sheet for active transfers actions.
@@ -41,6 +44,7 @@ fun ActiveTransfersActionsBottomSheet(
         modifier = Modifier.testTag(TEST_TAG_SELECT_ACTION),
         text = stringResource(id = sharedR.string.general_select),
         onClickListener = {
+            Analytics.tracker.trackEvent(ActiveTransfersSelectMenuItemEvent)
             onSelectTransfers()
             onDismissSheet()
         },
@@ -49,6 +53,7 @@ fun ActiveTransfersActionsBottomSheet(
         modifier = Modifier.testTag(TEST_TAG_CANCEL_ALL_ACTION),
         text = stringResource(id = R.string.menu_cancel_all_transfers),
         onClickListener = {
+            Analytics.tracker.trackEvent(ActiveTransfersCancelAllMenuItemEvent)
             onCancelAllTransfers()
             onDismissSheet()
         },

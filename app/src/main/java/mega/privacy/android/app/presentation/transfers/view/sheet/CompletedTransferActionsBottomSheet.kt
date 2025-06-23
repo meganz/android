@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -52,6 +53,10 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.CompletedTransfersItemClearMenuItemEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersItemOpenMenuItemEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersItemShareMenuItemEvent
+import mega.privacy.mobile.analytics.event.CompletedTransfersItemViewInFolderMenuItemEvent
 import timber.log.Timber
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -100,7 +105,7 @@ fun CompletedTransferActionsBottomSheet(
     previewUri: Uri?,
     uiState: CompletedTransferActionsUiState,
     onOpenWith: (CompletedTransfer) -> Unit,
-    onShareLink:(Long) -> Unit,
+    onShareLink: (Long) -> Unit,
     onClearTransfer: (CompletedTransfer) -> Unit,
     onConsumeOpenWithEvent: () -> Unit,
     onConsumeShareLinkEvent: () -> Unit,
@@ -136,6 +141,7 @@ fun CompletedTransferActionsBottomSheet(
                 iconPainter = IconPack.Medium.Thin.Outline.FileSearch02,
                 name = stringResource(id = R.string.view_in_folder_label),
                 onClick = {
+                    Analytics.tracker.trackEvent(CompletedTransfersItemViewInFolderMenuItemEvent)
                     if (uiState.isOnline(coroutineScope, snackbarHostState, context)) {
                         activity?.let {
                             onViewInFolder(completedTransfer, uiState.parentUri, it)
@@ -150,7 +156,10 @@ fun CompletedTransferActionsBottomSheet(
                 modifier = Modifier.testTag(TEST_TAG_OPEN_WITH_ACTION),
                 iconPainter = IconPack.Medium.Thin.Outline.ExternalLink,
                 name = stringResource(id = R.string.external_play),
-                onClick = { onOpenWith(completedTransfer) },
+                onClick = {
+                    Analytics.tracker.trackEvent(CompletedTransfersItemOpenMenuItemEvent)
+                    onOpenWith(completedTransfer)
+                },
             )
         }
         if (uiState.canShareLink) {
@@ -159,6 +168,7 @@ fun CompletedTransferActionsBottomSheet(
                 iconPainter = IconPack.Medium.Thin.Outline.Link01,
                 name = stringResource(id = R.string.context_get_link),
                 onClick = {
+                    Analytics.tracker.trackEvent(CompletedTransfersItemShareMenuItemEvent)
                     if (uiState.isOnline(coroutineScope, snackbarHostState, context)) {
                         onShareLink(handle)
                     }
@@ -170,6 +180,7 @@ fun CompletedTransferActionsBottomSheet(
             iconPainter = IconPack.Medium.Thin.Outline.Eraser,
             name = stringResource(id = R.string.general_clear),
             onClick = {
+                Analytics.tracker.trackEvent(CompletedTransfersItemClearMenuItemEvent)
                 onClearTransfer(completedTransfer)
                 onDismissSheet()
             },
