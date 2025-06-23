@@ -2,6 +2,7 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.android.library.compose)
+    alias(plugin.plugins.kotlin.serialisation)
     id("kotlin-parcelize")
 }
 
@@ -19,4 +20,10 @@ dependencies {
 
     implementation(lib.mega.core.ui)
     implementation(lib.mega.core.ui.tokens)
+
+    // Test dependencies
+    testImplementation(project(":core-ui-test"))
+    testImplementation(testlib.bundles.ui.test)
+    testImplementation(testlib.bundles.unit.test)
+    testImplementation(lib.kotlin.serialisation)
 }

@@ -9,13 +9,14 @@ import mega.privacy.android.feature.example.presentation.exampleHomeScreen
 import mega.privacy.android.feature.example.presentation.otherExampleHomeScreen
 import mega.privacy.android.icon.pack.R as IconPack
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.NavigationHandler
 import kotlin.reflect.KClass
 
 class ExampleMainItem : MainNavItem {
     override val destinationClass: KClass<*> = HomeScreen::class
     override val destination: Any = HomeScreen
-    override val screen: NavGraphBuilder.(() -> Unit, (Any) -> Unit) -> Unit =
-        { onBack, onNavigate -> exampleHomeScreen() }
+    override val screen: NavGraphBuilder.(NavigationHandler) -> Unit =
+        { navigationHandler -> exampleHomeScreen() }
     override val iconRes: Int = IconPack.drawable.ic_cloud
     override val badge: Flow<String?>? = null
     override val label: String = "Demo"
@@ -24,8 +25,8 @@ class ExampleMainItem : MainNavItem {
 class OtherExampleMainItem : MainNavItem {
     override val destinationClass: KClass<*> = HomeScreen2::class
     override val destination: Any = HomeScreen2
-    override val screen: NavGraphBuilder.(() -> Unit, (Any) -> Unit) -> Unit =
-        { onBack, onNavigate -> otherExampleHomeScreen(onNavigate) }
+    override val screen: NavGraphBuilder.(NavigationHandler) -> Unit =
+        { navigationHandler -> otherExampleHomeScreen(navigationHandler::navigate) }
     override val iconRes: Int = IconPack.drawable.ic_vpn
     override val badge: Flow<String?>? = flow {
         var count = 0

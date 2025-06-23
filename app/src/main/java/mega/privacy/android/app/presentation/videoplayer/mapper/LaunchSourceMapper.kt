@@ -40,7 +40,6 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccess
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import javax.inject.Inject
-import kotlin.getOrDefault
 
 /**
  * Mapper to map the launch source to the corresponding menu actions.

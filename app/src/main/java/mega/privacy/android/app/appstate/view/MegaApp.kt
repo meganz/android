@@ -16,27 +16,25 @@ fun MegaApp(
     passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
     appState: AppState.Data,
 ) {
-
     OriginalTheme(isDark = appState.themeMode.isDarkMode()) {
         NavHost(
             navController = navController,
             startDestination = MainNavigationScaffoldDestination::class
         ) {
+            val navigationHandler = NavigationHandlerImpl(navController)
+
             mainNavigationScaffold(
                 topLevelDestinations = appState.mainNavItems,
                 startDestination = appState.initialMainDestination,
-                onDestinationClick = { homeNavHostController, mainNavItem ->
-                    homeNavHostController.navigate(mainNavItem.destination)
-                },
                 builder = {
                     appState.mainNavItems.forEach {
-                        it.screen(this, navController::popBackStack, navController::navigate)
+                        it.screen(this, navigationHandler)
                     }
                 }
             )
             appState.featureDestinations
                 .forEach {
-                    it.navigationGraph(this, navController::popBackStack, navController::navigate)
+                    it.navigationGraph(this, navigationHandler)
                 }
         }
     }

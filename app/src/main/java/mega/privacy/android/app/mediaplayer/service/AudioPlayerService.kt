@@ -1,6 +1,5 @@
 package mega.privacy.android.app.mediaplayer.service
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
@@ -63,6 +62,7 @@ import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYE
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.mobile.analytics.event.AudioPlayerIsActivatedEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerLoopPlayingItemEnabledEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerLoopQueueEnabledEvent
