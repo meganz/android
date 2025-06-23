@@ -80,6 +80,7 @@ internal fun TransfersView(
     onSelectAllCompletedTransfers: () -> Unit,
     onSelectAllFailedTransfers: () -> Unit,
     onRetryTransfer: (CompletedTransfer) -> Unit,
+    onConsumeQuotaWarning: () -> Unit,
 ) = with(uiState) {
     var showActiveTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
@@ -164,7 +165,9 @@ internal fun TransfersView(
                     ) { _, listState, modifier ->
                         ActiveTransfersView(
                             activeTransfers = activeTransfers,
-                            isOverQuota = isOverQuota,
+                            isTransferOverQuota = isTransferOverQuota,
+                            isStorageOverQuota = isStorageOverQuota,
+                            quotaWarning = quotaWarning,
                             areTransfersPaused = areTransfersPaused,
                             onPlayPauseClicked = onPlayPauseTransfer,
                             onReorderPreview = onActiveTransfersReorderPreview,
@@ -172,6 +175,7 @@ internal fun TransfersView(
                             onActiveTransferSelected = onActiveTransferSelected,
                             selectedActiveTransfersIds = selectedActiveTransfersIds,
                             onUpgradeClick = onNavigateToUpgradeAccount,
+                            onConsumeQuotaWarning = onConsumeQuotaWarning,
                             lazyListState = listState,
                             modifier = modifier,
                         )
@@ -343,6 +347,7 @@ private fun TransfersViewPreview() {
             onSelectAllCompletedTransfers = {},
             onSelectAllFailedTransfers = {},
             onRetryTransfer = {},
+            onConsumeQuotaWarning = {},
         )
     }
 }

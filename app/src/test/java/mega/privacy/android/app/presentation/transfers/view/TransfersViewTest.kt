@@ -331,6 +331,7 @@ class TransfersViewTest {
                     onSelectAllCompletedTransfers = {},
                     onSelectAllFailedTransfers = {},
                     onRetryTransfer = {},
+                    onConsumeQuotaWarning = {},
                 )
             }
         }

@@ -16,6 +16,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  */
 @Composable
 fun OverQuotaBanner(
+    isTransferOverQuota: Boolean,
+    isStorageOverQuota: Boolean,
     onUpgradeClick: () -> Unit,
     onCancelButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -23,7 +25,14 @@ fun OverQuotaBanner(
     TopWarningBanner(
         modifier = modifier,
         body = null,
-        title = stringResource(sharedR.string.transfers_over_quota_banner_title),
+        title = stringResource(
+            when {
+                isStorageOverQuota && isTransferOverQuota -> sharedR.string.transfers_storage_and_transfer_quota_banner_title
+                isStorageOverQuota -> sharedR.string.transfers_storage_quota_banner_title
+                isTransferOverQuota -> sharedR.string.transfers_transfer_quota_banner_title
+                else -> sharedR.string.transfers_storage_and_transfer_quota_banner_title
+            }
+        ),
         actionButtonText = stringResource(sharedR.string.transfers_over_quota_banner_action_button),
         showCancelButton = true,
         onActionButtonClick = onUpgradeClick,
@@ -34,6 +43,11 @@ fun OverQuotaBanner(
 @Composable
 private fun OverQuotaBannerPreview() {
     AndroidThemeForPreviews {
-        OverQuotaBanner({}, {})
+        OverQuotaBanner(
+            isTransferOverQuota = false,
+            isStorageOverQuota = true,
+            onUpgradeClick = {},
+            onCancelButtonClick = {},
+        )
     }
 }

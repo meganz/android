@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  * @property selectedActiveTransfersIds List of selected in progress transfers ids. If not null, even empty, indicates selected mode is on.
  * @property isStorageOverQuota Whether the storage is over quota.
  * @property isTransferOverQuota Whether the transfer is over quota.
+ * @property quotaWarning Quota warning, can be null if no quota warning is present.
  * @property areTransfersPaused Whether the transfers are paused.
  * @property completedTransfers List of successfully completed transfers.
  * @property selectedCompletedTransfersIds List of selected completed transfers. If not null, even empty, indicates selected mode is on.
@@ -30,6 +31,7 @@ data class TransfersUiState(
     val selectedActiveTransfersIds: ImmutableList<Long>? = null,
     val isStorageOverQuota: Boolean = false,
     val isTransferOverQuota: Boolean = false,
+    val quotaWarning: QuotaWarning? = null,
     val areTransfersPaused: Boolean = false,
     val completedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
     val selectedCompletedTransfersIds: ImmutableList<Int>? = null,
@@ -78,4 +80,24 @@ data class TransfersUiState(
     val areAllFailedTransfersSelected by lazy {
         selectedFailedTransfersIds?.containsAll(failedTransfers.map { it.id }) == true
     }
+}
+
+/**
+ * Quota warning.
+ */
+sealed class QuotaWarning {
+    /**
+     * Storage over quota warning.
+     */
+    data object Storage : QuotaWarning()
+
+    /**
+     * Transfer over quota warning.
+     */
+    data object Transfer : QuotaWarning()
+
+    /**
+     * Both storage and transfer over quota warning.
+     */
+    data object StorageAndTransfer : QuotaWarning()
 }

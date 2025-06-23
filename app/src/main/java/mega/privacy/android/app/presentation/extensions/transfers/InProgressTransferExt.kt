@@ -14,10 +14,20 @@ import java.text.DecimalFormat
 @Composable
 internal fun InProgressTransfer.getSpeedString(
     areTransfersPaused: Boolean,
+    isTransferOverQuota: Boolean,
+    isStorageOverQuota: Boolean,
 ): String {
     val df = DecimalFormat("#.##")
 
     return when {
+        isTransferOverQuota -> {
+            stringResource(R.string.label_transfer_over_quota)
+        }
+
+        isStorageOverQuota -> {
+            stringResource(R.string.label_storage_over_quota)
+        }
+
         isPaused || areTransfersPaused -> {
             stringResource(R.string.transfer_paused)
         }

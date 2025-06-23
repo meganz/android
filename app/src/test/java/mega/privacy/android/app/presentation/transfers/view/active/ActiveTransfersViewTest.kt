@@ -18,6 +18,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.presentation.transfers.model.QuotaWarning
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
 import mega.privacy.android.domain.entity.Progress
@@ -157,70 +158,65 @@ class ActiveTransfersViewTest {
     }
 
     @Test
-    fun `test that over quota banner is displayed when isOverQuota is true`() = runTest {
-        initComposeTestRule(
-            inProgressTransfers = listOf(getTransfer(1)),
-            isOverQuota = true,
-        )
+    fun `test that over quota banner is displayed when quotaWarning is StorageAndTransfer`() =
+        runTest {
+            initComposeTestRule(
+                inProgressTransfers = listOf(getTransfer(1)),
+                quotaWarning = QuotaWarning.StorageAndTransfer,
+            )
 
-        composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertIsDisplayed()
-    }
+            composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertIsDisplayed()
+        }
 
     @Test
-    fun `test that over quota banner is not displayed when isOverQuota is false`() = runTest {
+    fun `test that over quota banner is displayed when quotaWarning is Transfer`() =
+        runTest {
+            initComposeTestRule(
+                inProgressTransfers = listOf(getTransfer(1)),
+                quotaWarning = QuotaWarning.Transfer,
+            )
+
+            composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertIsDisplayed()
+        }
+
+    @Test
+    fun `test that over quota banner is displayed when quotaWarning is Storage`() =
+        runTest {
+            initComposeTestRule(
+                inProgressTransfers = listOf(getTransfer(1)),
+                quotaWarning = QuotaWarning.Storage,
+            )
+
+            composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertIsDisplayed()
+        }
+
+    @Test
+    fun `test that over quota banner is not displayed when quotaWarning is null`() = runTest {
         initComposeTestRule(
             inProgressTransfers = listOf(getTransfer(1)),
-            isOverQuota = false,
+            quotaWarning = null,
         )
 
         composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertDoesNotExist()
-    }
-
-    @Test
-    fun `test that over quota banner is hidden when close banner button is clicked`() = runTest {
-        initComposeTestRule(
-            inProgressTransfers = listOf(getTransfer(1)),
-            isOverQuota = true
-        )
-        composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertIsDisplayed()
-
-        composeTestRule.onNodeWithContentDescription(
-            "cancel",
-            substring = true,
-            ignoreCase = true,
-            useUnmergedTree = true,
-        ).performClick()
-
-        composeTestRule.onNodeWithTag(OVER_QUOTA_BANNER_TAG).assertDoesNotExist()
-    }
-
-    @Test
-    fun `test that onUpgrade is called when banner action is clicked`() = runTest {
-        val onUpgradeClick = mock<() -> Unit>()
-        initComposeTestRule(
-            inProgressTransfers = listOf(getTransfer(1)),
-            isOverQuota = true,
-            onUpgradeClick = onUpgradeClick
-        )
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.transfers_over_quota_banner_action_button))
-            .performClick()
-
-        verify(onUpgradeClick).invoke()
     }
 
     private fun initComposeTestRule(
         inProgressTransfers: List<InProgressTransfer> = emptyList(),
         isOverQuota: Boolean = false,
+        quotaWarning: QuotaWarning? = null,
         areTransfersPaused: Boolean = false,
         onReorderPreview: (from: Int, to: Int) -> Unit = { _, _ -> },
         onReorderConfirmed: (InProgressTransfer) -> Unit = {},
         onUpgradeClick: () -> Unit = {},
+        onConsumeQuotaWarning: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
                 ActiveTransfersView(
                     activeTransfers = inProgressTransfers.toImmutableList(),
-                    isOverQuota = isOverQuota,
+                    isTransferOverQuota = isOverQuota,
+                    isStorageOverQuota = isOverQuota,
+                    quotaWarning = quotaWarning,
                     areTransfersPaused = areTransfersPaused,
                     onPlayPauseClicked = {},
                     onReorderPreview = onReorderPreview,
@@ -229,6 +225,7 @@ class ActiveTransfersViewTest {
                     onActiveTransferSelected = {},
                     lazyListState = rememberLazyListState(),
                     onUpgradeClick = onUpgradeClick,
+                    onConsumeQuotaWarning = onConsumeQuotaWarning,
                 )
             }
         }

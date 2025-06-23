@@ -239,8 +239,10 @@ class TransfersViewModelTest {
 
         initTestClass()
 
-        underTest.uiState.map { it.isStorageOverQuota }.test {
-            assertThat(awaitItem()).isFalse()
+        underTest.uiState.test {
+            var actual = awaitItem()
+            assertThat(actual.isStorageOverQuota).isFalse()
+            assertThat(actual.quotaWarning).isNull()
             flow.emit(
                 StorageStateEvent(
                     1L,
@@ -254,7 +256,23 @@ class TransfersViewModelTest {
             advanceUntilIdle()
 
             if (storageState == StorageState.Red || storageState == StorageState.PayWall) {
-                assertThat(awaitItem()).isTrue()
+                actual = awaitItem()
+                assertThat(actual.isStorageOverQuota).isTrue()
+                assertThat(actual.quotaWarning).isEqualTo(QuotaWarning.Storage)
+                flow.emit(
+                    StorageStateEvent(
+                        1L,
+                        "",
+                        0L,
+                        "",
+                        EventType.Unknown,
+                        storageState = StorageState.Green,
+                    )
+                )
+
+                actual = awaitItem()
+                assertThat(actual.isStorageOverQuota).isFalse()
+                assertThat(actual.quotaWarning).isNull()
             }
         }
     }
@@ -268,12 +286,60 @@ class TransfersViewModelTest {
 
             initTestClass()
 
-            underTest.uiState.map { it.isTransferOverQuota }.test {
-                assertThat(awaitItem()).isFalse()
+            underTest.uiState.test {
+                var actual = awaitItem()
+                assertThat(actual.isTransferOverQuota).isFalse()
+                assertThat(actual.quotaWarning).isNull()
                 flow.emit(true)
-                assertThat(awaitItem()).isTrue()
+                actual = awaitItem()
+                assertThat(actual.isTransferOverQuota).isTrue()
+                assertThat(actual.quotaWarning).isEqualTo(QuotaWarning.Transfer)
                 flow.emit(false)
-                assertThat(awaitItem()).isFalse()
+                actual = awaitItem()
+                assertThat(actual.isTransferOverQuota).isFalse()
+                assertThat(actual.quotaWarning).isNull()
+            }
+        }
+
+    @Test
+    fun `test that MonitorTransferOverQuotaUseCase and MonitorStorageStateEventUseCase updates state with quotaWarning`() =
+        runTest {
+            val transferQuotaFlow = MutableStateFlow(false)
+            val storageQuotaflow = MutableStateFlow(
+                StorageStateEvent(
+                    1L,
+                    "",
+                    0L,
+                    "",
+                    EventType.Unknown,
+                    storageState = StorageState.Unknown,
+                )
+            )
+
+            whenever(monitorTransferOverQuotaUseCase()).thenReturn(transferQuotaFlow)
+            whenever(monitorStorageStateEventUseCase()).thenReturn(storageQuotaflow)
+
+            initTestClass()
+
+            underTest.uiState.map { it.quotaWarning }.test {
+                assertThat(awaitItem()).isNull()
+                transferQuotaFlow.emit(true)
+                assertThat(awaitItem()).isEqualTo(QuotaWarning.Transfer)
+                storageQuotaflow.emit(
+                    StorageStateEvent(
+                        1L,
+                        "",
+                        0L,
+                        "",
+                        EventType.Unknown,
+                        storageState = StorageState.Red,
+                    )
+                )
+                assertThat(awaitItem()).isEqualTo(QuotaWarning.StorageAndTransfer)
+                transferQuotaFlow.emit(false)
+                assertThat(awaitItem()).isEqualTo(QuotaWarning.Storage)
+                underTest.onConsumeQuotaWarning()
+                assertThat(awaitItem()).isNull()
             }
         }
 

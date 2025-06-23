@@ -122,9 +122,16 @@ class TransfersViewModel @Inject constructor(
             monitorStorageStateEventUseCase()
                 .collectLatest { storageState ->
                     _uiState.update { state ->
+                        val isStorageOverQuota = storageState.storageState == StorageState.Red
+                                || storageState.storageState == StorageState.PayWall
+                        val quotaWarning = getQuotaWarning(
+                            isStorageOverQuota = isStorageOverQuota,
+                            isTransferOverQuota = state.isTransferOverQuota
+                        )
+
                         state.copy(
-                            isStorageOverQuota = storageState.storageState == StorageState.Red
-                                    || storageState.storageState == StorageState.PayWall,
+                            isStorageOverQuota = isStorageOverQuota,
+                            quotaWarning = quotaWarning,
                         )
                     }
                 }
@@ -136,10 +143,37 @@ class TransfersViewModel @Inject constructor(
             monitorTransferOverQuotaUseCase()
                 .collectLatest { isTransferOverQuota ->
                     _uiState.update { state ->
-                        state.copy(isTransferOverQuota = isTransferOverQuota)
+                        val quotaWarning = getQuotaWarning(
+                            isStorageOverQuota = state.isStorageOverQuota,
+                            isTransferOverQuota = isTransferOverQuota,
+                        )
+
+                        state.copy(
+                            isTransferOverQuota = isTransferOverQuota,
+                            quotaWarning = quotaWarning,
+                        )
                     }
                 }
         }
+    }
+
+    private fun getQuotaWarning(
+        isStorageOverQuota: Boolean,
+        isTransferOverQuota: Boolean,
+    ): QuotaWarning? {
+        return when {
+            isStorageOverQuota && isTransferOverQuota -> QuotaWarning.StorageAndTransfer
+            isStorageOverQuota -> QuotaWarning.Storage
+            isTransferOverQuota -> QuotaWarning.Transfer
+            else -> null
+        }
+    }
+
+    /**
+     * Consume quota warning.
+     */
+    fun onConsumeQuotaWarning() {
+        _uiState.update { state -> state.copy(quotaWarning = null) }
     }
 
     private fun monitorPausedTransfers() {

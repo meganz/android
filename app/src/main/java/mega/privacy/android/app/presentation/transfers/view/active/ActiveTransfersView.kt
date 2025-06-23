@@ -19,6 +19,7 @@ import mega.android.core.ui.components.list.MegaReorderableLazyColumn
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressPercentString
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressSizeString
 import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
+import mega.privacy.android.app.presentation.transfers.model.QuotaWarning
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_ACTIVE_TAB
@@ -31,31 +32,36 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal fun ActiveTransfersView(
     activeTransfers: ImmutableList<InProgressTransfer>,
     selectedActiveTransfersIds: ImmutableList<Long>?,
-    isOverQuota: Boolean,
+    isTransferOverQuota: Boolean,
+    isStorageOverQuota: Boolean,
+    quotaWarning: QuotaWarning?,
     areTransfersPaused: Boolean,
     onPlayPauseClicked: (Int) -> Unit,
     onReorderPreview: suspend (from: Int, to: Int) -> Unit,
     onReorderConfirmed: (InProgressTransfer) -> Unit,
     onActiveTransferSelected: (InProgressTransfer) -> Unit,
     onUpgradeClick: () -> Unit,
+    onConsumeQuotaWarning: () -> Unit,
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
     val selectMode = remember(selectedActiveTransfersIds) { selectedActiveTransfersIds != null }
     var draggedTransfer by remember { mutableStateOf<InProgressTransfer?>(null) }
+
     if (activeTransfers.isEmpty()) {
         EmptyTransfersView(
             emptyStringId = sharedR.string.transfers_no_active_transfers_empty_text,
             modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFERS_EMPTY_VIEW)
         )
     } else {
-        var showOverQuotaBanner by remember { mutableStateOf(isOverQuota) }
         Column {
-            if (showOverQuotaBanner) {
+            quotaWarning?.let {
                 OverQuotaBanner(
                     modifier = Modifier.testTag(OVER_QUOTA_BANNER_TAG),
+                    isTransferOverQuota = it is QuotaWarning.Transfer || it is QuotaWarning.StorageAndTransfer,
+                    isStorageOverQuota = it is QuotaWarning.Storage || it is QuotaWarning.StorageAndTransfer,
                     onUpgradeClick = onUpgradeClick,
-                    onCancelButtonClick = { showOverQuotaBanner = false }
+                    onCancelButtonClick = onConsumeQuotaWarning,
                 )
             }
             MegaReorderableLazyColumn(
@@ -77,7 +83,8 @@ internal fun ActiveTransfersView(
             ) { item ->
                 ActiveTransferItem(
                     activeTransfer = item,
-                    isOverQuota = isOverQuota,
+                    isTransferOverQuota = isTransferOverQuota,
+                    isStorageOverQuota = isStorageOverQuota,
                     areTransfersPaused = areTransfersPaused,
                     onPlayPauseClicked = onPlayPauseClicked,
                     isSelected = selectedActiveTransfersIds?.contains(item.uniqueId),
@@ -95,7 +102,8 @@ internal fun ActiveTransfersView(
 @Composable
 internal fun ActiveTransferItem(
     activeTransfer: InProgressTransfer,
-    isOverQuota: Boolean,
+    isTransferOverQuota: Boolean,
+    isStorageOverQuota: Boolean,
     areTransfersPaused: Boolean,
     onPlayPauseClicked: (Int) -> Unit,
     isSelected: Boolean?,
@@ -105,6 +113,7 @@ internal fun ActiveTransferItem(
     viewModel: ActiveTransferImageViewModel = hiltViewModel(),
 ) = with(activeTransfer) {
     val uiState by viewModel.getUiStateFlow(tag).collectAsStateWithLifecycle()
+    val isDownload = activeTransfer is InProgressTransfer.Download
 
     LaunchedEffect(key1 = tag) {
         viewModel.addTransfer(activeTransfer)
@@ -112,16 +121,20 @@ internal fun ActiveTransferItem(
 
     ActiveTransferItem(
         tag = tag,
-        isDownload = activeTransfer is InProgressTransfer.Download,
+        isDownload = isDownload,
         fileTypeResId = uiState.fileTypeResId,
         previewUri = uiState.previewUri,
         fileName = fileName,
         progressSizeString = getProgressSizeString(),
         progressPercentageString = getProgressPercentString(),
         progress = progress.floatValue,
-        speed = getSpeedString(areTransfersPaused),
+        speed = getSpeedString(
+            areTransfersPaused = areTransfersPaused,
+            isTransferOverQuota = isTransferOverQuota,
+            isStorageOverQuota = isStorageOverQuota
+        ),
         isPaused = isPaused,
-        isOverQuota = isOverQuota,
+        isOverQuota = (isDownload && isTransferOverQuota) || (isDownload.not() && isStorageOverQuota),
         areTransfersPaused = areTransfersPaused,
         onPlayPauseClicked = { onPlayPauseClicked(tag) },
         modifier = modifier,
