@@ -123,10 +123,11 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
         } ?: throw SynchronisationException("Non null node found be null when fetched from api")
     }
 
-    override suspend fun getChildNode(nodeId: NodeId): UnTypedNode? =
+    override suspend fun getChildNode(nodeId: NodeId): UnTypedNode? = withContext(ioDispatcher) {
         megaApiFolderGateway.getMegaNodeByHandle(nodeId.longValue)
             ?.let { megaApiFolderGateway.authorizeNode(it) }
             ?.let { convertToUntypedNode(it) }
+    }
 
 
     override suspend fun getNodeChildren(handle: Long, order: Int?): List<UnTypedNode> =
