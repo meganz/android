@@ -20,9 +20,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -354,16 +352,15 @@ class MeetingActivityViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            flow {
-                emitAll(monitorUserUpdates()
-                    .catch { Timber.w("Exception monitoring user updates: $it") }
-                    .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
-            }.collect {
-                when (it) {
-                    UserChanges.Firstname, UserChanges.Lastname -> getMyFullName()
-                    else -> Unit
+            monitorUserUpdates()
+                .catch { Timber.w("Exception monitoring user updates: $it") }
+                .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email }
+                .collect {
+                    when (it) {
+                        UserChanges.Firstname, UserChanges.Lastname -> getMyFullName()
+                        else -> Unit
+                    }
                 }
-            }
         }
     }
 
@@ -1627,7 +1624,15 @@ class MeetingActivityViewModel @Inject constructor(
         if (listener == null)
             return
 
-        Timber.d("Adding local video")
+        Timber.d("Adding local video ${state.value.camEnabled}")
+        if (!state.value.camEnabled) {
+            _state.update {
+                it.copy(
+                    camEnabled = true
+                )
+            }
+        }
+        enableDeviceCamera(enable = true, isReleasingVideo = false)
         meetingActivityRepository.addLocalVideo(chatId, listener)
     }
 
