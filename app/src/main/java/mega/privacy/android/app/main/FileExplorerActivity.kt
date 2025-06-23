@@ -31,6 +31,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -38,6 +40,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
@@ -110,6 +113,7 @@ import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
@@ -187,6 +191,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @Inject
     @LoginMutex
     lateinit var loginMutex: Mutex
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     /**
      * Mega navigator
@@ -1350,10 +1358,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                                     setRootTitle()
                                     supportActionBar?.setSubtitle(R.string.general_select_to_download)
                                 } else {
-                                    setToolbarTitle(
-                                        megaApi.getNodeByHandle(
-                                            cDriveExplorer?.parentHandle ?: return
-                                        )?.name
+                                    setToolbarTitleByNodeHandle(
+                                        cDriveExplorer?.parentHandle ?: return
                                     )
                                 }
                             }
@@ -1367,11 +1373,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (cDriveExplorer?.parentHandle == -1L || cDriveExplorer?.parentHandle == megaApi.rootNode?.handle) {
                         setRootTitle()
                     } else {
-                        setToolbarTitle(
-                            megaApi.getNodeByHandle(
-                                cDriveExplorer?.parentHandle
-                                    ?: return
-                            )?.name
+                        setToolbarTitleByNodeHandle(
+                            cDriveExplorer?.parentHandle ?: return
                         )
                     }
                 }
@@ -1397,7 +1400,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (f.parentHandle == -1L || f.parentHandle == megaApi.rootNode?.handle) {
                         setRootTitle()
                     } else {
-                        setToolbarTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
+                        setToolbarTitleByNodeHandle(f.parentHandle)
                     }
 
                     showFabButton(false)
@@ -1411,7 +1414,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (deepBrowserTree == 0) {
                         setRootTitle()
                     } else {
-                        setToolbarTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
+                        setToolbarTitleByNodeHandle(f.parentHandle)
                     }
                 } else if (f is CloudDriveExplorerFragment) {
                     if (tabShown != NO_TABS) {
@@ -1421,7 +1424,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (f.parentHandle == -1L || f.parentHandle == megaApi.rootNode?.handle) {
                         setRootTitle()
                     } else {
-                        setToolbarTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
+                        setToolbarTitleByNodeHandle(f.parentHandle)
                     }
                 }
                 showFabButton(false)
@@ -1440,7 +1443,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     if (deepBrowserTree == 0) {
                         setRootTitle()
                     } else {
-                        setToolbarTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
+                        setToolbarTitleByNodeHandle(f.parentHandle)
                     }
 
                     showFabButton(false)
@@ -1454,6 +1457,20 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun setToolbarTitle(title: String?) {
         supportActionBar?.title = title
         supportActionBar?.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white))
+    }
+
+    private fun setToolbarTitleByNodeHandle(handle: Long) {
+        lifecycleScope.launch(ioDispatcher) {
+            runCatching {
+                megaApi.getNodeByHandle(handle)
+            }.onSuccess {
+                withContext(Dispatchers.Main) {
+                    setToolbarTitle(it?.name ?: "")
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -1553,7 +1570,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         val nodeHandles = attachNodes.map { it.handle }
         val nodeIds = nodeHandles.map { NodeId(it) }
         checkNotificationsPermission(this)
-        viewModel.uploadFilesToChat(chatIds, documentsToShare ?: emptyList(), nodeIds,
+        viewModel.uploadFilesToChat(
+            chatIds, documentsToShare ?: emptyList(), nodeIds,
             toDoAfter = {
                 openManagerAndFinish()
             }
