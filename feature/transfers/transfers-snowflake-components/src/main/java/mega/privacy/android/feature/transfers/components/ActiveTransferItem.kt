@@ -126,7 +126,7 @@ fun ActiveTransferItem(
                 )
                 MegaText(
                     text = subTitle,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = AppTheme.typography.bodySmall,
                     textColor = TextColor.Secondary,
