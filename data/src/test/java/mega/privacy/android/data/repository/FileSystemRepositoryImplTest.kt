@@ -398,6 +398,32 @@ internal class FileSystemRepositoryImplTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that deleteDocumentFileByContentUri deletes the file correctly`(expected: Boolean) =
+        runTest {
+            mockStatic(Uri::class.java).use { _ ->
+                val fileName = "a.jpg"
+                val testUriPath = UriPath("content://test/file/path/$fileName")
+                val uri = mock<Uri>() {
+                    on { lastPathSegment } doReturn fileName
+                }
+                whenever(Uri.parse(testUriPath.value)).thenReturn(uri)
+                val documentFile = mock<DocumentFile>() {
+                    on { delete() } doReturn expected
+                }
+                whenever(
+                    documentFileWrapper.getDocumentFile(
+                        testUriPath.value,
+                        fileName
+                    )
+                ).thenReturn(documentFile)
+
+                val actual = underTest.deleteDocumentFileByContentUri(testUriPath)
+                assertThat(actual).isEqualTo(expected)
+            }
+        }
+
     @Test
     fun `test that get file in document folder returns correct value`() = runTest {
         val folderUri = UriPath("file://test/file/path")

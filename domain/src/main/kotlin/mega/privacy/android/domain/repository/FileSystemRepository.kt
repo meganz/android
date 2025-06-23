@@ -348,12 +348,21 @@ interface FileSystemRepository {
     suspend fun getFileTypeInfo(uriPath: UriPath, fileName: String): FileTypeInfo
 
     /**
-     * Delete file by uri
+     * Delete file by uri by content resolver for MediaStore
      *
      * @param uri
      * @return true if the file is deleted successfully
      */
     suspend fun deleteFileByUri(uri: String): Boolean
+
+
+    /**
+     * Delete a document file by its content uri.
+     *
+     * @param uriPath
+     * @return true if the file is deleted successfully
+     */
+    suspend fun deleteDocumentFileByContentUri(uriPath: UriPath): Boolean
 
     /**
      * Get files in document folder

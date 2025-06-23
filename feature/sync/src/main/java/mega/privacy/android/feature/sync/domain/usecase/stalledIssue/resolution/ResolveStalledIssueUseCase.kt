@@ -8,7 +8,8 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
-import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.file.DeleteDocumentFileByContentUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
@@ -22,7 +23,7 @@ import mega.privacy.android.feature.sync.domain.usecase.solvedissue.SetSyncSolve
 import javax.inject.Inject
 
 internal class ResolveStalledIssueUseCase @Inject constructor(
-    private val deleteFileUseCase: DeleteFileUseCase,
+    private val deleteDocumentFileByContentUriUseCase: DeleteDocumentFileByContentUriUseCase,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val getFileByPathUseCase: GetFileByPathUseCase,
@@ -89,7 +90,7 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
             }
 
             StalledIssueResolutionActionType.CHOOSE_REMOTE_FILE -> {
-                deleteFileUseCase(stalledIssue.localPaths.first())
+                deleteDocumentFileByContentUriUseCase(UriPath(stalledIssue.localPaths.first()))
             }
 
             StalledIssueResolutionActionType.CHOOSE_LATEST_MODIFIED_TIME -> {
@@ -101,7 +102,7 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
                     if (localModifiedDateInMilliseconds / 1000 > remoteModifiedDateInSeconds) {
                         moveNodesToRubbishUseCase(listOf(stalledIssue.nodeIds.first().longValue))
                     } else {
-                        deleteFileUseCase(stalledIssue.localPaths.first())
+                        deleteDocumentFileByContentUriUseCase(UriPath(stalledIssue.localPaths.first()))
                     }
                 }
             }
