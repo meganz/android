@@ -23,6 +23,7 @@ class HandleChatTransferEventsUseCase @Inject constructor(
      */
     override suspend operator fun invoke(vararg events: TransferEvent) {
         val chatEvents = events.filter { it.transfer.transferType == TransferType.CHAT_UPLOAD }
+        if (chatEvents.isEmpty()) return
 
         //update transfer uniqueId on Start event
         chatEvents
