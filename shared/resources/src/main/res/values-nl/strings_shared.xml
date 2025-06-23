@@ -1288,5 +1288,5 @@
     <!-- Label for the current plan badge in the pro plan card -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Huidige abonnement</string>
     <!-- Error message when achievements status is unavailable -->
-    <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
+    <string name="achievement_status_unavailable">De status van uw prestaties is momenteel niet beschikbaar. Probeer het later nog eens.</string>
 </resources>
