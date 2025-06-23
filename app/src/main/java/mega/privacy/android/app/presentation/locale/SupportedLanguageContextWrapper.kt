@@ -15,8 +15,7 @@ import java.util.Locale
 class SupportedLanguageContextWrapper private constructor(base: Context?) : ContextWrapper(base) {
 
     companion object {
-
-        private val supportedLanguages = listOf(
+        private val supportedLanguages = setOf(
             "en",
             "ar",
             "de",
@@ -35,6 +34,7 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
             "th",
             "vi",
             "zh",
+            "tr"
         )
 
         /**
@@ -52,28 +52,23 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
              * unsupported locales from the configuration as a measure to prevent the strange behaviour.
              **/
             context?.resources?.configuration?.let { configuration ->
-                val locales = configuration.locales
-                LocaleList(*getSupportedLocales(locales))
-                    .takeUnless { it.isEmpty }
-                    ?.let {
-                        Locale.setDefault(it.get(0))
-                        configuration.setLocales(it)
-                    } ?: run {
-                    // If only unsupported locale is set in phone setting and app-specific setting
-                    // set default locale to English.
-                    val defaultLocale = Locale("en")
-                    Locale.setDefault(defaultLocale)
-                    configuration.setLocales(LocaleList(defaultLocale))
-                }
+                val userLocales = configuration.locales
+                val supportedLocaleList = getSupportedLocales(userLocales)
+                val resolvedLocale = supportedLocaleList.firstOrNull() ?: Locale("en")
+
+                Locale.setDefault(resolvedLocale)
+                configuration.setLocales(LocaleList(resolvedLocale))
             }
+
             return SupportedLanguageContextWrapper(context)
         }
 
         private fun getSupportedLocales(
             locales: LocaleList,
-        ) = (0 until locales.size()).mapNotNull { i ->
-            locales[i].takeIf { locale -> supportedLanguages.contains(locale.language) }
-        }.toTypedArray()
+        ) = (0 until locales.size())
+            .mapNotNull { i ->
+                locales[i].takeIf { locale -> supportedLanguages.contains(locale.language) }
+            }
+            .toTypedArray()
     }
-
 }

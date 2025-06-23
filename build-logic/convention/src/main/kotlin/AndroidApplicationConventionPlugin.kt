@@ -109,7 +109,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
     private fun ApplicationDefaultConfig.setupLanguageResources(project: Project) {
         if (!shouldIncludeDevResOnly(project)) {
-            resourceConfigurations += listOf(
+            resourceConfigurations += setOf(
                 "en",
                 "ar",
                 "de",
@@ -125,12 +125,13 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 "ro",
                 "ru",
                 "th",
+                "tr",
                 "vi",
                 "zh-rCN",
                 "zh-rTW",
             )
         } else {
-            resourceConfigurations += listOf(
+            resourceConfigurations += setOf(
                 "en",
                 "xhdpi",
             )
