@@ -5,7 +5,8 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
-import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.file.DeleteDocumentFileByContentUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByFingerprintAndParentNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
@@ -37,7 +38,8 @@ import java.io.File
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ResolveStalledIssueUseCaseTest {
 
-    private val deleteFileUseCase: DeleteFileUseCase = mock()
+    private val deleteDocumentFileByContentUriUseCase: DeleteDocumentFileByContentUriUseCase =
+        mock()
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase = mock()
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
     private val getFileByPathUseCase: GetFileByPathUseCase = mock()
@@ -52,7 +54,7 @@ class ResolveStalledIssueUseCaseTest {
     private val syncId = 12323332L
 
     private val underTest = ResolveStalledIssueUseCase(
-        deleteFileUseCase,
+        deleteDocumentFileByContentUriUseCase,
         moveNodesToRubbishUseCase,
         getNodeByHandleUseCase,
         getFileByPathUseCase,
@@ -67,7 +69,7 @@ class ResolveStalledIssueUseCaseTest {
     @AfterEach
     fun resetAndTearDown() {
         Mockito.reset(
-            deleteFileUseCase,
+            deleteDocumentFileByContentUriUseCase,
             moveNodesToRubbishUseCase,
             getNodeByHandleUseCase,
             getFileByPathUseCase,
@@ -99,7 +101,7 @@ class ResolveStalledIssueUseCaseTest {
             underTest(stalledIssueResolutionAction, stalledIssue)
 
             verify(moveNodesToRubbishUseCase).invoke(listOf(megaNodeId))
-            verifyNoInteractions(deleteFileUseCase)
+            verifyNoInteractions(deleteDocumentFileByContentUriUseCase)
         }
 
     @Test
@@ -121,7 +123,7 @@ class ResolveStalledIssueUseCaseTest {
 
             underTest(stalledIssueResolutionAction, stalledIssue)
 
-            verify(deleteFileUseCase).invoke(localPath)
+            verify(deleteDocumentFileByContentUriUseCase).invoke(UriPath(localPath))
             verifyNoInteractions(moveNodesToRubbishUseCase)
         }
 
@@ -157,7 +159,7 @@ class ResolveStalledIssueUseCaseTest {
             underTest(stalledIssueResolutionAction, stalledIssue)
 
             verify(moveNodesToRubbishUseCase).invoke(listOf(nodeId.longValue))
-            verifyNoInteractions(deleteFileUseCase)
+            verifyNoInteractions(deleteDocumentFileByContentUriUseCase)
         }
 
     @Test
@@ -191,7 +193,7 @@ class ResolveStalledIssueUseCaseTest {
 
             underTest(stalledIssueResolutionAction, stalledIssue)
 
-            verify(deleteFileUseCase).invoke(localPath)
+            verify(deleteDocumentFileByContentUriUseCase).invoke(UriPath(localPath))
             verifyNoInteractions(moveNodesToRubbishUseCase)
         }
 

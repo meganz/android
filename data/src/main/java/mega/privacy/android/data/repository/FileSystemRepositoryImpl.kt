@@ -9,7 +9,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.gateway.CacheGateway
@@ -58,8 +57,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val documentFileWrapper: DocumentFileWrapper,
     private val documentFileMapper: DocumentFileMapper,
 ) : FileSystemRepository {
-
-    private val moveSdDocumentMutex = Mutex()
 
     override val localDCIMFolderPath: String
         get() = fileGateway.localDCIMFolderPath
@@ -332,9 +329,17 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileTypeInfoMapper(fileName, duration?.inWholeSeconds?.toInt() ?: 0)
         }
 
-    override suspend fun deleteFileByUri(uri: String): Boolean = withContext(ioDispatcher) {
-        fileGateway.deleteFileByUri(uri.toUri())
+    override suspend fun deleteFileByUri(uriString: String): Boolean = withContext(ioDispatcher) {
+        fileGateway.deleteFileByUri(uriString.toUri())
     }
+
+    override suspend fun deleteDocumentFileByContentUri(uriPath: UriPath) =
+        withContext(ioDispatcher) {
+            val uri = uriPath.value.toUri()
+            documentFileWrapper.getDocumentFile(uriPath.value, uri.lastPathSegment.toString())
+                ?.delete() == true
+        }
+
 
     override suspend fun getFilesInDocumentFolder(uri: UriPath): DocumentFolder =
         withContext(ioDispatcher) {
