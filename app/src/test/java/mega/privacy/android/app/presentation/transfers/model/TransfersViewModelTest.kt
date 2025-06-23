@@ -34,8 +34,6 @@ import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
-import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
-import mega.privacy.android.domain.usecase.file.IsUriPathInCacheUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
@@ -87,14 +85,12 @@ class TransfersViewModelTest {
     private val moveTransferBeforeByTagUseCase = mock<MoveTransferBeforeByTagUseCase>()
     private val moveTransferToFirstByTagUseCase = mock<MoveTransferToFirstByTagUseCase>()
     private val moveTransferToLastByTagUseCase = mock<MoveTransferToLastByTagUseCase>()
-    private val canReadUriUseCase = mock<CanReadUriUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val retryChatUploadUseCase = mock<RetryChatUploadUseCase>()
     private val deleteFailedOrCancelledTransfersUseCase =
         mock<DeleteFailedOrCancelledTransfersUseCase>()
     private val deleteCompletedTransfersUseCase = mock<DeleteCompletedTransfersUseCase>()
     private val deleteCompletedTransfersByIdUseCase = mock<DeleteCompletedTransfersByIdUseCase>()
-    private val isUriPathInCacheUseCase = mock<IsUriPathInCacheUseCase>()
     private val cancelTransferByTagUseCase = mock<CancelTransferByTagUseCase>()
 
     private val originalPath = "originalPath"
@@ -156,13 +152,11 @@ class TransfersViewModelTest {
             moveTransferBeforeByTagUseCase,
             moveTransferToFirstByTagUseCase,
             moveTransferToLastByTagUseCase,
-            canReadUriUseCase,
             getNodeByIdUseCase,
             retryChatUploadUseCase,
             deleteFailedOrCancelledTransfersUseCase,
             deleteCompletedTransfersUseCase,
             deleteCompletedTransfersByIdUseCase,
-            isUriPathInCacheUseCase,
             cancelTransferByTagUseCase,
             cancelTransfersUseCase,
             monitorCompletedTransfersUseCase,
@@ -191,13 +185,11 @@ class TransfersViewModelTest {
             moveTransferBeforeByTagUseCase = moveTransferBeforeByTagUseCase,
             moveTransferToFirstByTagUseCase = moveTransferToFirstByTagUseCase,
             moveTransferToLastByTagUseCase = moveTransferToLastByTagUseCase,
-            canReadUriUseCase = canReadUriUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             retryChatUploadUseCase = retryChatUploadUseCase,
             deleteFailedOrCancelledTransfersUseCase = deleteFailedOrCancelledTransfersUseCase,
             deleteCompletedTransfersUseCase = deleteCompletedTransfersUseCase,
             deleteCompletedTransfersByIdUseCase = deleteCompletedTransfersByIdUseCase,
-            isUriPathInCacheUseCase = isUriPathInCacheUseCase,
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
             savedStateHandle = savedStateHandle,
         )
@@ -615,23 +607,6 @@ class TransfersViewModelTest {
         }
 
     @Test
-    fun `test that retryFailedTransfer updates readRetryError in state correctly when cannot read the transfer Uri when the transfer is a failed upload`() =
-        runTest {
-            whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
-            whenever(canReadUriUseCase(originalPath)) doReturn false
-
-            initTestClass()
-
-            with(underTest) {
-                retryFailedTransfer(failedUpload)
-                advanceUntilIdle()
-                uiState.map { it.readRetryError }.test {
-                    assertThat(awaitItem()).isEqualTo(1)
-                }
-            }
-        }
-
-    @Test
     fun `test that retryFailedTransfer throws IllegalArgumentException if transfer is not upload or download`() =
         runTest {
             val unknownTransfer = mock<CompletedTransfer> {
@@ -646,17 +621,17 @@ class TransfersViewModelTest {
             initTestClass()
 
             assertThrows<IllegalArgumentException> {
-                underTest.getStartTransferEventByFailedTransfer(unknownTransfer)
+                underTest.getCloudTransferEventByFailedTransfer(unknownTransfer)
             }
         }
 
     @Test
     fun `test that retryFailedTransfer behaves correctly when the transfer is an offline download transfer`() =
         runTest {
-            val idAndEvent = mapOf(failedOfflineDownload.id!! to offlineStartEvent)
+            val id = failedOfflineDownload.id ?: return@runTest
+            val idAndEvent = mapOf(id to offlineStartEvent)
             val expectedStartEvent = triggered(TransferTriggerEvent.RetryTransfers(idAndEvent))
 
-            whenever(canReadUriUseCase(originalPath)) doReturn true
             whenever(getNodeByIdUseCase(NodeId(failedOfflineDownload.handle))) doReturn typedNode
 
             initTestClass()
@@ -674,10 +649,10 @@ class TransfersViewModelTest {
     @Test
     fun `test that retryFailedTransfer behaves correctly when the transfer is a general download transfer`() =
         runTest {
-            val idAndEvent = mapOf(cancelledDownload.id!! to downloadRetryEvent)
+            val id = cancelledDownload.id ?: return@runTest
+            val idAndEvent = mapOf(id to downloadRetryEvent)
             val expectedStartEvent = triggered(TransferTriggerEvent.RetryTransfers(idAndEvent))
 
-            whenever(canReadUriUseCase(originalPath)) doReturn true
             whenever(getNodeByIdUseCase(NodeId(cancelledDownload.handle))) doReturn typedNode
 
             initTestClass()
@@ -695,8 +670,6 @@ class TransfersViewModelTest {
     @Test
     fun `test that retryFailedTransfer does not update startEvent but invokes DeleteCompletedTransfersByIdUseCase when the transfer is a chat upload transfer`() =
         runTest {
-            whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
-            whenever(canReadUriUseCase(originalPath)) doReturn true
             whenever(retryChatUploadUseCase(chatAppData.mapNotNull { it as? TransferAppData.ChatUpload })) doReturn Unit
 
             initTestClass()
@@ -721,11 +694,10 @@ class TransfersViewModelTest {
                 mapOf(originalPath to null),
                 NodeId(cancelledChatUpload.parentHandle)
             )
-            val idAndEvent = mapOf(cancelledChatUpload.id!! to uploadStartEvent)
+            val id = cancelledChatUpload.id ?: return@runTest
+            val idAndEvent = mapOf(id to uploadStartEvent)
             val expectedStartEvent = triggered(TransferTriggerEvent.RetryTransfers(idAndEvent))
 
-            whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
-            whenever(canReadUriUseCase(originalPath)) doReturn true
             whenever(retryChatUploadUseCase(chatData)) doThrow ChatUploadNotRetriedException()
 
             initTestClass()
@@ -744,11 +716,10 @@ class TransfersViewModelTest {
     @Test
     fun `test that retryFailedTransfer updates startEvent with StartUpload and does not invoke DeleteCompletedTransfersByIdUseCase when the transfer is a general upload`() =
         runTest {
-            val idAndEvent = mapOf(failedUpload.id!! to uploadStartEvent)
+            val id = failedUpload.id ?: return@runTest
+            val idAndEvent = mapOf(id to uploadStartEvent)
             val expectedStartEvent = triggered(TransferTriggerEvent.RetryTransfers(idAndEvent))
 
-            whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
-            whenever(canReadUriUseCase(originalPath)) doReturn true
             whenever(getNodeByIdUseCase(NodeId(failedUpload.handle))) doReturn typedNode
 
             initTestClass()
@@ -767,10 +738,10 @@ class TransfersViewModelTest {
     @Test
     fun `test that retryFailedTransfer updates startEvent with StartUpload and does not invoke DeleteCompletedTransfersByIdUseCase when the transfer is a general upload from cache`() =
         runTest {
-            val idAndEvent = mapOf(failedUpload.id!! to uploadStartEvent)
+            val id = failedUpload.id ?: return@runTest
+            val idAndEvent = mapOf(id to uploadStartEvent)
             val expectedStartEvent = triggered(TransferTriggerEvent.RetryTransfers(idAndEvent))
 
-            whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn true
             whenever(getNodeByIdUseCase(NodeId(failedUpload.handle))) doReturn typedNode
 
             initTestClass()
@@ -786,33 +757,6 @@ class TransfersViewModelTest {
         }
 
     @Test
-    fun `test that retryAllFailedTransfers updates readRetryError in state correctly when cannot read one of three transfer Uris`() =
-        runTest {
-            val flow = MutableSharedFlow<List<CompletedTransfer>>()
-            val list = listOf(
-                failedOfflineDownload,
-                cancelledDownload,
-                failedUpload,
-                cancelledChatUpload
-            )
-
-            whenever(monitorCompletedTransfersUseCase()) doReturn flow
-            whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
-            whenever(canReadUriUseCase(originalPath)) doReturn false
-
-            initTestClass()
-
-            with(underTest) {
-                flow.emit(list)
-                retryAllFailedTransfers()
-                advanceUntilIdle()
-                uiState.map { it.readRetryError }.test {
-                    assertThat(awaitItem()).isEqualTo(1)
-                }
-            }
-        }
-
-    @Test
     fun `test that retryAllFailedTransfers updates startEvent in state with RetryTransfers for different transfers and invokes DeleteCompletedTransfersByIdUseCase`() =
         runTest {
             val flow = MutableSharedFlow<List<CompletedTransfer>>()
@@ -821,24 +765,18 @@ class TransfersViewModelTest {
                 cancelledDownload,
                 cancelledChatUpload,
             )
-            val startTransferEvents = listOf(
-                StartTransferEvent(failedOfflineDownload.id, offlineStartEvent),
-                StartTransferEvent(cancelledDownload.id, downloadRetryEvent),
-                StartTransferEvent(cancelledChatUpload.id, null),
+            val failedOfflineDownloadId = failedOfflineDownload.id ?: return@runTest
+            val cancelledDownloadId = cancelledDownload.id ?: return@runTest
+            val cloudTransferEvents = mapOf(
+                failedOfflineDownloadId to offlineStartEvent,
+                cancelledDownloadId to downloadRetryEvent,
             )
-
-            val notNullStartEvents = startTransferEvents
-                .filter { it.id != null && it.event != null }
-                .associate { it.id!! to it.event!! }
-
-            val expected = TransferTriggerEvent.RetryTransfers(notNullStartEvents)
+            val expected = TransferTriggerEvent.RetryTransfers(cloudTransferEvents)
 
             whenever(monitorCompletedTransfersUseCase()) doReturn flow
             whenever(getNodeByIdUseCase(NodeId(failedOfflineDownload.handle))) doReturn typedNode
             whenever(getNodeByIdUseCase(NodeId(cancelledDownload.handle))) doReturn typedNode
             whenever(retryChatUploadUseCase(chatAppData.mapNotNull { it as? TransferAppData.ChatUpload })) doReturn Unit
-            whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
-            whenever(canReadUriUseCase(originalPath)) doReturn true
 
             initTestClass()
 
@@ -865,24 +803,20 @@ class TransfersViewModelTest {
                 cancelledDownload,
                 failedUpload,
             )
-            val startTransferEvents = listOf(
-                StartTransferEvent(failedOfflineDownload.id, offlineStartEvent),
-                StartTransferEvent(cancelledDownload.id, downloadRetryEvent),
-                StartTransferEvent(failedUpload.id, uploadStartEvent),
+            val failedOfflineDownloadId = failedOfflineDownload.id ?: return@runTest
+            val cancelledDownloadId = cancelledDownload.id ?: return@runTest
+            val failedUploadId = failedUpload.id ?: return@runTest
+            val cloudTransferEvents = mapOf(
+                failedOfflineDownloadId to offlineStartEvent,
+                cancelledDownloadId to downloadRetryEvent,
+                failedUploadId to uploadStartEvent,
             )
-
-            val notNullStartEvents = startTransferEvents
-                .filter { it.id != null && it.event != null }
-                .associate { it.id!! to it.event!! }
-
-            val expected = TransferTriggerEvent.RetryTransfers(notNullStartEvents)
+            val expected = TransferTriggerEvent.RetryTransfers(cloudTransferEvents)
 
             whenever(monitorCompletedTransfersUseCase()) doReturn flow
             whenever(getNodeByIdUseCase(NodeId(failedOfflineDownload.handle))) doReturn typedNode
             whenever(getNodeByIdUseCase(NodeId(cancelledDownload.handle))) doReturn typedNode
             whenever(retryChatUploadUseCase(chatAppData.mapNotNull { it as? TransferAppData.ChatUpload })) doReturn Unit
-            whenever(isUriPathInCacheUseCase(UriPath(originalPath))) doReturn false
-            whenever(canReadUriUseCase(originalPath)) doReturn true
 
             initTestClass()
 

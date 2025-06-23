@@ -28,13 +28,10 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferState
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
-import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
-import mega.privacy.android.domain.usecase.file.IsUriPathInCacheUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
@@ -71,13 +68,11 @@ class TransfersViewModel @Inject constructor(
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase,
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase,
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
-    private val canReadUriUseCase: CanReadUriUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val retryChatUploadUseCase: RetryChatUploadUseCase,
     private val deleteFailedOrCancelledTransfersUseCase: DeleteFailedOrCancelledTransfersUseCase,
     private val deleteCompletedTransfersUseCase: DeleteCompletedTransfersUseCase,
     private val deleteCompletedTransfersByIdUseCase: DeleteCompletedTransfersByIdUseCase,
-    private val isUriPathInCacheUseCase: IsUriPathInCacheUseCase,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -238,19 +233,11 @@ class TransfersViewModel @Inject constructor(
      */
     fun retryFailedTransfer(transfer: CompletedTransfer) {
         viewModelScope.launch {
-            if (canReadTransferUri(transfer)) {
-                getStartTransferEventByFailedTransfer(transfer)?.let { startTransferEvent ->
-                    startTransferEvent.event?.let { event ->
-                        val idAndEvent = mapOf(transfer.id!! to event)
-                        setStartEvent(TransferTriggerEvent.RetryTransfers(idAndEvent))
-                    } ?: run {
-                        startTransferEvent.id?.let { id ->
-                            deleteCompletedTransfersByIdUseCase(listOf(id))
-                        }
-                    }
+            getCloudTransferEventByFailedTransfer(transfer)?.let { cloudTransferEvent ->
+                transfer.id?.let { id ->
+                    val idAndEvent = mapOf(id to cloudTransferEvent)
+                    setStartEvent(TransferTriggerEvent.RetryTransfers(idAndEvent))
                 }
-            } else {
-                _uiState.update { state -> state.copy(readRetryError = 1) }
             }
         }
     }
@@ -271,61 +258,34 @@ class TransfersViewModel @Inject constructor(
 
     private fun retryFailedTransfers(failedTransfers: List<CompletedTransfer>) {
         viewModelScope.launch(ioDispatcher) {
-            var cannotReadCount = 0
-
-            buildList {
+            buildMap {
                 failedTransfers.forEach { transfer ->
-                    if (canReadTransferUri(transfer)) {
-                        getStartTransferEventByFailedTransfer(transfer)?.let { startTransferEvent ->
-                            add(startTransferEvent)
-                        }
-                    } else {
-                        cannotReadCount++
+                    getCloudTransferEventByFailedTransfer(transfer)?.let { cloudTransferEvent ->
+                        transfer.id?.let { id -> put(id, cloudTransferEvent) }
                     }
                 }
-            }.let { startTransferEvents ->
-                if (startTransferEvents.isNotEmpty()) {
-                    val (failedTransferToRemove, failedTransferToStart) = startTransferEvents
-                        .partition { it.event == null }
-                    val notNullStartEvents = failedTransferToStart
-                        .filter { it.id != null && it.event != null }
-                        .associate { it.id!! to it.event!! }
-
-                    // Downloads and uploads pending to retry, will be removed once the transfer starts.
-                    setStartEvent(TransferTriggerEvent.RetryTransfers(notNullStartEvents))
-
-                    if (failedTransferToRemove.isNotEmpty()) {
-                        //Chat uploads already retried
-                        deleteCompletedTransfersByIdUseCase(failedTransferToRemove.mapNotNull { it.id })
-                    }
-
-                    if (cannotReadCount > 0) {
-                        _uiState.update { state -> state.copy(readRetryError = cannotReadCount) }
-                    }
-                }
+            }.let { cloudTransferEvents ->
+                setStartEvent(TransferTriggerEvent.RetryTransfers(cloudTransferEvents))
             }
         }
     }
 
-    internal suspend fun getStartTransferEventByFailedTransfer(failedTransfer: CompletedTransfer): StartTransferEvent? {
+    internal suspend fun getCloudTransferEventByFailedTransfer(failedTransfer: CompletedTransfer): TransferTriggerEvent.CloudTransfer? {
         with(failedTransfer) {
             when {
                 type.isDownloadType() -> {
                     getNodeByIdUseCase(NodeId(handle))?.let { typedNode ->
-                        return StartTransferEvent(
-                            id = failedTransfer.id,
-                            event = if (isOffline == true) {
-                                TransferTriggerEvent.StartDownloadForOffline(
-                                    node = typedNode,
-                                    withStartMessage = false
-                                )
-                            } else {
-                                TransferTriggerEvent.RetryDownloadNode(
-                                    node = typedNode,
-                                    downloadLocation = path,
-                                )
-                            },
-                        )
+                        return if (isOffline == true) {
+                            TransferTriggerEvent.StartDownloadForOffline(
+                                node = typedNode,
+                                withStartMessage = false
+                            )
+                        } else {
+                            TransferTriggerEvent.RetryDownloadNode(
+                                node = typedNode,
+                                downloadLocation = path,
+                            )
+                        }
                     } ?: run {
                         Timber.e("Node not found for this transfer")
                     }
@@ -342,24 +302,21 @@ class TransfersViewModel @Inject constructor(
                             retryChatUploadUseCase(
                                 appData?.mapNotNull { it as? TransferAppData.ChatUpload }.orEmpty()
                             )
-                            return StartTransferEvent(id = failedTransfer.id, event = null)
+                            failedTransfer.id?.let {
+                                deleteCompletedTransfersByIdUseCase(listOf(it))
+                            }
+                            return null
                         }.onFailure {
                             //No chat uploads retried, try general upload only.
-                            return StartTransferEvent(
-                                id = failedTransfer.id,
-                                event = TransferTriggerEvent.StartUpload.Files(
-                                    mapOf(path to null),
-                                    NodeId(parentHandle)
-                                )
+                            return TransferTriggerEvent.StartUpload.Files(
+                                mapOf(path to null),
+                                NodeId(parentHandle)
                             )
                         }
                     } else {
-                        return StartTransferEvent(
-                            id = failedTransfer.id,
-                            event = TransferTriggerEvent.StartUpload.Files(
-                                mapOf(path to null),
-                                NodeId(parentHandle)
-                            ),
+                        return TransferTriggerEvent.StartUpload.Files(
+                            mapOf(path to null),
+                            NodeId(parentHandle)
                         )
                     }
                 }
@@ -381,22 +338,6 @@ class TransfersViewModel @Inject constructor(
     fun consumeStartEvent() {
         _uiState.update { state -> state.copy(startEvent = consumed()) }
     }
-
-    private suspend fun canReadTransferUri(transfer: CompletedTransfer) =
-        if (transfer.type.isUploadType()) {
-            val appData = transfer.appData
-            val originalUriPath = UriPath(appData?.getOriginalContentUri() ?: transfer.originalPath)
-            val isChatUpload = appData?.any { it is TransferAppData.ChatUpload } == true
-            val isCacheUpload = isUriPathInCacheUseCase(originalUriPath)
-
-            if (isChatUpload || isCacheUpload) {
-                true
-            } else {
-                canReadUriUseCase(originalUriPath.value)
-            }
-        } else {
-            true
-        }
 
     private fun List<TransferAppData>.getOriginalContentUri(): String? = this
         .filterIsInstance<TransferAppData.OriginalUriPath>()
@@ -658,8 +599,3 @@ class TransfersViewModel @Inject constructor(
         }
     }
 }
-
-internal class StartTransferEvent(
-    val id: Int?,
-    val event: TransferTriggerEvent.CloudTransfer?,
-)

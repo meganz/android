@@ -19,12 +19,10 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
  * @property isTransferOverQuota Whether the transfer is over quota.
  * @property areTransfersPaused Whether the transfers are paused.
  * @property completedTransfers List of successfully completed transfers.
- * @property completedTransfersPaths Map of completed transfer
  * @property selectedCompletedTransfersIds List of selected completed transfers. If not null, even empty, indicates selected mode is on.
  * @property failedTransfers List of cancelled or failed completed transfers.
  * @property selectedFailedTransfersIds List of selected failed or cancelled transfers. If not null, even empty, indicates selected mode is on.
  * @property startEvent event to start a new transfer
- * @property readRetryError Null if there is no error, read retry error count otherwise
  */
 data class TransfersUiState(
     val selectedTab: Int = ACTIVE_TAB_INDEX,
@@ -38,7 +36,6 @@ data class TransfersUiState(
     val failedTransfers: ImmutableList<CompletedTransfer> = emptyList<CompletedTransfer>().toImmutableList(),
     val selectedFailedTransfersIds: ImmutableList<Int>? = null,
     val startEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
-    val readRetryError: Int? = null,
 ) {
 
     /**

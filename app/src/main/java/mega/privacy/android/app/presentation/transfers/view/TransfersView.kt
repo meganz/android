@@ -39,7 +39,6 @@ import mega.privacy.android.app.presentation.transfers.view.active.ActiveTransfe
 import mega.privacy.android.app.presentation.transfers.view.completed.CompletedTransfersView
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelAllTransfersDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelTransfersConfirmationDialog
-import mega.privacy.android.app.presentation.transfers.view.dialog.ClearAllTransfersDialog
 import mega.privacy.android.app.presentation.transfers.view.failed.FailedTransfersView
 import mega.privacy.android.app.presentation.transfers.view.sheet.ActiveTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTransfersActionsBottomSheet
@@ -86,7 +85,6 @@ internal fun TransfersView(
     var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showFailedTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCancelAllTransfersDialog by rememberSaveable { mutableStateOf(false) }
-    var showClearAllTransfersDialog by rememberSaveable { mutableStateOf(false) }
     var showConfirmCancelTransfersDialog by rememberSaveable { mutableStateOf(false) }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -220,7 +218,7 @@ internal fun TransfersView(
 
         if (showCompletedTransfersModal) {
             CompletedTransfersActionsBottomSheet(
-                onClearAllTransfers = { showClearAllTransfersDialog = true },
+                onClearAllTransfers = onClearAllCompletedTransfers,
                 onSelectTransfers = onSelectCompletedTransfers,
                 onDismissSheet = { showCompletedTransfersModal = false },
             )
@@ -229,7 +227,7 @@ internal fun TransfersView(
         if (showFailedTransfersModal) {
             FailedTransfersActionsBottomSheet(
                 onRetryAllTransfers = onRetryFailedTransfers,
-                onClearAllTransfers = { showClearAllTransfersDialog = true },
+                onClearAllTransfers = onClearAllFailedTransfers,
                 onSelectTransfers = onSelectFailedTransfers,
                 onDismissSheet = { showFailedTransfersModal = false },
             )
@@ -242,17 +240,6 @@ internal fun TransfersView(
             )
         }
 
-        if (showClearAllTransfersDialog) {
-            ClearAllTransfersDialog(
-                onClearAllTransfers = {
-                    when (selectedTab) {
-                        COMPLETED_TAB_INDEX -> onClearAllCompletedTransfers()
-                        FAILED_TAB_INDEX -> onClearAllFailedTransfers()
-                    }
-                },
-                onDismiss = { showClearAllTransfersDialog = false },
-            )
-        }
         if (showConfirmCancelTransfersDialog) {
             CancelTransfersConfirmationDialog(
                 selectedAmount = selectedActiveTransfersIds?.size ?: 1,
