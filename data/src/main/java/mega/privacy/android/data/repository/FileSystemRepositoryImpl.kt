@@ -471,4 +471,31 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                     )
                 }
         }
+
+    override suspend fun renameDocumentWithTheSameName(uriPaths: List<UriPath>) =
+        withContext(ioDispatcher) {
+            uriPaths.forEachIndexed { index, uriPath ->
+                val uri = uriPath.value.toUri()
+                val fileName = uri.lastPathSegment ?: return@forEachIndexed
+                val documentFile = documentFileWrapper.getDocumentFile(uriPath.value, fileName)
+                    ?: return@forEachIndexed
+                val counter = index + 1
+
+                val newName = generateNewName(fileName, counter)
+                if (!documentFile.renameTo(newName)) {
+                    Timber.e("Failed to rename document file: ${documentFile.uri} to $newName")
+                }
+            }
+        }
+
+    private fun generateNewName(fileName: String, counter: Int): String {
+        val fileNameWithoutExtension = fileName.substringBeforeLast(".")
+        val extension = fileName.substringAfterLast('.', missingDelimiterValue = "")
+        val fullExtension = if (extension.isNotEmpty()) {
+            ".$extension"
+        } else {
+            ""
+        }
+        return "$fileNameWithoutExtension ($counter)$fullExtension"
+    }
 }

@@ -257,7 +257,9 @@ class ResolveStalledIssueUseCaseTest {
 
             underTest(stalledIssueResolutionAction, stalledIssue)
 
-            verify(renameFilesWithTheSameNameUseCase).invoke(stalledIssue.localPaths)
+            verify(renameFilesWithTheSameNameUseCase).invoke(stalledIssue.localPaths.map {
+                UriPath(it)
+            })
         }
 
     // suspend high order function cannot be mocked on Kotlin 2.0

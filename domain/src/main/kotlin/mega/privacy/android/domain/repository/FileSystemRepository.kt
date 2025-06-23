@@ -558,4 +558,12 @@ interface FileSystemRepository {
      * @return The [DocumentEntity] of the file.
      */
     suspend fun getDocumentFileIfContentUri(uriString: String, fileName: String): DocumentEntity?
+
+    /**
+     * Renames a document with incremented counter with the same name in the same folder.
+     *
+     * @param uriPaths list of [UriPath] to be obtained from
+     *
+     */
+    suspend fun renameDocumentWithTheSameName(uriPaths: List<UriPath>)
 }
