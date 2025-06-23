@@ -624,7 +624,7 @@ internal class FileSystemRepositoryImplTest {
 
     @Test
     @OptIn(ExperimentalTime::class)
-    fun `test that getLastModifiedTime invokes and returs correctly`() = runTest {
+    fun `test that getLastModifiedTime invokes and returns correctly`() = runTest {
         val uriPath = UriPath("filePath")
         val lastModifiedTime = Instant.fromEpochMilliseconds(123456789L)
 
@@ -632,4 +632,42 @@ internal class FileSystemRepositoryImplTest {
 
         assertThat(underTest.getLastModifiedTime(uriPath)).isEqualTo(lastModifiedTime)
     }
+
+    @Test
+    fun `test that renameDocumentWithTheSameName renames all documents with the same name`() =
+        runTest {
+            mockStatic(Uri::class.java).use {
+                val fileNames = listOf("f01.txt")
+                val uriPaths = listOf(
+                    UriPath("content://test/file/path/f01.txt"),
+                )
+                val documentFiles =
+                    List(uriPaths.size) { mock<DocumentFile>() }
+                val uris = listOf(
+                    mock<Uri> {
+                        on { lastPathSegment } doReturn "f01.txt"
+                    })
+
+                uriPaths.forEachIndexed { index, uriPath ->
+                    whenever(Uri.parse(uriPath.value)) doReturn uris[index]
+                    whenever(
+                        documentFileWrapper.getDocumentFile(
+                            uriPath.value,
+                            fileNames[index]
+                        )
+                    ).thenReturn(
+                        documentFiles[index]
+                    )
+                    whenever(
+                        documentFiles[index].renameTo("f01 (${index + 1}).txt")
+                    ).thenReturn(true)
+                }
+
+                underTest.renameDocumentWithTheSameName(uriPaths)
+
+                uriPaths.forEachIndexed { index, uriPath ->
+                    verify(documentFiles[index]).renameTo("f01 (${index + 1}).txt")
+                }
+            }
+        }
 }

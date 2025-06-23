@@ -569,4 +569,12 @@ interface FileSystemRepository {
      */
     @OptIn(ExperimentalTime::class)
     suspend fun getLastModifiedTime(uriPath: UriPath): Instant?
+
+    /**
+     * Renames a document with incremented counter with the same name in the same folder.
+     *
+     * @param uriPaths list of [UriPath] to be obtained from
+     *
+     */
+    suspend fun renameDocumentWithTheSameName(uriPaths: List<UriPath>)
 }

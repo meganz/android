@@ -57,7 +57,7 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
                         stalledIssue.nodeIds.zip(stalledIssue.nodeNames)
                     )
                 } else if (stalledIssue.localPaths.size > 1) {
-                    renameFilesWithTheSameNameUseCase(stalledIssue.localPaths)
+                    renameFilesWithTheSameNameUseCase(stalledIssue.localPaths.map { UriPath(it) })
                 }
             }
 
