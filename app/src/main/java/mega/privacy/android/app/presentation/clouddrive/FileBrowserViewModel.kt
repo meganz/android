@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
@@ -43,6 +45,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
@@ -126,6 +129,7 @@ class FileBrowserViewModel @Inject constructor(
     private val storageCapacityMapper: StorageCapacityMapper,
     private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase,
     private val doesUriPathExistsUseCase: DoesUriPathExistsUseCase,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -403,13 +407,11 @@ class FileBrowserViewModel @Inject constructor(
 
         val childrenNodes = getFileBrowserNodeChildrenUseCase(fileBrowserHandle)
         val showMediaDiscoveryIcon = !isRootNode && containsMediaItemUseCase(childrenNodes)
-        val sourceNodeUIItems = getNodeUiItems(childrenNodes).map {
-            if (it.node.id == highlightedNode || highlightedNames?.contains(it.node.name) == true) {
-                it.copy(isHighlighted = true)
-            } else {
-                it
-            }
-        }
+        val sourceNodeUIItems = getNodeUiItems(
+            nodeList = childrenNodes,
+            highlightedNodeId = highlightedNode,
+            highlightedNames = highlightedNames?.toSet()
+        )
         val nodeUIItems = filterNonSensitiveNodes(sourceNodeUIItems)
         val sortOrder = getCloudSortOrder()
         val isFileBrowserEmpty = isRootNode || (fileBrowserHandle == MegaApiJava.INVALID_HANDLE)
@@ -430,18 +432,31 @@ class FileBrowserViewModel @Inject constructor(
     /**
      * This will map list of [Node] to [NodeUIItem]
      */
-    private fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem<TypedNode>> {
+    private suspend fun getNodeUiItems(
+        nodeList: List<TypedNode>,
+        highlightedNodeId: NodeId? = null,
+        highlightedNames: Set<String>? = null
+    ): List<NodeUIItem<TypedNode>> = withContext(defaultDispatcher) {
         val existingNodeList = state.value.nodesList
-        return nodeList.mapIndexed { index, node ->
-            val isSelected = state.value.selectedNodeHandles.contains(node.id.longValue)
+        val selectedHandles = state.value.selectedNodeHandles.toSet()
+        val existingHighlightedIds = existingNodeList.asSequence()
+            .filter { it.isHighlighted }
+            .map { it.node.id }
+            .toSet()
+
+        nodeList.mapIndexed { index, node ->
+            val isSelected = selectedHandles.contains(node.id.longValue)
             val fileDuration = if (node is FileNode) {
                 fileDurationMapper(node.type)?.let { durationInSecondsTextMapper(it) }
             } else null
-            val isHighlighted = existingNodeList.any { it.isHighlighted && it.node.id == node.id }
+            val isHighlighted = existingHighlightedIds.contains(node.id) ||
+                    node.id == highlightedNodeId ||
+                    highlightedNames?.contains(node.name) == true
+            val hasCorrespondingIndex = existingNodeList.size > index
             NodeUIItem(
                 node = node,
-                isSelected = if (existingNodeList.size > index) isSelected else false,
-                isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false,
+                isSelected = if (hasCorrespondingIndex) isSelected else false,
+                isInvisible = if (hasCorrespondingIndex) existingNodeList[index].isInvisible else false,
                 fileDuration = fileDuration,
                 isHighlighted = isHighlighted,
             )

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
@@ -179,6 +180,7 @@ class FileBrowserViewModelTest {
             storageCapacityMapper = storageCapacityMapper,
             isInTransferOverQuotaUseCase = isInTransferOverQuotaUseCase,
             doesUriPathExistsUseCase = doesUriPathExistsUseCase,
+            defaultDispatcher = UnconfinedTestDispatcher()
         )
     }
 
