@@ -46,7 +46,7 @@ import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -248,7 +248,7 @@ internal const val TAG_UPLOADING_DOWNLOADING_ICON = "uploadingDownloading"
 internal const val TAG_TRANSFERS_WIDGET = "transfers_widget_view:button:floating_button"
 
 
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 @Composable
 private fun TransfersWidgetPreview(
     @PreviewParameter(TransfersWidgetPreviewProvider::class) parameter: Pair<TransfersInfo, Boolean>,

@@ -41,6 +41,7 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.extensions.launchUrl
+import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
@@ -74,7 +75,6 @@ import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
@@ -682,7 +682,10 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     private fun transfersWidgetClicked() {
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                megaNavigator.openTransfers(this@SearchActivity, ACTIVE_TAB_INDEX)
+                megaNavigator.openTransfersAndConsumeErrorStatus(
+                    this@SearchActivity,
+                    transfersManagementViewModel
+                )
             } else {
                 startActivity(
                     Intent(this@SearchActivity, ManagerActivity::class.java)

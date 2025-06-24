@@ -33,6 +33,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.launchUrl
+import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -54,7 +55,6 @@ import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -428,7 +428,10 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 return@launch
             }
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                megaNavigator.openTransfers(this@FolderLinkComposeActivity, ACTIVE_TAB_INDEX)
+                megaNavigator.openTransfersAndConsumeErrorStatus(
+                    this@FolderLinkComposeActivity,
+                    transfersManagementViewModel
+                )
             } else {
                 startActivity(
                     Intent(this@FolderLinkComposeActivity, ManagerActivity::class.java)

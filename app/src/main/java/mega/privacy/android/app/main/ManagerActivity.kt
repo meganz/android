@@ -116,6 +116,7 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.extensions.consumeParentInsets
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.extensions.isTablet
+import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -1419,7 +1420,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private fun onTransfersWidgetClick() {
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                megaNavigator.openTransfers(this@ManagerActivity, ACTIVE_TAB_INDEX)
+                megaNavigator.openTransfersAndConsumeErrorStatus(
+                    this@ManagerActivity,
+                    transfersManagementViewModel,
+                )
             } else {
                 drawerItem = DrawerItem.TRANSFERS
                 selectDrawerItem(drawerItem)
@@ -1898,7 +1902,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         ACTIVE_TAB_INDEX
                     }
                 }
-                megaNavigator.openTransfers(this@ManagerActivity, tab)
+                megaNavigator.openTransfersAndConsumeErrorStatus(
+                    this@ManagerActivity,
+                    transfersManagementViewModel,
+                    tab
+                )
             } else {
                 drawerItem = DrawerItem.TRANSFERS
                 transferPageViewModel.setTransfersTab(openTab)
@@ -3803,7 +3811,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     override fun drawerItemClicked(item: DrawerItem) {
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection) && item == DrawerItem.TRANSFERS) {
-                megaNavigator.openTransfers(this@ManagerActivity, ACTIVE_TAB_INDEX)
+                megaNavigator.openTransfersAndConsumeErrorStatus(
+                    this@ManagerActivity,
+                    transfersManagementViewModel
+                )
             } else {
                 val oldDrawerItem = drawerItem
                 isFirstTimeCam
