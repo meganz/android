@@ -3,6 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application tools:node="merge">
+        <activity
+            android:name=".presentation.login.LoginActivity"
+            android:configChanges="screenSize"
+            android:exported="true"
+            android:theme="@style/Theme.Mega.Starting"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
+            tools:node="replace" />
         <service
             android:name="mega.privacy.android.app.featuretoggle.FeatureFlagTileService"
             android:exported="true"

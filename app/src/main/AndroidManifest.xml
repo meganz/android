@@ -183,7 +183,12 @@
             android:configChanges="screenSize"
             android:exported="true"
             android:theme="@style/Theme.Mega.Starting"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.WebViewActivity"
             android:configChanges="orientation|screenSize"
