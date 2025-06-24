@@ -194,6 +194,11 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Safer method to get the current node id. Use it instead of [nodeId] property
+     */
+    fun getCurrentNodeId() = if (this::typedNode.isInitialized) typedNode.id else null
+
     private fun monitorBusinessAccountExpiry() {
         viewModelScope.launch {
             monitorAccountDetailUseCase().filter { it.levelDetail?.accountType?.isBusinessAccount == true }

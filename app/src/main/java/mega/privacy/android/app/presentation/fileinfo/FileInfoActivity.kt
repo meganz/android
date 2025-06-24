@@ -128,7 +128,9 @@ class FileInfoActivity : BaseActivity() {
             retryConnectionsAndSignalPresence()
             if (viewModel.isAvailableOffline().not()) {
                 val intent = Intent()
-                intent.putExtra(NODE_HANDLE, viewModel.nodeId.longValue)
+                viewModel.getCurrentNodeId()?.let {
+                    intent.putExtra(NODE_HANDLE, it.longValue)
+                }
                 setResult(RESULT_OK, intent)
             }
             finish()
@@ -355,7 +357,7 @@ class FileInfoActivity : BaseActivity() {
                 if (!viewModel.checkAndHandleIsDeviceConnected()) {
                     return@registerForActivityResult
                 }
-                if (result == viewModel.nodeId.longValue) {
+                if (result == viewModel.getCurrentNodeId()?.longValue) {
                     viewModel.deleteHistoryVersions()
                 }
             }
