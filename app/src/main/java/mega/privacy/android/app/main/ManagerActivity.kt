@@ -3602,7 +3602,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
             DrawerItem.CHAT -> {
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
-                hideAdsView()
             }
 
             DrawerItem.TRANSFERS, DrawerItem.NOTIFICATIONS, DrawerItem.BACKUPS -> {
