@@ -20,6 +20,7 @@ import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.Serializable
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.PreferredSlot
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -180,23 +181,124 @@ class MainNavigationScaffoldTest {
         composeTestRule.onNodeWithTag(expected).assertIsDisplayed()
     }
 
+    // Tests for preferred slot ordering logic
+
+    @Test
+    fun test_that_only_first_four_items_and_last_item_are_displayed_when_more_than_four_are_added() {
+
+        val navItems = listOf(
+            createMockNavItem("Home", 1, PreferredSlot.Ordered(1)),
+            createMockNavItem("Chat", 2, PreferredSlot.Ordered(2)),
+            createMockNavItem("Photos", 3, PreferredSlot.Ordered(3)),
+            createMockNavItem("Settings", 4, PreferredSlot.Ordered(4)),
+            createMockNavItem("Extra1", 5, PreferredSlot.Ordered(5)),
+            createMockNavItem("Extra2", 6, PreferredSlot.Ordered(6)),
+            createMockNavItem("Menu", 7, PreferredSlot.Last)
+        ).toImmutableSet()
+        val onDestinationClick: (MainNavItem) -> Unit = mock()
+        val isSelected: (MainNavItem) -> Boolean = { false }
+
+        composeTestRule.setContent {
+            MainNavigationScaffold(
+                mainNavItems = navItems,
+                onDestinationClick = onDestinationClick,
+                isSelected = isSelected,
+                mainNavItemIcon = { mainNavItem ->
+                    TestIcon(mainNavItem)
+                },
+                navContent = {}
+            )
+        }
+
+        // Should display: Home (slot 1), Chat (slot 2), Photos (slot 3), Settings (slot 4), Menu (last)
+        composeTestRule.onNodeWithText("Home").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Chat").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Photos").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Settings").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Menu").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Extra1").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Extra2").assertDoesNotExist()
+
+    }
+
+    @Test
+    fun test_that_all_items_are_displayed_if_only_one_item_and_last_are_passed() {
+        val navItems = listOf(
+            createMockNavItem("Home", 1, PreferredSlot.Ordered(1)),
+            createMockNavItem("Menu", 2, PreferredSlot.Last)
+        ).toImmutableSet()
+        val onDestinationClick: (MainNavItem) -> Unit = mock()
+        val isSelected: (MainNavItem) -> Boolean = { false }
+
+        composeTestRule.setContent {
+            MainNavigationScaffold(
+                mainNavItems = navItems,
+                onDestinationClick = onDestinationClick,
+                isSelected = isSelected,
+                mainNavItemIcon = { mainNavItem ->
+                    TestIcon(mainNavItem)
+                },
+                navContent = {}
+            )
+        }
+
+        // Should display both items: Home (ordered) and Menu (last)
+        composeTestRule.onNodeWithText("Home").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Menu").assertIsDisplayed()
+    }
+
+    @Test
+    fun test_that_five_items_are_displayed_if_five_or_more_items_are_passed_and_no_last_item_is_passed() {
+        val navItems = listOf(
+            createMockNavItem("Home", 1, PreferredSlot.Ordered(1)),
+            createMockNavItem("Chat", 2, PreferredSlot.Ordered(2)),
+            createMockNavItem("Photos", 3, PreferredSlot.Ordered(3)),
+            createMockNavItem("Settings", 4, PreferredSlot.Ordered(4)),
+            createMockNavItem("Extra1", 5, PreferredSlot.Ordered(5))
+        ).toImmutableSet()
+        val onDestinationClick: (MainNavItem) -> Unit = mock()
+        val isSelected: (MainNavItem) -> Boolean = { false }
+
+        composeTestRule.setContent {
+            MainNavigationScaffold(
+                mainNavItems = navItems,
+                onDestinationClick = onDestinationClick,
+                isSelected = isSelected,
+                mainNavItemIcon = { mainNavItem ->
+                    TestIcon(mainNavItem)
+                },
+                navContent = {}
+            )
+        }
+
+        composeTestRule.onNodeWithText("Home").assertIsDisplayed()      // slot 1
+        composeTestRule.onNodeWithText("Chat").assertIsDisplayed()      // slot 2
+        composeTestRule.onNodeWithText("Photos").assertIsDisplayed()    // slot 3
+        composeTestRule.onNodeWithText("Settings").assertIsDisplayed()  // slot 4
+        composeTestRule.onNodeWithText("Extra1").assertIsDisplayed()    // slot 5
+    }
+
     private fun createTestNavItems(): ImmutableSet<MainNavItem> {
         return listOf(
-            createMockNavItem("Home", 1),
-            createMockNavItem("Chat", 2),
-            createMockNavItem("Photos", 3)
+            createMockNavItem("Home", 1, PreferredSlot.Ordered(1)),
+            createMockNavItem("Chat", 2, PreferredSlot.Ordered(2)),
+            createMockNavItem("Photos", 3, PreferredSlot.Last)
         ).toImmutableSet()
     }
 
     private fun createTestNavItemsWithBadge(): ImmutableSet<MainNavItem> {
         return listOf(
-            createMockNavItem("Home", 1),
-            createMockNavItemWithBadge("Chat", 2, "5"),
-            createMockNavItem("Photos", 3)
+            createMockNavItem("Home", 1, PreferredSlot.Ordered(1)),
+            createMockNavItemWithBadge("Chat", 2, "5", PreferredSlot.Ordered(2)),
+            createMockNavItem("Photos", 3, PreferredSlot.Last)
         ).toImmutableSet()
     }
 
-    private fun createMockNavItem(label: String, iconRes: Int): MainNavItem {
+    private fun createMockNavItem(
+        label: String,
+        iconRes: Int,
+        preferredSlot: PreferredSlot,
+    ): MainNavItem {
         return mock<MainNavItem> {
             on { this.label } doReturn label
             on { this.iconRes } doReturn iconRes
@@ -204,6 +306,7 @@ class MainNavigationScaffoldTest {
             on { destinationClass } doReturn TestHomeScreen::class
             on { destination } doReturn TestHomeScreen
             on { screen } doReturn { navigationHandler -> testHomeScreen() }
+            on { this.preferredSlot } doReturn preferredSlot
         }
     }
 
@@ -211,11 +314,13 @@ class MainNavigationScaffoldTest {
         label: String,
         iconRes: Int,
         badgeText: String,
+        preferredSlot: PreferredSlot,
     ): MainNavItem {
         return mock<MainNavItem> {
             on { this.label } doReturn label
             on { this.iconRes } doReturn iconRes
             on { badge } doReturn flowOf(badgeText)
+            on { this.preferredSlot } doReturn preferredSlot
         }
     }
 }

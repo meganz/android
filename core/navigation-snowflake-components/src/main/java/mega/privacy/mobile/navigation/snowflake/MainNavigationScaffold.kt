@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableSet
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationIcon
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationItemBadge
 
@@ -38,6 +39,10 @@ fun MainNavigationScaffold(
     val navSuiteType =
         NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfo())
     val borderColor = DSTokens.colors.border.subtle
+
+    // Order items based on preferredSlot
+    val orderedItems = orderNavigationItems(mainNavItems)
+
     NavigationSuiteScaffoldLayout(
         navigationSuite = {
             NavigationSuite(
@@ -63,7 +68,7 @@ fun MainNavigationScaffold(
                         }
                     }
             ) {
-                mainNavItems.forEach { navItem ->
+                orderedItems.forEach { navItem ->
                     item(
                         icon = {
                             mainNavItemIcon(navItem)
@@ -81,6 +86,27 @@ fun MainNavigationScaffold(
         layoutType = navSuiteType,
         content = navContent
     )
+}
+
+/**
+ * Orders navigation items based on their preferredSlot
+ * - Ordered items are sorted by slot number and take the first available slots
+ * - Last item is placed in the final slot
+ */
+private fun orderNavigationItems(items: ImmutableSet<MainNavItem>): List<MainNavItem> {
+    val orderedItems = items.filter { it.preferredSlot is PreferredSlot.Ordered }
+        .sortedBy { (it.preferredSlot as PreferredSlot.Ordered).slot }
+
+    val lastItem = items.find { it.preferredSlot is PreferredSlot.Last }
+
+    // For now, assume 5 slots for bottom navigation
+    val availableSlots = 5
+
+    return if (lastItem != null) {
+        orderedItems.take(availableSlots - 1) + lastItem
+    } else {
+        orderedItems.take(availableSlots)
+    }
 }
 
 @Composable

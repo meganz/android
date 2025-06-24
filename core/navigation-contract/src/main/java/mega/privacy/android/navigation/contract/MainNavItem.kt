@@ -11,5 +11,6 @@ interface MainNavItem {
     val iconRes: Int
     val badge: Flow<String?>?
     val label: String
+    val preferredSlot: PreferredSlot
 }
 

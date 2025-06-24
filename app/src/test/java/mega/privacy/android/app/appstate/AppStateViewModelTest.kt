@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.navigation.GetStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.PreferredSlot
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -75,6 +76,7 @@ class AppStateViewModelTest {
     fun `test that main destinations are added`() = runTest {
         val mainNavItem = mock<MainNavItem> {
             on { destinationClass }.thenReturn(String::class)
+            on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
         }
         val expected = setOf(mainNavItem)
 
@@ -98,6 +100,7 @@ class AppStateViewModelTest {
         stubDefaultThemeMode()
         val expected = mock<MainNavItem> {
             on { destinationClass }.thenReturn(String::class)
+            on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
         }
         val disabledFeature = mock<Feature>()
         getFeatureFlagValueUseCase.stub {
@@ -108,6 +111,7 @@ class AppStateViewModelTest {
         notExpected.stub {
             on { feature }.thenReturn(disabledFeature)
             (this as? KStubbing<MainNavItem>)?.on { destinationClass }?.thenReturn(String::class)
+            (this as? KStubbing<MainNavItem>)?.on { preferredSlot }?.thenReturn(PreferredSlot.Ordered(2))
         }
         val mainDestinations = setOf(expected, notExpected as MainNavItem)
         val featureDestinations = emptySet<@JvmSuppressWildcards FeatureDestination>()
@@ -127,6 +131,7 @@ class AppStateViewModelTest {
         stubDefaultThemeMode()
         val expected = mock<MainNavItem> {
             on { destinationClass }.thenReturn(String::class)
+            on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
         }
         val enabledFeature = mock<Feature>()
         getFeatureFlagValueUseCase.stub {
@@ -137,6 +142,7 @@ class AppStateViewModelTest {
         alsoExpected.stub {
             on { feature }.thenReturn(enabledFeature)
             (this as? KStubbing<MainNavItem>)?.on { destinationClass }?.thenReturn(String::class)
+            (this as? KStubbing<MainNavItem>)?.on { preferredSlot }?.thenReturn(PreferredSlot.Ordered(2))
         }
         val mainDestinations = setOf(expected, alsoExpected as MainNavItem)
         val featureDestinations = emptySet<@JvmSuppressWildcards FeatureDestination>()
@@ -291,6 +297,7 @@ class AppStateViewModelTest {
 
     private fun stubDefaultMainNavigationItems() = setOf(mock<MainNavItem> {
         on { destinationClass }.thenReturn(String::class)
+        on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
     })
 
 }

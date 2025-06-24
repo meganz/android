@@ -10,6 +10,7 @@ import mega.privacy.android.feature.example.presentation.otherExampleHomeScreen
 import mega.privacy.android.icon.pack.R as IconPack
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.PreferredSlot
 import kotlin.reflect.KClass
 
 class ExampleMainItem : MainNavItem {
@@ -20,6 +21,7 @@ class ExampleMainItem : MainNavItem {
     override val iconRes: Int = IconPack.drawable.ic_cloud
     override val badge: Flow<String?>? = null
     override val label: String = "Demo"
+    override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(1)
 }
 
 class OtherExampleMainItem : MainNavItem {
@@ -37,5 +39,6 @@ class OtherExampleMainItem : MainNavItem {
         }
     }
     override val label: String = "Other"
+    override val preferredSlot: PreferredSlot = PreferredSlot.Last
 }
 
