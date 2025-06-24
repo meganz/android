@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login.confirmemail
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -15,14 +14,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.view.ConfirmEmailRoute
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
+import mega.privacy.android.app.utils.Constants.HELP_CENTRE_HOME_URL
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -79,7 +78,7 @@ class ConfirmEmailFragment : Fragment() {
                         uiState = uiState,
                         onShowPendingFragment = ::onShowPendingFragment,
                         onSetTemporalEmail = ::onSetTemporalEmail,
-                        sendFeedbackEmail = ::sendFeedbackEmail
+                        onNavigateToHelpCentre = { context.launchUrl(HELP_CENTRE_HOME_URL) }
                     )
                 }
             } else if (uiState.isNewRegistrationUiEnabled == false) {
@@ -110,19 +109,5 @@ class ConfirmEmailFragment : Fragment() {
     private fun onCancelConfirmationAccount() {
         Timber.d("cancelConfirmationAccount")
         activityViewModel.cancelCreateAccount()
-    }
-
-    private fun sendFeedbackEmail(email: String) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val emailIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
-                putExtra(Intent.EXTRA_SUBJECT, "Mega Feedback")
-                putExtra(Intent.EXTRA_TEXT, viewModel.generateSupportEmailBody())
-            }
-            val intent = Intent.createChooser(emailIntent, " ")
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-        }
     }
 }

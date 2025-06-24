@@ -61,6 +61,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.spacing.LocalSpacing
+import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -68,7 +69,6 @@ import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailView
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailUiState
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
-import mega.privacy.android.app.utils.Constants.MAIL_SUPPORT
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ChangeEmailAddressButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ResendEmailConfirmationButtonPressedEvent
@@ -86,7 +86,7 @@ fun NavGraphBuilder.confirmEmail(
     onShowPendingFragment: (loginFragmentType: LoginFragmentType) -> Unit,
     onSetTemporalEmail: (email: String) -> Unit,
     onNavigateToChangeEmailAddress: () -> Unit,
-    sendFeedbackEmail: (String) -> Unit,
+    onNavigateToHelpCentre: () -> Unit,
     viewModel: ConfirmEmailViewModel,
 ) {
     composable(confirmEmailRoute) {
@@ -95,7 +95,7 @@ fun NavGraphBuilder.confirmEmail(
             onShowPendingFragment = onShowPendingFragment,
             onSetTemporalEmail = onSetTemporalEmail,
             onNavigateToChangeEmailAddress = onNavigateToChangeEmailAddress,
-            sendFeedbackEmail = sendFeedbackEmail,
+            onNavigateToHelpCentre = onNavigateToHelpCentre,
             viewModel = viewModel
         )
     }
@@ -107,7 +107,7 @@ private fun NewConfirmEmailRoute(
     onShowPendingFragment: (loginFragmentType: LoginFragmentType) -> Unit,
     onSetTemporalEmail: (email: String) -> Unit,
     onNavigateToChangeEmailAddress: () -> Unit,
-    sendFeedbackEmail: (String) -> Unit,
+    onNavigateToHelpCentre: () -> Unit,
     viewModel: ConfirmEmailViewModel = hiltViewModel(),
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
@@ -160,7 +160,7 @@ private fun NewConfirmEmailRoute(
         },
         onNavigateToChangeEmailAddress = onNavigateToChangeEmailAddress,
         snackBarHostState = snackBarHostState,
-        sendFeedbackEmail = sendFeedbackEmail
+        onNavigateToHelpCentre = onNavigateToHelpCentre
     )
 }
 
@@ -172,7 +172,7 @@ internal fun NewConfirmEmailScreen(
     onCancelClick: () -> Unit,
     onResendSignUpLink: (email: String) -> Unit,
     onNavigateToChangeEmailAddress: () -> Unit,
-    sendFeedbackEmail: (String) -> Unit,
+    onNavigateToHelpCentre: () -> Unit,
     snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
@@ -182,6 +182,8 @@ internal fun NewConfirmEmailScreen(
     val isTablet = LocalDeviceType.current == DeviceType.Tablet
     val isPhoneLandscape =
         orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
+    val helpCentre = stringResource(id = sharedR.string.general_help_centre)
+
     MegaScaffold(
         modifier = modifier.semantics { testTagsAsResourceId = true },
         snackbarHost = {
@@ -248,14 +250,14 @@ internal fun NewConfirmEmailScreen(
                         value = String.format(
                             stringResource(sharedR.string.email_confirmation_content),
                             email,
-                            MAIL_SUPPORT
+                            helpCentre
                         ),
                         spanStyles = hashMapOf(
                             SpanIndicator('A') to SpanStyleWithAnnotation(
-                                MegaSpanStyle.TextColorStyle(
+                                MegaSpanStyle.LinkColorStyle(
                                     SpanStyle(),
-                                    TextColor.Secondary
-                                ), MAIL_SUPPORT
+                                    LinkColor.Primary
+                                ), helpCentre
                             ),
                             SpanIndicator('P') to SpanStyleWithAnnotation(
                                 MegaSpanStyle.TextColorStyle(
@@ -266,7 +268,11 @@ internal fun NewConfirmEmailScreen(
                         ),
                         baseStyle = AppTheme.typography.bodyLarge,
                         baseTextColor = TextColor.Secondary,
-                        onAnnotationClick = {}
+                        onAnnotationClick = {
+                            if (it == helpCentre) {
+                                onNavigateToHelpCentre()
+                            }
+                        }
                     )
                 } else {
                     ContentLoading()
@@ -372,7 +378,7 @@ private fun ConfirmEmailScreenPreview() {
             onCancelClick = {},
             onResendSignUpLink = {},
             onNavigateToChangeEmailAddress = {},
-            sendFeedbackEmail = {},
+            onNavigateToHelpCentre = {},
             snackBarHostState = remember { SnackbarHostState() }
         )
     }

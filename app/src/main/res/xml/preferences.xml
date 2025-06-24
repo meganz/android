@@ -210,7 +210,7 @@
 		app:allowDividerBelow="false">
 		<androidx.preference.Preference
 			android:key="settings_help_centre"
-			android:title="@string/settings_help_centre"
+			android:title="@string/general_help_centre"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />

@@ -959,7 +959,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Email confirmation</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, contact [A]%s[/A]</string>
+    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]%s[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Resend</string>
     <!-- General change email address -->
@@ -1289,6 +1289,8 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Current plan</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">Help Centre</string>
     <!-- Warning indicating that the transfer quota limit has been reached -->
     <string name="transfers_transfer_quota_banner_title">Get more transfer quota</string>
     <!-- Warning indicating that the storage quota limit has been reached -->

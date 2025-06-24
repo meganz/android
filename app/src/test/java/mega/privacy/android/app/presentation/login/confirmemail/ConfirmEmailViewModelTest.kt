@@ -15,7 +15,6 @@ import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseC
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.confirmemail.ResendSignUpLinkUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.support.GenerateSupportEmailBodyUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -38,7 +37,6 @@ class ConfirmEmailViewModelTest {
     private val cancelCreateAccountUseCase: CancelCreateAccountUseCase = mock()
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
-    private val generateSupportEmailBodyUseCase: GenerateSupportEmailBodyUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase = mock()
 
@@ -62,7 +60,6 @@ class ConfirmEmailViewModelTest {
             cancelCreateAccountUseCase = cancelCreateAccountUseCase,
             saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            generateSupportEmailBodyUseCase = generateSupportEmailBodyUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorEphemeralCredentialsUseCase = monitorEphemeralCredentialsUseCase
         )
@@ -194,14 +191,6 @@ class ConfirmEmailViewModelTest {
         underTest.uiState.test {
             assertThat(expectMostRecentItem().message).isNull()
         }
-    }
-
-    @Test
-    fun `test that generate support email body returns the correct value`() = runTest {
-        val body = "body"
-        whenever(generateSupportEmailBodyUseCase()) doReturn body
-
-        assertThat(underTest.generateSupportEmailBody()).isEqualTo(body)
     }
 
     @Test

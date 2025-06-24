@@ -20,7 +20,6 @@ import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseC
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.confirmemail.ResendSignUpLinkUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.support.GenerateSupportEmailBodyUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -37,7 +36,6 @@ class ConfirmEmailViewModel @Inject constructor(
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val generateSupportEmailBodyUseCase: GenerateSupportEmailBodyUseCase,
     private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase,
 ) : ViewModel() {
 
@@ -187,15 +185,6 @@ class ConfirmEmailViewModel @Inject constructor(
             }.onFailure { Timber.e(it) }
         }
     }
-
-    /**
-     * Generate the support email body
-     */
-    suspend fun generateSupportEmailBody() = runCatching {
-        generateSupportEmailBodyUseCase()
-    }.onFailure { Timber.e(it) }
-        .getOrNull()
-        .orEmpty()
 
     /**
      * Handle the cancel account creation event
