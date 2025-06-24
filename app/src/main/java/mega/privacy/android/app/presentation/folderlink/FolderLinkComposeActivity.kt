@@ -42,6 +42,7 @@ import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImageNodeFetcher
@@ -56,6 +57,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartT
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.AlertDialogUtil
+import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
@@ -64,6 +66,7 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -238,7 +241,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 onResetMoreOptionNode = viewModel::resetMoreOptionNode,
                 onResetOpenMoreOption = viewModel::resetOpenMoreOption,
                 onStorageStatusDialogDismiss = viewModel::dismissStorageStatusDialog,
-                onStorageDialogActionButtonClick = { viewModel.handleActionClick(this) },
+                onStorageDialogActionButtonClick = { handleActionClick(uiState) },
                 onStorageDialogAchievementButtonClick = ::navigateToAchievements,
                 emptyViewString = getEmptyViewString(),
                 onDisputeTakeDownClicked = this::launchUrl,
@@ -301,6 +304,26 @@ class FolderLinkComposeActivity : PasscodeActivity(),
 
             BackHandler {
                 viewModel.handleBackPress()
+            }
+        }
+    }
+
+    private fun handleActionClick(uiState: FolderLinkState) = lifecycleScope.launch {
+        val email = viewModel.getEmail()
+        uiState.storageStatusDialogState?.accountType?.let { accountType ->
+            viewModel.dismissStorageStatusDialog()
+            when (accountType) {
+                AccountType.PRO_III -> {
+                    AlertsAndWarnings.askForCustomizedPlan(
+                        this@FolderLinkComposeActivity,
+                        email,
+                        accountType
+                    )
+                }
+
+                else -> {
+                    megaNavigator.openUpgradeAccount(context = this@FolderLinkComposeActivity)
+                }
             }
         }
     }

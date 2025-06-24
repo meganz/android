@@ -1,6 +1,5 @@
 package mega.privacy.android.app.myAccount
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,10 +23,10 @@ import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessOrProFl
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.MyAccountUpdate
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -43,6 +42,9 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
     @Inject
     lateinit var fileSizeStringMapper: FileSizeStringMapper
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel: MyAccountViewModel by activityViewModels()
 
@@ -79,7 +81,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
         setupView()
         setupObservers()
         binding.upgradeButton.setOnClickListener {
-            startActivity(Intent(requireActivity(), UpgradeAccountActivity::class.java))
+            megaNavigator.openUpgradeAccount(context = requireActivity())
             viewModel.setOpenUpgradeFrom()
         }
     }

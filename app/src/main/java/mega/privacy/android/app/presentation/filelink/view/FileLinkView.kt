@@ -36,6 +36,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.ads.AdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.nav.megaNavigator
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
 import mega.privacy.android.app.presentation.fileinfo.view.PreviewWithShadow
 import mega.privacy.android.app.presentation.filelink.model.FileLinkJobInProgressState
@@ -45,7 +46,6 @@ import mega.privacy.android.app.presentation.folderlink.view.ExpiredLinkView
 import mega.privacy.android.app.presentation.folderlink.view.ImportDownloadView
 import mega.privacy.android.app.presentation.folderlink.view.UnavailableLinkView
 import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
@@ -220,7 +220,9 @@ internal fun FileLinkView(
             preWarning = it != StorageState.Red,
             overQuotaAlert = true,
             onUpgradeClick = {
-                context.startActivity(Intent(context, UpgradeAccountActivity::class.java))
+                context.megaNavigator.openUpgradeAccount(
+                    context = context,
+                )
             },
             onCustomizedPlanClick = { email, accountType ->
                 AlertsAndWarnings.askForCustomizedPlan(context, email, accountType)

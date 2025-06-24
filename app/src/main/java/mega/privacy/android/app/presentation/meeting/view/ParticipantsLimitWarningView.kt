@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.view
 
 import android.content.Context
-import android.content.Intent
 import android.util.AttributeSet
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
@@ -19,7 +18,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.core.content.withStyledAttributes
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.app.nav.megaNavigator
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
@@ -28,7 +28,6 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnot
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -96,12 +95,7 @@ fun ParticipantsLimitWarningComposeView(
                         ),
                         onAnnotationClick = { annotation ->
                             if (annotation == "upgrade") {
-                                context.startActivity(
-                                    Intent(
-                                        context,
-                                        UpgradeAccountActivity::class.java
-                                    )
-                                )
+                                context.megaNavigator.openUpgradeAccount(context = context)
                             }
                         },
                         baseStyle = MaterialTheme.typography.caption,

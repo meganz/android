@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -35,7 +34,6 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.view.CreateScheduledMeetingView
 import mega.privacy.android.app.presentation.meeting.view.CustomRecurrenceView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.domain.entity.ThemeMode
@@ -43,7 +41,9 @@ import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CreateMeetingMaxDurationReachedEvent
 import mega.privacy.mobile.analytics.event.EditMeetingMaxDurationReachedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingCreateConfirmButtonEvent
@@ -77,6 +77,9 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel by viewModels<CreateScheduledMeetingViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
@@ -289,7 +292,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun openUpgradeAccount() {
         Analytics.tracker.trackEvent(if (viewModel.state.value.type == ScheduledMeetingType.Edition) EditMeetingMaxDurationReachedEvent else CreateMeetingMaxDurationReachedEvent)
-        startActivity(Intent(this, UpgradeAccountActivity::class.java))
+        megaNavigator.openUpgradeAccount(context = this,)
     }
 
     /**

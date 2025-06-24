@@ -1,6 +1,5 @@
 package mega.privacy.android.app.meeting.fragments
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.app.Dialog
 import android.content.Intent
@@ -85,7 +84,6 @@ import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagement
 import mega.privacy.android.app.presentation.meeting.view.SnackbarInMeetingView
 import mega.privacy.android.app.presentation.meeting.view.sheet.LeaveMeetingBottomSheetView
 import mega.privacy.android.app.presentation.meeting.view.sheet.MoreCallOptionsBottomSheetView
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
@@ -119,8 +117,10 @@ import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
@@ -141,6 +141,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     @Inject
     lateinit var chatManagement: ChatManagement
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val callRecordingViewModel: CallRecordingViewModel by activityViewModels()
 
@@ -493,12 +496,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             cancelButtonText = stringResource(id = R.string.meetings_in_call_warning_dialog_negative_button),
                             onConfirm = {
                                 inMeetingViewModel.onMeetingEndWarningDialogDismissed()
-                                context.startActivity(
-                                    Intent(
-                                        context,
-                                        UpgradeAccountActivity::class.java
-                                    )
-                                )
+                                megaNavigator.openUpgradeAccount(context = context)
                             },
                             onDismiss = {
                                 inMeetingViewModel.onMeetingEndWarningDialogDismissed()

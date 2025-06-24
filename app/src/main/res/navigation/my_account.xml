@@ -31,10 +31,6 @@
             app:destination="@+id/change_password" />
 
         <action
-            android:id="@+id/action_my_account_to_upgrade"
-            app:destination="@+id/upgrade" />
-
-        <action
             android:id="@+id/action_my_account_to_achievements"
             app:destination="@+id/achievements" />
 
@@ -62,11 +58,6 @@
     <activity
         android:id="@+id/change_password"
         android:name="mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity" />
-
-    <activity
-        android:id="@+id/upgrade"
-        android:name="mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity"
-        tools:layout="@layout/activity_upgrade_account" />
 
     <activity
         android:id="@+id/achievements"

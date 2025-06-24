@@ -10,7 +10,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.app.nav.megaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
@@ -18,7 +19,6 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnot
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.resources.R
 
 /**
@@ -33,9 +33,7 @@ internal fun NotEnoughSpaceForUploadDialog(
     val context = LocalContext.current
     NotEnoughSpaceForUploadDialog(
         onUpgrade = {
-            context.startActivity(
-                Intent(context, UpgradeAccountActivity::class.java)
-            )
+            context.megaNavigator.openUpgradeAccount(context = context)
         },
         onCancel = onCancel,
         modifier = modifier,

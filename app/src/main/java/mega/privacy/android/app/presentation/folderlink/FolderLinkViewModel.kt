@@ -23,15 +23,13 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.snackBarMessageId
-import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
+import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.textEditor.TextEditorViewModel
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
-import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product
@@ -986,23 +984,11 @@ class FolderLinkViewModel @Inject constructor(
     }
 
     /**
-     * Handle action click on StorageStatusDialog
+     * Get current user email
      */
-    fun handleActionClick(context: Context) = viewModelScope.launch {
-        val email = getCurrentUserEmail() ?: ""
-        state.value.storageStatusDialogState?.accountType?.let { accountType ->
-            dismissStorageStatusDialog()
-            when (accountType) {
-                AccountType.PRO_III -> {
-                    AlertsAndWarnings.askForCustomizedPlan(context, email, accountType)
-                }
-
-                else -> {
-                    context.startActivity(Intent(context, UpgradeAccountActivity::class.java))
-                }
-            }
-        }
-    }
+    suspend fun getEmail() = runCatching { getCurrentUserEmail() }
+        .onFailure { Timber.e(it) }
+        .getOrDefault("")
 
     /**
      * Reset finishActivityEvent when consumed

@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.meeting
 
-import mega.privacy.android.shared.resources.R as sharedR
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -23,12 +21,13 @@ import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingInfoView
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.EditSingleOccurrenceMeetingMaxDurationReachedEvent
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
@@ -41,7 +40,8 @@ import javax.inject.Inject
  * Activity which shows occurrences of recurring meeting.
  *
  * @property getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
- * @property monitorThemeModeUseCase               [MonitorThemeModeUseCase]
+ * @property monitorThemeModeUseCase               [MonitorThemeModeUseCase]\
+ * @property megaNavigator [MegaNavigator]
  */
 @AndroidEntryPoint
 class RecurringMeetingInfoActivity : PasscodeActivity() {
@@ -50,6 +50,10 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
     private val viewModel by viewModels<RecurringMeetingInfoViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
     private var materialDatePicker: MaterialDatePicker<Long>? = null
@@ -158,7 +162,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
      */
     private fun openUpgradeAccount() {
         Analytics.tracker.trackEvent(EditSingleOccurrenceMeetingMaxDurationReachedEvent)
-        startActivity(Intent(this, UpgradeAccountActivity::class.java))
+        megaNavigator.openUpgradeAccount(context = this)
     }
 
     /**

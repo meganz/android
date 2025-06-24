@@ -1,7 +1,6 @@
 package mega.privacy.android.app.activities.settingsActivities
 
 import android.content.DialogInterface
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -16,13 +15,17 @@ import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FileManagementPreferencesActivity : PreferencesBaseActivity() {
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel: FilePreferencesViewModel by viewModels()
     private var sttFileManagement: SettingsFileManagementFragment? = null
@@ -130,7 +133,7 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
         firstButton.text = getFormattedStringOrDefault(R.string.button_plans_almost_full_warning)
         firstButton.setOnClickListener {
             generalDialog?.dismiss()
-            startActivity(Intent(this, UpgradeAccountActivity::class.java))
+            megaNavigator.openUpgradeAccount(context = this)
             myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.SETTINGS
         }
         val secondButton = binding.findViewById<Button>(R.id.dialog_second_button)

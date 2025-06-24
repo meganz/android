@@ -12,9 +12,9 @@ import androidx.compose.runtime.getValue
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.HiddenNodeOnboardingCloseButtonPressedEvent
 import mega.privacy.mobile.analytics.event.HiddenNodeOnboardingContinueButtonPressedEvent
@@ -26,6 +26,9 @@ import javax.inject.Inject
 class HiddenNodesOnboardingActivity : AppCompatActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val isOnboarding: Boolean by lazy(LazyThreadSafetyMode.NONE) {
         intent.getBooleanExtra(IS_ONBOARDING, false)
@@ -59,8 +62,7 @@ class HiddenNodesOnboardingActivity : AppCompatActivity() {
         if (isOnboarding) {
             setResult(RESULT_OK)
         } else {
-            val intent = Intent(this, UpgradeAccountActivity::class.java)
-            startActivity(intent)
+            megaNavigator.openUpgradeAccount(context = this)
         }
 
         finish()

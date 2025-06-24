@@ -27,6 +27,7 @@ import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountSource
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.Constants
@@ -122,10 +123,15 @@ internal class MegaNavigatorImpl @Inject constructor(
             val isUpgradeAccountRevampEnabled =
                 getFeatureFlagValueUseCase(AppFeatures.UpdateAccountRevamp)
             if (isUpgradeAccountRevampEnabled) {
-                ChooseAccountActivity.navigateToUpgradeAccount(context, isFromAdsFree)
+                ChooseAccountActivity.navigateToUpgradeAccount(
+                    context = context,
+                    isFromAdsFree = isFromAdsFree
+                )
             } else {
-                val intent = Intent(context, UpgradeAccountActivity::class.java)
-                context.startActivity(intent)
+                UpgradeAccountActivity.navigate(
+                    context = context,
+                    source = if (isFromAdsFree) UpgradeAccountSource.ADS_FREE_SCREEN else UpgradeAccountSource.UNKNOWN
+                )
             }
         }
     }

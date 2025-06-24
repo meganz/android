@@ -50,7 +50,6 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.logout.LogoutViewModel
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
 import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError
@@ -71,6 +70,7 @@ import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CancelSubscriptionMenuToolbarEvent
@@ -82,7 +82,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MyAccountActivity : PasscodeActivity(),
+internal class MyAccountActivity : PasscodeActivity(),
     SnackbarShower {
 
     companion object {
@@ -104,6 +104,10 @@ class MyAccountActivity : PasscodeActivity(),
      */
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
     private val isBusinessAccount
         get() = viewModel.state.value.isBusinessAccount
 
@@ -195,10 +199,7 @@ class MyAccountActivity : PasscodeActivity(),
     private fun manageIntentExtras() {
         val accountType = intent.getIntExtra(EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
         if (accountType != INVALID_VALUE) {
-            startActivity(
-                Intent(this, UpgradeAccountActivity::class.java)
-                    .putExtra(EXTRA_ACCOUNT_TYPE, accountType)
-            )
+            megaNavigator.openUpgradeAccount(this)
 
             viewModel.setOpenUpgradeFrom()
 
@@ -310,7 +311,7 @@ class MyAccountActivity : PasscodeActivity(),
             R.id.action_export_MK -> navController.navigate(R.id.action_my_account_to_export_recovery_key)
             R.id.action_refresh -> viewModel.refresh(this)
             R.id.action_upgrade_account -> {
-                navController.navigate(R.id.action_my_account_to_upgrade)
+                megaNavigator.openUpgradeAccount(context = this)
                 viewModel.setOpenUpgradeFrom()
             }
 
