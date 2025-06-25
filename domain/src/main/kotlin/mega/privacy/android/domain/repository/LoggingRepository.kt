@@ -17,12 +17,6 @@ interface LoggingRepository {
     fun enableLogAllToConsole(isDebugBuild: Boolean)
 
     /**
-     * Reset sdk logging
-     *
-     */
-    fun resetSdkLogging()
-
-    /**
      * Get sdk logging flow
      *
      */

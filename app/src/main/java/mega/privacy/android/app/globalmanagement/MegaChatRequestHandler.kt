@@ -13,7 +13,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.ResetSdkLoggerUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFinishActivityUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -49,7 +48,6 @@ class MegaChatRequestHandler @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     private val broadcastFinishActivityUseCase: BroadcastFinishActivityUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
-    private val resetSdkLoggerUseCase: ResetSdkLoggerUseCase,
 ) : MegaChatRequestListenerInterface {
     private var isLoggingRunning = false
 
@@ -90,7 +88,6 @@ class MegaChatRequestHandler @Inject constructor(
             Timber.d("CHAT_TYPE_LOGOUT: %d__%s", e.errorCode, e.errorString)
             resetDefaults()
             MegaApplication.getInstance().disableMegaChatApi()
-            resetSdkLoggerUseCase()
             val loggedState: Int = megaApi.isLoggedIn
             Timber.d("Login status on %s", loggedState)
             if (loggedState == 0) {

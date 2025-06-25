@@ -102,7 +102,6 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
-import mega.privacy.android.domain.usecase.ResetSdkLoggerUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorSslVerificationFailedUseCase
@@ -153,9 +152,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
-
-    @Inject
-    lateinit var resetSdkLoggerUseCase: ResetSdkLoggerUseCase
 
     @Inject
     lateinit var getAccountDetailsUseCase: GetAccountDetailsUseCase
@@ -820,9 +816,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         when (accountBlockedDetail.type) {
             AccountBlockedType.NOT_BLOCKED -> {}
             AccountBlockedType.TOS_COPYRIGHT -> megaChatApi.logout(
-                ChatLogoutListener(
-                    resetSdkLoggerUseCase
-                ) {
+                ChatLogoutListener {
                     showAccountBlockedDialog(
                         AccountBlockedType.TOS_COPYRIGHT,
                         getString(sharedR.string.dialog_account_suspended_ToS_copyright_message)
@@ -831,9 +825,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             )
 
             AccountBlockedType.TOS_NON_COPYRIGHT -> megaChatApi.logout(
-                ChatLogoutListener(
-                    resetSdkLoggerUseCase
-                ) {
+                ChatLogoutListener {
                     showAccountBlockedDialog(
                         AccountBlockedType.TOS_NON_COPYRIGHT,
                         getString(sharedR.string.dialog_account_suspended_ToS_non_copyright_message)
@@ -842,9 +834,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             )
 
             AccountBlockedType.SUBUSER_DISABLED -> megaChatApi.logout(
-                ChatLogoutListener(
-                    resetSdkLoggerUseCase
-                ) {
+                ChatLogoutListener {
                     showAccountBlockedDialog(
                         AccountBlockedType.SUBUSER_DISABLED,
                         getString(sharedR.string.error_business_disabled)
@@ -853,9 +843,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             )
 
             AccountBlockedType.SUBUSER_REMOVED -> megaChatApi.logout(
-                ChatLogoutListener(
-                    resetSdkLoggerUseCase,
-                ) {
+                ChatLogoutListener {
                     showAccountBlockedDialog(
                         AccountBlockedType.SUBUSER_REMOVED,
                         getString(sharedR.string.error_business_removed)
@@ -1085,7 +1073,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
             if (state == MegaChatApi.INIT_ERROR) {
                 // The megaChatApi cannot be recovered, then logout
-                megaChatApi.logout(ChatLogoutListener(resetSdkLoggerUseCase))
+                megaChatApi.logout(ChatLogoutListener())
                 return true
             }
         }

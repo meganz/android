@@ -88,11 +88,6 @@ internal class TimberLoggingRepository @Inject constructor(
         }
     }
 
-    override fun resetSdkLogging() {
-        MegaApiAndroid.removeLoggerObject(megaSdkLogger)
-        MegaApiAndroid.addLoggerObject(megaSdkLogger)
-    }
-
     override fun getSdkLoggingFlow(): Flow<LogEntry> = sdkLogFlowTree
         .logFlow
         .onSubscription {
