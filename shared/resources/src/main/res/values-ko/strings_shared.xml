@@ -943,7 +943,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">이메일 확인</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">우리가 [P]%s[/P]로 링크가 있는 이메일을 보냈습니다. 당신의 이메일 주소를 확인하고 계정을 활성화하려면 링크를 탭하세요.\n\n만약 이메일을 받지 못 했다면 스팸 폴더를 확인하거나 다시 시도하세요. 다른 문제가 있다면 [A]%s[/A]로 연락하세요</string>
+    <string name="email_confirmation_content">우리가 [P]%s[/P]로 링크가 있는 이메일을 보냈습니다. 당신의 이메일 주소를 확인하고 계정을 활성화하려면 링크를 탭하세요.\n\n만약 이메일을 받지 못 했다면 스팸 폴더를 확인하거나 다시 시도하세요. 다른 문제가 있다면 [A]%s[/A]에 방문하세요.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">재발송</string>
     <!-- General change email address -->
@@ -1272,4 +1272,12 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">현재 요금제</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
+    <!-- Warning indicating that the transfer quota limit has been reached -->
+    <string name="transfers_transfer_quota_banner_title">더 많은 전송 할당량 받기</string>
+    <!-- Warning indicating that the storage quota limit has been reached -->
+    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
+    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">고객센터</string>
 </resources>

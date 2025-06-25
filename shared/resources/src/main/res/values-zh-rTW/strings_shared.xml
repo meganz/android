@@ -943,7 +943,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">電子郵件確認</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">我們已向[P]%s[/P]發送了一封帶有連結的電子郵件。點擊連結以驗證您的電子郵件地址並啟動您的帳戶。\n\n如果您沒有收到電子郵件，請檢查您的垃圾郵件資料夾或重試。如有任何其它問題，請聯繫[A]%s[/A]</string>
+    <string name="email_confirmation_content">我們已向[P]%s[/P]發送了一封內含連結的電子郵件。點擊連結以驗證您的電子郵件地址並啟動您的帳戶。\n\n如果您沒有收到該電子郵件，請檢查您的垃圾郵件資料夾或重試。如有任何其它問題，請前往我們的[A]%s[/A]。</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">重新發送</string>
     <!-- General change email address -->
@@ -1272,4 +1272,12 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">目前方案</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">您的成就狀態目前無法顯示。請稍後重試。</string>
+    <!-- Warning indicating that the transfer quota limit has been reached -->
+    <string name="transfers_transfer_quota_banner_title">獲取更多傳輸配額</string>
+    <!-- Warning indicating that the storage quota limit has been reached -->
+    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
+    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">幫助中心</string>
 </resources>

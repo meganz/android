@@ -943,7 +943,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">电子邮件确认</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">我们向[P]%s[/P]发送了一封带有链接的电子邮件。点按链接以验证您的电子邮件地址并激活您的帐户。\n\n如果您没有收到电子邮件，请检查您的垃圾邮件文件夹或重试。如有任何其它问题，请联系[A]%s[/A]</string>
+    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]%s[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">重新发送</string>
     <!-- General change email address -->
@@ -1273,4 +1273,12 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">当前方案</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
+    <!-- Warning indicating that the transfer quota limit has been reached -->
+    <string name="transfers_transfer_quota_banner_title">获取更多流量</string>
+    <!-- Warning indicating that the storage quota limit has been reached -->
+    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
+    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">帮助中心</string>
 </resources>

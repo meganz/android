@@ -991,7 +991,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Подтверждение электронной почты</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">Мы отправили письмо со ссылкой на [P]%s[/P]. Перейдите по ссылке, чтобы подтвердить адрес электронной почты и активировать аккаунт.\n\nЕсли вы не получили письмо, проверьте папку со спамом или повторите попытку. По любым другим вопросам пишите на [A]%s[/A]</string>
+    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]%s[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Выслать повторно</string>
     <!-- General change email address -->
@@ -1323,4 +1323,12 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Текущий план</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">Статус ваших достижений в настоящее время недоступен. Попробуйте позже.</string>
+    <!-- Warning indicating that the transfer quota limit has been reached -->
+    <string name="transfers_transfer_quota_banner_title">Увеличить квоту на передачу</string>
+    <!-- Warning indicating that the storage quota limit has been reached -->
+    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
+    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">Справочный центр</string>
 </resources>

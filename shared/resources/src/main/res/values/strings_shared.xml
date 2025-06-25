@@ -1289,12 +1289,12 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Current plan</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
-    <!-- Title for help centre -->
-    <string name="general_help_centre">Help Centre</string>
     <!-- Warning indicating that the transfer quota limit has been reached -->
     <string name="transfers_transfer_quota_banner_title">Get more transfer quota</string>
     <!-- Warning indicating that the storage quota limit has been reached -->
     <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
     <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">Help Centre</string>
 </resources>

@@ -975,7 +975,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Email de confirmação</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">Enviamos um email com um link para [P]%s[/P]. Acesse o link para verificar o seu email e ativar a sua conta.\n\nSe você não tiver recebido o email, verifique a sua pasta de spam ou tente novamente. Para qualquer outro problema, entre em contato com [A]%s[/A]</string>
+    <string name="email_confirmation_content">Enviamos um email com um link para [P]%s[/P]. Acesse o link para verificar o seu email e ativar a sua conta.\n\nSe você não tiver recebido o email, verifique a sua pasta de spam ou tente novamente. Para qualquer outro problema, acessse a nossa [A]%s[/A]</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Reenviar</string>
     <!-- General change email address -->
@@ -1306,4 +1306,12 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Plano atual</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">O status das suas Conquistas não está disponível no momento. Tente novamente mais tarde.</string>
+    <!-- Warning indicating that the transfer quota limit has been reached -->
+    <string name="transfers_transfer_quota_banner_title">Obter mais cota de transferência</string>
+    <!-- Warning indicating that the storage quota limit has been reached -->
+    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
+    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">Central de ajuda</string>
 </resources>

@@ -959,7 +959,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">E-posta onayı</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">[P]%s[/P] adresine bir bağlantı içeren bir e-posta gönderdik. E-posta adresinizi doğrulamak ve hesabınızı etkinleştirmek için lütfen bağlantıya dokunun.\n\nE-postayı almadıysanız, spam klasörünüzü kontrol edin veya tekrar deneyin. Diğer sorunlar için [A]%s[/A] ile iletişime geçin</string>
+    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]%s[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Yeniden gönder</string>
     <!-- General change email address -->
@@ -1289,4 +1289,12 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Mevcut plan</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">Başarılarınızın durumu şu anda kullanılamıyor. Daha sonra tekrar deneyin.</string>
+    <!-- Warning indicating that the transfer quota limit has been reached -->
+    <string name="transfers_transfer_quota_banner_title">Daha fazla aktarım kotası alın</string>
+    <!-- Warning indicating that the storage quota limit has been reached -->
+    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
+    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">Yardım Merkezi</string>
 </resources>

@@ -959,7 +959,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">E-Mail-Bestätigung</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">Wir haben eine E-Mail mit einem Link an [P]%s[/P] gesendet. Tippen Sie auf den Link, um Ihre E-Mail-Adresse zu bestätigen und Ihren Account zu aktivieren. \n\nWenn Sie die E-Mail nicht erhalten haben, überprüfen Sie Ihren Spam-Ordner oder versuchen Sie es erneut. Bei allen anderen Fragen wenden Sie sich an [A]%s[/A]</string>
+    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]%s[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Erneut senden</string>
     <!-- General change email address -->
@@ -1289,4 +1289,12 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Aktiv</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">Der Status Ihrer Boni ist derzeit nicht verfügbar. Versuchen Sie es später erneut.</string>
+    <!-- Warning indicating that the transfer quota limit has been reached -->
+    <string name="transfers_transfer_quota_banner_title">Erhöhen Sie Ihr verfügbares Übertragungsvolumen</string>
+    <!-- Warning indicating that the storage quota limit has been reached -->
+    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
+    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">Hilfecenter</string>
 </resources>

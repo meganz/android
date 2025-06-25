@@ -975,7 +975,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Confirmación por correo</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">Se te ha enviado un correo a [P]%s[/P] con un enlace. Toca en el enlace para verificar tu dirección de correo y así activar tu cuenta. \n\nSi no recibes ese correo electrónico, revisa tu carpeta de spam o prueba de nuevo. Para cualquier otro problema, contacta con [A]%s[/A]</string>
+    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]%s[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Reenviar</string>
     <!-- General change email address -->
@@ -1306,4 +1306,12 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Plan actual</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">El estado de tus logros no está disponible en este momento. Vuelve a intentarlo más tarde.</string>
+    <!-- Warning indicating that the transfer quota limit has been reached -->
+    <string name="transfers_transfer_quota_banner_title">Obtén más cuota de transferencia</string>
+    <!-- Warning indicating that the storage quota limit has been reached -->
+    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
+    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">Centro de ayuda</string>
 </resources>

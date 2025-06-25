@@ -943,7 +943,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Xác nhận email</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">Chúng&#160;tôi đã gửi một email đến [P]%s[/P] với đường liên&#160;kết. Nhấn vào đường liên&#160;kết để xác&#160;thực địa&#160;chỉ email của bạn và để kích&#160;hoạt tài&#160;khoản. \n\nNếu bạn không nhận được email, hãy kiểm&#160;tra thư&#160;mục thư rác của bạn hoặc thử lại. Bất kỳ vấn&#160;đề nào khác, xin liên&#160;hệ [A]%s[/A]</string>
+    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]%s[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Gửi lại</string>
     <!-- General change email address -->
@@ -1273,4 +1273,12 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Hạng hiện tại</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
+    <!-- Warning indicating that the transfer quota limit has been reached -->
+    <string name="transfers_transfer_quota_banner_title">Tăng hạn mức truyền tải</string>
+    <!-- Warning indicating that the storage quota limit has been reached -->
+    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
+    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">Trung&#160;Tâm Hướng&#160;Dẫn</string>
 </resources>

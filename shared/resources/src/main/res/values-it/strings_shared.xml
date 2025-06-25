@@ -973,7 +973,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Conferma dell\’email</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">Abbiamo inviato un\’email a [P]%s[/P] con un link. Tocca sul link per verificare il tuo indirizzo email e attivare il tuo account.\n\nSe non hai ricevuto l\’email, controlla la tua cartella Spam o riprova. Per qualsiasi altro problema, per favore contatta [A]%s[/A]</string>
+    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]%s[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Reinvia</string>
     <!-- General change email address -->
@@ -1303,4 +1303,12 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Piano corrente</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
+    <!-- Warning indicating that the transfer quota limit has been reached -->
+    <string name="transfers_transfer_quota_banner_title">Ottieni più quota di trasferimento</string>
+    <!-- Warning indicating that the storage quota limit has been reached -->
+    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
+    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">Assistenza</string>
 </resources>

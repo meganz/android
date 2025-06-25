@@ -943,7 +943,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">メールのご確認</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">[P]%s[/P]にリンクを記載したメールを送信いたしました。リンクをタップしてメールアドレスを認証し、アカウントを有効にしてください。\n\nメールが届かない場合は、迷惑メールフォルダをご確認いただくか、もう一度お試しください。その他の問題については、[A]%s[/A]までご連絡ください。</string>
+    <string name="email_confirmation_content">[P]%s[/P]にリンクを記載したメールを送信いたしました。リンクをタップしてメールアドレスを認証し、アカウントを有効にしてください。\n\nメールが届かない場合は、迷惑メールフォルダをご確認いただくか、もう一度お試しください。その他の問題については、[A]%s[/A]をご覧ください。</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">再送</string>
     <!-- General change email address -->
@@ -1272,4 +1272,12 @@
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">現在のプラン</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">実績のステータスは現在確認できません。 後でもう一度お試しください。</string>
+    <!-- Warning indicating that the transfer quota limit has been reached -->
+    <string name="transfers_transfer_quota_banner_title">転送容量を増やす</string>
+    <!-- Warning indicating that the storage quota limit has been reached -->
+    <string name="transfers_storage_quota_banner_title">ストレージ容量を増やしてください</string>
+    <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
+    <string name="transfers_storage_and_transfer_quota_banner_title">ストレージと転送容量を増やしてください</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">ヘルプセンター</string>
 </resources>

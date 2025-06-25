@@ -975,7 +975,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Confirmation par courriel</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">Nous avons envoyé un courriel avec un lien à [P]%s[/P]. Touchez le lien pour confirmer votre adresse courriel et activer votre compte.\n\nSi vous n’avez pas reçu le courriel, vérifiez votre dossier de pourriel (indésirables) ou réessayez. Pour tout autre problème, contactez [A]%s[/A]</string>
+    <string name="email_confirmation_content">Nous avons envoyé un e-mail à [P]%s[/P] avec un lien. Cliquez sur le lien pour vérifier votre adresse e-mail et activer votre compte. \n\nSi vous n\’avez pas reçu l\’e-mail, vérifiez votre dossier spam ou réessayez. Pour tout autre problème, veuillez consulter notre [A]%s[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Renvoyer</string>
     <!-- General change email address -->
@@ -1305,5 +1305,13 @@
     <!-- Label for the current plan badge in the pro plan card -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Abonnement actuel</string>
     <!-- Error message when achievements status is unavailable -->
-    <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
+    <string name="achievement_status_unavailable">Le statut de vos accomplissements n\’est actuellement pas disponible. Veuillez réessayer plus tard.</string>
+    <!-- Warning indicating that the transfer quota limit has been reached -->
+    <string name="transfers_transfer_quota_banner_title">Obtenir plus de quota de transfert</string>
+    <!-- Warning indicating that the storage quota limit has been reached -->
+    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
+    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <!-- Title for help centre -->
+    <string name="general_help_centre">Centre d’assistance</string>
 </resources>
