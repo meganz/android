@@ -33,7 +33,7 @@ enum class SyncFeatures(
      */
     DisableBatteryOptimization(
         "Add Warning for Disable Battery Optimization",
-        false,
+        true,
     );
 
     companion object : FeatureFlagValueProvider {
