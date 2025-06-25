@@ -26,7 +26,6 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.util.Pair;
 import android.widget.ImageView;
 
@@ -347,22 +346,6 @@ public class AvatarUtil {
         }
 
         return bitmap;
-    }
-
-    /**
-     * Gets the Uri of an avatar file given the File.
-     *
-     * @param avatar Avatar file.
-     * @return The Uri of the avatar if available.
-     */
-    public static Uri getAvatarUri(File avatar) {
-        Uri uri = null;
-
-        if (isFileAvailable(avatar) && avatar.length() > 0) {
-            uri = Uri.fromFile(avatar);
-        }
-
-        return uri;
     }
 
     /**

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.utils
 
 import dagger.hilt.android.EntryPointAccessors
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.EntryPointsModule
 import mega.privacy.android.data.gateway.CacheFolderGateway
@@ -9,6 +8,8 @@ import java.io.File
 
 /**
  * CacheFolder Manager
+ *
+ * Call to corresponding [CacheRepository] to perform operations related to cache folders.
  */
 object CacheFolderManager {
     /**
@@ -58,13 +59,6 @@ object CacheFolderManager {
     fun getCacheFolder(folderName: String): File? = cacheFolderGateway.getCacheFolder(folderName)
 
     /**
-     * Get Cache Folder given folder Name
-     */
-    @JvmStatic
-    suspend fun getCacheFolderAsync(folderName: String) =
-        cacheFolderGateway.getCacheFolderAsync(folderName)
-
-    /**
      * Create Cache Folders
      */
     @JvmStatic
@@ -76,30 +70,6 @@ object CacheFolderManager {
             createCacheFolder(QR_FOLDER)
             createCacheFolder(VOICE_CLIP_FOLDER)
         }
-    }
-
-    /**
-     * Get QR Cache File Instance
-     */
-    @JvmStatic
-    fun buildQrFile(fileName: String?): File? {
-        return cacheFolderGateway.getCacheFile(QR_FOLDER, fileName)
-    }
-
-    /**
-     * Get Preview Cache File Instance
-     */
-    @JvmStatic
-    fun buildPreviewFile(fileName: String?): File? {
-        return cacheFolderGateway.getCacheFile(PREVIEW_FOLDER, fileName)
-    }
-
-    /**
-     * Get Thumbnail Cache File Instance
-     */
-    @JvmStatic
-    fun buildThumbnailFile(fileName: String?): File? {
-        return cacheFolderGateway.getCacheFile(THUMBNAIL_FOLDER, fileName)
     }
 
     /**
@@ -132,31 +102,5 @@ object CacheFolderManager {
     @JvmStatic
     fun getCacheFile(folderName: String, fileName: String?): File? {
         return cacheFolderGateway.getCacheFile(folderName, fileName)
-    }
-
-    /**
-     * Get Cache File Instance given folderName & fileName
-     */
-    @JvmStatic
-    suspend fun getCacheFileAsync(folderName: String, fileName: String?) =
-        cacheFolderGateway.getCacheFileAsync(folderName, fileName)
-
-    /**
-     * Clear Cache
-     */
-    @JvmStatic
-    fun clearCache() {
-        runBlocking { cacheFolderGateway.clearCache() }
-    }
-
-
-    /**
-     *  Deletes the Cache folder if it is empty
-     *
-     *  @param folderName Name of the folder
-     */
-    @JvmStatic
-    fun deleteCacheFolderIfEmpty(folderName: String) {
-        cacheFolderGateway.deleteCacheFolderIfEmpty(folderName)
     }
 }

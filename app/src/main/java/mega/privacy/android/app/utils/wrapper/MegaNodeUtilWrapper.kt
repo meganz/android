@@ -53,14 +53,6 @@ interface MegaNodeUtilWrapper {
     fun showTakenDownNodeActionNotAvailableDialog(node: MegaNode?, context: Context): Boolean
 
     /**
-     * Gets the path of a folder.
-     *
-     * @param nodeFolder  MegaNode to get its path
-     * @return The path of the of the folder.
-     */
-    fun getNodeFolderPath(nodeFolder: MegaNode?): String
-
-    /**
      *
      * Shares a node.
      *
@@ -189,14 +181,6 @@ interface MegaNodeUtilWrapper {
      * @return whether the node is in rubbish
      */
     fun isNodeInRubbishOrDeleted(handle: Long): Boolean
-
-    /**
-     * Check if all nodes can be moved to rubbish bin.
-     *
-     * @param nodes nodes to check
-     * @return whether all nodes can be moved to rubbish bin
-     */
-    fun canMoveToRubbish(nodes: List<MegaNode?>): Boolean
 
     /**
      * Check if all nodes are file nodes and not taken down.
@@ -499,15 +483,6 @@ interface MegaNodeUtilWrapper {
      * @return The type of MyBackup folder, if the folder is not belong to the "My Backups" folder, return BACKUP_NONE
      */
     fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, node: MegaNode?): Int
-
-
-    /**
-     * Contains media file
-     *
-     * @param handle
-     * @return
-     */
-    fun containsMediaFile(handle: Long): Boolean
 
     /**
      * Setup streaming server

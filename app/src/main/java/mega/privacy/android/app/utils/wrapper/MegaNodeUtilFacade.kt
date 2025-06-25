@@ -53,9 +53,6 @@ class MegaNodeUtilFacade @Inject constructor(
         context: Context,
     ) = MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(node, context)
 
-    override fun getNodeFolderPath(nodeFolder: MegaNode?) =
-        MegaNodeUtil.getNodeFolderPath(nodeFolder)
-
     override fun shareNode(context: Context, node: MegaNode?) {
         MegaNodeUtil.shareNode(context, node)
     }
@@ -99,8 +96,6 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun isNodeInRubbishOrDeleted(handle: Long) =
         MegaNodeUtil.isNodeInRubbishOrDeleted(handle)
-
-    override fun canMoveToRubbish(nodes: List<MegaNode?>) = MegaNodeUtil.canMoveToRubbish(nodes)
 
     override fun areAllFileNodesAndNotTakenDown(nodes: List<MegaNode>) =
         MegaNodeUtil.areAllFileNodesAndNotTakenDown(nodes)
@@ -294,8 +289,6 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, node: MegaNode?) =
         MegaNodeUtil.checkBackupNodeTypeByHandle(megaApi, node)
-
-    override fun containsMediaFile(handle: Long) = MegaNodeUtil.containsMediaFile(handle)
 
     override fun setupStreamingServer() {
         runBlocking { launchStreamingServer() }

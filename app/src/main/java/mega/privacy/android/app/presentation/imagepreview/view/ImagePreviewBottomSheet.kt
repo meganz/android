@@ -42,7 +42,6 @@ import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.view.extension.fileInfo
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode

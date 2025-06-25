@@ -1,16 +1,16 @@
 package mega.privacy.android.app.contacts.mapper
 
-import mega.privacy.android.app.contacts.list.data.ContactItem as UIContactItem
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.contacts.list.data.ContactItem as UIContactItem
 import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.view.TextDrawable
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -88,6 +88,14 @@ internal class ContactItemDataMapper(
         }
     }
 
+    @ColorRes
+    private fun getUserStatusColor(userStatus: Int): Int =
+        when (userStatus) {
+            MegaChatApi.STATUS_AWAY -> R.color.orange_400
+            MegaChatApi.STATUS_ONLINE -> R.color.lime_green_500
+            MegaChatApi.STATUS_BUSY -> R.color.salmon_700
+            else -> R.color.grey_700
+        }
 }
 
 private fun getImagePlaceholder(

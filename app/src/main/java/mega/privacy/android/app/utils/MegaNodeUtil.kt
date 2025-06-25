@@ -1,6 +1,5 @@
 package mega.privacy.android.app.utils
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -49,12 +48,10 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
-import mega.privacy.android.app.utils.Constants.SEPARATOR
 import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -74,6 +71,7 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -132,48 +130,6 @@ object MegaNodeUtil {
             true
         } else {
             false
-        }
-    }
-
-    /**
-     * Gets the path of a folder.
-     *
-     * @param nodeFolder  MegaNode to get its path
-     * @return The path of the of the folder.
-     */
-    @JvmStatic
-    fun getNodeFolderPath(nodeFolder: MegaNode?): String {
-        if (nodeFolder == null) {
-            Timber.w("Node is null, cannot get its path.")
-            return ""
-        }
-
-        val app = MegaApplication.getInstance()
-        val megaApi = app.megaApi
-        val path = megaApi.getNodePath(nodeFolder)
-
-        var rootParent = nodeFolder
-
-        while (megaApi.getParentNode(rootParent) != null) {
-            rootParent = megaApi.getParentNode(rootParent)
-        }
-
-        return when {
-            rootParent!!.handle == megaApi.rootNode?.handle -> {
-                return app.getString(R.string.section_cloud_drive) + path
-            }
-
-            rootParent.handle == megaApi.rubbishNode?.handle -> {
-                return app.getString(R.string.section_rubbish_bin) +
-                        path?.replace("bin$SEPARATOR", "")
-            }
-
-            nodeFolder.isInShare -> {
-                return app.getString(R.string.title_incoming_shares_explorer) +
-                        SEPARATOR + path?.substring(path.indexOf(":") + 1)
-            }
-
-            else -> ""
         }
     }
 
@@ -551,29 +507,6 @@ object MegaNodeUtil {
     }
 
     /**
-     * Checks if a node is a sub-folder of MyBackup folder.
-     *
-     * @param node MegaNode to check
-     * @return True if the node is a sub-folder of MyBackup folder, false otherwise
-     */
-    private fun isSubRootBackupFolder(node: MegaNode): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
-        var p = node
-        if (isNodeInRubbishOrDeleted(node.handle)) {
-            return false
-        }
-
-        while (megaApi.getParentNode(p) != null) {
-            p = megaApi.getParentNode(p)!!
-            if (p.parentHandle == myBackupHandle) {
-                Timber.d("isSubRootBackupFolder")
-                return true
-            }
-        }
-        return false
-    }
-
-    /**
      * Checks if a node is the MyBackup folder.
      *
      * @param node MegaNode to check
@@ -694,29 +627,6 @@ object MegaNodeUtil {
     }
 
     /**
-     * Check if all nodes can be moved to rubbish bin.
-     *
-     * @param nodes nodes to check
-     * @return whether all nodes can be moved to rubbish bin
-     */
-    @JvmStatic
-    fun canMoveToRubbish(nodes: List<MegaNode?>): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
-
-        for (node in nodes) {
-            if (megaApi.checkMoveErrorExtended(
-                    node,
-                    megaApi.rubbishNode
-                ).errorCode != MegaError.API_OK
-            ) {
-                return false
-            }
-        }
-
-        return true
-    }
-
-    /**
      * Check if all nodes are file nodes and not taken down.
      *
      * @param nodes nodes to check
@@ -726,22 +636,6 @@ object MegaNodeUtil {
     fun areAllFileNodesAndNotTakenDown(nodes: List<MegaNode>): Boolean {
         for (node in nodes) {
             if (!node.isFile || node.isTakenDown) {
-                return false
-            }
-        }
-
-        return true
-    }
-
-    /**
-     * Check if all nodes are not taken down.
-     *
-     * @return True if all items are not taken down, false otherwise.
-     */
-    @JvmStatic
-    fun List<MegaNode?>.areAllNotTakenDown(): Boolean {
-        for (node in this) {
-            if (node?.isTakenDown == true) {
                 return false
             }
         }
@@ -931,23 +825,6 @@ object MegaNodeUtil {
 
             return rootNode?.handle ?: INVALID_HANDLE
         }
-
-    /**
-     * Setup SDK HTTP streaming server.
-     *
-     * @param api MegaApiAndroid instance to use
-     * @return whether this function call really starts SDK HTTP streaming server
-     */
-    @JvmStatic
-    fun setupStreamingServer(api: MegaApiAndroid): Boolean {
-        if (api.httpServerIsRunning() == 0) {
-            api.httpServerStart()
-
-            return true
-        }
-
-        return false
-    }
 
     /**
      * Stop SDK HTTP streaming server.
@@ -1625,23 +1502,6 @@ object MegaNodeUtil {
 
         } ?: BACKUP_NONE
 
-    @JvmStatic
-    fun containsMediaFile(handle: Long): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
-        val parent = megaApi.getNodeByHandle(handle)
-        val children: List<MegaNode?>? = megaApi.getChildren(parent)
-
-        children?.forEach {
-            val mime = MimeTypeList.typeForName(it?.name)
-            if (!mime.isSvgMimeType && (mime.isImage || mime.isVideoMimeType)) return true
-        }
-
-        return false
-    }
-
-    fun MegaNode.getFileName(): String =
-        "$base64Handle.${MimeTypeList.typeForName(name)?.extension}"
-
     fun MegaNode.isImage(): Boolean =
         this.isFile && MimeTypeList.typeForName(name).isImage
 
@@ -1651,23 +1511,4 @@ object MegaNodeUtil {
     fun MegaNode.isVideo(): Boolean =
         this.isFile && (MimeTypeList.typeForName(name).isVideoMimeType ||
                 MimeTypeList.typeForName(name).isMp4Video)
-
-    fun MegaNode.getLastAvailableTime(): Long =
-        when {
-            creationTime > 1 -> creationTime
-            modificationTime > 1 -> modificationTime
-            publicLinkCreationTime > 1 -> publicLinkCreationTime
-            else -> INVALID_VALUE.toLong()
-        }
-
-    /**
-     * Generate MegaNode information preformatted text
-     *
-     * @return MegaNode information
-     */
-    fun MegaNode.getInfoText(context: Context): String {
-        val nodeSizeText = getSizeString(size, context)
-        val nodeDateText = formatLongDateTime(getLastAvailableTime())
-        return TextUtil.getFileInfo(nodeSizeText, nodeDateText)
-    }
 }
