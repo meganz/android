@@ -8,7 +8,7 @@ android {
 
 dependencies {
 
-    implementation(project(":analytics-tracker"))
+    implementation(project(":core:analytics:analytics-tracker"))
     implementation(lib.mega.analytics)
 
     implementation(platform(testlib.junit5.bom))

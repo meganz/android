@@ -14,7 +14,7 @@ dependencies {
     // Coroutines
     implementation(lib.coroutines.test)
 
-    implementation(project(":analytics-tracker"))
+    implementation(project(":core:analytics:analytics-tracker"))
     // JUnit5
     implementation(platform(testlib.junit5.bom))
     implementation(testlib.junit.test.ktx)

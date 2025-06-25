@@ -39,7 +39,7 @@ if (!shouldUsePrebuiltSdk() || isServerBuild()) {
     include(":sdk")
 }
 
-include(":analytics-tracker")
+include(":core:analytics:analytics-tracker")
 include(":android-database-sqlcipher")
 include(":app")
 include(":baselineprofile")
