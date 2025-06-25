@@ -301,7 +301,7 @@ private fun onViewInFolder(
 
             } else {
                 action = Constants.ACTION_OPEN_FOLDER
-                putExtra(Constants.INTENT_EXTRA_KEY_PARENT_HANDLE, handle)
+                putExtra(Constants.INTENT_EXTRA_KEY_PARENT_HANDLE, parentHandle)
                 putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, arrayListOf(fileName))
             }
         }.let { activity.startActivity(it) }

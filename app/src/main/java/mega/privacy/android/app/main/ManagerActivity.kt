@@ -1570,6 +1570,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             Constants.INTENT_EXTRA_KEY_PARENT_HANDLE,
                             INVALID_HANDLE
                         )
+                        val highlightedNames =
+                            intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES)
                         if (intent.getBooleanExtra(
                                 Constants.SHOW_MESSAGE_UPLOAD_STARTED,
                                 false
@@ -1638,7 +1640,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                 }
                             }
                         } else {
-                            actionOpenFolder(handleIntent)
+                            actionOpenFolder(handleIntent, highlightedNames)
                         }
                         intent = null
                     } else if (intent.action == Constants.ACTION_PASS_CHANGED) {
