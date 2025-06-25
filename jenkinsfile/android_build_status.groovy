@@ -5,7 +5,7 @@ BUILD_STEP = ""
 GMS_APK_BUILD_LOG = "gms_build.log"
 QA_APK_BUILD_LOG = "qa_build.log"
 
-MODULE_LIST = ['app', 'domain', 'data', 'analytics', 'feature/chat', 'feature/devicecenter', 'feature/sync', 'shared/original-core-ui', 'shared/sync', 'core/formatter', 'legacy-core-ui']
+MODULE_LIST = ['app', 'domain', 'data', 'analytics-tracker', 'feature/chat', 'feature/devicecenter', 'feature/sync', 'shared/original-core-ui', 'shared/sync', 'core/formatter', 'legacy-core-ui']
 
 LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"

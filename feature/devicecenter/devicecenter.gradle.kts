@@ -24,7 +24,7 @@ dependencies {
     implementation(project(":core:formatter"))
     lintChecks(project(":lint"))
 
-    implementation(project(":analytics"))
+    implementation(project(":analytics-tracker"))
     implementation(project(":domain"))
     implementation(project(":navigation"))
     implementation(project(":data"))

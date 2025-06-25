@@ -37,7 +37,7 @@ dependencies {
     implementation(project(":shared:resources"))
     implementation(project(":legacy-core-ui"))
     implementation(project(":icon-pack"))
-    implementation(project(":analytics"))
+    implementation(project(":analytics-tracker"))
 
     implementation(lib.kotlin.ktx)
     implementation(lib.logging.timber)

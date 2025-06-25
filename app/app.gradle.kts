@@ -199,7 +199,7 @@ dependencies {
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
     implementation(project(":shared:sync"))
     "baselineProfile"(project(":baselineprofile"))
-    implementation(project(":analytics"))
+    implementation(project(":analytics-tracker"))
     implementation(project(":icon-pack"))
     implementation(project(":feature:sync"))
     implementation(project(":feature:devicecenter"))
