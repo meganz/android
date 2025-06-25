@@ -1,0 +1,22 @@
+--- autogen.sh	2025-06-25 20:59:38
++++ /Users/robin/Desktop/20250625_sodium_build_failure/autogen.sh	2025-06-25 20:59:13
+@@ -39,12 +39,15 @@
+   command -v curl >/dev/null 2>&1 && {
+   echo "Downloading config.guess and config.sub..."
+ 
+-  curl -sL -o config.guess \
+-    'https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' &&
++
++  # curl -sL -o config.guess \
++  #   'https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' &&
++  curl -o config.guess https://cgit.git.savannah.gnu.org/cgit/config.git/plain/config.guess &&
+     mv -f config.guess build-aux/config.guess
+ 
+-  curl -sL -o config.sub \
+-    'https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD' &&
++  # curl -sL -o config.sub \
++  #   'https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD' &&
++  curl -o config.sub https://cgit.git.savannah.gnu.org/cgit/config.git/plain/config.sub &&
+     mv -f config.sub build-aux/config.sub
+ 
+   echo "Done."

@@ -475,6 +475,7 @@ if [ ! -f ${SODIUM}/${SODIUM_SOURCE_FILE}.ready ]; then
     pushd ${SODIUM}/${SODIUM} &>> ${LOG_FILE}
     export ANDROID_NDK_HOME=${NDK_ROOT}
     export NDK_PLATFORM=${APP_PLATFORM}
+    patch autogen.sh < ../autogen.patch
     ./autogen.sh &>> ${LOG_FILE}
     echo "#include <limits.h>" >>  src/libsodium/include/sodium/export.h
     sed -i 's/enable-minimal/enable-minimal --disable-pie/g' dist-build/android-build.sh
