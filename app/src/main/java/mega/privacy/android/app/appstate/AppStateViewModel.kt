@@ -18,8 +18,10 @@ import mega.privacy.android.domain.entity.navigation.Flagged
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.navigation.GetStartScreenPreferenceDestinationUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -30,16 +32,18 @@ class AppStateViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getStartScreenPreferenceDestinationUseCase: GetStartScreenPreferenceDestinationUseCase, // We need a new use case
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
 
     val state: StateFlow<AppState> by lazy {
         combine(
             getFilteredValues(mainDestinations)
+                .setEnabledState()
                 .log("Main Destinations"),
             getFilteredValues(featureDestinations)
                 .log("Feature Destinations"),
 //            getStartScreenPreferenceDestinationUseCase()
-            flow { emit(mainDestinations.first().destinationClass) }
+            flow { emit(mainDestinations.first().destination) }
                 .log("Start Screen Preference Destination"),
             monitorThemeModeUseCase()
                 .log("Theme Mode")
@@ -77,4 +81,22 @@ class AppStateViewModel @Inject constructor(
         Timber.d("$flowName emitted: $it")
     }
 
+    private fun Flow<Set<MainNavItem>>.setEnabledState(): Flow<Set<NavigationItem>> =
+        this.combine(
+            monitorConnectivityUseCase()
+                .catch {
+                    Timber.e(
+                        it,
+                        "Error monitoring connectivity, defaulting to connected state"
+                    )
+                    emit(true)
+                }
+        ) { mainNavItems, isConnected ->
+            mainNavItems.map { item ->
+                NavigationItem(
+                    navItem = item,
+                    isEnabled = isConnected || item.availableOffline,
+                )
+            }.toSet()
+        }
 }

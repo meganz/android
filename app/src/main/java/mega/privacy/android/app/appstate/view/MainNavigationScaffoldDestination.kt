@@ -13,8 +13,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.serialization.Serializable
-import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
+import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 import kotlin.reflect.KClass
 
 @Serializable
@@ -23,8 +23,8 @@ object MainNavigationScaffoldDestination
 @OptIn(ExperimentalMaterial3Api::class)
 fun NavGraphBuilder.mainNavigationScaffold(
     modifier: Modifier = Modifier,
-    topLevelDestinations: ImmutableSet<MainNavItem>,
-    startDestination: KClass<*>,
+    topLevelDestinations: ImmutableSet<NavigationItem>,
+    startDestination: Any,
     builder: NavGraphBuilder.() -> Unit,
 ) {
     composable<MainNavigationScaffoldDestination> {

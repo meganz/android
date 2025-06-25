@@ -5,8 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -16,12 +15,14 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.appstate.model.AppState
+import mega.privacy.android.app.presentation.settings.compose.home.view.SettingsHomeViewKtTest
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.navigation.Flagged
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.navigation.GetStartScreenPreferenceDestinationUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.PreferredSlot
@@ -41,6 +42,7 @@ class AppStateViewModelTest {
     private lateinit var underTest: AppStateViewModel
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
 
     private val getStartScreenPreferenceDestinationUseCase =
         mock<GetStartScreenPreferenceDestinationUseCase>()
@@ -61,6 +63,7 @@ class AppStateViewModelTest {
             getFeatureFlagValueUseCase,
             getStartScreenPreferenceDestinationUseCase,
             monitorThemeModeUseCase,
+            monitorConnectivityUseCase
         )
     }
 
@@ -74,10 +77,13 @@ class AppStateViewModelTest {
 
     @Test
     fun `test that main destinations are added`() = runTest {
+        stubConnectivity()
         val mainNavItem = mock<MainNavItem> {
-            on { destinationClass }.thenReturn(String::class)
+            on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
+            on { availableOffline }.thenReturn(true)
         }
+
         val expected = setOf(mainNavItem)
 
         stubDefaultStartScreenPreference()
@@ -89,18 +95,23 @@ class AppStateViewModelTest {
         underTest.state
             .filterIsInstance<AppState.Data>()
             .test {
-                assertThat(awaitItem().mainNavItems).isEqualTo(expected)
+                assertThat(awaitItem().mainNavItems.map { it.navItem }).containsExactlyElementsIn(
+                    expected
+                )
                 cancelAndIgnoreRemainingEvents()
             }
     }
 
+    @Suppress("UNCHECKED_CAST")
     @Test
     fun `test that main nav items with disabled feature flags are not returned`() = runTest {
+        stubConnectivity()
         stubDefaultStartScreenPreference()
         stubDefaultThemeMode()
         val expected = mock<MainNavItem> {
-            on { destinationClass }.thenReturn(String::class)
+            on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
+            on { availableOffline }.thenReturn(true)
         }
         val disabledFeature = mock<Feature>()
         getFeatureFlagValueUseCase.stub {
@@ -110,8 +121,10 @@ class AppStateViewModelTest {
             mock<Flagged>(extraInterfaces = arrayOf(MainNavItem::class))
         notExpected.stub {
             on { feature }.thenReturn(disabledFeature)
-            (this as? KStubbing<MainNavItem>)?.on { destinationClass }?.thenReturn(String::class)
-            (this as? KStubbing<MainNavItem>)?.on { preferredSlot }?.thenReturn(PreferredSlot.Ordered(2))
+            (this as? KStubbing<MainNavItem>)?.on { destination }
+                ?.thenReturn(SettingsHomeViewKtTest.TestDestination)
+            (this as? KStubbing<MainNavItem>)?.on { preferredSlot }
+                ?.thenReturn(PreferredSlot.Ordered(2))
         }
         val mainDestinations = setOf(expected, notExpected as MainNavItem)
         val featureDestinations = emptySet<@JvmSuppressWildcards FeatureDestination>()
@@ -120,18 +133,21 @@ class AppStateViewModelTest {
         underTest.state
             .filterIsInstance<AppState.Data>()
             .test {
-                assertThat(awaitItem().mainNavItems).containsExactly(expected)
+                assertThat(awaitItem().mainNavItems.map { it.navItem }).containsExactly(expected)
                 cancelAndIgnoreRemainingEvents()
             }
     }
 
+    @Suppress("UNCHECKED_CAST")
     @Test
     fun `test that main nav items with enabled feature flags are returned`() = runTest {
+        stubConnectivity()
         stubDefaultStartScreenPreference()
         stubDefaultThemeMode()
         val expected = mock<MainNavItem> {
-            on { destinationClass }.thenReturn(String::class)
+            on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
+            on { availableOffline }.thenReturn(true)
         }
         val enabledFeature = mock<Feature>()
         getFeatureFlagValueUseCase.stub {
@@ -141,8 +157,12 @@ class AppStateViewModelTest {
             mock<Flagged>(extraInterfaces = arrayOf(MainNavItem::class))
         alsoExpected.stub {
             on { feature }.thenReturn(enabledFeature)
-            (this as? KStubbing<MainNavItem>)?.on { destinationClass }?.thenReturn(String::class)
-            (this as? KStubbing<MainNavItem>)?.on { preferredSlot }?.thenReturn(PreferredSlot.Ordered(2))
+            (this as? KStubbing<MainNavItem>)?.on { destination }
+                ?.thenReturn(SettingsHomeViewKtTest.TestDestination)
+            (this as? KStubbing<MainNavItem>)?.on { preferredSlot }
+                ?.thenReturn(PreferredSlot.Ordered(2))
+            (this as? KStubbing<MainNavItem>)?.on { availableOffline }
+                ?.thenReturn(true)
         }
         val mainDestinations = setOf(expected, alsoExpected as MainNavItem)
         val featureDestinations = emptySet<@JvmSuppressWildcards FeatureDestination>()
@@ -150,13 +170,17 @@ class AppStateViewModelTest {
         underTest.state
             .filterIsInstance<AppState.Data>()
             .test {
-                assertThat(awaitItem().mainNavItems).containsExactly(expected, alsoExpected)
+                assertThat(awaitItem().mainNavItems.map { it.navItem }).containsExactly(
+                    expected,
+                    alsoExpected
+                )
                 cancelAndIgnoreRemainingEvents()
             }
     }
 
     @Test
     fun `test that feature destinations are added`() = runTest {
+        stubConnectivity()
         val expected = setOf(mock<FeatureDestination>())
 
         stubDefaultStartScreenPreference()
@@ -176,6 +200,7 @@ class AppStateViewModelTest {
     @Test
     fun `test that featureDestination items with disabled feature flags are not returned`() =
         runTest {
+            stubConnectivity()
             stubDefaultStartScreenPreference()
             stubDefaultThemeMode()
             val expected = mock<FeatureDestination>()
@@ -202,6 +227,7 @@ class AppStateViewModelTest {
 
     @Test
     fun `test that featureDestination items with enabled feature flags are returned`() = runTest {
+        stubConnectivity()
         stubDefaultStartScreenPreference()
         stubDefaultThemeMode()
         val expected = mock<FeatureDestination>()
@@ -228,16 +254,14 @@ class AppStateViewModelTest {
     @Test
     fun `test that theme mode values are emitted`() = runTest {
         Dispatchers.setMain(StandardTestDispatcher())
+        stubConnectivity()
         stubDefaultStartScreenPreference()
         val expected = listOf(
             ThemeMode.Light,
             ThemeMode.Dark,
             ThemeMode.System
         )
-        val themeModeFlow = flow {
-            emitAll(expected.asFlow())
-            awaitCancellation()
-        }
+        val themeModeFlow = MutableStateFlow(expected.first())
         monitorThemeModeUseCase.stub {
             on { invoke() }.thenReturn(
                 themeModeFlow
@@ -252,12 +276,89 @@ class AppStateViewModelTest {
             .filterIsInstance<AppState.Data>()
             .test {
                 advanceUntilIdle()
-                expected.forEach { expectedThemeMode ->
+                expected.forEachIndexed { index, expectedThemeMode ->
+                    themeModeFlow.emit(expected[index])
                     assertThat(awaitItem().themeMode).isEqualTo(expectedThemeMode)
                 }
             }
 
         Dispatchers.setMain(UnconfinedTestDispatcher())
+    }
+
+    @Test
+    fun `test that items are enabled if available offline and connectivity is offline`() = runTest {
+        stubDefaultStartScreenPreference()
+        stubDefaultThemeMode()
+        val mainNavItem = mock<MainNavItem> {
+            on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+            on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
+            on { availableOffline }.thenReturn(true)
+        }
+        val expected = setOf(mainNavItem)
+
+        stubConnectivity(connected = false)
+
+        initUnderTest(expected, emptySet())
+
+        underTest.state
+            .filterIsInstance<AppState.Data>()
+            .test {
+                assertThat(awaitItem().mainNavItems.all { it.isEnabled }).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+    }
+
+    @Test
+    fun `test that items are not enabled if not available offline and connectivity is offline`() =
+        runTest {
+            stubDefaultStartScreenPreference()
+            stubDefaultThemeMode()
+            val mainNavItem = mock<MainNavItem> {
+                on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+                on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
+                on { availableOffline }.thenReturn(false)
+            }
+            val expected = setOf(mainNavItem)
+
+            stubConnectivity(connected = false)
+
+            initUnderTest(expected, emptySet())
+
+            underTest.state
+                .filterIsInstance<AppState.Data>()
+                .test {
+                    assertThat(awaitItem().mainNavItems.all { it.isEnabled }).isFalse()
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that exception in connectivity use case returns default connected state`() = runTest {
+        stubDefaultStartScreenPreference()
+        stubDefaultThemeMode()
+        val mainNavItem = mock<MainNavItem> {
+            on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+            on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
+            on { availableOffline }.thenReturn(false)
+        }
+        val expected = setOf(mainNavItem)
+
+        monitorConnectivityUseCase.stub {
+            on { invoke() }.thenReturn(
+                flow {
+                    throw Exception("Connectivity error")
+                }
+            )
+        }
+
+        initUnderTest(expected, emptySet())
+
+        underTest.state
+            .filterIsInstance<AppState.Data>()
+            .test {
+                assertThat(awaitItem().mainNavItems.all { it.isEnabled }).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
     }
 
     private fun initUnderTest(
@@ -270,6 +371,7 @@ class AppStateViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getStartScreenPreferenceDestinationUseCase = getStartScreenPreferenceDestinationUseCase,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
         )
     }
 
@@ -296,8 +398,19 @@ class AppStateViewModelTest {
     }
 
     private fun stubDefaultMainNavigationItems() = setOf(mock<MainNavItem> {
-        on { destinationClass }.thenReturn(String::class)
+        on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
         on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
+        on { availableOffline }.thenReturn(true)
     })
 
+    private fun stubConnectivity(connected: Boolean = true) {
+        monitorConnectivityUseCase.stub {
+            on { invoke() }.thenReturn(
+                flow {
+                    emit(connected)
+                    awaitCancellation()
+                }
+            )
+        }
+    }
 }

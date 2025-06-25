@@ -5,28 +5,27 @@ import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableSet
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.navigation.contract.FeatureDestination
-import mega.privacy.android.navigation.contract.MainNavItem
-import kotlin.reflect.KClass
+import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 
 @Stable
 sealed interface AppState {
     data object Loading : AppState
 
     data class Data(
-        val mainNavItems: ImmutableSet<MainNavItem>,
+        val mainNavItems: ImmutableSet<NavigationItem>,
         val featureDestinations: ImmutableSet<FeatureDestination>,
-        val initialMainDestination: KClass<*>,
+        val initialMainDestination: Any,
         val themeMode: ThemeMode,
     ) : AppState
 }
 
 class AppStateDataBuilder {
-    private var mainNavItemsBuilder: Set<MainNavItem>? = null
+    private var mainNavItemsBuilder: Set<NavigationItem>? = null
     private val featureDestinationsBuilder = mutableSetOf<FeatureDestination>()
-    private var initialDestinationBuilder: KClass<*>? = null
+    private var initialDestinationBuilder: Any? = null
     private var themeModeBuilder: ThemeMode = ThemeMode.System
 
-    fun mainNavItems(mainNavItems: Set<MainNavItem>) = this.apply {
+    fun mainNavItems(mainNavItems: Set<NavigationItem>) = this.apply {
         mainNavItemsBuilder = mainNavItems
     }
 
@@ -34,7 +33,7 @@ class AppStateDataBuilder {
         featureDestinationsBuilder.addAll(featureGraphs)
     }
 
-    fun initialDestination(destination: KClass<*>?) = this.apply {
+    fun initialDestination(destination: Any) = this.apply {
         initialDestinationBuilder = destination
     }
 
@@ -50,7 +49,7 @@ class AppStateDataBuilder {
             mainNavItems = mainNavItemsBuilder!!.toImmutableSet(),
             featureDestinations = featureDestinationsBuilder.toImmutableSet(),
             initialMainDestination = initialDestinationBuilder
-                ?: mainNavItemsBuilder!!.first().destinationClass,
+                ?: mainNavItemsBuilder!!.first().navItem.destination,
             themeMode = themeModeBuilder,
         )
     }

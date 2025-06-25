@@ -28,7 +28,7 @@ fun MegaApp(
                 startDestination = appState.initialMainDestination,
                 builder = {
                     appState.mainNavItems.forEach {
-                        it.screen(this, navigationHandler)
+                        it.navItem.screen(this, navigationHandler)
                     }
                 }
             )

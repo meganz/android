@@ -11,10 +11,8 @@ import mega.privacy.android.icon.pack.R as IconPack
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.PreferredSlot
-import kotlin.reflect.KClass
 
 class ExampleMainItem : MainNavItem {
-    override val destinationClass: KClass<*> = HomeScreen::class
     override val destination: Any = HomeScreen
     override val screen: NavGraphBuilder.(NavigationHandler) -> Unit =
         { navigationHandler -> exampleHomeScreen() }
@@ -22,10 +20,10 @@ class ExampleMainItem : MainNavItem {
     override val badge: Flow<String?>? = null
     override val label: String = "Demo"
     override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(1)
+    override val availableOffline: Boolean = false
 }
 
 class OtherExampleMainItem : MainNavItem {
-    override val destinationClass: KClass<*> = HomeScreen2::class
     override val destination: Any = HomeScreen2
     override val screen: NavGraphBuilder.(NavigationHandler) -> Unit =
         { navigationHandler -> otherExampleHomeScreen(navigationHandler::navigate) }
@@ -40,5 +38,6 @@ class OtherExampleMainItem : MainNavItem {
     }
     override val label: String = "Other"
     override val preferredSlot: PreferredSlot = PreferredSlot.Last
+    override val availableOffline: Boolean = true
 }
 

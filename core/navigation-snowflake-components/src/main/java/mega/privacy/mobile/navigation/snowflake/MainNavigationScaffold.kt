@@ -20,12 +20,13 @@ import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationIcon
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationItemBadge
+import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigationScaffold(
-    mainNavItems: ImmutableSet<MainNavItem>,
+    mainNavItems: ImmutableSet<NavigationItem>,
     onDestinationClick: (MainNavItem) -> Unit,
     isSelected: (MainNavItem) -> Boolean,
     mainNavItemIcon: @Composable (MainNavItem) -> Unit = { MainNavigationIcon(it) },
@@ -68,7 +69,7 @@ fun MainNavigationScaffold(
                         }
                     }
             ) {
-                orderedItems.forEach { navItem ->
+                orderedItems.forEach { (navItem, enabled) ->
                     item(
                         icon = {
                             mainNavItemIcon(navItem)
@@ -78,6 +79,7 @@ fun MainNavigationScaffold(
                         selected = isSelected(navItem),
                         onClick = { onDestinationClick(navItem) },
                         colors = itemColors,
+                        enabled = enabled,
                     )
                 }
             }
@@ -93,11 +95,11 @@ fun MainNavigationScaffold(
  * - Ordered items are sorted by slot number and take the first available slots
  * - Last item is placed in the final slot
  */
-private fun orderNavigationItems(items: ImmutableSet<MainNavItem>): List<MainNavItem> {
-    val orderedItems = items.filter { it.preferredSlot is PreferredSlot.Ordered }
-        .sortedBy { (it.preferredSlot as PreferredSlot.Ordered).slot }
+private fun orderNavigationItems(items: ImmutableSet<NavigationItem>): List<NavigationItem> {
+    val orderedItems = items.filter { it.navItem.preferredSlot is PreferredSlot.Ordered }
+        .sortedBy { (it.navItem.preferredSlot as PreferredSlot.Ordered).slot }
 
-    val lastItem = items.find { it.preferredSlot is PreferredSlot.Last }
+    val lastItem = items.find { it.navItem.preferredSlot is PreferredSlot.Last }
 
     // For now, assume 5 slots for bottom navigation
     val availableSlots = 5
