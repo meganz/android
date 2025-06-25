@@ -2,7 +2,12 @@ package mega.privacy.android.app.components.session
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
@@ -53,6 +58,32 @@ internal class SessionViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().isRootNodeExists).isEqualTo(rootNodeExists)
         }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that optimistic parameter sets initial state correctly`(
+        optimistic: Boolean,
+    ) = runTest {
+        Dispatchers.setMain(StandardTestDispatcher()) //we need async execution for this test
+        setUp() // ensure initial status
+
+        whenever(rootNodeExistsUseCase()).thenReturn(false)
+
+        assertThat(underTest.state.value.isRootNodeExists).isNull()
+        underTest.checkSdkSession(optimistic)
+
+        underTest.state.test {
+            if (optimistic) {
+                assertThat(awaitItem().isRootNodeExists).isEqualTo(true)
+            } else {
+                assertThat(awaitItem().isRootNodeExists).isNull()
+            }
+            assertThat(awaitItem().isRootNodeExists).isEqualTo(false)
+        }
+
+        Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     @Test

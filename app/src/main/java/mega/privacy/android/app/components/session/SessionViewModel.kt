@@ -25,7 +25,16 @@ internal class SessionViewModel @Inject constructor(
 
     private var retryConnectionsAndSignalPresenceJob: Job? = null
 
-    fun checkSdkSession() {
+    /**
+     * Check if SDK session exists
+     * @param optimistic If true, assumes that the SDK session exists while waiting for a response. That way it starts showing the content immediately
+     */
+    fun checkSdkSession(optimistic: Boolean = false) {
+        if (optimistic && _state.value.isRootNodeExists == null) {
+            _state.update { state ->
+                state.copy(isRootNodeExists = true)
+            }
+        }
         viewModelScope.launch {
             runCatching {
                 rootNodeExistsUseCase()

@@ -19,7 +19,14 @@ internal class ChatSessionViewModel @Inject constructor(
         MutableStateFlow(ChatSessionState.Pending)
     val state = _state.asStateFlow()
 
-    fun checkChatSession() {
+    /**
+     * Check if Chat SDK session exists
+     * @param optimistic If true, assumes that the SDK session exists while waiting for a response. That way it starts showing the content immediately
+     */
+    fun checkChatSession(optimistic: Boolean = false) {
+        if (optimistic && _state.value == ChatSessionState.Pending) {
+            _state.value = ChatSessionState.Valid
+        }
         viewModelScope.launch {
             runCatching {
                 checkChatSessionUseCase()

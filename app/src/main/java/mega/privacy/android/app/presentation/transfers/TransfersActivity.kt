@@ -53,9 +53,9 @@ class TransfersActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            SessionContainer {
-                ChatSessionContainer {
-                    OriginalTheme(isDark = mode.isDarkMode()) {
+            OriginalTheme(isDark = mode.isDarkMode()) {
+                SessionContainer(optimistic = true) {
+                    ChatSessionContainer(optimistic = true) {
                         PasscodeContainer(
                             passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                             content = {
