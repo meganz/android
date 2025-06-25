@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -146,6 +147,7 @@ class FileBrowserViewModel @Inject constructor(
 
     private var showHiddenItems: Boolean = true
     private var cachedStorageState: StorageState? = null
+    private var refreshNodesStateJob: Job? = null
 
     init {
         refreshNodes()
@@ -380,52 +382,53 @@ class FileBrowserViewModel @Inject constructor(
      * Refreshes the File Browser Nodes
      */
     fun refreshNodes() {
-        viewModelScope.launch {
-            refreshNodesState()
-        }
+        refreshNodesState()
     }
 
-    private suspend fun refreshNodesState(
+    private fun refreshNodesState(
         highlightedNode: NodeId? = null,
         highlightedNames: List<String>? = null,
     ) {
-        val fileBrowserHandle = _state.value.fileBrowserHandle
-        val rootNode = getRootNodeUseCase()?.id?.longValue
-        val isRootNode = fileBrowserHandle == rootNode
+        refreshNodesStateJob?.cancel()
+        refreshNodesStateJob = viewModelScope.launch {
+            val fileBrowserHandle = _state.value.fileBrowserHandle
+            val rootNode = getRootNodeUseCase()?.id?.longValue
+            val isRootNode = fileBrowserHandle == rootNode
 
-        /**
-         * When a folder is opened, and user clicks on cloud drive bottom drawer item, clear the openedFolderNodeHandles
-         */
-        if ((fileBrowserHandle == -1L || isRootNode) && state.value.openedFolderNodeHandles.isNotEmpty()) {
+            /**
+             * When a folder is opened, and user clicks on cloud drive bottom drawer item, clear the openedFolderNodeHandles
+             */
+            if ((fileBrowserHandle == -1L || isRootNode) && state.value.openedFolderNodeHandles.isNotEmpty()) {
+                _state.update {
+                    it.copy(
+                        isLoading = true,
+                        openedFolderNodeHandles = emptySet()
+                    )
+                }
+            }
+
+            val childrenNodes = getFileBrowserNodeChildrenUseCase(fileBrowserHandle)
+            val showMediaDiscoveryIcon = !isRootNode && containsMediaItemUseCase(childrenNodes)
+            val sourceNodeUIItems = getNodeUiItems(
+                nodeList = childrenNodes,
+                highlightedNodeId = highlightedNode,
+                highlightedNames = highlightedNames?.toSet()
+            )
+            val nodeUIItems = filterNonSensitiveNodes(sourceNodeUIItems)
+            val sortOrder = getCloudSortOrder()
+            val isFileBrowserEmpty = isRootNode || (fileBrowserHandle == MegaApiJava.INVALID_HANDLE)
+
             _state.update {
                 it.copy(
-                    isLoading = true,
-                    openedFolderNodeHandles = emptySet()
+                    showMediaDiscoveryIcon = showMediaDiscoveryIcon,
+                    nodesList = nodeUIItems,
+                    sourceNodesList = sourceNodeUIItems,
+                    isLoading = false,
+                    sortOrder = sortOrder,
+                    isFileBrowserEmpty = isFileBrowserEmpty,
+                    isRootNode = isRootNode,
                 )
             }
-        }
-
-        val childrenNodes = getFileBrowserNodeChildrenUseCase(fileBrowserHandle)
-        val showMediaDiscoveryIcon = !isRootNode && containsMediaItemUseCase(childrenNodes)
-        val sourceNodeUIItems = getNodeUiItems(
-            nodeList = childrenNodes,
-            highlightedNodeId = highlightedNode,
-            highlightedNames = highlightedNames?.toSet()
-        )
-        val nodeUIItems = filterNonSensitiveNodes(sourceNodeUIItems)
-        val sortOrder = getCloudSortOrder()
-        val isFileBrowserEmpty = isRootNode || (fileBrowserHandle == MegaApiJava.INVALID_HANDLE)
-
-        _state.update {
-            it.copy(
-                showMediaDiscoveryIcon = showMediaDiscoveryIcon,
-                nodesList = nodeUIItems,
-                sourceNodesList = sourceNodeUIItems,
-                isLoading = false,
-                sortOrder = sortOrder,
-                isFileBrowserEmpty = isFileBrowserEmpty,
-                isRootNode = isRootNode,
-            )
         }
     }
 
