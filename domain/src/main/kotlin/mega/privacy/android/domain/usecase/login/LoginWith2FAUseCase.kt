@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.login
 
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.entity.login.LoginStatus
@@ -38,28 +39,26 @@ class LoginWith2FAUseCase @Inject constructor(
         pin2FA: String,
         disableChatApiUseCase: DisableChatApiUseCase,
     ) = callbackFlow {
-        loginMutex.lock()
-
         runCatching {
+            loginMutex.lock()
             loginRepository.multiFactorAuthLogin(email, password, pin2FA)
+                .catch {
+                    if (it !is LoginLoggedOutFromOtherLocation
+                        && it !is LoginWrongMultiFactorAuth
+                    ) {
+                        chatLogoutUseCase(disableChatApiUseCase)
+                        resetChatSettingsUseCase()
+                    }
+                    close(it)
+                }
                 .collectLatest { loginStatus ->
                     if (loginStatus == LoginStatus.LoginSucceed) {
                         saveAccountCredentialsUseCase()
-                        runCatching { loginMutex.unlock() }
                     }
-
                     trySend(loginStatus)
                 }
         }.onFailure {
-            if (it !is LoginLoggedOutFromOtherLocation
-                && it !is LoginWrongMultiFactorAuth
-            ) {
-                chatLogoutUseCase(disableChatApiUseCase)
-                resetChatSettingsUseCase()
-            }
-
-            runCatching { loginMutex.unlock() }
-            throw it
+            close(it)
         }
 
         awaitClose {

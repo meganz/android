@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.login
 
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.entity.login.LoginStatus
@@ -37,38 +38,37 @@ class FastLoginUseCase @Inject constructor(
         refreshChatUrl: Boolean,
         disableChatApiUseCase: DisableChatApiUseCase,
     ) = callbackFlow {
-        loginMutex.lock()
+        runCatching {
+            loginMutex.lock()
 
-        runCatching { initialiseMegaChatUseCase(session) }
-            .onFailure { exception ->
-                if (exception is ChatNotInitializedErrorStatus) {
-                    chatLogoutUseCase(disableChatApiUseCase)
+            runCatching { initialiseMegaChatUseCase(session) }
+                .onFailure { exception ->
+                    if (exception is ChatNotInitializedErrorStatus) {
+                        chatLogoutUseCase(disableChatApiUseCase)
+                    }
                 }
+
+            if (refreshChatUrl) {
+                loginRepository.refreshMegaChatUrl()
             }
 
-        if (refreshChatUrl) {
-            loginRepository.refreshMegaChatUrl()
-        }
-
-        runCatching {
             loginRepository.fastLoginFlow(session)
+                .catch {
+                    if (it !is LoginLoggedOutFromOtherLocation) {
+                        chatLogoutUseCase(disableChatApiUseCase)
+                        resetChatSettingsUseCase()
+                    }
+                    close(it)
+                }
                 .collectLatest { loginStatus ->
                     if (loginStatus == LoginStatus.LoginSucceed) {
                         saveAccountCredentialsUseCase()
-                        unlockLoginMutex()
                     }
-
                     trySend(loginStatus)
                 }
         }.onFailure {
-            if (it !is LoginLoggedOutFromOtherLocation) {
-                chatLogoutUseCase(disableChatApiUseCase)
-                resetChatSettingsUseCase()
-            }
-            unlockLoginMutex()
-            throw it
+            close(it)
         }
-
         awaitClose {
             unlockLoginMutex()
         }

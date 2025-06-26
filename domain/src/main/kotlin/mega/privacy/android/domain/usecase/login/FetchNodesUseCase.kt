@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.login
 
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
@@ -26,10 +27,15 @@ class FetchNodesUseCase @Inject constructor(
      * @return Flow of [FetchNodesUpdate].
      */
     operator fun invoke() = callbackFlow {
-        loginMutex.lock()
-
         runCatching {
+            loginMutex.lock()
             loginRepository.fetchNodesFlow()
+                .catch {
+                    if (it !is FetchNodesBlockedAccount) {
+                        resetChatSettingsUseCase()
+                    }
+                    close(it)
+                }
                 .collectLatest { update ->
                     if (update.progress?.floatValue == 1F) {
                         runCatching { loginMutex.unlock() }
@@ -37,14 +43,8 @@ class FetchNodesUseCase @Inject constructor(
                     trySend(update)
                 }
         }.onFailure {
-            if (it !is FetchNodesBlockedAccount) {
-                resetChatSettingsUseCase()
-            }
-
-            runCatching { loginMutex.unlock() }
-            throw it
+            close(it)
         }
-
         awaitClose {
             runCatching { loginMutex.unlock() }
         }

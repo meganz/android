@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.login
 
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.entity.login.LoginStatus
@@ -38,42 +39,39 @@ class LoginUseCase @Inject constructor(
         password: String,
         disableChatApiUseCase: DisableChatApiUseCase,
     ) = callbackFlow {
-        loginMutex.lock()
-
-        runCatching { loginRepository.initMegaChat() }
-            .onFailure { exception ->
-                when (exception) {
-                    is ChatNotInitializedErrorStatus -> {
-                        chatLogoutUseCase(disableChatApiUseCase)
-                    }
-                    is ChatNotInitializedUnknownStatus -> {
-                        trySend(LoginStatus.LoginCannotStart)
-                        runCatching { loginMutex.unlock() }
-                        return@callbackFlow
-                    }
-                }
-
-            }
-
         runCatching {
-            loginRepository.login(email, password).collectLatest { loginStatus ->
-                if (loginStatus == LoginStatus.LoginSucceed) {
-                    saveAccountCredentialsUseCase()
-                    runCatching { loginMutex.unlock() }
+            loginMutex.lock()
+
+            runCatching { loginRepository.initMegaChat() }
+                .onFailure { exception ->
+                    when (exception) {
+                        is ChatNotInitializedErrorStatus -> {
+                            chatLogoutUseCase(disableChatApiUseCase)
+                        }
+
+                        is ChatNotInitializedUnknownStatus -> {
+                            send(LoginStatus.LoginCannotStart)
+                            close(exception)
+                        }
+                    }
                 }
 
+            loginRepository.login(email, password).catch {
+                if (it !is LoginLoggedOutFromOtherLocation
+                    && it !is LoginMultiFactorAuthRequired
+                ) {
+                    chatLogoutUseCase(disableChatApiUseCase)
+                    resetChatSettingsUseCase()
+                }
+                close(it)
+            }.collectLatest { loginStatus ->
+                if (loginStatus == LoginStatus.LoginSucceed) {
+                    runCatching { saveAccountCredentialsUseCase() }
+                }
                 trySend(loginStatus)
             }
         }.onFailure {
-            if (it !is LoginLoggedOutFromOtherLocation
-                && it !is LoginMultiFactorAuthRequired
-            ) {
-                chatLogoutUseCase(disableChatApiUseCase)
-                resetChatSettingsUseCase()
-            }
-
-            runCatching { loginMutex.unlock() }
-            throw it
+            close(it)
         }
 
         awaitClose {

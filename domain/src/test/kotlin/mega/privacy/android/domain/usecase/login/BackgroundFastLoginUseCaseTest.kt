@@ -1,19 +1,26 @@
 package mega.privacy.android.domain.usecase.login
 
+import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import org.junit.Assert.assertThrows
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
+
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BackgroundFastLoginUseCaseTest {
 
     private lateinit var underTest: BackgroundFastLoginUseCase
@@ -22,16 +29,29 @@ class BackgroundFastLoginUseCaseTest {
     private val initialiseMegaChatUseCase = mock<InitialiseMegaChatUseCase>()
     private val getSessionUseCase = mock<GetSessionUseCase>()
     private val getRootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
+    private val loginMutex = mock<Mutex>()
     private val session = "User session"
 
-    @Before
+    @BeforeEach
     fun setUp() {
         underTest = BackgroundFastLoginUseCase(
             loginRepository = loginRepository,
             initialiseMegaChatUseCase = initialiseMegaChatUseCase,
             getSessionUseCase = getSessionUseCase,
             getRootNodeExistsUseCase = getRootNodeExistsUseCase,
-            loginMutex = mock()
+            loginMutex = loginMutex
+        )
+    }
+
+    @AfterEach
+    fun tearDown() {
+        // Resetting the mocks after each test
+        reset(
+            loginRepository,
+            initialiseMegaChatUseCase,
+            getSessionUseCase,
+            getRootNodeExistsUseCase,
+            loginMutex,
         )
     }
 
@@ -41,6 +61,9 @@ class BackgroundFastLoginUseCaseTest {
         assertThrows(SessionNotRetrievedException::class.java) {
             runBlocking { underTest() }
         }
+        val inOrder = inOrder(loginMutex)
+        inOrder.verify(loginMutex).lock()
+        inOrder.verify(loginMutex).unlock()
     }
 
     @Test
@@ -48,7 +71,10 @@ class BackgroundFastLoginUseCaseTest {
         whenever(getSessionUseCase()).thenReturn(session)
         whenever(getRootNodeExistsUseCase()).thenReturn(true)
         val result = underTest()
-        assertEquals(session, result)
+        Truth.assertThat(result).isEqualTo(session)
+        val inOrder = inOrder(loginMutex)
+        inOrder.verify(loginMutex).lock()
+        inOrder.verify(loginMutex).unlock()
     }
 
     @Test
@@ -60,6 +86,9 @@ class BackgroundFastLoginUseCaseTest {
             assertThrows(RuntimeException::class.java) {
                 runBlocking { underTest() }
             }
+            val inOrder = inOrder(loginMutex)
+            inOrder.verify(loginMutex).lock()
+            inOrder.verify(loginMutex).unlock()
         }
 
     @Test
@@ -72,6 +101,9 @@ class BackgroundFastLoginUseCaseTest {
             assertThrows(RuntimeException::class.java) {
                 runBlocking { underTest() }
             }
+            val inOrder = inOrder(loginMutex)
+            inOrder.verify(loginMutex).lock()
+            inOrder.verify(loginMutex).unlock()
         }
 
     @Test
@@ -85,6 +117,9 @@ class BackgroundFastLoginUseCaseTest {
             assertThrows(RuntimeException::class.java) {
                 runBlocking { underTest() }
             }
+            val inOrder = inOrder(loginMutex)
+            inOrder.verify(loginMutex).lock()
+            inOrder.verify(loginMutex).unlock()
         }
 
     @Test
@@ -96,6 +131,9 @@ class BackgroundFastLoginUseCaseTest {
             whenever(loginRepository.fastLogin(session)).thenReturn(Unit)
             whenever(loginRepository.fetchNodes()).thenReturn(Unit)
             val result = underTest()
-            assertEquals(session, result)
+            Truth.assertThat(result).isEqualTo(session)
+            val inOrder = inOrder(loginMutex)
+            inOrder.verify(loginMutex).lock()
+            inOrder.verify(loginMutex).unlock()
         }
 }
