@@ -56,6 +56,9 @@ class LoginWith2FAUseCase @Inject constructor(
                         saveAccountCredentialsUseCase()
                     }
                     trySend(loginStatus)
+                    if (loginStatus == LoginStatus.LoginSucceed) {
+                        close()
+                    }
                 }
         }.onFailure {
             close(it)

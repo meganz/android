@@ -69,13 +69,19 @@ class LoginUseCase @Inject constructor(
                     runCatching { saveAccountCredentialsUseCase() }
                 }
                 trySend(loginStatus)
+                if (loginStatus == LoginStatus.LoginSucceed) {
+                    close()
+                }
             }
         }.onFailure {
             close(it)
         }
 
         awaitClose {
-            runCatching { loginMutex.unlock() }
+            unlockLoginMutex()
         }
     }
+
+    private fun unlockLoginMutex() = runCatching { loginMutex.unlock() }
+
 }
