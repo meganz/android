@@ -40,7 +40,6 @@ fun ProPlanCard(
     storage: String,
     transfer: String,
     price: String,
-    priceUnit: String,
     billingInfo: String?,
     isCurrentPlan: Boolean = false,
     onSelected: () -> Unit = {},
@@ -141,16 +140,14 @@ fun ProPlanCard(
                         textColor = TextColor.Primary,
                         modifier = Modifier.testTag(TEST_TAG_PRO_PLAN_CARD_PRICE)
                     )
-                    if (priceUnit.isNotEmpty()) {
-                        MegaText(
-                            text = "/${priceUnit}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            textColor = TextColor.Secondary,
-                            modifier = Modifier
-                                .padding(start = 2.dp, bottom = 2.dp)
-                                .testTag(TEST_TAG_PRO_PLAN_CARD_PRICE_UNIT)
-                        )
-                    }
+                    MegaText(
+                        text = stringResource(shareR.string.general_month),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textColor = TextColor.Secondary,
+                        modifier = Modifier
+                            .padding(start = 2.dp, bottom = 2.dp)
+                            .testTag(TEST_TAG_PRO_PLAN_CARD_PRICE_UNIT)
+                    )
                 }
                 if (!billingInfo.isNullOrEmpty()) {
                     MegaText(
@@ -180,7 +177,6 @@ private fun ProPlanCardPreview() {
                 storage = "8 TB storage",
                 transfer = "96 TB transfer",
                 price = "€16.67",
-                priceUnit = "month",
                 billingInfo = "€199.99 billed yearly",
                 isCurrentPlan = false
             )
@@ -193,7 +189,6 @@ private fun ProPlanCardPreview() {
                 storage = "8 TB storage",
                 transfer = "96 TB transfer",
                 price = "€16.67",
-                priceUnit = "month",
                 billingInfo = null,
                 isCurrentPlan = true
             )

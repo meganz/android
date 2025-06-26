@@ -1331,8 +1331,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Help</string>
-    <!-- Settings preference title for help centre -->
-    <string name="settings_help_centre">Help Centre</string>
     <!-- Settings preference title for send feedback -->
     <string name="settings_help_preference">Send feedback</string>
     <!-- mail subject -->

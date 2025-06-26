@@ -24,7 +24,6 @@ class ProPlanCardTest {
         val storage = "8 TB storage"
         val transfer = "96 TB transfer"
         val price = "€16.67"
-        val priceUnit = "month"
         val billingInfo = "€199.99 billed yearly"
         composeRule.setContent {
             ProPlanCard(
@@ -35,7 +34,6 @@ class ProPlanCardTest {
                 storage = storage,
                 transfer = transfer,
                 price = price,
-                priceUnit = priceUnit,
                 billingInfo = billingInfo,
                 isCurrentPlan = false,
                 onSelected = {}
@@ -63,7 +61,8 @@ class ProPlanCardTest {
         composeRule.onNodeWithText(storage).assertExists()
         composeRule.onNodeWithText(transfer).assertExists()
         composeRule.onNodeWithText(price).assertExists()
-        composeRule.onNodeWithText("/$priceUnit").assertExists()
+        composeRule.onNodeWithText(composeRule.activity.getString(R.string.general_month))
+            .assertExists()
         composeRule.onNodeWithText(billingInfo).assertExists()
     }
 
@@ -73,7 +72,6 @@ class ProPlanCardTest {
         val storage = "8 TB storage"
         val transfer = "96 TB transfer"
         val price = "€16.67"
-        val priceUnit = "month"
         val billingInfo = "€199.99 billed yearly"
         composeRule.setContent {
             ProPlanCard(
@@ -84,7 +82,6 @@ class ProPlanCardTest {
                 storage = storage,
                 transfer = transfer,
                 price = price,
-                priceUnit = priceUnit,
                 billingInfo = billingInfo,
                 isCurrentPlan = true,
                 onSelected = {}
@@ -103,7 +100,6 @@ class ProPlanCardTest {
         val storage = "8 TB storage"
         val transfer = "96 TB transfer"
         val price = "€16.67"
-        val priceUnit = "month"
         composeRule.setContent {
             ProPlanCard(
                 modifier = Modifier.fillMaxWidth(),
@@ -113,7 +109,6 @@ class ProPlanCardTest {
                 storage = storage,
                 transfer = transfer,
                 price = price,
-                priceUnit = priceUnit,
                 billingInfo = null,
                 isCurrentPlan = true,
                 onSelected = {}
