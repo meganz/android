@@ -293,7 +293,6 @@ internal fun NewChooseAccountScreen(
                     storage = storageString,
                     transfer = transferString,
                     price = yearlyPricePerMonth?.price ?: totalPrice.price,
-                    priceUnit = stringResource(sharedR.string.general_month),
                     billingInfo = billingInfo,
                     isCurrentPlan = isCurrentPlan,
                     onSelected = { chosenPlan = subscription.accountType },
