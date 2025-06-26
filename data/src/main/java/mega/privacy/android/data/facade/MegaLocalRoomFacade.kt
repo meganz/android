@@ -15,6 +15,7 @@ import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
@@ -30,6 +31,8 @@ import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
 import mega.privacy.android.data.mapper.offline.OfflineModelMapper
+import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfEntityMapper
+import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferGroupEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
@@ -49,6 +52,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
+import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -95,6 +99,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val insertPendingTransferRequestMapper: InsertPendingTransferRequestMapper,
     private val activeTransferGroupDao: Lazy<ActiveTransferGroupDao>,
     private val activeTransferGroupEntityMapper: ActiveTransferGroupEntityMapper,
+    private val lastPageViewedInPdfDao: Lazy<LastPageViewedInPdfDao>,
+    private val lastPageViewedInPdfEntityMapper: LastPageViewedInPdfEntityMapper,
+    private val lastPageViewedInPdfModelMapper: LastPageViewedInPdfModelMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.get().insertOrUpdateContact(contactEntityMapper(contact))
@@ -584,6 +591,17 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun deleteCompletedTransfersByPath(path: String) = completedTransferDao.get()
         .deleteCompletedTransfersByPath(path)
+
+    override suspend fun insertOrUpdateLastPageViewedInPdf(lastPageViewedInPdf: LastPageViewedInPdf) =
+        lastPageViewedInPdfDao.get()
+            .insertOrUpdateLastPageViewedInPdf(lastPageViewedInPdfEntityMapper(lastPageViewedInPdf))
+
+    override suspend fun getLastPageViewedInPdfByHandle(handle: Long) =
+        lastPageViewedInPdfDao.get().getLastPageViewedInPdfByHandle(handle)
+            ?.let { lastPageViewedInPdfModelMapper(it) }
+
+    override suspend fun deleteLastPageViewedInPdfByHandle(handle: Long) =
+        lastPageViewedInPdfDao.get().deleteLastPageViewedInPdfByHandle(handle)
 
     companion object {
         internal const val MAX_COMPLETED_TRANSFER_ROWS = 100

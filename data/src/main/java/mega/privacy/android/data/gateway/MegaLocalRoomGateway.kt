@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
+import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -587,4 +588,19 @@ interface MegaLocalRoomGateway {
      * @param path to search for
      */
     suspend fun deleteCompletedTransfersByPath(path: String)
+
+    /**
+     * Insert or update the last page viewed in a PDF document.
+     */
+    suspend fun insertOrUpdateLastPageViewedInPdf(lastPageViewedInPdf: LastPageViewedInPdf)
+
+    /**
+     * Get the last page viewed in a PDF document by its handle.
+     */
+    suspend fun getLastPageViewedInPdfByHandle(handle: Long): LastPageViewedInPdf?
+
+    /**
+     * Delete the last page viewed in a PDF document by its handle.
+     */
+    suspend fun deleteLastPageViewedInPdfByHandle(handle: Long)
 }

@@ -14,6 +14,7 @@ import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
@@ -24,6 +25,7 @@ import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
+import mega.privacy.android.data.database.entity.LastPageViewedInPdfEntity
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_COMPLETED_TRANSFER_ROWS
@@ -39,6 +41,8 @@ import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
 import mega.privacy.android.data.mapper.offline.OfflineModelMapper
+import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfEntityMapper
+import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferGroupEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
@@ -56,6 +60,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
+import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -118,6 +123,9 @@ internal class MegaLocalRoomFacadeTest {
     private val insertPendingTransferRequestMapper = mock<InsertPendingTransferRequestMapper>()
     private val activeTransferGroupDao = mock<ActiveTransferGroupDao>()
     private val activeTransferGroupEntityMapper = mock<ActiveTransferGroupEntityMapper>()
+    private val lastPageViewedInPdfDao = mock<LastPageViewedInPdfDao>()
+    private val lastPageViewedInPdfEntityMapper = mock<LastPageViewedInPdfEntityMapper>()
+    private val lastPageViewedInPdfModelMapper = mock<LastPageViewedInPdfModelMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -155,6 +163,9 @@ internal class MegaLocalRoomFacadeTest {
             insertPendingTransferRequestMapper = insertPendingTransferRequestMapper,
             activeTransferGroupDao = { activeTransferGroupDao },
             activeTransferGroupEntityMapper = activeTransferGroupEntityMapper,
+            lastPageViewedInPdfDao = { lastPageViewedInPdfDao },
+            lastPageViewedInPdfEntityMapper = lastPageViewedInPdfEntityMapper,
+            lastPageViewedInPdfModelMapper = lastPageViewedInPdfModelMapper,
         )
     }
 
@@ -991,5 +1002,40 @@ internal class MegaLocalRoomFacadeTest {
         val actual = underTest.insertActiveTransferGroup(activeTransferActionGroup)
 
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that insertOrUpdateLastPageViewedInPdf invokes dao with mapped entity`() = runTest {
+        val entity = mock<LastPageViewedInPdf>()
+        val mappedEntity = mock<LastPageViewedInPdfEntity>()
+
+        whenever(lastPageViewedInPdfEntityMapper(entity)).thenReturn(mappedEntity)
+
+        underTest.insertOrUpdateLastPageViewedInPdf(entity)
+
+        verify(lastPageViewedInPdfDao).insertOrUpdateLastPageViewedInPdf(mappedEntity)
+    }
+
+    @Test
+    fun `test that getLastPageViewedInPdfByHandle invokes dao with correct handle and returns mapped entity`() =
+        runTest {
+            val handle = 123L
+            val entity = mock<LastPageViewedInPdfEntity>()
+            val expected = mock<LastPageViewedInPdf>()
+
+            whenever(lastPageViewedInPdfDao.getLastPageViewedInPdfByHandle(handle))
+                .thenReturn(entity)
+            whenever(lastPageViewedInPdfModelMapper(entity)).thenReturn(expected)
+
+            assertThat(underTest.getLastPageViewedInPdfByHandle(handle)).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that deleteLastPageViewedInPdfByHandle invokes dao with correct handle`() = runTest {
+        val handle = 123L
+
+        underTest.deleteLastPageViewedInPdfByHandle(handle)
+
+        verify(lastPageViewedInPdfDao).deleteLastPageViewedInPdfByHandle(handle)
     }
 }
