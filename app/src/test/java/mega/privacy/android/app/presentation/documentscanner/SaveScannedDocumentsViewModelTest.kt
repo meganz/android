@@ -8,7 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.AnalyticsTestExtension
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension

@@ -62,6 +62,7 @@ dependencies {
     implementation(lib.kotlin.serialisation)
     implementation(google.guava)
 
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)

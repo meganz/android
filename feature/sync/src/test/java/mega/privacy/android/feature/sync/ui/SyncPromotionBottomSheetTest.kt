@@ -17,7 +17,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.feature.sync.ui.views.SYNC_PROMOTION_BOTTOM_SHEET_IMAGE_TEST_TAG
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet

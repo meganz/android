@@ -5,7 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
-import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.compose.ui.test.performClick
 import com.google.common.truth.Truth.assertThat

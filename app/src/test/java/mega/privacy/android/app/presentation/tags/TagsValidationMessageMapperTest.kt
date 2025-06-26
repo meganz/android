@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.shared.resources.R
 import mega.privacy.mobile.analytics.event.NodeInfoTagsLengthErrorDisplayedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoTagsLimitErrorDisplayedEvent

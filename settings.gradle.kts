@@ -39,31 +39,32 @@ if (!shouldUsePrebuiltSdk() || isServerBuild()) {
     include(":sdk")
 }
 
-include(":app")
-include(":domain")
-include(":core:formatter")
-include(":shared:original-core-ui")
-include(":data")
-include(":lint")
-include(":feature:sync")
-include(":feature:devicecenter")
 include(":analytics-tracker")
+include(":android-database-sqlcipher")
+include(":app")
+include(":baselineprofile")
 include(":core-test")
 include(":core-ui-test")
-include(":baselineprofile")
-include(":navigation")
-include(":legacy-core-ui")
-include(":icon-pack")
-include(":shared:resources")
-include(":shared:sync")
-include(":android-database-sqlcipher")
-include(":feature:chat")
-include(":feature:transfers:transfers-snowflake-components")
-include(":feature:payment:payment-snowflake-components")
-include(":feature:shared:shared-snowflake-components")
-include(":feature:example")
+include(":core:analytics:analytics-test")
+include(":core:formatter")
 include(":core:navigation-contract")
 include(":core:navigation-snowflake-components")
+include(":data")
+include(":domain")
+include(":feature:chat")
+include(":feature:devicecenter")
+include(":feature:example")
+include(":feature:payment:payment-snowflake-components")
+include(":feature:shared:shared-snowflake-components")
+include(":feature:sync")
+include(":feature:transfers:transfers-snowflake-components")
+include(":icon-pack")
+include(":legacy-core-ui")
+include(":lint")
+include(":navigation")
+include(":shared:original-core-ui")
+include(":shared:resources")
+include(":shared:sync")
 
 // Configure modules to use their own name as the build file name
 // app/build.gradle.kts -> app/app.gradle.kts
@@ -101,3 +102,4 @@ buildCache {
 fun shouldUsePrebuiltSdk(): Boolean =
     System.getenv("USE_PREBUILT_SDK")?.let { it != "false" } ?: true
 fun isServerBuild(): Boolean = System.getenv("BUILD_NUMBER") != null
+

@@ -29,7 +29,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class ForwardMessageActionTest {

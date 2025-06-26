@@ -11,7 +11,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.AnalyticsTestExtension
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.permissions.PermissionsViewModel.Companion.VIDEO_COMPRESSION_SIZE_LIMIT
 import mega.privacy.android.app.presentation.permissions.model.Permission

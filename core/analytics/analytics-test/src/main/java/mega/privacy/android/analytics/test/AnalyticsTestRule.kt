@@ -1,4 +1,4 @@
-package mega.privacy.android.core.test
+package mega.privacy.android.analytics.test
 
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
@@ -49,6 +49,3 @@ class AnalyticsTestRule(tracker: AnalyticsTracker? = null) : TestRule {
     }
 
 }
-
-
-

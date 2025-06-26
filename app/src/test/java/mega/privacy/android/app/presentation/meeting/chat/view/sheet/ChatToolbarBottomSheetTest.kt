@@ -15,7 +15,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
-import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent

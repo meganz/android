@@ -1,8 +1,7 @@
-package mega.privacy.android.app
+package mega.privacy.android.analytics.test
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.mobile.analytics.core.event.identifier.DialogDisplayedEventIdentifier
 import mega.privacy.mobile.analytics.core.event.identifier.ScreenViewEventIdentifier
 import org.junit.Rule

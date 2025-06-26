@@ -11,7 +11,7 @@ import kotlinx.parcelize.Parcelize
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.compose.home.model.MyAccountSettingsState
 import mega.privacy.android.app.presentation.settings.compose.home.model.SettingsHomeState
-import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint

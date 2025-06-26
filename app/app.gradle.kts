@@ -365,6 +365,7 @@ dependencies {
     testImplementation(google.hilt.android.test)
     testImplementation(androidx.work.test)
     testImplementation(androidx.navigation.testing)
+    testImplementation(project(":core:analytics:analytics-test"))
 
     //jUnit 5
     testImplementation(platform(testlib.junit5.bom))

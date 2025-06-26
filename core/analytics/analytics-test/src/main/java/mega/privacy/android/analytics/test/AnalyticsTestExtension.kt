@@ -1,4 +1,4 @@
-package mega.privacy.android.app
+package mega.privacy.android.analytics.test
 
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker

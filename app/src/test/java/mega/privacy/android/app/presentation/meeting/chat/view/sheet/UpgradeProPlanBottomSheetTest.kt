@@ -8,7 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UPGRADE_IMAGE_TEST_TAG
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UpgradeProPlanBottomSheet
-import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.mobile.analytics.event.UpgradeToProToGetUnlimitedCallsDialogEvent
 import org.junit.Rule
 import org.junit.Test

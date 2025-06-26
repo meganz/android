@@ -18,7 +18,7 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class SendMessageActionTest {
