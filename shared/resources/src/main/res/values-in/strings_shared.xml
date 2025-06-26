@@ -1218,7 +1218,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
     <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
     <!-- General month label -->
-    <string name="general_month">bulan</string>
+    <string name="general_month">/month</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s per bulan</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->

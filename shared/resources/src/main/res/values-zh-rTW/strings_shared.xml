@@ -1209,7 +1209,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
     <string name="choose_account_screen_transfer_quota_label">%1$s傳輸配額</string>
     <!-- General month label -->
-    <string name="general_month">每月</string>
+    <string name="general_month">/month</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s每月</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
@@ -1275,9 +1275,9 @@
     <!-- Warning indicating that the transfer quota limit has been reached -->
     <string name="transfers_transfer_quota_banner_title">獲取更多傳輸配額</string>
     <!-- Warning indicating that the storage quota limit has been reached -->
-    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <string name="transfers_storage_quota_banner_title">取得更多儲存配額</string>
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
-    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <string name="transfers_storage_and_transfer_quota_banner_title">獲得更多儲存和傳輸配額</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">幫助中心</string>
 </resources>

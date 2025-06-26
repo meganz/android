@@ -991,7 +991,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Potwierdzenie e-mail</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]%s[/A].</string>
+    <string name="email_confirmation_content">Wysłaliśmy email na [P]%s[/P] z linkiem. Kliknij link, aby zweryfikować swój adres email i aktywować konto. \n\nJeśli nie otrzymałeś emaila, sprawdź katalog ze spamem lub spróbuj ponownie. W przypadku jakichkolwiek innych problemów, odwiedź naszą [A]%s[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Wyślij ponownie</string>
     <!-- General change email address -->
@@ -1257,7 +1257,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
     <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
     <!-- General month label -->
-    <string name="general_month">miesiąc</string>
+    <string name="general_month">/month</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s na miesiąc</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
@@ -1326,9 +1326,9 @@
     <!-- Warning indicating that the transfer quota limit has been reached -->
     <string name="transfers_transfer_quota_banner_title">Zwiększ swój transfer</string>
     <!-- Warning indicating that the storage quota limit has been reached -->
-    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <string name="transfers_storage_quota_banner_title">Zwiększ limit pojemności na dane</string>
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
-    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <string name="transfers_storage_and_transfer_quota_banner_title">Zwiększ pojemność i limit transferu</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">Centrum pomocy</string>
 </resources>

@@ -1331,8 +1331,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Hilfe</string>
-    <!-- Settings preference title for help centre -->
-    <string name="settings_help_centre">Onlinehilfe</string>
     <!-- Settings preference title for send feedback -->
     <string name="settings_help_preference">Feedback senden</string>
     <!-- mail subject -->
@@ -1670,7 +1668,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Vorschau für gesendete Links aktivieren</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Erzeugt eine Vorschau für die Links, die Sie in Chats versenden. Beachten Sie, dass der Abruf dieser Vorschauen nicht durch Zero-Knowledge-Verschlüsselung geschützt erfolgt.</string>
+    <string name="text_enable_rich_links">Generates previews for certain links you send in chat, when available. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Bitte wählen Sie ein stärkeres Passwort</string>
     <!-- title of the notification for an acceptance of a contact request -->
