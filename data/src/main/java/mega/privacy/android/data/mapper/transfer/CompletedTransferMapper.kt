@@ -48,6 +48,8 @@ class CompletedTransferMapper @Inject constructor(
     ) =
         withContext(ioDispatcher) {
             val isOffline = isOffline(transfer)
+            val transferPath = formatTransferPath(transfer, isOffline)
+
             CompletedTransfer(
                 fileName = transfer.fileName,
                 type = transfer.transferType,
@@ -55,16 +57,15 @@ class CompletedTransferMapper @Inject constructor(
                 size = getSizeString(transfer.totalBytes),
                 handle = transfer.nodeHandle,
                 isOffline = isOffline,
-                path = formatTransferPath(transfer, isOffline),
+                path = transferPath,
                 timestamp = deviceGateway.now,
                 error = error?.errorString,
                 errorCode = error?.let { getErrorCode(transfer, it) },
                 originalPath = transfer.localPath,
                 parentHandle = transfer.parentHandle,
                 appData = transfer.appData,
-                displayPath = documentFileWrapper.getDocumentFile(transfer.parentPath)?.let {
-                    documentFileWrapper.getAbsolutePathFromContentUri(it.uri)
-                }?.takeIf { it.isNotBlank() },
+                displayPath = getDisplayPath(transfer, isOffline).takeUnless { it.isNullOrEmpty() }
+                    ?: transferPath,
             )
         }
 
@@ -102,6 +103,15 @@ class CompletedTransferMapper @Inject constructor(
 
             TransferType.NONE -> ""
         }.removeSuffix(File.separator)
+
+    private suspend fun getDisplayPath(transfer: Transfer, isOffline: Boolean): String? =
+        if (transfer.transferType == TransferType.DOWNLOAD && isOffline.not()) {
+            documentFileWrapper.getDocumentFile(transfer.parentPath)?.let {
+                documentFileWrapper.getAbsolutePathFromContentUri(it.uri)
+            }?.takeIf { it.isNotBlank() }
+        } else {
+            null
+        }
 
     /**
      * Get a formatted string of the size

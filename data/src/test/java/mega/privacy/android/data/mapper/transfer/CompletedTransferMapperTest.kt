@@ -120,9 +120,11 @@ class CompletedTransferMapperTest {
     @Test
     fun `test that displayPath is mapped correctly`() {
         runTest {
-            val transfer = mockTransfer()
+            val offlinePath = "Offline"
+            val transfer = mockTransfer(transferType = TransferType.DOWNLOAD,)
             val expected = "displayPath"
             whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
+            whenever(fileGateway.getOfflineFilesRootPath()).thenReturn(offlinePath)
             val uri = mock<Uri>()
             val documentFile = mock<DocumentFile> {
                 on { this.uri } doReturn uri
@@ -140,9 +142,11 @@ class CompletedTransferMapperTest {
     @Test
     fun `test that empty displayPath is not used`() {
         runTest {
-            val transfer = mockTransfer()
+            val offlinePath = "Offline"
+            val transfer = mockTransfer(transferType = TransferType.DOWNLOAD)
             val displayPath = ""
             whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
+            whenever(fileGateway.getOfflineFilesRootPath()).thenReturn(offlinePath)
             val uri = mock<Uri>()
             val documentFile = mock<DocumentFile> {
                 on { this.uri } doReturn uri
@@ -153,7 +157,7 @@ class CompletedTransferMapperTest {
 
             val actual = underTest(transfer, null)
 
-            assertThat(actual.displayPath).isNull()
+            assertThat(actual.displayPath).isEqualTo(transfer.parentPath)
         }
     }
 
