@@ -1301,8 +1301,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">帮助</string>
-    <!-- Settings preference title for help centre -->
-    <string name="settings_help_centre">帮助中心</string>
     <!-- Settings preference title for send feedback -->
     <string name="settings_help_preference">发送反馈</string>
     <!-- mail subject -->
@@ -1631,7 +1629,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">启用链接发送预览</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">预览您在聊天中发送的链接。请注意，检索这些预览不受零知识加密的保护。</string>
+    <string name="text_enable_rich_links">Generates previews for certain links you send in chat, when available. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">请输入一个较强的密码</string>
     <!-- title of the notification for an acceptance of a contact request -->

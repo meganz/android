@@ -1301,8 +1301,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">도움말</string>
-    <!-- Settings preference title for help centre -->
-    <string name="settings_help_centre">도움 센터</string>
     <!-- Settings preference title for send feedback -->
     <string name="settings_help_preference">피드백 보내기</string>
     <!-- mail subject -->
@@ -1631,7 +1629,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">보낸 링크 미리보기 활성화</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">대화에 보낸 링크에 대한 미리보기를 생성합니다. 이러한 미리보기를 수신하는 것은 영지식 암호화의 보호를 받지 않는다는 점을 참고하세요.</string>
+    <string name="text_enable_rich_links">Generates previews for certain links you send in chat, when available. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">더 강력한 암호를 입력하세요</string>
     <!-- title of the notification for an acceptance of a contact request -->
