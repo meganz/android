@@ -89,4 +89,9 @@ object MegaDatabaseConstant {
      * Table pending transfers
      */
     const val TABLE_PENDING_TRANSFER = "pending_transfer"
+
+    /**
+     * Table for last page viewed in PDF viewer
+     */
+    const val TABLE_LAST_PAGE_VIEWED_IN_PDF = "last_page_viewed_in_pdf"
 }
