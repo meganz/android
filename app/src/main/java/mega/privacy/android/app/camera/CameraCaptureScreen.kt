@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.ScaffoldState
@@ -20,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,10 +31,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,6 +53,8 @@ import mega.privacy.android.app.camera.state.CamSelector
 import mega.privacy.android.app.camera.state.FlashMode
 import mega.privacy.android.app.camera.state.rememberCameraState
 import mega.privacy.android.app.camera.state.rememberSaveableCamSelector
+import mega.privacy.android.app.camera.view.FOCUS_RING_SIZE
+import mega.privacy.android.app.camera.view.FocusRing
 import mega.privacy.android.app.camera.view.ZoomLevelButtonsGroup
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
@@ -107,6 +113,10 @@ internal fun CameraCaptureScreen(
             }
         }
     }
+
+    // Focus ring state management
+    var focusRingKey by remember { mutableIntStateOf(0) }
+    var tapOffset by remember { mutableStateOf(Offset(0f, 0f)) }
 
     val flashOptions = remember {
         hashMapOf(
@@ -252,7 +262,27 @@ internal fun CameraCaptureScreen(
                     camSelector = camSelector,
                     captureMode = cameraOption.mode,
                     flashMode = flashMode,
+                    onTapFocus = { x, y ->
+                        tapOffset = Offset(x, y)
+                        focusRingKey++
+                    }
                 )
+
+                if (cameraState.isFocusActive) {
+                    key(focusRingKey) {
+                        FocusRing(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset {
+                                    val ringOffset = (FOCUS_RING_SIZE / 2).dp.toPx()
+                                    IntOffset(
+                                        x = (tapOffset.x - ringOffset).toInt(),
+                                        y = (tapOffset.y - ringOffset).toInt()
+                                    )
+                                }
+                        )
+                    }
+                }
 
                 ZoomLevelButtonsGroup(
                     availableZoomRange = availableZoomRange,
@@ -301,6 +331,8 @@ private fun rememberAnimationRotation(rotation: Float): Float {
     )
     return targetRotation
 }
+
+
 
 private fun persistablePickVisualMedia() = object : ActivityResultContracts.PickVisualMedia() {
     override fun createIntent(context: Context, input: PickVisualMediaRequest): Intent =

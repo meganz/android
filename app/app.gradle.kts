@@ -220,6 +220,7 @@ dependencies {
     // Jetbrains
     implementation(lib.coroutines.android)
     implementation(lib.coroutines.core)
+    implementation(lib.concurrent.futures.ktx)
     implementation(lib.kotlin.ktx)
     implementation(lib.kotlin.stdlib)
     implementation(lib.kotlin.stdlib.jdk7)

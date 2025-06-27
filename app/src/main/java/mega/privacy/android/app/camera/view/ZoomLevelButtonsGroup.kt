@@ -115,7 +115,7 @@ internal fun ZoomLevelButtonsGroup(
                         .size(28.dp)
                         .graphicsLayer { scaleX = scale; scaleY = scale }
                         .background(
-                            color = Color.Black.copy(alpha = if (isClosest) 0.8f else 0.5f),
+                            color = Color.Black.copy(alpha = if (isClosest) 0.6f else 0.5f),
                             shape = CircleShape
                         )
                         .clickable(

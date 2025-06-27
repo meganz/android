@@ -65,6 +65,12 @@ class CameraState(context: Context) {
     )
 
     /**
+     * Focus state to track when focus is active.
+     * */
+    var isFocusActive: Boolean by mutableStateOf(false)
+        internal set
+
+    /**
      * Capture mode to be added on camera.
      * */
     internal var captureMode: CaptureMode = CaptureMode.Image
