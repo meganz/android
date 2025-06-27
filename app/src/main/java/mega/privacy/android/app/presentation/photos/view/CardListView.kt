@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.photos.view
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,15 +30,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.DateCardCount
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 
 @Composable
@@ -110,8 +110,8 @@ fun CardListView(
                             .crossfade(true)
                             .build(),
                         contentDescription = null,
-                        placeholder = painterResource(id = IconPackR.drawable.ic_image_medium_solid),
-                        error = painterResource(id = IconPackR.drawable.ic_image_medium_solid),
+                        placeholder = rememberAsyncImagePainter(model = IconPackR.drawable.ic_image_medium_solid),
+                        error = rememberAsyncImagePainter(model = IconPackR.drawable.ic_image_medium_solid),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxWidth()
