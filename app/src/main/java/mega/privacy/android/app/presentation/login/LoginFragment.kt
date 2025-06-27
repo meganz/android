@@ -749,7 +749,6 @@ class LoginFragment : Fragment() {
                             Timber.d("First launch")
                             val shouldShowNotificationPermission =
                                 viewModel.shouldShowNotificationPermission()
-
                             intent.apply {
                                 putExtra(
                                     IntentConstants.EXTRA_FIRST_LAUNCH,
@@ -770,7 +769,7 @@ class LoginFragment : Fragment() {
 
                             // we show upgrade account for all accounts that are free and logged in for the first time
                             if (uiState.shouldShowUpgradeAccount) {
-                                startActivity(
+                                loginActivity.startActivity(
                                     intent.setClass(
                                         requireContext(),
                                         ChooseAccountActivity::class.java
@@ -780,7 +779,7 @@ class LoginFragment : Fragment() {
                                     }
                                 )
                             } else {
-                                startActivity(intent)
+                                loginActivity.startActivity(intent)
                             }
                         }
                         Timber.d("LoginActivity finish")
