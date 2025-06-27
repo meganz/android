@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableSet
 import mega.android.core.ui.tokens.theme.DSTokens
@@ -76,14 +77,14 @@ fun MainNavigationScaffold(
                 orderedItems.forEach { navItem ->
                     item(
                         icon = {
-                            mainNavItemIcon(navItem.iconRes, navItem.label)
+                            mainNavItemIcon(navItem.iconRes, stringResource(navItem.label))
                         },
                         badge = {
                             navItem.badgeText?.let { text ->
                                 mainNavItemBadge(text)
                             }
                         },
-                        label = { Text(text = navItem.label) },
+                        label = { Text(text = stringResource(navItem.label)) },
                         selected = isSelected(navItem.destination),
                         onClick = {
                             Analytics.tracker.trackEvent(navItem.analyticsEventIdentifier)

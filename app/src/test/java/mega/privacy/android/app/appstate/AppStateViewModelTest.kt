@@ -82,7 +82,7 @@ class AppStateViewModelTest {
             on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(true)
-            on { label }.thenReturn("Expected Label")
+            on { label }.thenReturn(android.R.string.ok)
             on { analyticsEventIdentifier }.thenReturn(mock())
         }
 
@@ -114,7 +114,7 @@ class AppStateViewModelTest {
             on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(true)
-            on { label }.thenReturn("Expected Label")
+            on { label }.thenReturn(android.R.string.ok)
             on { analyticsEventIdentifier }.thenReturn(mock())
         }
         val disabledFeature = mock<Feature>()
@@ -130,7 +130,7 @@ class AppStateViewModelTest {
                 on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
                 on { preferredSlot }.thenReturn(PreferredSlot.Ordered(2))
                 on { availableOffline }.thenReturn(true)
-                on { label }.thenReturn("Not Expected Label")
+                on { label }.thenReturn(android.R.string.cancel)
                 on { analyticsEventIdentifier }.thenReturn(mock())
             }
         }
@@ -156,7 +156,7 @@ class AppStateViewModelTest {
             on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(true)
-            on { label }.thenReturn("Expected Label")
+            on { label }.thenReturn(android.R.string.ok)
             on { analyticsEventIdentifier }.thenReturn(mock())
         }
         val enabledFeature = mock<Feature>()
@@ -172,7 +172,7 @@ class AppStateViewModelTest {
                 on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
                 on { preferredSlot }.thenReturn(PreferredSlot.Ordered(2))
                 on { availableOffline }.thenReturn(true)
-                on { label }.thenReturn("Also Expected Label")
+                on { label }.thenReturn(android.R.string.cancel)
                 on { analyticsEventIdentifier }.thenReturn(mock())
             }
         }
@@ -306,7 +306,7 @@ class AppStateViewModelTest {
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(true)
             on { analyticsEventIdentifier }.thenReturn(mock())
-            on { label }.thenReturn("Expected Label")
+            on { label }.thenReturn(android.R.string.ok)
         }
         val expected = setOf(mainNavItem)
 
@@ -332,7 +332,7 @@ class AppStateViewModelTest {
                 on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
                 on { availableOffline }.thenReturn(false)
                 on { analyticsEventIdentifier }.thenReturn(mock())
-                on { label }.thenReturn("Expected Label")
+                on { label }.thenReturn(android.R.string.ok)
             }
             val expected = setOf(mainNavItem)
 
@@ -357,7 +357,7 @@ class AppStateViewModelTest {
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(false)
             on { analyticsEventIdentifier }.thenReturn(mock())
-            on { label }.thenReturn("Expected Label")
+            on { label }.thenReturn(android.R.string.ok)
         }
         val expected = setOf(mainNavItem)
 
@@ -420,7 +420,7 @@ class AppStateViewModelTest {
         on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
         on { availableOffline }.thenReturn(true)
         on { analyticsEventIdentifier }.thenReturn(mock())
-        on { label }.thenReturn("Expected Label")
+        on { label }.thenReturn(android.R.string.ok)
     })
 
     private fun stubConnectivity(connected: Boolean = true) {

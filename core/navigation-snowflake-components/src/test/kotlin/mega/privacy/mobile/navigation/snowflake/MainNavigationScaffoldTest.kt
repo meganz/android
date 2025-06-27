@@ -13,6 +13,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableSet
@@ -35,6 +36,7 @@ class MainNavigationScaffoldTest {
 
     val composeTestRule = createComposeRule()
     private val analyticsRule = AnalyticsTestRule()
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
@@ -58,9 +60,10 @@ class MainNavigationScaffoldTest {
         }
 
         // Verify all navigation items are displayed
-        composeTestRule.onNodeWithText("Home").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Chat").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Photos").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.ok)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.cancel))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.copy)).assertIsDisplayed()
     }
 
     @Test
@@ -82,10 +85,10 @@ class MainNavigationScaffoldTest {
         }
 
         // Click on a navigation item
-        composeTestRule.onNodeWithText("Home").performClick()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.ok)).performClick()
 
         // Verify the click handler was called with the correct item
-        verify(onDestinationClick).invoke(navItems.first { it.label == "Home" }.destination)
+        verify(onDestinationClick).invoke(navItems.first { it.label == android.R.string.ok }.destination)
         verifyNoMoreInteractions(onDestinationClick)
     }
 
@@ -93,7 +96,7 @@ class MainNavigationScaffoldTest {
     fun test_that_selected_state_is_reflected_in_ui() {
         val navItems = createTestNavItems()
         val onDestinationClick: (Any) -> Unit = mock()
-        val selectedItem = navItems.first { it.label == "Home" }.destination
+        val selectedItem = navItems.first { it.label == android.R.string.ok }.destination
         val isSelected: (Any) -> Boolean = { it == selectedItem }
 
         composeTestRule.setContent {
@@ -109,9 +112,10 @@ class MainNavigationScaffoldTest {
         }
 
         // The selected item should be displayed (UI state changes are handled by Material3)
-        composeTestRule.onNodeWithText("Home").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Chat").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Photos").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.ok)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.cancel))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.copy)).assertIsDisplayed()
     }
 
     @Test
@@ -133,7 +137,8 @@ class MainNavigationScaffoldTest {
         }
 
         // Verify the item with badge is displayed
-        composeTestRule.onNodeWithText("Chat").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.cancel))
+            .assertIsDisplayed()
     }
 
     @Test
@@ -192,13 +197,13 @@ class MainNavigationScaffoldTest {
     fun test_that_only_first_four_items_and_last_item_are_displayed_when_more_than_four_are_added() {
 
         val navItems = listOf(
-            createMockNavItem("Home", 1, PreferredSlot.Ordered(1)),
-            createMockNavItem("Chat", 2, PreferredSlot.Ordered(2)),
-            createMockNavItem("Photos", 3, PreferredSlot.Ordered(3)),
-            createMockNavItem("Settings", 4, PreferredSlot.Ordered(4)),
-            createMockNavItem("Extra1", 5, PreferredSlot.Ordered(5)),
-            createMockNavItem("Extra2", 6, PreferredSlot.Ordered(6)),
-            createMockNavItem("Menu", 7, PreferredSlot.Last)
+            createMockNavItem(android.R.string.ok, 1, PreferredSlot.Ordered(1)),
+            createMockNavItem(android.R.string.cancel, 2, PreferredSlot.Ordered(2)),
+            createMockNavItem(android.R.string.copy, 3, PreferredSlot.Ordered(3)),
+            createMockNavItem(android.R.string.cut, 4, PreferredSlot.Ordered(4)),
+            createMockNavItem(android.R.string.paste, 5, PreferredSlot.Ordered(5)),
+            createMockNavItem(android.R.string.selectAll, 6, PreferredSlot.Ordered(6)),
+            createMockNavItem(android.R.string.dialog_alert_title, 7, PreferredSlot.Last)
         ).toImmutableSet()
         val onDestinationClick: (Any) -> Unit = mock()
         val isSelected: (Any) -> Boolean = { false }
@@ -216,21 +221,26 @@ class MainNavigationScaffoldTest {
         }
 
         // Should display: Home (slot 1), Chat (slot 2), Photos (slot 3), Settings (slot 4), Menu (last)
-        composeTestRule.onNodeWithText("Home").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Chat").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Photos").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Settings").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Menu").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Extra1").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Extra2").assertDoesNotExist()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.ok)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.cancel))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.copy)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.cut)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.dialog_alert_title))
+            .assertIsDisplayed()
+        // These shouldn't exist since we only show 5 items max
+        composeTestRule.onNodeWithText(context.getString(android.R.string.paste))
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.selectAll))
+            .assertDoesNotExist()
 
     }
 
     @Test
     fun test_that_all_items_are_displayed_if_only_one_item_and_last_are_passed() {
         val navItems = listOf(
-            createMockNavItem("Home", 1, PreferredSlot.Ordered(1)),
-            createMockNavItem("Menu", 2, PreferredSlot.Last)
+            createMockNavItem(android.R.string.ok, 1, PreferredSlot.Ordered(1)),
+            createMockNavItem(android.R.string.dialog_alert_title, 2, PreferredSlot.Last)
         ).toImmutableSet()
         val onDestinationClick: (Any) -> Unit = mock()
         val isSelected: (Any) -> Boolean = { false }
@@ -247,19 +257,20 @@ class MainNavigationScaffoldTest {
             )
         }
 
-        // Should display both items: Home (ordered) and Menu (last)
-        composeTestRule.onNodeWithText("Home").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Menu").assertIsDisplayed()
+        // Should display both items using actual resolved strings
+        composeTestRule.onNodeWithText(context.getString(android.R.string.ok)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.dialog_alert_title))
+            .assertIsDisplayed()
     }
 
     @Test
     fun test_that_five_items_are_displayed_if_five_or_more_items_are_passed_and_no_last_item_is_passed() {
         val navItems = listOf(
-            createMockNavItem("Home", 1, PreferredSlot.Ordered(1)),
-            createMockNavItem("Chat", 2, PreferredSlot.Ordered(2)),
-            createMockNavItem("Photos", 3, PreferredSlot.Ordered(3)),
-            createMockNavItem("Settings", 4, PreferredSlot.Ordered(4)),
-            createMockNavItem("Extra1", 5, PreferredSlot.Ordered(5))
+            createMockNavItem(android.R.string.ok, 1, PreferredSlot.Ordered(1)),
+            createMockNavItem(android.R.string.cancel, 2, PreferredSlot.Ordered(2)),
+            createMockNavItem(android.R.string.copy, 3, PreferredSlot.Ordered(3)),
+            createMockNavItem(android.R.string.cut, 4, PreferredSlot.Ordered(4)),
+            createMockNavItem(android.R.string.paste, 5, PreferredSlot.Ordered(5))
         ).toImmutableSet()
         val onDestinationClick: (Any) -> Unit = mock()
         val isSelected: (Any) -> Boolean = { false }
@@ -276,11 +287,16 @@ class MainNavigationScaffoldTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Home").assertIsDisplayed()      // slot 1
-        composeTestRule.onNodeWithText("Chat").assertIsDisplayed()      // slot 2
-        composeTestRule.onNodeWithText("Photos").assertIsDisplayed()    // slot 3
-        composeTestRule.onNodeWithText("Settings").assertIsDisplayed()  // slot 4
-        composeTestRule.onNodeWithText("Extra1").assertIsDisplayed()    // slot 5
+        composeTestRule.onNodeWithText(context.getString(android.R.string.ok))
+            .assertIsDisplayed()      // slot 1
+        composeTestRule.onNodeWithText(context.getString(android.R.string.cancel))
+            .assertIsDisplayed()      // slot 2
+        composeTestRule.onNodeWithText(context.getString(android.R.string.copy))
+            .assertIsDisplayed()    // slot 3
+        composeTestRule.onNodeWithText(context.getString(android.R.string.cut))
+            .assertIsDisplayed()  // slot 4
+        composeTestRule.onNodeWithText(context.getString(android.R.string.paste))
+            .assertIsDisplayed()    // slot 5
     }
 
     @Test
@@ -288,7 +304,7 @@ class MainNavigationScaffoldTest {
         val expected = mock<NavigationEventIdentifier>()
         val navItems = listOf(
             createMockNavItem(
-                label = "Home",
+                label = android.R.string.ok,
                 iconRes = 1,
                 preferredSlot = PreferredSlot.Ordered(1),
                 navigationEventIdentifier = expected,
@@ -310,30 +326,50 @@ class MainNavigationScaffoldTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Home").performClick()
+        composeTestRule.onNodeWithText(context.getString(android.R.string.ok)).performClick()
 
         assertThat(analyticsRule.events).contains(expected)
     }
 
     private fun createTestNavItems() = listOf(
-        createMockNavItem(label = "Home", iconRes = 1, preferredSlot = PreferredSlot.Ordered(1)),
-        createMockNavItem(label = "Chat", iconRes = 2, preferredSlot = PreferredSlot.Ordered(2)),
-        createMockNavItem(label = "Photos", iconRes = 3, preferredSlot = PreferredSlot.Last)
+        createMockNavItem(
+            label = android.R.string.ok,
+            iconRes = 1,
+            preferredSlot = PreferredSlot.Ordered(1)
+        ),
+        createMockNavItem(
+            label = android.R.string.cancel,
+            iconRes = 2,
+            preferredSlot = PreferredSlot.Ordered(2)
+        ),
+        createMockNavItem(
+            label = android.R.string.copy,
+            iconRes = 3,
+            preferredSlot = PreferredSlot.Last
+        )
     ).toImmutableSet()
 
     private fun createTestNavItemsWithBadge() = listOf(
-        createMockNavItem(label = "Home", iconRes = 1, preferredSlot = PreferredSlot.Ordered(1)),
         createMockNavItem(
-            label = "Chat",
+            label = android.R.string.ok,
+            iconRes = 1,
+            preferredSlot = PreferredSlot.Ordered(1)
+        ),
+        createMockNavItem(
+            label = android.R.string.cancel,
             iconRes = 2,
             preferredSlot = PreferredSlot.Ordered(2),
             badgeText = "5"
         ),
-        createMockNavItem(label = "Photos", iconRes = 3, preferredSlot = PreferredSlot.Last)
+        createMockNavItem(
+            label = android.R.string.copy,
+            iconRes = 3,
+            preferredSlot = PreferredSlot.Last
+        )
     ).toImmutableSet()
 
     private fun createMockNavItem(
-        label: String,
+        label: Int,
         iconRes: Int,
         preferredSlot: PreferredSlot,
         enabled: Boolean = true,

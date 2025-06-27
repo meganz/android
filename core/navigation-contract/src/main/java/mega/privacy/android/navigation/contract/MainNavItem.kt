@@ -9,7 +9,7 @@ interface MainNavItem {
     val screen: NavGraphBuilder.(navigationHandler: NavigationHandler) -> Unit
     val iconRes: Int
     val badge: Flow<String?>?
-    val label: String
+    val label: Int
     val preferredSlot: PreferredSlot
     val availableOffline: Boolean
     val analyticsEventIdentifier: NavigationEventIdentifier
