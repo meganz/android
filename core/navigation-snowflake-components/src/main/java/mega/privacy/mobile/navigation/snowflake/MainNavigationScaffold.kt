@@ -16,6 +16,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableSet
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationIcon
@@ -77,7 +78,10 @@ fun MainNavigationScaffold(
                         badge = { renderBadge(navItem, mainNavItemBadge) },
                         label = { Text(text = navItem.label) },
                         selected = isSelected(navItem),
-                        onClick = { onDestinationClick(navItem) },
+                        onClick = {
+                            Analytics.tracker.trackEvent(navItem.analyticsEventIdentifier)
+                            onDestinationClick(navItem)
+                        },
                         colors = itemColors,
                         enabled = enabled,
                     )

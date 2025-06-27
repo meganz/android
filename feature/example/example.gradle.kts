@@ -29,7 +29,7 @@ dependencies {
     implementation(project(":icon-pack"))
     implementation(project(":core:navigation-contract"))
     implementation(lib.mega.core.ui)
-
+    implementation(lib.mega.analytics)
     implementation(lib.kotlin.ktx)
     implementation(lib.logging.timber)
     implementation(androidx.appcompat)

@@ -11,6 +11,7 @@ import mega.privacy.android.icon.pack.R as IconPack
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.PreferredSlot
+import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 
 class ExampleMainItem : MainNavItem {
     override val destination: Any = HomeScreen
@@ -21,6 +22,7 @@ class ExampleMainItem : MainNavItem {
     override val label: String = "Demo"
     override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(1)
     override val availableOffline: Boolean = false
+    override val analyticsEventIdentifier: NavigationEventIdentifier = ExampleNavigationIdentifier
 }
 
 class OtherExampleMainItem : MainNavItem {
@@ -39,5 +41,17 @@ class OtherExampleMainItem : MainNavItem {
     override val label: String = "Other"
     override val preferredSlot: PreferredSlot = PreferredSlot.Last
     override val availableOffline: Boolean = true
+    override val analyticsEventIdentifier: NavigationEventIdentifier = ExampleNavigationIdentifier
+}
+
+object ExampleNavigationIdentifier : NavigationEventIdentifier {
+    override val navigationElementType: String?
+        get() = "ExampleNavigation"
+    override val destination: String?
+        get() = "ExampleNavigation"
+    override val eventName: String
+        get() = "ExampleNavigation"
+    override val uniqueIdentifier: Int
+        get() = -1
 }
 

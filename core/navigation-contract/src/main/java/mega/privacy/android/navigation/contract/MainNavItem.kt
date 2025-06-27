@@ -2,6 +2,7 @@ package mega.privacy.android.navigation.contract
 
 import androidx.navigation.NavGraphBuilder
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 
 interface MainNavItem {
     val destination: Any
@@ -11,5 +12,6 @@ interface MainNavItem {
     val label: String
     val preferredSlot: PreferredSlot
     val availableOffline: Boolean
+    val analyticsEventIdentifier: NavigationEventIdentifier
 }
 

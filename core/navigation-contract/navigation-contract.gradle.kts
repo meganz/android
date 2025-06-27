@@ -10,4 +10,5 @@ android {
 
 dependencies {
     implementation(androidx.navigation.compose)
+    implementation(lib.mega.analytics)
 }

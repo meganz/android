@@ -12,18 +12,24 @@ android {
 
 dependencies {
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:analytics:analytics-tracker"))
     implementation(platform(androidx.compose.bom))
     implementation(androidx.navigation.compose)
     implementation(androidx.material3.adaptive.navigation.suite)
     implementation(lib.kotlinx.collections.immutable)
     implementation(lib.logging.timber)
 
+    implementation(lib.mega.analytics)
+
     implementation(lib.mega.core.ui)
     implementation(lib.mega.core.ui.tokens)
 
+    debugImplementation(testlib.compose.manifest)
+
     // Test dependencies
-    testImplementation(project(":core-ui-test"))
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
+    testImplementation(testlib.bundles.junit5.api)
     testImplementation(lib.kotlin.serialisation)
 }
