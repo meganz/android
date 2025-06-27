@@ -6,18 +6,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.SpanStyle
+import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
@@ -34,6 +39,8 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
+import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
@@ -101,6 +108,8 @@ internal fun TransfersView(
     onRetryTransfer: (CompletedTransfer) -> Unit,
     onConsumeQuotaWarning: () -> Unit,
 ) = with(uiState) {
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
     var showActiveTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showFailedTransfersModal by rememberSaveable { mutableStateOf(false) }
@@ -120,12 +129,27 @@ internal fun TransfersView(
             .semantics { testTagsAsResourceId = true }
             .testTag(TEST_TAG_TRANSFERS_VIEW),
         topBar = {
+            val snackbarHostState = LocalSnackBarHostState.current?.let {
+                SnackbarHostStateWrapper(it)
+            }
+
             if (!isInSelectTransfersMode) {
                 TransfersTopBar(onBackPress, getTransferActions(uiState)) { action ->
                     when (action) {
                         TransferMenuAction.Pause -> {
                             Analytics.tracker.trackEvent(ActiveTransfersGlobalPauseMenuItemEvent)
                             onPauseTransfers()
+
+                            coroutineScope.launch {
+                                val result = snackbarHostState?.showAutoDurationSnackbar(
+                                    context.getString(sharedR.string.transfers_all_transfers_paused_warning),
+                                    context.getString(sharedR.string.transfers_resume_all_button)
+                                )
+
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    onResumeTransfers()
+                                }
+                            }
                         }
 
                         TransferMenuAction.Resume -> {

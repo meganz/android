@@ -1297,4 +1297,8 @@
     <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">Help Centre</string>
+    <!-- Warning informing the transfers queue has been paused -->
+    <string name="transfers_all_transfers_paused_warning">All transfers paused</string>
+    <!-- Button for resuming the transfers queue -->
+    <string name="transfers_resume_all_button">Resume all</string>
 </resources>
