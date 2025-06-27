@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.camera.preview.navigateToPhotoPreview
 import mega.privacy.android.app.camera.preview.navigateToVideoPreview
 import mega.privacy.android.app.camera.preview.photoPreviewScreen
@@ -24,7 +25,6 @@ import mega.privacy.android.app.camera.setting.cameraSettingModal
 import mega.privacy.android.app.camera.setting.navigateCameraSettingModal
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 
 @AndroidEntryPoint
@@ -46,7 +46,7 @@ internal class CameraActivity : AppCompatActivity() {
             val coroutineScope = rememberCoroutineScope()
 
             // force dark theme for camera
-            OriginalTheme(isDark = true) {
+            AndroidTheme(isDark = true) {
                 NavHost(
                     navController = navController,
                     startDestination = CAMERA_CAPTURE_ROUTE,

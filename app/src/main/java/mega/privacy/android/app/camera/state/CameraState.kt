@@ -14,6 +14,7 @@ import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.video.AudioConfig
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
@@ -130,6 +131,11 @@ class CameraState(context: Context) {
     var isRecording: Boolean by mutableStateOf(controller.isRecording)
         private set
 
+    /**
+     * Current zoom ratio of the camera.
+     * */
+    var zoomRatio: Float by mutableFloatStateOf(0f)
+
     init {
         controller.initializationFuture.addListener({
             resetCamera()
@@ -243,7 +249,8 @@ class CameraState(context: Context) {
 
     private fun resetCamera() {
         hasFlashUnit = controller.cameraInfo?.hasFlashUnit() ?: false
-        controller.isPinchToZoomEnabled = false
+        controller.isPinchToZoomEnabled = true
+        zoomRatio = 1.0f
     }
 
     /**

@@ -1,10 +1,12 @@
 package mega.privacy.android.app.camera
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.view.OrientationEventListener
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,9 +28,9 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
@@ -47,6 +49,7 @@ import mega.privacy.android.app.camera.state.CamSelector
 import mega.privacy.android.app.camera.state.FlashMode
 import mega.privacy.android.app.camera.state.rememberCameraState
 import mega.privacy.android.app.camera.state.rememberSaveableCamSelector
+import mega.privacy.android.app.camera.view.ZoomLevelButtonsGroup
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -58,10 +61,10 @@ import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionStat
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+
 @OptIn(
     ExperimentalPermissionsApi::class,
-    ExperimentalMaterialNavigationApi::class,
-    ExperimentalComposeUiApi::class
+    ExperimentalMaterialNavigationApi::class
 )
 @Composable
 internal fun CameraCaptureScreen(
@@ -74,6 +77,7 @@ internal fun CameraCaptureScreen(
     viewModel: CameraViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val cameraState = rememberCameraState()
     var flashMode by rememberSaveable { mutableStateOf(cameraState.flashMode) }
     var camSelector by rememberSaveableCamSelector(CamSelector.Back)
@@ -93,6 +97,16 @@ internal fun CameraCaptureScreen(
     var selectFlashMode by rememberSaveable { mutableStateOf(false) }
     var rotation by rememberSaveable { mutableIntStateOf(0) }
     val animatedRotation = rememberAnimationRotation(rotation.toFloat())
+
+    var availableZoomRange by remember { mutableStateOf(1.0f..5.0f) }
+    LaunchedEffect(cameraState.isInitialized) {
+        if (cameraState.isInitialized) {
+            cameraState.controller.cameraInfo?.zoomState?.observe(lifecycleOwner) { zoomState ->
+                cameraState.zoomRatio = zoomState.zoomRatio
+                availableZoomRange = zoomState.minZoomRatio..zoomState.maxZoomRatio
+            }
+        }
+    }
 
     val flashOptions = remember {
         hashMapOf(
@@ -239,6 +253,27 @@ internal fun CameraCaptureScreen(
                     captureMode = cameraOption.mode,
                     flashMode = flashMode,
                 )
+
+                ZoomLevelButtonsGroup(
+                    availableZoomRange = availableZoomRange,
+                    currentZoomRatio = cameraState.zoomRatio,
+                    onZoomLevelSelected = { zoomLevel ->
+                        ValueAnimator.ofFloat(cameraState.zoomRatio, zoomLevel).apply {
+                            duration = 300
+                            interpolator = AccelerateDecelerateInterpolator()
+                            addUpdateListener { animation ->
+                                val zoomValue = animation.animatedValue as Float
+                                cameraState.controller.setZoomRatio(zoomValue)
+                            }
+                            start()
+                        }
+                    },
+                    rotationDegree = animatedRotation,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp)
+                )
+
                 if (isRecording) {
                     CameraTimer(
                         modifier = Modifier
@@ -251,6 +286,7 @@ internal fun CameraCaptureScreen(
         }
     }
 }
+
 
 @Composable
 private fun rememberAnimationRotation(rotation: Float): Float {

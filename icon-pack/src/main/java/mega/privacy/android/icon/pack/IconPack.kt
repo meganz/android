@@ -398,6 +398,10 @@ public object IconPack {
                 public val Square: Painter
                     @Composable
                     get() = painterResource(R.drawable.ic_square_medium_thin_outline)
+
+                public val Sync2: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_sync_2_medium_thin_outline)
             }
 
             public object Solid {

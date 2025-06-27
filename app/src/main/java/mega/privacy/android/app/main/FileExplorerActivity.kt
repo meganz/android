@@ -440,7 +440,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     Timber.d("Result is not OK")
                     return@registerForActivityResult
                 }
-
+                val vaal = intent.getStringArrayListExtra(EXTRA_CONTACTS)
                 result.data?.let { intent ->
                     intent.getStringArrayListExtra(EXTRA_CONTACTS)
                         ?.let { contactsData ->

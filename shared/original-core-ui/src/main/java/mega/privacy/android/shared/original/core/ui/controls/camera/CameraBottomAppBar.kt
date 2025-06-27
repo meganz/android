@@ -92,7 +92,7 @@ fun CameraBottomAppBar(
                 CameraButton(
                     modifier = Modifier.testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_ROTATE),
                     rotationDegree = rotationDegree,
-                    iconResId = R.drawable.ic_camera_rotate,
+                    iconResId = mega.privacy.android.icon.pack.R.drawable.ic_sync_2_medium_thin_outline,
                     onClick = onToggleCamera,
                 )
             }
