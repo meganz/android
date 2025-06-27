@@ -266,7 +266,7 @@ internal fun TransfersView(
                     .fillMaxSize(),
                 beyondViewportPageCount = 1,
                 hideTabs = isInSelectTransfersMode,
-                pagerScrollEnabled = !isInSelectTransfersMode,
+                pagerScrollEnabled = false,
                 cells = {
                     addTextTabWithLazyListState(
                         tabItem = TabItems(stringResource(id = sharedR.string.transfers_section_tab_title_active_transfers)),
