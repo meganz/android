@@ -9,7 +9,6 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldLayout
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -17,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableSet
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationIcon
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationItemBadge
@@ -28,9 +26,14 @@ import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 @Composable
 fun MainNavigationScaffold(
     mainNavItems: ImmutableSet<NavigationItem>,
-    onDestinationClick: (MainNavItem) -> Unit,
-    isSelected: (MainNavItem) -> Boolean,
-    mainNavItemIcon: @Composable (MainNavItem) -> Unit = { MainNavigationIcon(it) },
+    onDestinationClick: (Any) -> Unit,
+    isSelected: (Any) -> Boolean,
+    mainNavItemIcon: @Composable (Int, String) -> Unit = { icon, label ->
+        MainNavigationIcon(
+            icon,
+            label
+        )
+    },
     mainNavItemBadge: @Composable (String) -> Unit = { text ->
         MainNavigationItemBadge(text)
     },
@@ -70,20 +73,24 @@ fun MainNavigationScaffold(
                         }
                     }
             ) {
-                orderedItems.forEach { (navItem, enabled) ->
+                orderedItems.forEach { navItem ->
                     item(
                         icon = {
-                            mainNavItemIcon(navItem)
+                            mainNavItemIcon(navItem.iconRes, navItem.label)
                         },
-                        badge = { renderBadge(navItem, mainNavItemBadge) },
+                        badge = {
+                            navItem.badgeText?.let { text ->
+                                mainNavItemBadge(text)
+                            }
+                        },
                         label = { Text(text = navItem.label) },
-                        selected = isSelected(navItem),
+                        selected = isSelected(navItem.destination),
                         onClick = {
                             Analytics.tracker.trackEvent(navItem.analyticsEventIdentifier)
-                            onDestinationClick(navItem)
+                            onDestinationClick(navItem.destination)
                         },
                         colors = itemColors,
-                        enabled = enabled,
+                        enabled = navItem.isEnabled,
                     )
                 }
             }
@@ -100,10 +107,10 @@ fun MainNavigationScaffold(
  * - Last item is placed in the final slot
  */
 private fun orderNavigationItems(items: ImmutableSet<NavigationItem>): List<NavigationItem> {
-    val orderedItems = items.filter { it.navItem.preferredSlot is PreferredSlot.Ordered }
-        .sortedBy { (it.navItem.preferredSlot as PreferredSlot.Ordered).slot }
+    val orderedItems = items.filter { it.preferredSlot is PreferredSlot.Ordered }
+        .sortedBy { (it.preferredSlot as PreferredSlot.Ordered).slot }
 
-    val lastItem = items.find { it.navItem.preferredSlot is PreferredSlot.Last }
+    val lastItem = items.find { it.preferredSlot is PreferredSlot.Last }
 
     // For now, assume 5 slots for bottom navigation
     val availableSlots = 5
@@ -114,19 +121,3 @@ private fun orderNavigationItems(items: ImmutableSet<NavigationItem>): List<Navi
         orderedItems.take(availableSlots)
     }
 }
-
-@Composable
-private fun renderBadge(
-    navItem: MainNavItem,
-    badge: @Composable (String) -> Unit,
-): @Composable (() -> Unit)? = navItem.badge
-    ?.let {
-        {
-            val badgeText = it.collectAsState(initial = null)
-            badgeText.value?.let { text ->
-                badge(text)
-            }
-        }
-    }
-
-

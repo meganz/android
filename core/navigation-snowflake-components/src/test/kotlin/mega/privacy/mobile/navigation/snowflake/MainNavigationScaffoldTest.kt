@@ -12,17 +12,13 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableSet
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
 import mega.privacy.android.analytics.test.AnalyticsTestRule
-import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
@@ -30,7 +26,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -47,16 +42,16 @@ class MainNavigationScaffoldTest {
     @Test
     fun test_that_navigation_items_are_displayed() {
         val navItems = createTestNavItems()
-        val onDestinationClick: (MainNavItem) -> Unit = mock()
-        val isSelected: (MainNavItem) -> Boolean = { false }
+        val onDestinationClick: (Any) -> Unit = mock()
+        val isSelected: (Any) -> Boolean = { false }
 
         composeTestRule.setContent {
             MainNavigationScaffold(
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { mainNavItem ->
-                    TestIcon(mainNavItem)
+                mainNavItemIcon = { _, label ->
+                    TestIcon(label)
                 },
                 navContent = {}
             )
@@ -71,16 +66,16 @@ class MainNavigationScaffoldTest {
     @Test
     fun test_that_navigation_item_click_is_handled() {
         val navItems = createTestNavItems()
-        val onDestinationClick: (MainNavItem) -> Unit = mock()
-        val isSelected: (MainNavItem) -> Boolean = { false }
+        val onDestinationClick: (Any) -> Unit = mock()
+        val isSelected: (Any) -> Boolean = { false }
 
         composeTestRule.setContent {
             MainNavigationScaffold(
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { mainNavItem ->
-                    TestIcon(mainNavItem)
+                mainNavItemIcon = { _, label ->
+                    TestIcon(label)
                 },
                 navContent = {}
             )
@@ -90,24 +85,24 @@ class MainNavigationScaffoldTest {
         composeTestRule.onNodeWithText("Home").performClick()
 
         // Verify the click handler was called with the correct item
-        verify(onDestinationClick).invoke(navItems.map { it.navItem }.first { it.label == "Home" })
+        verify(onDestinationClick).invoke(navItems.first { it.label == "Home" }.destination)
         verifyNoMoreInteractions(onDestinationClick)
     }
 
     @Test
     fun test_that_selected_state_is_reflected_in_ui() {
         val navItems = createTestNavItems()
-        val onDestinationClick: (MainNavItem) -> Unit = mock()
-        val selectedItem = navItems.map { it.navItem }.first { it.label == "Home" }
-        val isSelected: (MainNavItem) -> Boolean = { it == selectedItem }
+        val onDestinationClick: (Any) -> Unit = mock()
+        val selectedItem = navItems.first { it.label == "Home" }.destination
+        val isSelected: (Any) -> Boolean = { it == selectedItem }
 
         composeTestRule.setContent {
             MainNavigationScaffold(
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { mainNavItem ->
-                    TestIcon(mainNavItem)
+                mainNavItemIcon = { _, label ->
+                    TestIcon(label)
                 },
                 navContent = {}
             )
@@ -122,16 +117,16 @@ class MainNavigationScaffoldTest {
     @Test
     fun test_that_badge_is_displayed_if_provided() {
         val navItemsWithBadge = createTestNavItemsWithBadge()
-        val onDestinationClick: (MainNavItem) -> Unit = mock()
-        val isSelected: (MainNavItem) -> Boolean = { false }
+        val onDestinationClick: (Any) -> Unit = mock()
+        val isSelected: (Any) -> Boolean = { false }
 
         composeTestRule.setContent {
             MainNavigationScaffold(
                 mainNavItems = navItemsWithBadge,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = @Composable { mainNavItem ->
-                    TestIcon(mainNavItem)
+                mainNavItemIcon = @Composable { _, label ->
+                    TestIcon(label)
                 },
                 navContent = {}
             )
@@ -145,8 +140,8 @@ class MainNavigationScaffoldTest {
     fun test_that_empty_navigation_items_list_is_handled() {
         val emptyNavItems: ImmutableSet<NavigationItem> =
             emptySet<NavigationItem>().toImmutableSet()
-        val onDestinationClick: (MainNavItem) -> Unit = mock()
-        val isSelected: (MainNavItem) -> Boolean = { false }
+        val onDestinationClick: (Any) -> Unit = mock()
+        val isSelected: (Any) -> Boolean = { false }
         val expected = "contentArea"
 
         composeTestRule.setContent {
@@ -154,8 +149,8 @@ class MainNavigationScaffoldTest {
                 mainNavItems = emptyNavItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = @Composable { mainNavItem ->
-                    TestIcon(mainNavItem)
+                mainNavItemIcon = @Composable { _, label ->
+                    TestIcon(label)
                 },
                 navContent = @Composable {
                     Text(text = "Content Area", modifier = Modifier.Companion.testTag(expected))
@@ -171,16 +166,16 @@ class MainNavigationScaffoldTest {
     @Test
     fun test_that_content_area_is_displayed() {
         val navItems = createTestNavItems()
-        val onDestinationClick: (MainNavItem) -> Unit = mock()
-        val isSelected: (MainNavItem) -> Boolean = { false }
+        val onDestinationClick: (Any) -> Unit = mock()
+        val isSelected: (Any) -> Boolean = { false }
         val expected = "contentArea"
         composeTestRule.setContent {
             MainNavigationScaffold(
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { mainNavItem ->
-                    TestIcon(mainNavItem)
+                mainNavItemIcon = { _, label ->
+                    TestIcon(label)
                 },
                 navContent = {
                     Text(text = "Content Area", modifier = Modifier.Companion.testTag(expected))
@@ -205,16 +200,16 @@ class MainNavigationScaffoldTest {
             createMockNavItem("Extra2", 6, PreferredSlot.Ordered(6)),
             createMockNavItem("Menu", 7, PreferredSlot.Last)
         ).toImmutableSet()
-        val onDestinationClick: (MainNavItem) -> Unit = mock()
-        val isSelected: (MainNavItem) -> Boolean = { false }
+        val onDestinationClick: (Any) -> Unit = mock()
+        val isSelected: (Any) -> Boolean = { false }
 
         composeTestRule.setContent {
             MainNavigationScaffold(
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { mainNavItem ->
-                    TestIcon(mainNavItem)
+                mainNavItemIcon = { _, label ->
+                    TestIcon(label)
                 },
                 navContent = {}
             )
@@ -237,16 +232,16 @@ class MainNavigationScaffoldTest {
             createMockNavItem("Home", 1, PreferredSlot.Ordered(1)),
             createMockNavItem("Menu", 2, PreferredSlot.Last)
         ).toImmutableSet()
-        val onDestinationClick: (MainNavItem) -> Unit = mock()
-        val isSelected: (MainNavItem) -> Boolean = { false }
+        val onDestinationClick: (Any) -> Unit = mock()
+        val isSelected: (Any) -> Boolean = { false }
 
         composeTestRule.setContent {
             MainNavigationScaffold(
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { mainNavItem ->
-                    TestIcon(mainNavItem)
+                mainNavItemIcon = { _, label ->
+                    TestIcon(label)
                 },
                 navContent = {}
             )
@@ -266,22 +261,20 @@ class MainNavigationScaffoldTest {
             createMockNavItem("Settings", 4, PreferredSlot.Ordered(4)),
             createMockNavItem("Extra1", 5, PreferredSlot.Ordered(5))
         ).toImmutableSet()
-        val onDestinationClick: (MainNavItem) -> Unit = mock()
-        val isSelected: (MainNavItem) -> Boolean = { false }
+        val onDestinationClick: (Any) -> Unit = mock()
+        val isSelected: (Any) -> Boolean = { false }
 
         composeTestRule.setContent {
             MainNavigationScaffold(
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { mainNavItem ->
-                    TestIcon(mainNavItem)
+                mainNavItemIcon = { _, label ->
+                    TestIcon(label)
                 },
                 navContent = {}
             )
         }
-
-
 
         composeTestRule.onNodeWithText("Home").assertIsDisplayed()      // slot 1
         composeTestRule.onNodeWithText("Chat").assertIsDisplayed()      // slot 2
@@ -302,16 +295,16 @@ class MainNavigationScaffoldTest {
             ),
         ).toImmutableSet()
 
-        val onDestinationClick: (MainNavItem) -> Unit = mock()
-        val isSelected: (MainNavItem) -> Boolean = { false }
+        val onDestinationClick: (Any) -> Unit = mock()
+        val isSelected: (Any) -> Boolean = { false }
 
         composeTestRule.setContent {
             MainNavigationScaffold(
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { mainNavItem ->
-                    TestIcon(mainNavItem)
+                mainNavItemIcon = { _, label ->
+                    TestIcon(label)
                 },
                 navContent = {}
             )
@@ -347,44 +340,26 @@ class MainNavigationScaffoldTest {
         badgeText: String? = null,
         navigationEventIdentifier: NavigationEventIdentifier = mock<NavigationEventIdentifier>(),
     ): NavigationItem {
-        val mainNavItem = mock<MainNavItem> {
-            on { this.label } doReturn label
-            on { this.iconRes } doReturn iconRes
-            on { badge } doReturn null
-            on { destination } doReturn TestHomeScreen
-            on { screen } doReturn { navigationHandler -> testHomeScreen() }
-            on { this.preferredSlot } doReturn preferredSlot
-            on { badge } doReturn badgeText?.let { flowOf(badgeText) }
-            on { analyticsEventIdentifier } doReturn navigationEventIdentifier
-        }
         return NavigationItem(
-            navItem = mainNavItem,
+            destination = TestHomeScreen,
+            iconRes = iconRes,
+            label = label,
             isEnabled = enabled,
+            badgeText = badgeText,
+            analyticsEventIdentifier = navigationEventIdentifier,
+            preferredSlot = preferredSlot,
         )
     }
 
     @Composable
-    private fun TestIcon(mainNavItem: MainNavItem) {
+    private fun TestIcon(label: String) {
         // This is a placeholder for the actual icon rendering logic
         Icon(
             painter = ColorPainter(Color.Red),
-            contentDescription = mainNavItem.label,
+            contentDescription = label,
         )
     }
 
     @Serializable
     object TestHomeScreen
-
-    fun NavGraphBuilder.testHomeScreen() {
-        composable<TestHomeScreen> {
-            TestHomeScreen()
-        }
-    }
-
-    @Composable
-    fun TestHomeScreen() {
-        // This is a placeholder for the actual screen content
-        Text(text = "Home Screen")
-    }
-
 }

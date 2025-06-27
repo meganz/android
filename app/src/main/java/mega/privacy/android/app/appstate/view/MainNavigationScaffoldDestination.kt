@@ -32,11 +32,11 @@ fun NavGraphBuilder.mainNavigationScaffold(
         val currentDestination = navController.currentBackStackEntryAsState().value?.destination
         MainNavigationScaffold(
             mainNavItems = topLevelDestinations,
-            onDestinationClick = { mainNavItem ->
-                navController.navigate(mainNavItem.destination)
+            onDestinationClick = { destination ->
+                navController.navigate(destination)
             },
-            isSelected = { navItem ->
-                currentDestination?.isTopLevelDestinationInHierarchy(navItem.destination::class) == true
+            isSelected = { destination ->
+                currentDestination?.isTopLevelDestinationInHierarchy(destination::class) == true
             },
         ) {
             NavHost(

@@ -82,6 +82,8 @@ class AppStateViewModelTest {
             on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(true)
+            on { label }.thenReturn("Expected Label")
+            on { analyticsEventIdentifier }.thenReturn(mock())
         }
 
         val expected = setOf(mainNavItem)
@@ -95,8 +97,8 @@ class AppStateViewModelTest {
         underTest.state
             .filterIsInstance<AppState.Data>()
             .test {
-                assertThat(awaitItem().mainNavItems.map { it.navItem }).containsExactlyElementsIn(
-                    expected
+                assertThat(awaitItem().mainNavItems.map { it.label }).containsExactlyElementsIn(
+                    expected.map { it.label }
                 )
                 cancelAndIgnoreRemainingEvents()
             }
@@ -112,6 +114,8 @@ class AppStateViewModelTest {
             on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(true)
+            on { label }.thenReturn("Expected Label")
+            on { analyticsEventIdentifier }.thenReturn(mock())
         }
         val disabledFeature = mock<Feature>()
         getFeatureFlagValueUseCase.stub {
@@ -121,10 +125,14 @@ class AppStateViewModelTest {
             mock<Flagged>(extraInterfaces = arrayOf(MainNavItem::class))
         notExpected.stub {
             on { feature }.thenReturn(disabledFeature)
-            (this as? KStubbing<MainNavItem>)?.on { destination }
-                ?.thenReturn(SettingsHomeViewKtTest.TestDestination)
-            (this as? KStubbing<MainNavItem>)?.on { preferredSlot }
-                ?.thenReturn(PreferredSlot.Ordered(2))
+            with(this as KStubbing<MainNavItem>) {
+                // Using KStubbing to allow for more readable stubbing
+                on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+                on { preferredSlot }.thenReturn(PreferredSlot.Ordered(2))
+                on { availableOffline }.thenReturn(true)
+                on { label }.thenReturn("Not Expected Label")
+                on { analyticsEventIdentifier }.thenReturn(mock())
+            }
         }
         val mainDestinations = setOf(expected, notExpected as MainNavItem)
         val featureDestinations = emptySet<@JvmSuppressWildcards FeatureDestination>()
@@ -133,7 +141,7 @@ class AppStateViewModelTest {
         underTest.state
             .filterIsInstance<AppState.Data>()
             .test {
-                assertThat(awaitItem().mainNavItems.map { it.navItem }).containsExactly(expected)
+                assertThat(awaitItem().mainNavItems.map { it.label }).containsExactly(expected.label)
                 cancelAndIgnoreRemainingEvents()
             }
     }
@@ -148,6 +156,8 @@ class AppStateViewModelTest {
             on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(true)
+            on { label }.thenReturn("Expected Label")
+            on { analyticsEventIdentifier }.thenReturn(mock())
         }
         val enabledFeature = mock<Feature>()
         getFeatureFlagValueUseCase.stub {
@@ -157,12 +167,14 @@ class AppStateViewModelTest {
             mock<Flagged>(extraInterfaces = arrayOf(MainNavItem::class))
         alsoExpected.stub {
             on { feature }.thenReturn(enabledFeature)
-            (this as? KStubbing<MainNavItem>)?.on { destination }
-                ?.thenReturn(SettingsHomeViewKtTest.TestDestination)
-            (this as? KStubbing<MainNavItem>)?.on { preferredSlot }
-                ?.thenReturn(PreferredSlot.Ordered(2))
-            (this as? KStubbing<MainNavItem>)?.on { availableOffline }
-                ?.thenReturn(true)
+            with(this as KStubbing<MainNavItem>) {
+                // Using KStubbing to allow for more readable stubbing
+                on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
+                on { preferredSlot }.thenReturn(PreferredSlot.Ordered(2))
+                on { availableOffline }.thenReturn(true)
+                on { label }.thenReturn("Also Expected Label")
+                on { analyticsEventIdentifier }.thenReturn(mock())
+            }
         }
         val mainDestinations = setOf(expected, alsoExpected as MainNavItem)
         val featureDestinations = emptySet<@JvmSuppressWildcards FeatureDestination>()
@@ -170,9 +182,9 @@ class AppStateViewModelTest {
         underTest.state
             .filterIsInstance<AppState.Data>()
             .test {
-                assertThat(awaitItem().mainNavItems.map { it.navItem }).containsExactly(
-                    expected,
-                    alsoExpected
+                assertThat(awaitItem().mainNavItems.map { it.label }).containsExactly(
+                    expected.label,
+                    alsoExpected.label
                 )
                 cancelAndIgnoreRemainingEvents()
             }
@@ -293,6 +305,8 @@ class AppStateViewModelTest {
             on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(true)
+            on { analyticsEventIdentifier }.thenReturn(mock())
+            on { label }.thenReturn("Expected Label")
         }
         val expected = setOf(mainNavItem)
 
@@ -317,6 +331,8 @@ class AppStateViewModelTest {
                 on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
                 on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
                 on { availableOffline }.thenReturn(false)
+                on { analyticsEventIdentifier }.thenReturn(mock())
+                on { label }.thenReturn("Expected Label")
             }
             val expected = setOf(mainNavItem)
 
@@ -340,6 +356,8 @@ class AppStateViewModelTest {
             on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
             on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
             on { availableOffline }.thenReturn(false)
+            on { analyticsEventIdentifier }.thenReturn(mock())
+            on { label }.thenReturn("Expected Label")
         }
         val expected = setOf(mainNavItem)
 
@@ -401,6 +419,8 @@ class AppStateViewModelTest {
         on { destination }.thenReturn(SettingsHomeViewKtTest.TestDestination)
         on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
         on { availableOffline }.thenReturn(true)
+        on { analyticsEventIdentifier }.thenReturn(mock())
+        on { label }.thenReturn("Expected Label")
     })
 
     private fun stubConnectivity(connected: Boolean = true) {

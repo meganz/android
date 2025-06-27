@@ -3,14 +3,20 @@ package mega.privacy.android.app.appstate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import mega.privacy.android.app.appstate.model.AppState
 import mega.privacy.android.app.appstate.model.AppStateDataBuilder
@@ -37,9 +43,12 @@ class AppStateViewModel @Inject constructor(
 
     val state: StateFlow<AppState> by lazy {
         combine(
-            getFilteredValues(mainDestinations)
-                .setEnabledState()
-                .log("Main Destinations"),
+            filteredMainNavItemsFlow()
+                .asNavigationItems()
+                .log("NavigationItems"),
+            filteredMainNavItemsFlow()
+                .map { itemSet -> itemSet.map { it.screen }.toSet() }
+                .log("Main Nav Screens"),
             getFilteredValues(featureDestinations)
                 .log("Feature Destinations"),
 //            getStartScreenPreferenceDestinationUseCase()
@@ -47,9 +56,10 @@ class AppStateViewModel @Inject constructor(
                 .log("Start Screen Preference Destination"),
             monitorThemeModeUseCase()
                 .log("Theme Mode")
-        ) { mainItems, featureItems, startDestination, themeMode ->
+        ) { mainItems, mainScreens, featureItems, startDestination, themeMode ->
             AppStateDataBuilder()
                 .mainNavItems(mainItems)
+                .mainNavScreens(mainScreens)
                 .featureDestinations(featureItems)
                 .initialDestination(startDestination)
                 .themeMode(themeMode)
@@ -64,6 +74,10 @@ class AppStateViewModel @Inject constructor(
             initialValue = AppState.Loading
         )
     }
+
+    private fun filteredMainNavItemsFlow(): SharedFlow<Set<@JvmSuppressWildcards MainNavItem>> =
+        getFilteredValues(mainDestinations)
+            .shareIn(viewModelScope, started = SharingStarted.WhileSubscribed(200), replay = 1)
 
     private fun <T> getFilteredValues(items: Set<T>): Flow<Set<T>> = flow {
         val filteredItems = items.filter { item ->
@@ -81,22 +95,49 @@ class AppStateViewModel @Inject constructor(
         Timber.d("$flowName emitted: $it")
     }
 
-    private fun Flow<Set<MainNavItem>>.setEnabledState(): Flow<Set<NavigationItem>> =
-        this.combine(
-            monitorConnectivityUseCase()
-                .catch {
-                    Timber.e(
-                        it,
-                        "Error monitoring connectivity, defaulting to connected state"
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun Flow<Set<MainNavItem>>.asNavigationItems(): Flow<Set<NavigationItem>> {
+        return combine(
+            getConnectivityStateOrDefault(),
+            this.map { mainNavItemsSet ->
+                mainNavItemsSet.map { (it.badge ?: flowOf(null)) to it }
+            }
+        ) { connected: Boolean, badgeFlowPair: List<Pair<Flow<String?>, MainNavItem>> ->
+            badgeFlowPair.map { (badgeFlow, mainNavItem) ->
+                badgeFlow.map { badgeText ->
+                    mapToNavigationItem(
+                        mainNavItem = mainNavItem,
+                        connected = connected,
+                        badgeText = badgeText
                     )
-                    emit(true)
                 }
-        ) { mainNavItems, isConnected ->
-            mainNavItems.map { item ->
-                NavigationItem(
-                    navItem = item,
-                    isEnabled = isConnected || item.availableOffline,
-                )
-            }.toSet()
+            }
+        }.flatMapConcat { flowsList ->
+            combine(flowsList) { it.toSet() }
         }
+    }
+
+    private fun mapToNavigationItem(
+        mainNavItem: MainNavItem,
+        connected: Boolean,
+        badgeText: String?,
+    ): NavigationItem = NavigationItem(
+        destination = mainNavItem.destination,
+        iconRes = mainNavItem.iconRes,
+        label = mainNavItem.label,
+        preferredSlot = mainNavItem.preferredSlot,
+        analyticsEventIdentifier = mainNavItem.analyticsEventIdentifier,
+        isEnabled = connected || mainNavItem.availableOffline,
+        badgeText = badgeText
+    )
+
+    private fun getConnectivityStateOrDefault(): Flow<Boolean> = monitorConnectivityUseCase()
+        .catch {
+            Timber.e(
+                it,
+                "Error monitoring connectivity, defaulting to connected state"
+            )
+            emit(true)
+        }
+
 }

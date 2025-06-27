@@ -6,13 +6,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.navigation.contract.MainNavItem
 
 @Composable
-internal fun MainNavigationIcon(navItem: MainNavItem) {
+internal fun MainNavigationIcon(iconRes: Int, label: String) {
     Icon(
         modifier = Modifier.Companion.size(32.dp),
-        painter = painterResource(navItem.iconRes),
-        contentDescription = navItem.label
+        painter = painterResource(iconRes),
+        contentDescription = label
     )
 }
