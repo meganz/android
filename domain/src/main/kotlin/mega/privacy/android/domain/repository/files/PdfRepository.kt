@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository.files
 
+import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
@@ -26,4 +27,19 @@ interface PdfRepository {
      * @return Path of the thumbnail file if created successfully, null otherwise.
      */
     suspend fun createPreview(nodeHandle: Long, uriPath: UriPath): String?
+
+    /**
+     * Get the last page viewed in PDF.
+     */
+    suspend fun getLastPageViewedInPdf(nodeHandle: Long): Long?
+
+    /**
+     * Set or update the last page viewed in PDF.
+     */
+    suspend fun setOrUpdateLastPageViewedInPdf(lastPageViewedInPdf: LastPageViewedInPdf)
+
+    /**
+     * Delete the last page viewed in PDF for a specific node handle.
+     */
+    suspend fun deleteLastPageViewedInPdf(nodeHandle: Long)
 }

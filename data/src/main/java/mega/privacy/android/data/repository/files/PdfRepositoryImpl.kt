@@ -12,7 +12,9 @@ import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.files.PdfRepository
@@ -32,6 +34,7 @@ class PdfRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val cacheGateway: CacheGateway,
     private val fileGateway: FileGateway,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
 ) : PdfRepository {
 
     override suspend fun createThumbnail(nodeHandle: Long, uriPath: UriPath) =
@@ -85,6 +88,22 @@ class PdfRepositoryImpl @Inject constructor(
         } finally {
             pdfiumCore.closeDocument(pdfDocument)
             out.close()
+        }
+    }
+
+    override suspend fun getLastPageViewedInPdf(nodeHandle: Long) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.getLastPageViewedInPdfByHandle(nodeHandle)?.lastPageViewed
+    }
+
+    override suspend fun setOrUpdateLastPageViewedInPdf(lastPageViewedInPdf: LastPageViewedInPdf) {
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.insertOrUpdateLastPageViewedInPdf(lastPageViewedInPdf)
+        }
+    }
+
+    override suspend fun deleteLastPageViewedInPdf(nodeHandle: Long) {
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.deleteLastPageViewedInPdfByHandle(nodeHandle)
         }
     }
 }
