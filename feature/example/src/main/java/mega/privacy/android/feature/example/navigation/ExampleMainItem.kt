@@ -50,7 +50,7 @@ class OtherExampleMainItem : MainNavItem {
 
     @StringRes
     override val label: Int = sharedR.string.general_settings
-    override val preferredSlot: PreferredSlot = PreferredSlot.Last
+    override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(2)
     override val availableOffline: Boolean = true
     override val analyticsEventIdentifier: NavigationEventIdentifier = ExampleNavigationIdentifier
 }

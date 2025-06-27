@@ -375,6 +375,10 @@ public object IconPack {
                     @Composable
                     get() = painterResource(R.drawable.ic_link_01_medium_thin_outline)
 
+                public val Menu: Painter
+                    @Composable
+                    get() = painterResource(R.drawable.ic_menu_medium_thin_outline)
+
                 public val MinusCircle: Painter
                     @Composable
                     get() = painterResource(R.drawable.ic_minus_circle_medium_thin_outline)
