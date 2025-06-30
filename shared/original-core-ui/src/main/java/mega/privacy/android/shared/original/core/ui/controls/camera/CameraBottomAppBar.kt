@@ -2,25 +2,34 @@ package mega.privacy.android.shared.original.core.ui.controls.camera
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,16 +37,19 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
+import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
-import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
-import mega.privacy.android.shared.original.core.ui.controls.chip.RoundedChipStyle
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 
 /**
  * Camera bottom app bar
@@ -99,72 +111,85 @@ fun CameraBottomAppBar(
         }
 
         InternalAnimatedContent(visible = !isRecording) {
-            ConstraintLayout(
+            val pillWidth = 84.dp
+            val textWidth = 88.dp // Account for pill width and spacing
+            val offset by animateDpAsState(
+                targetValue = if (isCaptureVideo) -textWidth else 0.dp,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessLow
+                ),
+                label = "PhotoVideoScrollerOffset"
+            )
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .height(36.dp),
+                contentAlignment = Alignment.Center
             ) {
-                val (videoRef, photoRef) = createRefs()
-
-                if (isCaptureVideo) {
-                    MegaChip(
-                        selected = true,
-                        text = stringResource(id = R.string.video_button),
-                        modifier = Modifier
-                            .width(80.dp)
-                            .testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_VIDEO)
-                            .constrainAs(videoRef) {
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                                top.linkTo(parent.top)
-                            },
-                        style = RoundedChipStyle
-                    )
-
-                    MegaChip(
-                        selected = false,
+                Box(
+                    modifier = Modifier
+                        .width(pillWidth)
+                        .height(36.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .border(
+                            width = 1.dp,
+                            color = DSTokens.colors.border.subtle,
+                            shape = RoundedCornerShape(24.dp)
+                        )
+                        .background(DSTokens.colors.background.surface2)
+                )
+                Row(
+                    modifier = Modifier
+                        .offset(x = offset),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(modifier = Modifier.width(textWidth))
+                    TextButton(
                         text = stringResource(id = R.string.camera_photo_button),
-                        modifier = Modifier
-                            .width(80.dp)
-                            .testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_PHOTO)
-                            .constrainAs(photoRef) {
-                                end.linkTo(videoRef.start, 10.dp)
-                                top.linkTo(parent.top)
-                            },
-                        style = RoundedChipStyle,
-                        onClick = onToggleCaptureMode
+                        isSelected = !isCaptureVideo,
+                        textWidth = textWidth,
+                        onClick = onToggleCaptureMode,
+                        modifier = Modifier.testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_PHOTO)
                     )
-                } else {
-                    MegaChip(
-                        selected = true,
-                        text = stringResource(id = R.string.camera_photo_button),
-                        modifier = Modifier
-                            .width(80.dp)
-                            .testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_PHOTO)
-                            .constrainAs(photoRef) {
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                                top.linkTo(parent.top)
-                            },
-                        style = RoundedChipStyle
-                    )
-
-                    MegaChip(
-                        selected = false,
+                    TextButton(
                         text = stringResource(id = R.string.video_button),
-                        modifier = Modifier
-                            .width(80.dp)
-                            .testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_VIDEO)
-                            .constrainAs(videoRef) {
-                                start.linkTo(photoRef.end, 10.dp)
-                                top.linkTo(parent.top)
-                            },
-                        style = RoundedChipStyle,
-                        onClick = onToggleCaptureMode
+                        isSelected = isCaptureVideo,
+                        textWidth = textWidth,
+                        onClick = onToggleCaptureMode,
+                        modifier = Modifier.testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_VIDEO)
                     )
                 }
             }
         }
     }
+}
+
+@Composable
+private fun TextButton(
+    text: String,
+    isSelected: Boolean,
+    textWidth: Dp,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    MegaText(
+        text = text,
+        textColor = TextColor.Primary,
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.body2medium.copy(
+            fontWeight = if (isSelected) FontWeight.W600 else FontWeight.W400
+        ),
+        modifier = modifier
+            .width(textWidth)
+            .clickable(
+                enabled = !isSelected,
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onClick() },
+    )
 }
 
 @Composable
