@@ -13,12 +13,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
-import coil.ImageLoader
-import coil.ImageLoaderFactory
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
-import coil.decode.SvgDecoder
-import coil.decode.VideoFrameDecoder
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
+import coil3.gif.AnimatedImageDecoder
+import coil3.gif.GifDecoder
+import coil3.svg.SvgDecoder
+import coil3.video.VideoFrameDecoder
 import com.google.android.gms.ads.MobileAds
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
@@ -109,7 +110,7 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
-    ImageLoaderFactory, Configuration.Provider {
+    SingletonImageLoader.Factory, Configuration.Provider {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
@@ -262,12 +263,11 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         if (BuildConfig.ACTIVATE_GREETER) greeter.get().initialize()
     }
 
-    override fun newImageLoader(): ImageLoader {
+    override fun newImageLoader(context: PlatformContext): ImageLoader {
         return ImageLoader.Builder(this)
-            .respectCacheHeaders(false)
             .components {
                 if (SDK_INT >= Build.VERSION_CODES.P) {
-                    add(ImageDecoderDecoder.Factory())
+                    add(AnimatedImageDecoder.Factory())
                 } else {
                     add(GifDecoder.Factory())
                 }

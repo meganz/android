@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
-import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -34,13 +32,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.view.isSelected
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_032
 import mega.privacy.android.shared.original.core.ui.theme.white
 

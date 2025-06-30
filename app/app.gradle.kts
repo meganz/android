@@ -396,6 +396,7 @@ dependencies {
     // Live Data testing
     testImplementation(testlib.jraska.livedata.test)
     testImplementation(testlib.coil.test)
+    testImplementation(testlib.coil3.test)
 
     //QA
     "qaImplementation"(google.firebase.app.distribution)

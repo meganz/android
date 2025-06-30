@@ -42,15 +42,17 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
-import coil.decode.VideoFrameDecoder
-import coil.request.ImageRequest
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.video.VideoFrameDecoder
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPartialMediaPermission
+import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AskGalleryPermissionView
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.ChatGalleryItem
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.PartialPermissionView
@@ -58,8 +60,6 @@ import mega.privacy.android.shared.original.core.ui.controls.progressindicator.M
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.contactinfo.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,12 +35,13 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.ExperimentalMotionApi
 import androidx.constraintlayout.compose.MotionLayout
 import androidx.core.graphics.toColorInt
-import coil.compose.rememberAsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_070
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
-import mega.privacy.android.domain.entity.contacts.UserChatStatus
 
 /**
  * Collapsing top bar for contact info screen

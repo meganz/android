@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.photos.albums.getlink
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.text.TextUtils.TruncateAt.MIDDLE
 import android.view.View
 import android.widget.TextView
@@ -66,8 +64,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -76,17 +74,19 @@ import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.SingleAlbumLinkScreenEvent
 
 private typealias ImageDownloader = (photo: Photo, callback: (Boolean) -> Unit) -> Unit

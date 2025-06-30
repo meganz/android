@@ -3,15 +3,16 @@ package mega.privacy.android.app.fetcher
 import android.content.Context
 import android.webkit.MimeTypeMap
 import androidx.core.content.ContextCompat
-import coil.ImageLoader
-import coil.decode.DataSource
-import coil.decode.ImageSource
-import coil.fetch.DrawableResult
-import coil.fetch.FetchResult
-import coil.fetch.Fetcher
-import coil.fetch.SourceResult
-import coil.request.Options
-import coil.size.Dimension
+import coil3.ImageLoader
+import coil3.asImage
+import coil3.decode.DataSource
+import coil3.decode.ImageSource
+import coil3.fetch.FetchResult
+import coil3.fetch.Fetcher
+import coil3.fetch.ImageFetchResult
+import coil3.fetch.SourceFetchResult
+import coil3.request.Options
+import coil3.size.Dimension
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.AvatarUtil
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromEmailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromHandleUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
+import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 import timber.log.Timber
 import javax.inject.Inject
@@ -53,8 +55,8 @@ class MegaAvatarFetcher(
         }
             .onFailure { Timber.e(it, "Error getting avatar file from handle or email") }
             .getOrNull()?.takeIf { it.length() > 0 }?.let { file ->
-                return SourceResult(
-                    source = ImageSource(file = file.toOkioPath()),
+                return SourceFetchResult(
+                    source = ImageSource(file = file.toOkioPath(), fileSystem = FileSystem.SYSTEM),
                     mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension),
                     dataSource = DataSource.DISK
                 )
@@ -78,8 +80,8 @@ class MegaAvatarFetcher(
                 AvatarUtil.getFirstLetter(getParticipantFirstNameUseCase(data.id.id).orEmpty()),
                 getUserAvatarColorUseCase(data.id.id)
             )
-        return DrawableResult(
-            drawable = drawable,
+        return ImageFetchResult(
+            image = drawable.asImage(),
             isSampled = false,
             dataSource = DataSource.DISK
         )

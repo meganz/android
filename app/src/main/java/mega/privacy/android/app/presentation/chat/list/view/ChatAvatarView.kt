@@ -24,15 +24,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import coil3.request.error
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
+import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
-import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import timber.log.Timber
 
 /**
@@ -190,7 +192,6 @@ private fun AvatarImageView(
         modifier = modifier,
         contentDescription = "User avatar",
         model = ImageRequest.Builder(LocalContext.current)
-            .setParameter("timestamp", avatarTimestamp)
             .error(R.drawable.ic_avatar_placeholder)
             .crossfade(true)
             .data(avatarUri)

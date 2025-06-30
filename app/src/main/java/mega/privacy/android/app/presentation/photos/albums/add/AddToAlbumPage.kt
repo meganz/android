@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.photos.albums.add
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,20 +36,22 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDialog
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.view.AlbumListSkeletonView
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body3
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
-import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 internal fun AddToAlbumPage(

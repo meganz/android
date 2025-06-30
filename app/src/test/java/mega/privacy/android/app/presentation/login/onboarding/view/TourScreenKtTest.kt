@@ -1,7 +1,10 @@
 package mega.privacy.android.app.presentation.login.onboarding.view
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -9,7 +12,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.core.content.ContextCompat
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import coil3.ColorImage
+import coil3.ImageLoader
+import coil3.test.FakeImageLoaderEngine
 import com.google.common.truth.Truth
 import mega.privacy.android.app.presentation.login.onboarding.model.TourUiState
 import org.junit.Rule
@@ -24,7 +31,6 @@ import org.robolectric.util.ReflectionHelpers
 
 @RunWith(AndroidJUnit4::class)
 class TourScreenKtTest {
-
     @get:Rule
     val composeRule = createComposeRule()
 
@@ -183,6 +189,14 @@ class TourScreenKtTest {
         onOpenLink: (meetingLink: String) -> Unit = {},
         onClearLogoutProgressFlag: () -> Unit = {},
     ) {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val engine = FakeImageLoaderEngine.Builder()
+            .default(ColorImage(Color.White.toArgb()))
+            .build()
+        val imageLoader = ImageLoader.Builder(context)
+            .components { add(engine) }
+            .build()
+
         setContent {
             TourScreen(
                 uiState = uiState,
@@ -191,7 +205,8 @@ class TourScreenKtTest {
                 onMeetingLinkChange = onMeetingLinkChange,
                 onConfirmMeetingLinkClick = onConfirmMeetingLinkClick,
                 onOpenLink = onOpenLink,
-                onClearLogoutProgressFlag = onClearLogoutProgressFlag
+                onClearLogoutProgressFlag = onClearLogoutProgressFlag,
+                imageLoader = imageLoader
             )
         }
     }

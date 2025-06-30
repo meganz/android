@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat.messages.file
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.content.ContentResolver
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -23,15 +22,17 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * File message with or without preview

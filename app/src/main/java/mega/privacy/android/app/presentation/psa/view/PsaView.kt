@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.psa.view
 
-import mega.privacy.android.icon.pack.R as IconPack
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -24,14 +23,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.R as IconPack
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Psa view

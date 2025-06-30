@@ -19,6 +19,7 @@ roboelectric = "4.11.1"
 room-test = "2.6.1"
 runner = "1.6.1"
 coil = "2.5.0"
+coil3 = "3.2.0"
 system-stubs-jupiter = "2.1.6"
 truth-ext = "1.6.0"
 
@@ -57,6 +58,7 @@ roboelectric = { module = "org.robolectric:robolectric", version.ref = "roboelec
 room-test = { module = "androidx.room:room-testing", version.ref = "room-test" }
 runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 coil-test = { module = "io.coil-kt:coil-test", version.ref = "coil" }
+coil3-test = { module = "io.coil-kt.coil3:coil-test", version.ref = "coil3" }
 system-stubs-jupiter = { module = "uk.org.webcompere:system-stubs-jupiter", version.ref = "system-stubs-jupiter" }
 
 [bundles]

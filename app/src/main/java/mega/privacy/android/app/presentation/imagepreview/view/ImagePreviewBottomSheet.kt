@@ -2,8 +2,6 @@
 
 package mega.privacy.android.app.presentation.imagepreview.view
 
-import mega.privacy.android.icon.pack.R as IconPack
-import mega.privacy.android.shared.resources.R as SharedResources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -35,25 +33,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.view.extension.fileInfo
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.icon.pack.R as IconPack
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsisText
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_070
 import mega.privacy.android.shared.original.core.ui.theme.accent_050
 import mega.privacy.android.shared.original.core.ui.theme.accent_900
-import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_070
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_070
+import mega.privacy.android.shared.resources.R as SharedResources
 import nz.mega.sdk.MegaNode
 
 @OptIn(ExperimentalMaterialApi::class)

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.mediaplayer.trackinfo
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_ADDED_TEST_TAG
@@ -45,6 +44,7 @@ import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_TITLE_TEST
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.OFFLINE_OPTION_TEST_TAG
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme

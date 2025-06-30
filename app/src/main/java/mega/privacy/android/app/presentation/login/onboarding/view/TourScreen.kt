@@ -51,9 +51,9 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import coil.compose.rememberAsyncImagePainter
-import coil.decode.SvgDecoder
-import coil.imageLoader
+import coil3.ImageLoader
+import coil3.compose.rememberAsyncImagePainter
+import coil3.svg.SvgDecoder
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import mega.android.core.ui.theme.values.TextColor
@@ -112,6 +112,9 @@ internal fun TourScreen(
     onOpenLink: (meetingLink: String) -> Unit,
     onClearLogoutProgressFlag: () -> Unit,
     modifier: Modifier = Modifier,
+    imageLoader: ImageLoader = ImageLoader.Builder(LocalContext.current)
+        .components { add(SvgDecoder.Factory()) }
+        .build()
 ) {
     val context = LocalContext.current
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -172,7 +175,8 @@ internal fun TourScreen(
                             weight(1f)
                         }
                         .padding(bottom = if (isLandscape) 20.dp else 40.dp),
-                    item = getOnboardingUiItem()
+                    item = getOnboardingUiItem(),
+                    imageLoader = imageLoader
                 )
 
                 Row(
@@ -309,6 +313,7 @@ private fun getOnboardingUiItem() = listOf(
 @Composable
 private fun HorizontalTourPager(
     item: List<OnboardingUiItem>,
+    imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
 ) {
     InfiniteHorizontalPagerWithIndicator(
@@ -331,9 +336,7 @@ private fun HorizontalTourPager(
         ) {
             val painter = rememberAsyncImagePainter(
                 model = item[page].imageDrawableId,
-                imageLoader = context.imageLoader.newBuilder()
-                    .components { add(SvgDecoder.Factory()) }
-                    .build()
+                imageLoader = imageLoader
             )
             val intrinsicSize = painter.intrinsicSize
             val imageRatio = if (intrinsicSize != Size.Unspecified) {
