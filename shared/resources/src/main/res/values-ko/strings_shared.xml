@@ -1280,4 +1280,8 @@
     <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">고객센터</string>
+    <!-- Warning informing the transfers queue has been paused -->
+    <string name="transfers_all_transfers_paused_warning">모든 동기화 일시정지됨</string>
+    <!-- Button for resuming the transfers queue -->
+    <string name="transfers_resume_all_button">모두 재개</string>
 </resources>

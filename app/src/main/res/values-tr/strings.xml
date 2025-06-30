@@ -1668,7 +1668,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Gönderilen bağlantı önizlemelerini etkinleştir</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generates previews for certain links you send in chat, when available. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">Sohbet içinde gönderdiğiniz belirli bağlantılar için, mevcut olduğunda ön izlemeler oluşturur. Bu ön izlemelerin alınmasının sıfır bilgi şifrelemesi ile korunmadığını unutmayın.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Lütfen daha güçlü bir şifre girin</string>
     <!-- title of the notification for an acceptance of a contact request -->

@@ -1668,7 +1668,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Voorvertoningen van verzonden links inschakelen</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generates previews for certain links you send in chat, when available. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">Genereert weergaves voor bepaalde links die u in een gesprek verstuurt, indien beschikbaar. Hou er rekening mee dat het ophalen van deze weergave niet beveiligd is met zero-knowledge codering.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Voer een sterker wachtwoord in</string>
     <!-- title of the notification for an acceptance of a contact request -->

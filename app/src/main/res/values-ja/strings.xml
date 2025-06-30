@@ -1629,7 +1629,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">送信済みリンクのプレビューを有効にする</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generates previews for certain links you send in chat, when available. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">チャットで送信した特定のリンクのプレビューを生成します（利用可能な場合）。これらのプレビューの取得は、ゼロ知識暗号化によって保護されていないことに注意してください。</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">より強力なパスワードを入力してください</string>
     <!-- title of the notification for an acceptance of a contact request -->

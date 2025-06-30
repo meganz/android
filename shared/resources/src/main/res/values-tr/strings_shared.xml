@@ -838,7 +838,7 @@
     <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
     <string name="transfers_notification_title_preview_download">“%1$s” önizlemeye hazır</string>
     <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
-    <string name="transfers_notification_preview_action">Önizle</string>
+    <string name="transfers_notification_preview_action">Ön izle</string>
     <!-- Title for the OS dialog shown with available apps to open a file -->
     <string name="open_with_os_dialog_title">“%1$s” dosyasını şununla aç</string>
     <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
@@ -959,7 +959,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">E-posta onayı</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]%s[/A].</string>
+    <string name="email_confirmation_content">[P]%s[/P] adresine bağlantı içeren bir e-posta gönderdik. E-posta adresinizi doğrulamak ve hesabınızı etkinleştirmek için bağlantıya dokunun. \n\nE-postayı almadıysanız, spam klasörünüzü kontrol edin veya tekrar deneyin. Diğer tüm sorunlar için lütfen [A]%s[/A] adresini ziyaret edin.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Yeniden gönder</string>
     <!-- General change email address -->
@@ -1225,7 +1225,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
     <string name="choose_account_screen_transfer_quota_label">%1$s aktarım</string>
     <!-- General month label -->
-    <string name="general_month">/month</string>
+    <string name="general_month">/ay</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s / Ay</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
@@ -1292,9 +1292,13 @@
     <!-- Warning indicating that the transfer quota limit has been reached -->
     <string name="transfers_transfer_quota_banner_title">Daha fazla aktarım kotası alın</string>
     <!-- Warning indicating that the storage quota limit has been reached -->
-    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <string name="transfers_storage_quota_banner_title">Daha fazla depolama alanı kotası alın</string>
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
-    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <string name="transfers_storage_and_transfer_quota_banner_title">Daha fazla depolama alanı ve aktarım kotası elde edin</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">Yardım Merkezi</string>
+    <!-- Warning informing the transfers queue has been paused -->
+    <string name="transfers_all_transfers_paused_warning">Tüm transferler duraklatıldı</string>
+    <!-- Button for resuming the transfers queue -->
+    <string name="transfers_resume_all_button">Resume all</string>
 </resources>

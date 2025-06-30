@@ -1280,4 +1280,8 @@
     <string name="transfers_storage_and_transfer_quota_banner_title">ストレージと転送容量を増やしてください</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">ヘルプセンター</string>
+    <!-- Warning informing the transfers queue has been paused -->
+    <string name="transfers_all_transfers_paused_warning">すべての転送が一時停止されました</string>
+    <!-- Button for resuming the transfers queue -->
+    <string name="transfers_resume_all_button">すべて再開</string>
 </resources>

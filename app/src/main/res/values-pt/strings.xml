@@ -1707,7 +1707,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Ativar a visualização dos links enviados</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generates previews for certain links you send in chat, when available. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">Permite visualizar alguns links que você envia nos chats. Tenha em mente que a obtenção destas visualizações não é protegida pela criptografia de conhecimento zero.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Por favor, digite uma senha mais segura</string>
     <!-- title of the notification for an acceptance of a contact request -->
