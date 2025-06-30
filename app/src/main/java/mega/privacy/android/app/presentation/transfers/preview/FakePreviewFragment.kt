@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -13,17 +12,15 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navOptions
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
-import mega.privacy.android.app.presentation.transfers.preview.view.navigation.fakePreviewViewNavigationGraph
-import mega.privacy.android.app.presentation.transfers.preview.view.navigation.navigateToFakePreviewViewGraph
+import mega.privacy.android.app.presentation.transfers.preview.view.FakePreviewInfo
+import mega.privacy.android.app.presentation.transfers.preview.view.fakePreviewScreen
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -59,7 +56,6 @@ class FakePreviewFragment : Fragment() {
                     content = {
                         PsaContainer {
                             val navHostController = rememberNavController()
-                            val scaffoldState = rememberScaffoldState()
                             val transferPath =
                                 arguments?.getString(EXTRA_FILE_PATH)
                                     .takeUnless { it.isNullOrEmpty() }
@@ -72,25 +68,14 @@ class FakePreviewFragment : Fragment() {
 
                             NavHost(
                                 navController = navHostController,
-                                startDestination = "start",
+                                startDestination = FakePreviewInfo(
+                                    transferPath = transferPath,
+                                    transferUniqueId = transferUniqueId,
+                                    transferTagToCancel = transferTagToCancel,
+                                ),
                                 modifier = Modifier.navigationBarsPadding(),
                             ) {
-                                composable("start") {
-                                    navHostController.navigateToFakePreviewViewGraph(
-                                        transferPath = transferPath,
-                                        transferUniqueId = transferUniqueId,
-                                        transferTagToCancel = transferTagToCancel,
-                                        navOptions = navOptions {
-                                            popUpTo("start") {
-                                                inclusive = true
-                                            }
-                                        },
-                                    )
-                                }
-
-                                fakePreviewViewNavigationGraph(
-                                    navHostController = navHostController,
-                                    scaffoldState = scaffoldState,
+                                fakePreviewScreen(
                                     onBackPress = { requireActivity().supportFinishAfterTransition() },
                                     navigateToStorageSettings = {
                                         megaNavigator.openSettings(

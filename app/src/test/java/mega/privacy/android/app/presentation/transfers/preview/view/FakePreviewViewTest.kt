@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.preview.view
 
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
@@ -69,7 +68,6 @@ class TransfersViewTest {
                 LocalViewModelStoreOwner provides viewModelStoreOwner
             ) {
                 FakePreviewView(
-                    scaffoldState = rememberScaffoldState(),
                     onBackPress = {},
                     uiState = uiState,
                     consumeTransferEvent = {},
