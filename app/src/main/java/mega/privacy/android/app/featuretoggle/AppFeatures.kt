@@ -207,7 +207,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     UpdateAccountRevamp(
         "Update Account Revamp with new components",
-        false,
+        true,
     ),
 
     /**
