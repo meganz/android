@@ -13,7 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.onNodeWithText
-import mega.privacy.android.app.presentation.transfers.preview.model.FakePreviewState
+import mega.privacy.android.app.presentation.transfers.preview.model.LoadingPreviewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -26,7 +26,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
-class TransfersViewTest {
+class LoadingPreviewViewTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -44,7 +44,7 @@ class TransfersViewTest {
     @Test
     fun `test that the view is displayed correctly`() {
         val fileName = "test.txt"
-        val uiState = FakePreviewState(
+        val uiState = LoadingPreviewState(
             fileName = fileName,
             fileTypeResId = iconPackR.drawable.ic_text_medium_solid,
         )
@@ -62,12 +62,12 @@ class TransfersViewTest {
     }
 
     @OptIn(ExperimentalMaterialNavigationApi::class)
-    private fun initComposeTestRule(uiState: FakePreviewState) {
+    private fun initComposeTestRule(uiState: LoadingPreviewState) {
         composeTestRule.setContent {
             CompositionLocalProvider(
                 LocalViewModelStoreOwner provides viewModelStoreOwner
             ) {
-                FakePreviewView(
+                LoadingPreviewView(
                     onBackPress = {},
                     uiState = uiState,
                     consumeTransferEvent = {},

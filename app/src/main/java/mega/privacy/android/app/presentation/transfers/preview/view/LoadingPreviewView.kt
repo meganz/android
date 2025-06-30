@@ -27,9 +27,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.qrcode.findActivity
-import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_ERROR
-import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_FILE_PATH
-import mega.privacy.android.app.presentation.transfers.preview.model.FakePreviewState
+import mega.privacy.android.app.presentation.transfers.preview.LoadingPreviewActivity.Companion.EXTRA_ERROR
+import mega.privacy.android.app.presentation.transfers.preview.LoadingPreviewActivity.Companion.EXTRA_FILE_PATH
+import mega.privacy.android.app.presentation.transfers.preview.model.LoadingPreviewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
@@ -45,9 +45,9 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
-internal fun FakePreviewView(
+internal fun LoadingPreviewView(
     onBackPress: () -> Unit,
-    uiState: FakePreviewState,
+    uiState: LoadingPreviewState,
     consumeTransferEvent: () -> Unit,
     navigateToStorageSettings: () -> Unit,
 ) {
@@ -142,11 +142,11 @@ internal fun FakePreviewView(
 
 @CombinedThemePreviews
 @Composable
-private fun FakePreviewViewPreview() {
+private fun LoadingPreviewViewPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        FakePreviewView(
+        LoadingPreviewView(
             onBackPress = {},
-            uiState = FakePreviewState(
+            uiState = LoadingPreviewState(
                 fileName = "Porter_final.ai",
                 fileTypeResId = iconPackR.drawable.ic_generic_medium_solid,
                 progress = Progress(0.3f),

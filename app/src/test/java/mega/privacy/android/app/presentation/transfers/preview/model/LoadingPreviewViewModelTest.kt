@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +17,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.transfers.preview.view.FakePreviewInfo
+import mega.privacy.android.app.presentation.transfers.preview.view.LoadingPreviewInfo
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -43,9 +44,9 @@ import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
-class FakePreviewViewModelTest {
+class LoadingPreviewViewModelTest {
 
-    private lateinit var underTest: FakePreviewViewModel
+    private lateinit var underTest: LoadingPreviewViewModel
 
     private val getTransferByUniqueIdUseCase = mock<GetTransferByUniqueIdUseCase>()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase> {
@@ -53,6 +54,7 @@ class FakePreviewViewModelTest {
     }
     private val broadcastTransferTagToCancelUseCase = mock<BroadcastTransferTagToCancelUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
+    private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val transferUniqueId = 12L
     private val fileName = "test.txt"
@@ -75,25 +77,24 @@ class FakePreviewViewModelTest {
     }
 
     private fun initTest() {
-        underTest = FakePreviewViewModel(
+        underTest = LoadingPreviewViewModel(
             getTransferByUniqueIdUseCase = getTransferByUniqueIdUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             broadcastTransferTagToCancelUseCase = broadcastTransferTagToCancelUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             savedStateHandle = savedStateHandle,
+            appScope = appScope,
         )
     }
 
     private fun initSavedStateHandle(
         transferUniqueId: Long? = null,
         transferPath: String? = null,
-        transferTagToCancel: Int? = null,
     ) {
         savedStateHandle = SavedStateHandle.Companion.invoke(
-            route = FakePreviewInfo(
+            route = LoadingPreviewInfo(
                 transferUniqueId = transferUniqueId,
                 transferPath = transferPath,
-                transferTagToCancel = transferTagToCancel,
             )
         )
     }
@@ -356,10 +357,11 @@ class FakePreviewViewModelTest {
         runTest {
             val transferTagToCancel = 1234
 
-            initSavedStateHandle(transferTagToCancel = transferTagToCancel)
             whenever(broadcastTransferTagToCancelUseCase(transferTagToCancel)) doReturn Unit
 
             initTest()
+
+            underTest.onNewIntent(transferTagToCancel = transferTagToCancel)
 
             underTest.uiState.test {
                 assertThat(awaitItem().error)
@@ -377,15 +379,14 @@ class FakePreviewViewModelTest {
                 on { this.fileName } doReturn fileName
             }
 
-            initSavedStateHandle(
-                transferUniqueId = transferUniqueId,
-                transferTagToCancel = transferTagToCancel,
-            )
+            initSavedStateHandle(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer)
 
             whenever(broadcastTransferTagToCancelUseCase(transferTagToCancel)) doReturn Unit
 
             initTest()
+
+            underTest.onNewIntent(transferTagToCancel = transferTagToCancel)
 
             underTest.uiState.test {
                 assertThat(awaitItem().error).isNull()

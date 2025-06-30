@@ -12,8 +12,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.transfers.preview.FakePreviewActivity
-import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_TRANSFER_TAG
+import mega.privacy.android.app.presentation.transfers.preview.LoadingPreviewActivity
+import mega.privacy.android.app.presentation.transfers.preview.LoadingPreviewActivity.Companion.EXTRA_TRANSFER_TAG
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupProgressNotificationBuilder
@@ -128,7 +128,7 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             ) to openTransfersSectionIntent
         } else {
-            null to Intent(context, FakePreviewActivity::class.java).apply {
+            null to Intent(context, LoadingPreviewActivity::class.java).apply {
                 putExtra(EXTRA_TRANSFER_TAG, actionGroup.singleTransferTag)
             }
         }

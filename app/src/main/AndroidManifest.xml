@@ -524,7 +524,7 @@
             android:name=".presentation.transfers.TransfersActivity"
             android:launchMode="singleTask" />
         <activity
-            android:name=".presentation.transfers.preview.FakePreviewActivity"
+            android:name=".presentation.transfers.preview.LoadingPreviewActivity"
             android:launchMode="singleTask" />
 
         <service

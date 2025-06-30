@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.Progress
  * @param error [Throwable].
  * @param transferEvent [StateEventWithContent] of [TransferTriggerEvent].
  */
-data class FakePreviewState(
+data class LoadingPreviewState(
     val fileName: String? = null,
     val fileTypeResId: Int? = null,
     val progress: Progress = Progress(0f),
