@@ -1280,4 +1280,8 @@
     <string name="transfers_storage_and_transfer_quota_banner_title">獲得更多儲存和傳輸配額</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">幫助中心</string>
+    <!-- Warning informing the transfers queue has been paused -->
+    <string name="transfers_all_transfers_paused_warning">所有傳輸已暫停</string>
+    <!-- Button for resuming the transfers queue -->
+    <string name="transfers_resume_all_button">全部恢復</string>
 </resources>

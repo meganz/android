@@ -1241,7 +1241,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
     <string name="choose_account_screen_transfer_quota_label">%1$s de transfert</string>
     <!-- General month label -->
-    <string name="general_month">/month</string>
+    <string name="general_month">/mois</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s par mois</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
@@ -1309,9 +1309,13 @@
     <!-- Warning indicating that the transfer quota limit has been reached -->
     <string name="transfers_transfer_quota_banner_title">Obtenir plus de quota de transfert</string>
     <!-- Warning indicating that the storage quota limit has been reached -->
-    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <string name="transfers_storage_quota_banner_title">Obtenez plus d\’espace de stockage</string>
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
-    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <string name="transfers_storage_and_transfer_quota_banner_title">Obtenez plus d\’espace de stockage et de quota de transfert</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">Centre d’assistance</string>
+    <!-- Warning informing the transfers queue has been paused -->
+    <string name="transfers_all_transfers_paused_warning">Tous les transferts ont été suspendus</string>
+    <!-- Button for resuming the transfers queue -->
+    <string name="transfers_resume_all_button">Tout reprendre</string>
 </resources>

@@ -1314,4 +1314,8 @@
     <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">Centru de ajutor</string>
+    <!-- Warning informing the transfers queue has been paused -->
+    <string name="transfers_all_transfers_paused_warning">Toate transferurile au fost întrerupte</string>
+    <!-- Button for resuming the transfers queue -->
+    <string name="transfers_resume_all_button">Reluați toate</string>
 </resources>
