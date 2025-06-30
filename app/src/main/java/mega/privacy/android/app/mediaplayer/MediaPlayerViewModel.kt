@@ -17,6 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerMenuClickedEvent
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerState
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NameCollision
@@ -28,12 +29,14 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -49,6 +52,7 @@ class MediaPlayerViewModel @Inject constructor(
     private val getChatFileUseCase: GetChatFileUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val getPublicAlbumNodeDataUseCase: GetPublicAlbumNodeDataUseCase,
+    private val getFileUriUseCase: GetFileUriUseCase,
 ) : ViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -316,4 +320,7 @@ class MediaPlayerViewModel @Inject constructor(
             }
         }
     }
+
+    internal suspend fun getContentUri(file: File) =
+        getFileUriUseCase(file, Constants.AUTHORITY_STRING_FILE_PROVIDER)
 }

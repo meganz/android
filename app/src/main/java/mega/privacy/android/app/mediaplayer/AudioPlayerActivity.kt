@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
@@ -96,7 +97,9 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 /**
  * Extending MediaPlayerActivity is to declare portrait in manifest,
@@ -385,17 +388,24 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 R.id.share -> {
                     when (adapterType) {
                         OFFLINE_ADAPTER, ZIP_ADAPTER -> {
-                            val mediaItem = serviceGateway?.getCurrentMediaItem()
-                            playerServiceGateway?.getPlaylistItem(mediaItem?.mediaId)?.nodeName
-                                ?.let { nodeName ->
-                                    mediaItem?.localConfiguration?.uri?.let { uri ->
-                                        FileUtil.shareUri(
-                                            this,
-                                            nodeName,
-                                            uri
-                                        )
+                            lifecycleScope.launch {
+                                runCatching {
+                                    val mediaItem = serviceGateway?.getCurrentMediaItem()
+                                    mediaItem?.localConfiguration?.uri?.path?.let { path ->
+                                        val file = File(path)
+                                        if (file.exists()) {
+                                            val contentUri = viewModel.getContentUri(file)
+                                            FileUtil.shareUri(
+                                                this@AudioPlayerActivity,
+                                                file.name,
+                                                contentUri.toUri()
+                                            )
+                                        }
                                     }
+                                }.onFailure {
+                                    Timber.e(it)
                                 }
+                            }
                         }
 
                         FILE_LINK_ADAPTER -> {

@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -62,6 +64,7 @@ internal class MediaPlayerViewModelTest {
     }
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val getPublicAlbumNodeDataUseCase = mock<GetPublicAlbumNodeDataUseCase>()
+    private val getFileUriUseCase = mock<GetFileUriUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -74,12 +77,17 @@ internal class MediaPlayerViewModelTest {
             getChatFileUseCase = getChatFileUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             getPublicAlbumNodeDataUseCase = getPublicAlbumNodeDataUseCase,
+            getFileUriUseCase = getFileUriUseCase,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(checkNodesNameCollisionWithActionUseCase, checkChatNodesNameCollisionAndCopyUseCase)
+        reset(
+            checkNodesNameCollisionWithActionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase,
+            getFileUriUseCase
+        )
     }
 
     @Test
@@ -387,6 +395,15 @@ internal class MediaPlayerViewModelTest {
                 it is IllegalStateException
             }
         }
+
+    @Test
+    fun `test that getFileUriUseCase returns as expected`() = runTest {
+        val expectedUri = "content://test/12345"
+        whenever(getFileUriUseCase(any(), any())).thenReturn(expectedUri)
+
+        val actual = underTest.getContentUri(mock())
+        assertThat(actual).isEqualTo(expectedUri)
+    }
 
     companion object {
         @JvmField
