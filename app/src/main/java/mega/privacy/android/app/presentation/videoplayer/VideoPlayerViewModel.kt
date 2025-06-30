@@ -366,7 +366,6 @@ class VideoPlayerViewModel @Inject constructor(
                     Timber.e(it)
                 }.collectLatest { mode ->
                     uiState.update { it.copy(repeatToggleMode = mode) }
-                    mediaPlayerGateway.setRepeatToggleMode(mode)
                 }
         }
 
