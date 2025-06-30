@@ -1,22 +1,24 @@
 package mega.privacy.android.app.presentation.login.confirmemail
 
-import androidx.activity.compose.BackHandler
-import androidx.fragment.compose.AndroidFragment
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
+import mega.privacy.android.app.presentation.login.LoginViewModel
 
 @Serializable
 data object ConfirmationEmailScreen
 
 internal fun NavGraphBuilder.confirmationEmailScreen(
+    activityViewModel: LoginViewModel,
     onBackPressed: () -> Unit,
 ) {
     composable<ConfirmationEmailScreen> {
-        BackHandler(onBack = onBackPressed)
-        AndroidFragment(ConfirmEmailFragment::class.java)
+        NewConfirmEmailGraph(
+            activityViewModel = activityViewModel,
+            onBackPressed = onBackPressed,
+        )
     }
 }
 

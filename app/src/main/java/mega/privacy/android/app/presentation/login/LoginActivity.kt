@@ -183,6 +183,7 @@ class LoginActivity : BaseActivity() {
                     }
                 )
                 confirmationEmailScreen(
+                    activityViewModel = viewModel,
                     onBackPressed = {
                         finish()
                     }

@@ -5,26 +5,22 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailUiState
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CancelCreateAccountUseCase
 import mega.privacy.android.domain.usecase.createaccount.MonitorAccountConfirmationUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.confirmemail.ResendSignUpLinkUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * View Model for [ConfirmEmailFragment]
  *
  * @property uiState View state as [ConfirmEmailUiState]
  */
@@ -34,9 +30,8 @@ class ConfirmEmailViewModel @Inject constructor(
     private val resendSignUpLinkUseCase: ResendSignUpLinkUseCase,
     private val cancelCreateAccountUseCase: CancelCreateAccountUseCase,
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase,
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ConfirmEmailUiState())
@@ -60,31 +55,10 @@ class ConfirmEmailViewModel @Inject constructor(
             }
         }
 
-        monitorConnectivity()
-
         viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)
-            }.onSuccess { isEnabled ->
-                _uiState.update {
-                    it.copy(isNewRegistrationUiEnabled = isEnabled)
-                }
-            }.onFailure {
-                Timber.e(it)
-                _uiState.update { state ->
-                    state.copy(
-                        isNewRegistrationUiEnabled = false
-                    )
-                }
+            monitorThemeModeUseCase().collectLatest { themeMode ->
+                _uiState.update { state -> state.copy(themeMode = themeMode) }
             }
-        }
-    }
-
-    private fun monitorConnectivity() {
-        viewModelScope.launch {
-            monitorConnectivityUseCase()
-                .catch { Timber.e(it) }
-                .collectLatest { isOnline -> _uiState.update { it.copy(isOnline = isOnline) } }
         }
     }
 
