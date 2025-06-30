@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.transfers.preview.model
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,9 +12,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_FILE_PATH
-import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_TRANSFER_TAG
-import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_TRANSFER_UNIQUE_ID
 import mega.privacy.android.app.presentation.transfers.preview.view.FakePreviewInfo
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.Progress
@@ -45,13 +43,7 @@ class FakePreviewViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(FakePreviewState())
     val uiState = _uiState.asStateFlow()
 
-    private val fakePreviewInfo = with(savedStateHandle) {
-        FakePreviewInfo(
-            transferPath = get<String>(EXTRA_FILE_PATH),
-            transferUniqueId = get<Long>(EXTRA_TRANSFER_UNIQUE_ID),
-            transferTagToCancel = get<Int>(EXTRA_TRANSFER_TAG),
-        )
-    }
+    private val fakePreviewInfo = savedStateHandle.toRoute<FakePreviewInfo>()
 
     init {
         checkArgs()

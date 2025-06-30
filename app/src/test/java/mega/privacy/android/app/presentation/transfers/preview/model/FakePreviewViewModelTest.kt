@@ -1,19 +1,22 @@
 package mega.privacy.android.app.presentation.transfers.preview.model
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.testing.invoke
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_FILE_PATH
-import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_TRANSFER_TAG
-import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_TRANSFER_UNIQUE_ID
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.presentation.transfers.preview.view.FakePreviewInfo
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -26,12 +29,10 @@ import mega.privacy.android.domain.exception.transfers.TransferNotFoundException
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.previews.BroadcastTransferTagToCancelUseCase
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.io.TempDir
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -40,10 +41,8 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 
-
 @OptIn(ExperimentalCoroutinesApi::class)
-@ExtendWith(CoroutineMainDispatcherExtension::class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@RunWith(AndroidJUnit4::class)
 class FakePreviewViewModelTest {
 
     private lateinit var underTest: FakePreviewViewModel
@@ -55,20 +54,27 @@ class FakePreviewViewModelTest {
     private val broadcastTransferTagToCancelUseCase = mock<BroadcastTransferTagToCancelUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
 
-    @TempDir
-    lateinit var temporaryFolder: File
     private val transferUniqueId = 12L
     private val fileName = "test.txt"
-    private val savedStateHandle = SavedStateHandle(
-        mapOf(EXTRA_TRANSFER_UNIQUE_ID to transferUniqueId)
-    )
+    private var savedStateHandle = SavedStateHandle()
 
-    @BeforeAll
+    @Before
     fun setup() {
-        initTest()
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+        reset(
+            getTransferByUniqueIdUseCase,
+            monitorTransferEventsUseCase,
+            broadcastTransferTagToCancelUseCase,
+            fileTypeIconMapper,
+        )
     }
 
-    private fun initTest(savedStateHandle: SavedStateHandle = this.savedStateHandle) {
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    private fun initTest() {
         underTest = FakePreviewViewModel(
             getTransferByUniqueIdUseCase = getTransferByUniqueIdUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
@@ -78,13 +84,17 @@ class FakePreviewViewModelTest {
         )
     }
 
-    @BeforeEach
-    fun resetMock() {
-        reset(
-            getTransferByUniqueIdUseCase,
-            monitorTransferEventsUseCase,
-            broadcastTransferTagToCancelUseCase,
-            fileTypeIconMapper,
+    private fun initSavedStateHandle(
+        transferUniqueId: Long? = null,
+        transferPath: String? = null,
+        transferTagToCancel: Int? = null,
+    ) {
+        savedStateHandle = SavedStateHandle.Companion.invoke(
+            route = FakePreviewInfo(
+                transferUniqueId = transferUniqueId,
+                transferPath = transferPath,
+                transferTagToCancel = transferTagToCancel,
+            )
         )
     }
 
@@ -98,7 +108,9 @@ class FakePreviewViewModelTest {
 
     @Test
     fun `test initial state`() = runTest {
-        initTest(savedStateHandle = SavedStateHandle())
+        initSavedStateHandle()
+
+        initTest()
 
         underTest.uiState.test {
             val actual = awaitItem()
@@ -119,26 +131,23 @@ class FakePreviewViewModelTest {
     @Test
     fun `test that when transfer is not found but file is, state is updated with path`() =
         runTest {
-            val transferPath = temporaryFolder.absolutePath + File.separator + fileName
-            val savedStateHandle = SavedStateHandle(
-                mapOf(
-                    EXTRA_TRANSFER_UNIQUE_ID to transferUniqueId,
-                    EXTRA_FILE_PATH to transferPath,
-                )
-            )
-            val progress = Progress(1f)
-            val file = File(temporaryFolder, fileName)
+            val file = File.createTempFile("test", fileName)
             file.createNewFile()
+            val progress = Progress(1f)
 
+            initSavedStateHandle(
+                transferUniqueId = transferUniqueId,
+                transferPath = file.absolutePath,
+            )
             commonStub(transfer = null)
 
-            initTest(savedStateHandle)
+            initTest()
             advanceUntilIdle()
 
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.progress).isEqualTo(progress)
-                assertThat(actual.previewFilePathToOpen).isEqualTo(transferPath)
+                assertThat(actual.previewFilePathToOpen).isEqualTo(file.absolutePath)
             }
         }
 
@@ -152,6 +161,7 @@ class FakePreviewViewModelTest {
                 on { this.fileName } doReturn fileName
             }
 
+            initSavedStateHandle(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer)
             whenever(fileTypeIconMapper(extension)) doReturn fileTypeResId
 
@@ -168,6 +178,7 @@ class FakePreviewViewModelTest {
     @Test
     fun `test that when transfer nor file are found, then file name and file typeRes are not set but error is`() =
         runTest {
+            initSavedStateHandle(transferUniqueId = transferUniqueId)
             commonStub(transfer = null)
 
             initTest()
@@ -195,6 +206,7 @@ class FakePreviewViewModelTest {
                 on { this.transfer } doReturn transfer
             }
 
+            initSavedStateHandle(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
@@ -220,6 +232,7 @@ class FakePreviewViewModelTest {
                 on { this.transfer } doReturn transfer
             }
 
+            initSavedStateHandle(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
@@ -244,6 +257,7 @@ class FakePreviewViewModelTest {
                 on { this.error } doReturn error
             }
 
+            initSavedStateHandle(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
@@ -266,6 +280,7 @@ class FakePreviewViewModelTest {
                 on { this.error } doReturn error
             }
 
+            initSavedStateHandle(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
@@ -288,6 +303,7 @@ class FakePreviewViewModelTest {
                 on { this.error } doReturn error
             }
 
+            initSavedStateHandle(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
@@ -312,6 +328,7 @@ class FakePreviewViewModelTest {
                 on { this.error } doReturn error
             }
 
+            initSavedStateHandle(transferUniqueId = transferUniqueId)
             commonStub(transfer = transfer, flow = flowOf(event))
 
             initTest()
@@ -324,6 +341,8 @@ class FakePreviewViewModelTest {
     @Test
     fun `test that consumeTransferEvent updates state with null`() =
         runTest {
+            initTest()
+
             underTest.consumeTransferEvent()
 
             underTest.uiState.test {
@@ -336,13 +355,11 @@ class FakePreviewViewModelTest {
     fun `test that BroadcastTransferTagToCancelUseCase is invoked if transfer tag to cancel is received and state is updated with error if not transfer unique id`() =
         runTest {
             val transferTagToCancel = 1234
-            val savedStateHandle = SavedStateHandle(
-                mapOf(EXTRA_TRANSFER_TAG to transferTagToCancel)
-            )
 
+            initSavedStateHandle(transferTagToCancel = transferTagToCancel)
             whenever(broadcastTransferTagToCancelUseCase(transferTagToCancel)) doReturn Unit
 
-            initTest(savedStateHandle)
+            initTest()
 
             underTest.uiState.test {
                 assertThat(awaitItem().error)
@@ -356,21 +373,19 @@ class FakePreviewViewModelTest {
     fun `test that BroadcastTransferTagToCancelUseCase is invoked if transfer tag to cancel is received but state is NOT updated with error when there is transfer unique id`() =
         runTest {
             val transferTagToCancel = 1234
-            val savedStateHandle = SavedStateHandle(
-                mapOf(
-                    EXTRA_TRANSFER_UNIQUE_ID to transferUniqueId,
-                    EXTRA_TRANSFER_TAG to transferTagToCancel
-                )
-            )
             val transfer = mock<Transfer> {
                 on { this.fileName } doReturn fileName
             }
 
+            initSavedStateHandle(
+                transferUniqueId = transferUniqueId,
+                transferTagToCancel = transferTagToCancel,
+            )
             commonStub(transfer = transfer)
 
             whenever(broadcastTransferTagToCancelUseCase(transferTagToCancel)) doReturn Unit
 
-            initTest(savedStateHandle)
+            initTest()
 
             underTest.uiState.test {
                 assertThat(awaitItem().error).isNull()
