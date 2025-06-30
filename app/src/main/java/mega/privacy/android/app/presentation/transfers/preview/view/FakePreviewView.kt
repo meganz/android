@@ -12,11 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
@@ -27,7 +25,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_ERROR
@@ -47,15 +44,15 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedResR
 
-@OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 internal fun FakePreviewView(
-    scaffoldState: ScaffoldState,
     onBackPress: () -> Unit,
     uiState: FakePreviewState,
     consumeTransferEvent: () -> Unit,
     navigateToStorageSettings: () -> Unit,
 ) {
+    val scaffoldState = rememberScaffoldState()
+
     with(uiState) {
         fileName?.let {
             MegaScaffold(
@@ -143,13 +140,11 @@ internal fun FakePreviewView(
     }
 }
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 @CombinedThemePreviews
 @Composable
 private fun FakePreviewViewPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         FakePreviewView(
-            scaffoldState = rememberScaffoldState(),
             onBackPress = {},
             uiState = FakePreviewState(
                 fileName = "Porter_final.ai",

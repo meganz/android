@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.transfers.preview.view.navigation.FakePreviewArgs
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_FILE_PATH
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_TRANSFER_TAG
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_TRANSFER_UNIQUE_ID
+import mega.privacy.android.app.presentation.transfers.preview.view.FakePreviewInfo
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -42,7 +45,13 @@ class FakePreviewViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(FakePreviewState())
     val uiState = _uiState.asStateFlow()
 
-    private val fakePreviewArgs = FakePreviewArgs(savedStateHandle)
+    private val fakePreviewInfo = with(savedStateHandle) {
+        FakePreviewInfo(
+            transferPath = get<String>(EXTRA_FILE_PATH),
+            transferUniqueId = get<Long>(EXTRA_TRANSFER_UNIQUE_ID),
+            transferTagToCancel = get<Int>(EXTRA_TRANSFER_TAG),
+        )
+    }
 
     init {
         checkArgs()
@@ -52,14 +61,14 @@ class FakePreviewViewModel @Inject constructor(
     }
 
     private fun checkArgs() {
-        if (fakePreviewArgs.transferUniqueId == null && fakePreviewArgs.transferTagToCancel == null) {
+        if (fakePreviewInfo.transferUniqueId == null && fakePreviewInfo.transferTagToCancel == null) {
             Timber.e("No transferUniqueId and no transferTagToCancel provided")
             _uiState.update { state -> state.copy(error = NoTransferToShowException()) }
         }
     }
 
     private fun getTransfer() {
-        fakePreviewArgs.transferUniqueId?.let {
+        fakePreviewInfo.transferUniqueId?.let {
             viewModelScope.launch {
                 runCatching {
                     getTransferByUniqueIdUseCase(it)
@@ -74,7 +83,7 @@ class FakePreviewViewModel @Inject constructor(
                         )
                     }
                 } ?: run {
-                    fakePreviewArgs.transferPath?.let { path ->
+                    fakePreviewInfo.transferPath?.let { path ->
                         if (File(path).exists()) {
                             _uiState.update { state ->
                                 state.copy(
@@ -95,7 +104,7 @@ class FakePreviewViewModel @Inject constructor(
     }
 
     private fun monitorTransferEvents() {
-        fakePreviewArgs.transferUniqueId?.let {
+        fakePreviewInfo.transferUniqueId?.let {
             viewModelScope.launch {
                 monitorTransferEventsUseCase()
                     .filter { event -> event.transfer.uniqueId == it }
@@ -146,13 +155,13 @@ class FakePreviewViewModel @Inject constructor(
     }
 
     private fun checkTransferTagToCancel() {
-        fakePreviewArgs.transferTagToCancel?.let {
+        fakePreviewInfo.transferTagToCancel?.let {
             viewModelScope.launch {
                 broadcastTransferTagToCancelUseCase(it)
             }
             Timber.d("Broadcast sent to cancel transfer with tag: $it")
 
-            if (fakePreviewArgs.transferUniqueId == null) {
+            if (fakePreviewInfo.transferUniqueId == null) {
                 _uiState.update { state -> state.copy(error = NoTransferToShowException()) }
             }
         }

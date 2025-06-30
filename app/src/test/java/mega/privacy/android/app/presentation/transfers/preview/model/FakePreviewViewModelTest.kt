@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.transfers.preview.view.navigation.transferPathArg
-import mega.privacy.android.app.presentation.transfers.preview.view.navigation.transferTagToCancelArg
-import mega.privacy.android.app.presentation.transfers.preview.view.navigation.transferUniqueIdArg
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_FILE_PATH
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_TRANSFER_TAG
+import mega.privacy.android.app.presentation.transfers.preview.FakePreviewFragment.Companion.EXTRA_TRANSFER_UNIQUE_ID
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.Progress
@@ -60,7 +60,7 @@ class FakePreviewViewModelTest {
     private val transferUniqueId = 12L
     private val fileName = "test.txt"
     private val savedStateHandle = SavedStateHandle(
-        mapOf(transferUniqueIdArg to transferUniqueId.toString())
+        mapOf(EXTRA_TRANSFER_UNIQUE_ID to transferUniqueId)
     )
 
     @BeforeAll
@@ -122,8 +122,8 @@ class FakePreviewViewModelTest {
             val transferPath = temporaryFolder.absolutePath + File.separator + fileName
             val savedStateHandle = SavedStateHandle(
                 mapOf(
-                    transferUniqueIdArg to transferUniqueId.toString(),
-                    transferPathArg to transferPath,
+                    EXTRA_TRANSFER_UNIQUE_ID to transferUniqueId,
+                    EXTRA_FILE_PATH to transferPath,
                 )
             )
             val progress = Progress(1f)
@@ -337,7 +337,7 @@ class FakePreviewViewModelTest {
         runTest {
             val transferTagToCancel = 1234
             val savedStateHandle = SavedStateHandle(
-                mapOf(transferTagToCancelArg to transferTagToCancel.toString())
+                mapOf(EXTRA_TRANSFER_TAG to transferTagToCancel)
             )
 
             whenever(broadcastTransferTagToCancelUseCase(transferTagToCancel)) doReturn Unit
@@ -358,8 +358,8 @@ class FakePreviewViewModelTest {
             val transferTagToCancel = 1234
             val savedStateHandle = SavedStateHandle(
                 mapOf(
-                    transferUniqueIdArg to transferUniqueId.toString(),
-                    transferTagToCancelArg to transferTagToCancel.toString()
+                    EXTRA_TRANSFER_UNIQUE_ID to transferUniqueId,
+                    EXTRA_TRANSFER_TAG to transferTagToCancel
                 )
             )
             val transfer = mock<Transfer> {
