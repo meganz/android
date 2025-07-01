@@ -796,10 +796,6 @@
     <string name="file_link_unavaible_ToS_violation">Linkul fișierului a fost eliminat deoarece a încălcat Termenii de utilizare a serviciului.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Acest URL este corupt sau deformat. Linkul pe care încerci să îl accesezi nu există.</string>
-    <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">În așteptarea confirmării e-mailului</string>
-    <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Verificați căsuța de e-mail și urmați linkul pentru a vă confirma contul.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">%1$d element</item>
@@ -1173,8 +1169,6 @@
     <string name="chat_connecting">Se conectează&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s a fost deja invitat. Verificați cererile în așteptare.</string>
-    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="confirm_email_misspelled_resend">Retrimite</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Avertisment privind drepturile de autor pentru toți utilizatorii</string>
     <!-- text_copyright_alert_first_paragraph -->

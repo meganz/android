@@ -780,10 +780,6 @@
     <string name="file_link_unavaible_ToS_violation">Đường liên kết tệp tin đã bị xóa bỏ do vi phạm Điều Khoản Dịch Vụ của MEGA.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">URL vừa nhập này không đúng hoặc bị viết sai. Đường liên&#160;kết bạn đang cố truy&#160;cập không có tồn&#160;tại.</string>
-    <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">Đang chờ xác nhận địa chỉ e-mail</string>
-    <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Kiểm&#160;tra hộp&#160;thư email của bạn và đi theo đường liên&#160;kết để xác&#160;nhận tài&#160;khoản của bạn.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d mục</item>
@@ -1123,8 +1119,6 @@
     <string name="chat_connecting">Đang kết nối&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s đã được mời rồi. Kiểm&#160;tra lại các lời yêu&#160;cầu đang chờ.</string>
-    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="confirm_email_misspelled_resend">Gửi lại</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Cảnh&#160;báo bản&#160;quyền cho tất cả người dùng</string>
     <!-- text_copyright_alert_first_paragraph -->

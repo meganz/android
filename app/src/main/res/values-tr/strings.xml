@@ -788,10 +788,6 @@
     <string name="file_link_unavaible_ToS_violation">Hizmet Şartlarımızı ihlal ettiği için dosya bağlantısı kaldırıldı.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Bu URL bozuk veya hatalı. Erişmeye çalıştığınız bağlantı mevcut değil.</string>
-    <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">E-posta onayı bekleniyor</string>
-    <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">E-posta gelen kutunuzu kontrol edin ve hesabınızı onaylamak için bağlantıyı izleyin.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">%1$d öğe</item>
@@ -1148,8 +1144,6 @@
     <string name="chat_connecting">Bağlanılıyor&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s zaten davet edilmiş. Bekleyen isteklerinizi kontrol edin.</string>
-    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="confirm_email_misspelled_resend">Yeniden gönder</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Tüm kullanıcılara telif hakkı uyarısı</string>
     <!-- text_copyright_alert_first_paragraph -->

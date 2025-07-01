@@ -246,8 +246,6 @@
     <string name="sync_error_dialog_insufficient_storage_confirm_button">ดูแผนการ</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">ไม่ใช่ตอนนี้</string>
-    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
-    <string name="account_confirm_email_misspelled_email_description">หากคุณสะกดที่อยู่อีเมลผิด ให้แก้ไขแล้วแตะ[A]ส่งใหม่[/A]</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">การซิงค์ถูกหยุดไว้ชั่วคราว เนื่องจากพื้นที่เก็บข้อมูลใน MEGA ของคุณเต็มแล้ว</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
@@ -433,7 +431,7 @@
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">บนคอมพิวเตอร์</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Visit [A]https://mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website">1. ไปที่ [A]https://mega.nz[/A] ในเว็บเบราว์เซอร์ของคุณ</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. เข้าสู่ระบบบัญชี MEGA ของคุณ</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -943,7 +941,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">การยืนยันอีเมล</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]%s[/A].</string>
+    <string name="email_confirmation_content">เราได้ส่งอีเมลพร้อมลิงก์ไปยังที่อยู่อีเมลของคุณ [P]%s[/P] คลิกที่ลิงก์เพื่อยืนยันที่อยู่อีเมลและเปิดใช้งานบัญชีของคุณ\n\nหากคุณไม่ได้รับอีเมล ให้ตรวจสอบโฟลเดอร์สแปมหรือลองส่งอีกครั้ง หากพบปัญหาอื่น ๆ กรุณาเยี่ยมชม[A]%s[/A]ของเรา</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">ส่งใหม่</string>
     <!-- General change email address -->
@@ -1209,7 +1207,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
     <string name="choose_account_screen_transfer_quota_label">ถ่ายโอนข้อมูล %1$s</string>
     <!-- General month label -->
-    <string name="general_month">/month</string>
+    <string name="general_month">/เดือน</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s ต่อเดือน</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
@@ -1255,33 +1253,35 @@
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">โฟลเดอร์บางรายการไม่สามารถซิงค์หรือสำรองข้อมูลได้ เนื่องจากแอป MEGA สูญเสียสิทธิ์ในการเข้าถึงโฟลเดอร์ในเครื่อง แตะ ดำเนินการต่อ เพื่อเพิ่มสิทธิ์สำหรับแต่ละโฟลเดอร์ที่ได้รับผลกระทบอีกครั้ง</string>
     <!-- Title for the free plan card when the user is an existing account -->
-    <string name="free_plan_card_existing_title">Continue with your free plan</string>
+    <string name="free_plan_card_existing_title">ดำเนินการต่อด้วยแผนฟรีของคุณ</string>
     <!-- Button text for existing users to continue with the free plan -->
-    <string name="free_plan_card_existing_button">Continue with free plan</string>
+    <string name="free_plan_card_existing_button">ดำเนินการต่อด้วยแผนฟรี</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">พื้นที่เก็บข้อมูล %1$s</string>
     <!-- Sort by newest shares -->
-    <string name="general_sort_newest_shares">Newest shares</string>
+    <string name="general_sort_newest_shares">แชร์ใหม่ล่าสุด</string>
     <!-- Sort by oldest shares -->
-    <string name="general_sort_oldest_shares">Oldest shares</string>
+    <string name="general_sort_oldest_shares">แชร์เก่าที่สุด</string>
     <!-- Title for recovery key error dialog -->
     <string name="recovery_key_error_title">ข้อผิดพลาดเกี่ยวกับคีย์การกู้คืน</string>
     <!-- Description for recovery key error dialog -->
-    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again.</string>
+    <string name="recovery_key_error_description">คีย์การกู้คืนไม่ถูกต้อง หรือไม่ใช่ของบัญชีนี้ กรุณาตรวจสอบว่าคุณใช้คีย์ที่ถูกต้อง แล้วลองอีกครั้ง</string>
     <!-- Label for the current plan badge in the pro plan card -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">แพลนปัจจุบัน</string>
     <!-- Error message when achievements status is unavailable -->
-    <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
+    <string name="achievement_status_unavailable">สถานะความสำเร็จของคุณไม่พร้อมใช้งานในขณะนี้ กรุณาลองอีกครั้งในภายหลัง</string>
     <!-- Warning indicating that the transfer quota limit has been reached -->
     <string name="transfers_transfer_quota_banner_title">รับโควต้าการถ่ายโอนเพิ่มขึ้น</string>
     <!-- Warning indicating that the storage quota limit has been reached -->
-    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <string name="transfers_storage_quota_banner_title">รับพื้นที่จัดเก็บเพิ่ม</string>
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
-    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <string name="transfers_storage_and_transfer_quota_banner_title">รับพื้นที่จัดเก็บและโควตาการถ่ายโอนเพิ่ม</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">ศูนย์ความช่วยเหลือ</string>
     <!-- Warning informing the transfers queue has been paused -->
     <string name="transfers_all_transfers_paused_warning">หยุดการโอนข้อมูลทั้งหมดชั่วคราวแล้ว</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">ดำเนินการต่อทั้งหมด</string>
+    <!-- Sync over quota warning title -->
+    <string name="sync_storage_over_quota_warning_title">การซิงค์ถูกหยุดไว้ชั่วคราว เนื่องจากพื้นที่เก็บข้อมูลใน MEGA ของคุณเต็มแล้ว</string>
 </resources>

@@ -820,10 +820,6 @@
     <string name="file_link_unavaible_ToS_violation">تمت إزالة رابط الملف لأنه ينتهك شروط الخدمة الخاصة بنا.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">عنوان الرابط الالكتروني URL هذا تالف أو مشوه. الرابط الذي تحاول الوصول إليه غير موجود.</string>
-    <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">بانتظار تأكيد البريد الإلكتروني</string>
-    <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">تحقق من صندوق البريد الإلكتروني الخاص بك واتبع الرابط لتأكيد حسابك.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="zero">%1$d عنصر</item>
@@ -1248,8 +1244,6 @@
     <string name="chat_connecting">جاري الاتصال&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s تمت دعوته بالفعل. تحقق من طلباتك قيد الانتظار.</string>
-    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="confirm_email_misspelled_resend">إعادة إرسال</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">تحذير حقوق النشر لكل المستخدمين</string>
     <!-- text_copyright_alert_first_paragraph -->

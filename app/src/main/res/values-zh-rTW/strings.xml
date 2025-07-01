@@ -780,10 +780,6 @@
     <string name="file_link_unavaible_ToS_violation">該檔案連結因違反我們的服務條款而被刪除。</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">此URL已損毀或不完整。您嘗試造訪的連結不存在。</string>
-    <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">等待電子郵件確認中</string>
-    <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">檢查您的電子郵件收件匣，並點選連結以確認您的帳戶。</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d個項目</item>
@@ -1123,8 +1119,6 @@
     <string name="chat_connecting">正在連線⋯</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s已被邀請。請檢查您的待處理請求。</string>
-    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="confirm_email_misspelled_resend">重新發送</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">致所有使用者之著作權警告</string>
     <!-- text_copyright_alert_first_paragraph -->

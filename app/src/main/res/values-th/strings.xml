@@ -780,10 +780,6 @@
     <string name="file_link_unavaible_ToS_violation">ลิงก์ไฟล์ถูกลบออกเนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">URL นี้เสียหายหรือผิดรูปแบบ ไม่มีลิงก์ที่คุณพยายามเข้าถึง</string>
-    <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">กำลังรอการยืนยันทางอีเมล</string>
-    <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">ตรวจสอบกล่องจดหมายอีเมลของคุณและไปที่ลิงก์เพื่อยืนยันการเปิดบัญชีของคุณ</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d รายการ</item>
@@ -881,7 +877,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">เป็นความลับ</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">คุณได้เข้าสู่ระบบบัญชี MEGA อื่นอยู่ กรุณาออกจากระบบและเปิดลิงก์รีเซ็ตรหัสผ่านอีกครั้ง</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">ลิงก์ยกเลิกนี้หมดอายุแล้ว กรุณาลองอีกครั้ง</string>
     <!-- Text shown after searching and no results found -->
@@ -1123,8 +1119,6 @@
     <string name="chat_connecting">กำลังเชื่อมต่อ&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s ได้รับเชิญไปแล้ว ตรวจสอบคำขอที่รอดำเนินการของคุณ</string>
-    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="confirm_email_misspelled_resend">ส่งใหม่</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">คำเตือนลิขสิทธิ์สำหรับผู้ใช้ทั้งหมด</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -1629,7 +1623,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">เปิดใช้งานการดูตัวอย่างลิงก์ที่ส่ง</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generates previews for certain links you send in chat, when available. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">แอปจะสร้างตัวอย่างสำหรับลิงก์บางรายการที่คุณส่งในแชท หากมีให้บริการ โปรดทราบว่าการเรียกดูตัวอย่างเหล่านี้ไม่ได้รับการป้องกันด้วยการเข้ารหัสด้วยวิธีซีโร่-นอว์เลจ</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">กรุณากรอกรหัสผ่านที่คาดเดายากกว่านี้</string>
     <!-- title of the notification for an acceptance of a contact request -->

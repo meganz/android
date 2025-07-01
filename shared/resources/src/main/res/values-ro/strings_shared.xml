@@ -262,8 +262,6 @@
     <string name="sync_error_dialog_insufficient_storage_confirm_button">Vezi abonamentele</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">Nu acum</string>
-    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
-    <string name="account_confirm_email_misspelled_email_description">Dacă ați scris greșit adresa dvs. de e-mail, corectați-o și atingeți [A]Retrimite[/A].</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">Sincronizarea a fost întreruptă. Planul dvs. MEGA a rămas fără spațiu de stocare.</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
@@ -1318,4 +1316,6 @@
     <string name="transfers_all_transfers_paused_warning">Toate transferurile au fost întrerupte</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">Reluați toate</string>
+    <!-- Sync over quota warning title -->
+    <string name="sync_storage_over_quota_warning_title">Sincronizarea a fost întreruptă. Planul dvs. MEGA a rămas fără spațiu de stocare.</string>
 </resources>

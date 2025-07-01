@@ -804,10 +804,6 @@
     <string name="file_link_unavaible_ToS_violation">Ссылка на файл была удалёна из-за нарушения наших условий использования.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Этот адрес повреждён или изменён. Ссылка, по которой вы пытаетесь получить доступ, не существует.</string>
-    <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">Ожидание подтверждения по электронной почте</string>
-    <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Подтвердите регистрацию, перейдя по ссылке в письме, которое вам придёт.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">%1$d элемент</item>
@@ -1198,8 +1194,6 @@
     <string name="chat_connecting">Соединение&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s уже приглашён. Проверьте отправленные запросы.</string>
-    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="confirm_email_misspelled_resend">Выслать повторно</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Предупреждение о защите авторских прав</string>
     <!-- text_copyright_alert_first_paragraph -->

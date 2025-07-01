@@ -254,8 +254,6 @@
     <string name="sync_error_dialog_insufficient_storage_confirm_button">Planları gör</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">Şimdi değil</string>
-    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
-    <string name="account_confirm_email_misspelled_email_description">E-posta adresinizi yanlış yazdıysanız düzeltin ve [A]Yeniden gönder[/A] seçeneğine dokunun.</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">Senkronizasyon duraklatıldı, MEGA planınızın depolama alanı doldu</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
@@ -861,9 +859,9 @@
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">Yanlış doğrulama kodu</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview">%1$s önizleme için hazırlanıyor</string>
+    <string name="transfers_notification_downloading_preview">%1$s ön izleme için hazırlanıyor</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview_paused">%1$s önizleme için hazırlanıyor (duraklatıldı)</string>
+    <string name="transfers_notification_downloading_preview_paused">%1$s ön izleme için hazırlanıyor (duraklatıldı)</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
         <item quantity="one">“%1$s” kuyruktan kaldırıldı</item>
@@ -1033,13 +1031,13 @@
     <!-- Text shown in the fake preview screen -->
     <string name="transfers_fake_preview_text">Dosya yükleniyor&#8230;</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_title">Önizleme iptal edilsin mi?</string>
+    <string name="transfers_cancel_preview_download_warning_title">Ön izleme iptal edilsin mi?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_text">Artık bu dosyayı önizleyemeyeceksiniz</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">Önizleme yüklenemedi, lütfen tekrar deneyin</string>
+    <string name="transfers_fake_preview_screen_general_error">Ön izleme yüklenemedi, lütfen tekrar deneyin</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_preview_download">Bir şeyler ters gitti. Önizleme iptal edilemedi. Ayrıntılar için bildirime bakın.</string>
+    <string name="transfers_error_cancelling_preview_download">Bir şeyler ters gitti. Ön izleme iptal edilemedi. Ayrıntılar için bildirime bakın.</string>
     <!-- Title of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_title">Yedek adı zaten mevcut</string>
     <!-- Text of the Rename and Create Backup Dialog -->
@@ -1301,4 +1299,6 @@
     <string name="transfers_all_transfers_paused_warning">Tüm transferler duraklatıldı</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">Resume all</string>
+    <!-- Sync over quota warning title -->
+    <string name="sync_storage_over_quota_warning_title">Senkronizasyon duraklatıldı, MEGA planınızın depolama alanı doldu</string>
 </resources>

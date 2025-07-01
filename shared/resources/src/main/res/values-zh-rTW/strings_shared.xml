@@ -246,8 +246,6 @@
     <string name="sync_error_dialog_insufficient_storage_confirm_button">檢視方案</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">稍後再說</string>
-    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
-    <string name="account_confirm_email_misspelled_email_description">如果您拼錯您的電子郵件地址，請更正並點選[A]重新發送[/A]。</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">同步已暫停，您的MEGA方案的儲存空間已用完</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
@@ -1209,7 +1207,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
     <string name="choose_account_screen_transfer_quota_label">%1$s傳輸配額</string>
     <!-- General month label -->
-    <string name="general_month">/month</string>
+    <string name="general_month">/月</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s每月</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
@@ -1284,4 +1282,6 @@
     <string name="transfers_all_transfers_paused_warning">所有傳輸已暫停</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">全部恢復</string>
+    <!-- Sync over quota warning title -->
+    <string name="sync_storage_over_quota_warning_title">同步已暫停，您的MEGA方案的儲存空間已用完</string>
 </resources>

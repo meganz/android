@@ -780,10 +780,6 @@
     <string name="file_link_unavaible_ToS_violation">このフォルダリンクは当社のご利用規約に違反するため、削除されました。</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">このURLは破損しているか変形しています。アクセスしようとしているリンクは存在しません。</string>
-    <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">メールの確認を待っています</string>
-    <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">メール受信箱を確認し、リンクをクリックしてアカウントを認証してください。</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d項目</item>
@@ -1123,8 +1119,6 @@
     <string name="chat_connecting">接続中&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%sさんはすでに招待されました。保留中の要求を確認してください。</string>
-    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="confirm_email_misspelled_resend">再送</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">すべてのユーザー様に対する著作権の警告</string>
     <!-- text_copyright_alert_first_paragraph -->

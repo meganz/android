@@ -804,10 +804,6 @@
     <string name="file_link_unavaible_ToS_violation">Łącze do pliku zostało usunięte, ponieważ naruszało nasze warunki korzystania z usługi.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Ten adres URL jest uszkodzony lub zdeformowany. Link, do którego próbujesz uzyskać dostęp, nie istnieje.</string>
-    <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">Oczekiwanie na potwierdzenia konta</string>
-    <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Sprawdź swoją skrzynkę email i kliknij link, aby potwierdź swoje konto.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">%1$d element</item>
@@ -1198,8 +1194,6 @@
     <string name="chat_connecting">Trwa łączenie&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s został już zaproszony. Sprawdź oczekujące zaproszenia.</string>
-    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="confirm_email_misspelled_resend">Wyślij ponownie</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Informacja do wszystkich użytkowników, dotycząca ochrony praw autorskich</string>
     <!-- text_copyright_alert_first_paragraph -->

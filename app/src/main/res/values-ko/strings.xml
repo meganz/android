@@ -780,10 +780,6 @@
     <string name="file_link_unavaible_ToS_violation">파일 링크가 이용 약관 위반으로 인해 삭제되었습니다.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">이 URL은 손상되었거나 변형되었습니다. 접근하려는 링크가 존재하지 않습니다.</string>
-    <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">이메일 인증 대기중</string>
-    <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">계정을 확인하려면 이메일 수신함을 확인하고 링크를 따라가세요.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d개의 항목</item>
@@ -1123,8 +1119,6 @@
     <string name="chat_connecting">연결중&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s님이 이미 초대되었습니다. 보류중인 요청을 확인하세요.</string>
-    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="confirm_email_misspelled_resend">재발송</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">모든 이용자에게 저작권 경고</string>
     <!-- text_copyright_alert_first_paragraph -->

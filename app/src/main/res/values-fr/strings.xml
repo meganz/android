@@ -796,10 +796,6 @@
     <string name="file_link_unavaible_ToS_violation">Le lien de fichier a été supprimé pour non-respect des Conditions générales d’utilisation.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Cette URL est corrompue ou mal formée. Le lien auquel vous essayez d’accéder n’existe pas.</string>
-    <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">En attente de la confirmation par courriel</string>
-    <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Vérifiez votre boîte de réception des courriels et suivez le lien pour confirmer votre compte.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">%1$d&#160;élément</item>
@@ -1173,8 +1169,6 @@
     <string name="chat_connecting">Connexion&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s a déjà été invité. Consultez les demandes en attente.</string>
-    <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="confirm_email_misspelled_resend">Renvoyer</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Avertissement sur le droit d’auteur à tous les utilisateurs</string>
     <!-- text_copyright_alert_first_paragraph -->

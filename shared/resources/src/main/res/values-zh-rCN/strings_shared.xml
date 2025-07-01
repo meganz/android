@@ -246,8 +246,6 @@
     <string name="sync_error_dialog_insufficient_storage_confirm_button">查看方案</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">现在不用</string>
-    <!-- Hint text explaining that you can change the email and resend the create account link to the new email address. This appears on the confirmation email screen under the email address text input field. -->
-    <string name="account_confirm_email_misspelled_email_description">如果您拼错了您的电子邮件地址，请更正并点按[A]重新发送[/A]。</string>
     <!-- Title of the insufficient storage error banner -->
     <string name="sync_error_storage_over_quota_banner_title">同步已暂停，您MEGA方案的存储空间已耗尽</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
@@ -1285,4 +1283,6 @@
     <string name="transfers_all_transfers_paused_warning">所有传输均已暂停</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">全部恢复</string>
+    <!-- Sync over quota warning title -->
+    <string name="sync_storage_over_quota_warning_title">同步已暂停，您MEGA方案的存储空间已耗尽</string>
 </resources>
