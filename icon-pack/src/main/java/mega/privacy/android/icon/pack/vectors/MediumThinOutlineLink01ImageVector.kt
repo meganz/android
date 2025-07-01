@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 public fun createMediumThinOutlineLink01ImageVector(): ImageVector = ImageVector.Builder(
-    name = "ic_link_01_medium_thin_outline",
+    name = "icon_link-01_medium_thin_outline",
     defaultWidth = 24.0.dp,
     defaultHeight = 24.0.dp,
     viewportWidth = 24.0f,
@@ -36,25 +36,25 @@ public fun createMediumThinOutlineLink01ImageVector(): ImageVector = ImageVector
         strokeLineMiter = 4.0f,
         pathFillType = PathFillType.NonZero,
     ) {
-        moveTo(2.785f, 8.811f)
-        curveTo(3.605f, 7.969f, 4.713f, 7.5f, 5.864f, 7.5f)
-        lineTo(8.932f, 7.5f)
-        curveTo(9.346f, 7.5f, 9.682f, 7.164f, 9.682f, 6.75f)
-        curveTo(9.682f, 6.336f, 9.346f, 6.0f, 8.932f, 6.0f)
-        lineTo(5.864f, 6.0f)
-        curveTo(4.302f, 6.0f, 2.809f, 6.637f, 1.71f, 7.764f)
-        curveTo(0.613f, 8.891f, 0.0f, 10.415f, 0.0f, 12.0f)
-        curveTo(0.0f, 13.585f, 0.613f, 15.109f, 1.71f, 16.236f)
-        curveTo(2.254f, 16.794f, 2.9f, 17.237f, 3.613f, 17.541f)
-        curveTo(4.326f, 17.844f, 5.091f, 18.0f, 5.864f, 18.0f)
-        lineTo(8.932f, 18.0f)
-        curveTo(9.346f, 18.0f, 9.682f, 17.664f, 9.682f, 17.25f)
-        curveTo(9.682f, 16.836f, 9.346f, 16.5f, 8.932f, 16.5f)
-        lineTo(5.864f, 16.5f)
-        curveTo(5.293f, 16.5f, 4.728f, 16.385f, 4.2f, 16.16f)
-        curveTo(3.672f, 15.936f, 3.191f, 15.606f, 2.785f, 15.189f)
-        curveTo(1.964f, 14.347f, 1.5f, 13.2f, 1.5f, 12.0f)
-        curveTo(1.5f, 10.8f, 1.964f, 9.653f, 2.785f, 8.811f)
+        moveTo(2.78501f, 8.811f)
+        curveTo(3.60496f, 7.96918f, 4.71279f, 7.5f, 5.86364f, 7.5f)
+        lineTo(8.93182f, 7.5f)
+        curveTo(9.34603f, 7.5f, 9.68182f, 7.16421f, 9.68182f, 6.75f)
+        curveTo(9.68182f, 6.33579f, 9.34603f, 6.0f, 8.93182f, 6.0f)
+        lineTo(5.86364f, 6.0f)
+        curveTo(4.30204f, 6.0f, 2.80852f, 6.63707f, 1.71049f, 7.76438f)
+        curveTo(0.613108f, 8.89103f, 0.0f, 10.415f, 0.0f, 12.0f)
+        curveTo(0.0f, 13.585f, 0.613108f, 15.109f, 1.71049f, 16.2356f)
+        curveTo(2.25404f, 16.7937f, 2.90042f, 17.2374f, 3.61323f, 17.5406f)
+        curveTo(4.32608f, 17.8437f, 5.09083f, 18.0f, 5.86364f, 18.0f)
+        lineTo(8.93182f, 18.0f)
+        curveTo(9.34603f, 18.0f, 9.68182f, 17.6642f, 9.68182f, 17.25f)
+        curveTo(9.68182f, 16.8358f, 9.34603f, 16.5f, 8.93182f, 16.5f)
+        lineTo(5.86364f, 16.5f)
+        curveTo(5.29338f, 16.5f, 4.72821f, 16.3847f, 4.20024f, 16.1602f)
+        curveTo(3.67222f, 15.9356f, 3.19114f, 15.606f, 2.78501f, 15.189f)
+        curveTo(1.9644f, 14.3465f, 1.5f, 13.1997f, 1.5f, 12.0f)
+        curveTo(1.5f, 10.8003f, 1.9644f, 9.65348f, 2.78501f, 8.811f)
         close()
     }
     path(
@@ -68,31 +68,31 @@ public fun createMediumThinOutlineLink01ImageVector(): ImageVector = ImageVector
         strokeLineMiter = 4.0f,
         pathFillType = PathFillType.NonZero,
     ) {
-        moveTo(15.068f, 6.0f)
-        curveTo(14.654f, 6.0f, 14.318f, 6.336f, 14.318f, 6.75f)
-        curveTo(14.318f, 7.164f, 14.654f, 7.5f, 15.068f, 7.5f)
-        lineTo(18.136f, 7.5f)
-        curveTo(18.707f, 7.5f, 19.272f, 7.615f, 19.8f, 7.84f)
-        curveTo(20.328f, 8.064f, 20.809f, 8.394f, 21.215f, 8.811f)
-        curveTo(21.621f, 9.228f, 21.944f, 9.724f, 22.165f, 10.271f)
-        curveTo(22.386f, 10.819f, 22.5f, 11.406f, 22.5f, 12.0f)
-        curveTo(22.5f, 12.594f, 22.386f, 13.181f, 22.165f, 13.729f)
-        curveTo(21.944f, 14.276f, 21.621f, 14.772f, 21.215f, 15.189f)
-        curveTo(20.809f, 15.606f, 20.328f, 15.936f, 19.8f, 16.16f)
-        curveTo(19.272f, 16.385f, 18.707f, 16.5f, 18.136f, 16.5f)
-        lineTo(15.068f, 16.5f)
-        curveTo(14.654f, 16.5f, 14.318f, 16.836f, 14.318f, 17.25f)
-        curveTo(14.318f, 17.664f, 14.654f, 18.0f, 15.068f, 18.0f)
-        lineTo(18.136f, 18.0f)
-        curveTo(18.909f, 18.0f, 19.674f, 17.844f, 20.387f, 17.541f)
-        curveTo(21.1f, 17.237f, 21.746f, 16.794f, 22.289f, 16.236f)
-        curveTo(22.833f, 15.678f, 23.263f, 15.016f, 23.556f, 14.29f)
-        curveTo(23.849f, 13.563f, 24.0f, 12.785f, 24.0f, 12.0f)
-        curveTo(24.0f, 11.215f, 23.849f, 10.437f, 23.556f, 9.71f)
-        curveTo(23.263f, 8.984f, 22.833f, 8.322f, 22.289f, 7.764f)
-        curveTo(21.746f, 7.206f, 21.1f, 6.763f, 20.387f, 6.459f)
-        curveTo(19.674f, 6.156f, 18.909f, 6.0f, 18.136f, 6.0f)
-        lineTo(15.068f, 6.0f)
+        moveTo(15.0682f, 6.0f)
+        curveTo(14.654f, 6.0f, 14.3182f, 6.33579f, 14.3182f, 6.75f)
+        curveTo(14.3182f, 7.16421f, 14.654f, 7.5f, 15.0682f, 7.5f)
+        lineTo(18.1364f, 7.5f)
+        curveTo(18.7066f, 7.5f, 19.2718f, 7.61529f, 19.7998f, 7.83982f)
+        curveTo(20.3278f, 8.06436f, 20.8089f, 8.39403f, 21.215f, 8.811f)
+        curveTo(21.6212f, 9.228f, 21.9444f, 9.72412f, 22.1652f, 10.2715f)
+        curveTo(22.3861f, 10.819f, 22.5f, 11.4064f, 22.5f, 12.0f)
+        curveTo(22.5f, 12.5936f, 22.3861f, 13.181f, 22.1652f, 13.7285f)
+        curveTo(21.9444f, 14.2759f, 21.6212f, 14.772f, 21.215f, 15.189f)
+        curveTo(20.8089f, 15.606f, 20.3278f, 15.9356f, 19.7998f, 16.1602f)
+        curveTo(19.2718f, 16.3847f, 18.7066f, 16.5f, 18.1364f, 16.5f)
+        lineTo(15.0682f, 16.5f)
+        curveTo(14.654f, 16.5f, 14.3182f, 16.8358f, 14.3182f, 17.25f)
+        curveTo(14.3182f, 17.6642f, 14.654f, 18.0f, 15.0682f, 18.0f)
+        lineTo(18.1364f, 18.0f)
+        curveTo(18.9092f, 18.0f, 19.6739f, 17.8437f, 20.3868f, 17.5406f)
+        curveTo(21.0996f, 17.2374f, 21.746f, 16.7937f, 22.2895f, 16.2356f)
+        curveTo(22.833f, 15.6776f, 23.2632f, 15.0162f, 23.5563f, 14.2897f)
+        curveTo(23.8494f, 13.5632f, 24.0f, 12.7852f, 24.0f, 12.0f)
+        curveTo(24.0f, 11.2148f, 23.8494f, 10.4368f, 23.5563f, 9.7103f)
+        curveTo(23.2632f, 8.98378f, 22.833f, 8.32239f, 22.2895f, 7.76438f)
+        curveTo(21.746f, 7.20633f, 21.0996f, 6.76258f, 20.3868f, 6.45945f)
+        curveTo(19.6739f, 6.1563f, 18.9092f, 6.0f, 18.1364f, 6.0f)
+        lineTo(15.0682f, 6.0f)
         close()
     }
     path(
@@ -106,13 +106,13 @@ public fun createMediumThinOutlineLink01ImageVector(): ImageVector = ImageVector
         strokeLineMiter = 4.0f,
         pathFillType = PathFillType.NonZero,
     ) {
-        moveTo(7.909f, 11.25f)
-        curveTo(7.495f, 11.25f, 7.159f, 11.586f, 7.159f, 12.0f)
-        curveTo(7.159f, 12.414f, 7.495f, 12.75f, 7.909f, 12.75f)
+        moveTo(7.90918f, 11.25f)
+        curveTo(7.49497f, 11.25f, 7.15918f, 11.5858f, 7.15918f, 12.0f)
+        curveTo(7.15918f, 12.4142f, 7.49497f, 12.75f, 7.90918f, 12.75f)
         lineTo(16.091f, 12.75f)
-        curveTo(16.505f, 12.75f, 16.841f, 12.414f, 16.841f, 12.0f)
-        curveTo(16.841f, 11.586f, 16.505f, 11.25f, 16.091f, 11.25f)
-        lineTo(7.909f, 11.25f)
+        curveTo(16.5052f, 12.75f, 16.841f, 12.4142f, 16.841f, 12.0f)
+        curveTo(16.841f, 11.5858f, 16.5052f, 11.25f, 16.091f, 11.25f)
+        lineTo(7.90918f, 11.25f)
         close()
     }
 }.build()

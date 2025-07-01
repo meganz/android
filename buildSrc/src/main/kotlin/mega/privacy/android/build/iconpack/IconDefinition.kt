@@ -22,10 +22,18 @@ data class IconDefinition(
     fun getPropertyName(): String = name
 
     /**
-     * Generates the file name pattern for this icon.
+     * Generates the file name pattern for this icon in XML resources.
      */
     fun getFileNamePattern(): String =
         "ic_${sourceName}_${size.lowercase()}_${weight.lowercase()}_${style.lowercase()}"
+
+    /**
+     * Generates the file name pattern for this icon.
+     */
+    fun getFileNamePatternForSvg(): String =
+        "icon_${
+            sourceName.replace("_", "-")
+        }_${size.lowercase()}_${weight.lowercase()}_${style.lowercase()}"
 }
 
 internal typealias Size = String

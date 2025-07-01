@@ -43,7 +43,7 @@ class IndividualFileGenerator(
         svgConverter: SvgToImageVectorConverter,
     ) {
         val imageVectorCode =
-            svgConverter.convertSvgToImageVector(icon.getFileNamePattern())
+            svgConverter.convertSvgToImageVector(icon.getFileNamePatternForSvg())
                 ?: xmlConverter.convertXmlToImageVector(icon.getFileNamePattern())
 
         if (imageVectorCode != null) {

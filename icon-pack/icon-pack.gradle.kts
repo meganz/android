@@ -39,7 +39,7 @@ tasks.register("generateIconPackVectors") {
         mega.privacy.android.build.iconpack.GenerateIconVectorsScript(
             outputDirPath = "./icon-pack/src/main/java",
             drawablesPath = "./icon-pack/src/main/res/drawable",
-            svgDirectoryPath = "./icon-pack/svgs", // Directory for SVG files
+            svgDirectoryPath = "./icon-pack/icons_MEGA", // Directory for SVG files with icon_ prefix
             interfaceFilePath = "./icon-pack/src/main/java/mega/privacy/android/icon/pack/IconPackInterface.kt",
             mainObjectPackage = "mega.privacy.android.icon.pack",
             mainObjectName = "IconPack",

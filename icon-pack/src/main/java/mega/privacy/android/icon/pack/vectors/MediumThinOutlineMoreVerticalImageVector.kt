@@ -19,14 +19,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 public fun createMediumThinOutlineMoreVerticalImageVector(): ImageVector = ImageVector.Builder(
-    name = "ic_more_vertical_medium_thin_outline",
+    name = "icon_more-vertical_medium_thin_outline",
     defaultWidth = 24.0.dp,
     defaultHeight = 24.0.dp,
     viewportWidth = 24.0f,
     viewportHeight = 24.0f
 ).apply {
     path(
-        fill = SolidColor(Color(0xFF04101E)),
+        fill = SolidColor(Color(0xFF303233)),
         fillAlpha = 1.0f,
         stroke = null,
         strokeAlpha = 1.0f,
@@ -37,14 +37,14 @@ public fun createMediumThinOutlineMoreVerticalImageVector(): ImageVector = Image
         pathFillType = PathFillType.NonZero,
     ) {
         moveTo(12.5f, 7.5f)
-        curveTo(13.328f, 7.5f, 14.0f, 6.828f, 14.0f, 6.0f)
-        curveTo(14.0f, 5.172f, 13.328f, 4.5f, 12.5f, 4.5f)
-        curveTo(11.672f, 4.5f, 11.0f, 5.172f, 11.0f, 6.0f)
-        curveTo(11.0f, 6.828f, 11.672f, 7.5f, 12.5f, 7.5f)
+        curveTo(13.3284f, 7.5f, 14.0f, 6.82843f, 14.0f, 6.0f)
+        curveTo(14.0f, 5.17157f, 13.3284f, 4.5f, 12.5f, 4.5f)
+        curveTo(11.6716f, 4.5f, 11.0f, 5.17157f, 11.0f, 6.0f)
+        curveTo(11.0f, 6.82843f, 11.6716f, 7.5f, 12.5f, 7.5f)
         close()
     }
     path(
-        fill = SolidColor(Color(0xFF04101E)),
+        fill = SolidColor(Color(0xFF303233)),
         fillAlpha = 1.0f,
         stroke = null,
         strokeAlpha = 1.0f,
@@ -55,14 +55,14 @@ public fun createMediumThinOutlineMoreVerticalImageVector(): ImageVector = Image
         pathFillType = PathFillType.NonZero,
     ) {
         moveTo(12.5f, 13.5f)
-        curveTo(13.328f, 13.5f, 14.0f, 12.828f, 14.0f, 12.0f)
-        curveTo(14.0f, 11.172f, 13.328f, 10.5f, 12.5f, 10.5f)
-        curveTo(11.672f, 10.5f, 11.0f, 11.172f, 11.0f, 12.0f)
-        curveTo(11.0f, 12.828f, 11.672f, 13.5f, 12.5f, 13.5f)
+        curveTo(13.3284f, 13.5f, 14.0f, 12.8284f, 14.0f, 12.0f)
+        curveTo(14.0f, 11.1716f, 13.3284f, 10.5f, 12.5f, 10.5f)
+        curveTo(11.6716f, 10.5f, 11.0f, 11.1716f, 11.0f, 12.0f)
+        curveTo(11.0f, 12.8284f, 11.6716f, 13.5f, 12.5f, 13.5f)
         close()
     }
     path(
-        fill = SolidColor(Color(0xFF04101E)),
+        fill = SolidColor(Color(0xFF303233)),
         fillAlpha = 1.0f,
         stroke = null,
         strokeAlpha = 1.0f,
@@ -73,10 +73,10 @@ public fun createMediumThinOutlineMoreVerticalImageVector(): ImageVector = Image
         pathFillType = PathFillType.NonZero,
     ) {
         moveTo(14.0f, 18.0f)
-        curveTo(14.0f, 18.828f, 13.328f, 19.5f, 12.5f, 19.5f)
-        curveTo(11.672f, 19.5f, 11.0f, 18.828f, 11.0f, 18.0f)
-        curveTo(11.0f, 17.172f, 11.672f, 16.5f, 12.5f, 16.5f)
-        curveTo(13.328f, 16.5f, 14.0f, 17.172f, 14.0f, 18.0f)
+        curveTo(14.0f, 18.8284f, 13.3284f, 19.5f, 12.5f, 19.5f)
+        curveTo(11.6716f, 19.5f, 11.0f, 18.8284f, 11.0f, 18.0f)
+        curveTo(11.0f, 17.1716f, 11.6716f, 16.5f, 12.5f, 16.5f)
+        curveTo(13.3284f, 16.5f, 14.0f, 17.1716f, 14.0f, 18.0f)
         close()
     }
 }.build()

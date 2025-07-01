@@ -19,14 +19,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 public fun createSmallThinOutlineArrowUpImageVector(): ImageVector = ImageVector.Builder(
-    name = "ic_arrow_up_small_thin_outline",
+    name = "icon_arrow-up_small_thin_outline",
     defaultWidth = 16.0.dp,
     defaultHeight = 16.0.dp,
     viewportWidth = 16.0f,
     viewportHeight = 16.0f
 ).apply {
     path(
-        fill = SolidColor(Color(0xFF04101E)),
+        fill = SolidColor(Color(0xFF303233)),
         fillAlpha = 1.0f,
         stroke = null,
         strokeAlpha = 1.0f,
@@ -36,20 +36,20 @@ public fun createSmallThinOutlineArrowUpImageVector(): ImageVector = ImageVector
         strokeLineMiter = 4.0f,
         pathFillType = PathFillType.NonZero,
     ) {
-        moveTo(8.354f, 3.146f)
-        curveTo(8.158f, 2.951f, 7.842f, 2.951f, 7.646f, 3.146f)
-        lineTo(3.146f, 7.646f)
-        curveTo(2.951f, 7.842f, 2.951f, 8.158f, 3.146f, 8.354f)
-        curveTo(3.342f, 8.549f, 3.658f, 8.549f, 3.854f, 8.354f)
-        lineTo(7.5f, 4.707f)
+        moveTo(8.35355f, 3.14645f)
+        curveTo(8.15829f, 2.95118f, 7.84171f, 2.95118f, 7.64645f, 3.14645f)
+        lineTo(3.14645f, 7.64645f)
+        curveTo(2.95118f, 7.84171f, 2.95118f, 8.15829f, 3.14645f, 8.35355f)
+        curveTo(3.34171f, 8.54882f, 3.65829f, 8.54882f, 3.85355f, 8.35355f)
+        lineTo(7.5f, 4.70711f)
         lineTo(7.5f, 12.5f)
-        curveTo(7.5f, 12.776f, 7.724f, 13.0f, 8.0f, 13.0f)
-        curveTo(8.276f, 13.0f, 8.5f, 12.776f, 8.5f, 12.5f)
-        lineTo(8.5f, 4.707f)
-        lineTo(12.146f, 8.354f)
-        curveTo(12.342f, 8.549f, 12.658f, 8.549f, 12.854f, 8.354f)
-        curveTo(13.049f, 8.158f, 13.049f, 7.842f, 12.854f, 7.646f)
-        lineTo(8.354f, 3.146f)
+        curveTo(7.5f, 12.7761f, 7.72386f, 13.0f, 8.0f, 13.0f)
+        curveTo(8.27614f, 13.0f, 8.5f, 12.7761f, 8.5f, 12.5f)
+        lineTo(8.5f, 4.70711f)
+        lineTo(12.1464f, 8.35355f)
+        curveTo(12.3417f, 8.54882f, 12.6583f, 8.54882f, 12.8536f, 8.35355f)
+        curveTo(13.0488f, 8.15829f, 13.0488f, 7.84171f, 12.8536f, 7.64645f)
+        lineTo(8.35355f, 3.14645f)
         close()
     }
 }.build()

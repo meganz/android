@@ -19,14 +19,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 public fun createSmallThinOutlineArrowDownImageVector(): ImageVector = ImageVector.Builder(
-    name = "ic_arrow_down_small_thin_outline",
+    name = "icon_arrow-down_small_thin_outline",
     defaultWidth = 16.0.dp,
     defaultHeight = 16.0.dp,
     viewportWidth = 16.0f,
     viewportHeight = 16.0f
 ).apply {
     path(
-        fill = SolidColor(Color(0xFF04101E)),
+        fill = SolidColor(Color(0xFF303233)),
         fillAlpha = 1.0f,
         stroke = null,
         strokeAlpha = 1.0f,
@@ -37,18 +37,18 @@ public fun createSmallThinOutlineArrowDownImageVector(): ImageVector = ImageVect
         pathFillType = PathFillType.NonZero,
     ) {
         moveTo(8.5f, 3.5f)
-        curveTo(8.5f, 3.224f, 8.276f, 3.0f, 8.0f, 3.0f)
-        curveTo(7.724f, 3.0f, 7.5f, 3.224f, 7.5f, 3.5f)
-        lineTo(7.5f, 11.293f)
-        lineTo(3.854f, 7.646f)
-        curveTo(3.658f, 7.451f, 3.342f, 7.451f, 3.146f, 7.646f)
-        curveTo(2.951f, 7.842f, 2.951f, 8.158f, 3.146f, 8.354f)
-        lineTo(7.646f, 12.854f)
-        curveTo(7.842f, 13.049f, 8.158f, 13.049f, 8.354f, 12.854f)
-        lineTo(12.854f, 8.354f)
-        curveTo(13.049f, 8.158f, 13.049f, 7.842f, 12.854f, 7.646f)
-        curveTo(12.658f, 7.451f, 12.342f, 7.451f, 12.146f, 7.646f)
-        lineTo(8.5f, 11.293f)
+        curveTo(8.5f, 3.22386f, 8.27614f, 3.0f, 8.0f, 3.0f)
+        curveTo(7.72386f, 3.0f, 7.5f, 3.22386f, 7.5f, 3.5f)
+        lineTo(7.5f, 11.2929f)
+        lineTo(3.85355f, 7.64645f)
+        curveTo(3.65829f, 7.45118f, 3.34171f, 7.45118f, 3.14645f, 7.64645f)
+        curveTo(2.95118f, 7.84171f, 2.95118f, 8.15829f, 3.14645f, 8.35355f)
+        lineTo(7.64645f, 12.8536f)
+        curveTo(7.84171f, 13.0488f, 8.15829f, 13.0488f, 8.35355f, 12.8536f)
+        lineTo(12.8536f, 8.35355f)
+        curveTo(13.0488f, 8.15829f, 13.0488f, 7.84171f, 12.8536f, 7.64645f)
+        curveTo(12.6583f, 7.45118f, 12.3417f, 7.45118f, 12.1464f, 7.64645f)
+        lineTo(8.5f, 11.2929f)
         lineTo(8.5f, 3.5f)
         close()
     }
