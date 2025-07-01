@@ -99,7 +99,6 @@ class GenerateIconVectors(
         // Generate the main IconPack file
         val fileBuilder = FileSpec.builder(mainObjectPackage, mainObjectName)
             .addImport("androidx.compose.ui.graphics.vector", "ImageVector")
-            .addImport("kotlin", "lazy")
             .indent("    ")
             .addFileComment(
                 """

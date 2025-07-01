@@ -85,8 +85,7 @@ public object IconPack : IconPackInterface {
         public object Regular : IconPackInterface.Small.Regular {
             public object Outline : IconPackInterface.Small.Regular.Outline {
                 override val Image01: ImageVector by lazy {
-                    createSmallRegularOutlineImage01ImageVector()
-                }
+                        createSmallRegularOutlineImage01ImageVector() }
             }
         }
 
