@@ -1301,4 +1301,6 @@
     <string name="transfers_all_transfers_paused_warning">All transfers paused</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">Resume all</string>
+    <!-- Sync over quota warning title -->
+    <string name="sync_storage_over_quota_warning_title">Syncing paused, your MEGA plan run out of storage</string>
 </resources>

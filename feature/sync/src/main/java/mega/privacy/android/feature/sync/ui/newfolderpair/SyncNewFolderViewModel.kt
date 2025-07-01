@@ -11,6 +11,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.repository.BackupRepository.Companion.BACKUPS_FOLDER_DEFAULT_NAME
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -45,6 +47,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
     private val myBackupsFolderExistsUseCase: MyBackupsFolderExistsUseCase,
     private val setMyBackupsFolderUseCase: SetMyBackupsFolderUseCase,
     private val syncUriValidityMapper: SyncUriValidityMapper,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -82,6 +85,14 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                 )
             }
         }
+
+        viewModelScope.launch {
+            monitorAccountDetailUseCase()
+                .catch { Timber.e(it) }
+                .collect {
+                    checkOverQuotaStatus()
+                }
+        }
     }
 
     private fun getDeviceName() {
@@ -90,6 +101,22 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                 getDeviceIdUseCase()?.let { deviceId ->
                     val deviceName = getDeviceNameUseCase(deviceId).orEmpty()
                     _state.update { it.copy(deviceName = deviceName) }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    private fun checkOverQuotaStatus() {
+        viewModelScope.launch {
+            runCatching {
+                isStorageOverQuotaUseCase()
+            }.onSuccess { isStorageOverQuota ->
+                _state.update {
+                    it.copy(
+                        isStorageOverQuota = isStorageOverQuota,
+                    )
                 }
             }.onFailure {
                 Timber.e(it)

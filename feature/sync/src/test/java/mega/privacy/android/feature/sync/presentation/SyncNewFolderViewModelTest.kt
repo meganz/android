@@ -11,12 +11,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -59,6 +62,7 @@ internal class SyncNewFolderViewModelTest {
     private val myBackupsFolderExistsUseCase: MyBackupsFolderExistsUseCase = mock()
     private val setMyBackupsFolderUseCase: SetMyBackupsFolderUseCase = mock()
     private val syncUriValidityMapper: SyncUriValidityMapper = mock()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private lateinit var underTest: SyncNewFolderViewModel
 
     @AfterEach
@@ -72,7 +76,8 @@ internal class SyncNewFolderViewModelTest {
             getDeviceNameUseCase,
             myBackupsFolderExistsUseCase,
             setMyBackupsFolderUseCase,
-            syncUriValidityMapper
+            syncUriValidityMapper,
+            monitorAccountDetailUseCase
         )
     }
 
@@ -400,6 +405,51 @@ internal class SyncNewFolderViewModelTest {
             assertThat(underTest.state.value.openSyncListScreen).isEqualTo(consumed)
         }
 
+    @Test
+    fun `test that storage over quota status is updated when account details change`() = runTest {
+        val accountDetails = mock<AccountDetail>()
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetails))
+        whenever(isStorageOverQuotaUseCase()).thenReturn(true)
+
+        initViewModel(syncType = SyncType.TYPE_TWOWAY)
+
+        underTest.state.test {
+            val result = awaitItem()
+            assertThat(result.isStorageOverQuota).isEqualTo(true)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that storage over quota status is false when account has sufficient storage`() =
+        runTest {
+            val accountDetails = mock<AccountDetail>()
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetails))
+            whenever(isStorageOverQuotaUseCase()).thenReturn(false)
+
+            initViewModel(syncType = SyncType.TYPE_TWOWAY)
+
+            underTest.state.test {
+                val result = awaitItem()
+                assertThat(result.isStorageOverQuota).isEqualTo(false)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that storage over quota status is checked on ViewModel initialization`() = runTest {
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+        whenever(isStorageOverQuotaUseCase()).thenReturn(true)
+
+        initViewModel(syncType = SyncType.TYPE_TWOWAY)
+        advanceUntilIdle()
+
+        verify(isStorageOverQuotaUseCase).invoke() // once on account detail change
+    }
+
     private fun initViewModel(
         syncType: SyncType,
         remoteFolderHandle: NodeId? = null,
@@ -417,7 +467,8 @@ internal class SyncNewFolderViewModelTest {
             getDeviceNameUseCase = getDeviceNameUseCase,
             myBackupsFolderExistsUseCase = myBackupsFolderExistsUseCase,
             setMyBackupsFolderUseCase = setMyBackupsFolderUseCase,
-            syncUriValidityMapper = syncUriValidityMapper
+            syncUriValidityMapper = syncUriValidityMapper,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase
         )
     }
 

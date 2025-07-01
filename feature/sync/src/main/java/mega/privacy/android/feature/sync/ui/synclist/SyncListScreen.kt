@@ -56,10 +56,10 @@ import mega.privacy.android.feature.sync.ui.views.ConflictDetailsDialog
 import mega.privacy.android.feature.sync.ui.views.IssuesResolutionDialog
 import mega.privacy.android.feature.sync.ui.views.SyncNotificationWarningBanner
 import mega.privacy.android.feature.sync.ui.views.SyncPermissionWarningBanner
+import mega.privacy.android.feature.sync.ui.views.SyncStorageQuotaExceedWarning
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.controls.banners.ActionBanner
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaMultiFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MultiFloatingActionButtonItem
@@ -67,8 +67,6 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.MultiFloati
 import mega.privacy.android.shared.original.core.ui.controls.buttons.rememberMultiFloatingActionButtonState
 import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
-import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
-import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
@@ -187,7 +185,7 @@ internal fun SyncListScreen(
                 }
             },
             floatingActionButton = {
-                if (syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) {
+                if ((syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) && syncFoldersState.isStorageOverQuota.not()) {
                     MegaMultiFloatingActionButton(
                         items = listOf(
                             MultiFloatingActionButtonItem(
@@ -301,33 +299,25 @@ private fun SyncListScreenContent(
         })
 
     Column(modifier) {
-        SyncPermissionWarningBanner(
-            syncPermissionsManager = syncPermissionsManager,
-            isDisableBatteryOptimizationEnabled = syncFoldersUiState.isDisableBatteryOptimizationEnabled
-        )
-        SyncNotificationWarningBanner(
-            issueNotificationState,
-            onDismissNotification = syncIssueNotificationViewModel::dismissNotification,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
         if (syncFoldersUiState.isStorageOverQuota) {
-            ActionBanner(
-                mainText = stringResource(sharedR.string.sync_error_storage_over_quota_banner_title),
-                leftActionText = stringResource(sharedR.string.general_upgrade_button),
-                leftActionClicked = onOpenUpgradeAccountClicked,
-                modifier = Modifier.padding(top = 20.dp)
+            SyncStorageQuotaExceedWarning(onUpgradeClick = onOpenUpgradeAccountClicked)
+        } else {
+            SyncPermissionWarningBanner(
+                syncPermissionsManager = syncPermissionsManager,
+                isDisableBatteryOptimizationEnabled = syncFoldersUiState.isDisableBatteryOptimizationEnabled
             )
-            MegaDivider(
-                dividerType = DividerType.FullSize,
+            SyncNotificationWarningBanner(
+                issueNotificationState,
+                onDismissNotification = syncIssueNotificationViewModel::dismissNotification,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-        } else if (syncFoldersUiState.syncUiItems.isNotEmpty() && syncFoldersUiState.isLowBatteryLevel) {
-            WarningBanner(
-                textString = stringResource(id = sharedResR.string.general_message_sync_paused_low_battery_level),
-                onCloseClick = null
-            )
+            if (syncFoldersUiState.syncUiItems.isNotEmpty() && syncFoldersUiState.isLowBatteryLevel) {
+                WarningBanner(
+                    textString = stringResource(id = sharedResR.string.general_message_sync_paused_low_battery_level),
+                    onCloseClick = null
+                )
+            }
         }
-
         if (checkedChip != SYNC_FOLDERS || syncStalledIssuesState.stalledIssues.isNotEmpty() || syncSolvedIssuesState.solvedIssues.isNotEmpty()) {
             HeaderChips(
                 selectedChip = checkedChip,

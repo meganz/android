@@ -415,19 +415,21 @@ class SyncFoldersViewModelTest {
         }
 
     @Test
-    fun `test that storage over quota use case returns true changes ui state to show storage overquota`() =
+    fun `test that storage over quota use case returns true changes ui state to show storage over quota`() =
         runTest {
             whenever(isStorageOverQuotaUseCase()).thenReturn(true)
             initViewModel()
             assertThat(underTest.uiState.value.isStorageOverQuota).isTrue()
+            verify(isStorageOverQuotaUseCase).invoke()
         }
 
     @Test
-    fun `test that storage over quota use case returns false changes ui state to not show storage overquota`() =
+    fun `test that storage over quota use case returns false changes ui state to not show storage over quota`() =
         runTest {
             whenever(isStorageOverQuotaUseCase()).thenReturn(false)
             initViewModel()
             assertThat(underTest.uiState.value.isStorageOverQuota).isFalse()
+            verify(isStorageOverQuotaUseCase).invoke()
         }
 
 

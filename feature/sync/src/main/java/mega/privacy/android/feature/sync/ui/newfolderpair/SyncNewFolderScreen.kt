@@ -49,6 +49,7 @@ import mega.privacy.android.feature.sync.ui.megapicker.AllFilesAccessDialog
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.renamebackup.model.RenameAndCreateBackupDialog
 import mega.privacy.android.feature.sync.ui.views.InputSyncInformationView
+import mega.privacy.android.feature.sync.ui.views.SyncStorageQuotaExceedWarning
 import mega.privacy.android.feature.sync.ui.views.SyncTypePreviewProvider
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -171,6 +172,7 @@ private fun SyncNewFolderScreenScaffold(
                         isWarningBannerDisplayed = value
                     },
                     snackBarHostState = scaffoldState.snackbarHostState,
+                    isStorageOverQuota = state.isStorageOverQuota
                 )
 
                 val context = LocalContext.current
@@ -193,6 +195,7 @@ private fun SyncNewFolderScreenScaffold(
 private fun SyncNewFolderScreenContent(
     syncType: SyncType,
     deviceName: String,
+    isStorageOverQuota: Boolean,
     onSelectFolder: () -> Unit,
     selectMegaFolderClicked: () -> Unit,
     selectedLocalFolder: String,
@@ -243,58 +246,62 @@ private fun SyncNewFolderScreenContent(
             }
         }
 
-        AnimatedVisibility(showSyncPermissionBanner) {
-            WarningBanner(
-                textComponent = {
-                    when (syncType) {
-                        SyncType.TYPE_BACKUP -> {
-                            MegaSpannedClickableText(
-                                value = stringResource(id = sharedResR.string.sync_add_new_backup_storage_permission_banner),
-                                styles = mapOf(
-                                    SpanIndicator('U') to MegaSpanStyleWithAnnotation(
-                                        megaSpanStyle = MegaSpanStyle(
-                                            spanStyle = SpanStyle(
-                                                textDecoration = TextDecoration.Underline
-                                            )
-                                        ),
-                                        annotation = "Tap to grant access",
-                                    )
-                                ),
-                                color = TextColor.Primary,
-                                onAnnotationClick = {
-                                    syncPermissionsManager.launchAppSettingFileStorageAccess()
-                                    showSyncPermissionBanner = false
-                                    onShowSyncPermissionBannerValueChanged(false)
-                                },
-                            )
+        if (isStorageOverQuota) {
+            SyncStorageQuotaExceedWarning(onUpgradeClick = onOpenUpgradeAccount)
+        } else {
+            AnimatedVisibility(showSyncPermissionBanner) {
+                WarningBanner(
+                    textComponent = {
+                        when (syncType) {
+                            SyncType.TYPE_BACKUP -> {
+                                MegaSpannedClickableText(
+                                    value = stringResource(id = sharedResR.string.sync_add_new_backup_storage_permission_banner),
+                                    styles = mapOf(
+                                        SpanIndicator('U') to MegaSpanStyleWithAnnotation(
+                                            megaSpanStyle = MegaSpanStyle(
+                                                spanStyle = SpanStyle(
+                                                    textDecoration = TextDecoration.Underline
+                                                )
+                                            ),
+                                            annotation = "Tap to grant access",
+                                        )
+                                    ),
+                                    color = TextColor.Primary,
+                                    onAnnotationClick = {
+                                        syncPermissionsManager.launchAppSettingFileStorageAccess()
+                                        showSyncPermissionBanner = false
+                                        onShowSyncPermissionBannerValueChanged(false)
+                                    },
+                                )
+                            }
+
+                            else -> {
+                                MegaText(
+                                    text = stringResource(id = R.string.sync_storage_permission_banner),
+                                    textColor = TextColor.Primary,
+                                )
+                            }
                         }
 
-                        else -> {
-                            MegaText(
-                                text = stringResource(id = R.string.sync_storage_permission_banner),
-                                textColor = TextColor.Primary,
-                            )
-                        }
-                    }
+                    },
+                    onCloseClick = null,
+                    modifier = Modifier.clickable {
+                        syncPermissionsManager.launchAppSettingFileStorageAccess()
+                        showSyncPermissionBanner = false
+                        onShowSyncPermissionBannerValueChanged(false)
+                    })
+            }
 
-                },
-                onCloseClick = null,
-                modifier = Modifier.clickable {
+            if (showAllowAppAccessDialog) {
+                AllFilesAccessDialog(onConfirm = {
                     syncPermissionsManager.launchAppSettingFileStorageAccess()
-                    showSyncPermissionBanner = false
-                    onShowSyncPermissionBannerValueChanged(false)
+                    showAllowAppAccessDialog = false
+                }, onDismiss = {
+                    showSyncPermissionBanner = true
+                    onShowSyncPermissionBannerValueChanged(true)
+                    showAllowAppAccessDialog = false
                 })
-        }
-
-        if (showAllowAppAccessDialog) {
-            AllFilesAccessDialog(onConfirm = {
-                syncPermissionsManager.launchAppSettingFileStorageAccess()
-                showAllowAppAccessDialog = false
-            }, onDismiss = {
-                showSyncPermissionBanner = true
-                onShowSyncPermissionBannerValueChanged(true)
-                showAllowAppAccessDialog = false
-            })
+            }
         }
 
         if (showStorageOverQuota) {
@@ -418,7 +425,7 @@ private fun SyncNewFolderScreenContent(
                         proceedButtonClicked = true
                         syncClicked()
                     },
-                    enabled = buttonEnabled && proceedButtonClicked.not()
+                    enabled = buttonEnabled && proceedButtonClicked.not() && isStorageOverQuota.not()
                 )
             }
         }
@@ -433,7 +440,7 @@ internal const val TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON =
 @CombinedThemePhoneLandscapePreviews
 @Composable
 private fun SyncNewFolderScreenPreview(
-    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncNewFolderScreenScaffold(
@@ -462,7 +469,7 @@ private fun SyncNewFolderScreenPreview(
 @CombinedThemePreviews
 @Composable
 private fun SyncNewFolderScreenContentPreview(
-    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         SyncNewFolderScreenContent(
@@ -483,6 +490,7 @@ private fun SyncNewFolderScreenContentPreview(
             onOpenUpgradeAccount = {},
             onShowSyncPermissionBannerValueChanged = {},
             snackBarHostState = rememberScaffoldState().snackbarHostState,
+            isStorageOverQuota = true
         )
     }
 }

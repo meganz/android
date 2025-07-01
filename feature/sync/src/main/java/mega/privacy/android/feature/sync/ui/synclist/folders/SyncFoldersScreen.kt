@@ -86,6 +86,7 @@ internal fun SyncFoldersScreen(
                     SyncFoldersScreenEmptyState(
                         onAddNewSyncClicked = onAddNewSyncClicked,
                         onAddNewBackupClicked = onAddNewBackupClicked,
+                        buttonsEnabled = isStorageOverQuota.not(),
                         modifier = Modifier
                             .fillParentMaxHeight()
                             .fillParentMaxWidth()
@@ -130,11 +131,13 @@ internal fun SyncFoldersScreen(
     }
 }
 
+
 @Composable
 private fun SyncFoldersScreenEmptyState(
     onAddNewSyncClicked: () -> Unit,
     onAddNewBackupClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    buttonsEnabled: Boolean = true,
 ) {
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -169,6 +172,7 @@ private fun SyncFoldersScreenEmptyState(
         RaisedDefaultMegaButton(
             textId = sharedResR.string.device_center_sync_add_new_syn_button_option,
             onClick = onAddNewSyncClicked,
+            enabled = buttonsEnabled,
             modifier = Modifier
                 .padding(top = if (isLandscape) 32.dp else 48.dp)
                 .defaultMinSize(minWidth = 232.dp)
@@ -177,6 +181,7 @@ private fun SyncFoldersScreenEmptyState(
         RaisedDefaultMegaButton(
             textId = sharedResR.string.device_center_sync_add_new_backup_button_option,
             onClick = onAddNewBackupClicked,
+            enabled = buttonsEnabled,
             modifier = Modifier
                 .padding(top = 24.dp)
                 .defaultMinSize(minWidth = 232.dp)

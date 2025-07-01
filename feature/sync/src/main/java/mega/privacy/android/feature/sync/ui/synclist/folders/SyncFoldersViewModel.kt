@@ -117,7 +117,6 @@ internal class SyncFoldersViewModel @Inject constructor(
             }
         }
 
-        checkOverQuotaStatus()
         getAndMonitorBatteryInfo()
 
         viewModelScope.launch {

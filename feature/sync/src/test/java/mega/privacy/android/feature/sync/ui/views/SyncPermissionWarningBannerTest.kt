@@ -34,6 +34,8 @@ class SyncPermissionWarningBannerTest {
                 isDisableBatteryOptimizationEnabled = true,
             )
         }
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(2000) // Advance by 2 seconds to account for delay
 
         composeTestRule.onNodeWithText(
             composeTestRule.activity.getString(R.string.sync_battery_optimisation_banner)
@@ -50,6 +52,8 @@ class SyncPermissionWarningBannerTest {
                 isDisableBatteryOptimizationEnabled = true
             )
         }
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(2000) // Advance by 2 seconds to account for delay
 
         composeTestRule.onNodeWithText(
             composeTestRule.activity.getString(R.string.sync_battery_optimisation_banner)

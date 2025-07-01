@@ -29,6 +29,7 @@ internal data class SyncNewFolderState(
     val selectedMegaFolder: RemoteFolder? = null,
     val showDisableBatteryOptimizationsBanner: Boolean = false,
     val showAllFilesAccessBanner: Boolean = false,
+    val isStorageOverQuota: Boolean = false,
     val showStorageOverQuota: Boolean = false,
     val openSyncListScreen: StateEvent = consumed,
     val showSnackbar: StateEventWithContent<Int?> = consumed(),

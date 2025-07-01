@@ -351,4 +351,29 @@ class SyncNewFolderScreenRouteTest {
             AndroidSyncSelectDeviceFolderButtonPressedEvent
         )
     }
+
+    @Test
+    fun `test that SyncStorageQuotaExceedWarning is displayed when storage quota is exceeded`() {
+        whenever(state.value).thenReturn(
+            SyncNewFolderState(
+                syncType = SyncType.TYPE_TWOWAY,
+                deviceName = "Device Name",
+                isStorageOverQuota = true
+            )
+        )
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            SyncNewFolderScreenRoute(
+                viewModel,
+                syncPermissionsManager = syncPermissionsManager,
+                openNextScreen = {},
+                openSelectMegaFolderScreen = {},
+                openUpgradeAccount = {},
+                onBackClicked = {}
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_error_storage_over_quota_banner_title))
+            .assertIsDisplayed()
+    }
 }

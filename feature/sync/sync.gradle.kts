@@ -1,5 +1,4 @@
 import mega.privacy.android.build.preBuiltSdkDependency
-import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
@@ -69,5 +68,6 @@ dependencies {
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
     testImplementation(google.hilt.android.test)
+    testImplementation(androidx.material3)
     testImplementation(androidx.work.test)
 }
