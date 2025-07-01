@@ -17,4 +17,7 @@ internal interface LastPageViewedInPdfDao {
 
     @Query("DELETE FROM last_page_viewed_in_pdf WHERE nodeHandle = :handle")
     suspend fun deleteLastPageViewedInPdfByHandle(handle: Long)
+
+    @Query("DELETE FROM last_page_viewed_in_pdf")
+    suspend fun deleteAllLastPageViewedInPdf()
 }

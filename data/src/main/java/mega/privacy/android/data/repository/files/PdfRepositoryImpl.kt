@@ -106,4 +106,10 @@ class PdfRepositoryImpl @Inject constructor(
             megaLocalRoomGateway.deleteLastPageViewedInPdfByHandle(nodeHandle)
         }
     }
+
+    override suspend fun deleteAllLastPageViewedInPdf() {
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.deleteAllLastPageViewedInPdf()
+        }
+    }
 }

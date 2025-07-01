@@ -603,6 +603,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun deleteLastPageViewedInPdfByHandle(handle: Long) =
         lastPageViewedInPdfDao.get().deleteLastPageViewedInPdfByHandle(handle)
 
+    override suspend fun deleteAllLastPageViewedInPdf() =
+        lastPageViewedInPdfDao.get().deleteAllLastPageViewedInPdf()
+
     companion object {
         internal const val MAX_COMPLETED_TRANSFER_ROWS = 100
         internal const val MAX_INSERT_LIST_SIZE = 200

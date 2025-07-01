@@ -12,6 +12,7 @@ import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.repository.files.PdfRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInAppUseCase
@@ -48,6 +49,7 @@ class LocalLogoutAppUseCaseTest {
     private val clearTransfersPreferencesUseCase = mock<ClearTransfersPreferencesUseCase>()
     private val setSecurityUpgradeInAppUseCase = mock<SetSecurityUpgradeInAppUseCase>()
     private val bannerRepository = mock<BannerRepository>()
+    private val pdfRepository = mock<PdfRepository>()
 
     @BeforeAll
     fun setUp() {
@@ -66,7 +68,8 @@ class LocalLogoutAppUseCaseTest {
             clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
             clearTransfersPreferencesUseCase = clearTransfersPreferencesUseCase,
             setSecurityUpgradeInAppUseCase = setSecurityUpgradeInAppUseCase,
-            bannerRepository = bannerRepository
+            bannerRepository = bannerRepository,
+            pdfRepository = pdfRepository,
         )
     }
 
@@ -84,7 +87,8 @@ class LocalLogoutAppUseCaseTest {
             clearCameraUploadsRecordUseCase,
             clearTransfersPreferencesUseCase,
             setSecurityUpgradeInAppUseCase,
-            bannerRepository
+            bannerRepository,
+            pdfRepository,
         )
     }
 
@@ -113,5 +117,6 @@ class LocalLogoutAppUseCaseTest {
             .invoke(listOf(CameraUploadFolderType.Primary, CameraUploadFolderType.Secondary))
         verify(setSecurityUpgradeInAppUseCase).invoke(false)
         verify(bannerRepository).clearCache()
+        verify(pdfRepository).deleteAllLastPageViewedInPdf()
     }
 }

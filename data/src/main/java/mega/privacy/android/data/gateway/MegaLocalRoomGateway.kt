@@ -603,4 +603,9 @@ interface MegaLocalRoomGateway {
      * Delete the last page viewed in a PDF document by its handle.
      */
     suspend fun deleteLastPageViewedInPdfByHandle(handle: Long)
+
+    /**
+     * Delete all last page viewed in PDF records.
+     */
+    suspend fun deleteAllLastPageViewedInPdf()
 }

@@ -98,4 +98,11 @@ class PdfRepositoryImplTest {
 
         verify(megaLocalRoomGateway).deleteLastPageViewedInPdfByHandle(nodeHandle)
     }
+
+    @Test
+    fun `test that deleteAllLastPageViewedInPdf invokes correctly`() = runTest {
+        underTest.deleteAllLastPageViewedInPdf()
+
+        verify(megaLocalRoomGateway).deleteAllLastPageViewedInPdf()
+    }
 }

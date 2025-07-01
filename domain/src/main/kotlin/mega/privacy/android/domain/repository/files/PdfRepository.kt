@@ -42,4 +42,9 @@ interface PdfRepository {
      * Delete the last page viewed in PDF for a specific node handle.
      */
     suspend fun deleteLastPageViewedInPdf(nodeHandle: Long)
+
+    /**
+     * Delete all last page viewed in PDF records.
+     */
+    suspend fun deleteAllLastPageViewedInPdf()
 }

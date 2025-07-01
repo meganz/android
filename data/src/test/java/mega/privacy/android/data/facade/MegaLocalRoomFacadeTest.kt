@@ -1038,4 +1038,11 @@ internal class MegaLocalRoomFacadeTest {
 
         verify(lastPageViewedInPdfDao).deleteLastPageViewedInPdfByHandle(handle)
     }
+
+    @Test
+    fun `test that deleteAllLastPageViewedInPdf invokes dao`() = runTest {
+        underTest.deleteAllLastPageViewedInPdf()
+
+        verify(lastPageViewedInPdfDao).deleteAllLastPageViewedInPdf()
+    }
 }
