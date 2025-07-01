@@ -77,6 +77,13 @@ data class FolderLinkState(
     val shouldShowAdsForLink: Boolean = false,
     val errorState: LinkErrorState = LinkErrorState.NoError,
 ) {
+
+    /**
+     * Whether the folder link is in loading state
+     */
+    val isLoading: Boolean
+        get() = errorState == LinkErrorState.NoError && !isNodesFetched
+
     /**
      * Whether to show toolbar and bottom bar actions
      */

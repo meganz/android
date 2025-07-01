@@ -349,6 +349,18 @@ class FolderLinkViewModelTest {
         }
 
     @Test
+    fun `test that error state is set when folder login throws exception`() =
+        runTest {
+            val folderLink = "abcd"
+            whenever(loginToFolderUseCase(folderLink)).thenThrow(IllegalArgumentException())
+            underTest.state.test {
+                underTest.folderLogin(folderLink)
+                val newValue = expectMostRecentItem()
+                assertThat(newValue.errorState).isEqualTo(LinkErrorState.Unavailable)
+            }
+        }
+
+    @Test
     fun `test that on valid credentials and no root node shouldShowLogin is returned true`() =
         runTest {
             whenever(hasCredentialsUseCase()).thenReturn(true)

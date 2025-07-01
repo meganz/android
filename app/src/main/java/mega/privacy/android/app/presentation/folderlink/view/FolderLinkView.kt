@@ -263,7 +263,7 @@ internal fun FolderLinkView(
                         .fillMaxWidth()
                 ) {
                     when {
-                        !state.isNodesFetched -> {
+                        state.isLoading -> {
                             LoadingStateView(isList = true)
                         }
 
@@ -493,7 +493,6 @@ internal fun EmptyFolderLinkView(
         )
     }
 }
-
 
 
 internal object Constants {

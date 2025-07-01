@@ -175,7 +175,11 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun folderLogin(folderLink: String, decryptionIntroduced: Boolean = false) {
         viewModelScope.launch {
-            when (val result = loginToFolderUseCase(folderLink)) {
+            val result = runCatching {
+                loginToFolderUseCase(folderLink)
+            }.getOrDefault(FolderLoginStatus.ERROR)
+
+            when (result) {
                 FolderLoginStatus.SUCCESS -> {
                     _state.update {
                         it.copy(
