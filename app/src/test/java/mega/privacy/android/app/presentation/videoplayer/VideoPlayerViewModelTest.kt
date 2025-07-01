@@ -2465,6 +2465,21 @@ class VideoPlayerViewModelTest {
             }
         }
 
+    @Test
+    fun `test that state is updated correctly when monitorVideoRepeatModeUseCase returns a value`() =
+        runTest {
+            val mode = RepeatToggleMode.REPEAT_ONE
+            whenever(monitorVideoRepeatModeUseCase()).thenReturn(flowOf(mode))
+            initViewModel()
+            underTest.initRepeatToggleMode()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.repeatToggleMode).isEqualTo(mode)
+                verify(mediaPlayerGateway).setRepeatToggleMode(mode)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
     companion object {
         @JvmField
         @RegisterExtension
