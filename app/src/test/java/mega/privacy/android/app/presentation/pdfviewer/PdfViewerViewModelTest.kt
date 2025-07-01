@@ -457,7 +457,7 @@ internal class PdfViewerViewModelTest {
     }
 
     @Test
-    internal fun `test that lastPageViewed is null if handle is invalid`() = runTest {
+    internal fun `test that lastPageViewed is 1 if handle is invalid`() = runTest {
         savedStateHandle = SavedStateHandle()
 
         initTest()
@@ -465,7 +465,7 @@ internal class PdfViewerViewModelTest {
 
         underTest.uiState.test {
             val actual = awaitItem()
-            assertThat(actual.lastPageViewed).isNull()
+            assertThat(actual.lastPageViewed).isEqualTo(1L)
         }
 
         verifyNoInteractions(getLastPageViewedInPdfUseCase)
@@ -522,7 +522,7 @@ internal class PdfViewerViewModelTest {
         }
 
     @Test
-    internal fun `test that lastPageViewed is not updated in state when setOrUpdateLastPageViewedInPdfUseCase is called with invalid handle`() =
+    internal fun `test that lastPageViewed is updated in state when setOrUpdateLastPageViewedInPdfUseCase is called with invalid handle`() =
         runTest {
             val lastPageViewed = 5L
             savedStateHandle = SavedStateHandle()
@@ -533,7 +533,7 @@ internal class PdfViewerViewModelTest {
             underTest.setOrUpdateLastPageViewed(lastPageViewed)
             underTest.uiState.test {
                 val actual = awaitItem()
-                assertThat(actual.lastPageViewed).isNull()
+                assertThat(actual.lastPageViewed).isEqualTo(lastPageViewed)
             }
         }
 

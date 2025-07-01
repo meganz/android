@@ -89,6 +89,8 @@ class PdfViewerViewModel @Inject constructor(
                     _state.update { it.copy(lastPageViewed = lastPageViewed ?: 1) }
                 }.onFailure { Timber.e(it) }
             }
+        } else {
+            _state.update { it.copy(lastPageViewed = 1) }
         }
     }
 
@@ -96,8 +98,9 @@ class PdfViewerViewModel @Inject constructor(
      * Sets or updates the last page viewed in the PDF.
      */
     fun setOrUpdateLastPageViewed(lastPageViewed: Long) {
+        _state.update { it.copy(lastPageViewed = lastPageViewed) }
+
         if (handle != INVALID_HANDLE) {
-            _state.update { it.copy(lastPageViewed = lastPageViewed) }
             appScope.launch {
                 runCatching {
                     setOrUpdateLastPageViewedInPdfUseCase(
