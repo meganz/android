@@ -5,8 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
-import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 import android.database.ContentObserver
 import android.media.AudioFocusRequest
 import android.media.AudioManager
@@ -164,8 +163,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
     private val videoPlayerViewModel: VideoPlayerViewModel by viewModels()
     private val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
 
-    private var currentOrientation: Int = SCREEN_ORIENTATION_SENSOR_PORTRAIT
-
     private val headsetPlugReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == Intent.ACTION_HEADSET_PLUG) {
@@ -204,7 +201,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                     if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
                         SCREEN_ORIENTATION_SENSOR
                     } else {
-                        currentOrientation
+                        SCREEN_ORIENTATION_UNSPECIFIED
                     }
             }
         }
@@ -282,7 +279,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
         Analytics.tracker.trackEvent(VideoPlayerScreenEvent)
         enableEdgeToEdge()
         setupImmersiveMode()
-        currentOrientation = resources.configuration.orientation
         observeRotationSettingsChange()
         val player = createPlayer()
         videoPlayerViewModel.initRepeatToggleMode()
@@ -423,38 +419,9 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                     videoPlayerViewModel.updateCurrentPlayingVideoSize(
                         VideoSize(videoWidth, videoHeight)
                     )
-                    updateOrientationBasedOnVideoSize(videoWidth, videoHeight)
                 }
             }
         )
-    }
-
-    /**
-     * Update orientation according to the video size.
-     *
-     * @param videoWidth the width of the video
-     * @param videoHeight the height of the video
-     */
-    private fun updateOrientationBasedOnVideoSize(videoWidth: Int, videoHeight: Int) {
-        val rotationMode = Settings.System.getInt(
-            contentResolver,
-            ACCELEROMETER_ROTATION,
-            SCREEN_BRIGHTNESS_MODE_MANUAL
-        )
-
-        currentOrientation =
-            if (videoWidth > videoHeight) {
-                SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-            } else {
-                SCREEN_ORIENTATION_SENSOR_PORTRAIT
-            }
-
-        requestedOrientation =
-            if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                SCREEN_ORIENTATION_SENSOR
-            } else {
-                currentOrientation
-            }
     }
 
     private fun setupObserver() {
