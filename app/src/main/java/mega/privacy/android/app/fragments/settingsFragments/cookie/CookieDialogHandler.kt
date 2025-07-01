@@ -50,7 +50,6 @@ class CookieDialogHandler @Inject constructor(
 ) {
 
     private var dialog: AlertDialog? = null
-    private var isCookieDialogWithAds = false
     private var getCookieDialogJob: Job? = null
 
     /**
@@ -93,17 +92,17 @@ class CookieDialogHandler @Inject constructor(
         url: String?,
         onButtonClicked: () -> Unit,
     ) {
-        isCookieDialogWithAds = false
         if (dialog?.isShowing == true || !context.isValid()) return
 
         dialog = MaterialAlertDialogBuilder(context)
             .setCancelable(false)
             .setView(R.layout.dialog_cookie_alert)
             .setPositiveButton(context.getString(R.string.preference_cookies_accept)) { _, _ ->
-                acceptAllCookies()
+                acceptCookies(CookieType.entries.toSet())
                 onButtonClicked()
             }
             .setNegativeButton(context.getString(R.string.settings_about_cookie_settings)) { _, _ ->
+                acceptCookies(setOf(CookieType.ESSENTIAL))
                 context.startActivity(Intent(context, CookiePreferencesActivity::class.java))
                 onButtonClicked()
             }
@@ -124,16 +123,9 @@ class CookieDialogHandler @Inject constructor(
             }.also { it.show() }
     }
 
-    private fun acceptAllCookies() {
+    private fun acceptCookies(enabledCookies: Set<CookieType>) {
         applicationScope.launch {
             runCatching {
-                // If the user accepts all cookies, we will enable all the cookies,
-                // including the Ads cookies else, enable all the cookies except the Ads cookies
-                val enabledCookies = if (isCookieDialogWithAds) {
-                    CookieType.entries.toSet()
-                } else {
-                    CookieType.entries.toSet() - CookieType.ADS_CHECK - CookieType.ADVERTISEMENT
-                }
                 updateCookieSettingsUseCase(enabledCookies)
                 broadcastCookieSettingsSavedUseCase(enabledCookies)
                 updateCrashAndPerformanceReportersUseCase()
