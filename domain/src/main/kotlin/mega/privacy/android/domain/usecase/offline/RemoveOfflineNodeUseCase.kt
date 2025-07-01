@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.pdf.CheckIfShouldDeleteLastPageViewedInPdfUseCase
 import javax.inject.Inject
 
 /**
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class RemoveOfflineNodeUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val fileRepository: FileSystemRepository,
+    private val checkIfShouldDeleteLastPageViewedInPdfUseCase: CheckIfShouldDeleteLastPageViewedInPdfUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -34,7 +36,7 @@ class RemoveOfflineNodeUseCase @Inject constructor(
             }
             //remove red arrow from current item
             val parentId = it.parentId
-            nodeRepository.removeOfflineNodeById(it.id)
+            removeOffline(it)
             if (parentId != -1) {
                 updateParentOfflineStatus(parentId)
             }
@@ -61,9 +63,22 @@ class RemoveOfflineNodeUseCase @Inject constructor(
             if (offlineInfoChildren.isNotEmpty()) {
                 deleteChildrenInDb(children)
             }
-            nodeRepository.removeOfflineNodeById(offlineChild.id)
+            removeOffline(offlineChild)
         }
     }
+
+    private suspend fun removeOffline(offlineNodeInformation: OfflineNodeInformation) =
+        with(offlineNodeInformation) {
+            nodeRepository.removeOfflineNodeById(id)
+
+            if (isFolder.not()) {
+                checkIfShouldDeleteLastPageViewedInPdfUseCase(
+                    nodeHandle = handle.toLong(),
+                    fileName = name,
+                    isOfflineRemoval = true,
+                )
+            }
+        }
 
     /**
      * Delete empty parent folders recursively
@@ -77,7 +92,7 @@ class RemoveOfflineNodeUseCase @Inject constructor(
             val parentNode = nodeRepository.getOfflineNodeById(parentId)
             parentNode?.let { offlineInfo ->
                 val grandParentId = offlineInfo.parentId
-                nodeRepository.removeOfflineNodeById(parentId)
+                removeOffline(offlineInfo)
                 deleteFileByNode(offlineInfo)
                 updateParentOfflineStatus(grandParentId)
             }

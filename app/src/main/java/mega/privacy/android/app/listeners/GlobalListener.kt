@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCas
 import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
 import mega.privacy.android.domain.usecase.contact.GetIncomingContactRequestsNotificationListUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
+import mega.privacy.android.domain.usecase.pdf.CheckIfShouldDeleteLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastMiscLoadedUseCase
 import mega.privacy.android.icon.pack.R as IconPackR
 import nz.mega.sdk.MegaApiAndroid
@@ -92,6 +93,7 @@ class GlobalListener @Inject constructor(
     private val isRichPreviewsEnabledUseCase: IsRichPreviewsEnabledUseCase,
     private val broadcastMiscLoadedUseCase: BroadcastMiscLoadedUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
+    private val checkIfShouldDeleteLastPageViewedInPdfUseCase: CheckIfShouldDeleteLastPageViewedInPdfUseCase,
 ) : MegaGlobalListenerInterface {
 
     private val globalSyncUpdates = MutableSharedFlow<Unit>()
@@ -172,11 +174,27 @@ class GlobalListener @Inject constructor(
      */
     override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode>?) {
         nodeList?.toList()?.forEach { node ->
-            if (node.isInShare && node.hasChanged(MegaNode.CHANGE_TYPE_INSHARE.toLong())) {
-                showSharedFolderNotification(node)
-            } else if (node.hasChanged(MegaNode.CHANGE_TYPE_PUBLIC_LINK.toLong()) && node.publicLink != null) {
-                // when activated share, will show rating if it matches the condition
-                RatingHandlerImpl(appContext).showRatingBaseOnSharing()
+            when {
+                node.isInShare && node.hasChanged(MegaNode.CHANGE_TYPE_INSHARE.toLong()) -> {
+                    showSharedFolderNotification(node)
+                }
+
+                node.hasChanged(MegaNode.CHANGE_TYPE_PUBLIC_LINK.toLong()) && node.publicLink != null -> {
+                    // when activated share, will show rating if it matches the condition
+                    RatingHandlerImpl(appContext).showRatingBaseOnSharing()
+                }
+
+                node.hasChanged(MegaNode.CHANGE_TYPE_REMOVED.toLong()) && node.isFile -> {
+                    applicationScope.launch {
+                        runCatching {
+                            checkIfShouldDeleteLastPageViewedInPdfUseCase(
+                                nodeHandle = node.handle,
+                                fileName = node.name,
+                                isOfflineRemoval = false,
+                            )
+                        }.onFailure { Timber.e(it) }
+                    }
+                }
             }
         }
     }
