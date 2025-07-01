@@ -3,6 +3,7 @@ package mega.privacy.android.feature.transfers.components
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.image.MegaIcon
@@ -19,7 +20,7 @@ fun SelectedTransferIcon(
     modifier: Modifier = Modifier,
 ) =
     MegaIcon(
-        if (isSelected) IconPack.Medium.Thin.Solid.CheckSquare else IconPack.Medium.Thin.Outline.Square,
+        rememberVectorPainter(if (isSelected) IconPack.Medium.Thin.Solid.CheckSquare else IconPack.Medium.Thin.Outline.Square),
         contentDescription = if (isSelected) "Selected" else "Unselected",
         tint = IconColor.Primary,
         modifier = modifier

@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -87,7 +88,7 @@ fun ActiveTransferItem(
             exit = fadeOut() + shrinkHorizontally(),
         ) {
             MegaIcon(
-                painter = IconPack.Small.Thin.Outline.QueueLine,
+                painter = rememberVectorPainter(IconPack.Small.Thin.Outline.QueueLine),
                 contentDescription = "Reorder icon",
                 tint = IconColor.Secondary,
                 modifier = Modifier
@@ -144,7 +145,7 @@ fun ActiveTransferItem(
             ) {
 
                 MegaIcon(
-                    painter = if (isPaused) IconPack.Medium.Thin.Outline.Play else IconPack.Medium.Thin.Outline.Pause,
+                    painter = rememberVectorPainter(if (isPaused) IconPack.Medium.Thin.Outline.Play else IconPack.Medium.Thin.Outline.Pause),
                     contentDescription = if (isPaused) stringResource(id = sharedR.string.transfers_section_action_play)
                     else stringResource(id = sharedR.string.transfers_section_action_pause),
                     tint = if (areTransfersPaused) IconColor.Disabled else IconColor.Secondary,

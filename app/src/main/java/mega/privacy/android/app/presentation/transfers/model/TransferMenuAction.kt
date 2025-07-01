@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.transfers.model
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.model.TopAppBarAction
 import mega.privacy.android.app.R
@@ -21,7 +22,7 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_RESUME_ACTION,
     ), TransferMenuAction {
         @Composable
-        override fun getIconPainter() = IconPack.Medium.Thin.Outline.Play
+        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.Play)
     }
 
     /**
@@ -32,7 +33,7 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_PAUSE_ACTION,
     ), TransferMenuAction {
         @Composable
-        override fun getIconPainter() = IconPack.Medium.Thin.Outline.Pause
+        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.Pause)
     }
 
     /**
@@ -43,7 +44,7 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_MORE_ACTION,
     ), TransferMenuAction {
         @Composable
-        override fun getIconPainter() = IconPack.Medium.Thin.Outline.MoreVertical
+        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical)
     }
 
     /**
@@ -54,7 +55,7 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_SELECT_ALL_ACTION,
     ), TransferMenuAction {
         @Composable
-        override fun getIconPainter() = IconPack.Medium.Thin.Outline.CheckStack
+        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.CheckStack)
     }
 
     /**
@@ -65,7 +66,7 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_CANCEL_ACTION,
     ), TransferMenuAction {
         @Composable
-        override fun getIconPainter() = IconPack.Medium.Thin.Outline.MinusCircle
+        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.MinusCircle)
     }
 
     /**
@@ -76,7 +77,7 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_CLEAR_ACTION,
     ), TransferMenuAction {
         @Composable
-        override fun getIconPainter() = IconPack.Medium.Thin.Outline.Eraser
+        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser)
     }
 
     /**
@@ -87,7 +88,7 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_RETRY_ACTION,
     ), TransferMenuAction {
         @Composable
-        override fun getIconPainter() = IconPack.Medium.Thin.Outline.RotateCcw
+        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.RotateCcw)
     }
 
     /**

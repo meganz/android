@@ -13,6 +13,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -142,7 +143,7 @@ internal fun CompletedTransferItem(
                 modifier = Modifier.size(24.dp)
             ) {
                 MegaIcon(
-                    painter = IconPack.Medium.Thin.Outline.MoreVertical,
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                     contentDescription = "",
                     tint = IconColor.Secondary,
                 )

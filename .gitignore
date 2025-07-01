@@ -2,6 +2,7 @@
 
 /build/
 **/build
+!**/mega/privacy/android/build/
 
 ### Android Studio files ###
 *.iml

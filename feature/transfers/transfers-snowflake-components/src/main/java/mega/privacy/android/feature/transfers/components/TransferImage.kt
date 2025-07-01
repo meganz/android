@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -92,7 +93,7 @@ internal fun LeadingIndicator(
             else TEST_TAG_UPLOAD_LEADING_INDICATOR
         )
         .size(16.dp),
-    painter = if (isDownload) IconPack.Small.Thin.Outline.ArrowDown else IconPack.Small.Thin.Outline.ArrowUp,
+    painter = rememberVectorPainter(if (isDownload) IconPack.Small.Thin.Outline.ArrowDown else IconPack.Small.Thin.Outline.ArrowUp),
     contentDescription = null,
     tint = when {
         isOverQuota -> DSTokens.colors.indicator.yellow

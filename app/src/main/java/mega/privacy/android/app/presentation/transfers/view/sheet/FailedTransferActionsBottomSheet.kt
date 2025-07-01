@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -116,7 +117,7 @@ fun FailedTransferActionsBottomSheet(
         )
         BottomSheetAction(
             modifier = Modifier.testTag(TEST_TAG_RETRY_ACTION),
-            iconPainter = IconPack.Medium.Thin.Outline.RotateCcw,
+            iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.RotateCcw),
             name = stringResource(id = R.string.general_retry),
             onClick = {
                 Analytics.tracker.trackEvent(FailedTransfersItemRetryMenuItemEvent)
@@ -128,7 +129,7 @@ fun FailedTransferActionsBottomSheet(
         )
         BottomSheetAction(
             modifier = Modifier.testTag(TEST_TAG_CLEAR_FAILED_TRANSFER_ACTION),
-            iconPainter = IconPack.Medium.Thin.Outline.Eraser,
+            iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser),
             name = stringResource(id = R.string.general_clear),
             onClick = {
                 Analytics.tracker.trackEvent(FailedTransfersItemClearMenuItemEvent)

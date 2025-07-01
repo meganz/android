@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -66,7 +67,7 @@ fun BottomSheetAction(
 private fun BottomSheetActionPreview() {
     AndroidThemeForPreviews {
         BottomSheetAction(
-            iconPainter = IconPack.Medium.Thin.Outline.ExternalLink,
+            iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ExternalLink),
             name = "Action Name",
             onClick = {},
         )

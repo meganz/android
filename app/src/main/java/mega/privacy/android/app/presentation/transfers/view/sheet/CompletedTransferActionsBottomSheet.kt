@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -138,7 +139,7 @@ fun CompletedTransferActionsBottomSheet(
         if (uiState.canViewInFolder) {
             BottomSheetAction(
                 modifier = Modifier.testTag(TEST_TAG_VIEW_IN_FOLDER_ACTION),
-                iconPainter = IconPack.Medium.Thin.Outline.FileSearch02,
+                iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.FileSearch02),
                 name = stringResource(id = R.string.view_in_folder_label),
                 onClick = {
                     Analytics.tracker.trackEvent(CompletedTransfersItemViewInFolderMenuItemEvent)
@@ -154,7 +155,7 @@ fun CompletedTransferActionsBottomSheet(
         if (uiState.canOpenWith) {
             BottomSheetAction(
                 modifier = Modifier.testTag(TEST_TAG_OPEN_WITH_ACTION),
-                iconPainter = IconPack.Medium.Thin.Outline.ExternalLink,
+                iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ExternalLink),
                 name = stringResource(id = R.string.external_play),
                 onClick = {
                     Analytics.tracker.trackEvent(CompletedTransfersItemOpenMenuItemEvent)
@@ -165,7 +166,7 @@ fun CompletedTransferActionsBottomSheet(
         if (uiState.canShareLink) {
             BottomSheetAction(
                 modifier = Modifier.testTag(TEST_TAG_SHARE_LINK_ACTION),
-                iconPainter = IconPack.Medium.Thin.Outline.Link01,
+                iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Link01),
                 name = stringResource(id = R.string.context_get_link),
                 onClick = {
                     Analytics.tracker.trackEvent(CompletedTransfersItemShareMenuItemEvent)
@@ -177,7 +178,7 @@ fun CompletedTransferActionsBottomSheet(
         }
         BottomSheetAction(
             modifier = Modifier.testTag(TEST_TAG_CLEAR_ACTION),
-            iconPainter = IconPack.Medium.Thin.Outline.Eraser,
+            iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser),
             name = stringResource(id = R.string.general_clear),
             onClick = {
                 Analytics.tracker.trackEvent(CompletedTransfersItemClearMenuItemEvent)

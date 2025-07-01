@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.shared.components
 
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -45,7 +46,7 @@ class BottomSheetActionTest {
     private fun initComposeRuleContent() =
         composeRule.setContent {
             BottomSheetAction(
-                iconPainter = IconPack.Medium.Thin.Outline.ExternalLink,
+                iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ExternalLink),
                 name = fileName,
                 onClick = onClick,
             )

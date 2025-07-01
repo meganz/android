@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.MegaOutlinedButton
@@ -58,7 +59,7 @@ fun ExampleHomeScreen(content: String) {
                         Row() {
                             MegaIcon(
                                 modifier = Modifier.padding(16.dp),
-                                painter = IconPack.Small.Regular.Outline.Image01,
+                                painter = rememberVectorPainter(IconPack.Small.Regular.Outline.Image01),
                                 contentDescription = "Icon $index",
                                 tint = IconColor.Primary
                             )
