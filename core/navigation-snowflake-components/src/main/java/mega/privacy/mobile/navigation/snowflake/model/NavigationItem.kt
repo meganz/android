@@ -22,4 +22,5 @@ data class NavigationItem(
     val badgeText: String?,
     val analyticsEventIdentifier: NavigationEventIdentifier,
     val preferredSlot: PreferredSlot,
+    val testTag: String = "main_navigation:navigation_item_${destination::class.simpleName}"
 )

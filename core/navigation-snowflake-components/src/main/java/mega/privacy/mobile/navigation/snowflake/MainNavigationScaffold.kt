@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableSet
@@ -29,10 +30,11 @@ fun MainNavigationScaffold(
     mainNavItems: ImmutableSet<NavigationItem>,
     onDestinationClick: (Any) -> Unit,
     isSelected: (Any) -> Boolean,
-    mainNavItemIcon: @Composable (Int, String) -> Unit = { icon, label ->
+    mainNavItemIcon: @Composable (Int, String, Modifier) -> Unit = { icon, label, modifier ->
         MainNavigationIcon(
-            icon,
-            label
+            iconRes = icon,
+            label = label,
+            modifier = modifier
         )
     },
     mainNavItemBadge: @Composable (String) -> Unit = { text ->
@@ -77,7 +79,11 @@ fun MainNavigationScaffold(
                 orderedItems.forEach { navItem ->
                     item(
                         icon = {
-                            mainNavItemIcon(navItem.iconRes, stringResource(navItem.label))
+                            mainNavItemIcon(
+                                navItem.iconRes,
+                                stringResource(navItem.label),
+                                Modifier.testTag(navItem.testTag),
+                            )
                         },
                         badge = {
                             navItem.badgeText?.let { text ->

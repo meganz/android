@@ -2,17 +2,30 @@ package mega.privacy.android.feature.example.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.MegaOutlinedButton
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.surface.ColumnSurface
 import mega.android.core.ui.components.surface.SurfaceColor
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.icon.pack.IconPack
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExampleHomeScreen(content: String) {
     Column(
@@ -23,9 +36,41 @@ fun ExampleHomeScreen(content: String) {
         ColumnSurface(
             surfaceColor = SurfaceColor.PageBackground,
         ) {
+
+            var openBottomSheet by remember { mutableStateOf(false) }
             MegaText("Example Home Screen", textColor = TextColor.Primary)
 
             MegaText(content, textColor = TextColor.Accent)
+
+            MegaOutlinedButton(
+                onClick = { openBottomSheet = openBottomSheet.not() },
+                modifier = Modifier.padding(16.dp),
+                text = "Toggle bottom sheet",
+            )
+
+            if (openBottomSheet) {
+                MegaModalBottomSheet(
+                    sheetState = rememberModalBottomSheetState(),
+                    bottomSheetBackground = MegaModalBottomSheetBackground.PageBackground,
+                    onDismissRequest = { openBottomSheet = false },
+                ) {
+                    (1..15).forEach { index ->
+                        Row() {
+                            MegaIcon(
+                                modifier = Modifier.padding(16.dp),
+                                painter = IconPack.Small.Regular.Outline.Image01,
+                                contentDescription = "Icon $index",
+                                tint = IconColor.Primary
+                            )
+                            MegaText(
+                                text = "Item $index",
+                                modifier = Modifier.padding(16.dp),
+                                textColor = TextColor.Primary
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -8,9 +8,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal fun MainNavigationIcon(iconRes: Int, label: String) {
+internal fun MainNavigationIcon(
+    iconRes: Int, label: String, modifier: Modifier = Modifier,
+) {
     Icon(
-        modifier = Modifier.Companion.size(32.dp),
+        modifier = modifier.size(32.dp),
         painter = painterResource(iconRes),
         contentDescription = label
     )

@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.serialization.Serializable
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
@@ -33,7 +34,16 @@ fun NavGraphBuilder.mainNavigationScaffold(
         MainNavigationScaffold(
             mainNavItems = topLevelDestinations,
             onDestinationClick = { destination ->
-                navController.navigate(destination)
+                navController.navigate(destination, navOptions {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                        saveState = true
+                    }
+
+                    launchSingleTop = true
+
+                    restoreState = true
+                })
             },
             isSelected = { destination ->
                 currentDestination?.isTopLevelDestinationInHierarchy(destination::class) == true
