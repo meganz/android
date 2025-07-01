@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.advertisements
 
+import android.app.Activity
 import app.cash.turbine.test
 import com.google.android.ump.ConsentInformation
 import com.google.common.truth.Truth.assertThat
@@ -27,6 +28,7 @@ class GoogleAdsManagerTest {
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
     private val shouldShowGenericCookieDialogUseCase = mock<ShouldShowGenericCookieDialogUseCase>()
+    private val activity = mock<Activity>()
 
     @BeforeEach
     fun setUp() {
@@ -40,6 +42,7 @@ class GoogleAdsManagerTest {
 
     private fun init() {
         underTest = GoogleAdsManager(
+            activity,
             consentInformation,
             getFeatureFlagValueUseCase,
             getCookieSettingsUseCase,

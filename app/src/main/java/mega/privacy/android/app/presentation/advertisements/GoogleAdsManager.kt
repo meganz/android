@@ -1,14 +1,23 @@
 package mega.privacy.android.app.presentation.advertisements
 
 import android.app.Activity
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.FormError
 import com.google.android.ump.UserMessagingPlatform
+import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
@@ -19,19 +28,23 @@ import javax.inject.Inject
 /**
  * Class to manage Google Ads and User consent information.
  *
+ * @property activity The activity context scope for lifecycle awareness.
  * @property consentInformation The ConsentInformation instance.
  * @property getFeatureFlagValueUseCase The use case to get the feature flag value.
  * @property getCookieSettingsUseCase The use case to get the cookie settings.
  * @property shouldShowGenericCookieDialogUseCase The use case to check if the generic cookie dialog should be shown.
  */
+@ActivityScoped
 class GoogleAdsManager @Inject constructor(
+    private val activity: Activity,
     private val consentInformation: ConsentInformation,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val shouldShowGenericCookieDialogUseCase: ShouldShowGenericCookieDialogUseCase,
 ) {
-
     private val _isAdsFeatureEnabled = MutableStateFlow(false)
+    private var lastFetchTime = -1L
+    private var refreshAdsJob: Job? = null
 
     /**
      * Flow to provide if the ads feature is enabled.
@@ -149,9 +162,43 @@ class GoogleAdsManager @Inject constructor(
     fun fetchAdRequest() {
         Timber.d("Fetching AdRequest")
         if (isAdsEnabled() && consentInformation.canRequestAds()) {
-            _request.update { AdManagerAdRequest.Builder().build() }
+            createNewAdRequestIfNeeded()
+            scheduleRefreshAds()
         } else {
             _request.update { null }
         }
+    }
+
+    private fun scheduleRefreshAds() {
+        if (refreshAdsJob?.isActive == true) return
+        val activity = activity as? ComponentActivity ?: return
+        refreshAdsJob = activity.lifecycleScope.launch {
+            activity.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                createNewAdRequestIfNeeded()
+                while (isActive) {
+                    delay(MINIMUM_AD_REFRESH_INTERVAL)
+                    Timber.d("Refreshing AdRequest")
+                    createNewAdRequestIfNeeded()
+                }
+            }
+        }
+    }
+
+    private fun createNewAdRequestIfNeeded() {
+        Timber.d("Checking if a new AdRequest is needed")
+        if (_request.value == null || System.currentTimeMillis() - lastFetchTime > MINIMUM_AD_REFRESH_INTERVAL) {
+            Timber.d("Creating new AdRequest")
+            _request.update { AdManagerAdRequest.Builder().build() }
+            lastFetchTime = System.currentTimeMillis()
+        }
+    }
+
+    companion object {
+        /**
+         * Minimum interval for ad refresh in milliseconds.
+         *
+         * https://support.google.com/admanager/answer/6022114?hl=en
+         */
+        private const val MINIMUM_AD_REFRESH_INTERVAL = 30_000L // 30 seconds
     }
 }
