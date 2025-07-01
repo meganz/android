@@ -360,14 +360,6 @@ class VideoPlayerViewModel @Inject constructor(
 
     init {
         setupTransferListener()
-        viewModelScope.launch {
-            monitorVideoRepeatModeUseCase().conflate()
-                .catch {
-                    Timber.e(it)
-                }.collectLatest { mode ->
-                    uiState.update { it.copy(repeatToggleMode = mode) }
-                }
-        }
 
         viewModelScope.launch {
             if (isHiddenNodesActive()) {
@@ -1200,6 +1192,15 @@ class VideoPlayerViewModel @Inject constructor(
     internal fun setRepeatToggleModeForPlayer(mode: RepeatToggleMode) = viewModelScope.launch {
         mediaPlayerGateway.setRepeatToggleMode(mode)
         setVideoRepeatModeUseCase(mode.ordinal)
+    }
+
+    internal fun initRepeatToggleMode() {
+        viewModelScope.launch {
+            runCatching { monitorVideoRepeatModeUseCase().first() }.onSuccess { mode ->
+                updateRepeatToggleMode(mode)
+                mediaPlayerGateway.setRepeatToggleMode(mode)
+            }.onFailure { Timber.e(it) }
+        }
     }
 
     internal fun updateRepeatToggleMode(mode: RepeatToggleMode) =

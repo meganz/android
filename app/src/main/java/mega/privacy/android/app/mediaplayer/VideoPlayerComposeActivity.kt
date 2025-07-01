@@ -285,6 +285,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
         currentOrientation = resources.configuration.orientation
         observeRotationSettingsChange()
         val player = createPlayer()
+        videoPlayerViewModel.initRepeatToggleMode()
         setContent {
             val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             var passcodeEnabled by remember { mutableStateOf(true) }
@@ -389,7 +390,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
             }
 
         return mediaPlayerGateway.createPlayer(
-            repeatToggleMode = videoPlayerViewModel.uiState.value.repeatToggleMode,
+            repeatToggleMode = RepeatToggleMode.REPEAT_NONE,
             nameChangeCallback = nameChangeCallback,
             mediaPlayerCallback = object : MediaPlayerCallback {
                 override fun onMediaItemTransitionCallback(handle: String?, isUpdateName: Boolean) {
