@@ -1,11 +1,13 @@
 package mega.privacy.android.app.presentation.pdfviewer
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -17,6 +19,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -27,6 +31,8 @@ import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCo
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
+import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
@@ -38,6 +44,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class PdfViewerViewModel @Inject constructor(
+    @ApplicationScope private val appScope: CoroutineScope,
     private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase,
     private val checkNodesNameCollisionWithActionUseCase: CheckNodesNameCollisionWithActionUseCase,
     private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase,
@@ -50,6 +57,8 @@ class PdfViewerViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
+    private val getLastPageViewedInPdfUseCase: GetLastPageViewedInPdfUseCase,
+    private val setOrUpdateLastPageViewedInPdfUseCase: SetOrUpdateLastPageViewedInPdfUseCase,
 ) : ViewModel() {
 
     private val handle: Long
@@ -64,10 +73,49 @@ class PdfViewerViewModel @Inject constructor(
     val uiState = _state.asStateFlow()
 
     init {
+        checkLastPageViewed()
         monitorAccountDetail()
         monitorIsHiddenNodesOnboarded()
         checkIsNodeInBackups()
         monitorTransferOverQuota()
+    }
+
+    private fun checkLastPageViewed() {
+        if (handle != INVALID_HANDLE) {
+            viewModelScope.launch {
+                runCatching {
+                    getLastPageViewedInPdfUseCase(handle)
+                }.onSuccess { lastPageViewed ->
+                    _state.update { it.copy(lastPageViewed = lastPageViewed ?: 1) }
+                }.onFailure { Timber.e(it) }
+            }
+        }
+    }
+
+    /**
+     * Sets or updates the last page viewed in the PDF.
+     */
+    fun setOrUpdateLastPageViewed(lastPageViewed: Long) {
+        if (handle != INVALID_HANDLE) {
+            _state.update { it.copy(lastPageViewed = lastPageViewed) }
+            appScope.launch {
+                runCatching {
+                    setOrUpdateLastPageViewedInPdfUseCase(
+                        LastPageViewedInPdf(
+                            nodeHandle = handle,
+                            lastPageViewed = lastPageViewed
+                        )
+                    )
+                }.onFailure { Timber.e(it) }
+            }
+        }
+    }
+
+    /**
+     * Sets the PDF URI data to the state.
+     */
+    fun setPdfUriData(pdfUriData: Uri) {
+        _state.update { it.copy(pdfUriData = pdfUriData) }
     }
 
     private fun checkIsNodeInBackups() {

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.pdfviewer
 
+import android.net.Uri
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.AccountType
@@ -34,4 +35,6 @@ data class PdfViewerState(
     val startChatOfflineDownloadEvent: StateEventWithContent<ChatFile> = consumed(),
     val isNodeInBackups: Boolean = false,
     val isInTransferOverQuota: Boolean = false,
+    val pdfUriData: Uri? = null,
+    val lastPageViewed: Long? = null,
 )

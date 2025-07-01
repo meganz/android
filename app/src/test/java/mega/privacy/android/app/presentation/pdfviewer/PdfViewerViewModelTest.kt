@@ -1,14 +1,17 @@
 package mega.privacy.android.app.presentation.pdfviewer
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
@@ -20,6 +23,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -30,6 +34,8 @@ import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCo
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
+import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,6 +46,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
@@ -49,6 +57,8 @@ import org.mockito.kotlin.wheneverBlocking
 internal class PdfViewerViewModelTest {
 
     private lateinit var underTest: PdfViewerViewModel
+
+    private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
     private val checkNodesNameCollisionWithActionUseCase =
         mock<CheckNodesNameCollisionWithActionUseCase>()
     private val checkChatNodesNameCollisionAndCopyUseCase =
@@ -72,9 +82,12 @@ internal class PdfViewerViewModelTest {
             invoke(any())
         }.thenReturn(false)
     }
-    private val savedStateHandle = mock<SavedStateHandle>()
+    private var savedStateHandle = mock<SavedStateHandle>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
+    private val getLastPageViewedInPdfUseCase = mock<GetLastPageViewedInPdfUseCase>()
+    private val setOrUpdateLastPageViewedInPdfUseCase =
+        mock<SetOrUpdateLastPageViewedInPdfUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -83,6 +96,7 @@ internal class PdfViewerViewModelTest {
 
     private fun initTest() {
         underTest = PdfViewerViewModel(
+            appScope = appScope,
             getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
@@ -95,6 +109,8 @@ internal class PdfViewerViewModelTest {
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             savedStateHandle = savedStateHandle,
             monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
+            getLastPageViewedInPdfUseCase = getLastPageViewedInPdfUseCase,
+            setOrUpdateLastPageViewedInPdfUseCase = setOrUpdateLastPageViewedInPdfUseCase,
         )
     }
 
@@ -105,6 +121,8 @@ internal class PdfViewerViewModelTest {
             checkChatNodesNameCollisionAndCopyUseCase,
             getChatFileUseCase,
             isAvailableOfflineUseCase,
+            getLastPageViewedInPdfUseCase,
+            setOrUpdateLastPageViewedInPdfUseCase,
         )
 
         wheneverBlocking { monitorTransferOverQuotaUseCase() } doReturn emptyFlow()
@@ -420,6 +438,120 @@ internal class PdfViewerViewModelTest {
 
             assertThat(underTest.isInTransferOverQuota()).isTrue()
         }
+
+    @Test
+    internal fun `test that lastPageViewed is updated if handle exists`() = runTest {
+        val expectedPage = 5L
+        val handle = 123456789L
+        savedStateHandle = SavedStateHandle(mapOf("HANDLE" to handle))
+
+        whenever(getLastPageViewedInPdfUseCase(handle)).thenReturn(expectedPage)
+
+        initTest()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.lastPageViewed).isEqualTo(expectedPage)
+        }
+    }
+
+    @Test
+    internal fun `test that lastPageViewed is null if handle is invalid`() = runTest {
+        savedStateHandle = SavedStateHandle()
+
+        initTest()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.lastPageViewed).isNull()
+        }
+
+        verifyNoInteractions(getLastPageViewedInPdfUseCase)
+    }
+
+    @Test
+    internal fun `test that lastPageViewed is updated when setOrUpdateLastPageViewedInPdfUseCase is called`() =
+        runTest {
+            val lastPageViewed = 5L
+            val handle = 123456789L
+            val lastPageViewedInPdf = LastPageViewedInPdf(
+                nodeHandle = handle,
+                lastPageViewed = lastPageViewed
+            )
+            savedStateHandle = SavedStateHandle(mapOf("HANDLE" to handle))
+
+            initTest()
+            advanceUntilIdle()
+
+            underTest.setOrUpdateLastPageViewed(lastPageViewed)
+
+            verify(setOrUpdateLastPageViewedInPdfUseCase).invoke(lastPageViewedInPdf)
+        }
+
+    @Test
+    internal fun `test that lastPageViewed is not updated when setOrUpdateLastPageViewedInPdfUseCase is called with invalid handle`() =
+        runTest {
+            val lastPageViewed = 5L
+            savedStateHandle = SavedStateHandle()
+
+            initTest()
+            advanceUntilIdle()
+
+            underTest.setOrUpdateLastPageViewed(lastPageViewed)
+
+            verifyNoInteractions(setOrUpdateLastPageViewedInPdfUseCase)
+        }
+
+    @Test
+    internal fun `test that lastPageViewed is updated in state when setOrUpdateLastPageViewedInPdfUseCase is called`() =
+        runTest {
+            val lastPageViewed = 5L
+            val handle = 123456789L
+            savedStateHandle = SavedStateHandle(mapOf("HANDLE" to handle))
+
+            initTest()
+            advanceUntilIdle()
+
+            underTest.setOrUpdateLastPageViewed(lastPageViewed)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.lastPageViewed).isEqualTo(lastPageViewed)
+            }
+        }
+
+    @Test
+    internal fun `test that lastPageViewed is not updated in state when setOrUpdateLastPageViewedInPdfUseCase is called with invalid handle`() =
+        runTest {
+            val lastPageViewed = 5L
+            savedStateHandle = SavedStateHandle()
+
+            initTest()
+            advanceUntilIdle()
+
+            underTest.setOrUpdateLastPageViewed(lastPageViewed)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.lastPageViewed).isNull()
+            }
+        }
+
+
+    @Test
+    internal fun `test that setPdfUriData updates the state with the provided URI`() = runTest {
+        val uri = mock<Uri>()
+
+        initTest()
+        advanceUntilIdle()
+
+        underTest.setPdfUriData(uri)
+
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.pdfUriData).isEqualTo(uri)
+        }
+    }
 
     companion object {
         @JvmField

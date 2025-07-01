@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.pdfviewer
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -92,6 +91,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentPreviewHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -234,7 +234,10 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             finish()
             return
         }
-        val credentials = runBlocking { runBlocking { getAccountCredentialsUseCase() } }
+        val credentials = runBlocking {
+            runCatching { getAccountCredentialsUseCase() }
+                .onFailure { Timber.e(it) }
+        }
 
         binding = ActivityPdfviewerBinding.inflate(layoutInflater)
 
@@ -415,10 +418,10 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     dismissAlertDialogIfExists(statusDialog)
                     nameCollisionActivityContract.launch(arrayListOf(nameCollision))
                 }
-                if (pdfStreamData != null) {
+                if (pdfStreamData != null && lastPageViewed != null) {
                     try {
                         binding.pdfView.fromBytes(pdfStreamData)
-                            .defaultPage(currentPage - 1)
+                            .defaultPage(lastPageViewed.toInt() - 1)
                             .onPageChange(this@PdfViewerActivity)
                             .enableAnnotationRendering(true)
                             .onLoad(this@PdfViewerActivity)
@@ -434,6 +437,10 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     if (loading && viewModel.isInTransferOverQuota().not()) {
                         binding.pdfViewerProgressBar.isVisible = true
                     }
+                }
+
+                if (pdfUriData != null && lastPageViewed != null) {
+                    loadLocalPDF(lastPageViewed.toInt())
                 }
             }
         }
@@ -622,7 +629,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             binding.pdfView.setBackgroundColor(Color.LTGRAY)
             defaultScrollHandle = DefaultScrollHandle(this@PdfViewerActivity)
             isUrl = false
-            loadLocalPDF()
+            loadLocalPDF(currentPage)
             pdfFileName = getFileName(uri)
             path = uri?.path
             title = pdfFileName
@@ -737,22 +744,28 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         viewModel.loadPdfStream(uri.toString())
     }
 
-    private fun loadLocalPDF() {
+    private fun loadLocalPDF(currentPage: Int? = null) {
+        val uri = this.uri ?: return
         Timber.d("loading: $loading")
         binding.pdfViewerProgressBar.isVisible = true
-        try {
-            binding.pdfView.fromUri(uri)
-                .defaultPage(currentPage - 1)
-                .onPageChange(this)
-                .enableAnnotationRendering(true)
-                .onLoad(this)
-                .scrollHandle(defaultScrollHandle)
-                .spacing(10) // in dp
-                .onPageError(this)
-                .password(password)
-                .load()
-        } catch (e: Exception) {
-            e.printStackTrace()
+
+        if (currentPage == null) {
+            viewModel.setPdfUriData(uri)
+        } else {
+            try {
+                binding.pdfView.fromUri(uri)
+                    .defaultPage(currentPage - 1)
+                    .onPageChange(this)
+                    .enableAnnotationRendering(true)
+                    .onLoad(this)
+                    .scrollHandle(defaultScrollHandle)
+                    .spacing(10) // in dp
+                    .onPageError(this)
+                    .password(password)
+                    .load()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -1864,5 +1877,10 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
          */
         @JvmField
         var loading = true
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.setOrUpdateLastPageViewed(currentPage.toLong())
     }
 }
