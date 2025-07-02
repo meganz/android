@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":shared:resources"))
     implementation(project(":icon-pack"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":domain"))
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)
     implementation(lib.kotlin.ktx)

@@ -1,0 +1,58 @@
+package mega.privacy.android.app.appstate
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import mega.privacy.android.app.appstate.model.AuthState
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
+import timber.log.Timber
+import javax.inject.Inject
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@HiltViewModel
+class AuthStateViewModel @Inject constructor(
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
+    private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
+) : ViewModel() {
+
+    val state: StateFlow<AuthState> by lazy {
+        getStateValues().map { (themeMode, credentials) ->
+            when (credentials?.session) {
+                null -> AuthState.RequireLogin(themeMode)
+                else -> AuthState.LoggedIn(themeMode, credentials)
+            }
+        }.catch {
+            Timber.e(it, "Error while building auth state")
+        }.onEach {
+            Timber.d("AuthState emitted: $it")
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(200),
+            initialValue = AuthState.Loading(ThemeMode.System)
+        )
+    }
+
+    private fun getStateValues(): Flow<Pair<ThemeMode, UserCredentials?>> {
+        return monitorUserCredentialsUseCase().flatMapLatest { credentials ->
+            monitorThemeModeUseCase()
+                .catch {
+                    Timber.e(it, "Error monitoring theme mode")
+                    emit(ThemeMode.System)
+                }.map { themeMode ->
+                    Pair(themeMode, credentials)
+                }
+        }
+    }
+}

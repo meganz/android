@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.example.presentation
 
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
@@ -18,7 +19,9 @@ fun NavGraphBuilder.exampleHomeScreen() {
 
 fun NavGraphBuilder.otherExampleHomeScreen(onNavigate: (Any) -> Unit) {
     composable<HomeScreen2> {
+        val viewModel = hiltViewModel<ExampleViewModel>()
         ExampleHomeScreen2(
+            logout = { viewModel.logout() },
             navigateToFeature = { onNavigate(Secondary) },
         )
     }

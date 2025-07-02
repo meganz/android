@@ -77,12 +77,20 @@ fun ExampleHomeScreen(content: String) {
 }
 
 @Composable
-fun ExampleHomeScreen2(navigateToFeature: () -> Unit) {
+fun ExampleHomeScreen2(
+    logout: () -> Unit,
+    navigateToFeature: () -> Unit,
+) {
     Column(
         modifier = Modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        MegaOutlinedButton(
+            onClick = logout,
+            modifier = Modifier.padding(16.dp),
+            text = "Logout",
+        )
         MegaOutlinedButton(
             onClick = navigateToFeature,
             modifier = Modifier.padding(16.dp),

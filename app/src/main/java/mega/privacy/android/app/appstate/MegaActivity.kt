@@ -9,9 +9,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.appstate.model.AppState
-import mega.privacy.android.app.appstate.view.MegaApp
+import mega.privacy.android.app.appstate.model.AuthState
+import mega.privacy.android.app.appstate.view.LoggedInAppView
+import mega.privacy.android.app.appstate.view.NotLoggedInAppView
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -27,20 +30,27 @@ class MegaActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
         enableEdgeToEdge()
         setContent {
-            val viewModel = viewModel<AppStateViewModel>()
+            val viewModel = viewModel<AuthStateViewModel>()
             val state = viewModel.state.collectAsStateWithLifecycle()
             val navController = rememberNavController()
-            when (val appState = state.value) {
-                is AppState.Data -> {
-                    keepSplashScreen = false
-                    MegaApp(
-                        navController = navController,
-                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                        appState = appState
-                    )
-                }
+            keepSplashScreen = state.value is AuthState.Loading
 
-                AppState.Loading -> {}
+            OriginalTheme(isDark = state.value.themeMode.isDarkMode()) {
+                when (val authState = state.value) {
+                    is AuthState.Loading -> {}
+                    is AuthState.LoggedIn -> {
+                        LoggedInAppView(
+                            navController = navController,
+                            credentials = authState.credentials,
+                        )
+                    }
+
+                    is AuthState.RequireLogin -> {
+                        NotLoggedInAppView(
+                            navController = navController,
+                        )
+                    }
+                }
             }
         }
     }
