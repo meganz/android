@@ -89,6 +89,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import me.saket.telephoto.ExperimentalTelephotoApi
 import me.saket.telephoto.flick.FlickToDismiss
 import me.saket.telephoto.flick.FlickToDismissState
 import me.saket.telephoto.flick.rememberFlickToDismissState
@@ -706,6 +707,7 @@ private fun HandleFlickStateEffect(
     }
 }
 
+@OptIn(ExperimentalTelephotoApi::class)
 @Composable
 private fun ImagePreviewContent(
     imageNode: ImageNode,
@@ -721,7 +723,7 @@ private fun ImagePreviewContent(
     modifier: Modifier = Modifier,
     imageState: ZoomableImageState? = null,
 ) {
-    val flickState = rememberFlickToDismissState(dismissThresholdRatio = 0.25f)
+    val flickState = rememberFlickToDismissState(dismissThresholdRatio = 0.3f)
     HandleFlickStateEffect(
         flickState = flickState,
         onSwitchFullScreenMode = onSwitchFullScreenMode,
