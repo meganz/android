@@ -14,6 +14,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -41,6 +42,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -60,6 +62,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -118,6 +122,8 @@ import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
+import mega.privacy.android.legacy.core.ui.controls.keyboard.keyboardAsState
+import mega.privacy.android.shared.original.core.ui.model.KeyboardState
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ForgotPasswordButtonPressedEvent
@@ -171,6 +177,10 @@ fun NewLoginView(
         orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
     val requiredLoginScrollState = rememberScrollState()
     val twoFactorAuthScrollState = rememberScrollState()
+    var loginTopBarTitle by rememberSaveable {
+        mutableStateOf("")
+    }
+    val loginText = stringResource(sharedR.string.login_text)
 
     MegaScaffold(
         modifier = modifier
@@ -202,7 +212,7 @@ fun NewLoginView(
                     exit = slideOutVertically(targetOffsetY = { -it }),
                 ) {
                     MegaTopAppBar(
-                        title = "",
+                        title = if (state.isLoginRequired) loginTopBarTitle else "",
                         navigationType = AppBarNavigationType.Back {
                             onBackPressed()
                             focusManager.clearFocus(true)
@@ -242,9 +252,11 @@ fun NewLoginView(
                     onForgotPassword = onForgotPassword,
                     onCreateAccount = onCreateAccount,
                     onChangeApiServer = { showChangeApiServerDialog = true },
-                    modifier = Modifier
-                        .verticalScroll(requiredLoginScrollState)
-                        .padding(paddingValues),
+                    modifier = Modifier.padding(paddingValues),
+                    onToggleTitle = { isHidden ->
+                        loginTopBarTitle = if (isHidden) loginText else ""
+                    },
+                    scrollState = requiredLoginScrollState,
                     onLoginExceptionConsumed = onLoginExceptionConsumed,
                     onResendVerificationEmail = onResendVerificationEmail,
                     onResetAccountBlockedEvent = onResetAccountBlockedEvent,
@@ -295,23 +307,43 @@ private fun RequireLogin(
     onResetAccountBlockedEvent: () -> Unit,
     onResetResendVerificationEmailEvent: () -> Unit,
     stopLogin: () -> Unit,
+    onToggleTitle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    scrollState: ScrollState = rememberScrollState(),
     onLoginExceptionConsumed: () -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
     val orientation = LocalConfiguration.current.orientation
     val isTablet = LocalDeviceType.current == DeviceType.Tablet
-    val isPhoneLandscape =
-        orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
+    val isPhoneLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
+    val keyboardState by keyboardAsState()
     val emailRequester = remember { FocusRequester() }
     val passwordRequester = remember { FocusRequester() }
     var wrongCredentials by remember { mutableStateOf(false) }
     var tooManyAttempts by remember { mutableStateOf(false) }
     var accountBlockedDetail by remember { mutableStateOf<AccountBlockedDetail?>(null) }
+    var titleOffset by remember { mutableIntStateOf(0) }
+    var emailFieldOffset by remember { mutableIntStateOf(0) }
+    var isEmailFieldFocused by remember { mutableStateOf(false) }
+    val isTitleHidden by remember {
+        derivedStateOf {
+            titleOffset > scrollState.value
+        }
+    }
+
+    LaunchedEffect(isTitleHidden) {
+        onToggleTitle(!isTitleHidden)
+    }
 
     LaunchedEffect(Unit) {
         delay(300L)
         emailRequester.requestFocus()
+    }
+
+    LaunchedEffect(isEmailFieldFocused, keyboardState) {
+        if (isEmailFieldFocused && keyboardState == KeyboardState.Opened) {
+            scrollState.animateScrollTo(emailFieldOffset)
+        }
     }
 
     LaunchedEffect(state.loginException) {
@@ -351,6 +383,7 @@ private fun RequireLogin(
 
     Box(
         modifier = modifier
+            .verticalScroll(scrollState)
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
@@ -379,6 +412,8 @@ private fun RequireLogin(
                 contentDescription = "Login Icon"
             )
 
+            Spacer(modifier = Modifier.height(24.dp))
+
             MegaText(
                 modifier = Modifier
                     .wrapContentSize()
@@ -392,7 +427,7 @@ private fun RequireLogin(
                             }
                         })
                     }
-                    .padding(top = 24.dp, start = 16.dp, end = 16.dp)
+                    .padding(start = 16.dp, end = 16.dp)
                     .align(Alignment.CenterHorizontally),
                 text = stringResource(sharedR.string.login_page_title),
                 style = AppTheme.typography.titleLarge,
@@ -400,16 +435,29 @@ private fun RequireLogin(
                 textColor = TextColor.Primary,
             )
 
+            Spacer(
+                modifier = Modifier
+                    .height(40.dp)
+                    .onGloballyPositioned { coordinates ->
+                        // Store position of bottom of the title
+                        titleOffset = coordinates.positionInParent().y.toInt()
+                    }
+            )
+
             TextInputField(
                 modifier = Modifier
                     .testTag(LoginTestTags.EMAIL_INPUT)
+                    .onGloballyPositioned { coordinates ->
+                        emailFieldOffset = coordinates.positionInParent().y.toInt()
+                    }
                     .focusRequester(emailRequester)
                     .focusProperties {
                         next = passwordRequester
                     }
-                    .padding(
-                        top = 40.dp, start = 16.dp, end = 16.dp
-                    ),
+                    .padding(start = 16.dp, end = 16.dp),
+                onFocusChanged = { isFocused ->
+                    isEmailFieldFocused = isFocused
+                },
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next,
                 capitalization = KeyboardCapitalization.None,
@@ -543,6 +591,8 @@ private fun RequireLogin(
                     onCreateAccount()
                 }
             )
+
+            Spacer(modifier = Modifier.height(56.dp))
 
             accountBlockedDetail?.let {
                 if (it.type == AccountBlockedType.TOS_COPYRIGHT || it.type == AccountBlockedType.TOS_NON_COPYRIGHT || it.type == AccountBlockedType.SUBUSER_DISABLED) {
@@ -754,6 +804,7 @@ private fun EmptyLoginViewPreview() {
             onEmailChanged = {
                 state = state.copy(accountSession = AccountSession(email = it))
             },
+            onToggleTitle = {},
             onPasswordChanged = { state = state.copy(password = it) },
             onLoginClicked = {},
             onForgotPassword = {},
