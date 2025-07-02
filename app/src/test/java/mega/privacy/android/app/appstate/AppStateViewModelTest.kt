@@ -5,12 +5,9 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -264,40 +261,6 @@ class AppStateViewModelTest {
     }
 
     @Test
-    fun `test that theme mode values are emitted`() = runTest {
-        Dispatchers.setMain(StandardTestDispatcher())
-        stubConnectivity()
-        stubDefaultStartScreenPreference()
-        val expected = listOf(
-            ThemeMode.Light,
-            ThemeMode.Dark,
-            ThemeMode.System
-        )
-        val themeModeFlow = MutableStateFlow(expected.first())
-        monitorThemeModeUseCase.stub {
-            on { invoke() }.thenReturn(
-                themeModeFlow
-            )
-        }
-        initUnderTest(
-            mainDestinations = stubDefaultMainNavigationItems(),
-            featureDestinations = emptySet(),
-        )
-
-        underTest.state
-            .filterIsInstance<AppState.Data>()
-            .test {
-                advanceUntilIdle()
-                expected.forEachIndexed { index, expectedThemeMode ->
-                    themeModeFlow.emit(expected[index])
-                    assertThat(awaitItem().themeMode).isEqualTo(expectedThemeMode)
-                }
-            }
-
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
-    @Test
     fun `test that items are enabled if available offline and connectivity is offline`() = runTest {
         stubDefaultStartScreenPreference()
         stubDefaultThemeMode()
@@ -387,8 +350,6 @@ class AppStateViewModelTest {
             mainDestinations = mainDestinations,
             featureDestinations = featureDestinations,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            getStartScreenPreferenceDestinationUseCase = getStartScreenPreferenceDestinationUseCase,
-            monitorThemeModeUseCase = monitorThemeModeUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
         )
     }

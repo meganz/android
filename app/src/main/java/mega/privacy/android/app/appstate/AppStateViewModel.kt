@@ -21,9 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import mega.privacy.android.app.appstate.model.AppState
 import mega.privacy.android.app.appstate.model.AppStateDataBuilder
 import mega.privacy.android.domain.entity.navigation.Flagged
-import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.navigation.GetStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
@@ -36,10 +34,11 @@ class AppStateViewModel @Inject constructor(
     private val mainDestinations: Set<@JvmSuppressWildcards MainNavItem>,
     private val featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getStartScreenPreferenceDestinationUseCase: GetStartScreenPreferenceDestinationUseCase, // We need a new use case
-    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
+
+    private val getStartScreenPreferenceDestinationUseCase: suspend () -> Any =
+        { mainDestinations.first().destination } // Inject as param once we have a new use case for it
 
     val state: StateFlow<AppState> by lazy {
         combine(
@@ -51,18 +50,14 @@ class AppStateViewModel @Inject constructor(
                 .log("Main Nav Screens"),
             getFilteredValues(featureDestinations)
                 .log("Feature Destinations"),
-//            getStartScreenPreferenceDestinationUseCase()
-            flow { emit(mainDestinations.first().destination) }
+            flow { emit(getStartScreenPreferenceDestinationUseCase()) }
                 .log("Start Screen Preference Destination"),
-            monitorThemeModeUseCase()
-                .log("Theme Mode")
-        ) { mainItems, mainScreens, featureItems, startDestination, themeMode ->
+        ) { mainItems, mainScreens, featureItems, startDestination ->
             AppStateDataBuilder()
                 .mainNavItems(mainItems)
                 .mainNavScreens(mainScreens)
                 .featureDestinations(featureItems)
                 .initialDestination(startDestination)
-                .themeMode(themeMode)
                 .build()
         }.catch {
             Timber.e(it, "Error while building app state")

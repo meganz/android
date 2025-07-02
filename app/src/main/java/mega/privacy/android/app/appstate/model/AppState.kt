@@ -4,7 +4,6 @@ import androidx.compose.runtime.Stable
 import androidx.navigation.NavGraphBuilder
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableSet
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
@@ -18,7 +17,6 @@ sealed interface AppState {
         val mainNavScreens: ImmutableSet<NavGraphBuilder.(navigationHandler: NavigationHandler) -> Unit>,
         val featureDestinations: ImmutableSet<FeatureDestination>,
         val initialMainDestination: Any,
-        val themeMode: ThemeMode,
     ) : AppState
 }
 
@@ -28,7 +26,6 @@ class AppStateDataBuilder {
         mutableSetOf()
     private val featureDestinationsBuilder = mutableSetOf<FeatureDestination>()
     private var initialDestinationBuilder: Any? = null
-    private var themeModeBuilder: ThemeMode = ThemeMode.System
 
     fun mainNavItems(mainNavItems: Set<NavigationItem>) = this.apply {
         mainNavItemsBuilder = mainNavItems
@@ -47,10 +44,6 @@ class AppStateDataBuilder {
         initialDestinationBuilder = destination
     }
 
-    fun themeMode(themeMode: ThemeMode) = this.apply {
-        themeModeBuilder = themeMode
-    }
-
     fun build(): AppState.Data {
         requireNotNull(mainNavItemsBuilder) { "Main nav items must be set" }
         require(mainNavItemsBuilder!!.isNotEmpty()) { "Main nav items cannot be empty" }
@@ -61,7 +54,6 @@ class AppStateDataBuilder {
             featureDestinations = featureDestinationsBuilder.toImmutableSet(),
             initialMainDestination = initialDestinationBuilder
                 ?: mainNavItemsBuilder!!.first().destination,
-            themeMode = themeModeBuilder,
         )
     }
 }
