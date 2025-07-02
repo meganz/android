@@ -58,6 +58,7 @@ import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.ProFeature
@@ -409,8 +410,8 @@ internal fun NewChooseAccountScreen(
                     baseStyle = AppTheme.typography.labelLarge,
                     onAnnotationClick = { annotation ->
                         when (annotation) {
-                            termsText -> context.navigateToTermsOfService()
-                            privacyText -> context.navigateToPrivacyPolicy()
+                            termsText -> context.launchUrl(TERMS_OF_SERVICE_URL)
+                            privacyText -> context.launchUrl(PRIVACY_POLICY_URL)
                         }
                     }
                 )
@@ -427,22 +428,6 @@ private fun Context.navigateToPlayStoreAccountSubscription() {
         startActivity(Intent(ACTION_VIEW, PLAY_STORE_ACCOUNT_SUBSCRIPTION_URL.toUri()))
     } catch (e: ActivityNotFoundException) {
         Timber.e(e, "Play Store Subscription Page Not Found!")
-    }
-}
-
-private fun Context.navigateToTermsOfService() {
-    try {
-        startActivity(Intent(ACTION_VIEW, TERMS_OF_SERVICE_URL.toUri()))
-    } catch (e: ActivityNotFoundException) {
-        Timber.e(e, "Terms of Service Page Not Found!")
-    }
-}
-
-private fun Context.navigateToPrivacyPolicy() {
-    try {
-        startActivity(Intent(ACTION_VIEW, PRIVACY_POLICY_URL.toUri()))
-    } catch (e: ActivityNotFoundException) {
-        Timber.e(e, "Privacy Policy Page Not Found!")
     }
 }
 
