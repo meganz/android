@@ -62,6 +62,8 @@ import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.ProFeature
 import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
 import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider
+import mega.privacy.android.app.utils.Constants.PRIVACY_POLICY_URL
+import mega.privacy.android.app.utils.Constants.TERMS_OF_SERVICE_URL
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
@@ -366,6 +368,16 @@ internal fun NewChooseAccountScreen(
                         context.navigateToPlayStoreAccountSubscription()
                     }
                 )
+                val termsText =
+                    stringResource(id = sharedR.string.choose_account_screen_terms_and_policies_link_text)
+                        .substringAfter("[A]")
+                        .substringBefore("[/A]")
+
+                val privacyText =
+                    stringResource(id = sharedR.string.choose_account_screen_terms_and_policies_link_text)
+                        .substringAfter("[B]")
+                        .substringBefore("[/B]")
+
                 LinkSpannedText(
                     modifier = Modifier
                         .padding(
@@ -382,14 +394,22 @@ internal fun NewChooseAccountScreen(
                                 spanStyle = SpanStyle(),
                                 linkColor = LinkColor.Primary
                             ),
-                            annotation = stringResource(id = sharedR.string.choose_account_screen_terms_and_policies_link_text)
-                                .substringAfter("[A]")
-                                .substringBefore("[/A]")
+                            annotation = termsText
+                        ),
+                        SpanIndicator('B') to SpanStyleWithAnnotation(
+                            megaSpanStyle = MegaSpanStyle.LinkColorStyle(
+                                spanStyle = SpanStyle(),
+                                linkColor = LinkColor.Primary
+                            ),
+                            annotation = privacyText
                         )
                     ),
                     baseStyle = AppTheme.typography.labelLarge,
-                    onAnnotationClick = {
-                        context.navigateToLearnMoreHowToManagerYourSubscription()
+                    onAnnotationClick = { annotation ->
+                        when (annotation) {
+                            termsText -> context.navigateToTermsOfService()
+                            privacyText -> context.navigateToPrivacyPolicy()
+                        }
                     }
                 )
             }
@@ -399,8 +419,6 @@ internal fun NewChooseAccountScreen(
 
 private const val PLAY_STORE_ACCOUNT_SUBSCRIPTION_URL =
     "https://play.google.com/store/account/subscriptions"
-private const val LEARN_MORE_HOW_TO_MANAGER_YOUR_SUBSCRIPTION =
-    "https://support.google.com/googleplay/answer/7018481?hl=en&co=GENIE.Platform%3DAndroid"
 
 private fun Context.navigateToPlayStoreAccountSubscription() {
     try {
@@ -410,11 +428,19 @@ private fun Context.navigateToPlayStoreAccountSubscription() {
     }
 }
 
-private fun Context.navigateToLearnMoreHowToManagerYourSubscription() {
+private fun Context.navigateToTermsOfService() {
     try {
-        startActivity(Intent(ACTION_VIEW, LEARN_MORE_HOW_TO_MANAGER_YOUR_SUBSCRIPTION.toUri()))
+        startActivity(Intent(ACTION_VIEW, TERMS_OF_SERVICE_URL.toUri()))
     } catch (e: ActivityNotFoundException) {
-        Timber.e(e, "Learn More How To Manager Your Subscription Page Not Found!")
+        Timber.e(e, "Terms of Service Page Not Found!")
+    }
+}
+
+private fun Context.navigateToPrivacyPolicy() {
+    try {
+        startActivity(Intent(ACTION_VIEW, PRIVACY_POLICY_URL.toUri()))
+    } catch (e: ActivityNotFoundException) {
+        Timber.e(e, "Privacy Policy Page Not Found!")
     }
 }
 

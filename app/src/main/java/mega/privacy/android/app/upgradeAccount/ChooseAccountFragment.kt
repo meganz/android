@@ -23,6 +23,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.account.AccountStorageViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.container.MegaAppContainer
@@ -294,12 +295,21 @@ class ChooseAccountFragment : Fragment() {
             Timber.d("Downgrade, the new subscription takes effect when the old one expires.")
         }
 
-        val intent = Intent(requireContext(), ManagerActivity::class.java)
-            .putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
-            .putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
-            .putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
+        if (isUpgradeAccount) {
+            if (myAccountInfo.isUpgradeFromAccount()) {
+                val intent = Intent(chooseAccountActivity, MyAccountActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                chooseAccountActivity.startActivity(intent)
+            }
+        } else {
+            val intent = Intent(requireContext(), ManagerActivity::class.java)
+                .putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+                .putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
+                .putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
 
-        startActivity(intent)
+            startActivity(intent)
+        }
+
         requireActivity().finish()
     }
 }
