@@ -14,7 +14,7 @@ object MegaVpnItem : NavDrawerItem.PrivacySuite(
 
 object MegaPassItem : NavDrawerItem.PrivacySuite(
     destination = Unit,
-    iconRes = R.drawable.ic_password_manager,
+    iconRes = R.drawable.ic_password_manager_medium_thin_outline,
     title = sharedR.string.pro_plan_feature_pass_title,
     subTitle = sharedR.string.menu_item_mega_pass_subtitle,
     link = ""

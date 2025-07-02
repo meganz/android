@@ -46,10 +46,21 @@ interface IconPackInterface {
     interface Medium {
         interface Regular {
             interface Outline {
+                val ChevronRight: ImageVector
+                val HelpCircle: ImageVector
+                val CircleSmall: ImageVector
+                val MoreVertical: ImageVector
+                val X: ImageVector
+                val Key02: ImageVector
+                val Folder: ImageVector
                 val Eraser: ImageVector
+                val Info: ImageVector
+                val Check: ImageVector
             }
 
             interface Solid {
+                val Heart: ImageVector
+                val CheckCircle: ImageVector
 
             }
         }
@@ -68,6 +79,10 @@ interface IconPackInterface {
                 val RotateCcw: ImageVector
                 val Link01: ImageVector
                 val fileQuestion01: ImageVector
+                val Cloud: ImageVector
+                val ArrowsUpDown: ImageVector
+                val VPN: ImageVector
+                val PasswordManager: ImageVector
             }
 
             interface Solid {

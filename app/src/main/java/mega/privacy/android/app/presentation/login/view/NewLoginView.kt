@@ -60,6 +60,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -122,6 +123,7 @@ import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.keyboard.keyboardAsState
 import mega.privacy.android.shared.original.core.ui.model.KeyboardState
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
@@ -225,7 +227,7 @@ fun NewLoginView(
                                 },
                             ) {
                                 MegaIcon(
-                                    painter = painterResource(id = mega.privacy.android.icon.pack.R.drawable.ic_help_circle_medium_regular_outline),
+                                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.HelpCircle),
                                     tint = IconColor.Primary,
                                     contentDescription = "Report issue Icon"
                                 )

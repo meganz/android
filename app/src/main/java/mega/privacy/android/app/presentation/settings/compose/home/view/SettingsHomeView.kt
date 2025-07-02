@@ -30,12 +30,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -57,6 +55,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.compose.container.view.SettingContainerView
 import mega.privacy.android.app.presentation.settings.compose.home.model.SettingsHomeState
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.settings.SettingEntryPoint
 import mega.privacy.mobile.analytics.event.SettingsScreenEvent
 
@@ -248,7 +247,7 @@ private fun LazyListScope.listEntryPoints(
                 MegaText(text = stringResource(it.navData.title), textColor = TextColor.Primary)
             }
             MegaIcon(
-                painter = rememberVectorPainter(ImageVector.vectorResource(id = R.drawable.ic_chevron_right)),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ChevronRight),
                 tint = IconColor.Primary,
                 contentDescription = null,
             )

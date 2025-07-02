@@ -20,8 +20,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
@@ -32,7 +32,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.app.presentation.filecontact.model.ShareRecipientPreviewParameterProvider
 import mega.privacy.android.domain.entity.shares.ShareRecipient
-import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.icon.pack.IconPack
 
 @Composable
 internal fun ShareRecipientsListView(
@@ -78,7 +78,7 @@ internal fun ShareRecipientsListView(
                         contentAlignment = Alignment.Center
                     ) {
                         MegaIcon(
-                            painter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
+                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
                             contentDescription = "More",
                             modifier = Modifier
                                 .size(24.dp)

@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
@@ -28,8 +28,8 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.icon.pack.R
 
 @Composable
 fun PasswordHint(
@@ -143,7 +143,7 @@ private fun HintChecklistItem(
                     .size(16.dp)
                     .align(Alignment.CenterVertically)
                     .testTag(PASSWORD_HINT_CHECK_ICON_TAG + text),
-                painter = painterResource(id = R.drawable.ic_check),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Check),
                 supportTint = SupportColor.Success,
                 contentDescription = text
             )
@@ -152,7 +152,7 @@ private fun HintChecklistItem(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .testTag(PASSWORD_HINT_CIRCLE_ICON_TAG + text),
-                painter = painterResource(id = R.drawable.ic_circle_small),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.CircleSmall),
                 tint = IconColor.Secondary,
                 contentDescription = text
             )

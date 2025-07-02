@@ -15,11 +15,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -29,9 +27,9 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.util.shimmerEffect
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.compose.home.model.MyAccountSettingsState
 import mega.privacy.android.domain.entity.user.ContactAvatar
+import mega.privacy.android.icon.pack.IconPack
 
 internal fun LazyListScope.myAccountSettingsEntryView(
     data: MyAccountSettingsState,
@@ -69,7 +67,7 @@ internal fun LazyListScope.myAccountSettingsEntryView(
                 }
             }
             MegaIcon(
-                painter = rememberVectorPainter(ImageVector.vectorResource(id = R.drawable.ic_chevron_right)),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ChevronRight),
                 contentDescription = null,
             )
         }

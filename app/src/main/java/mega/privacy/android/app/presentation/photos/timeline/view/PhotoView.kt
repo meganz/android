@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultAlpha
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -46,12 +47,13 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.theme.spacing.LocalSpacing
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_700
 
@@ -137,7 +139,8 @@ fun PhotoView(
             || photo.isFavourite && currentZoomLevel == ZoomLevel.Grid_3
         ) {
             MegaIcon(
-                painter = painterResource(id = R.drawable.ic_favourite_white),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.Heart),
+                tint = IconColor.Inverse,
                 contentDescription = null,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -153,9 +156,10 @@ private fun SelectedIconView(
     modifier: Modifier,
 ) {
     MegaIcon(
-        painter = painterResource(id = CoreUiR.drawable.ic_select_folder),
+        painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.CheckCircle),
         contentDescription = null,
         modifier = modifier,
+        tint = IconColor.Primary,
     )
 }
 

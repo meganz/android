@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.filecontact.view
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,8 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -31,7 +31,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.entity.user.UserVisibility
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 
 
 /**
@@ -75,7 +75,7 @@ private fun Actions(
 ) {
     onInfoClicked?.let {
         ActionItem(
-            iconResId = iconPackR.drawable.ic_info_medium_regular_outline,
+            icon = IconPack.Medium.Regular.Outline.Info,
             text = stringResource(id = R.string.general_info),
             onClickListener = it,
             modifier = modifier.testTag(SHARE_CONTACT_OPTIONS_INFO),
@@ -84,14 +84,14 @@ private fun Actions(
     if (allowChangePermission) {
         ActionItem(
             text = stringResource(id = R.string.file_properties_shared_folder_change_permissions),
-            iconResId = iconPackR.drawable.ic_key_02_medium_regular_outline,
+            icon = IconPack.Medium.Regular.Outline.Key02,
             onClickListener = onChangePermissionClicked,
             modifier = modifier.testTag(SHARE_CONTACT_OPTIONS_CHANGE_PERMISSION),
         )
     }
     ActionItem(
         text = stringResource(id = R.string.context_remove),
-        iconResId = iconPackR.drawable.ic_x_medium_regular_outline,
+        icon = IconPack.Medium.Regular.Outline.X,
         iconTint = TextColor.Warning,
         textColor = TextColor.Warning,
         onClickListener = onRemoveClicked,
@@ -102,7 +102,7 @@ private fun Actions(
 @Composable
 private fun ActionItem(
     onClickListener: () -> Unit,
-    @DrawableRes iconResId: Int,
+    icon: ImageVector,
     text: String,
     modifier: Modifier = Modifier,
     iconTint: TextColor = TextColor.Primary,
@@ -119,7 +119,7 @@ private fun ActionItem(
             modifier = Modifier
                 .size(24.dp)
                 .align(Alignment.CenterVertically),
-            painter = painterResource(id = iconResId),
+            painter = rememberVectorPainter(icon),
             textColorTint = iconTint
         )
         MegaText(

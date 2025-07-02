@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -72,6 +73,7 @@ import mega.privacy.android.feature.payment.components.ChooseAccountScreenTopBar
 import mega.privacy.android.feature.payment.components.FreePlanCard
 import mega.privacy.android.feature.payment.components.NewFeatureRow
 import mega.privacy.android.feature.payment.components.ProPlanCard
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
@@ -105,25 +107,25 @@ internal fun NewChooseAccountScreen(
     val proFeatures = remember {
         listOf(
             ProFeature(
-                icon = IconPackR.drawable.ic_cloud,
+                icon = IconPack.Medium.Thin.Outline.Cloud,
                 title = context.getString(sharedR.string.pro_plan_feature_storage_title),
                 description = context.getString(sharedR.string.pro_plan_feature_storage_desc),
                 testTag = "pro_plan:feature:storage"
             ),
             ProFeature(
-                icon = IconPackR.drawable.ic_arrows_up_down,
+                icon = IconPack.Medium.Thin.Outline.ArrowsUpDown,
                 title = context.getString(sharedR.string.pro_plan_feature_transfer_title),
                 description = context.getString(sharedR.string.pro_plan_feature_transfer_desc),
                 testTag = "pro_plan:feature:transfer"
             ),
             ProFeature(
-                icon = IconPackR.drawable.ic_vpn,
+                icon = IconPack.Medium.Thin.Outline.VPN,
                 title = context.getString(sharedR.string.pro_plan_feature_vpn_title),
                 description = context.getString(sharedR.string.pro_plan_feature_vpn_desc),
                 testTag = "pro_plan:feature:vpn"
             ),
             ProFeature(
-                icon = IconPackR.drawable.ic_password_manager,
+                icon = IconPack.Medium.Thin.Outline.PasswordManager,
                 title = context.getString(sharedR.string.pro_plan_feature_pass_title),
                 description = context.getString(sharedR.string.pro_plan_feature_pass_desc),
                 testTag = "pro_plan:feature:pass"
@@ -191,7 +193,7 @@ internal fun NewChooseAccountScreen(
             items(proFeatures, key = { it.title }) { feature ->
                 val index = proFeatures.indexOf(feature)
                 NewFeatureRow(
-                    painter = painterResource(id = feature.icon),
+                    painter = rememberVectorPainter(feature.icon),
                     title = feature.title,
                     description = feature.description,
                     testTag = feature.testTag,

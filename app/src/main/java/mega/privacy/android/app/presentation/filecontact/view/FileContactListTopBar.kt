@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
@@ -22,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -34,7 +31,7 @@ import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.filecontact.model.SelectionState
-import mega.privacy.android.icon.pack.R.drawable as MegaIcons
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 
 @Composable
@@ -128,7 +125,7 @@ private fun RowScope.DefaultActions(
         onClick = shareFolder,
     ) {
         MegaIcon(
-            painter = painterResource(id = MegaIcons.ic_folder_users_medium_regular_outline),
+            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Folder),
             contentDescription = stringResource(R.string.context_share_folder),
             tint = IconColor.Primary,
         )
@@ -139,7 +136,7 @@ private fun RowScope.DefaultActions(
         onClick = { expanded = true },
     ) {
         MegaIcon(
-            rememberVectorPainter(Icons.Default.MoreVert),
+            rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
             contentDescription = "More items Icon",
             tint = IconColor.Primary,
         )
@@ -179,7 +176,7 @@ private fun RowScope.SelectModeActions(
         onClick = changePermissions,
     ) {
         MegaIcon(
-            painter = painterResource(id = MegaIcons.ic_key_02_medium_regular_outline),
+            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Key02),
             contentDescription = stringResource(R.string.file_properties_shared_folder_change_permissions),
             tint = IconColor.Primary,
         )
@@ -192,7 +189,7 @@ private fun RowScope.SelectModeActions(
         onClick = removeShare,
     ) {
         MegaIcon(
-            painter = painterResource(id = MegaIcons.ic_x_medium_regular_outline),
+            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
             contentDescription = stringResource(R.string.context_remove),
             tint = IconColor.Primary,
         )
@@ -203,7 +200,7 @@ private fun RowScope.SelectModeActions(
         onClick = { expanded = true },
     ) {
         MegaIcon(
-            rememberVectorPainter(Icons.Default.MoreVert),
+            rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
             contentDescription = "More items Icon",
             tint = IconColor.Primary,
         )
