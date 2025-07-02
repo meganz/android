@@ -147,6 +147,7 @@
 
         <item name="materialCalendarTheme">@style/ThemeOverlay.Mega.DatePicker</item>
         <item name="materialTimePickerTheme">@style/ThemeOverlay.Mega.TimePicker</item>
+        <item name="android:windowBackground">@color/white_dark_grey</item>
     </style>
 
     <style name="Theme.Mega.FullScreen" parent="Theme.Mega">

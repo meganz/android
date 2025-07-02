@@ -4,6 +4,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -89,7 +90,10 @@ internal fun DocumentSectionComposeView(
             )
         }
     ) { paddingValue ->
-        Box(modifier = modifier.padding(paddingValue)) {
+        Box(modifier = modifier
+            .background(MaterialTheme.colors.background)
+            .padding(paddingValue)
+        ) {
             when {
                 progressBarShowing -> LoadingStateView(
                     uiState.currentViewType == ViewType.LIST,

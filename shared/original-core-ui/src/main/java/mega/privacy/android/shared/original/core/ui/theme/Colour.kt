@@ -85,15 +85,7 @@ val white_alpha_090 = Color(0xE6FFFFFF)
 
 val black = Color(0xFF000000)
 
-val dark_grey = Color(0xFF121212)
-
-val dark_grey_alpha_050 = Color(0x80121212)
-
-val dark_grey_alpha_054 = Color(0x8A121212)
-
-val dark_grey_alpha_066 = Color(0xA8121212)
-
-val dark_grey_alpha_070 = Color(0xB3121212)
+val dark_grey = Color(0xFF18191A)
 
 val grey_010 = Color(0xFFFAFAFA)
 

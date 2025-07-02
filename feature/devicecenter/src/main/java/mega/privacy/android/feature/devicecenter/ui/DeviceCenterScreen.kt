@@ -1,13 +1,14 @@
 package mega.privacy.android.feature.devicecenter.ui
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.SnackbarHostState
@@ -42,6 +43,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.feature.devicecenter.ui.renamedevice.RenameDeviceDialog
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -214,7 +216,9 @@ internal fun DeviceCenterScreen(
                                 onBackupFolderClicked = onBackupFolderClicked,
                                 onNonBackupFolderClicked = onNonBackupFolderClicked,
                                 onInfoClicked = onInfoOptionClicked,
-                                modifier = Modifier.consumeWindowInsets(paddingValues)
+                                modifier = Modifier
+                                    .background(MaterialTheme.colors.background)
+                                    .consumeWindowInsets(paddingValues)
                             )
                         }
                     }

@@ -106,7 +106,8 @@ val LegacyDarkColorPalette = darkColors(
     surface = surface_dark,
     error = error_dark,
     onPrimary = on_primary_dark,
-    onSecondary = on_secondary_dark
+    onSecondary = on_secondary_dark,
+    background = dark_grey,
 )
 
 

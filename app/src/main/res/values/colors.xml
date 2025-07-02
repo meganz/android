@@ -31,11 +31,11 @@
     <color name="white_alpha_090">#E6FFFFFF</color>
 
     <color name="black">#000000</color>
-    <color name="dark_grey">#121212</color>
-    <color name="dark_grey_alpha_050">#80121212</color>
-    <color name="dark_grey_alpha_054">#8A121212</color>
-    <color name="dark_grey_alpha_066">#A8121212</color>
-    <color name="dark_grey_alpha_070">#B3121212</color>
+    <color name="dark_grey">#18191A</color>
+    <color name="dark_grey_alpha_050">#8018191A</color>
+    <color name="dark_grey_alpha_054">#8A18191A</color>
+    <color name="dark_grey_alpha_066">#A818191A</color>
+    <color name="dark_grey_alpha_070">#B318191A</color>
     <color name="dark_grey_border_color">#646464</color>
 
     <color name="grey_010">#FAFAFA</color>
