@@ -34,6 +34,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlinePauseImageV
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlinePlayImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineRotateCcwImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSquareImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTrashImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVPNImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlinefileQuestion01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidCheckSquareImageVector
@@ -127,6 +128,9 @@ public object IconPack : IconPackInterface {
 
                 override val Square: ImageVector by lazy {
                         createMediumThinOutlineSquareImageVector() }
+
+                override val Trash: ImageVector by lazy { createMediumThinOutlineTrashImageVector()
+                        }
 
                 override val VPN: ImageVector by lazy { createMediumThinOutlineVPNImageVector() }
 

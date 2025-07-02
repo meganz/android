@@ -66,7 +66,7 @@ sealed interface TransferMenuAction : TopAppBarAction {
         testTag = TEST_TAG_CANCEL_ACTION,
     ), TransferMenuAction {
         @Composable
-        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.MinusCircle)
+        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash)
     }
 
     /**

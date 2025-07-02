@@ -67,6 +67,7 @@ interface IconPackInterface {
 
         interface Thin {
             interface Outline {
+                val Trash: ImageVector
                 val Square: ImageVector
                 val ExternalLink: ImageVector
                 val FileSearch02: ImageVector
