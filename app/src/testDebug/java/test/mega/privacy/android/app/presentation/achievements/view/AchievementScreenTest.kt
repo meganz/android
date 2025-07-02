@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.achievements.view.AchievementView
 import mega.privacy.android.app.presentation.achievements.view.AchievementViewTestTags
 import org.junit.Rule
@@ -95,7 +96,7 @@ internal class AchievementScreenTest {
             .assert(hasAnyDescendant(hasText(fromId(R.string.unlocked_rewards_title))))
         composeTestRule.onNodeWithTag(AchievementViewTestTags.TOOLBAR)
             .assertIsDisplayed()
-            .assert(hasAnyDescendant(hasText(fromId(R.string.achievements_title))))
+            .assert(hasAnyDescendant(hasText(fromId(sharedR.string.general_section_achievements))))
     }
 
     @Test

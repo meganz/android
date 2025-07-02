@@ -155,7 +155,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/rubbish_storage_text"
-                android:text="@string/section_rubbish_bin"
+                android:text="@string/general_section_rubbish_bin"
                 android:textAppearance="@style/TextAppearance.Mega.Body2" />
 
             <TextView

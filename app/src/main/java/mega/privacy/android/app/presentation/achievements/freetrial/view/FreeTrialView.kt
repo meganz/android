@@ -28,7 +28,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -59,7 +58,7 @@ internal fun FreeTrialView(
         topBar = {
             SimpleTopAppBar(
                 modifier = Modifier.testTag(FreeTrialViewTestTags.TOOLBAR),
-                titleId = R.string.achievements_title,
+                titleId = sharedR.string.general_section_achievements,
                 elevation = scrollState.value > 0,
                 onBackPressed = {
                     onBackPressedDispatcher?.onBackPressed()
@@ -82,7 +81,9 @@ internal fun FreeTrialView(
             )
 
             Column(
-                modifier = Modifier.fillMaxWidth().wrapContentHeight()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
             ) {
                 Box(
                     modifier = Modifier

@@ -3302,7 +3302,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     rubbishBinViewModel.setRubbishBinHandle(INVALID_HANDLE)
                     viewModel.setIsFirstNavigationLevel(true)
                 } else if (rubbishBinViewModel.state().currentHandle == INVALID_HANDLE || node == null || node.handle == rubbishNode.handle) {
-                    supportActionBar?.title = getString(R.string.section_rubbish_bin)
+                    supportActionBar?.title = getString(sharedR.string.general_section_rubbish_bin)
                     viewModel.setIsFirstNavigationLevel(true)
                 } else {
                     supportActionBar?.title = node.name
@@ -3325,7 +3325,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
             DrawerItem.TRANSFERS -> {
                 supportActionBar?.subtitle = null
-                supportActionBar?.title = getString(R.string.section_transfers)
+                supportActionBar?.title = getString(sharedR.string.general_section_transfers)
                 isFirstNavigationLevel = true
             }
 

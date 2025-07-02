@@ -46,6 +46,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DeviceCenterEntrypointButtonEvent
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
@@ -338,7 +339,7 @@ internal class ManagerDrawerFragment : Fragment() {
 
     private fun setContactTitleSection(pendingRequestCount: Int) {
         binding.contactsSectionText.text = if (pendingRequestCount == 0) {
-            getString(R.string.section_contacts)
+            getString(sharedR.string.general_section_contacts)
         } else {
             getString(R.string.section_contacts_with_notification, pendingRequestCount)
                 .spanABTextFontColour(

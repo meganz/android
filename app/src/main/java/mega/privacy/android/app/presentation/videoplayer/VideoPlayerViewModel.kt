@@ -199,6 +199,7 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
@@ -912,7 +913,7 @@ class VideoPlayerViewModel @Inject constructor(
                             if (parentHandle == INVALID_HANDLE) {
                                 context.getString(
                                     when (launchSource) {
-                                        RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
+                                        RUBBISH_BIN_ADAPTER -> sharedR.string.general_section_rubbish_bin
                                         BACKUPS_ADAPTER -> R.string.home_side_menu_backups_title
                                         else -> R.string.section_cloud_drive
                                     }

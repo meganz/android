@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel
 import mega.privacy.android.app.presentation.achievements.info.model.AchievementsInfoUIState
@@ -87,7 +88,7 @@ internal fun AchievementsInfoView(
         topBar = {
             SimpleTopAppBar(
                 modifier = Modifier.testTag(AchievementsInfoViewTestTags.TOOLBAR),
-                titleId = R.string.achievements_title,
+                titleId = sharedR.string.general_section_achievements,
                 elevation = scrollState.value > 0,
                 onBackPressed = {
                     onBackPressedDispatcher?.onBackPressed()

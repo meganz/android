@@ -413,7 +413,7 @@ internal fun TransfersTopBar(
 ) {
     MegaTopAppBar(
         navigationType = AppBarNavigationType.Back(onBackPress),
-        title = stringResource(id = R.string.section_transfers),
+        title = stringResource(id = sharedR.string.general_section_transfers),
         actions = actions,
         onActionPressed = onActionPressed,
     )

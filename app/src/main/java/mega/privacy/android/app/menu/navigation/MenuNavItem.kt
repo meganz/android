@@ -19,7 +19,7 @@ class MenuNavItem : MainNavItem {
         { navigationHandler -> menuHomeScreen(navigationHandler::navigate) }
     override val iconRes: Int = IconPackR.drawable.ic_menu_medium_thin_outline
     override val badge: Flow<String?>? = null
-    override val label: Int = sharedR.string.general_syncs
+    override val label: Int = sharedR.string.general_menu
     override val preferredSlot: PreferredSlot = PreferredSlot.Last
     override val availableOffline: Boolean = true
     override val analyticsEventIdentifier: NavigationEventIdentifier = MenuNavigationIdentifier

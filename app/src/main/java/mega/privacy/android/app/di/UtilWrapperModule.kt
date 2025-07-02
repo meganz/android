@@ -12,6 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.notifications.CameraUploadsNotificationManager
@@ -113,7 +114,7 @@ abstract class UtilWrapperModule {
                     context.getString(R.string.section_cloud_drive)
 
                 override fun getRubbishBinSection() =
-                    context.getString(R.string.section_rubbish_bin)
+                    context.getString(sharedR.string.general_section_rubbish_bin)
 
                 override fun getTitleIncomingSharesExplorer() =
                     context.getString(R.string.title_incoming_shares_explorer)

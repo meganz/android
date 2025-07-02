@@ -134,7 +134,7 @@ internal fun AchievementView(
         topBar = {
             SimpleTopAppBar(
                 modifier = Modifier.testTag(AchievementViewTestTags.TOOLBAR),
-                titleId = R.string.achievements_title,
+                titleId = sharedR.string.general_section_achievements,
                 elevation = scrollState.value > 0,
                 onBackPressed = {
                     onBackPressedDispatcher?.onBackPressed()

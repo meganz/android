@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.CustomAlert
 import mega.privacy.android.domain.entity.IncomingShareAlert
 import mega.privacy.android.domain.entity.ScheduledMeetingAlert
 import mega.privacy.android.domain.entity.UserAlert
-import java.util.Locale
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Section title
@@ -15,16 +15,20 @@ import java.util.Locale
  */
 internal fun UserAlert.sectionTitle(): (Context) -> String = when (this) {
     is ContactAlert -> { context ->
-        context.getString(R.string.section_contacts)
+        context.getString(sharedR.string.general_section_contacts)
     }
+
     is IncomingShareAlert -> { context ->
         context.getString(R.string.title_incoming_shares_explorer)
     }
+
     is ScheduledMeetingAlert -> { context ->
         context.getString(R.string.chat_tab_meetings_title)
     }
+
     is CustomAlert -> { _ ->
         heading ?: ""
     }
+
     else -> { _ -> "" }
 }

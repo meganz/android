@@ -4,14 +4,15 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
 import mega.privacy.android.app.presentation.startconversation.view.StartConversationView
+import mega.privacy.android.app.presentation.startconversation.view.TEST_TAG_RAISED_DEFAULT_MEGA_BUTTON
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import mega.privacy.android.app.onNodeWithText
-import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
-import mega.privacy.android.app.presentation.startconversation.view.TEST_TAG_RAISED_DEFAULT_MEGA_BUTTON
 
 @RunWith(AndroidJUnit4::class)
 
@@ -47,7 +48,7 @@ class StartConversationViewTest {
     @Test
     fun test_that_contacts_text_is_shown() {
         initComposeRuleContent()
-        composeRule.onNodeWithText(R.string.section_contacts).assertExists()
+        composeRule.onNodeWithText(sharedR.string.general_section_contacts).assertExists()
     }
 
     private fun initComposeRuleContent(

@@ -13,6 +13,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.info.model.AchievementsInfoUIState
 import mega.privacy.android.app.presentation.achievements.info.util.toAchievementsInfoAttribute
@@ -59,7 +60,7 @@ class AchievementsInfoViewTest {
 
         composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.TOOLBAR)
             .assertIsDisplayed()
-            .assert(hasAnyDescendant(hasText(fromId(R.string.achievements_title))))
+            .assert(hasAnyDescendant(hasText(fromId(sharedR.string.general_section_achievements))))
     }
 
     @Test

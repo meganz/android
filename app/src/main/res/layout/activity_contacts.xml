@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:title="@string/section_contacts" />
+        tools:title="@string/general_section_contacts" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/contacts_nav_host_fragment"

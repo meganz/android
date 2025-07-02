@@ -189,7 +189,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
             if (contact.isHeader()) {
                 holder.itemLayout.setVisibility(View.GONE);
                 holder.itemHeader.setVisibility(View.VISIBLE);
-                holder.textHeader.setText(mContext.getString(R.string.section_contacts));
+                holder.textHeader.setText(mContext.getString(mega.privacy.android.shared.resources.R.string.general_section_contacts));
             } else {
                 holder.itemLayout.setVisibility(View.VISIBLE);
                 holder.itemHeader.setVisibility(View.GONE);

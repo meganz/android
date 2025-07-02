@@ -159,6 +159,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
@@ -860,7 +861,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                             if (parentHandle == INVALID_HANDLE) {
                                 context.getString(
                                     when (type) {
-                                        RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
+                                        RUBBISH_BIN_ADAPTER -> sharedR.string.general_section_rubbish_bin
                                         BACKUPS_ADAPTER -> R.string.home_side_menu_backups_title
                                         else -> R.string.section_cloud_drive
                                     }

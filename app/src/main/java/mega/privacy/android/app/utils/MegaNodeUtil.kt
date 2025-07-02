@@ -85,6 +85,7 @@ import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Deprecated("This class is deprecated. Use corresponding use cases instead.")
 object MegaNodeUtil {
@@ -1096,7 +1097,7 @@ object MegaNodeUtil {
     ): String {
         return when {
             parent.handle == megaApi.rootNode?.handle -> context.getString(R.string.section_cloud_drive)
-            parent.handle == megaApi.rubbishNode?.handle -> context.getString(R.string.section_rubbish_bin)
+            parent.handle == megaApi.rubbishNode?.handle -> context.getString(sharedR.string.general_section_rubbish_bin)
             parent.handle == megaApi.vaultNode?.handle -> context.getString(R.string.home_side_menu_backups_title)
             else -> parent.name
         }

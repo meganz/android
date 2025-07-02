@@ -125,6 +125,7 @@ import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import timber.log.Timber
@@ -462,7 +463,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                             if (parentHandle == INVALID_HANDLE) {
                                 context.getString(
                                     when (type) {
-                                        RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
+                                        RUBBISH_BIN_ADAPTER -> sharedR.string.general_section_rubbish_bin
                                         BACKUPS_ADAPTER -> R.string.home_side_menu_backups_title
                                         else -> R.string.section_cloud_drive
                                     }

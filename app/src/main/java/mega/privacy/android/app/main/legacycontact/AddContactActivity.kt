@@ -1,7 +1,5 @@
 package mega.privacy.android.app.main.legacycontact
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.DialogInterface
@@ -85,8 +83,10 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava
@@ -1147,7 +1147,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
             Constants.CONTACT_TYPE_MEGA -> {
                 recyclerViewList?.layoutManager = linearLayoutManager
                 showHeader(true)
-                textHeader?.text = getString(R.string.section_contacts)
+                textHeader?.text = getString(sharedR.string.general_section_contacts)
                 recyclerViewList?.addItemDecoration(SimpleDividerItemDecoration(this))
             }
 

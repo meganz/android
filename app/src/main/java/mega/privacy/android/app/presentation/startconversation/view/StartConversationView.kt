@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.startconversation.view
 
-import mega.privacy.android.icon.pack.R as IconR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -39,28 +37,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.ContactItemView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.title
+import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfView
+import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.app.presentation.search.view.EmptySearchView
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfView
-import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
-import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
-import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Composable function that displays the Start Conversation screen.
@@ -224,7 +224,7 @@ private fun ContactsHeader() {
             end = 16.dp,
             bottom = 8.dp
         ),
-        text = stringResource(id = R.string.section_contacts),
+        text = stringResource(id = sharedR.string.general_section_contacts),
         style = MaterialTheme.typography.body2
     )
 }
@@ -241,9 +241,10 @@ private fun ActionButtons(
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        Row(modifier = Modifier
-            .clickable { onButtonClicked(action) }
-            .fillMaxWidth(),
+        Row(
+            modifier = Modifier
+                .clickable { onButtonClicked(action) }
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically) {
             MegaIcon(
                 modifier = Modifier.padding(horizontal = 26.dp, vertical = 18.dp),
@@ -271,9 +272,10 @@ private fun ActionButtons(
 
 @Composable
 private fun InviteContactsButton(onInviteContactsClicked: () -> Unit) {
-    Row(modifier = Modifier
-        .clickable { onInviteContactsClicked() }
-        .fillMaxWidth(),
+    Row(
+        modifier = Modifier
+            .clickable { onInviteContactsClicked() }
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically) {
         MegaIcon(
             modifier = Modifier.padding(horizontal = 26.dp, vertical = 18.dp),

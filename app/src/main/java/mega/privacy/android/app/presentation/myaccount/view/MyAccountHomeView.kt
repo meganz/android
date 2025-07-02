@@ -84,6 +84,7 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.ACCOUNT_TY
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACCOUNT_TYPE_TOP_PADDING
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACHIEVEMENTS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ADD_PHONE_NUMBER
+import mega.privacy.android.app.presentation.myaccount.view.Constants.AVATAR
 import mega.privacy.android.app.presentation.myaccount.view.Constants.AVATAR_SIZE
 import mega.privacy.android.app.presentation.myaccount.view.Constants.BACKUP_RECOVERY_KEY
 import mega.privacy.android.app.presentation.myaccount.view.Constants.CLICKS_TO_CHANGE_API_SERVER
@@ -95,7 +96,6 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.EXPIRED_BU
 import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_LEFT_MARGIN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_RIGHT_MARGIN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_TOP_PADDING
-import mega.privacy.android.app.presentation.myaccount.view.Constants.AVATAR
 import mega.privacy.android.app.presentation.myaccount.view.Constants.LAST_SESSION
 import mega.privacy.android.app.presentation.myaccount.view.Constants.NAME_TEXT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.PAYMENT_ALERT_INFO
@@ -587,7 +587,7 @@ private fun AccountInfoSection(
 
         ImageIconItem(
             icon = R.drawable.ic_contacts_connection,
-            title = R.string.section_contacts,
+            title = sharedR.string.general_section_contacts,
             description = uiState.visibleContacts?.let {
                 pluralStringResource(id = R.plurals.my_account_connections, count = it, it)
             } ?: stringResource(id = R.string.recovering_info),
@@ -600,7 +600,7 @@ private fun AccountInfoSection(
         if (uiState.isBusinessAccount.not()) {
             ImageIconItem(
                 icon = R.drawable.ic_achievement,
-                title = R.string.achievements_title,
+                title = sharedR.string.general_section_achievements,
                 description = stringResource(id = R.string.achievements_subtitle),
                 isIconMode = true,
                 onClickListener = uiActions::onClickAchievements,

@@ -164,7 +164,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:gravity="start|center_vertical"
-                    android:text="@string/section_contacts"
+                    android:text="@string/general_section_contacts"
                     android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View
@@ -225,7 +225,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:gravity="start|center_vertical"
-                    android:text="@string/section_transfers"
+                    android:text="@string/general_section_transfers"
                     android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View
@@ -250,7 +250,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:gravity="start|center_vertical"
-                    android:text="@string/home_side_menu_device_center_title"
+                    android:text="@string/general_section_device_centre"
                     android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View
@@ -295,7 +295,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:gravity="start|center_vertical"
-                    android:text="@string/section_rubbish_bin"
+                    android:text="@string/general_section_rubbish_bin"
                     android:textAppearance="?attr/textAppearanceSubtitle2" />
 
 

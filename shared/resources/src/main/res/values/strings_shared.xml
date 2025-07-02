@@ -1299,6 +1299,28 @@
     <string name="transfers_all_transfers_paused_warning">All transfers paused</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">Resume all</string>
+    <!-- Label for contacts -->
+    <string name="general_section_contacts">Contacts</string>
+    <!-- Label for achievements -->
+    <string name="general_section_achievements">Achievements</string>
+    <!-- Label for device centre -->
+    <string name="general_section_device_centre">Device centre</string>
+    <!-- Label for transfers -->
+    <string name="general_section_transfers">Transfers</string>
+    <!-- Label for offline files -->
+    <string name="general_section_offline_files">Offline files</string>
+    <!-- Label for rubbish bin -->
+    <string name="general_section_rubbish_bin">Rubbish bin</string>
+    <!-- Subtitle for VPN -->
+    <string name="menu_item_vpn_subtitle">High speed VPN</string>
+    <!-- Subtitle for MEGA PASS -->
+    <string name="menu_item_mega_pass_subtitle">All your passwords in one place</string>
+    <!-- Subtitle for transfer.it -->
+    <string name="menu_item_transfer_it_subtitle">Faster, larger, and more secure file transfers</string>
+    <!-- Label for transfer it -->
+    <string name="general_section_transfer_it">transfer.it</string>
+    <!-- Label for Menu -->
+    <string name="general_menu">Menu</string>
     <!-- Sync over quota warning title -->
     <string name="sync_storage_over_quota_warning_title">Syncing paused, your MEGA plan has run out of storage</string>
 </resources>

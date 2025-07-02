@@ -12,6 +12,7 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.contacts.list.ContactListFragment
 import mega.privacy.android.app.contacts.requests.ContactRequestsFragment
@@ -135,7 +136,7 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
                     when (this.currentDestination?.id) {
                         R.id.contact_requests -> R.string.section_requests
                         R.id.contact_groups -> R.string.section_groups
-                        else -> R.string.section_contacts
+                        else -> sharedR.string.general_section_contacts
                     }
                 )
             }

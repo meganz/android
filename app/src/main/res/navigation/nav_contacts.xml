@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/contact_list"
         android:name="mega.privacy.android.app.contacts.list.ContactListFragment"
-        android:label="@string/section_contacts"
+        android:label="@string/general_section_contacts"
         tools:layout="@layout/fragment_contact_list">
 
         <action
