@@ -670,4 +670,8 @@ public class Constants {
     private static final String PACKAGE_NAME = "id=mega.privacy.android.app";
     public static final String MARKET_URI = "market://details?" + PACKAGE_NAME;
     public static final String PLAY_STORE_URI = "https://play.google.com/store/apps/details?" + PACKAGE_NAME;
+
+    public static final String MEGA_VPN_URL = "https://vpn.mega.nz";
+    public static final String MEGA_PASS_URL = "https://pwm.mega.nz";
+    public static final String MEGA_TRANSFER_IT_URL = "https://transfer.it";
 }
