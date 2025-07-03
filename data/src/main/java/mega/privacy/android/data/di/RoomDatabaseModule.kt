@@ -25,6 +25,7 @@ import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
+import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.SyncShownNotificationDao
@@ -232,4 +233,8 @@ internal object RoomDatabaseModule {
     internal fun provideLastPageViewedInPdfDao(database: MegaDatabase): LastPageViewedInPdfDao =
         database.lastPageViewedInPdfDao()
 
+    @Provides
+    @Singleton
+    internal fun provideMediaPlaybackInfoDao(database: MegaDatabase): MediaPlaybackInfoDao =
+        database.mediaPlaybackInfoDao()
 }

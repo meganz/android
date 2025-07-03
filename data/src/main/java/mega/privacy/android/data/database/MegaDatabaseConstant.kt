@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 109
+    const val DATABASE_VERSION = 110
 
     /**
      * Database Name
@@ -94,4 +94,9 @@ object MegaDatabaseConstant {
      * Table for last page viewed in PDF viewer
      */
     const val TABLE_LAST_PAGE_VIEWED_IN_PDF = "last_page_viewed_in_pdf"
+
+    /**
+     * Table for media playback info
+     */
+    const val TABLE_MEDIA_PLAYBACK_INFO = "media_playback_info"
 }

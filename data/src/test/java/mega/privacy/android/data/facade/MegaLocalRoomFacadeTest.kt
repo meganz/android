@@ -15,6 +15,7 @@ import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
+import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
@@ -26,10 +27,13 @@ import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.data.database.entity.LastPageViewedInPdfEntity
+import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_COMPLETED_TRANSFER_ROWS
 import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_INSERT_LIST_SIZE
+import mega.privacy.android.data.mapper.MediaPlaybackInfoEntityMapper
+import mega.privacy.android.data.mapper.MediaPlaybackInfoMapper
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.data.mapper.backup.BackupModelMapper
@@ -52,6 +56,8 @@ import mega.privacy.android.data.mapper.transfer.pending.InsertPendingTransferRe
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
+import mega.privacy.android.data.model.MediaPlaybackInfo
+import mega.privacy.android.data.model.MediaType
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.backup.Backup
@@ -126,6 +132,9 @@ internal class MegaLocalRoomFacadeTest {
     private val lastPageViewedInPdfDao = mock<LastPageViewedInPdfDao>()
     private val lastPageViewedInPdfEntityMapper = mock<LastPageViewedInPdfEntityMapper>()
     private val lastPageViewedInPdfModelMapper = mock<LastPageViewedInPdfModelMapper>()
+    private val mediaPlaybackInfoDao: MediaPlaybackInfoDao = mock()
+    private val mediaPlaybackInfoEntityMapper: MediaPlaybackInfoEntityMapper = mock()
+    private val mediaPlaybackInfoMapper: MediaPlaybackInfoMapper = mock()
 
     @BeforeAll
     fun setUp() {
@@ -166,6 +175,9 @@ internal class MegaLocalRoomFacadeTest {
             lastPageViewedInPdfDao = { lastPageViewedInPdfDao },
             lastPageViewedInPdfEntityMapper = lastPageViewedInPdfEntityMapper,
             lastPageViewedInPdfModelMapper = lastPageViewedInPdfModelMapper,
+            mediaPlaybackInfoDao = { mediaPlaybackInfoDao },
+            mediaPlaybackInfoEntityMapper = mediaPlaybackInfoEntityMapper,
+            mediaPlaybackInfoMapper = mediaPlaybackInfoMapper
         )
     }
 
@@ -199,6 +211,9 @@ internal class MegaLocalRoomFacadeTest {
             insertPendingTransferRequestMapper,
             activeTransferGroupDao,
             activeTransferGroupEntityMapper,
+            mediaPlaybackInfoDao,
+            mediaPlaybackInfoMapper,
+            mediaPlaybackInfoEntityMapper
         )
     }
 
@@ -1045,4 +1060,145 @@ internal class MegaLocalRoomFacadeTest {
 
         verify(lastPageViewedInPdfDao).deleteAllLastPageViewedInPdf()
     }
+
+    @Test
+    fun `test that deletePlaybackInfo invokes as expected`() =
+        runTest {
+            val testVideoHandle = 123456L
+            underTest.deletePlaybackInfo(testVideoHandle)
+            verify(mediaPlaybackInfoDao).removePlaybackInfo(testVideoHandle)
+        }
+
+    @Test
+    fun `test that clearAllPlaybackInfos invokes as expected`() =
+        runTest {
+            underTest.clearAllPlaybackInfos()
+            verify(mediaPlaybackInfoDao).clearAllPlaybackInfos()
+        }
+
+    @Test
+    fun `test that clearAudioPlaybackInfos invokes as expected`() =
+        runTest {
+            underTest.clearAudioPlaybackInfos()
+            verify(mediaPlaybackInfoDao).clearPlaybackInfosByType(MediaType.Audio)
+        }
+
+    @Test
+    fun `test that insertOrUpdatePlaybackInfo insert the mapped entity`() = runTest {
+        val testItem = mock<MediaPlaybackInfo>()
+        val testEntity = mock<MediaPlaybackInfoEntity>()
+        whenever(mediaPlaybackInfoEntityMapper(testItem)).thenReturn(testEntity)
+
+        underTest.insertOrUpdatePlaybackInfo(testItem)
+        verify(mediaPlaybackInfoDao).insertOrUpdatePlaybackInfo(testEntity)
+    }
+
+    @Test
+    fun `test that insertOrUpdatePlaybackInfos insert the mapped entities`() = runTest {
+        val testItems = (1..100).map {
+            mock<MediaPlaybackInfo>()
+        }
+        val testEntities = (1..100).map {
+            mock<MediaPlaybackInfoEntity>()
+        }
+        testItems.forEachIndexed { index, item ->
+            whenever(mediaPlaybackInfoEntityMapper(item)).thenReturn(testEntities[index])
+        }
+
+        underTest.insertOrUpdatePlaybackInfos(testItems)
+        verify(mediaPlaybackInfoDao).insertOrUpdatePlaybackInfos(testEntities)
+    }
+
+    @Test
+    fun `test that monitorAllPlaybackInfos returns as expected`() =
+        runTest {
+            val testItems = (1..100L).map { value ->
+                mock<MediaPlaybackInfo> {
+                    on { mediaHandle }.thenReturn(value)
+                    on { mediaType }.thenReturn(
+                        if (value % 2 == 0L) {
+                            MediaType.Video
+                        } else {
+                            MediaType.Audio
+                        }
+                    )
+                }
+            }
+            val testEntities = (1..100L).map { value ->
+                mock<MediaPlaybackInfoEntity> {
+                    on { mediaHandle }.thenReturn(value)
+                    on { mediaType }.thenReturn(
+                        if (value % 2 == 0L) {
+                            MediaType.Video
+                        } else {
+                            MediaType.Audio
+                        }
+                    )
+                }
+            }
+            whenever(mediaPlaybackInfoDao.getAllPlaybackInfos()).thenReturn(
+                flowOf(
+                    testEntities
+                )
+            )
+            testItems.forEachIndexed { index, item ->
+                whenever(
+                    mediaPlaybackInfoMapper(
+                        mediaHandle = testEntities[index].mediaHandle,
+                        mediaType = testEntities[index].mediaType
+                    )
+                ).thenReturn(item)
+            }
+            underTest.monitorAllPlaybackInfos().test {
+                assertThat(awaitItem()).isEqualTo(testItems)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that monitorAudioPlaybackInfos returns as expected`() =
+        runTest {
+            val testItems = (1..100L).map { value ->
+                mock<MediaPlaybackInfo> {
+                    on { mediaHandle }.thenReturn(value)
+                    on { mediaType }.thenReturn(
+                        if (value % 2 == 0L) {
+                            MediaType.Video
+                        } else {
+                            MediaType.Audio
+                        }
+                    )
+                }
+            }
+            val testEntities = (1..100L).map { value ->
+                mock<MediaPlaybackInfoEntity> {
+                    on { mediaHandle }.thenReturn(value)
+                    on { mediaType }.thenReturn(
+                        if (value % 2 == 0L) {
+                            MediaType.Video
+                        } else {
+                            MediaType.Audio
+                        }
+                    )
+                }
+            }
+            val audioEntities = testEntities.filter { it.mediaType == MediaType.Audio }
+            whenever(
+                mediaPlaybackInfoDao.getAllPlaybackInfosByType(MediaType.Audio)
+            ).thenReturn(flowOf(audioEntities))
+
+            testItems.forEachIndexed { index, item ->
+                whenever(
+                    mediaPlaybackInfoMapper(
+                        mediaHandle = testEntities[index].mediaHandle,
+                        mediaType = testEntities[index].mediaType
+                    )
+                ).thenReturn(item)
+            }
+            val audioItems = testItems.filter { it.mediaType == MediaType.Audio }
+            underTest.monitorAudioPlaybackInfos().test {
+                assertThat(awaitItem()).isEqualTo(audioItems)
+                awaitComplete()
+            }
+        }
 }

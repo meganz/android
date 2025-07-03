@@ -16,10 +16,13 @@ import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
+import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
+import mega.privacy.android.data.mapper.MediaPlaybackInfoEntityMapper
+import mega.privacy.android.data.mapper.MediaPlaybackInfoMapper
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
 import mega.privacy.android.data.mapper.backup.BackupModelMapper
@@ -42,6 +45,8 @@ import mega.privacy.android.data.mapper.transfer.pending.InsertPendingTransferRe
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
+import mega.privacy.android.data.model.MediaPlaybackInfo
+import mega.privacy.android.data.model.MediaType
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
@@ -102,6 +107,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val lastPageViewedInPdfDao: Lazy<LastPageViewedInPdfDao>,
     private val lastPageViewedInPdfEntityMapper: LastPageViewedInPdfEntityMapper,
     private val lastPageViewedInPdfModelMapper: LastPageViewedInPdfModelMapper,
+    private val mediaPlaybackInfoDao: Lazy<MediaPlaybackInfoDao>,
+    private val mediaPlaybackInfoEntityMapper: MediaPlaybackInfoEntityMapper,
+    private val mediaPlaybackInfoMapper: MediaPlaybackInfoMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.get().insertOrUpdateContact(contactEntityMapper(contact))
@@ -605,6 +613,54 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun deleteAllLastPageViewedInPdf() =
         lastPageViewedInPdfDao.get().deleteAllLastPageViewedInPdf()
+
+    override suspend fun deletePlaybackInfo(handle: Long) {
+        mediaPlaybackInfoDao.get().removePlaybackInfo(handle)
+    }
+
+    override suspend fun clearAllPlaybackInfos() {
+        mediaPlaybackInfoDao.get().clearAllPlaybackInfos()
+    }
+
+    override suspend fun clearAudioPlaybackInfos() {
+        mediaPlaybackInfoDao.get().clearPlaybackInfosByType(MediaType.Audio)
+    }
+
+    override suspend fun insertOrUpdatePlaybackInfo(info: MediaPlaybackInfo) {
+        mediaPlaybackInfoDao.get().insertOrUpdatePlaybackInfo(
+            mediaPlaybackInfoEntityMapper(info)
+        )
+    }
+
+    override suspend fun insertOrUpdatePlaybackInfos(infos: List<MediaPlaybackInfo>) {
+        mediaPlaybackInfoDao.get().insertOrUpdatePlaybackInfos(
+            infos.map { info -> mediaPlaybackInfoEntityMapper(info) }
+        )
+    }
+
+    override suspend fun monitorAllPlaybackInfos(): Flow<List<MediaPlaybackInfo>> =
+        mediaPlaybackInfoDao.get().getAllPlaybackInfos().map { entities ->
+            entities.map {
+                mediaPlaybackInfoMapper(
+                    it.mediaHandle,
+                    it.totalDuration,
+                    it.currentPosition,
+                    it.mediaType
+                )
+            }
+        }
+
+    override suspend fun monitorAudioPlaybackInfos(): Flow<List<MediaPlaybackInfo>> =
+        mediaPlaybackInfoDao.get().getAllPlaybackInfosByType(MediaType.Audio).map { entities ->
+            entities.map {
+                mediaPlaybackInfoMapper(
+                    it.mediaHandle,
+                    it.totalDuration,
+                    it.currentPosition,
+                    it.mediaType
+                )
+            }
+        }
 
     companion object {
         internal const val MAX_COMPLETED_TRANSFER_ROWS = 100

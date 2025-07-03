@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.data.model.MediaPlaybackInfo
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
@@ -608,4 +609,49 @@ interface MegaLocalRoomGateway {
      * Delete all last page viewed in PDF records.
      */
     suspend fun deleteAllLastPageViewedInPdf()
+
+    /**
+     * Delete playback info by handle
+     *
+     * @param handle the handle of the playback info to delete
+     */
+    suspend fun deletePlaybackInfo(handle: Long)
+
+    /**
+     * Clear all playback infos
+     */
+    suspend fun clearAllPlaybackInfos()
+
+    /**
+     * Clear all audio playback infos
+     */
+    suspend fun clearAudioPlaybackInfos()
+
+    /**
+     * Insert or update playback info
+     *
+     * @param info the [MediaPlaybackInfo] to insert or update
+     */
+    suspend fun insertOrUpdatePlaybackInfo(info: MediaPlaybackInfo)
+
+    /**
+     * Insert or update a list of playback infos
+     *
+     * @param infos the list of [MediaPlaybackInfo] to insert or update
+     */
+    suspend fun insertOrUpdatePlaybackInfos(infos: List<MediaPlaybackInfo>)
+
+    /**
+     * Get all playback infos
+     *
+     * @return a flow of list of [MediaPlaybackInfo]
+     */
+    suspend fun monitorAllPlaybackInfos(): Flow<List<MediaPlaybackInfo>>
+
+    /**
+     * Get all audio playback infos
+     *
+     * @return a flow of list of [MediaPlaybackInfo] filtered by audio media type
+     */
+    suspend fun monitorAudioPlaybackInfos(): Flow<List<MediaPlaybackInfo>>
 }
