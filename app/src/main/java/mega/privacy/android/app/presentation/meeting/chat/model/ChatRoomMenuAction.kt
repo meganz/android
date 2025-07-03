@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.model
 
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
@@ -17,7 +18,7 @@ sealed interface ChatRoomMenuAction : MenuAction {
      * Audio call
      */
     class AudioCall(override val enabled: Boolean) : MenuActionString(
-        iconRes = R.drawable.ic_phone,
+        icon = IconPack.Medium.Regular.Outline.Phone01,
         descriptionRes = R.string.call_button,
         testTag = TEST_TAG_AUDIO_CALL_ACTION,
     ), ChatRoomMenuAction {
@@ -28,7 +29,7 @@ sealed interface ChatRoomMenuAction : MenuAction {
      * Video call
      */
     class VideoCall(override val enabled: Boolean) : MenuActionString(
-        iconRes = R.drawable.ic_video_action,
+        icon = IconPack.Medium.Regular.Outline.Video,
         descriptionRes = R.string.video_button,
         testTag = TEST_TAG_VIDEO_CALL_ACTION,
     ), ChatRoomMenuAction {

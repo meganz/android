@@ -1,13 +1,11 @@
 package mega.privacy.android.app.contacts.requests
 
-import mega.privacy.android.icon.pack.R.drawable as IconPack
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.material.ExperimentalMaterialApi
@@ -19,9 +17,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -53,6 +52,8 @@ import mega.privacy.android.domain.entity.contacts.ContactRequestAction
 import mega.privacy.android.domain.entity.user.ContactAvatar
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.icon.pack.R.drawable as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
@@ -80,21 +81,21 @@ class ContactRequestsPageFragment : Fragment() {
     private val incomingActions = listOf(
         BottomSheetActionInfo(
             R.string.contact_accept,
-            R.drawable.ic_check_circle_medium_regular_outline,
+            IconPack.Medium.Regular.Outline.CheckCircle,
             false,
             ContactRequestAction.Accept,
             "contact_request_options_sheet:action_accept",
         ),
         BottomSheetActionInfo(
             R.string.contact_ignore,
-            IconPack.ic_slash_circle_medium_regular_outline,
+            IconPack.Medium.Regular.Outline.SlashCircle,
             false,
             ContactRequestAction.Ignore,
             "contact_request_options_sheet:action_ignore",
         ),
         BottomSheetActionInfo(
             R.string.contact_decline,
-            IconPack.ic_x_circle_medium_regular_outline,
+            IconPack.Medium.Regular.Outline.XCircle,
             true,
             ContactRequestAction.Deny,
             "contact_request_options_sheet:action_deny",
@@ -104,14 +105,14 @@ class ContactRequestsPageFragment : Fragment() {
     private val outgoingActions = listOf(
         BottomSheetActionInfo(
             R.string.contact_reinvite,
-            R.drawable.ic_reinvite,
+            IconPack.Medium.Regular.Outline.RotateCw,
             false,
             ContactRequestAction.Remind,
             "contact_request_options_sheet:action_remind",
         ),
         BottomSheetActionInfo(
             R.string.general_remove,
-            IconPack.ic_x_medium_regular_outline,
+            IconPack.Medium.Regular.Outline.X,
             true,
             ContactRequestAction.Delete,
             "contact_request_options_sheet:action_delete",
@@ -278,10 +279,10 @@ class ContactRequestsPageFragment : Fragment() {
 
             if (isOutgoing) {
                 textRes = R.string.sent_requests_empty
-                drawableRes = IconPack.ic_user_arrow_out_glass
+                drawableRes = IconPackR.ic_user_arrow_out_glass
             } else {
                 textRes = R.string.received_requests_empty
-                drawableRes = IconPack.ic_user_arrow_in_glass
+                drawableRes = IconPackR.ic_user_arrow_in_glass
             }
 
             binding.viewEmpty.setCompoundDrawablesWithIntrinsicBounds(0, drawableRes, 0, 0)
@@ -328,7 +329,7 @@ class ContactRequestsPageFragment : Fragment() {
      */
     internal data class BottomSheetActionInfo(
         @StringRes val text: Int,
-        @DrawableRes val icon: Int,
+        val icon: ImageVector,
         val isDestructive: Boolean,
         val action: ContactRequestAction,
         val testTag: String,
@@ -340,7 +341,7 @@ class ContactRequestsPageFragment : Fragment() {
     ): @Composable () -> Unit = {
         MenuActionListTile(
             text = stringResource(id = info.text),
-            icon = painterResource(id = info.icon),
+            icon = rememberVectorPainter(info.icon),
             modifier = Modifier
                 .testTag(info.testTag)
                 .clickable { onClick(info.action) },

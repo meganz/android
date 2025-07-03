@@ -115,8 +115,6 @@ internal class XmlDrawableParser {
             return null
         }
 
-        println("Path data: $pathData")
-
         val fillColor = parseColor(pathElement.getAttribute("android:fillColor"), "Color.Black")
         val strokeColor = parseColor(pathElement.getAttribute("android:strokeColor"), "null")
         val strokeWidth = pathElement.getAttribute("android:strokeWidth").toFloatOrNull() ?: 0f

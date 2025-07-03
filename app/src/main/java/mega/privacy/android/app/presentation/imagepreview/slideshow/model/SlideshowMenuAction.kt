@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.imagepreview.slideshow.model
 
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 
@@ -10,7 +11,7 @@ import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 sealed interface SlideshowMenuAction : MenuAction {
 
     object SettingOptionsMenuAction : MenuActionString(
-        iconRes = mega.privacy.android.icon.pack.R.drawable.ic_gear_six_medium_regular_outline,
+        icon = IconPack.Medium.Regular.Outline.GearSix,
         descriptionRes = R.string.slideshow_settings_page_title,
         testTag = TEST_TAG_SETTING_OPTIONS_ACTION,
     ), SlideshowMenuAction {
@@ -18,7 +19,7 @@ sealed interface SlideshowMenuAction : MenuAction {
     }
 
     object SettingTutorialMenuAction : MenuActionString(
-        iconRes = R.drawable.ic_shield_info,
+        icon = IconPack.Medium.Regular.Outline.ShieldInfo,
         descriptionRes = mega.privacy.android.shared.resources.R.string.slideshow_tutorial_title,
         testTag = TEST_TAG_SETTING_TUTORIAL_INFO_ACTION,
     ), SlideshowMenuAction {

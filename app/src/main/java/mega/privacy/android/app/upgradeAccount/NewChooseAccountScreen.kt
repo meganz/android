@@ -125,7 +125,7 @@ internal fun NewChooseAccountScreen(
                 testTag = "pro_plan:feature:vpn"
             ),
             ProFeature(
-                icon = IconPack.Medium.Thin.Outline.PasswordManager,
+                icon = IconPack.Medium.Thin.Outline.LockKeyholeCircle,
                 title = context.getString(sharedR.string.pro_plan_feature_pass_title),
                 description = context.getString(sharedR.string.pro_plan_feature_pass_desc),
                 testTag = "pro_plan:feature:pass"

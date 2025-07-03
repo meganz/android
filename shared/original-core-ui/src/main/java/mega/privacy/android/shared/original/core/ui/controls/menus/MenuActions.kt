@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.menus
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -23,23 +22,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import com.google.android.material.R
+import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.appbar.LocalMegaAppBarColors
 import mega.privacy.android.shared.original.core.ui.controls.appbar.addClick
 import mega.privacy.android.shared.original.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
-import mega.android.core.ui.tokens.theme.DSTokens
 
 
 /**
@@ -119,7 +119,7 @@ private fun RowScope.OverflowDropDown(
     }
     Box(contentAlignment = Alignment.BottomEnd) {
         IconButtonWithTooltip(
-            iconPainter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
+            iconPainter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
             description = stringResource(id = R.string.abc_action_menu_overflow_description),
             onClick = { showMoreMenu = !showMoreMenu },
             modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE),

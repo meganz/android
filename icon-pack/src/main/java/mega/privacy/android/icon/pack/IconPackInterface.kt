@@ -46,6 +46,40 @@ interface IconPackInterface {
     interface Medium {
         interface Regular {
             interface Outline {
+                val MessageChatCircle: ImageVector
+                val Database: ImageVector
+                val Sync01: ImageVector
+                val FilePlus02: ImageVector
+                val Camera: ImageVector
+                val FileScan: ImageVector
+                val FolderArrow: ImageVector
+                val FileUpload: ImageVector
+                val RotateCw: ImageVector
+                val XCircle: ImageVector
+                val SlashCircle: ImageVector
+                val CheckCircle: ImageVector
+                val ZapAuto: ImageVector
+                val Zap: ImageVector
+                val ZapOff: ImageVector
+                val SlidersVertical02: ImageVector
+                val ClockPlay: ImageVector
+                val ArrowDownCircle: ImageVector
+                val CloudUpload: ImageVector
+                val Link01: ImageVector
+                val ShareNetwork: ImageVector
+                val Video: ImageVector
+                val Phone01: ImageVector
+                val ShieldInfo: ImageVector
+                val GearSix: ImageVector
+                val LogOut02: ImageVector
+                val Trash: ImageVector
+                val Copy01: ImageVector
+                val Move: ImageVector
+                val Pen2: ImageVector
+                val MessageArrowUp: ImageVector
+                val FolderUsers: ImageVector
+                val LinkOff01: ImageVector
+                val AlertTriangle: ImageVector
                 val ChevronRight: ImageVector
                 val HelpCircle: ImageVector
                 val CircleSmall: ImageVector
@@ -56,9 +90,11 @@ interface IconPackInterface {
                 val Eraser: ImageVector
                 val Info: ImageVector
                 val Check: ImageVector
+                val Download: ImageVector
             }
 
             interface Solid {
+                val Link01: ImageVector
                 val Heart: ImageVector
                 val CheckCircle: ImageVector
 
@@ -83,6 +119,7 @@ interface IconPackInterface {
                 val Cloud: ImageVector
                 val ArrowsUpDown: ImageVector
                 val VPN: ImageVector
+                val LockKeyholeCircle: ImageVector
                 val PasswordManager: ImageVector
             }
 

@@ -3,9 +3,9 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattac
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.google.common.io.Files
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.model.ChatAttachmentUiEntity
@@ -14,7 +14,7 @@ import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_AVAILABLE_OF
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.icon.pack.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
@@ -50,7 +50,7 @@ internal fun NodeAttachmentBottomSheetContent(
                     MenuActionListTile(
                         modifier = Modifier.testTag(ADD_TO_CLOUD_DRIVE_ACTION_TEST_TAG),
                         text = stringResource(id = mega.privacy.android.app.R.string.add_to_cloud_node_chat),
-                        icon = painterResource(id = R.drawable.ic_cloud_upload_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.CloudUpload),
                         dividerType = DividerType.BigStartPadding,
                         onActionClicked = onImportClicked,
                     )
@@ -59,7 +59,7 @@ internal fun NodeAttachmentBottomSheetContent(
                 MenuActionListTile(
                     modifier = Modifier.testTag(SAVE_TO_DEVICE_ACTION_TEST_TAG),
                     text = stringResource(id = mega.privacy.android.app.R.string.general_save_to_device),
-                    icon = painterResource(id = R.drawable.ic_download_medium_regular_outline),
+                    icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Download),
                     dividerType = DividerType.BigStartPadding,
                     onActionClicked = onSaveToDeviceClicked,
                 )
@@ -68,7 +68,7 @@ internal fun NodeAttachmentBottomSheetContent(
                     MenuActionListTile(
                         modifier = Modifier.testTag(AVAILABLE_OFFLINE_ACTION_TEST_TAG),
                         text = stringResource(id = mega.privacy.android.app.R.string.file_properties_available_offline),
-                        icon = painterResource(id = R.drawable.ic_arrow_down_circle_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.ArrowDownCircle),
                         dividerType = null,
                         trailingItem = {
                             MegaSwitch(

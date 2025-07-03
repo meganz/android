@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.fileinfo.model
 
 import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionPlural
 import mega.privacy.android.shared.original.core.ui.model.MenuActionString
@@ -11,7 +11,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal sealed interface FileInfoMenuAction : MenuAction {
 
     object Download : MenuActionString(
-        IconPackR.drawable.ic_download_medium_regular_outline,
+        IconPack.Medium.Regular.Outline.Download,
         R.string.general_save_to_device,
         TEST_TAG_DOWNLOAD_ACTION
     ), FileInfoMenuAction {
@@ -19,19 +19,19 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object ShareFolder : MenuActionString(
-        IconPackR.drawable.ic_folder_users_medium_regular_outline,
+        IconPack.Medium.Regular.Outline.FolderUsers,
         R.string.context_share_folder,
         TEST_TAG_SHARE_FOLDER_ACTION,
     ), FileInfoMenuAction
 
     object GetLink : MenuActionPlural(
-        IconPackR.drawable.ic_link_01_medium_regular_solid,
+        IconPack.Medium.Regular.Solid.Link01,
         sharedR.plurals.label_share_links, 1,
         TEST_TAG_GET_LINK_ACTION,
     ), FileInfoMenuAction
 
     object SendToChat : MenuActionString(
-        IconPackR.drawable.ic_message_arrow_up_medium_regular_outline,
+        IconPack.Medium.Regular.Outline.MessageArrowUp,
         R.string.context_send_file_to_chat,
         TEST_TAG_SEND_CHAT_ACTION,
     ), FileInfoMenuAction {
@@ -46,13 +46,13 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object RemoveLink : MenuActionString(
-        IconPackR.drawable.ic_link_off_01_medium_regular_outline,
+        IconPack.Medium.Regular.Outline.LinkOff01,
         R.string.context_remove_link_menu,
         TEST_TAG_REMOVE_LINK_ACTION
     ), FileInfoMenuAction
 
     object DisputeTakedown : MenuActionString(
-        R.drawable.ic_taken_down_file_info,
+        IconPack.Medium.Regular.Outline.AlertTriangle,
         R.string.dispute_takendown_file,
         TEST_TAG_DISPUTE_TAKE_DOWN_ACTION
     ), FileInfoMenuAction {
@@ -60,7 +60,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object Rename : MenuActionString(
-        R.drawable.ic_pen_2_medium_regular_outline,
+        IconPack.Medium.Regular.Outline.Pen2,
         R.string.context_rename,
         TEST_TAG_RENAME_ACTION
     ), FileInfoMenuAction {
@@ -68,7 +68,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object Move : MenuActionString(
-        IconPackR.drawable.ic_move_medium_regular_outline,
+        IconPack.Medium.Regular.Outline.Move,
         R.string.general_move,
         TEST_TAG_MOVE_ACTION
     ), FileInfoMenuAction {
@@ -76,7 +76,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object Copy : MenuActionString(
-        IconPackR.drawable.ic_copy_01_medium_regular_outline,
+        IconPack.Medium.Regular.Outline.Copy01,
         R.string.context_copy,
         TEST_TAG_COPY_ACTION
     ), FileInfoMenuAction {
@@ -84,7 +84,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object MoveToRubbishBin : MenuActionString(
-        IconPackR.drawable.ic_trash_medium_regular_outline,
+        IconPack.Medium.Regular.Outline.Trash,
         R.string.context_move_to_trash,
         TEST_TAG_RUBBISH_ACTION
     ), FileInfoMenuAction {
@@ -92,7 +92,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object Leave : MenuActionString(
-        IconPackR.drawable.ic_log_out_02_medium_regular_outline,
+        IconPack.Medium.Regular.Outline.LogOut02,
         R.string.general_leave,
         TEST_TAG_LEAVE_ACTION
     ), FileInfoMenuAction {
@@ -118,13 +118,13 @@ internal sealed interface FileInfoMenuAction : MenuAction {
         ), SelectionModeAction
 
         object ChangePermission : MenuActionString(
-            IconPackR.drawable.ic_key_02_medium_regular_outline,
+            IconPack.Medium.Regular.Outline.Key02,
             R.string.file_properties_shared_folder_change_permissions,
             TEST_TAG_CHANGE_PERMISSION_SELECT_MODE_ACTION
         ), SelectionModeAction
 
         object Remove : MenuActionString(
-            R.drawable.ic_close_white,
+            IconPack.Medium.Regular.Outline.X,
             R.string.context_remove,
             TEST_TAG_REMOVE_SELECT_MODE_ACTION
         ), SelectionModeAction

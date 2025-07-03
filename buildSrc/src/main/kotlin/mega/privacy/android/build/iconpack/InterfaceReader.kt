@@ -94,7 +94,6 @@ class InterfaceReader(
                         )
 
                         iconDefinitions.add(iconDefinition)
-                        println("Found icon: $currentSize.$currentWeight.$currentStyle.$iconName")
                     }
                 }
             }
@@ -111,6 +110,7 @@ class InterfaceReader(
      */
     private fun convertToSnakeCase(input: String): String {
         return input
+            .replace(Regex("([A-Z])([A-Z][a-z])"), "$1_$2")
             .replace(Regex("([a-z])([A-Z])"), "$1_$2")
             .replace(Regex("([a-zA-Z])([0-9])"), "$1_$2")
             .lowercase()

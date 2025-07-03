@@ -70,7 +70,6 @@ class SvgToImageVectorConverter(
             // Convert the result to a proper vector drawable XML
             val vectorDrawableXml = convertSvg2VectorResultToXml(vectorDrawable)
 
-            println("Successfully converted SVG to vector drawable")
             vectorDrawableXml
 
         } catch (e: Exception) {

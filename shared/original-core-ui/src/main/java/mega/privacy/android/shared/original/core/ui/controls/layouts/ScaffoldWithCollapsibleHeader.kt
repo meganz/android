@@ -44,7 +44,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import androidx.constraintlayout.compose.Dimension
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.LocalMegaAppBarColors
@@ -178,16 +178,17 @@ fun ScaffoldWithCollapsibleHeader(
         //draw the composables
         val (headerRef, headerBelowRef) = createRefs()
         if (headerIncludingSystemBar != null && headerAlpha > 0) {
-            Box(modifier = Modifier
-                .constrainAs(headerBelowRef) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(headerRef.bottom)
-                    height = Dimension.fillToConstraints
-                    width = Dimension.fillToConstraints
-                }
-                .alpha(headerAlpha)) {
+            Box(
+                modifier = Modifier
+                    .constrainAs(headerBelowRef) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        bottom.linkTo(headerRef.bottom)
+                        height = Dimension.fillToConstraints
+                        width = Dimension.fillToConstraints
+                    }
+                    .alpha(headerAlpha)) {
                 CompositionLocalProvider(
                     LocalMegaAppBarColors provides MegaAppBarColors(
                         iconsTintColor = iconTintColor,
@@ -284,16 +285,17 @@ private fun ConstraintLayoutScope.DrawHeader(
     subtitleColor: Color,
     header: @Composable BoxScope.() -> Unit,
 ) {
-    Box(modifier = Modifier
-        .statusBarsPadding()
-        .constrainAs(headerRef) {
-            top.linkTo(parent.top)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-            height = Dimension.wrapContent
-            width = Dimension.fillToConstraints
-        }
-        .alpha(collapsibleHeaderTitleTransition.headerAlpha)) {
+    Box(
+        modifier = Modifier
+            .statusBarsPadding()
+            .constrainAs(headerRef) {
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                height = Dimension.wrapContent
+                width = Dimension.fillToConstraints
+            }
+            .alpha(collapsibleHeaderTitleTransition.headerAlpha)) {
         if (headerAlpha > 0) {
             CompositionLocalProvider(
                 LocalMegaAppBarColors provides MegaAppBarColors(
@@ -451,7 +453,12 @@ private fun Header() = Box(
 
 private fun getSampleToolbarActions(): List<MenuAction> = listOf(
     object : MenuActionString(
-        iconPackR.drawable.ic_alert_circle_regular_medium_outline, mega.privacy.android.shared.resources.R.string.password_text, "circle"
+        IconPack.Medium.Thin.Outline.Pause,
+        mega.privacy.android.shared.resources.R.string.password_text,
+        "circle"
     ) {},
-    object : MenuActionWithoutIcon(mega.privacy.android.shared.resources.R.string.password_text, "password") {},
+    object : MenuActionWithoutIcon(
+        mega.privacy.android.shared.resources.R.string.password_text,
+        "password"
+    ) {},
 )

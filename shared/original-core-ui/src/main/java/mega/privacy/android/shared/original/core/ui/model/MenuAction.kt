@@ -1,15 +1,13 @@
 package mega.privacy.android.shared.original.core.ui.model
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import androidx.annotation.DrawableRes
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.menus.MenuActions
 
 
@@ -75,12 +73,12 @@ abstract class MenuActionWithoutIcon(
 
 /**
  * Utility abstract class for actions with description and icon from resources
- * @param iconRes the drawable resource to be used to generate the icon painter
+ * @param icon the [ImageVector] to be used to generate the icon painter
  * @param descriptionRes the string resource to be used to generate the description of this action
  * @param testTag tag for testing purposes.
  */
 abstract class MenuActionString(
-    @DrawableRes val iconRes: Int,
+    val icon: ImageVector,
     @StringRes val descriptionRes: Int,
     override val testTag: String,
 ) : MenuActionWithIcon {
@@ -88,18 +86,18 @@ abstract class MenuActionString(
     override fun getDescription() = stringResource(id = descriptionRes)
 
     @Composable
-    override fun getIconPainter() = painterResource(id = iconRes)
+    override fun getIconPainter() = rememberVectorPainter(icon)
 }
 
 /**
  * Utility abstract class for actions with description and icon from resources using plurals
- * @param iconRes the drawable resource to be used to generate the icon painter
+ * @param icon the [ImageVector] to be used to generate the icon painter
  * @param descriptionRes the plural resource to be used to generate the description of this action
  * @param amount the amount to be used in [descriptionRes] plural
  * @param testTag tag for testing purposes.
  */
 abstract class MenuActionPlural(
-    @DrawableRes val iconRes: Int,
+    val icon: ImageVector,
     @PluralsRes val descriptionRes: Int,
     val amount: Int,
     override val testTag: String,
@@ -108,21 +106,5 @@ abstract class MenuActionPlural(
     override fun getDescription() = pluralStringResource(id = descriptionRes, amount, amount)
 
     @Composable
-    override fun getIconPainter() = painterResource(id = iconRes)
-}
-
-/**
- * Utility abstract class for drop down actions
- */
-abstract class MenuActionDropDown(
-    override val testTag: String,
-) : MenuActionWithIcon {
-
-    @Composable
-    override fun getDescription() =
-        stringResource(id = R.string.label_more)
-
-    @Composable
-    override fun getIconPainter() =
-        painterResource(id = iconPackR.drawable.ic_more_vertical_medium_regular_outline)
+    override fun getIconPainter() = rememberVectorPainter(icon)
 }

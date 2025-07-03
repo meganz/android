@@ -1,7 +1,7 @@
 package mega.privacy.android.app.mediaplayer.queue.model
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
@@ -25,7 +25,7 @@ sealed interface VideoQueueMenuAction : MenuAction {
      * Video queue select action
      */
     object VideoQueueRemoveAction : MenuActionString(
-        iconRes = iconPackR.drawable.ic_x_medium_regular_outline,
+        icon = IconPack.Medium.Regular.Outline.X,
         descriptionRes = R.string.general_remove,
         testTag = TEST_TAG_VIDEO_QUEUE_REMOVE_ACTION
     ), VideoQueueMenuAction {

@@ -1,7 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.appbar
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -12,9 +10,11 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -69,24 +69,24 @@ class SelectModeAppBarTest {
 
     private fun getSampleToolbarActions(): List<MenuAction> {
         val item1 = object : MenuActionString(
-            iconRes = R.drawable.ic_down,
+            icon = IconPack.Medium.Thin.Outline.Play,
             descriptionRes = R.string.action_long,
             testTag = menuButtonDownload
         ) {}
         val item2 = object : MenuActionString(
-            iconRes = R.drawable.ic_menu,
+            icon = IconPack.Medium.Thin.Outline.Play,
             descriptionRes = R.string.discard,
             testTag = menuButtonDiscard
         ) {}
         val item3 = object :
             MenuActionString(
-                iconRes = R.drawable.ic_back,
+                icon = IconPack.Medium.Thin.Outline.Play,
                 descriptionRes = R.string.cancel_long,
                 testTag = menuButtonCancel
             ) {}
         val item4 =
             object : MenuActionString(
-                iconRes = iconPackR.drawable.ic_alert_circle_regular_medium_outline,
+                icon = IconPack.Medium.Thin.Outline.Play,
                 descriptionRes = R.string.action_long,
                 testTag = menuButtonAlert
             ) {}
@@ -101,7 +101,7 @@ class SelectModeAppBarTest {
         return getSampleToolbarActions().toMutableList().apply {
             add(object :
                 MenuActionString(
-                    iconRes = R.drawable.ic_favorite,
+                    icon = IconPack.Medium.Thin.Outline.Play,
                     descriptionRes = R.string.dialog_title,
                     testTag = menuButtonFav
                 ) {})

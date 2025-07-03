@@ -2,26 +2,25 @@ package mega.privacy.android.app.main.bottomsheets
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-
-import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
-import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.HomeNewTextFileMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeUploadFilesMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeUploadFolderMenuToolbarEvent
@@ -51,7 +50,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(R.string.upload_files),
-            icon = painterResource(iconPackR.drawable.ic_file_upload_medium_regular_outline),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FileUpload),
             dividerType = null,
             onActionClicked = {
                 Analytics.tracker.trackEvent(HomeUploadFilesMenuToolbarEvent)
@@ -61,7 +60,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(R.string.upload_folder),
-            icon = painterResource(iconPackR.drawable.ic_folder_arrow_medium_regular_outline),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FolderArrow),
             dividerType = DividerType.BigStartPadding,
             onActionClicked = {
                 Analytics.tracker.trackEvent(HomeUploadFolderMenuToolbarEvent)
@@ -71,7 +70,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(R.string.menu_scan_document),
-            icon = painterResource(iconPackR.drawable.ic_file_scan_medium_regular_outline),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FileScan),
             dividerType = null,
             onActionClicked = {
                 onScanDocumentClicked()
@@ -80,7 +79,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(R.string.menu_take_picture),
-            icon = painterResource(iconPackR.drawable.ic_camera_medium_regular_outline),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Camera),
             dividerType = DividerType.BigStartPadding,
             onActionClicked = {
                 onCaptureClicked()
@@ -89,7 +88,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(R.string.action_create_txt),
-            icon = painterResource(iconPackR.drawable.ic_file_plus_02_medium_regular_outline),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FilePlus02),
             dividerType = null,
             onActionClicked = {
                 Analytics.tracker.trackEvent(HomeNewTextFileMenuToolbarEvent)
@@ -105,7 +104,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(sharedResR.string.device_center_sync_add_new_syn_button_option),
-            icon = painterResource(iconPackR.drawable.ic_sync_01),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Sync01),
             dividerType = null,
             onActionClicked = {
                 onAddNewSyncClicked()
@@ -114,7 +113,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(sharedResR.string.device_center_sync_add_new_backup_button_option),
-            icon = painterResource(iconPackR.drawable.ic_database),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Database),
             dividerType = null,
             onActionClicked = {
                 onAddNewBackupClicked()
@@ -129,7 +128,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(R.string.fab_label_new_chat),
-            icon = painterResource(iconPackR.drawable.ic_message_chat_circle_medium_regular_outline),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.MessageChatCircle),
             dividerType = null,
             onActionClicked = {
                 onNewChatClicked()
