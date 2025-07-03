@@ -13,6 +13,7 @@ import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams
 import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
@@ -330,7 +331,10 @@ internal class BillingFacade @Inject constructor(
             val oldClient = billingClientRef.get()
             if (oldClient?.isReady == true) return@withLock oldClient
             val newClient = BillingClient.newBuilder(context)
-                .enablePendingPurchases()
+                .enablePendingPurchases(
+                    PendingPurchasesParams.newBuilder().enableOneTimeProducts().build()
+                )
+                .enableAutoServiceReconnection()
                 .setListener(this)
                 .build()
             return@withLock suspendCancellableCoroutine { continuation ->
