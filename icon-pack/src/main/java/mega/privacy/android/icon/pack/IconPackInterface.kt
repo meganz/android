@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
  *
  * Developers should add the icon properties they need to this interface.
  * The generator will read this interface and create the implementation.
+ * Once the icon is added to this interface, just build the icon-pack module and `IconPack` will be updated.
  *
  * The structure follows the pattern: Size -> Weight -> Style -> IconName
  * Where:
@@ -46,6 +47,27 @@ interface IconPackInterface {
     interface Medium {
         interface Regular {
             interface Outline {
+                val File02: ImageVector
+                val ClockUser: ImageVector
+                val Users: ImageVector
+                val CalendarArrowRight: ImageVector
+                val UserPlus: ImageVector
+                val Menu04: ImageVector
+                val Cloud: ImageVector
+                val ClockRotate: ImageVector
+                val Minimize02: ImageVector
+                val Maximize02: ImageVector
+                val Lock: ImageVector
+                val Screenshot: ImageVector
+                val ArrowLeft: ImageVector
+                val Menu01: ImageVector
+                val SearchLarge: ImageVector
+                val Edit: ImageVector
+                val Archive: ImageVector
+                val BellOff: ImageVector
+                val Bell: ImageVector
+                val VideoPlus: ImageVector
+                val ArchiveArrowUp: ImageVector
                 val MessageChatCircle: ImageVector
                 val Database: ImageVector
                 val Sync01: ImageVector
@@ -94,6 +116,7 @@ interface IconPackInterface {
             }
 
             interface Solid {
+                val Eye: ImageVector
                 val Link01: ImageVector
                 val Heart: ImageVector
                 val CheckCircle: ImageVector
@@ -120,7 +143,6 @@ interface IconPackInterface {
                 val ArrowsUpDown: ImageVector
                 val VPN: ImageVector
                 val LockKeyholeCircle: ImageVector
-                val PasswordManager: ImageVector
             }
 
             interface Solid {

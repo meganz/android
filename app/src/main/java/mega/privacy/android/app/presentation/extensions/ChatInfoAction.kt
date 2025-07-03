@@ -1,8 +1,9 @@
 package mega.privacy.android.app.presentation.extensions
 
+import androidx.compose.ui.graphics.vector.ImageVector
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ChatInfoAction
-import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.icon.pack.IconPack
 
 internal val ChatInfoAction.title: Int
     get() = when (this) {
@@ -42,18 +43,18 @@ internal val ChatInfoAction.description: Int?
         ChatInfoAction.EnabledEncryptedKeyRotation -> R.string.make_chat_private_option_text
     }
 
-internal val ChatInfoAction.icon: Int?
+internal val ChatInfoAction.icon: ImageVector?
     get() = when (this) {
-        ChatInfoAction.MeetingLink -> R.drawable.ic_link
+        ChatInfoAction.MeetingLink -> IconPack.Medium.Regular.Outline.Link01
         ChatInfoAction.ShareMeetingLink -> null
-        ChatInfoAction.ChatNotifications -> R.drawable.ic_bell
-        ChatInfoAction.WaitingRoom -> R.drawable.waiting_room_ic
-        ChatInfoAction.AllowNonHostAddParticipants -> R.drawable.ic_users
-        ChatInfoAction.ShareFiles, ChatInfoAction.Files -> R.drawable.ic_share_files
-        ChatInfoAction.ShareMeetingLinkNonHosts -> IconPackR.drawable.ic_link_01_medium_regular_solid
-        ChatInfoAction.ManageChatHistory, ChatInfoAction.ManageMeetingHistory -> R.drawable.ic_clear_chat_history
+        ChatInfoAction.ChatNotifications -> IconPack.Medium.Regular.Outline.Bell
+        ChatInfoAction.WaitingRoom -> IconPack.Medium.Regular.Outline.ClockUser
+        ChatInfoAction.AllowNonHostAddParticipants -> IconPack.Medium.Regular.Outline.Users
+        ChatInfoAction.ShareFiles, ChatInfoAction.Files -> IconPack.Medium.Regular.Outline.File02
+        ChatInfoAction.ShareMeetingLinkNonHosts -> IconPack.Medium.Regular.Outline.Link01
+        ChatInfoAction.ManageChatHistory, ChatInfoAction.ManageMeetingHistory -> IconPack.Medium.Regular.Outline.Eraser
         ChatInfoAction.EnableEncryptedKeyRotation -> null
         ChatInfoAction.EnabledEncryptedKeyRotation -> null
-        ChatInfoAction.Archive -> R.drawable.ic_chat_archive
-        ChatInfoAction.Unarchive -> R.drawable.ic_chat_archive_off
+        ChatInfoAction.Archive -> IconPack.Medium.Regular.Outline.Archive
+        ChatInfoAction.Unarchive -> IconPack.Medium.Regular.Outline.ArchiveArrowUp
     }

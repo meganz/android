@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -16,14 +15,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
  * Show a clickable button with the total amount of versions of this file
@@ -45,7 +45,7 @@ internal fun FileVersionsView(
         modifier = Modifier
             .sizeIn(minWidth = textStartPadding)
             .padding(start = 16.dp),
-        painter = painterResource(id = iconPackR.drawable.ic_clock_rotate_medium_regular_outline),
+        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ClockRotate),
         alignment = Alignment.CenterStart,
         contentDescription = "versions icon"
     )

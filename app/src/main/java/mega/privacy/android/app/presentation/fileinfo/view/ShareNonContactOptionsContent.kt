@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -24,7 +24,7 @@ import mega.privacy.android.app.presentation.contact.view.ContactItemView
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
@@ -68,14 +68,14 @@ fun ColumnScope.ShareNonContactOptionsContent(
     if (allowChangePermission) {
         MenuActionListTile(
             text = stringResource(id = R.string.file_properties_shared_folder_change_permissions),
-            icon = painterResource(id = iconPackR.drawable.ic_key_02_medium_regular_outline),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Key02),
             onActionClicked = onChangePermissionClicked,
             modifier = Modifier.testTag(SHARE_NON_CONTACT_OPTIONS_CHANGE_PERMISSION),
         )
     }
     MenuActionListTile(
         text = stringResource(id = R.string.context_remove),
-        icon = painterResource(id = iconPackR.drawable.ic_x_medium_regular_outline),
+        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
         isDestructive = true,
         onActionClicked = onRemoveClicked,
         modifier = Modifier.testTag(SHARE_NON_CONTACT_OPTIONS_REMOVE),

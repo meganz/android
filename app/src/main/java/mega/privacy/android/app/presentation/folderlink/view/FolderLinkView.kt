@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -73,6 +74,7 @@ import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.buttons.DebouncedButtonContainer
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
@@ -366,7 +368,7 @@ internal fun FolderLinkTopAppBar(
             if (showMenuActions) {
                 IconButton(onClick = onShareClicked) {
                     Image(
-                        painter = painterResource(id = iconPackR.drawable.ic_share_network_medium_regular_outline),
+                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ShareNetwork),
                         contentDescription = stringResource(id = R.string.general_share),
                         colorFilter = ColorFilter.tint(if (MaterialTheme.colors.isLight) Color.Black else Color.White)
                     )
@@ -377,7 +379,7 @@ internal fun FolderLinkTopAppBar(
                     onClick = onMoreClicked
                 ) {
                     Icon(
-                        Icons.Default.MoreVert,
+                        IconPack.Medium.Regular.Outline.MoreVertical,
                         contentDescription = stringResource(id = R.string.label_more),
                         tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
                     )

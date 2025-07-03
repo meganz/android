@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo.view.sharedinfo
 
-import mega.privacy.android.core.R as CoreUiR
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
@@ -11,9 +9,11 @@ import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.presentation.contact.view.ContactItemView
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_CONTACT_ITEM_SHARED
@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_CONTACT_ITEM
 import mega.privacy.android.app.presentation.preview.contactItemForPreviews
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
@@ -58,9 +59,10 @@ internal fun SharedInfoContactItemView(
             .testTag(TEST_TAG_CONTACT_ITEM_SHARED_DOTS),
         onClick = onMoreOptionsClick,
     ) {
-        Image(
-            painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
-            contentDescription = "More options"
+        MegaIcon(
+            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+            contentDescription = "More options",
+            tint = IconColor.Secondary,
         )
     }
 }

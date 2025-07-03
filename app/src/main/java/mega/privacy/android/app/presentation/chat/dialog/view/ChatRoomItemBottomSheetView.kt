@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.chat.dialog.view
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,10 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,7 +46,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.NoteToSelfChatRoomItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
@@ -204,7 +204,7 @@ internal fun ChatRoomItemBottomSheetView(
             if (item.isArchived) {
                 MenuItem(
                     modifier = Modifier.testTag("unarchive"),
-                    res = R.drawable.ic_chat_archive_off,
+                    icon = IconPack.Medium.Regular.Outline.ArchiveArrowUp,
                     text = R.string.general_unarchive,
                     description = "Unarchive",
                     onClick = onUnarchiveClick
@@ -214,7 +214,7 @@ internal fun ChatRoomItemBottomSheetView(
                     if (item.currentCallStatus == ChatRoomItemStatus.NotJoined) {
                         MenuItem(
                             modifier = Modifier.testTag("join_meeting"),
-                            res = R.drawable.join_sched_icon,
+                            icon = IconPack.Medium.Regular.Outline.VideoPlus,
                             text = R.string.meetings_list_join_scheduled_meeting_option,
                             description = "Join meeting",
                             onClick = onStartMeetingClick
@@ -222,7 +222,7 @@ internal fun ChatRoomItemBottomSheetView(
                     } else if (item.currentCallStatus == ChatRoomItemStatus.NotStarted) {
                         MenuItem(
                             modifier = Modifier.testTag("start_meeting"),
-                            res = R.drawable.start_sched_icon,
+                            icon = IconPack.Medium.Regular.Outline.Video,
                             text = R.string.meetings_list_start_scheduled_meeting_option,
                             description = "Start meeting",
                             onClick = onStartMeetingClick
@@ -233,7 +233,7 @@ internal fun ChatRoomItemBottomSheetView(
                     if (item.isRecurring() && !item.isCancelled) {
                         MenuItem(
                             modifier = Modifier.testTag("occurrences"),
-                            res = R.drawable.occurrences_icon,
+                            icon = IconPack.Medium.Regular.Outline.RotateCw,
                             text = R.string.meetings_list_recurring_meeting_occurrences_option,
                             description = "Occurrences",
                             onClick = onOccurrencesClick
@@ -244,7 +244,7 @@ internal fun ChatRoomItemBottomSheetView(
                     if (item.hasPermissions && item.schedId != null) {
                         MenuItem(
                             modifier = Modifier.testTag("edit"),
-                            res = R.drawable.ic_scheduled_meeting_edit,
+                            icon = IconPack.Medium.Regular.Outline.Edit,
                             text = R.string.title_edit_profile_info,
                             description = "Edit",
                             onClick = onEditClick
@@ -256,7 +256,7 @@ internal fun ChatRoomItemBottomSheetView(
                 if (isGroup || item.hasPermissions) {
                     MenuItem(
                         modifier = Modifier.testTag("info"),
-                        res = iconPackR.drawable.ic_info_medium_regular_outline,
+                        icon = IconPack.Medium.Regular.Outline.Info,
                         text = R.string.general_info,
                         description = "Info",
                         onClick = onInfoClick
@@ -268,7 +268,7 @@ internal fun ChatRoomItemBottomSheetView(
                 if (item.hasPermissions && (!isNoteToSelf || !item.isEmptyNoteToSelfChatRoom)) {
                     MenuItem(
                         modifier = Modifier.testTag("clear_chat_history"),
-                        res = R.drawable.ic_eraser,
+                        icon = IconPack.Medium.Regular.Outline.Eraser,
                         text = R.string.title_properties_chat_clear,
                         description = "Clear chat history",
                         onClick = onClearChatClick
@@ -280,7 +280,7 @@ internal fun ChatRoomItemBottomSheetView(
                     if (item.isMuted) {
                         MenuItem(
                             modifier = Modifier.testTag("unmute"),
-                            res = R.drawable.ic_bell,
+                            icon = IconPack.Medium.Regular.Outline.Bell,
                             text = R.string.general_unmute,
                             description = "Unmute",
                             onClick = onUnmuteClick
@@ -288,7 +288,7 @@ internal fun ChatRoomItemBottomSheetView(
                     } else {
                         MenuItem(
                             modifier = Modifier.testTag("mute"),
-                            res = R.drawable.ic_bell_off,
+                            icon = IconPack.Medium.Regular.Outline.BellOff,
                             text = R.string.general_mute,
                             description = "Mute",
                             onClick = onMuteClick
@@ -300,7 +300,7 @@ internal fun ChatRoomItemBottomSheetView(
 
                 MenuItem(
                     modifier = Modifier.testTag("archive"),
-                    res = R.drawable.ic_chat_archive,
+                    icon = IconPack.Medium.Regular.Outline.Archive,
                     text = R.string.general_archive,
                     description = "Archive",
                     onClick = {
@@ -313,7 +313,7 @@ internal fun ChatRoomItemBottomSheetView(
                         ChatDivider()
                         MenuItem(
                             modifier = Modifier.testTag("cancel"),
-                            res = R.drawable.ic_trash,
+                            icon = IconPack.Medium.Regular.Outline.Trash,
                             text = sharedR.string.general_dialog_cancel_button,
                             description = "Cancel",
                             tintRed = true,
@@ -325,7 +325,7 @@ internal fun ChatRoomItemBottomSheetView(
                         ChatDivider()
                         MenuItem(
                             modifier = Modifier.testTag("leave"),
-                            res = R.drawable.ic_log_out,
+                            icon = IconPack.Medium.Regular.Outline.LogOut02,
                             text = R.string.general_leave,
                             description = "Leave",
                             tintRed = true,
@@ -349,7 +349,7 @@ private fun canCancel(item: ChatRoomItem?): Boolean =
 @Composable
 private fun MenuItem(
     modifier: Modifier,
-    @DrawableRes res: Int,
+    icon: ImageVector,
     @StringRes text: Int,
     description: String,
     tintRed: Boolean = false,
@@ -375,7 +375,7 @@ private fun MenuItem(
                 .padding(start = 16.dp)
                 .size(24.dp)
                 .align(Alignment.CenterVertically),
-            painter = painterResource(id = res),
+            painter = rememberVectorPainter(icon),
             contentDescription = description,
             tint = iconColor
         )

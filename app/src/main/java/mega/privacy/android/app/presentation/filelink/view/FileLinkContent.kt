@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.filelink.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -12,16 +11,17 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
@@ -41,7 +41,7 @@ internal fun FileLinkContent(
                 .padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 12.dp)
         ) {
             Image(
-                painter = painterResource(id = iconPackR.drawable.ic_info_medium_regular_outline),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Info),
                 contentDescription = "info icon",
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
             )

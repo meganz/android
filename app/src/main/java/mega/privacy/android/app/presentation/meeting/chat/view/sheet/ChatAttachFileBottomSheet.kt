@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -14,15 +13,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -82,14 +82,14 @@ fun ChatAttachFileBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(id = R.string.attachment_upload_panel_from_cloud),
-            icon = painterResource(id = R.drawable.ic_pick_cloud_drive),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Cloud),
             dividerType = null,
             onActionClicked = { openCloudDrivePicker(context, cloudDriveLauncher) },
             modifier = Modifier.testTag(TEST_TAG_SEND_FROM_CLOUD)
         )
         MenuActionListTile(
             text = stringResource(id = R.string.upload_files),
-            icon = painterResource(id = iconPackR.drawable.ic_file_upload_medium_regular_outline),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FileUpload),
             dividerType = null,
             onActionClicked = { openFilePicker(localLauncher) },
             modifier = Modifier.testTag(TEST_TAG_SEND_FROM_LOCAL)

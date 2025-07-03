@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaButtonWithIcon
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
@@ -251,7 +253,7 @@ fun ParticipantInCallItem(
                                 IconButton(onClick = { onParticipantMoreOptionsClicked(participant) }) {
                                     Icon(
                                         modifier = Modifier.padding(start = 10.dp),
-                                        painter = painterResource(id = mega.privacy.android.core.R.drawable.ic_dots_vertical_grey),
+                                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
                                         contentDescription = "Three dots icon",
                                         tint = MaterialTheme.colors.grey_alpha_054_white_alpha_054
                                     )

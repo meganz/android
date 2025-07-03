@@ -24,9 +24,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
@@ -37,7 +37,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.R.drawable
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
@@ -170,7 +170,7 @@ private fun NoLocationInfo() {
         horizontalArrangement = Arrangement.Start,
     ) {
         Icon(
-            painter = painterResource(id = drawable.ic_info_medium_regular_outline),
+            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Info),
             contentDescription = null,
             tint = MaterialTheme.colors.black_white,
             modifier = Modifier

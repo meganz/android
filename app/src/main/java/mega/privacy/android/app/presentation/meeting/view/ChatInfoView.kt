@@ -1,9 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.view
 
 
-import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -50,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.contact.view.ContactStatusView
@@ -60,24 +59,31 @@ import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.extensions.title
+import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfView
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
+import mega.privacy.android.app.presentation.meeting.model.ChatInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ChatInfoUiState
+import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.WaitingRoomWarningDialog
 import mega.privacy.android.app.presentation.meeting.view.menuaction.ScheduledMeetingInfoMenuAction
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.legacy.core.ui.controls.text.MarqueeText
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -88,19 +94,15 @@ import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.red_300
 import mega.privacy.android.shared.original.core.ui.theme.red_600
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfView
-import mega.privacy.android.app.presentation.meeting.model.ChatInfoAction
-import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 
 /**
  * Scheduled meeting info View
@@ -882,7 +884,7 @@ private fun ScheduledMeetingDescriptionView(state: ChatInfoUiState) {
                             .wrapContentSize(Alignment.Center)
 
                     ) {
-                        Icon(painter = painterResource(id = R.drawable.ic_sched_meeting_description),
+                        Icon(painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Menu04),
                             contentDescription = "Scheduled meeting description icon",
                             tint = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054)
                     }
@@ -943,7 +945,7 @@ private fun ActionOption(
             ) {
                 action.icon?.let { icon ->
                     MegaIcon(
-                        painter = painterResource(id = icon),
+                        painter = rememberVectorPainter(icon),
                         contentDescription = "${action.name} icon",
                         tint = IconColor.Secondary,
                     )
@@ -1114,7 +1116,7 @@ private fun ParticipantItemView(
                 Row(modifier = Modifier.align(Alignment.Center)) {
                     ParticipantsPermissionView(participant)
                     Icon(modifier = Modifier.padding(start = 30.dp),
-                        painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
+                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
                         contentDescription = "Three dots icon",
                         tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
                 }
@@ -1139,21 +1141,21 @@ private fun ParticipantsPermissionView(participant: ChatParticipant) {
     when (participant.privilege) {
         ChatRoomPermission.Moderator -> {
             Icon(
-                painter = painterResource(id = R.drawable.ic_permissions_full_access),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.CheckCircle),
                 contentDescription = "Permissions icon",
                 tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
         }
 
         ChatRoomPermission.Standard -> {
             Icon(
-                painter = painterResource(id = R.drawable.ic_permissions_read_write),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Pen2),
                 contentDescription = "Permissions icon",
                 tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
         }
 
         ChatRoomPermission.ReadOnly -> {
             Icon(
-                painter = painterResource(id = R.drawable.ic_permissions_read_only),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.Eye),
                 contentDescription = "Permissions icon",
                 tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
         }

@@ -18,15 +18,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 
 /**
@@ -62,7 +63,7 @@ internal fun LocationInfoView(
         Spacer(modifier = Modifier.height(verticalSpace.dp))
     }
     Icon(
-        painter = painterResource(mega.privacy.android.icon.pack.R.drawable.ic_chevron_right_medium_regular_outline),
+        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ChevronRight),
         modifier = Modifier.padding(top = 4.dp),
         tint = MaterialTheme.colors.onPrimary,
         contentDescription = null,

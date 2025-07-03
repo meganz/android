@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.extensions
 
+import androidx.compose.ui.graphics.vector.ImageVector
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
+import mega.privacy.android.icon.pack.IconPack
 
 internal val ScheduleMeetingAction.title: Int
     get() = when (this) {
@@ -27,14 +29,14 @@ internal val ScheduleMeetingAction.description: Int?
         ScheduleMeetingAction.WaitingRoom -> R.string.meetings_schedule_meeting_waiting_room_description
     }
 
-internal val ScheduleMeetingAction.icon: Int?
+internal val ScheduleMeetingAction.icon: ImageVector?
     get() = when (this) {
-        ScheduleMeetingAction.Recurrence -> R.drawable.ic_recurrence
+        ScheduleMeetingAction.Recurrence -> IconPack.Medium.Regular.Outline.RotateCw
         ScheduleMeetingAction.EndRecurrence -> null
-        ScheduleMeetingAction.MeetingLink -> R.drawable.ic_meeting_link_info
-        ScheduleMeetingAction.AddParticipants -> R.drawable.add_participants
-        ScheduleMeetingAction.SendCalendarInvite -> R.drawable.ic_send_calendar
-        ScheduleMeetingAction.AllowNonHostAddParticipants -> R.drawable.ic_users
-        ScheduleMeetingAction.AddDescription -> R.drawable.ic_sched_meeting_description
-        ScheduleMeetingAction.WaitingRoom -> R.drawable.waiting_room_ic
+        ScheduleMeetingAction.MeetingLink -> IconPack.Medium.Regular.Outline.Link01
+        ScheduleMeetingAction.AddParticipants -> IconPack.Medium.Regular.Outline.UserPlus
+        ScheduleMeetingAction.SendCalendarInvite -> IconPack.Medium.Regular.Outline.CalendarArrowRight
+        ScheduleMeetingAction.AllowNonHostAddParticipants -> IconPack.Medium.Regular.Outline.Users
+        ScheduleMeetingAction.AddDescription -> IconPack.Medium.Regular.Outline.Menu04
+        ScheduleMeetingAction.WaitingRoom -> IconPack.Medium.Regular.Outline.ClockUser
     }

@@ -27,9 +27,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -46,6 +46,7 @@ import mega.privacy.android.app.presentation.shares.links.LinksComposeFragment
 import mega.privacy.android.app.presentation.shares.links.model.LinksUiState
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeFragment
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.appbar.TEST_TAG_APP_BAR
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
@@ -138,7 +139,7 @@ internal fun SharesScreen(
                                 },
                             ) {
                                 Icon(
-                                    painter = painterResource(if (isTabShown) mega.privacy.android.core.R.drawable.ic_menu else mega.privacy.android.core.R.drawable.ic_back),
+                                    painter = rememberVectorPainter(if (isTabShown) IconPack.Medium.Regular.Outline.Menu01 else IconPack.Medium.Regular.Outline.ArrowLeft),
                                     contentDescription = "Back button",
                                     tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
                                 )
@@ -152,7 +153,7 @@ internal fun SharesScreen(
                                 onClick = onSearchClick,
                             ) {
                                 Icon(
-                                    painter = painterResource(mega.privacy.android.legacy.core.ui.R.drawable.ic_search),
+                                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.SearchLarge),
                                     contentDescription = "Search button",
                                     tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
                                 )
@@ -163,7 +164,7 @@ internal fun SharesScreen(
                                     onClick = onMoreClick,
                                 ) {
                                     Icon(
-                                        painter = painterResource(R.drawable.ic_more),
+                                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
                                         contentDescription = "More button",
                                         tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
                                     )

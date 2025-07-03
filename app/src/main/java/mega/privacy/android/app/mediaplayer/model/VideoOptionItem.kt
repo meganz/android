@@ -1,8 +1,9 @@
 package mega.privacy.android.app.mediaplayer.model
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.vector.ImageVector
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
 
 /**
  * The enum class for video option
@@ -11,8 +12,7 @@ import mega.privacy.android.app.R
  * @param optionTitleId the option title sting id
  */
 enum class VideoOptionItem(
-    @get:DrawableRes
-    val iconId: Int,
+    val icon: ImageVector,
     @get:StringRes
     val optionTitleId: Int,
 ) {
@@ -20,7 +20,7 @@ enum class VideoOptionItem(
      * The snapshot option
      */
     VIDEO_OPTION_SNAPSHOT(
-        iconId = R.drawable.ic_screenshot,
+        icon = IconPack.Medium.Regular.Outline.Screenshot,
         optionTitleId = R.string.media_player_video_option_snapshot_title
     ),
 
@@ -28,7 +28,7 @@ enum class VideoOptionItem(
      * The lock option
      */
     VIDEO_OPTION_LOCK(
-        iconId = R.drawable.ic_lock,
+        icon = IconPack.Medium.Regular.Outline.Lock,
         optionTitleId = R.string.media_player_video_option_lock_title
     ),
 
@@ -36,7 +36,7 @@ enum class VideoOptionItem(
      * The zoom to fill option
      */
     VIDEO_OPTION_ZOOM_TO_FILL(
-        iconId = R.drawable.ic_full_screen,
+        icon = IconPack.Medium.Regular.Outline.Maximize02,
         optionTitleId = R.string.media_player_video_option_zoom_to_fill_title
     ),
 
@@ -44,7 +44,7 @@ enum class VideoOptionItem(
      * The original option
      */
     VIDEO_OPTION_ORIGINAL(
-        iconId = R.drawable.ic_original,
+        icon = IconPack.Medium.Regular.Outline.Minimize02,
         optionTitleId = R.string.media_player_video_option_original_title
     ),
 }

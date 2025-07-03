@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import android.text.format.DateFormat
 import androidx.activity.OnBackPressedCallback
@@ -49,9 +48,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -64,6 +63,7 @@ import androidx.compose.ui.unit.sp
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.icon
@@ -81,6 +81,7 @@ import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
@@ -97,8 +98,8 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -403,7 +404,7 @@ private fun AddDescriptionButton(
                         .wrapContentSize(Alignment.TopCenter)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_sched_meeting_description),
+                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Menu04),
                         contentDescription = "${stringResource(id = R.string.meetings_schedule_meeting_add_description_label)} icon",
                         tint = MaterialTheme.colors.textColorSecondary
                     )
@@ -656,7 +657,7 @@ private fun ActionOption(
                         .wrapContentSize(Alignment.TopCenter)
                 ) {
                     Icon(
-                        painter = painterResource(id = icon),
+                        painter = rememberVectorPainter(icon),
                         contentDescription = "${action.name} icon",
                         tint = MaterialTheme.colors.textColorSecondary
                     )
