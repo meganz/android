@@ -240,7 +240,11 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 val isCameraUploadsEnabledDeferred = async {
                     isCameraUploadsEnabledUseCase().takeIf { it }?.let {
                         val status = checkEnableCameraUploadsStatusUseCase()
-                        if (status == EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS) {
+                        val isEnableCameraUploads = status in listOf(
+                            EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS,
+                            EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
+                        )
+                        if (isEnableCameraUploads) {
                             true
                         } else {
                             onCameraUploadsStateChanged(false)

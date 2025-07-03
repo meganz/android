@@ -653,10 +653,15 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     private suspend fun isBusinessAccountActive(): Boolean {
         val status = checkEnableCameraUploadsStatusUseCase()
-        if (status != EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS) {
+        val isEnableCameraUploads = status in listOf(
+            EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS,
+            EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
+        )
+
+        if (!isEnableCameraUploads) {
             Timber.e("Business account expired")
         }
-        return status == EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
+        return isEnableCameraUploads
     }
 
     /**

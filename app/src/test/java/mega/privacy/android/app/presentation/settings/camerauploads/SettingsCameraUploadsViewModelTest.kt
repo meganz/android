@@ -698,9 +698,14 @@ internal class SettingsCameraUploadsViewModelTest {
                 verifyNoInteractions(checkEnableCameraUploadsStatusUseCase)
             }
 
+            val isAvailable = checkEnableCameraUploadsStatus in listOf(
+                EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS,
+                EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
+            )
+
             underTest.uiState.test {
                 val state = awaitItem()
-                if (isCameraUploadsEnabled && checkEnableCameraUploadsStatus == EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS) {
+                if (isCameraUploadsEnabled && isAvailable) {
                     assertThat(state.isCameraUploadsEnabled).isTrue()
                 } else {
                     assertThat(state.isCameraUploadsEnabled).isFalse()

@@ -1493,7 +1493,7 @@ internal class CameraUploadsWorkerTest {
     }
 
     @Test
-    fun `test that worker returns failure when the camera uploads status is SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT`() =
+    fun `test that worker returns success when the camera uploads status is SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT`() =
         runTest {
             setupDefaultCheckConditionMocks()
             whenever(checkEnableCameraUploadsStatusUseCase.invoke()).thenReturn(
@@ -1501,14 +1501,7 @@ internal class CameraUploadsWorkerTest {
             )
 
             val result = underTest.doWork()
-
-            verify(underTest).setProgress(
-                workDataOf(
-                    STATUS_INFO to FINISHED,
-                    FINISHED_REASON to CameraUploadsFinishedReason.BUSINESS_ACCOUNT_EXPIRED.name
-                )
-            )
-            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
 
     @Test
