@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.login.confirmemail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailUiState
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CancelCreateAccountUseCase
 import mega.privacy.android.domain.usecase.createaccount.MonitorAccountConfirmationUseCase
@@ -85,10 +88,14 @@ class ConfirmEmailViewModel @Inject constructor(
                     showSuccessSnackBar()
                 }
                 .onFailure { error ->
-                    Timber.e("Failed to re-sent the sign up link", error)
-                    if (error is MegaException) {
-                        error.errorString?.let {
-                            showSnackBar(it)
+                    Timber.e("Failed to re-send the sign up link: ${error.message}")
+                    when (error) {
+                        is CreateAccountException.AccountAlreadyExists -> {
+                            _uiState.update { it.copy(accountExistEvent = triggered) }
+                        }
+
+                        else -> {
+                            _uiState.update { it.copy(generalErrorEvent = triggered) }
                         }
                     }
                 }
@@ -147,6 +154,20 @@ class ConfirmEmailViewModel @Inject constructor(
      */
     internal fun onErrorMessageDisplayed() {
         _uiState.update { it.copy(message = null) }
+    }
+
+    /**
+     * Reset the account exist event
+     */
+    fun resetAccountExistEvent() {
+        _uiState.update { it.copy(accountExistEvent = consumed) }
+    }
+
+    /**
+     * Reset the general error event
+     */
+    fun resetGeneralErrorEvent() {
+        _uiState.update { it.copy(generalErrorEvent = consumed) }
     }
 
     /**

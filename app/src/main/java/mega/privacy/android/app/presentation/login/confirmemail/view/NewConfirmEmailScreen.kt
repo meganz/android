@@ -38,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
@@ -144,6 +145,28 @@ private fun NewConfirmEmailRoute(
             )
             viewModel.onErrorMessageDisplayed()
         }
+    }
+
+    val accountExistMessage =
+        stringResource(id = sharedR.string.sign_up_account_existed_error_message)
+    EventEffect(
+        event = uiState.accountExistEvent,
+        onConsumed = viewModel::resetAccountExistEvent
+    ) {
+        snackBarHostState.showSnackbar(
+            message = accountExistMessage
+        )
+    }
+
+    val generalErrorMessage = stringResource(id = sharedR.string.general_request_failed_message)
+    EventEffect(
+        event = uiState.generalErrorEvent,
+        onConsumed = viewModel::resetGeneralErrorEvent
+    ) {
+
+        snackBarHostState.showSnackbar(
+            message = generalErrorMessage
+        )
     }
 
     NewConfirmEmailScreen(

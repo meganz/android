@@ -34,7 +34,7 @@ import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginUnknownStatus
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
-import mega.privacy.android.domain.exception.account.AccountExistedException
+import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
@@ -774,7 +774,7 @@ class DefaultLoginRepositoryTest {
     }
 
     @Test
-    fun `resendSignupLink throws AccountExistedException when API_EEXIST error occurs`() = runTest {
+    fun `resendSignupLink throws AccountAlreadyExists when API_EEXIST error occurs`() = runTest {
         val email = "test@test.com"
         val fullName = "fullName"
         val error = mock<MegaError> {
@@ -795,12 +795,10 @@ class DefaultLoginRepositoryTest {
             )
         }
 
-        val exception = assertThrows<AccountExistedException> {
+        val exception = assertThrows<CreateAccountException.AccountAlreadyExists> {
             underTest.resendSignupLink(email, fullName)
         }
-
-        assertThat(exception.errorCode).isEqualTo(MegaError.API_EEXIST)
-        assertThat(exception.errorString).isEqualTo("Account already exists")
+        assertThat(exception.message).isEqualTo("Account already exists")
     }
 
     @Test

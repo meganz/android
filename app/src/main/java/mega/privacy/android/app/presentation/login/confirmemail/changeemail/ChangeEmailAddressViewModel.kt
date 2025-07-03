@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.exception.account.AccountExistedException
+import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.login.confirmemail.ResendSignUpLinkUseCase
 import javax.inject.Inject
@@ -37,11 +37,11 @@ internal class ChangeEmailAddressViewModel @Inject constructor(
         }
     }
 
-    fun resetGeneralErrorEvent() = viewModelScope.launch {
+    fun resetGeneralErrorEvent() {
         _uiState.update { it.copy(generalErrorEvent = consumed) }
     }
 
-    fun resetChangeEmailAddressSuccessEvent() = viewModelScope.launch {
+    fun resetChangeEmailAddressSuccessEvent() {
         _uiState.update { it.copy(changeEmailAddressSuccessEvent = consumed) }
     }
 
@@ -78,7 +78,7 @@ internal class ChangeEmailAddressViewModel @Inject constructor(
                 it.copy(changeEmailAddressSuccessEvent = triggered, isLoading = false)
             }
         }.onFailure { e ->
-            if (e is AccountExistedException) {
+            if (e is CreateAccountException.AccountAlreadyExists) {
                 _uiState.update {
                     it.copy(accountExistEvent = triggered, isLoading = false)
                 }
@@ -91,10 +91,8 @@ internal class ChangeEmailAddressViewModel @Inject constructor(
     }
 
     fun resetAccountExistEvent() {
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(accountExistEvent = consumed)
-            }
+        _uiState.update {
+            it.copy(accountExistEvent = consumed)
         }
     }
 }

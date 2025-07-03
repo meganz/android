@@ -2,12 +2,14 @@ package mega.privacy.android.app.presentation.login.confirmemail
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CancelCreateAccountUseCase
 import mega.privacy.android.domain.usecase.createaccount.MonitorAccountConfirmationUseCase
@@ -41,6 +43,7 @@ class ConfirmEmailViewModelTest {
     private lateinit var underTest: ConfirmEmailViewModel
 
     private val email = "test@test.com"
+    private val fullName = "Test User"
 
     @BeforeEach
     fun setUp() = runTest {
@@ -74,7 +77,6 @@ class ConfirmEmailViewModelTest {
     @Test
     fun `test that the registered email is updated after successfully resending the sign up link`() =
         runTest {
-            val fullName = "fullName"
             whenever(resendSignUpLinkUseCase(email = email, fullName = fullName)) doReturn email
 
             underTest.resendSignUpLink(email = email, fullName = fullName)
@@ -87,7 +89,6 @@ class ConfirmEmailViewModelTest {
     @Test
     fun `test that the success message is shown after successfully resending the sign up link`() =
         runTest {
-            val fullName = "fullName"
             whenever(resendSignUpLinkUseCase(email = email, fullName = fullName)) doReturn email
 
             underTest.resendSignUpLink(email = email, fullName = fullName)
@@ -98,24 +99,39 @@ class ConfirmEmailViewModelTest {
         }
 
     @Test
-    fun `test that the error message is shown when fails to resend the sign up link`() =
+    fun `test that account exist event is triggered when AccountAlreadyExists is thrown`() =
         runTest {
-            val fullName = "fullName"
-            val errorMessage = "errorMessage"
             whenever(
                 resendSignUpLinkUseCase(
                     email = email,
                     fullName = fullName
                 )
-            ) doThrow MegaException(
-                errorCode = 0,
-                errorString = errorMessage
-            )
+            ).thenAnswer {
+                throw CreateAccountException.AccountAlreadyExists
+            }
 
             underTest.resendSignUpLink(email = email, fullName = fullName)
 
             underTest.uiState.test {
-                assertThat(expectMostRecentItem().message).isEqualTo(errorMessage)
+                assertThat(expectMostRecentItem().accountExistEvent).isEqualTo(triggered)
+            }
+        }
+
+
+    @Test
+    fun `test that general error event is triggered when unknown exception is thrown`() =
+        runTest {
+            whenever(
+                resendSignUpLinkUseCase(
+                    email = email,
+                    fullName = fullName
+                )
+            ) doThrow RuntimeException("Unknown error")
+
+            underTest.resendSignUpLink(email = email, fullName = fullName)
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().generalErrorEvent).isEqualTo(triggered)
             }
         }
 

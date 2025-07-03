@@ -7,7 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.exception.account.AccountExistedException
+import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.login.confirmemail.ResendSignUpLinkUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -77,14 +77,16 @@ internal class ChangeEmailAddressViewModelTest {
         }
 
     @Test
-    fun `changeEmailAddress triggers account exist event when resendSignUpLinkUseCase throws AccountExistedException`() =
+    fun `changeEmailAddress triggers account exist event when resendSignUpLinkUseCase throws AccountAlreadyExists`() =
         runTest {
             val email = "existing.email@mega.co.nz"
             val fullName = "Full Name"
             savedStateHandle[EMAIL] = email
             savedStateHandle[FULL_NAME] = fullName
             whenever(resendSignUpLinkUseCase(email, fullName))
-                .thenThrow(AccountExistedException(1, ""))
+                .thenAnswer {
+                    throw CreateAccountException.AccountAlreadyExists
+                }
 
             underTest.changeEmailAddress()
 

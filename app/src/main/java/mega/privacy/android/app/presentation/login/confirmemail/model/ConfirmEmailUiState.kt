@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.login.confirmemail.model
 
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.domain.entity.ThemeMode
 
@@ -15,6 +17,8 @@ import mega.privacy.android.domain.entity.ThemeMode
  * @property isCreatingAccountCancelled True if the account creation was cancelled, false otherwise.
  * @property isAccountConfirmed True if the account has been confirmed, false otherwise.
  * @property themeMode The current theme mode.
+ * @property accountExistEvent Event triggered when account already exists.
+ * @property generalErrorEvent Event triggered when a general error occurs.
  */
 data class ConfirmEmailUiState(
     val isLoading: Boolean = false,
@@ -25,5 +29,7 @@ data class ConfirmEmailUiState(
     val message: String? = null,
     val isCreatingAccountCancelled: Boolean = false,
     val isAccountConfirmed: Boolean = false,
-    val themeMode: ThemeMode = ThemeMode.System
+    val themeMode: ThemeMode = ThemeMode.System,
+    val accountExistEvent: StateEvent = consumed,
+    val generalErrorEvent: StateEvent = consumed
 )
