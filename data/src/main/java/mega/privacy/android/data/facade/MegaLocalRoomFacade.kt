@@ -45,8 +45,8 @@ import mega.privacy.android.data.mapper.transfer.pending.InsertPendingTransferRe
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
-import mega.privacy.android.data.model.MediaPlaybackInfo
-import mega.privacy.android.data.model.MediaType
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
@@ -641,24 +641,14 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun monitorAllPlaybackInfos(): Flow<List<MediaPlaybackInfo>> =
         mediaPlaybackInfoDao.get().getAllPlaybackInfos().map { entities ->
             entities.map {
-                mediaPlaybackInfoMapper(
-                    it.mediaHandle,
-                    it.totalDuration,
-                    it.currentPosition,
-                    it.mediaType
-                )
+                mediaPlaybackInfoMapper(it)
             }
         }
 
     override suspend fun monitorAudioPlaybackInfos(): Flow<List<MediaPlaybackInfo>> =
         mediaPlaybackInfoDao.get().getAllPlaybackInfosByType(MediaType.Audio).map { entities ->
             entities.map {
-                mediaPlaybackInfoMapper(
-                    it.mediaHandle,
-                    it.totalDuration,
-                    it.currentPosition,
-                    it.mediaType
-                )
+                mediaPlaybackInfoMapper(it)
             }
         }
 

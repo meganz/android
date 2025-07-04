@@ -1,7 +1,8 @@
 package mega.privacy.android.data.mapper
 
-import mega.privacy.android.data.model.MediaPlaybackInfo
-import mega.privacy.android.data.model.MediaType
+import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import javax.inject.Inject
 
 /**
@@ -9,15 +10,10 @@ import javax.inject.Inject
  */
 class MediaPlaybackInfoMapper @Inject constructor() {
 
-    operator fun invoke(
-        mediaHandle: Long,
-        totalDuration: Long = 0L,
-        currentPosition: Long = 0L,
-        mediaType: MediaType,
-    ) = MediaPlaybackInfo(
-        mediaHandle = mediaHandle,
-        totalDuration = totalDuration,
-        currentPosition = currentPosition,
-        mediaType = mediaType
+    operator fun invoke(entity: MediaPlaybackInfoEntity) = MediaPlaybackInfo(
+        mediaHandle = entity.mediaHandle,
+        totalDuration = entity.totalDuration,
+        currentPosition = entity.currentPosition,
+        mediaType = entity.mediaType
     )
 }

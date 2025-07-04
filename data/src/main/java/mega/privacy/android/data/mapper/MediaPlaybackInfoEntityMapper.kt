@@ -1,7 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
-import mega.privacy.android.data.model.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import javax.inject.Inject
 
 /**

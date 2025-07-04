@@ -7,7 +7,7 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
-import mega.privacy.android.data.model.MediaType
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 
 @Dao
 internal interface MediaPlaybackInfoDao {

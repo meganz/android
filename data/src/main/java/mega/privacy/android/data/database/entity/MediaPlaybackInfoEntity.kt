@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import mega.privacy.android.data.database.MegaDatabaseConstant
-import mega.privacy.android.data.model.MediaType
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 
 /**
  * Entity representing media playback information in the database.

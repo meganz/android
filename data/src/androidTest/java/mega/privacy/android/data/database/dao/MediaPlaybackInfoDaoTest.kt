@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
-import mega.privacy.android.data.model.MediaType
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

@@ -56,8 +56,6 @@ import mega.privacy.android.data.mapper.transfer.pending.InsertPendingTransferRe
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
-import mega.privacy.android.data.model.MediaPlaybackInfo
-import mega.privacy.android.data.model.MediaType
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.backup.Backup
@@ -66,6 +64,8 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
@@ -1142,12 +1142,7 @@ internal class MegaLocalRoomFacadeTest {
                 )
             )
             testItems.forEachIndexed { index, item ->
-                whenever(
-                    mediaPlaybackInfoMapper(
-                        mediaHandle = testEntities[index].mediaHandle,
-                        mediaType = testEntities[index].mediaType
-                    )
-                ).thenReturn(item)
+                whenever(mediaPlaybackInfoMapper(testEntities[index])).thenReturn(item)
             }
             underTest.monitorAllPlaybackInfos().test {
                 assertThat(awaitItem()).isEqualTo(testItems)
@@ -1188,12 +1183,7 @@ internal class MegaLocalRoomFacadeTest {
             ).thenReturn(flowOf(audioEntities))
 
             testItems.forEachIndexed { index, item ->
-                whenever(
-                    mediaPlaybackInfoMapper(
-                        mediaHandle = testEntities[index].mediaHandle,
-                        mediaType = testEntities[index].mediaType
-                    )
-                ).thenReturn(item)
+                whenever(mediaPlaybackInfoMapper(testEntities[index])).thenReturn(item)
             }
             val audioItems = testItems.filter { it.mediaType == MediaType.Audio }
             underTest.monitorAudioPlaybackInfos().test {

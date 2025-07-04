@@ -1,7 +1,7 @@
 package mega.privacy.android.data.gateway
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.data.model.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact

@@ -1,6 +1,4 @@
-package mega.privacy.android.data.model
-
-import kotlinx.serialization.SerialName
+package mega.privacy.android.domain.entity.mediaplayer
 
 /**
  * Data class representing media playback information.

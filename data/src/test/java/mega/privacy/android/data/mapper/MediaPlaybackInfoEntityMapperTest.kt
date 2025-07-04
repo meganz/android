@@ -3,8 +3,8 @@ package mega.privacy.android.data.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
-import mega.privacy.android.data.model.MediaPlaybackInfo
-import mega.privacy.android.data.model.MediaType
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
