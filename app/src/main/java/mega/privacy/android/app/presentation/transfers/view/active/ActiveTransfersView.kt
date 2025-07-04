@@ -133,8 +133,8 @@ internal fun ActiveTransferItem(
         progress = progress.floatValue,
         speed = getSpeedString(
             areTransfersPaused = areTransfersPaused,
-            isTransferOverQuota = isTransferOverQuota,
-            isStorageOverQuota = isStorageOverQuota
+            isTransferOverQuota = isTransferOverQuota && isDownload,
+            isStorageOverQuota = isStorageOverQuota && isDownload.not(),
         ),
         isPaused = isPaused,
         isOverQuota = (isDownload && isTransferOverQuota) || (isDownload.not() && isStorageOverQuota),
