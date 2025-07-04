@@ -5,18 +5,17 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import mega.privacy.android.app.appstate.model.AuthState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
+import mega.privacy.android.shared.original.core.ui.utils.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -37,9 +36,8 @@ class AuthStateViewModel @Inject constructor(
             Timber.e(it, "Error while building auth state")
         }.onEach {
             Timber.d("AuthState emitted: $it")
-        }.stateIn(
+        }.asUiStateFlow(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(200),
             initialValue = AuthState.Loading(ThemeMode.System)
         )
     }

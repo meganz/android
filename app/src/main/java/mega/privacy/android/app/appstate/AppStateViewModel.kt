@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.stateIn
 import mega.privacy.android.app.appstate.model.AppState
 import mega.privacy.android.app.appstate.model.AppStateDataBuilder
 import mega.privacy.android.domain.entity.navigation.Flagged
@@ -25,6 +24,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.shared.original.core.ui.utils.asUiStateFlow
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 import timber.log.Timber
 import javax.inject.Inject
@@ -63,9 +63,8 @@ class AppStateViewModel @Inject constructor(
             Timber.e(it, "Error while building app state")
         }.onEach {
             Timber.d("AppState emitted: $it")
-        }.stateIn(
+        }.asUiStateFlow(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(200),
             initialValue = AppState.Loading
         )
     }
