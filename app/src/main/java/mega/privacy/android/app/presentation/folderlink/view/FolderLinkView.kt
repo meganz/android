@@ -228,13 +228,11 @@ internal fun FolderLinkView(
                             onSaveToDeviceClicked = { onSaveToDeviceClicked(null) }
                         )
                     }
-                    request?.let {
-                        AdsContainer(
-                            request = request,
-                            modifier = Modifier.fillMaxWidth(),
-                            isLoggedInUser = state.hasDbCredentials,
-                        )
-                    }
+                    AdsContainer(
+                        request = request,
+                        modifier = Modifier.fillMaxWidth(),
+                        isLoggedInUser = state.hasDbCredentials,
+                    )
                 }
             },
         ) { paddingValues ->

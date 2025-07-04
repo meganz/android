@@ -59,7 +59,7 @@ fun AdsContainer(
                         }
 
                         override fun onAdFailedToLoad(adError: LoadAdError) {
-                            Timber.w("Ad failed to load: ${adError.message}")
+                            Timber.w("Ad failed to load: ${adError.message} (${adError.code})")
                             onAdFailedToLoad()
                         }
 

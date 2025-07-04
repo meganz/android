@@ -148,13 +148,11 @@ internal fun FileLinkView(
                         onSaveToDeviceClicked = onSaveToDeviceClicked
                     )
                 }
-                request?.let { request ->
-                    AdsContainer(
-                        request = request,
-                        isLoggedInUser = viewState.hasDbCredentials,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+                AdsContainer(
+                    request = request,
+                    isLoggedInUser = viewState.hasDbCredentials,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
         },
         floatingActionButton = {
