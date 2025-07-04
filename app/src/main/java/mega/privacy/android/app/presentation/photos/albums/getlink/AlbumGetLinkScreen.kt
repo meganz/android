@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -74,7 +75,7 @@ import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.theme.accent_900
@@ -301,7 +302,7 @@ private fun AlbumGetLinkTopBar(
                 enabled = link.isNotBlank(),
                 content = {
                     Icon(
-                        painter = painterResource(id = iconPackR.drawable.ic_share_network_medium_regular_outline),
+                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ShareNetwork),
                         contentDescription = null,
                         tint = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
                     )

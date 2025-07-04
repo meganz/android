@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.qrcode
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -13,6 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -67,7 +68,7 @@ internal fun QRCodeTopBar(
                     onClick = onShare
                 ) {
                     Icon(
-                        painter = painterResource(id = iconPackR.drawable.ic_share_network_medium_regular_outline),
+                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ShareNetwork),
                         contentDescription = stringResource(id = R.string.general_share),
                         tint = MaterialTheme.colors.black_white
                     )
@@ -78,7 +79,7 @@ internal fun QRCodeTopBar(
                     onClick = onShowMoreClicked
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_dots_vertical_white),
+                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
                         contentDescription = stringResource(id = R.string.label_more),
                         tint = MaterialTheme.colors.black_white,
                     )

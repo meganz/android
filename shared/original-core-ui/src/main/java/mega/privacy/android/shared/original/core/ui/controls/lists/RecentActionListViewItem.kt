@@ -1,7 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.lists
 
-import mega.privacy.android.core.R as CoreR
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,11 +21,16 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.core.R as CoreR
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
@@ -40,7 +43,6 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.android.core.ui.theme.values.TextColor
 
 
 /**
@@ -193,7 +195,7 @@ fun RecentActionListViewItem(
 
             if (showMenuButton) {
                 Image(
-                    painter = painterResource(id = CoreR.drawable.ic_dots_vertical_grey),
+                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
                     contentDescription = "3 dots",
                     modifier = Modifier
                         .align(Alignment.CenterVertically)

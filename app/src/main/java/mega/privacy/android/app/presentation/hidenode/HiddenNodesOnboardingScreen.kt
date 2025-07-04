@@ -1,10 +1,7 @@
 package mega.privacy.android.app.presentation.hidenode
 
-import mega.privacy.android.icon.pack.R as RPack
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +40,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.icon.pack.R as RPack
 import mega.privacy.android.shared.original.core.ui.theme.accent_050
 import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.black
@@ -52,6 +52,7 @@ import mega.privacy.android.shared.original.core.ui.theme.teal_200_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.teal_300_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.HideNodeOnboardingScreenEvent
 import mega.privacy.mobile.analytics.event.HideNodeUpgradeScreenEvent
 
@@ -110,7 +111,7 @@ private fun HiddenNodesOnboardingAppBar(
                 onClick = onClickBack,
                 content = {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_close),
+                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
                         contentDescription = null,
                         tint = black.takeIf { isLight } ?: white,
                     )
@@ -200,7 +201,7 @@ private fun HiddenNodesOnboardingContent(
             Spacer(modifier = Modifier.height(32.dp))
 
             HiddenNodesBenefit(
-                icon = painterResource(id = RPack.drawable.ic_eye_off_medium_regular_outline),
+                icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.EyeOff),
                 title = stringResource(id = sharedR.string.hidden_nodes_title_hide_files_folders_feature),
                 description = stringResource(id = sharedR.string.hidden_nodes_description_hide_files_folders_feature),
             )
@@ -216,7 +217,7 @@ private fun HiddenNodesOnboardingContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             HiddenNodesBenefit(
-                icon = painterResource(id = RPack.drawable.ic_eye_medium_regular_outline),
+                icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Eye),
                 title = stringResource(id = sharedR.string.hidden_nodes_title_visible_shared_files),
                 description = stringResource(id = sharedR.string.hidden_nodes_description_visible_shared_files),
             )

@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.lists
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -36,6 +35,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -43,14 +43,15 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.icon.pack.R
+import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.images.GridThumbnailView
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
-import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.color_button_brand
 
@@ -150,7 +151,7 @@ fun NodeGridViewItem(
                                     .align(Alignment.Center)
                                     .size(32.dp)
                                     .testTag(VIDEO_PLAY_ICON_TEST_TAG),
-                                painter = painterResource(id = IconPackR.drawable.ic_play_circle_medium_regular_solid),
+                                painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.PlayCircle),
                                 contentDescription = "Play Icon",
                                 tint = DSTokens.colors.icon.onColor,
                             )
@@ -243,7 +244,7 @@ private fun Footer(
                     .padding(start = 8.dp)
                     .size(24.dp)
                     .testTag(GRID_VIEW_TAKEN_TEST_TAG),
-                painter = painterResource(id = R.drawable.ic_alert_triangle_medium_regular_outline),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.AlertTriangle),
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.color_button_brand),
                 contentDescription = "Taken Down",
             )
@@ -251,7 +252,7 @@ private fun Footer(
         val optionIconSize = 32.dp
         if (onMenuClick != null) {
             Icon(
-                painter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
                 tint = DSTokens.colors.icon.secondary,
                 contentDescription = "More",
                 modifier = Modifier
@@ -263,7 +264,7 @@ private fun Footer(
         } else {
             if (isSelected) {
                 Icon(
-                    painter = painterResource(id = IconPackR.drawable.ic_check_circle_medium_regular_solid),
+                    painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.CheckCircle),
                     tint = DSTokens.colors.icon.accent,
                     contentDescription = "Selected",
                     modifier = Modifier

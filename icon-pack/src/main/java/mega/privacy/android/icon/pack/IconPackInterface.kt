@@ -24,6 +24,8 @@ interface IconPackInterface {
     interface Small {
         interface Regular {
             interface Outline {
+                val Grid4: ImageVector
+                val ListSmall: ImageVector
                 val Image01: ImageVector
             }
 
@@ -47,6 +49,25 @@ interface IconPackInterface {
     interface Medium {
         interface Regular {
             interface Outline {
+                val EmojiSmile: ImageVector
+                val Play: ImageVector
+                val Pause: ImageVector
+                val FolderPlus01: ImageVector
+                val FolderGear01: ImageVector
+                val FolderOpen: ImageVector
+                val ZoomIn: ImageVector
+                val ExternalLink: ImageVector
+                val FolderIncoming: ImageVector
+                val UserRight: ImageVector
+                val RotateCcw: ImageVector
+                val RectangleStackPlus: ImageVector
+                val Eye: ImageVector
+                val EyeOff: ImageVector
+                val CornerUpRight: ImageVector
+                val TagSimple: ImageVector
+                val Heart: ImageVector
+                val HeartBroken: ImageVector
+                val AlertCircle: ImageVector
                 val File02: ImageVector
                 val ClockUser: ImageVector
                 val Users: ImageVector
@@ -116,6 +137,8 @@ interface IconPackInterface {
             }
 
             interface Solid {
+                val EmojiSmile: ImageVector
+                val PlayCircle: ImageVector
                 val Eye: ImageVector
                 val Link01: ImageVector
                 val Heart: ImageVector

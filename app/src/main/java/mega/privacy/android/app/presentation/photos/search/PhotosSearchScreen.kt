@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -60,6 +61,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.appbar.ExpandedSearchAppBar
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
@@ -559,7 +561,7 @@ private fun PhotoCard(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Icon(
-                        painter = painterResource(id = iconPackR.drawable.ic_more_vertical_medium_regular_outline),
+                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
                         contentDescription = null,
                         modifier = Modifier.clickable { onClickMenu(NodeId(photo.id)) },
                     )

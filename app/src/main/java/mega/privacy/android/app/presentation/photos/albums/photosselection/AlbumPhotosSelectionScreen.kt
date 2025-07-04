@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -65,7 +66,7 @@ import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.accent_900
@@ -200,7 +201,7 @@ fun AlbumPhotosSelectionScreen(
                     backgroundColor = accent_900,
                 ) {
                     Icon(
-                        painter = painterResource(id = iconPackR.drawable.ic_check_medium_regular_outline),
+                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Check),
                         contentDescription = null,
                         tint = white.takeIf { isLight } ?: black,
                     )

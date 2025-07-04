@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,6 +42,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.legacy.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
@@ -218,7 +220,7 @@ fun NodeListViewItem(
                 Image(
                     modifier = thumbNailModifier
                         .testTag(SELECTED_TEST_TAG),
-                    painter = painterResource(R.drawable.ic_select_folder),
+                    painter =rememberVectorPainter(IconPack.Medium.Regular.Solid.CheckCircle),
                     contentDescription = "Selected",
                 )
             } else {
@@ -251,7 +253,7 @@ fun NodeListViewItem(
             ) {
                 val (nodeInfo, threeDots, infoRow, availableOffline, sharesStatus) = createRefs()
                 Image(
-                    painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
+                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
                     contentDescription = "3 dots",
                     modifier = Modifier
                         .constrainAs(threeDots) {
@@ -282,7 +284,8 @@ fun NodeListViewItem(
 
                     MiddleEllipsisText(
                         text = name,
-                        modifier = Modifier.widthIn(max = if (isScreenOrientationLandscape()) 275.dp else 190.dp)
+                        modifier = Modifier
+                            .widthIn(max = if (isScreenOrientationLandscape()) 275.dp else 190.dp)
                             .testTag(NODE_TITLE_TEXT_TEST_TAG),
                         style = MaterialTheme.typography.subtitle1,
                         color = if (isTakenDown || isUnverifiedShare) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
@@ -293,7 +296,8 @@ fun NodeListViewItem(
                                 .size(10.dp)
                                 .background(
                                     shape = CircleShape, color = it
-                                ).testTag(LABEL_TEST_TAG)
+                                )
+                                .testTag(LABEL_TEST_TAG)
                         ) {}
                     }
                     if (isFavourite) {
@@ -301,7 +305,7 @@ fun NodeListViewItem(
                             alignment = Alignment.Center,
                             modifier = iconModifier
                                 .testTag(FAVORITE_TEST_TAG),
-                            painter = painterResource(id = R.drawable.ic_favorite),
+                            painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.Heart),
                             contentDescription = "Favorite",
 
                             )
@@ -312,7 +316,7 @@ fun NodeListViewItem(
                             modifier = iconModifier
                                 .size(16.dp)
                                 .testTag(EXPORTED_TEST_TAG),
-                            painter = painterResource(id = IconPackR.drawable.ic_link_01_medium_regular_solid),
+                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Link01),
                             contentDescription = "Link",
                             colorFilter = ColorFilter.tint(
                                 MaterialTheme.colors.textColorSecondary
@@ -324,7 +328,7 @@ fun NodeListViewItem(
                             alignment = Alignment.Center,
                             modifier = iconModifier
                                 .testTag(TAKEN_TEST_TAG),
-                            painter = painterResource(id = IconPackR.drawable.ic_alert_triangle_medium_regular_outline),
+                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.AlertTriangle),
                             contentDescription = "Taken Down",
                             colorFilter = ColorFilter.tint(color = MaterialTheme.colors.color_button_brand)
                         )
@@ -399,7 +403,8 @@ fun NodeListViewItem(
                             end.linkTo(threeDots.start)
                             visibility =
                                 if (nodeAvailableOffline) Visibility.Visible else Visibility.Gone
-                        }.testTag(AVAILABLE_OFFLINE_ICON_TEST_TAG),
+                        }
+                        .testTag(AVAILABLE_OFFLINE_ICON_TEST_TAG),
                     colorFilter = ColorFilter.tint(
                         MaterialTheme.colors.textColorSecondary
                     ),

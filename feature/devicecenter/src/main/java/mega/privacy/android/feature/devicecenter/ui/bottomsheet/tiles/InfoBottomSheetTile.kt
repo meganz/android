@@ -3,14 +3,14 @@ package mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.feature.devicecenter.R
-import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
@@ -33,7 +33,7 @@ internal fun InfoBottomSheetTile(
     MenuActionListTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_INFO),
         text = stringResource(R.string.device_center_bottom_sheet_item_info),
-        icon = painterResource(id = IconPackR.drawable.ic_info_medium_regular_outline),
+        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Info),
         dividerType = dividerType,
         onActionClicked = onActionClicked,
     )

@@ -11,6 +11,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -19,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.R
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -79,7 +80,7 @@ fun HeaderViewItem(
                     .size(16.dp)
                     .clickable { onEnterMediaDiscoveryClick() }
                     .testTag(MEDIA_DISCOVERY_TAG),
-                painter = painterResource(id = iconPackR.drawable.ic_image_01_small_regular_outline),
+                painter = rememberVectorPainter(IconPack.Small.Regular.Outline.Image01),
                 tint = IconColor.Secondary,
                 contentDescription = "Enter media discovery"
             )
@@ -93,9 +94,9 @@ fun HeaderViewItem(
                         onChangeViewTypeClick()
                     },
                 painter = if (isListView) {
-                    painterResource(id = iconPackR.drawable.ic_grid_4_small_regular_outline)
+                    rememberVectorPainter(IconPack.Small.Regular.Outline.Grid4)
                 } else {
-                    painterResource(id = iconPackR.drawable.ic_list_small_small_regular_outline)
+                    rememberVectorPainter(IconPack.Small.Regular.Outline.ListSmall)
                 },
                 tint = IconColor.Secondary,
                 contentDescription = "Toggle grid list"

@@ -12,7 +12,7 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -55,7 +55,7 @@ internal fun ContactInfoContent(
     Divider(color = MaterialTheme.colors.grey_alpha_012_white_alpha_012)
     MenuActionListTile(
         text = stringResource(id = R.string.title_incoming_shares_explorer),
-        icon = painterResource(id = R.drawable.ic_incoming_share),
+        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FolderIncoming),
     ) {
         Text(
             text = pluralStringResource(
@@ -68,7 +68,7 @@ internal fun ContactInfoContent(
     }
     MenuActionListTile(
         text = stringResource(id = R.string.title_properties_chat_notifications_contact),
-        icon = painterResource(id = R.drawable.ic_bell),
+        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Bell),
     ) {
         MegaSwitch(
             checked = true
@@ -76,22 +76,22 @@ internal fun ContactInfoContent(
     }
     MenuActionListTile(
         text = stringResource(id = R.string.title_properties_chat_share_contact),
-        icon = painterResource(id = iconPackR.drawable.ic_user_right_medium_regular_outline),
+        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.UserRight),
     )
     VerifyCredentialsView(isVerified = uiState.areCredentialsVerified)
     if (uiState.chatRoom != null) {
         MenuActionListTile(
             text = stringResource(id = R.string.title_chat_shared_files_info),
-            icon = painterResource(id = R.drawable.ic_shared_files),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FileUpload),
         )
         MenuActionListTile(
             text = stringResource(id = R.string.title_properties_manage_chat),
-            icon = painterResource(id = R.drawable.ic_clear_chat_history),
+            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Eraser),
         )
     }
     MenuActionListTile(
         text = stringResource(id = R.string.title_properties_remove_contact),
-        icon = painterResource(id = R.drawable.ic_remove_contact),
+        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
         isDestructive = true,
         dividerType = null,
     )

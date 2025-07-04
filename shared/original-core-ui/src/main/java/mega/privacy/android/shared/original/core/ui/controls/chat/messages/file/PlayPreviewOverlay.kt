@@ -11,10 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.chat.VideoDuration
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -37,7 +37,7 @@ fun PlayPreviewOverlay(
             .padding(4.dp)
             .size(32.dp),
         colorFilter = ColorFilter.tint(DSTokens.colors.icon.onColor),
-        painter = painterResource(id = IconPackR.drawable.ic_play_circle_medium_regular_solid),
+        painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.PlayCircle),
         contentDescription = "Play"
     )
     VideoDuration(

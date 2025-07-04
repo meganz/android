@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.folderlink.view
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -31,6 +32,8 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
@@ -38,7 +41,6 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionLis
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 internal fun FolderLinkBottomSheetView(
@@ -137,7 +139,8 @@ private fun BottomSheetContent(
 
         MenuActionListTile(
             modifier = Modifier.testTag(Constants.BOTTOM_SHEET_SAVE),
-            icon = painterResource(IconPackR.drawable.ic_download_medium_regular_outline),
+            icon = rememberVectorPainter(
+                IconPack.Medium.Regular.Outline.Download),
             text = stringResource(R.string.general_save_to_device),
             onActionClicked = {
                 coroutineScope.launch { modalSheetState.hide() }
@@ -147,7 +150,7 @@ private fun BottomSheetContent(
         if (showImport) {
             MenuActionListTile(
                 modifier = Modifier.testTag(Constants.BOTTOM_SHEET_IMPORT),
-                icon = painterResource(R.drawable.ic_cloud_upload_medium_regular_outline),
+                icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.CloudUpload),
                 text = stringResource(R.string.add_to_cloud),
                 onActionClicked = {
                     coroutineScope.launch { modalSheetState.hide() }

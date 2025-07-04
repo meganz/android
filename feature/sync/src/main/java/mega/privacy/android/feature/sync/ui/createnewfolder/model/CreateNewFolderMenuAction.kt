@@ -1,9 +1,9 @@
 package mega.privacy.android.feature.sync.ui.createnewfolder.model
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
-import mega.privacy.android.icon.pack.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
@@ -14,7 +14,7 @@ import javax.inject.Inject
 class CreateNewFolderMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() =
-        painterResource(id = R.drawable.ic_folder_plus_01_medium_regular_outline)
+        rememberVectorPainter(IconPack.Medium.Regular.Outline.FolderPlus01)
 
     @Composable
     override fun getDescription() =

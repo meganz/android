@@ -11,13 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
-import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.status.MegaStatusIndicator
 import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
@@ -96,7 +97,7 @@ fun StatusListViewItem(
             }
             if (onMoreClicked != null) {
                 Icon(
-                    painter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
+                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
                     contentDescription = "More",
                     modifier = Modifier
                         .size(24.dp)

@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.documentscanner.groups
 
-import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.resources.R as SharedR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -26,10 +24,10 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextRange
@@ -38,15 +36,17 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
-import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.resources.R as SharedR
 
 /**
  * A Composable Group allowing Users to change the filename of the scanned Document/s
@@ -171,7 +171,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
                     .clickable(enabled = !isFocused) { focusRequester.requestFocus() }
                     .testTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_EDIT_FILENAME_IMAGE)
                     .alpha(if (isFocused) 0f else 1f),
-                painter = painterResource(IconPackR.drawable.ic_pen_02_medium_regular_outline),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Pen2),
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.accent_900_accent_050),
                 contentDescription = "Edit Filename Image"
             )

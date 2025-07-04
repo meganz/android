@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
@@ -44,6 +45,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -130,7 +132,9 @@ fun ChatInputTextToolbar(
                     .clickable {
                         isInputExpanded = !isInputExpanded
                     },
-                painter = painterResource(id = if (isInputExpanded) R.drawable.ic_collapse_text_input else R.drawable.ic_expand_text_input),
+                painter = rememberVectorPainter(
+                    if (isInputExpanded) IconPack.Medium.Regular.Outline.Minimize02 else IconPack.Medium.Regular.Outline.Maximize02
+                ),
                 contentDescription = "Attachment icon",
                 tint = DSTokens.colors.icon.secondary,
             )
@@ -270,7 +274,8 @@ fun ChatInputTextToolbar(
                     maxOf(
                         keyboardHeight,
                         WindowInsets.ime.asPaddingValues().calculateBottomPadding()
-                                - WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                                - WindowInsets.navigationBars.asPaddingValues()
+                            .calculateBottomPadding()
                     )
                 MegaEmojiPickerView(
                     onEmojiPicked = {

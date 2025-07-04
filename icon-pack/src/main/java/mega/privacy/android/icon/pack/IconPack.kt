@@ -8,6 +8,7 @@
 package mega.privacy.android.icon.pack
 
 import androidx.compose.ui.graphics.vector.ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineAlertCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineAlertTriangleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineArchiveArrowUpImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineArchiveImageVector
@@ -27,18 +28,29 @@ import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineClockUse
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineCloudImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineCloudUploadImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineCopy01ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineCornerUpRightImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineDatabaseImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineDownloadImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineEditImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineEmojiSmileImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineEraserImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineExternalLinkImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineEyeImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineEyeOffImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineFile02ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineFilePlus02ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineFileScanImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineFileUploadImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineFolderArrowImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineFolderGear01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineFolderImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineFolderIncomingImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineFolderOpenImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineFolderPlus01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineFolderUsersImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineGearSixImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineHeartBrokenImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineHeartImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineHelpCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineInfoImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineKey02ImageVector
@@ -54,8 +66,12 @@ import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineMessageC
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineMinimize02ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineMoreVerticalImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineMoveImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlinePauseImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlinePen2ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlinePhone01ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlinePlayImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineRectangleStackPlusImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineRotateCcwImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineRotateCwImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineScreenshotImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineSearchLargeImageVector
@@ -64,8 +80,10 @@ import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineShieldIn
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineSlashCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineSlidersVertical02ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineSync01ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineTagSimpleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineTrashImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineUserPlusImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineUserRightImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineUsersImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineVideoImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineVideoPlusImageVector
@@ -74,10 +92,13 @@ import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineXImageVe
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineZapAutoImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineZapImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineZapOffImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularOutlineZoomInImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidCheckCircleImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidEmojiSmileImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidEyeImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidHeartImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidLink01ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidPlayCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArrowsUpDownImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCheckStackImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCloudImageVector
@@ -96,7 +117,9 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTrashImageV
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVPNImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlinefileQuestion01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidCheckSquareImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallRegularOutlineGrid4ImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallRegularOutlineImage01ImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallRegularOutlineListSmallImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowDownImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowUpImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineQueueLineImageVector
@@ -105,6 +128,9 @@ public object IconPack : IconPackInterface {
     public object Medium : IconPackInterface.Medium {
         public object Regular : IconPackInterface.Medium.Regular {
             public object Outline : IconPackInterface.Medium.Regular.Outline {
+                override val AlertCircle: ImageVector by lazy {
+                        createMediumRegularOutlineAlertCircleImageVector() }
+
                 override val AlertTriangle: ImageVector by lazy {
                         createMediumRegularOutlineAlertTriangleImageVector() }
 
@@ -162,6 +188,9 @@ public object IconPack : IconPackInterface {
                 override val Copy01: ImageVector by lazy {
                         createMediumRegularOutlineCopy01ImageVector() }
 
+                override val CornerUpRight: ImageVector by lazy {
+                        createMediumRegularOutlineCornerUpRightImageVector() }
+
                 override val Database: ImageVector by lazy {
                         createMediumRegularOutlineDatabaseImageVector() }
 
@@ -171,8 +200,19 @@ public object IconPack : IconPackInterface {
                 override val Edit: ImageVector by lazy { createMediumRegularOutlineEditImageVector()
                         }
 
+                override val EmojiSmile: ImageVector by lazy {
+                        createMediumRegularOutlineEmojiSmileImageVector() }
+
                 override val Eraser: ImageVector by lazy {
                         createMediumRegularOutlineEraserImageVector() }
+
+                override val ExternalLink: ImageVector by lazy {
+                        createMediumRegularOutlineExternalLinkImageVector() }
+
+                override val Eye: ImageVector by lazy { createMediumRegularOutlineEyeImageVector() }
+
+                override val EyeOff: ImageVector by lazy {
+                        createMediumRegularOutlineEyeOffImageVector() }
 
                 override val File02: ImageVector by lazy {
                         createMediumRegularOutlineFile02ImageVector() }
@@ -192,11 +232,29 @@ public object IconPack : IconPackInterface {
                 override val FolderArrow: ImageVector by lazy {
                         createMediumRegularOutlineFolderArrowImageVector() }
 
+                override val FolderGear01: ImageVector by lazy {
+                        createMediumRegularOutlineFolderGear01ImageVector() }
+
+                override val FolderIncoming: ImageVector by lazy {
+                        createMediumRegularOutlineFolderIncomingImageVector() }
+
+                override val FolderOpen: ImageVector by lazy {
+                        createMediumRegularOutlineFolderOpenImageVector() }
+
+                override val FolderPlus01: ImageVector by lazy {
+                        createMediumRegularOutlineFolderPlus01ImageVector() }
+
                 override val FolderUsers: ImageVector by lazy {
                         createMediumRegularOutlineFolderUsersImageVector() }
 
                 override val GearSix: ImageVector by lazy {
                         createMediumRegularOutlineGearSixImageVector() }
+
+                override val Heart: ImageVector by lazy {
+                        createMediumRegularOutlineHeartImageVector() }
+
+                override val HeartBroken: ImageVector by lazy {
+                        createMediumRegularOutlineHeartBrokenImageVector() }
 
                 override val HelpCircle: ImageVector by lazy {
                         createMediumRegularOutlineHelpCircleImageVector() }
@@ -243,11 +301,23 @@ public object IconPack : IconPackInterface {
                 override val Move: ImageVector by lazy { createMediumRegularOutlineMoveImageVector()
                         }
 
+                override val Pause: ImageVector by lazy {
+                        createMediumRegularOutlinePauseImageVector() }
+
                 override val Pen2: ImageVector by lazy { createMediumRegularOutlinePen2ImageVector()
                         }
 
                 override val Phone01: ImageVector by lazy {
                         createMediumRegularOutlinePhone01ImageVector() }
+
+                override val Play: ImageVector by lazy { createMediumRegularOutlinePlayImageVector()
+                        }
+
+                override val RectangleStackPlus: ImageVector by lazy {
+                        createMediumRegularOutlineRectangleStackPlusImageVector() }
+
+                override val RotateCcw: ImageVector by lazy {
+                        createMediumRegularOutlineRotateCcwImageVector() }
 
                 override val RotateCw: ImageVector by lazy {
                         createMediumRegularOutlineRotateCwImageVector() }
@@ -273,11 +343,17 @@ public object IconPack : IconPackInterface {
                 override val Sync01: ImageVector by lazy {
                         createMediumRegularOutlineSync01ImageVector() }
 
+                override val TagSimple: ImageVector by lazy {
+                        createMediumRegularOutlineTagSimpleImageVector() }
+
                 override val Trash: ImageVector by lazy {
                         createMediumRegularOutlineTrashImageVector() }
 
                 override val UserPlus: ImageVector by lazy {
                         createMediumRegularOutlineUserPlusImageVector() }
+
+                override val UserRight: ImageVector by lazy {
+                        createMediumRegularOutlineUserRightImageVector() }
 
                 override val Users: ImageVector by lazy {
                         createMediumRegularOutlineUsersImageVector() }
@@ -300,11 +376,17 @@ public object IconPack : IconPackInterface {
 
                 override val ZapOff: ImageVector by lazy {
                         createMediumRegularOutlineZapOffImageVector() }
+
+                override val ZoomIn: ImageVector by lazy {
+                        createMediumRegularOutlineZoomInImageVector() }
             }
 
             public object Solid : IconPackInterface.Medium.Regular.Solid {
                 override val CheckCircle: ImageVector by lazy {
                         createMediumRegularSolidCheckCircleImageVector() }
+
+                override val EmojiSmile: ImageVector by lazy {
+                        createMediumRegularSolidEmojiSmileImageVector() }
 
                 override val Eye: ImageVector by lazy { createMediumRegularSolidEyeImageVector() }
 
@@ -313,6 +395,9 @@ public object IconPack : IconPackInterface {
 
                 override val Link01: ImageVector by lazy {
                         createMediumRegularSolidLink01ImageVector() }
+
+                override val PlayCircle: ImageVector by lazy {
+                        createMediumRegularSolidPlayCircleImageVector() }
             }
         }
 
@@ -378,8 +463,14 @@ public object IconPack : IconPackInterface {
     public object Small : IconPackInterface.Small {
         public object Regular : IconPackInterface.Small.Regular {
             public object Outline : IconPackInterface.Small.Regular.Outline {
+                override val Grid4: ImageVector by lazy {
+                        createSmallRegularOutlineGrid4ImageVector() }
+
                 override val Image01: ImageVector by lazy {
                         createSmallRegularOutlineImage01ImageVector() }
+
+                override val ListSmall: ImageVector by lazy {
+                        createSmallRegularOutlineListSmallImageVector() }
             }
         }
 

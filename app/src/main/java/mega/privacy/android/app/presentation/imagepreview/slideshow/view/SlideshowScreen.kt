@@ -39,9 +39,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
@@ -75,7 +75,7 @@ import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
-import mega.privacy.android.icon.pack.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -325,7 +325,9 @@ private fun SlideshowBottomBar(
             ) {
                 IconButton(onClick = onPlayOrPauseSlideshow) {
                     Icon(
-                        painter = painterResource(id = if (isPlaying) R.drawable.ic_pause_medium_regular_outline else R.drawable.ic_play_medium_regular_outline),
+                        painter = rememberVectorPainter(
+                            if (isPlaying) IconPack.Medium.Regular.Outline.Pause else IconPack.Medium.Regular.Outline.Play
+                        ),
                         contentDescription = null,
                         tint = MaterialTheme.colors.black_white,
                         modifier = Modifier.size(26.dp)

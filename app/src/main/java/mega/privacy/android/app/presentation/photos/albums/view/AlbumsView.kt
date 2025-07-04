@@ -53,6 +53,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -82,7 +83,7 @@ import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.theme.accent_050
@@ -373,7 +374,7 @@ fun AlbumsView(
                                     .matchParentSize()
                             )
                             Icon(
-                                painter = painterResource(id = iconPackR.drawable.ic_link_01_medium_regular_solid),
+                                painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.Link01),
                                 contentDescription = "${(album.title as AlbumTitle.StringTitle).title} Exported",
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)

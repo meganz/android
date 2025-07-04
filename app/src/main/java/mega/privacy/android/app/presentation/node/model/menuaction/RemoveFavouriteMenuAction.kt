@@ -1,10 +1,10 @@
 package mega.privacy.android.app.presentation.node.model.menuaction
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ import javax.inject.Inject
 class RemoveFavouriteMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() =
-        painterResource(id = iconPackR.drawable.ic_heart_broken_medium_regular_outline)
+        rememberVectorPainter(IconPack.Medium.Regular.Outline.HeartBroken)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.file_properties_unfavourite)

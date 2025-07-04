@@ -24,6 +24,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -45,7 +46,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
-import mega.privacy.android.icon.pack.R as IconPack
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
@@ -230,7 +231,7 @@ internal fun ImagePreviewBottomSheet(
             ) {
                 if (isInfoMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_alert_circle_regular_medium_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.AlertCircle),
                         text = stringResource(id = R.string.general_info),
                         onActionClicked = onClickInfo,
                         dividerType = null,
@@ -239,11 +240,11 @@ internal fun ImagePreviewBottomSheet(
                 }
                 if (isFavouriteMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(
-                            id = if (imageNode.isFavourite) {
-                                IconPack.drawable.ic_heart_broken_medium_regular_outline
+                        icon = rememberVectorPainter(
+                            if (imageNode.isFavourite) {
+                                IconPack.Medium.Regular.Outline.HeartBroken
                             } else {
-                                IconPack.drawable.ic_heart_medium_regular_outline
+                                IconPack.Medium.Regular.Outline.Heart
                             }
                         ),
                         text = if (imageNode.isFavourite) {
@@ -259,7 +260,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isLabelMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_tag_simple_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.TagSimple),
                         text = stringResource(id = R.string.file_properties_label),
                         onActionClicked = onClickLabel,
                         dividerType = null,
@@ -291,7 +292,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isDisputeMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_taken_down_bottom_sheet),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.AlertTriangle),
                         text = stringResource(id = R.string.dispute_takendown_file),
                         onActionClicked = onClickDispute,
                         dividerType = null,
@@ -301,7 +302,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isOpenWithMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = mega.privacy.android.icon.pack.R.drawable.ic_external_link_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.ExternalLink),
                         text = stringResource(id = R.string.external_play),
                         onActionClicked = onClickOpenWith,
                         dividerType = null,
@@ -313,7 +314,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isForwardMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_corner_up_right_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.CornerUpRight),
                         text = stringResource(id = R.string.forward_menu_item),
                         onActionClicked = onClickForward,
                         dividerType = null,
@@ -323,7 +324,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isSaveToDeviceMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_download_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Download),
                         text = stringResource(id = R.string.general_save_to_device),
                         onActionClicked = onClickSaveToDevice,
                         dividerType = null,
@@ -333,7 +334,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isImportMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_cloud_upload_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.CloudUpload),
                         text = stringResource(id = R.string.general_import),
                         onActionClicked = onClickImport,
                         dividerType = null,
@@ -344,7 +345,7 @@ internal fun ImagePreviewBottomSheet(
                 if (isAvailableOfflineMenuVisible) {
                     MenuActionListTile(
                         text = stringResource(id = R.string.file_properties_available_offline),
-                        icon = painterResource(id = IconPack.drawable.ic_arrow_down_circle_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.ArrowDownCircle),
                         dividerType = null,
                         modifier = Modifier.testTag(
                             IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_AVAILABLE_OFFLINE
@@ -361,7 +362,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isGetLinkMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_link_01_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Link01),
                         text = if (imageNode.exportedData != null) {
                             stringResource(id = R.string.edit_link_option)
                         } else {
@@ -378,7 +379,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isGetLinkMenuVisible && imageNode.exportedData != null) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_link_off_01_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.LinkOff01),
                         text = stringResource(id = R.string.context_remove_link_menu),
                         onActionClicked = onClickRemoveLink,
                         dividerType = null,
@@ -388,7 +389,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isSendToChatMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_message_arrow_up_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.MessageArrowUp),
                         text = stringResource(id = R.string.context_send_file_to_chat),
                         onActionClicked = onClickSendToChat,
                         dividerType = null,
@@ -398,7 +399,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isShareMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_share_network_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.ShareNetwork),
                         text = stringResource(id = R.string.general_share),
                         onActionClicked = onClickShare,
                         dividerType = null,
@@ -410,7 +411,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isRenameMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_pen_2_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Pen2),
                         text = stringResource(id = R.string.context_rename),
                         onActionClicked = onClickRename,
                         dividerType = null,
@@ -420,7 +421,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType != null && (!accountType.isPaid || isBusinessAccountExpired || (isHideMenuVisible && isHiddenNodesOnboarded != null))) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_eye_off_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.EyeOff),
                         text = stringResource(id = R.string.general_hide_node),
                         onActionClicked = onClickHide,
                         dividerType = null,
@@ -436,7 +437,7 @@ internal fun ImagePreviewBottomSheet(
                                 )
                             } else {
                                 Icon(
-                                    painter = painterResource(id = IconPack.drawable.ic_help_circle_medium_regular_outline),
+                                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.HelpCircle),
                                     contentDescription = null,
                                     modifier = Modifier
                                         .size(24.dp)
@@ -450,7 +451,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType?.isPaid == true && !isBusinessAccountExpired && isUnhideMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_eye_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Eye),
                         text = stringResource(id = R.string.general_unhide_node),
                         onActionClicked = onClickUnhide,
                         dividerType = null,
@@ -460,7 +461,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isMoveMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_move_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Move),
                         text = stringResource(id = R.string.general_move),
                         onActionClicked = onClickMove,
                         dividerType = null,
@@ -470,7 +471,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isAddToAlbumMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_add_to_album),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.RectangleStackPlus),
                         text = stringResource(id = SharedResources.string.album_add_to_image),
                         onActionClicked = onClickAddToAlbum,
                         dividerType = null,
@@ -481,7 +482,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isCopyMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_copy_01_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Copy01),
                         text = stringResource(id = R.string.context_copy),
                         onActionClicked = onClickCopy,
                         dividerType = null,
@@ -491,7 +492,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isRestoreMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_rotate_ccw_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.RotateCcw),
                         text = stringResource(id = R.string.context_restore),
                         onActionClicked = onClickRestore,
                         dividerType = null,
@@ -501,7 +502,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isRemoveMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_x_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
                         text = stringResource(id = R.string.context_remove),
                         isDestructive = true,
                         onActionClicked = onClickRemove,
@@ -512,7 +513,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isRemoveOfflineMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_x_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
                         text = stringResource(id = R.string.context_delete_offline),
                         onActionClicked = { onSwitchAvailableOffline(false) },
                         isDestructive = true,
@@ -523,7 +524,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isMoveToRubbishBinMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = IconPack.drawable.ic_trash_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Trash),
                         text = stringResource(id = R.string.context_move_to_trash),
                         onActionClicked = onClickMoveToRubbishBin,
                         dividerType = null,

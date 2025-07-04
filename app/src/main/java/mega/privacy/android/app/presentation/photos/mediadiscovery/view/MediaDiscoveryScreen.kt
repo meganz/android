@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,7 +53,7 @@ import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
@@ -294,7 +295,7 @@ private fun MDHeader(
                 } else {
                     IconButton(onClick = onSaveToDeviceClicked) {
                         Icon(
-                            painter = painterResource(id = iconPackR.drawable.ic_download_medium_regular_outline),
+                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Download),
                             contentDescription = null,
                             tint = tealIconTint(),
                         )
@@ -303,7 +304,7 @@ private fun MDHeader(
                     if (showImportMenu) {
                         IconButton(onClick = onImportClicked) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_cloud_upload_medium_regular_outline),
+                                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.CloudUpload),
                                 contentDescription = null,
                                 tint = tealIconTint(),
                             )

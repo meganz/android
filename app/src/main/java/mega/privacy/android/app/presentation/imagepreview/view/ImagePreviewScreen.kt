@@ -68,6 +68,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -109,7 +110,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.layouts.navigationBarsLandscapePadding
@@ -923,7 +924,7 @@ private fun ImagePreviewTopBar(
                 if (isForwardMenuVisible) {
                     IconButton(onClick = onClickForward) {
                         Icon(
-                            painter = painterResource(id = iconPackR.drawable.ic_corner_up_right_medium_regular_outline),
+                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.CornerUpRight),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_FORWARD),
@@ -934,7 +935,7 @@ private fun ImagePreviewTopBar(
                 if (isSaveToDeviceMenuVisible) {
                     IconButton(onClick = onClickSaveToDevice) {
                         Icon(
-                            painter = painterResource(id = iconPackR.drawable.ic_download_medium_regular_outline),
+                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Download),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SAVE_TO_DEVICE),
@@ -945,7 +946,7 @@ private fun ImagePreviewTopBar(
                 if (isManageLinkMenuVisible) {
                     IconButton(onClick = onClickGetLink) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_link),
+                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Link01),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MANAGE_LINK),
@@ -956,7 +957,7 @@ private fun ImagePreviewTopBar(
                 if (isMagnifierMenuVisible) {
                     IconButton(onClick = onClickMagnifier) {
                         Icon(
-                            painter = painterResource(id = iconPackR.drawable.ic_magnifier),
+                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ZoomIn),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MAGNIFIER),
@@ -967,7 +968,7 @@ private fun ImagePreviewTopBar(
                 if (isSendToMenuVisible) {
                     IconButton(onClick = onClickSendTo) {
                         Icon(
-                            painter = painterResource(id = iconPackR.drawable.ic_message_arrow_up_medium_regular_outline),
+                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MessageArrowUp),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SEND_TO),
@@ -978,7 +979,7 @@ private fun ImagePreviewTopBar(
                 if (isMoreMenuVisible) {
                     IconButton(onClick = onClickMore) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_dots_vertical_white),
+                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MORE),

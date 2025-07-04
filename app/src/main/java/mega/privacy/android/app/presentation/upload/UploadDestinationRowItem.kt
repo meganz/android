@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.upload
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,13 +14,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -82,7 +83,7 @@ fun UploadDestinationRowItem(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
                             .size(16.dp),
-                        painter = painterResource(iconPackR.drawable.ic_pen_02_medium_regular_outline),
+                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Pen2),
                         contentDescription = "Edit",
                         tint = MaterialTheme.colors.onPrimary,
                     )

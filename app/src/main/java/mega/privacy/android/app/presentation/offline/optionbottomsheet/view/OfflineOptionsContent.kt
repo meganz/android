@@ -3,8 +3,8 @@ package mega.privacy.android.app.presentation.offline.optionbottomsheet.view
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.google.common.io.Files
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.model.OfflineOptionsUiState
@@ -12,6 +12,7 @@ import mega.privacy.android.app.presentation.offline.view.getOfflineNodeDescript
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
@@ -53,7 +54,7 @@ internal fun OfflineOptionsContent(
                 MenuActionListTile(
                     modifier = Modifier.testTag(INFO_ACTION_TEST_TAG),
                     text = stringResource(id = mega.privacy.android.app.R.string.general_info),
-                    icon = painterResource(id = R.drawable.ic_info_medium_regular_outline),
+                    icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Info),
                     dividerType = DividerType.BigStartPadding,
                     onActionClicked = {
                         onOpenInfoClicked()
@@ -64,7 +65,7 @@ internal fun OfflineOptionsContent(
                     MenuActionListTile(
                         modifier = Modifier.testTag(OPEN_WITH_ACTION_TEST_TAG),
                         text = stringResource(id = mega.privacy.android.app.R.string.external_play),
-                        icon = painterResource(id = R.drawable.ic_external_link_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.ExternalLink),
                         dividerType = DividerType.BigStartPadding,
                         onActionClicked = {
                             onOpenWithClicked(this@with)
@@ -76,7 +77,7 @@ internal fun OfflineOptionsContent(
                     MenuActionListTile(
                         modifier = Modifier.testTag(SHARE_ACTION_TEST_TAG),
                         text = stringResource(id = mega.privacy.android.app.R.string.general_share),
-                        icon = painterResource(id = R.drawable.ic_share_network_medium_regular_outline),
+                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.ShareNetwork),
                         dividerType = DividerType.BigStartPadding,
                         onActionClicked = {
                             onShareNodeClicked(this@with)
@@ -86,7 +87,7 @@ internal fun OfflineOptionsContent(
                 MenuActionListTile(
                     modifier = Modifier.testTag(SAVE_TO_DEVICE_ACTION_TEST_TAG),
                     text = stringResource(id = mega.privacy.android.app.R.string.general_save_to_device),
-                    icon = painterResource(id = R.drawable.ic_download_medium_regular_outline),
+                    icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Download),
                     dividerType = DividerType.BigStartPadding,
                     onActionClicked = {
                         onSaveToDeviceClicked()
@@ -95,7 +96,7 @@ internal fun OfflineOptionsContent(
                 MenuActionListTile(
                     modifier = Modifier.testTag(REMOVE_FROM_OFFLINE_ACTION_TEST_TAG),
                     text = stringResource(id = mega.privacy.android.app.R.string.context_delete_offline),
-                    icon = painterResource(id = R.drawable.ic_x_medium_regular_outline),
+                    icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
                     dividerType = null,
                     onActionClicked = {
                         onRemoveFromOfflineClicked()

@@ -1,17 +1,17 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -61,7 +61,7 @@ internal fun RenameVideoPlaylistBottomSheetTile(
         modifier = Modifier.testTag(VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG),
         dividerType = null,
         text = stringResource(id = R.string.video_section_playlists_rename_playlist_dialog_title),
-        icon = painterResource(id = iconPackR.drawable.ic_pen_02_medium_regular_outline),
+        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Pen2),
         onActionClicked = onActionClicked,
     )
 }
@@ -74,7 +74,7 @@ internal fun DeleteVideoPlaylistBottomSheetTile(
         modifier = Modifier.testTag(VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG),
         dividerType = null,
         text = stringResource(id = R.string.video_section_playlist_bottom_sheet_option_title_delete),
-        icon = painterResource(id = iconPackR.drawable.ic_trash_medium_regular_outline),
+        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Trash),
         onActionClicked = onActionClicked,
     )
 }

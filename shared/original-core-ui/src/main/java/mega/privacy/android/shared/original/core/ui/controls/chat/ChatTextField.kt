@@ -25,8 +25,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -36,7 +36,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.textfields.customTextSelectionColors
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -144,10 +144,9 @@ fun ChatTextField(
             .align(Alignment.BottomEnd)
             .padding(end = 8.dp, bottom = 8.dp)
             .clickable { onEmojiClick() },
-        painter = painterResource(
-            id =
-            if (isEmojiPickerShown) R.drawable.ic_emoji_smile_medium_regular_solid
-            else R.drawable.ic_emoji_smile_medium_regular
+        painter = rememberVectorPainter(
+            if (isEmojiPickerShown) IconPack.Medium.Regular.Solid.EmojiSmile
+            else IconPack.Medium.Regular.Outline.EmojiSmile
         ),
         contentDescription = "Emoji Icon",
         tint = DSTokens.colors.icon.secondary

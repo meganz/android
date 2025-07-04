@@ -25,9 +25,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintSet
@@ -36,9 +36,8 @@ import androidx.constraintlayout.compose.ExperimentalMotionApi
 import androidx.constraintlayout.compose.MotionLayout
 import androidx.core.graphics.toColorInt
 import coil3.compose.rememberAsyncImagePainter
-import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_070
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
@@ -125,7 +124,7 @@ fun ContactInfoTopAppBar(
 
         IconButton(modifier = Modifier.layoutId(BACK_ARROW), onClick = { onBackPress() }) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_back_black),
+                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ArrowLeft),
                 contentDescription = BACK_ARROW,
                 tint = primaryTextColorAlpha
             )
@@ -144,21 +143,21 @@ fun ContactInfoTopAppBar(
 private fun ActionItems(iconColor: Color) {
     IconButton(onClick = { /*TODO*/ }) {
         Icon(
-            painter = painterResource(id = iconPackR.drawable.ic_message_arrow_up_medium_regular_outline),
+            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MessageArrowUp),
             contentDescription = "",
             tint = iconColor
         )
     }
     IconButton(onClick = { /*TODO*/ }) {
         Icon(
-            painter = painterResource(id = iconPackR.drawable.ic_folder_users_medium_regular_outline),
+            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.FolderUsers),
             contentDescription = "",
             tint = iconColor
         )
     }
     IconButton(onClick = { /*TODO*/ }) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_dots_vertical_white),
+            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
             contentDescription = "",
             tint = iconColor
         )

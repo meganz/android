@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.settings.startscreen.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -21,12 +20,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
@@ -34,8 +38,6 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.IconColor
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * Start screen option view
@@ -91,7 +93,7 @@ fun StartScreenOptionView(
             )
             if (isSelected) {
                 MegaIcon(
-                    painter = painterResource(id = iconPackR.drawable.ic_check_medium_regular_outline),
+                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Check),
                     tint = IconColor.Secondary,
                     contentDescription = null,
                     modifier = Modifier

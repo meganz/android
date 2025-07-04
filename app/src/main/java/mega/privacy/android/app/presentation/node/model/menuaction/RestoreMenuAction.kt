@@ -1,10 +1,10 @@
 package mega.privacy.android.app.presentation.node.model.menuaction
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import javax.inject.Inject
 
@@ -18,7 +18,7 @@ class RestoreMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() =
-        painterResource(id = IconPackR.drawable.ic_rotate_ccw_medium_regular_outline)
+        rememberVectorPainter(IconPack.Medium.Regular.Outline.RotateCcw)
 
     override val orderInCategory = 250
 
