@@ -20,7 +20,10 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +32,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
@@ -67,8 +71,10 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -247,6 +253,7 @@ fun NewLoginView(
 
                 isLoginRequired -> RequireLogin(
                     state = this,
+                    paddingValues = paddingValues,
                     snackbarHostState = snackbarHostState,
                     onEmailChanged = onEmailChanged,
                     onPasswordChanged = onPasswordChanged,
@@ -254,7 +261,6 @@ fun NewLoginView(
                     onForgotPassword = onForgotPassword,
                     onCreateAccount = onCreateAccount,
                     onChangeApiServer = { showChangeApiServerDialog = true },
-                    modifier = Modifier.padding(paddingValues),
                     onToggleTitle = { isHidden ->
                         loginTopBarTitle = if (isHidden) loginText else ""
                     },
@@ -312,6 +318,7 @@ private fun RequireLogin(
     onToggleTitle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
+    paddingValues: PaddingValues = PaddingValues(0.dp),
     onLoginExceptionConsumed: () -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
@@ -383,9 +390,12 @@ private fun RequireLogin(
         )
     }
 
+    val minContentHeight = rememberMinContentHeight(paddingValues)
+
     Box(
         modifier = modifier
             .verticalScroll(scrollState)
+            .padding(paddingValues)
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
@@ -404,7 +414,8 @@ private fun RequireLogin(
         }
 
         Column(
-            modifier = contentModifier,
+            modifier = contentModifier
+                .defaultMinSize(minHeight = minContentHeight),
         ) {
             Image(
                 modifier = Modifier
@@ -594,8 +605,6 @@ private fun RequireLogin(
                 }
             )
 
-            Spacer(modifier = Modifier.height(56.dp))
-
             accountBlockedDetail?.let {
                 if (it.type == AccountBlockedType.TOS_COPYRIGHT || it.type == AccountBlockedType.TOS_NON_COPYRIGHT || it.type == AccountBlockedType.SUBUSER_DISABLED) {
                     BasicDialog(
@@ -622,6 +631,30 @@ private fun RequireLogin(
                     )
                 }
             }
+        }
+    }
+}
+
+/**
+ * Calculates the minimum content height based on the screen height, padding values, and system bars.
+ * This ensure container doesn't become scrollable if the content is smaller than the screen height.
+ *
+ * @param paddingValues The padding values to consider for the calculation.
+ * @return the height as [Dp].
+ */
+@Composable
+private fun rememberMinContentHeight(
+    paddingValues: PaddingValues,
+): Dp {
+    val density = LocalDensity.current
+    val windowInfo = LocalWindowInfo.current
+    val systemBars = WindowInsets.systemBars
+    return remember(density, windowInfo, systemBars, paddingValues) {
+        with(density) {
+            val windowHeight = windowInfo.containerSize.height
+            val contentTopPadding = paddingValues.calculateTopPadding().toPx()
+            val systemBarsPadding = systemBars.getTop(this) + systemBars.getBottom(this)
+            (windowHeight - contentTopPadding - systemBarsPadding).toDp()
         }
     }
 }
