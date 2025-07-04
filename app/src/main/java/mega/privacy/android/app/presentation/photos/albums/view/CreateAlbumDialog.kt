@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -31,6 +31,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
@@ -41,18 +43,22 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import kotlinx.coroutines.delay
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.grey_300
 import mega.privacy.android.shared.original.core.ui.theme.red_400
 import mega.privacy.android.shared.original.core.ui.theme.red_900
-import mega.privacy.android.shared.original.core.ui.theme.accent_050
-import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CreateNewAlbumDialogEvent
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
@@ -68,6 +74,14 @@ fun CreateNewAlbumDialog(
     errorMessage: Int? = null,
     isInputValid: () -> Boolean = { true },
 ) {
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        // delay needed before requesting focus to account for transition
+        delay(300L)
+        focusRequester.requestFocus()
+    }
+
     LaunchedEffect(Unit) {
         Analytics.tracker.trackEvent(CreateNewAlbumDialogEvent)
     }
@@ -124,6 +138,7 @@ fun CreateNewAlbumDialog(
     MegaDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         modifier = Modifier
+            .imePadding()
             .padding(horizontal = 40.dp),
         onDismissRequest = onDismissRequest,
         titleString = stringResource(id = titleResID),
@@ -141,6 +156,7 @@ fun CreateNewAlbumDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(color = Color.Transparent)
+                        .focusRequester(focusRequester)
                         .indicatorLine(
                             enabled = isEnabled,
                             isError = isError,
@@ -239,9 +255,9 @@ fun CreateNewAlbumDialog(
                     focusedElevation = 0.dp
                 ),
             ) {
-                Text(
+                MegaText(
                     text = stringResource(id = positiveButtonTextResID),
-                    color = accent_900
+                    textColor = TextColor.Primary
                 )
             }
         },
@@ -260,9 +276,9 @@ fun CreateNewAlbumDialog(
                     focusedElevation = 0.dp
                 ),
             ) {
-                Text(
-                    stringResource(id = sharedR.string.general_dialog_cancel_button),
-                    color = accent_900
+                MegaText(
+                    text = stringResource(id = sharedR.string.general_dialog_cancel_button),
+                    textColor = TextColor.Primary
                 )
             }
         }
