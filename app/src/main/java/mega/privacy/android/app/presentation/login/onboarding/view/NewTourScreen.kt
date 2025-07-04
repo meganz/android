@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.login.onboarding.view
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalOverscrollConfiguration
@@ -13,15 +14,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -34,6 +34,8 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.button.TextOnlyButton
@@ -45,6 +47,9 @@ import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.login.LoginViewModel
+import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.onboarding.view.TourTestTags.CREATE_ACCOUNT_BUTTON
 import mega.privacy.android.app.presentation.login.onboarding.view.TourTestTags.LOG_IN_BUTTON
 import mega.privacy.android.app.presentation.login.onboarding.view.TourTestTags.ONBOARDING_IMAGE
@@ -55,19 +60,31 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLa
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeTabletLandscapePreviews
 import mega.privacy.android.shared.resources.R as sharedR
+import timber.log.Timber
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun NewTourRoute(
-    onLoginClick: () -> Unit,
-    onCreateAccountClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    activityViewModel: LoginViewModel,
+    onBackPressed: () -> Unit,
+    viewModel: TourViewModel = hiltViewModel(),
 ) {
-    NewTourScreen(
-        modifier = modifier.semantics { testTagsAsResourceId = true },
-        onLoginClick = onLoginClick,
-        onCreateAccountClick = onCreateAccountClick,
-    )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    BackHandler(onBack = onBackPressed)
+
+    AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
+        NewTourScreen(
+            modifier = Modifier.fillMaxSize().semantics { testTagsAsResourceId = true },
+            onLoginClick = {
+                Timber.d("onLoginClick")
+                activityViewModel.setPendingFragmentToShow(LoginFragmentType.Login)
+            },
+            onCreateAccountClick = {
+                Timber.d("onRegisterClick")
+                activityViewModel.setPendingFragmentToShow(LoginFragmentType.CreateAccount)
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -94,8 +111,7 @@ internal fun NewTourScreen(
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { Int.MAX_VALUE })
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .safeDrawingPadding(),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CompositionLocalProvider(LocalOverscrollConfiguration provides null) {

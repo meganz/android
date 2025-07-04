@@ -10,6 +10,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
@@ -17,6 +19,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -122,6 +125,8 @@ class LoginActivity : BaseActivity() {
             val navController = rememberNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
+            val focusManager = LocalFocusManager.current
+            val keyboardController = LocalSoftwareKeyboardController.current
 
             val visibleFragment = when {
                 currentDestination?.hierarchy?.any {
@@ -153,7 +158,16 @@ class LoginActivity : BaseActivity() {
                     when (fragmentType) {
                         LoginFragmentType.Login -> navController.openLoginScreen()
                         LoginFragmentType.CreateAccount -> navController.openCreateAccountScreen()
-                        LoginFragmentType.Tour -> navController.openTourScreen()
+
+                        LoginFragmentType.Tour -> {
+                            focusManager.clearFocus()
+                            navController.openTourScreen(
+                                NavOptions.Builder()
+                                    .setPopUpTo(route = "start", inclusive = false)
+                                    .build()
+                            )
+                        }
+
                         LoginFragmentType.ConfirmEmail -> navController.openConfirmationEmailScreen()
                     }
                     viewModel.isPendingToShowFragmentConsumed()
@@ -178,6 +192,7 @@ class LoginActivity : BaseActivity() {
                     }
                 )
                 tourScreen(
+                    activityViewModel = viewModel,
                     onBackPressed = {
                         finish()
                     }

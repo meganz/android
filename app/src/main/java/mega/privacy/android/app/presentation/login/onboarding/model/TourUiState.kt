@@ -1,19 +1,12 @@
 package mega.privacy.android.app.presentation.login.onboarding.model
 
-import androidx.annotation.StringRes
-import mega.privacy.android.app.presentation.login.onboarding.view.TourScreen
+import mega.privacy.android.domain.entity.ThemeMode
 
 /**
- * UI state class for [TourScreen].
+ * UI state class for [mega.privacy.android.app.presentation.login.onboarding.view.NewTourScreen].
  *
- * @property meetingLink The meeting link to be joined.
- * @property errorTextId The error text string resource ID.
- * @property shouldOpenLink Whether we need to open the meeting link or not.
- * @property isNewRegistrationUiEnabled Whether the new registration UI is enabled or not.
+ * @property themeMode The current theme mode.
  */
 data class TourUiState(
-    val meetingLink: String = "",
-    @StringRes val errorTextId: Int? = null,
-    val shouldOpenLink: Boolean = false,
-    val isNewRegistrationUiEnabled: Boolean? = null,
+    val themeMode: ThemeMode = ThemeMode.System,
 )
