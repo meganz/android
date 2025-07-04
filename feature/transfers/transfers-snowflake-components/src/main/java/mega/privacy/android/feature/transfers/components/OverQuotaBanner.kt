@@ -21,23 +21,22 @@ fun OverQuotaBanner(
     onUpgradeClick: () -> Unit,
     onCancelButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
-) =
-    TopWarningBanner(
-        modifier = modifier,
-        body = null,
-        title = stringResource(
-            when {
-                isStorageOverQuota && isTransferOverQuota -> sharedR.string.transfers_storage_and_transfer_quota_banner_title
-                isStorageOverQuota -> sharedR.string.transfers_storage_quota_banner_title
-                isTransferOverQuota -> sharedR.string.transfers_transfer_quota_banner_title
-                else -> sharedR.string.transfers_storage_and_transfer_quota_banner_title
-            }
-        ),
-        actionButtonText = stringResource(sharedR.string.transfers_over_quota_banner_action_button),
-        showCancelButton = true,
-        onActionButtonClick = onUpgradeClick,
-        onCancelButtonClick = onCancelButtonClick
-    )
+) = TopWarningBanner(
+    modifier = modifier,
+    body = null,
+    title = stringResource(
+        when {
+            isStorageOverQuota && isTransferOverQuota -> sharedR.string.transfers_storage_and_transfer_quota_banner_title
+            isStorageOverQuota -> sharedR.string.transfers_storage_quota_banner_title
+            isTransferOverQuota -> sharedR.string.transfers_transfer_quota_banner_title
+            else -> sharedR.string.transfers_storage_and_transfer_quota_banner_title
+        }
+    ),
+    actionButtonText = stringResource(sharedR.string.transfers_over_quota_banner_action_button),
+    showCancelButton = isTransferOverQuota,
+    onActionButtonClick = onUpgradeClick,
+    onCancelButtonClick = onCancelButtonClick
+)
 
 @CombinedThemePreviews
 @Composable
