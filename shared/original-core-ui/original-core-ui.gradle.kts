@@ -40,6 +40,7 @@ dependencies {
     implementation(google.accompanist.systemui)
     implementation(google.accompanist.permissions)
     implementation(google.accompanist.navigationmaterial)
+    implementation(androidx.splashscreen)
     implementation(androidx.compose.activity)
     implementation(androidx.lifecycle.runtime)
     implementation(androidx.lifecycle.runtime.compose)

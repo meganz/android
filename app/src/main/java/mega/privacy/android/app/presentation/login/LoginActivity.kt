@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.login
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,9 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -47,6 +44,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
+import mega.privacy.android.shared.original.core.ui.utils.setupSplashExitAnimation
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -205,7 +203,7 @@ class LoginActivity : BaseActivity() {
                 )
             }
         }
-        setupSplashExitAnimation(splashScreen)
+        splashScreen.setupSplashExitAnimation(window)
         setupObservers()
         lifecycleScope.launch {
             // A fail-safe to avoid the splash screen to be shown forever
@@ -215,26 +213,6 @@ class LoginActivity : BaseActivity() {
                 stopShowingSplashScreen()
                 Timber.w("Splash screen is being shown for too long")
             }
-        }
-    }
-
-    /**
-     * Disables the splash screen exit animation to prevent a visual "jump" of the app icon.
-     *
-     * Skipped on Android 13 (Tiramisu) for certain Chinese OEMs (e.g., OPPO, Realme, OnePlus),
-     * or specific models (e.g., Galaxy A03 Core), as it may cause crashes.
-     * See: https://issuetracker.google.com/issues/242118185
-     */
-    private fun setupSplashExitAnimation(splashScreen: SplashScreen) {
-        val isAndroid13 = Build.VERSION.SDK_INT == Build.VERSION_CODES.TIRAMISU
-        val isAffectedBrand = Build.BRAND.lowercase() in setOf("oppo", "realme", "oneplus")
-        val isAffectedModel = Build.MODEL.lowercase().contains("a03 core")
-
-        if (isAndroid13 && (isAffectedBrand || isAffectedModel)) return
-
-        splashScreen.setOnExitAnimationListener {
-            it.remove()
-            WindowCompat.setDecorFitsSystemWindows(window, false)
         }
     }
 

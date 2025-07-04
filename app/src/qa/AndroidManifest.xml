@@ -22,6 +22,7 @@
         </service>
         <activity
             android:name="mega.privacy.android.app.appstate.RerouteActivity"
+            android:theme="@style/Theme.Mega.Starting"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
