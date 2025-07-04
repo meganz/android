@@ -20,7 +20,7 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncPreferencesRepositoryImplTest {
+internal class SyncPreferencesRepositoryImplTest {
 
     private lateinit var underTest: SyncPreferencesRepositoryImpl
     private val syncPreferencesDatastore = mock<SyncPreferencesDatastore>()
@@ -106,4 +106,63 @@ class SyncPreferencesRepositoryImplTest {
 
         assertThat(result).isTrue()
     }
+
+    @Test
+    fun `test that setSyncByCharging calls setSyncOnlyByCharging on datastore`() = runTest {
+        underTest.setSyncByCharging(true)
+
+        verify(syncPreferencesDatastore).setSyncOnlyByCharging(true)
+    }
+
+    @Test
+    fun `test that monitorSyncByCharging returns flow from datastore`() = runTest {
+        val flow = flowOf(false)
+        whenever(syncPreferencesDatastore.monitorSyncOnlyByCharging()).thenReturn(flow)
+
+        val result = underTest.monitorSyncByCharging()
+
+        result.test {
+            assertThat(awaitItem()).isEqualTo(false)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isSyncPausedByTheUser returns false when gateway returns null`() = runTest {
+        val syncId = 123L
+        whenever(userPausedSyncGateway.getUserPausedSync(syncId)).thenReturn(null)
+
+        val result = underTest.isSyncPausedByTheUser(syncId)
+
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `test that setSyncFrequencyInMinutes calls setSyncFrequencyInMinutes on datastore`() =
+        runTest {
+            val frequency = 30
+            underTest.setSyncFrequencyInMinutes(frequency)
+
+            verify(syncPreferencesDatastore).setSyncFrequencyInMinutes(frequency)
+        }
+
+    @Test
+    fun `test that getSyncFrequencyMinutes returns value from datastore`() = runTest {
+        val frequency = 30
+        whenever(syncPreferencesDatastore.getSyncFrequencyMinutes()).thenReturn(frequency)
+
+        val result = underTest.getSyncFrequencyMinutes()
+
+        assertThat(result).isEqualTo(frequency)
+    }
+
+    @Test
+    fun `test that getSyncFrequencyMinutes returns default value when datastore returns null`() =
+        runTest {
+            whenever(syncPreferencesDatastore.getSyncFrequencyMinutes()).thenReturn(null)
+
+            val result = underTest.getSyncFrequencyMinutes()
+
+            assertThat(result).isEqualTo(15)
+        }
 }

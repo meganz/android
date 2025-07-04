@@ -22,6 +22,13 @@ internal class SyncPreferencesRepositoryImpl @Inject constructor(
     override fun monitorSyncByWiFi(): Flow<Boolean?> =
         syncPreferencesDatastore.monitorSyncOnlyByWiFi()
 
+    override suspend fun setSyncByCharging(checked: Boolean) {
+        syncPreferencesDatastore.setSyncOnlyByCharging(checked)
+    }
+
+    override fun monitorSyncByCharging(): Flow<Boolean?> =
+        syncPreferencesDatastore.monitorSyncOnlyByCharging()
+
     override suspend fun setOnboardingShown(shown: Boolean) {
         syncPreferencesDatastore.setOnboardingShown(shown)
     }
