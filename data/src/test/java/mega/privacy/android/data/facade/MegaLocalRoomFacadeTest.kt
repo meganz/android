@@ -1191,4 +1191,32 @@ internal class MegaLocalRoomFacadeTest {
                 awaitComplete()
             }
         }
+
+    @Test
+    fun `test that getMediaPlaybackInfo returns as expected`() =
+        runTest {
+            val testHandle = 123456L
+            val testInfo = mock<MediaPlaybackInfo> {
+                on { mediaHandle }.thenReturn(testHandle)
+                on { mediaType }.thenReturn(MediaType.Audio)
+            }
+            val testEntity = mock<MediaPlaybackInfoEntity> {
+                on { mediaHandle }.thenReturn(testHandle)
+                on { mediaType }.thenReturn(MediaType.Audio)
+            }
+
+            whenever(mediaPlaybackInfoMapper(testEntity)).thenReturn(testInfo)
+            whenever(mediaPlaybackInfoDao.getMediaPlaybackInfo(testHandle)).thenReturn(testEntity)
+            val actual = underTest.getMediaPlaybackInfo(testHandle)
+            assertThat(actual).isEqualTo(testInfo)
+        }
+
+    @Test
+    fun `test that getMediaPlaybackInfo returns null`() =
+        runTest {
+            val testHandle = 123456L
+            whenever(mediaPlaybackInfoDao.getMediaPlaybackInfo(testHandle)).thenReturn(null)
+            val actual = underTest.getMediaPlaybackInfo(testHandle)
+            assertThat(actual).isNull()
+        }
 }

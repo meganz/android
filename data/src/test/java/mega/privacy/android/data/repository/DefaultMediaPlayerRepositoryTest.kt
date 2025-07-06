@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.FileGateway
@@ -24,6 +23,7 @@ import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.FileNode
@@ -47,6 +47,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -95,7 +96,7 @@ class DefaultMediaPlayerRepositoryTest {
             mediaPlayerPreferencesGateway = mediaPlayerPreferencesGateway,
             repeatToggleModeMapper = RepeatToggleModeMapper(),
             searchFilterMapper = searchFilterMapper,
-            cancelTokenProvider = cancelTokenProvider
+            cancelTokenProvider = cancelTokenProvider,
         )
     }
 
@@ -113,7 +114,7 @@ class DefaultMediaPlayerRepositoryTest {
             fileNodeMapper,
             typedAudioNodeMapper,
             typedVideoNodeMapper,
-            megaLocalRoomGateway
+            megaLocalRoomGateway,
         )
     }
 
@@ -566,4 +567,52 @@ class DefaultMediaPlayerRepositoryTest {
         totalDuration = expectedTotalDuration,
         currentPosition = expectedCurrentPosition
     )
+
+    @Test
+    fun `test that deletePlaybackInfo of megaLocalRoomGateway is invoked`() = runTest {
+        underTest.deleteMediaPlaybackInfo(expectedHandle)
+        verify(megaLocalRoomGateway).deletePlaybackInfo(expectedHandle)
+    }
+
+    @Test
+    fun `test that clearAllPlaybackInfos of megaLocalRoomGateway is invoked`() = runTest {
+        underTest.clearAllPlaybackInfos()
+        verify(megaLocalRoomGateway).clearAllPlaybackInfos()
+    }
+
+    @Test
+    fun `test that insertOrUpdatePlaybackInfo of megaLocalRoomGateway is invoked`() = runTest {
+        val playbackInfo = mock<MediaPlaybackInfo> {
+            on { mediaHandle }.thenReturn(expectedHandle)
+        }
+        underTest.updateAudioPlaybackInfo(playbackInfo)
+        underTest.saveAudioPlaybackInfo()
+        verify(megaLocalRoomGateway).insertOrUpdatePlaybackInfo(playbackInfo)
+    }
+
+    @Test
+    fun `test that insertOrUpdatePlaybackInfo of megaLocalRoomGateway is not invoked when media handle is -1`() =
+        runTest {
+            val playbackInfo = mock<MediaPlaybackInfo> {
+                on { mediaHandle }.thenReturn(-1)
+            }
+            underTest.updateAudioPlaybackInfo(playbackInfo)
+            underTest.saveAudioPlaybackInfo()
+            verify(megaLocalRoomGateway, never()).insertOrUpdatePlaybackInfo(any())
+        }
+
+    @Test
+    fun `test that getMediaPlaybackInfo returns as expected`() = runTest {
+        val expectedPlaybackInfo = mock<MediaPlaybackInfo> {
+            on { mediaHandle }.thenReturn(expectedHandle)
+        }
+        whenever(megaLocalRoomGateway.getMediaPlaybackInfo(expectedHandle)).thenReturn(
+            expectedPlaybackInfo
+        )
+
+        val actual = underTest.getMediaPlaybackInfo(expectedHandle)
+
+        assertThat(actual).isEqualTo(expectedPlaybackInfo)
+        verify(megaLocalRoomGateway).getMediaPlaybackInfo(expectedHandle)
+    }
 }

@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.getRequestListener
@@ -28,6 +27,7 @@ import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedAudioNode
@@ -65,6 +65,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 ) : MediaPlayerRepository {
 
     private val playbackInfoMap = mutableMapOf<Long, PlaybackInformation>()
+    private var latestAudioPlaybackInfo: MediaPlaybackInfo? = null
 
     override suspend fun getLocalLinkForFolderLinkFromMegaApi(nodeHandle: Long): String? =
         withContext(ioDispatcher) {
@@ -328,6 +329,29 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                     )
                 }
         }
+
+    override suspend fun deleteMediaPlaybackInfo(mediaHandle: Long) {
+        megaLocalRoomGateway.deletePlaybackInfo(mediaHandle)
+    }
+
+    override suspend fun clearAllPlaybackInfos() {
+        megaLocalRoomGateway.clearAllPlaybackInfos()
+    }
+
+    override suspend fun saveAudioPlaybackInfo() {
+        latestAudioPlaybackInfo?.let {
+            megaLocalRoomGateway.insertOrUpdatePlaybackInfo(it)
+        }
+    }
+
+    override suspend fun updateAudioPlaybackInfo(info: MediaPlaybackInfo) {
+        if (info.mediaHandle != -1L) {
+            latestAudioPlaybackInfo = info
+        }
+    }
+
+    override suspend fun getMediaPlaybackInfo(handle: Long): MediaPlaybackInfo? =
+        megaLocalRoomGateway.getMediaPlaybackInfo(handle)
 
     private suspend fun getMegaNodeByHandle(nodeId: NodeId, attemptFromFolderApi: Boolean = false) =
         megaApi.getMegaNodeByHandle(nodeId.longValue)

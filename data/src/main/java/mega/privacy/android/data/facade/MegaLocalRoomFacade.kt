@@ -638,6 +638,11 @@ internal class MegaLocalRoomFacade @Inject constructor(
         )
     }
 
+    override suspend fun getMediaPlaybackInfo(handle: Long): MediaPlaybackInfo? =
+        mediaPlaybackInfoDao.get().getMediaPlaybackInfo(handle)?.let {
+            mediaPlaybackInfoMapper(it)
+        }
+
     override suspend fun monitorAllPlaybackInfos(): Flow<List<MediaPlaybackInfo>> =
         mediaPlaybackInfoDao.get().getAllPlaybackInfos().map { entities ->
             entities.map {

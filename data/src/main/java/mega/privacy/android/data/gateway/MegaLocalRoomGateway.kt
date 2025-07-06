@@ -642,6 +642,14 @@ interface MegaLocalRoomGateway {
     suspend fun insertOrUpdatePlaybackInfos(infos: List<MediaPlaybackInfo>)
 
     /**
+     * Get media playback info by handle
+     *
+     * @param handle the handle of the media playback info
+     * @return the [MediaPlaybackInfo] if found, null otherwise
+     */
+    suspend fun getMediaPlaybackInfo(handle: Long): MediaPlaybackInfo?
+
+    /**
      * Get all playback infos
      *
      * @return a flow of list of [MediaPlaybackInfo]

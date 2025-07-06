@@ -85,6 +85,44 @@ class MediaPlaybackInfoDaoTest {
     }
 
     @Test
+    fun `test_that_get_playback_info_functions_are_working_as_expected`() = runTest {
+        val testAudioHandle = 1011L
+        val testVideoHandle = 11L
+        val videoEntities = (1..100L).map {
+            val videoEntity = MediaPlaybackInfoEntity(
+                mediaHandle = it,
+                mediaType = MediaType.Video,
+                currentPosition = it * 1000L,
+                totalDuration = it * 2000L,
+            )
+            mediaPlaybackInfoDao.insertOrUpdatePlaybackInfo(videoEntity)
+            videoEntity
+        }
+
+        val audioEntities = (1..50L).map {
+            val audioEntity = MediaPlaybackInfoEntity(
+                mediaHandle = 1000 + it,
+                mediaType = MediaType.Audio,
+                currentPosition = it * 1000L,
+                totalDuration = it * 2000L,
+            )
+            mediaPlaybackInfoDao.insertOrUpdatePlaybackInfo(audioEntity)
+            audioEntity
+        }
+        val videoReturnedEntity = mediaPlaybackInfoDao.getMediaPlaybackInfo(testVideoHandle)
+        val audioReturnedEntity = mediaPlaybackInfoDao.getMediaPlaybackInfo(testAudioHandle)
+        val nullEntity = mediaPlaybackInfoDao.getMediaPlaybackInfo(100000)
+
+        assertThat(videoReturnedEntity).isEqualTo(
+            videoEntities.firstOrNull { it.mediaHandle == testVideoHandle }
+        )
+        assertThat(audioReturnedEntity).isEqualTo(
+            audioEntities.firstOrNull { it.mediaHandle == testAudioHandle }
+        )
+        assertThat(nullEntity).isNull()
+    }
+
+    @Test
     fun `test_that_clearAllPlaybackInfos_is_working_as_expected`() = runTest {
         (1..100L).map {
             val videoEntity = MediaPlaybackInfoEntity(

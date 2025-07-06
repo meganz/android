@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
@@ -405,4 +406,36 @@ interface MediaPlayerRepository {
         handle: Long,
         attemptFromFolderApi: Boolean = false,
     ): TypedAudioNode?
+
+    /**
+     * Delete the media playback info by media handle
+     *
+     * @param mediaHandle the media id of deleted item
+     */
+    suspend fun deleteMediaPlaybackInfo(mediaHandle: Long)
+
+    /**
+     * Clear all playback infos
+     */
+    suspend fun clearAllPlaybackInfos()
+
+    /**
+     * Save the playback times
+     */
+    suspend fun saveAudioPlaybackInfo()
+
+    /**
+     * Update audio playback info
+     *
+     * @param info the new playback info
+     */
+    suspend fun updateAudioPlaybackInfo(info: MediaPlaybackInfo)
+
+    /**
+     * Get media playback info by handle
+     *
+     * @param handle the media handle
+     * @return [MediaPlaybackInfo] if exists, otherwise null
+     */
+    suspend fun getMediaPlaybackInfo(handle: Long): MediaPlaybackInfo?
 }

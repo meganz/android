@@ -17,6 +17,9 @@ internal interface MediaPlaybackInfoDao {
     @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_MEDIA_PLAYBACK_INFO} WHERE media_type = :mediaType")
     fun getAllPlaybackInfosByType(mediaType: MediaType): Flow<List<MediaPlaybackInfoEntity>>
 
+    @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_MEDIA_PLAYBACK_INFO} WHERE mediaHandle = :handle")
+    fun getMediaPlaybackInfo(handle: Long): MediaPlaybackInfoEntity?
+
     @Query("DELETE FROM ${MegaDatabaseConstant.TABLE_MEDIA_PLAYBACK_INFO}")
     suspend fun clearAllPlaybackInfos()
 
