@@ -4,23 +4,25 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
+import androidx.navigation.compose.navigation
+import kotlinx.serialization.Serializable
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 
-internal const val deviceCenterRoute = "device-center"
+@Serializable
+data object DeviceCenter
 
-private const val deviceCenterInfoRoute = "device-center/info"
+@Serializable
+data class DeviceCenterInfo(val deviceCenterNode: DeviceCenterUINode)
 
 internal fun NavGraphBuilder.deviceCenterInfoNavGraph(
     navController: NavController,
     selectedItem: DeviceCenterUINode,
     onBackPressHandled: () -> Unit,
 ) {
-    navigation(
-        startDestination = deviceCenterInfoRoute,
-        route = deviceCenterRoute
+    navigation<DeviceCenter>(
+        startDestination = DeviceCenterInfo(selectedItem)
     ) {
-        composable(route = deviceCenterInfoRoute) {
+        composable<DeviceCenterInfo> {
             DeviceCenterInfoScreenRoute(
                 viewModel = hiltViewModel(),
                 selectedItem = selectedItem,

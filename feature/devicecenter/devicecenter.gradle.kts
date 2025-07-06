@@ -8,6 +8,7 @@ plugins {
     alias(convention.plugins.mega.lint)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.de.mannodermaus.android.junit5)
+    alias(plugin.plugins.kotlin.serialisation)
     id("kotlin-android")
 }
 

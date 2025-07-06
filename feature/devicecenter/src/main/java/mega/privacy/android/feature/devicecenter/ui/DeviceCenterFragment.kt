@@ -33,8 +33,8 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.feature.devicecenter.navigation.DeviceCenter
 import mega.privacy.android.feature.devicecenter.navigation.deviceCenterInfoNavGraph
-import mega.privacy.android.feature.devicecenter.navigation.deviceCenterRoute
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
 import mega.privacy.android.navigation.MegaNavigator
@@ -216,7 +216,7 @@ class DeviceCenterFragment : Fragment() {
                         val animatedNavController = rememberNavController()
                         NavHost(
                             navController = animatedNavController,
-                            startDestination = deviceCenterRoute,
+                            startDestination = DeviceCenter,
                         ) {
                             deviceCenterInfoNavGraph(
                                 navController = animatedNavController,

@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.devicecenter.ui.model.status
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.feature.devicecenter.R as DeviceCenterR
@@ -17,6 +18,7 @@ import mega.privacy.android.feature.devicecenter.R
  * @property icon The Status Icon. If no Icon should be displayed, leave it as null
  * @property color The Status Color to be applied for [name] and [icon]. If the Color should not be changed, leave it as null
  */
+@Serializable
 sealed class DeviceCenterUINodeStatus(
     @StringRes val name: Int,
     @StringRes val localizedErrorMessage: Int?,
@@ -28,6 +30,7 @@ sealed class DeviceCenterUINodeStatus(
      * Represents an Unknown Status. This is the default Status assigned when no matching Status
      * is found
      */
+    @Serializable
     data object Unknown : DeviceCenterUINodeStatus(
         name = R.string.device_center_list_view_item_status_unknown_status,
         localizedErrorMessage = null,
@@ -38,6 +41,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents an Up to Date Status
      */
+    @Serializable
     data object UpToDate : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_up_to_date,
         localizedErrorMessage = null,
@@ -48,6 +52,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents an Updating Status
      */
+    @Serializable
     data object Updating : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_updating,
         localizedErrorMessage = null,
@@ -60,6 +65,7 @@ sealed class DeviceCenterUINodeStatus(
      *
      * @param progress the Update Progress indicator
      */
+    @Serializable
     data class UpdatingWithPercentage(val progress: Int) : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_updating_with_progress,
         localizedErrorMessage = null,
@@ -70,6 +76,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents an Uploading Status
      */
+    @Serializable
     data object Uploading : DeviceCenterUINodeStatus(
         name = SharedR.string.device_center_list_view_item_status_uploading,
         localizedErrorMessage = null,
@@ -82,6 +89,7 @@ sealed class DeviceCenterUINodeStatus(
      *
      * @param progress the Update Progress indicator
      */
+    @Serializable
     data class UploadingWithPercentage(val progress: Int) : DeviceCenterUINodeStatus(
         name = SharedR.string.device_center_list_view_item_status_uploading_with_progress,
         localizedErrorMessage = null,
@@ -92,6 +100,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents a Nothing Set Up Status
      */
+    @Serializable
     data object NothingSetUp : DeviceCenterUINodeStatus(
         name = SharedR.string.device_center_list_view_item_status_nothing_setup,
         localizedErrorMessage = null,
@@ -102,6 +111,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents a Disabled Status
      */
+    @Serializable
     data object Disabled : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_disabled,
         localizedErrorMessage = null,
@@ -112,6 +122,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents an Inactive Status
      */
+    @Serializable
     data object Inactive : DeviceCenterUINodeStatus(
         name = SharedR.string.device_center_list_view_item_status_inactive,
         localizedErrorMessage = null,
@@ -122,6 +133,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents a Paused Status
      */
+    @Serializable
     data object Paused : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_paused,
         localizedErrorMessage = null,
@@ -132,6 +144,7 @@ sealed class DeviceCenterUINodeStatus(
     /**
      * Represents an "Attention needed" Status
      */
+    @Serializable
     data object AttentionNeeded : DeviceCenterUINodeStatus(
         name = SharedR.string.device_center_list_view_item_status_attention_needed,
         localizedErrorMessage = null,
@@ -144,6 +157,7 @@ sealed class DeviceCenterUINodeStatus(
      *
      * @property specificErrorMessage The specific Error Message which may or may not exist
      */
+    @Serializable
     data class Error(val specificErrorMessage: Int?) : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_error,
         localizedErrorMessage = specificErrorMessage,
