@@ -106,23 +106,41 @@ val shouldSuppressWarnings by extra(
     fun(): Boolean = isServerBuild() && System.getenv("DO_NOT_SUPPRESS_WARNINGS") != "true"
 )
 
-tasks.register("runUnitTest") {
-    group = "Verification"
-    description = "Runs all unit tests same as CI/CD pipeline"
-    dependsOn(":domain:jacocoTestReport")
-    dependsOn(":data:testDebugUnitTestCoverage")
-    dependsOn(":app:createUnitTestCoverageReport")
-    dependsOn(":feature:devicecenter:testDebugUnitTestCoverage")
-    dependsOn(":feature:sync:testDebugUnitTestCoverage")
-    dependsOn(":shared:original-core-ui:testDebugUnitTestCoverage")
-    dependsOn(":legacy-core-ui:testDebugUnitTestCoverage")
-}
-
-
 tasks.register("printSubprojectPaths") {
     doLast {
         rootProject.subprojects.forEach {
             println("SUBPROJECT_PATH: " + it.path.removePrefix(":").replace(":", "/"))
+        }
+    }
+}
+
+tasks.register("runAllUnitTestsWithCoverage") {
+    group = "Verification"
+    description = "Runs all unit tests same as CI/CD pipeline"
+    val testTasks = rootProject.subprojects.flatMap { sub ->
+        listOfNotNull(
+            // We only add one test task for each module, which is the most fitted one.
+            sub.tasks.findByName("testDebugUnitTestCoverage")?.path   // for Android library
+                ?: sub.tasks.findByName("createUnitTestCoverageReport")?.path // for Android app
+                ?: sub.tasks.findByName("jacocoTestReport")?.path     // for JVM module
+        )
+    }.distinct()
+    println("Running Test Tasks: $testTasks")
+    dependsOn(testTasks)
+}
+
+tasks.register("printModulesWithUnitTest") {
+    doLast {
+        val unitTestTaskNames = listOf(
+            "testDebugUnitTestCoverage", // Android library
+            "createUnitTestCoverageReport", // Android app
+            "jacocoTestReport" // JVM module
+        )
+        rootProject.subprojects.forEach { sub ->
+            val hasUnitTestTask = unitTestTaskNames.any { sub.tasks.findByName(it) != null }
+            if (hasUnitTestTask) {
+                println("UNIT-TEST-MODULE: ${sub.path.removePrefix(":").replace(":", "/")}")
+            }
         }
     }
 }

@@ -72,7 +72,10 @@ class OverQuotaBannerTest {
     @Test
     fun `test that onCancelButtonClick is called when cancel button is clicked`() {
         val onCancelButtonClick = mock<() -> Unit>()
-        initComposeRuleContent(onCancelButtonClick = onCancelButtonClick)
+        initComposeRuleContent(
+            isTransferOverQuota = true,  // show the cancel button
+            onCancelButtonClick = onCancelButtonClick
+        )
 
         with(composeRule) {
             onNodeWithContentDescription(

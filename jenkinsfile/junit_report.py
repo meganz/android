@@ -57,11 +57,6 @@ for file in os.listdir(testReportRoot):
         total_failures = total_failures + int(values[2])
         total_errors = total_errors + int(values[3])
         total_duration = total_duration + float(values[4])
-if total_cases == 0:
-    print("No Unit Test data available.")
-    exit(0)
-else:
-    rate = "{0:.2%}".format((total_cases - total_failures - total_errors)/total_cases)
 
 # In order to easily parse the results in a table format, print them without any label and separate each result with a comma
 # The final results can be visualized as a String:

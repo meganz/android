@@ -767,7 +767,27 @@ def getModuleList() {
         .collect { it.replace("SUBPROJECT_PATH:", "").trim() }
         .findAll { !(it in EXCLUDED_MODULES) }
 
-    echo "MODULE_LIST: ${moduleList}"
+    print("MODULE_LIST: ${moduleList}")
+    return moduleList
+}
+
+/**
+ * Gets list of all modules that have unit tests by parsing output from printModulesWithUnitTest task.
+ * Excludes modules defined in EXCLUDED_MODULES.
+ * 
+ * @return List of module paths like ["app", "domain", "feature/chat"] that contain unit tests
+ */
+def getUnitTestModuleList() {
+    def unitTestModuleListRaw = sh(
+        script: "./gradlew printModulesWithUnitTest --no-daemon -q",
+        returnStdout: true
+    ).trim()
+
+    def moduleList = unitTestModuleListRaw.readLines()
+        .findAll { it.startsWith("UNIT-TEST-MODULE:") }
+        .collect { it.replace("UNIT-TEST-MODULE:", "").trim() }
+
+    print("UNIT_TEST_MODULE_LIST: ${moduleList}")
     return moduleList
 }
 

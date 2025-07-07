@@ -4,6 +4,8 @@
  * 2. Build SDK and publish to Artifactory
  */
 
+ @Library('jenkins-android-shared-lib') _
+
 BUILD_STEP = ''
 
 // Below values will be read from MR description and are used to decide SDK versions
@@ -456,15 +458,11 @@ pipeline {
                 script {
                     BUILD_STEP = "Upload Code Coverage"
 
-                    withCredentials([
-                            string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
-                            string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
-                    ]) {
-
-                        sh "./gradlew --no-daemon runUnitTest"
+                    util.useArtifactory() {
+                        sh "./gradlew --no-daemon runAllUnitTestsWithCoverage"
                         String artifactoryTargetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
                         String coverageSummaryFile = "coverage_summary.csv"
-                        sh "./gradlew --no-daemon collectCoverage --modules \"app,data,domain,shared/original-core-ui,feature/sync,feature/devicecenter,legacy-core-ui\" --csv-output ${coverageSummaryFile}"
+                        sh "./gradlew --no-daemon collectCoverage --modules \"${common.getUnitTestModuleList().join(",")}\" --csv-output ${coverageSummaryFile}"
                         sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"$WORKSPACE/$coverageSummaryFile\" \"${artifactoryTargetPath}/$coverageSummaryFile\""
                     }
                 }

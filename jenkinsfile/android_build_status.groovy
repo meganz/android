@@ -19,7 +19,6 @@ JSON_LINT_REPORT_LINK = ""
 
 NODE_LABELS = 'mac-jenkins-slave-android || mac-jenkins-slave'
 
-
 /**
  * Folder to contain build outputs, including APK, AAG and symbol files
  */
@@ -188,8 +187,6 @@ pipeline {
                         sh("rm -fv unit_test_result*.zip")
                         sh("rm -frv $ARCHIVE_FOLDER")
                         sh("mkdir -p ${WORKSPACE}/${ARCHIVE_FOLDER}")
-                        
-                        MODULE_LIST = new ArrayList(common.getModuleList())
                     }
                 }
             }
@@ -261,70 +258,21 @@ pipeline {
                         gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
                             script {
                                 util.useArtifactory() {
-                                    String buildReportPath = "build/unittest/html"
+                                    def moduleList = common.getUnitTestModuleList()
                                     try {
-                                        sh "./gradlew --no-daemon domain:jacocoTestReport"
+                                        sh "./gradlew --no-daemon runAllUnitTestsWithCoverage"
                                     } finally {
-                                        // if gradle command fails, we collect the test report. And the build will discontinue.
-                                        UNIT_TEST_RESULT_LINK_MAP.put("domain", unitTestArchiveLink("domain/$buildReportPath", "unit_test_result_domain.zip"))
-                                    }
-
-                                    try {
-                                        sh "./gradlew --no-daemon data:testDebugUnitTestCoverage"
-                                    } finally {
-                                        UNIT_TEST_RESULT_LINK_MAP.put("data", unitTestArchiveLink("data/$buildReportPath", "unit_test_result_data.zip"))
-                                    }
-
-                                    try {
-                                        sh "./gradlew --no-daemon app:createUnitTestCoverageReport"
-                                    } finally {
-                                        UNIT_TEST_RESULT_LINK_MAP.put("app", unitTestArchiveLink("app/$buildReportPath", "unit_test_result_app.zip"))
-                                    }
-
-                                    try {
-                                        sh "./gradlew --no-daemon feature:devicecenter:testDebugUnitTestCoverage"
-                                    } finally {
-                                        UNIT_TEST_RESULT_LINK_MAP.put("feature/devicecenter", unitTestArchiveLink("feature/devicecenter/$buildReportPath", "unit_test_result_feature_devicecenter.zip"))
-                                    }
-
-                                    try {
-                                        sh "./gradlew --no-daemon feature:sync:testDebugUnitTestCoverage"
-                                    } finally {
-                                        UNIT_TEST_RESULT_LINK_MAP.put("feature/sync", unitTestArchiveLink("feature/sync/$buildReportPath", "unit_test_result_feature_sync.zip"))
-                                    }
-
-                                    try {
-                                        sh "./gradlew --no-daemon shared:original-core-ui:testDebugUnitTestCoverage"
-                                    } finally {
-                                        UNIT_TEST_RESULT_LINK_MAP.put("shared/original-core-ui", unitTestArchiveLink("shared/original-core-ui/$buildReportPath", "unit_test_result_shared_original_core_ui.zip"))
-                                    }
-
-                                    try {
-                                        sh "./gradlew --no-daemon legacy-core-ui:testDebugUnitTestCoverage"
-                                    } finally {
-                                        UNIT_TEST_RESULT_LINK_MAP.put("legacy-core-ui", unitTestArchiveLink("legacy-core-ui/$buildReportPath", "unit_test_result_legacy_core_ui.zip"))
-                                    }
-
-                                    try {
-                                        sh "./gradlew --no-daemon feature:payment:payment-snowflake-components:testDebugUnitTestCoverage"
-                                    } finally {
-                                        UNIT_TEST_RESULT_LINK_MAP.put("feature/payment-snowflake-components", unitTestArchiveLink("feature/payment-snowflake-components/$buildReportPath", "unit_test_result_feature_payment_snowflake_components.zip"))
-                                    }
-
-                                    try {
-                                        sh "./gradlew --no-daemon feature:shared:shared-snowflake-components:testDebugUnitTestCoverage"
-                                    } finally {
-                                        UNIT_TEST_RESULT_LINK_MAP.put("feature/shared-snowflake-components", unitTestArchiveLink("feature/shared-snowflake-components/$buildReportPath", "unit_test_result_feature_shared_snowflake_components.zip"))
-                                    }
-
-                                    try {
-                                        sh "./gradlew --no-daemon feature:chat:testDebugUnitTestCoverage"
-                                    } finally {
-                                        UNIT_TEST_RESULT_LINK_MAP.put("feature/chat", unitTestArchiveLink("feature/chat/$buildReportPath", "unit_test_result_feature_chat.zip"))
+                                        
+                                        moduleList.each { module ->
+                                            UNIT_TEST_RESULT_LINK_MAP.put(
+                                                module, 
+                                                unitTestArchiveLink("${module}/build/unittest/html", "unit_test_result_${module.replace('/', '_')}.zip")
+                                            )
+                                        }
                                     }
 
                                     String htmlOutput = "coverage.html"
-                                    sh "./gradlew --no-daemon collectCoverage --modules \"${MODULE_LIST.join(",")}\" --html-output ${htmlOutput}"
+                                    sh "./gradlew --no-daemon collectCoverage --modules \"${moduleList.join(",")}\" --html-output ${htmlOutput}"
                                     COVERAGE_SUMMARY = getHtmlReport(htmlOutput, "No coverage report found")
                                 }
                             }
@@ -357,12 +305,14 @@ pipeline {
                                     sh "./gradlew --no-daemon lint"
                                 }
 
-                                MODULE_LIST.each { module ->
+                                def lintModuleList = new ArrayList(common.getModuleList())
+
+                                lintModuleList.each { module ->
                                     def lintJsonContent = generateLintSummary(module)
                                     checkFatalErrors(lintJsonContent)
                                     LINT_REPORT_SUMMARY_MAP.put(module, lintJsonContent)
                                 }
-                                archiveLintReports()
+                                archiveLintReports(lintModuleList)
 
                                 this.JSON_LINT_REPORT_LINK = common.uploadFileToArtifactory(LINT_REPORT_ARCHIVE)
                             }
@@ -516,7 +466,7 @@ def generateLintSummary(String module) {
 /**
  * Archive all HTML lint reports into a zip file.
  */
-def archiveLintReports() {
+def archiveLintReports(List<String> moduleList) {
     sh """
         cd ${WORKSPACE}
         rm -frv ${LINT_REPORT_FOLDER}
@@ -524,7 +474,7 @@ def archiveLintReports() {
         rm -fv ${LINT_REPORT_ARCHIVE}
     """
 
-    MODULE_LIST.eachWithIndex { module, _ ->
+    moduleList.each { module ->
         sh("cp -fv ${module}/build/reports/lint*.html ${WORKSPACE}/${LINT_REPORT_FOLDER}/${module.replace('/', '_')}_lint_report.html")
     }
 
