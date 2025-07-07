@@ -338,7 +338,9 @@ private fun ButtonsColumn(
                 .then(
                     Modifier.adaptiveWidth(isTablet, 16.dp)
                 )
-                .padding(bottom = spacing.x20)
+                // Temporary add bottom padding to avoid the buttons over the bottom navigation bar
+                // it will be removed when all the fragments are migrated to full Compose
+                .padding(bottom = spacing.x56)
                 .height(spacing.x48),
             text = stringResource(id = sharedR.string.login_text),
             onClick = onLoginClick
