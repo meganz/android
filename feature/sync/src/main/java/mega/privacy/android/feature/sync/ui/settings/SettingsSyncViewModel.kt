@@ -5,17 +5,22 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ClearSyncDebrisUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncDebrisSizeInBytesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByChargingUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSyncByChargingUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.worker.GetSyncFrequencyUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.worker.SetSyncFrequencyUseCase
+import mega.privacy.android.feature.sync.ui.model.SyncConnectionType
 import mega.privacy.android.feature.sync.ui.model.SyncFrequency
-import mega.privacy.android.feature.sync.ui.model.SyncOption
+import mega.privacy.android.feature.sync.ui.model.SyncPowerOption
 import mega.privacy.android.shared.resources.R
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
@@ -23,8 +28,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SettingsSyncViewModel @Inject constructor(
-    monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
+    private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
+    private val monitorSyncByChargingUseCase: MonitorSyncByChargingUseCase,
     private val setSyncByWiFiUseCase: SetSyncByWiFiUseCase,
+    private val setSyncByChargingUseCase: SetSyncByChargingUseCase,
     private val getSyncDebrisSizeUseCase: GetSyncDebrisSizeInBytesUseCase,
     private val clearSyncDebrisUseCase: ClearSyncDebrisUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
@@ -36,21 +43,37 @@ internal class SettingsSyncViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
+        monitorSyncSettings()
+        fetchSyncDebris()
+        loadSyncFrequency()
+    }
+
+    private fun monitorSyncSettings() {
         viewModelScope.launch {
-            monitorSyncByWiFiUseCase().collect { syncByWifi ->
+            combine(
+                monitorSyncByWiFiUseCase().catch { Timber.e("Error Monitoring Wifi Setting $it") },
+                monitorSyncByChargingUseCase().catch { Timber.e("Error Monitoring Charging Setting $it") },
+            ) { wifiSettings, batterySettings ->
+                wifiSettings to batterySettings
+            }.collect { (wiFiOnly, syncOnlyWhenCharging) ->
+
+                val syncConnectionType = when {
+                    wiFiOnly -> SyncConnectionType.WiFiOnly
+                    else -> SyncConnectionType.WiFiOrMobileData
+                }
+
+                val syncPowerOption = when {
+                    syncOnlyWhenCharging -> SyncPowerOption.SyncOnlyWhenCharging
+                    else -> SyncPowerOption.SyncAlways
+                }
                 _uiState.update {
                     it.copy(
-                        syncOption = if (syncByWifi) {
-                            SyncOption.WI_FI_ONLY
-                        } else {
-                            SyncOption.WI_FI_OR_MOBILE_DATA
-                        }
+                        syncConnectionType = syncConnectionType,
+                        syncPowerOption = syncPowerOption,
                     )
                 }
             }
         }
-        fetchSyncDebris()
-        loadSyncFrequency()
     }
 
     private fun loadSyncFrequency() {
@@ -76,8 +99,12 @@ internal class SettingsSyncViewModel @Inject constructor(
 
     fun handleAction(action: SettingsSyncAction) {
         when (action) {
-            is SettingsSyncAction.SyncOptionSelected -> {
-                setSyncByWiFi(action.option)
+            is SettingsSyncAction.SyncConnectionTypeSelected -> {
+                setSyncNetworkOption(action.option)
+            }
+
+            is SettingsSyncAction.SyncPowerOptionSelected -> {
+                setSyncPowerOption(action.option)
             }
 
             is SettingsSyncAction.ClearDebrisClicked -> {
@@ -108,10 +135,38 @@ internal class SettingsSyncViewModel @Inject constructor(
         }
     }
 
-    private fun setSyncByWiFi(option: SyncOption) {
+    private fun setSyncNetworkOption(option: SyncConnectionType) {
         viewModelScope.launch {
             runCatching {
-                setSyncByWiFiUseCase(option == SyncOption.WI_FI_ONLY)
+                when (option) {
+                    SyncConnectionType.WiFiOnly -> {
+                        setSyncByWiFiUseCase(true)
+                    }
+
+                    SyncConnectionType.WiFiOrMobileData -> {
+                        setSyncByWiFiUseCase(false)
+                    }
+                }
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(snackbarMessage = R.string.settings_sync_option_updated_message)
+                }
+            }.onFailure(Timber::e)
+        }
+    }
+
+    private fun setSyncPowerOption(option: SyncPowerOption) {
+        viewModelScope.launch {
+            runCatching {
+                when (option) {
+                    SyncPowerOption.SyncAlways -> {
+                        setSyncByChargingUseCase(false)
+                    }
+
+                    SyncPowerOption.SyncOnlyWhenCharging -> {
+                        setSyncByChargingUseCase(true)
+                    }
+                }
             }.onSuccess {
                 _uiState.update {
                     it.copy(snackbarMessage = R.string.settings_sync_option_updated_message)

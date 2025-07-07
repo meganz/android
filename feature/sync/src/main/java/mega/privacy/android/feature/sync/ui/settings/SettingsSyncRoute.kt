@@ -21,11 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.feature.sync.ui.model.SyncConnectionType
 import mega.privacy.android.feature.sync.ui.model.SyncFrequency
-import mega.privacy.android.feature.sync.ui.model.SyncOption
 import mega.privacy.android.feature.sync.ui.views.ClearSyncDebrisDialog
+import mega.privacy.android.feature.sync.ui.views.SyncConnectionTypesDialog
 import mega.privacy.android.feature.sync.ui.views.SyncFrequencyDialog
-import mega.privacy.android.feature.sync.ui.views.SyncOptionsDialog
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -44,8 +44,8 @@ internal fun SettingsSyncRoute(
         syncDebrisCleared = {
             viewModel.handleAction(SettingsSyncAction.ClearDebrisClicked)
         },
-        syncOptionSelected = { selectedOption ->
-            viewModel.handleAction(SettingsSyncAction.SyncOptionSelected(selectedOption))
+        syncConnectionTypeSelected = { selectedOption ->
+            viewModel.handleAction(SettingsSyncAction.SyncConnectionTypeSelected(selectedOption))
         },
         syncFrequencySelected = { selectedFrequency ->
             viewModel.handleAction(SettingsSyncAction.SyncFrequencySelected(selectedFrequency))
@@ -57,16 +57,16 @@ internal fun SettingsSyncRoute(
 }
 
 @Composable
-private fun SettingSyncScreen(
+internal fun SettingSyncScreen(
     uiState: SettingsSyncUiState,
     syncDebrisCleared: () -> Unit,
-    syncOptionSelected: (SyncOption) -> Unit,
+    syncConnectionTypeSelected: (SyncConnectionType) -> Unit,
     syncFrequencySelected: (SyncFrequency) -> Unit,
     snackbarShown: () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-    var showSyncOptionsDialog by rememberSaveable { mutableStateOf(false) }
+    var showSyncConnectionTypeDialog by rememberSaveable { mutableStateOf(false) }
     var showClearSyncDebrisDialog by rememberSaveable { mutableStateOf(false) }
     var showSyncFrequencyDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -88,10 +88,10 @@ private fun SettingSyncScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(padding),
             ) {
-                SyncOptionView(
-                    syncOption = uiState.syncOption,
-                    syncOptionsClicked = {
-                        showSyncOptionsDialog = true
+                SyncConnectionTypeView(
+                    syncNetworkOption = uiState.syncConnectionType,
+                    syncConnectionTypeClicked = {
+                        showSyncConnectionTypeDialog = true
                     },
                 )
                 SyncDebrisView(
@@ -111,29 +111,29 @@ private fun SettingSyncScreen(
             }
         }
     )
-    if (showSyncOptionsDialog) {
-        SyncOptionsDialog(
+    if (showSyncConnectionTypeDialog) {
+        SyncConnectionTypesDialog(
             onDismiss = {
-                showSyncOptionsDialog = false
+                showSyncConnectionTypeDialog = false
             },
-            selectedOption = uiState.syncOption,
-            onSyncOptionsClicked = { selectedSyncOption ->
-                when (selectedSyncOption) {
-                    SyncOption.WI_FI_OR_MOBILE_DATA -> {
+            selectedOption = uiState.syncConnectionType,
+            onSyncNetworkOptionsClicked = { selectedSyncNetworkOption ->
+                when (selectedSyncNetworkOption) {
+                    SyncConnectionType.WiFiOrMobileData -> {
                         Analytics.tracker.trackEvent(
                             SyncOptionSelectedEvent(SyncOptionSelected.SelectionType.SyncOptionWifiAndMobileSelected)
                         )
                     }
 
-                    SyncOption.WI_FI_ONLY -> {
+                    SyncConnectionType.WiFiOnly -> {
                         Analytics.tracker.trackEvent(
                             SyncOptionSelectedEvent(SyncOptionSelected.SelectionType.SyncOptionWifiOnlySelected)
                         )
                     }
                 }
 
-                syncOptionSelected(selectedSyncOption)
-                showSyncOptionsDialog = false
+                syncConnectionTypeSelected(selectedSyncNetworkOption)
+                showSyncConnectionTypeDialog = false
             },
         )
     }

@@ -273,3 +273,4 @@ app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/Crea
 app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/view/NewCreateAccountScreenTest.kt:hashicorp-tf-password:181
 app/src/test/java/mega/privacy/android/app/presentation/login/createaccount/view/NewCreateAccountScreenTest.kt:hashicorp-tf-password:202
 app/src/test/java/mega/privacy/android/app/presentation/login/LoginViewModelTest.kt:hashicorp-tf-password:688
+feature/sync/src/test/java/mega/privacy/android/feature/sync/presentation/SettingsSyncViewModelTest.kt:etsy-access-token:44
