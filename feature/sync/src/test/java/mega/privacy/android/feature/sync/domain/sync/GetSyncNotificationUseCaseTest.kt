@@ -436,7 +436,7 @@ internal class GetSyncNotificationUseCaseTest {
             )
 
             assertThat(result).isNull()
-            if (notificationType != SyncNotificationType.CHANGE_SYNC_ROOT) {
+            if (notificationType != SyncNotificationType.CHANGE_SYNC_ROOT && notificationType != SyncNotificationType.NOT_CHARGING) {
                 verify(syncNotificationManager).cancelNotification(notificationId)
                 verify(syncNotificationRepository).deleteDisplayedNotificationByType(
                     notificationType

@@ -78,6 +78,7 @@ internal class SyncNotificationRepositoryImplTest {
                     SyncNotificationType.ERROR -> sharedResR.string.general_sync_notification_generic_error_title
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_title
                     SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_title
+                    SyncNotificationType.NOT_CHARGING -> sharedResR.string.general_sync_notification_generic_error_title
                 },
                 text = when (notificationType) {
                     SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_text
@@ -85,6 +86,7 @@ internal class SyncNotificationRepositoryImplTest {
                     SyncNotificationType.ERROR -> sharedResR.string.general_sync_notification_generic_error_text
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_text
                     SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_text
+                    SyncNotificationType.NOT_CHARGING -> sharedResR.string.general_sync_notification_low_battery_text
                 },
                 syncNotificationType = notificationType,
                 notificationDetails = NotificationDetails(path = "Path", errorCode = 0)
@@ -114,6 +116,7 @@ internal class SyncNotificationRepositoryImplTest {
                     SyncNotificationType.ERROR -> sharedResR.string.general_sync_notification_generic_error_title
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_title
                     SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_title
+                    SyncNotificationType.NOT_CHARGING -> sharedResR.string.general_sync_notification_generic_error_title
                 },
                 text = when (notificationType) {
                     SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_text
@@ -121,6 +124,7 @@ internal class SyncNotificationRepositoryImplTest {
                     SyncNotificationType.ERROR -> sharedResR.string.general_sync_notification_generic_error_text
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_text
                     SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_text
+                    SyncNotificationType.NOT_CHARGING -> sharedResR.string.general_sync_notification_low_battery_text
                 },
                 syncNotificationType = notificationType,
                 notificationDetails = NotificationDetails(path = "Path", errorCode = null)
@@ -255,4 +259,32 @@ internal class SyncNotificationRepositoryImplTest {
 
             assertThat(result.first()).isEqualTo(notificationId)
         }
+
+    @Test
+    fun `test that getDeviceIsNotChargingNotification returns a generic error notification message`() =
+        runTest {
+            val notificationMessage: SyncNotificationMessage = mock()
+            whenever(genericErrorToNotificationMessageMapper(SyncNotificationType.NOT_CHARGING)).thenReturn(
+                notificationMessage
+            )
+
+            val result = underTest.getDeviceIsNotChargingNotification()
+
+            assertThat(result).isEqualTo(notificationMessage)
+        }
+
+    @ParameterizedTest
+    @EnumSource(SyncNotificationType::class)
+    fun `test that getSyncIssueNotificationByType returns a generic error notification message`(
+        notificationType: SyncNotificationType,
+    ) = runTest {
+        val notificationMessage: SyncNotificationMessage = mock()
+        whenever(genericErrorToNotificationMessageMapper(notificationType)).thenReturn(
+            notificationMessage
+        )
+
+        val result = underTest.getSyncIssueNotificationByType(notificationType)
+
+        assertThat(result).isEqualTo(notificationMessage)
+    }
 }

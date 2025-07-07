@@ -11,7 +11,7 @@ internal class GenericErrorToNotificationMessageMapper @Inject constructor() {
     operator fun invoke(
         syncNotificationType: SyncNotificationType,
         issuePath: String = "",
-        errorCode: Int = 0
+        errorCode: Int = 0,
     ): SyncNotificationMessage = SyncNotificationMessage(
         title = when (syncNotificationType) {
             SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_title
@@ -19,7 +19,7 @@ internal class GenericErrorToNotificationMessageMapper @Inject constructor() {
             else -> sharedResR.string.general_sync_notification_generic_error_title
         },
         text = when (syncNotificationType) {
-            SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_text
+            SyncNotificationType.BATTERY_LOW, SyncNotificationType.NOT_CHARGING -> sharedResR.string.general_sync_notification_low_battery_text
             SyncNotificationType.NOT_CONNECTED_TO_WIFI -> sharedResR.string.general_sync_notification_lost_wifi_text
             else -> sharedResR.string.general_sync_notification_generic_error_text
         },

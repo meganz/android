@@ -40,6 +40,13 @@ interface SyncNotificationRepository {
     suspend fun getBatteryLowNotification(): SyncNotificationMessage
 
     /**
+     * Get the user not charging notification message
+     * This notification is shown when the device is not charging
+     * @return the device not charging notification message
+     */
+    suspend fun getDeviceIsNotChargingNotification(): SyncNotificationMessage
+
+    /**
      * Get the user not on wifi notification message
      * @return the user not on wifi notification message
      */

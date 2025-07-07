@@ -26,6 +26,11 @@ enum class SyncNotificationType {
     NOT_CONNECTED_TO_WIFI,
 
     /**
+     * Notification for when device is not charging
+     */
+    NOT_CHARGING,
+
+    /**
      * Change sync root notification
      */
     CHANGE_SYNC_ROOT,

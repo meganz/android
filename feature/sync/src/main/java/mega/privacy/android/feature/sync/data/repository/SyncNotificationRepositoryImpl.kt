@@ -51,6 +51,9 @@ internal class SyncNotificationRepositoryImpl @Inject constructor(
     override suspend fun getBatteryLowNotification(): SyncNotificationMessage =
         genericErrorToNotificationMessageMapper(SyncNotificationType.BATTERY_LOW)
 
+    override suspend fun getDeviceIsNotChargingNotification(): SyncNotificationMessage =
+        genericErrorToNotificationMessageMapper(SyncNotificationType.NOT_CHARGING)
+
     override suspend fun getUserNotOnWifiNotification(): SyncNotificationMessage =
         genericErrorToNotificationMessageMapper(SyncNotificationType.NOT_CONNECTED_TO_WIFI)
 
