@@ -14,6 +14,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.transfers.notification.OpenTransfersSectionIntentMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -31,6 +32,7 @@ class CameraUploadsNotificationManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val stringWrapper: StringWrapper,
     private val getVideoCompressionSizeLimitUseCase: GetVideoCompressionSizeLimitUseCase,
+    private val openTransfersSectionIntentMapper: OpenTransfersSectionIntentMapper,
 ) {
 
     companion object {
@@ -63,20 +65,6 @@ class CameraUploadsNotificationManager @Inject constructor(
      */
     private val notificationManager: NotificationManager by lazy {
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    }
-
-    /**
-     * Default notification pending intent
-     * that will redirect to the manager activity with a [ACTION_CANCEL_CAM_SYNC] action
-     */
-    private val defaultPendingIntent: PendingIntent by lazy {
-        Intent(context, ManagerActivity::class.java).apply {
-            action = ACTION_CANCEL_CAM_SYNC
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-            putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-        }.let {
-            PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_IMMUTABLE)
-        }
     }
 
     /**
@@ -164,12 +152,19 @@ class CameraUploadsNotificationManager @Inject constructor(
         return builder.build()
     }
 
+    private suspend fun getDefaultPendingIntent() = PendingIntent.getActivity(
+        context,
+        0,
+        openTransfersSectionIntentMapper(TransfersTab.PENDING_TAB),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+
     /**
      * Display a notification for upload progress
      *
      * @progress an Int between 0 and 100
      */
-    private fun showUploadProgressNotification(
+    private suspend fun showUploadProgressNotification(
         totalUploaded: Int,
         totalToUpload: Int,
         totalUploadedBytes: Long,
@@ -177,24 +172,26 @@ class CameraUploadsNotificationManager @Inject constructor(
         progress: Int,
         areUploadsPaused: Boolean,
     ) {
-        val content = stringWrapper.getProgressSize(totalUploadedBytes, totalUploadBytes)
-        val notification = createNotification(
-            title = context.getString(
-                if (areUploadsPaused)
-                    R.string.upload_service_notification_paused
-                else
-                    R.string.upload_service_notification,
-                totalUploaded,
-                totalToUpload
-            ),
-            content = content,
-            subText = content,
-            intent = defaultPendingIntent,
-            isAutoCancel = false,
-            isOngoing = true,
-            progress = progress,
-        )
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        getDefaultPendingIntent()?.let { defaultPendingIntent ->
+            val content = stringWrapper.getProgressSize(totalUploadedBytes, totalUploadBytes)
+            val notification = createNotification(
+                title = context.getString(
+                    if (areUploadsPaused)
+                        R.string.upload_service_notification_paused
+                    else
+                        R.string.upload_service_notification,
+                    totalUploaded,
+                    totalToUpload
+                ),
+                content = content,
+                subText = content,
+                intent = defaultPendingIntent,
+                isAutoCancel = false,
+                isOngoing = true,
+                progress = progress,
+            )
+            notificationManager.notify(NOTIFICATION_ID, notification)
+        }
     }
 
     /**
@@ -202,40 +199,44 @@ class CameraUploadsNotificationManager @Inject constructor(
      *
      *  @progress an Int between 0 and 100
      */
-    private fun showVideoCompressionProgressNotification(
+    private suspend fun showVideoCompressionProgressNotification(
         progress: Int,
         currentFileIndex: Int,
         totalCount: Int,
     ) {
-        val content = context.getString(
-            R.string.title_compress_video,
-            currentFileIndex,
-            totalCount
-        )
-        val notification = createNotification(
-            title = context.getString(R.string.message_compress_video, "$progress%"),
-            content = content,
-            subText = content,
-            intent = defaultPendingIntent,
-            isAutoCancel = false,
-            isOngoing = true,
-            progress = progress,
-        )
-        notificationManager.notify(COMPRESSION_NOTIFICATION_ID, notification)
+        getDefaultPendingIntent()?.let { defaultPendingIntent ->
+            val content = context.getString(
+                R.string.title_compress_video,
+                currentFileIndex,
+                totalCount
+            )
+            val notification = createNotification(
+                title = context.getString(R.string.message_compress_video, "$progress%"),
+                content = content,
+                subText = content,
+                intent = defaultPendingIntent,
+                isAutoCancel = false,
+                isOngoing = true,
+                progress = progress,
+            )
+            notificationManager.notify(COMPRESSION_NOTIFICATION_ID, notification)
+        }
     }
 
     /**
      *  Display a notification for checking files to upload
      */
-    private fun showCheckUploadsNotification() {
-        val notification = createNotification(
-            title = context.getString(R.string.section_photo_sync),
-            content = context.getString(R.string.settings_camera_notif_checking_title),
-            intent = defaultPendingIntent,
-            isAutoCancel = false,
-            isOngoing = true,
-        )
-        notificationManager.notify(NOTIFICATION_ID, notification)
+    private suspend fun showCheckUploadsNotification() {
+        getDefaultPendingIntent()?.let { defaultPendingIntent ->
+            val notification = createNotification(
+                title = context.getString(R.string.section_photo_sync),
+                content = context.getString(R.string.settings_camera_notif_checking_title),
+                intent = defaultPendingIntent,
+                isAutoCancel = false,
+                isOngoing = true,
+            )
+            notificationManager.notify(NOTIFICATION_ID, notification)
+        }
     }
 
     /**
