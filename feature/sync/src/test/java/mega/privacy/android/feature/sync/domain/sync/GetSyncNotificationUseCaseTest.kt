@@ -60,6 +60,8 @@ internal class GetSyncNotificationUseCaseTest {
         val isSyncOnlyByWifi = true
         val syncs = emptyList<FolderPair>()
         val stalledIssues = emptyList<StalledIssue>()
+        val isCharging = true
+        val isSyncOnlyWhenCharging = false
 
         whenever(syncNotificationRepository.getDisplayedNotificationsIdsByType(any()))
             .thenReturn(emptyList())
@@ -69,7 +71,9 @@ internal class GetSyncNotificationUseCaseTest {
             isUserOnWifi,
             isSyncOnlyByWifi,
             syncs,
-            stalledIssues
+            stalledIssues,
+            isCharging,
+            isSyncOnlyWhenCharging
         )
 
         assertThat(result).isEqualTo(null)
@@ -83,6 +87,8 @@ internal class GetSyncNotificationUseCaseTest {
             val isSyncOnlyByWifi = true
             val syncs = listOf(mock<FolderPair> { on { syncError } doReturn mock() })
             val stalledIssues = emptyList<StalledIssue>()
+            val isCharging = true
+            val isSyncOnlyWhenCharging = false
             val notification: SyncNotificationMessage = mock()
             whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.BATTERY_LOW)).thenReturn(
                 emptyList()
@@ -97,7 +103,9 @@ internal class GetSyncNotificationUseCaseTest {
                 isUserOnWifi,
                 isSyncOnlyByWifi,
                 syncs,
-                stalledIssues
+                stalledIssues,
+                isCharging,
+                isSyncOnlyWhenCharging
             )
 
             assertThat(result).isEqualTo(notification)
@@ -111,6 +119,8 @@ internal class GetSyncNotificationUseCaseTest {
             val isSyncOnlyByWifi = true
             val syncs = listOf(mock<FolderPair>())
             val stalledIssues = emptyList<StalledIssue>()
+            val isCharging = true
+            val isSyncOnlyWhenCharging = false
             whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.BATTERY_LOW)).thenReturn(
                 listOf(mock())
             )
@@ -123,7 +133,9 @@ internal class GetSyncNotificationUseCaseTest {
                 isUserOnWifi,
                 isSyncOnlyByWifi,
                 syncs,
-                stalledIssues
+                stalledIssues,
+                isCharging,
+                isSyncOnlyWhenCharging
             )
 
             assertThat(result).isNull()
@@ -137,6 +149,8 @@ internal class GetSyncNotificationUseCaseTest {
             val isSyncOnlyByWifi = true
             val syncs = listOf(mock<FolderPair> { on { syncError } doReturn mock() })
             val stalledIssues = emptyList<StalledIssue>()
+            val isCharging = true
+            val isSyncOnlyWhenCharging = false
             val notification: SyncNotificationMessage = mock()
             whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.NOT_CONNECTED_TO_WIFI)).thenReturn(
                 emptyList()
@@ -153,7 +167,9 @@ internal class GetSyncNotificationUseCaseTest {
                 isUserOnWifi,
                 isSyncOnlyByWifi,
                 syncs,
-                stalledIssues
+                stalledIssues,
+                isCharging,
+                isSyncOnlyWhenCharging
             )
 
             assertThat(result).isEqualTo(notification)
@@ -170,6 +186,8 @@ internal class GetSyncNotificationUseCaseTest {
             val isSyncOnlyByWifi = true
             val syncs = listOf(mock<FolderPair>())
             val stalledIssues = emptyList<StalledIssue>()
+            val isCharging = true
+            val isSyncOnlyWhenCharging = false
             whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.NOT_CONNECTED_TO_WIFI)).thenReturn(
                 listOf(mock())
             )
@@ -182,7 +200,9 @@ internal class GetSyncNotificationUseCaseTest {
                 isUserOnWifi,
                 isSyncOnlyByWifi,
                 syncs,
-                stalledIssues
+                stalledIssues,
+                isCharging,
+                isSyncOnlyWhenCharging
             )
 
             verify(syncNotificationRepository).deleteDisplayedNotificationByType(
@@ -199,6 +219,8 @@ internal class GetSyncNotificationUseCaseTest {
             val isSyncOnlyByWifi = true
             val syncs = listOf(mock<FolderPair> { on { syncError } doReturn mock() })
             val stalledIssues = emptyList<StalledIssue>()
+            val isCharging = true
+            val isSyncOnlyWhenCharging = false
             val notification: SyncNotificationMessage = mock()
             whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.ERROR)).thenReturn(
                 emptyList()
@@ -215,7 +237,9 @@ internal class GetSyncNotificationUseCaseTest {
                 isUserOnWifi,
                 isSyncOnlyByWifi,
                 syncs,
-                stalledIssues
+                stalledIssues,
+                isCharging,
+                isSyncOnlyWhenCharging
             )
 
             assertThat(result).isEqualTo(notification)
@@ -245,6 +269,8 @@ internal class GetSyncNotificationUseCaseTest {
                 )
             )
             val stalledIssues = emptyList<StalledIssue>()
+            val isCharging = true
+            val isSyncOnlyWhenCharging = false
             whenever(syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.ERROR)).thenReturn(
                 listOf(
                     SyncNotificationMessage(
@@ -270,7 +296,9 @@ internal class GetSyncNotificationUseCaseTest {
                 isUserOnWifi,
                 isSyncOnlyByWifi,
                 syncs,
-                stalledIssues
+                stalledIssues,
+                isCharging,
+                isSyncOnlyWhenCharging
             )
 
             verify(syncNotificationRepository).deleteDisplayedNotificationByType(
@@ -291,6 +319,8 @@ internal class GetSyncNotificationUseCaseTest {
             val syncs =
                 listOf(mock<FolderPair> { on { syncError } doReturn SyncError.NO_SYNC_ERROR })
             val stalledIssues = listOf(mock<StalledIssue>())
+            val isCharging = true
+            val isSyncOnlyWhenCharging = false
             val notification: SyncNotificationMessage = mock()
             whenever(
                 syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.STALLED_ISSUE)
@@ -307,7 +337,9 @@ internal class GetSyncNotificationUseCaseTest {
                 isUserOnWifi,
                 isSyncOnlyByWifi,
                 syncs,
-                stalledIssues
+                stalledIssues,
+                isCharging,
+                isSyncOnlyWhenCharging
             )
 
             assertThat(result).isEqualTo(notification)
@@ -330,6 +362,8 @@ internal class GetSyncNotificationUseCaseTest {
             val isSyncOnlyByWifi = true
             val syncs = emptyList<FolderPair>()
             val stalledIssues = listOf(mock<StalledIssue>())
+            val isCharging = true
+            val isSyncOnlyWhenCharging = false
             whenever(
                 syncNotificationRepository.getDisplayedNotificationsByType(SyncNotificationType.STALLED_ISSUE)
             ).thenReturn(
@@ -357,7 +391,9 @@ internal class GetSyncNotificationUseCaseTest {
                 isUserOnWifi,
                 isSyncOnlyByWifi,
                 syncs,
-                stalledIssues
+                stalledIssues,
+                isCharging,
+                isSyncOnlyWhenCharging
             )
 
             verify(syncNotificationRepository).deleteDisplayedNotificationByType(
@@ -379,6 +415,8 @@ internal class GetSyncNotificationUseCaseTest {
         val isSyncOnlyByWifi = true
         val syncs = emptyList<FolderPair>()
         val stalledIssues = emptyList<StalledIssue>()
+        val isCharging = true
+        val isSyncOnlyWhenCharging = false
 
         whenever(
             syncNotificationRepository.getDisplayedNotificationsIdsByType(any())
@@ -389,7 +427,9 @@ internal class GetSyncNotificationUseCaseTest {
             isUserOnWifi,
             isSyncOnlyByWifi,
             syncs,
-            stalledIssues
+            stalledIssues,
+            isCharging,
+            isSyncOnlyWhenCharging
         )
 
         verify(syncNotificationRepository).deleteDisplayedNotificationByType(
@@ -419,6 +459,8 @@ internal class GetSyncNotificationUseCaseTest {
             val syncs =
                 listOf(mock<FolderPair> { on { syncError } doReturn SyncError.NO_SYNC_ERROR })
             val stalledIssues = emptyList<StalledIssue>()
+            val isCharging = true
+            val isSyncOnlyWhenCharging = false
             val notificationId = 1234
             whenever(syncNotificationRepository.getDisplayedNotificationsByType(notificationType))
                 .thenReturn(listOf(mock()))
@@ -432,7 +474,9 @@ internal class GetSyncNotificationUseCaseTest {
                 isUserOnWifi,
                 isSyncOnlyByWifi,
                 syncs,
-                stalledIssues
+                stalledIssues,
+                isCharging,
+                isSyncOnlyWhenCharging
             )
 
             assertThat(result).isNull()
@@ -442,5 +486,67 @@ internal class GetSyncNotificationUseCaseTest {
                     notificationType
                 )
             }
+        }
+
+    @Test
+    fun `test that use case returns charging notification when device is not charging and sync only when charging is enabled`() =
+        runTest {
+            val isBatteryLow = false
+            val isUserOnWifi = true
+            val isSyncOnlyByWifi = false
+            val syncs =
+                listOf(mock<FolderPair> { on { syncError } doReturn SyncError.NO_SYNC_ERROR })
+            val stalledIssues = emptyList<StalledIssue>()
+            val isCharging = false
+            val isSyncOnlyWhenCharging = true
+            val notification: SyncNotificationMessage = mock()
+
+            whenever(
+                syncNotificationRepository.getDisplayedNotificationsByType(any())
+            ).thenReturn(emptyList())
+            whenever(syncNotificationRepository.getDeviceIsNotChargingNotification()).thenReturn(
+                notification
+            )
+
+            val result = underTest(
+                isBatteryLow,
+                isUserOnWifi,
+                isSyncOnlyByWifi,
+                syncs,
+                stalledIssues,
+                isCharging,
+                isSyncOnlyWhenCharging
+            )
+
+            assertThat(result).isEqualTo(notification)
+        }
+
+    @Test
+    fun `test that use case returns null when device is charging and sync only when charging is enabled`() =
+        runTest {
+            val isBatteryLow = false
+            val isUserOnWifi = true
+            val isSyncOnlyByWifi = false
+            val syncs =
+                listOf(mock<FolderPair> { on { syncError } doReturn SyncError.NO_SYNC_ERROR })
+            val stalledIssues = emptyList<StalledIssue>()
+            val isCharging = true
+            val isSyncOnlyWhenCharging = true
+
+            whenever(
+                syncNotificationRepository.getDisplayedNotificationsIdsByType(any())
+            ).thenReturn(emptyList())
+
+            val result = underTest(
+                isBatteryLow,
+                isUserOnWifi,
+                isSyncOnlyByWifi,
+                syncs,
+                stalledIssues,
+                isCharging,
+                isSyncOnlyWhenCharging
+            )
+
+            assertThat(result).isNull()
         }
 }

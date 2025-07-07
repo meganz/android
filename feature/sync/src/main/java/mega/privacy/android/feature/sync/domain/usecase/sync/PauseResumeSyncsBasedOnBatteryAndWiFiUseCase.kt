@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.sync.domain.usecase.sync
 
 import kotlinx.coroutines.flow.first
-import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
@@ -25,30 +24,12 @@ class PauseResumeSyncsBasedOnBatteryAndWiFiUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @param connectedToInternet   True if device is connected to Internet or False otherwise
-     * @param syncOnlyByWifi        True if setting to sync only by WiFi is enabled or False otherwise
-     * @param batteryInfo           The device [BatteryInfo]
+     * @param shouldResumeSync       True if syncs should be resumed or False if they should be paused
      */
     suspend operator fun invoke(
-        connectedToInternet: Boolean,
-        isUserOnWifi: Boolean,
-        syncOnlyByWifi: Boolean,
-        batteryInfo: BatteryInfo,
+        shouldResumeSync: Boolean,
     ) {
-        val internetNotAvailable = !connectedToInternet
-        val userNotOnWifi = !isUserOnWifi
-        val isLowBatteryLevel =
-            batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging
-
-        if (internetNotAvailable || syncOnlyByWifi && userNotOnWifi || isLowBatteryLevel) {
-            val activeSyncs =
-                monitorSyncsUseCase().first()
-                    .filter {
-                        (it.syncError == SyncError.NO_SYNC_ERROR || it.syncError == null)
-                                && (it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.SYNCING)
-                    }
-            activeSyncs.forEach { pauseSyncUseCase(it.id) }
-        } else {
+        if (shouldResumeSync) {
             val activeSyncs =
                 monitorSyncsUseCase().first()
                     .filter {
@@ -59,13 +40,14 @@ class PauseResumeSyncsBasedOnBatteryAndWiFiUseCase @Inject constructor(
             activeSyncs.forEach {
                 resumeSyncUseCase(it.id)
             }
+        } else {
+            val activeSyncs =
+                monitorSyncsUseCase().first()
+                    .filter {
+                        (it.syncError == SyncError.NO_SYNC_ERROR || it.syncError == null)
+                                && (it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.SYNCING)
+                    }
+            activeSyncs.forEach { pauseSyncUseCase(it.id) }
         }
-    }
-
-    companion object {
-        /**
-         * Low battery level
-         */
-        const val LOW_BATTERY_LEVEL = 20
     }
 }

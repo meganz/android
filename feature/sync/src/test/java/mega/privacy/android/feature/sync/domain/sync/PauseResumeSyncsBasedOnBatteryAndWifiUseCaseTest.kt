@@ -2,7 +2,6 @@ package mega.privacy.android.feature.sync.domain.sync
 
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -11,7 +10,6 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase.Companion.LOW_BATTERY_LEVEL
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
@@ -78,7 +76,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
     }
 
     @Test
-    fun `test that sync is paused when not connected to internet`() = runTest {
+    fun `test that sync is paused when  invoked with false`() = runTest {
         val newPairs = folderPairs.mapIndexed { index, item ->
             item.copy(
                 syncStatus = if (index == 0) SyncStatus.SYNCING else SyncStatus.SYNCED,
@@ -87,19 +85,14 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
         whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
 
 
-        underTest(
-            connectedToInternet = false,
-            syncOnlyByWifi = true,
-            batteryInfo = BatteryInfo(100, true),
-            isUserOnWifi = true,
-        )
+        underTest(false)
 
         verify(pauseSyncUseCase).invoke(secondSyncId)
         verifyNoInteractions(resumeSyncUseCase, isSyncPausedByTheUserUseCase)
     }
 
     @Test
-    fun `test that sync is resumed when connected to internet and not only on wifi`() = runTest {
+    fun `test that sync is resumed when invoked with true`() = runTest {
         val newPairs = folderPairs.mapIndexed { index, item ->
             item.copy(
                 syncStatus = SyncStatus.PAUSED,
@@ -109,12 +102,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
         whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
         whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 
-        underTest(
-            connectedToInternet = true,
-            syncOnlyByWifi = false,
-            batteryInfo = BatteryInfo(100, true),
-            isUserOnWifi = true,
-        )
+        underTest(true)
 
         verify(resumeSyncUseCase).invoke(firstSyncId)
         verify(resumeSyncUseCase, times(0)).invoke(secondSyncId)
@@ -122,53 +110,8 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
     }
 
     @Test
-    fun `test that sync is paused when device has low battery level and not charging`() = runTest {
-        val newPairs = folderPairs.mapIndexed { index, item ->
-            item.copy(
-                syncStatus = SyncStatus.SYNCING,
-            )
-        }
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
-        whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
-        whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
 
-        underTest(
-            connectedToInternet = true,
-            syncOnlyByWifi = true,
-            batteryInfo = BatteryInfo(LOW_BATTERY_LEVEL - 1, false),
-            isUserOnWifi = true
-        )
-
-        verify(pauseSyncUseCase).invoke(firstSyncId)
-        verifyNoInteractions(resumeSyncUseCase)
-    }
-
-    @Test
-    fun `test that sync is resumed when device has low battery level but device is charging`() =
-        runTest {
-            val newPairs = folderPairs.mapIndexed { index, item ->
-                item.copy(
-                    syncStatus = SyncStatus.PAUSED,
-                )
-            }
-            whenever(monitorSyncsUseCase()).thenReturn(flowOf(newPairs))
-            whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
-            whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(true)
-
-            underTest(
-                connectedToInternet = true,
-                syncOnlyByWifi = false,
-                batteryInfo = BatteryInfo(LOW_BATTERY_LEVEL - 1, true),
-                isUserOnWifi = true
-            )
-
-            verify(resumeSyncUseCase).invoke(firstSyncId)
-            verifyNoInteractions(pauseSyncUseCase)
-        }
-
-    @Test
-
-    fun `test that sync is not resumed when has any error and device is connected to internet`() =
+    fun `test that sync is not resumed when syncs have errors`() =
         runTest {
             val newPairs = folderPairs.mapIndexed { index, item ->
                 item.copy(
@@ -180,12 +123,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
             whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(false)
 
-            underTest(
-                connectedToInternet = true,
-                syncOnlyByWifi = false,
-                batteryInfo = BatteryInfo(100, true),
-                isUserOnWifi = true
-            )
+            underTest(true)
 
             verify(resumeSyncUseCase).invoke(firstSyncId)
             verify(resumeSyncUseCase, times(0)).invoke(secondSyncId)
@@ -193,7 +131,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
         }
 
     @Test
-    fun `test that sync is not paused when has any error and device is not connected to wifi`() =
+    fun `test that sync is not paused when syncs have error`() =
         runTest {
             val newPairs = folderPairs.mapIndexed { index, item ->
                 item.copy(
@@ -205,12 +143,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             whenever(isSyncPausedByTheUserUseCase(firstSyncId)).thenReturn(false)
             whenever(isSyncPausedByTheUserUseCase(secondSyncId)).thenReturn(false)
 
-            underTest(
-                connectedToInternet = true,
-                syncOnlyByWifi = true,
-                batteryInfo = BatteryInfo(100, true),
-                isUserOnWifi = false
-            )
+            underTest(false)
 
             verify(pauseSyncUseCase).invoke(firstSyncId)
             verify(pauseSyncUseCase, times(0)).invoke(secondSyncId)

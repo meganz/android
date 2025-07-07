@@ -2,30 +2,28 @@ package mega.privacy.android.feature.sync.presentation
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
-import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.GetSyncNotificationUseCase
+import mega.privacy.android.feature.sync.domain.usecase.notifcation.MonitorSyncNotificationsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotificationShownUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import mega.privacy.android.feature.sync.ui.SyncMonitorViewModel
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.jupiter.api.AfterEach
@@ -46,8 +44,8 @@ class SyncMonitorViewModelTest {
 
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
     private val handleTransferEventUseCase: HandleTransferEventUseCase = mock()
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
-    private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
+    private val monitorShouldSyncUseCase: MonitorShouldSyncUseCase = mock()
+    private val monitorSyncNotificationsUseCase: MonitorSyncNotificationsUseCase = mock()
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
     private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase =
         mock()
@@ -61,12 +59,12 @@ class SyncMonitorViewModelTest {
 
     @BeforeEach
     fun setup() {
-        whenever(monitorTransferEventsUseCase()).thenReturn(flowOf())
-        whenever(monitorConnectivityUseCase()).thenReturn(flowOf())
-        whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf())
-        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf())
-        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf())
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf())
+        whenever(monitorTransferEventsUseCase()).thenReturn(emptyFlow())
+        whenever(monitorShouldSyncUseCase()).thenReturn(emptyFlow())
+        whenever(monitorSyncNotificationsUseCase()).thenReturn(emptyFlow())
+        whenever(monitorBatteryInfoUseCase()).thenReturn(emptyFlow())
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(emptyFlow())
+        whenever(monitorSyncsUseCase()).thenReturn(emptyFlow())
     }
 
     @AfterEach
@@ -74,8 +72,6 @@ class SyncMonitorViewModelTest {
         reset(
             monitorTransferEventsUseCase,
             handleTransferEventUseCase,
-            monitorConnectivityUseCase,
-            monitorSyncByWiFiUseCase,
             monitorBatteryInfoUseCase,
             pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
             monitorSyncStalledIssuesUseCase,
@@ -109,76 +105,22 @@ class SyncMonitorViewModelTest {
 
     @Test
     fun `test that monitor sync state updates sync state`() = runTest {
-        val batteryInfo = mock<BatteryInfo>()
-        val connectedToInternet = true
-        val syncOnlyByWifi = true
-        val isUserOnWifi = true
-        whenever(monitorConnectivityUseCase()).thenReturn(
-            flowOf(connectedToInternet)
-        )
-        whenever(monitorSyncByWiFiUseCase()).thenReturn(
-            flowOf(syncOnlyByWifi)
-        )
-        whenever(monitorBatteryInfoUseCase()).thenReturn(
-            flowOf(batteryInfo)
-        )
-        whenever(isOnWifiNetworkUseCase()).thenReturn(isUserOnWifi)
-
+        whenever(monitorShouldSyncUseCase()).thenReturn(flowOf(true))
         initViewModel()
         underTest.startMonitoring()
 
-        verify(pauseResumeSyncsBasedOnBatteryAndWiFiUseCase).invoke(
-            connectedToInternet = connectedToInternet,
-            isUserOnWifi = isUserOnWifi,
-            syncOnlyByWifi = syncOnlyByWifi,
-            batteryInfo = batteryInfo,
-        )
+        verify(pauseResumeSyncsBasedOnBatteryAndWiFiUseCase).invoke(true)
     }
 
     @Test
     fun `test that monitor notifications updates sync state`() = runTest {
-        val batteryInfo = mock<BatteryInfo>()
-        val connectedToInternet = true
-        val syncByWifi = true
-        val isOnWifi = false
-        val isBatteryLow = true
-        val syncs = emptyList<FolderPair>()
-        val stalledIssues = emptyList<StalledIssue>()
         val notificationMessage = SyncNotificationMessage(
             title = sharedResR.string.general_sync_notification_low_battery_title,
             text = sharedResR.string.general_sync_notification_low_battery_text,
             syncNotificationType = SyncNotificationType.BATTERY_LOW,
             notificationDetails = NotificationDetails(path = "", errorCode = 0)
         )
-        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(
-            flowOf(stalledIssues)
-        )
-        whenever(monitorSyncsUseCase()).thenReturn(
-            flowOf(syncs)
-        )
-        whenever(monitorConnectivityUseCase()).thenReturn(
-            flowOf(connectedToInternet)
-        )
-        whenever(monitorSyncByWiFiUseCase()).thenReturn(
-            flowOf(syncByWifi)
-        )
-        whenever(monitorBatteryInfoUseCase()).thenReturn(
-            flowOf(batteryInfo)
-        )
-        whenever(isOnWifiNetworkUseCase()).thenReturn(
-            isOnWifi
-        )
-        whenever(
-            getSyncNotificationUseCase(
-                isBatteryLow = isBatteryLow,
-                isUserOnWifi = isOnWifi,
-                isSyncOnlyByWifi = syncByWifi,
-                syncs = syncs,
-                stalledIssues = stalledIssues
-            )
-        ).thenReturn(
-            notificationMessage
-        )
+        whenever(monitorSyncNotificationsUseCase()).thenReturn(flowOf(notificationMessage))
 
         initViewModel()
         underTest.startMonitoring()
@@ -204,17 +146,12 @@ class SyncMonitorViewModelTest {
 
     private fun initViewModel() {
         underTest = SyncMonitorViewModel(
-            monitorTransferEventsUseCase,
-            handleTransferEventUseCase,
-            monitorConnectivityUseCase,
-            monitorSyncByWiFiUseCase,
-            monitorBatteryInfoUseCase,
-            pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
-            monitorSyncStalledIssuesUseCase,
-            monitorSyncsUseCase,
-            setSyncNotificationShownUseCase,
-            getSyncNotificationUseCase,
-            isOnWifiNetworkUseCase,
+            monitorTransferEventsUseCase = monitorTransferEventsUseCase,
+            handleTransferEventUseCase = handleTransferEventUseCase,
+            monitorShouldSyncUseCase = monitorShouldSyncUseCase,
+            monitorSyncNotificationsUseCase = monitorSyncNotificationsUseCase,
+            pauseResumeSyncsBasedOnBatteryAndWiFiUseCase = pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
+            setSyncNotificationShownUseCase = setSyncNotificationShownUseCase,
         )
     }
 }

@@ -9,30 +9,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.extension.collectChunked
-import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
-import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.feature.sync.domain.entity.FolderPair
-import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
-import mega.privacy.android.feature.sync.domain.usecase.notifcation.GetSyncNotificationUseCase
+import mega.privacy.android.feature.sync.domain.usecase.notifcation.MonitorSyncNotificationsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotificationShownUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase.Companion.LOW_BATTERY_LEVEL
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -45,15 +36,10 @@ import kotlin.time.Duration.Companion.seconds
 class SyncMonitorViewModel @Inject constructor(
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val handleTransferEventUseCase: HandleTransferEventUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
-    private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
+    private val monitorShouldSyncUseCase: MonitorShouldSyncUseCase,
+    private val monitorSyncNotificationsUseCase: MonitorSyncNotificationsUseCase,
     private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
-    private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
-    private val monitorSyncsUseCase: MonitorSyncsUseCase,
     private val setSyncNotificationShownUseCase: SetSyncNotificationShownUseCase,
-    private val getSyncNotificationUseCase: GetSyncNotificationUseCase,
-    private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncMonitorState())
@@ -99,77 +85,27 @@ class SyncMonitorViewModel @Inject constructor(
     private fun monitorSyncState() {
         if (monitorSyncsStateJob == null || monitorSyncsStateJob?.isCancelled == true) {
             monitorSyncsStateJob = viewModelScope.launch {
-                combine(
-                    monitorConnectivityUseCase(),
-                    monitorSyncByWiFiUseCase(),
-                    monitorBatteryInfoUseCase(),
-                ) { connectedToInternet: Boolean, syncByWifi: Boolean, batteryInfo: BatteryInfo ->
-                    Pair(
-                        batteryInfo,
-                        Triple(
-                            connectedToInternet,
-                            syncByWifi,
-                            isOnWifiNetworkUseCase(),
-                        )
-                    )
-                }
+                monitorShouldSyncUseCase()
                     .distinctUntilChanged()
                     .catch { Timber.e("Error Monitoring SyncState $it") }
-                    .collect { (batteryInfo, connectionDetails) ->
-                        val (connectedToInternet, syncOnlyByWifi, isUserOnWifi) = connectionDetails
-                        updateSyncState(
-                            connectedToInternet = connectedToInternet,
-                            syncOnlyByWifi = syncOnlyByWifi,
-                            batteryInfo = batteryInfo,
-                            isUserOnWifi = isUserOnWifi
-                        )
+                    .collect {
+                        pauseResumeSyncsBasedOnBatteryAndWiFiUseCase(it)
                     }
             }
         }
     }
 
-    private suspend fun updateSyncState(
-        connectedToInternet: Boolean,
-        syncOnlyByWifi: Boolean,
-        batteryInfo: BatteryInfo,
-        isUserOnWifi: Boolean,
-    ) {
-        pauseResumeSyncsBasedOnBatteryAndWiFiUseCase(
-            connectedToInternet = connectedToInternet,
-            syncOnlyByWifi = syncOnlyByWifi,
-            batteryInfo = batteryInfo,
-            isUserOnWifi = isUserOnWifi,
-        )
-    }
-
     private fun monitorNotifications() {
         if (monitorNotificationsJob == null || monitorNotificationsJob?.isCancelled == true) {
-            monitorNotificationsJob = combine(
-                monitorSyncStalledIssuesUseCase(),
-                monitorSyncsUseCase(),
-                monitorBatteryInfoUseCase(),
-                monitorSyncByWiFiUseCase(),
-                monitorConnectivityUseCase()
-            ) { stalledIssues: List<StalledIssue>, syncs: List<FolderPair>, batteryInfo: BatteryInfo, syncByWifi: Boolean, _ ->
-                runCatching {
-                    getSyncNotificationUseCase(
-                        isBatteryLow = batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging,
-                        isUserOnWifi = isOnWifiNetworkUseCase(),
-                        isSyncOnlyByWifi = syncByWifi,
-                        syncs = syncs,
-                        stalledIssues = stalledIssues
-                    )
-                }.onSuccess { notification ->
-                    notification?.let {
-                        _state.update { it.copy(displayNotification = notification) }
-                    }
-                }
-                    .onFailure {
-                        Timber.e(it)
-                    }
-            }
-                .distinctUntilChanged()
-                .launchIn(viewModelScope)
+            monitorNotificationsJob =
+                monitorSyncNotificationsUseCase()
+                    .distinctUntilChanged()
+                    .catch { Timber.e("Error Monitoring SyncNotification $it") }
+                    .onEach { notification ->
+                        notification?.let {
+                            _state.update { it.copy(displayNotification = notification) }
+                        }
+                    }.launchIn(viewModelScope)
         }
     }
 

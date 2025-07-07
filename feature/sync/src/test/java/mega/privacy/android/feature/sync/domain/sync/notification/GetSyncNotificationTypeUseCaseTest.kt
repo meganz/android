@@ -30,91 +30,99 @@ class GetSyncNotificationTypeUseCaseTest {
             isBatteryLow = false,
             isUserOnWifi = true,
             isSyncOnlyByWifi = true,
+            isCharging = true,
+            isSyncOnlyWhenCharging = false,
             syncs = emptyList(),
             stalledIssues = emptyList()
         )
-        Truth.assertThat(result).isEqualTo(null)
+        Truth.assertThat(result).isNull()
+    }
+
+    @Test
+    fun `test that it returns CHANGE_SYNC_ROOT when sync has invalid local path`() {
+        val folderPair = createFolderPair(isLocalPathUri = true)
+        val result = underTest(
+            isBatteryLow = false,
+            isUserOnWifi = true,
+            isSyncOnlyByWifi = true,
+            isCharging = true,
+            isSyncOnlyWhenCharging = false,
+            syncs = listOf(folderPair),
+            stalledIssues = emptyList()
+        )
+        Truth.assertThat(result).isEqualTo(SyncNotificationType.CHANGE_SYNC_ROOT)
+    }
+
+    @Test
+    fun `test that it returns CHANGE_SYNC_ROOT when sync has ignore file error`() {
+        val folderPair = createFolderPair(syncError = SyncError.COULD_NOT_CREATE_IGNORE_FILE)
+        val result = underTest(
+            isBatteryLow = false,
+            isUserOnWifi = true,
+            isSyncOnlyByWifi = true,
+            isCharging = true,
+            isSyncOnlyWhenCharging = false,
+            syncs = listOf(folderPair),
+            stalledIssues = emptyList()
+        )
+        Truth.assertThat(result).isEqualTo(SyncNotificationType.CHANGE_SYNC_ROOT)
+    }
+
+    @Test
+    fun `test that it returns NOT_CHARGING when device is not charging and sync only when charging is enabled`() {
+        val folderPair = createFolderPair()
+        val result = underTest(
+            isBatteryLow = false,
+            isUserOnWifi = true,
+            isSyncOnlyByWifi = true,
+            isCharging = false,
+            isSyncOnlyWhenCharging = true,
+            syncs = listOf(folderPair),
+            stalledIssues = emptyList()
+        )
+        Truth.assertThat(result).isEqualTo(SyncNotificationType.NOT_CHARGING)
     }
 
     @Test
     fun `test that it returns BATTERY_LOW when battery is low`() {
-        val firstSync = FolderPair(
-            id = 343L,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "Sync",
-            localFolderPath = LOCAL_FOLDER_PATH,
-            remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
-            syncStatus = SyncStatus.SYNCED,
-        )
-        val secondSync = FolderPair(
-            id = 6886L,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "Trip_to_NZ",
-            localFolderPath = LOCAL_FOLDER_PATH,
-            remoteFolder = RemoteFolder(NodeId(1244L), "NZ_trip"),
-            syncStatus = SyncStatus.SYNCED,
-        )
+        val folderPair = createFolderPair()
         val result = underTest(
             isBatteryLow = true,
             isUserOnWifi = true,
             isSyncOnlyByWifi = true,
-            syncs = listOf(firstSync, secondSync),
-            stalledIssues = emptyList()
+            isCharging = true,
+            isSyncOnlyWhenCharging = false,
+            syncs = listOf(folderPair),
+            stalledIssues = listOf(mock(), mock())
         )
         Truth.assertThat(result).isEqualTo(SyncNotificationType.BATTERY_LOW)
     }
 
     @Test
-    fun `test that it returns NOT_CONNECTED_TO_WIFI when network constraint is not respected`() {
-        val firstSync = FolderPair(
-            id = 343L,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "Sync",
-            localFolderPath = LOCAL_FOLDER_PATH,
-            remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
-            syncStatus = SyncStatus.SYNCED,
-        )
-        val secondSync = FolderPair(
-            id = 6886L,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "Trip_to_NZ",
-            localFolderPath = LOCAL_FOLDER_PATH,
-            remoteFolder = RemoteFolder(NodeId(1244L), "NZ_trip"),
-            syncStatus = SyncStatus.SYNCED,
-        )
+    fun `test that it returns NOT_CONNECTED_TO_WIFI when not on wifi and sync only by wifi is enabled`() {
+        val folderPair = createFolderPair()
         val result = underTest(
             isBatteryLow = false,
             isUserOnWifi = false,
             isSyncOnlyByWifi = true,
-            syncs = listOf(firstSync, secondSync),
+            isCharging = true,
+            isSyncOnlyWhenCharging = false,
+            syncs = listOf(folderPair),
             stalledIssues = emptyList()
         )
         Truth.assertThat(result).isEqualTo(SyncNotificationType.NOT_CONNECTED_TO_WIFI)
     }
 
     @Test
-    fun `test that it returns ERROR when any sync has an error`() {
-        val firstSync = FolderPair(
-            id = 343L,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "Sync",
-            localFolderPath = LOCAL_FOLDER_PATH,
-            remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
-            syncStatus = SyncStatus.SYNCED,
-        )
-        val secondSync = FolderPair(
-            id = 6886L,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "Trip_to_NZ",
-            localFolderPath = LOCAL_FOLDER_PATH,
-            remoteFolder = RemoteFolder(NodeId(1244L), "NZ_trip"),
-            syncStatus = SyncStatus.ERROR,
-        )
+    fun `test that it returns ERROR when sync has error`() {
+        val folderPair = createFolderPair(syncError = SyncError.UNKNOWN_ERROR)
         val result = underTest(
             isBatteryLow = false,
             isUserOnWifi = true,
             isSyncOnlyByWifi = true,
-            syncs = listOf(firstSync, secondSync),
+            isCharging = true,
+            isSyncOnlyWhenCharging = false,
+            syncs = listOf(folderPair),
             stalledIssues = emptyList()
         )
         Truth.assertThat(result).isEqualTo(SyncNotificationType.ERROR)
@@ -122,109 +130,74 @@ class GetSyncNotificationTypeUseCaseTest {
 
     @Test
     fun `test that it returns STALLED_ISSUE when there are stalled issues`() {
-        val sync = FolderPair(
-            id = 343L,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "Sync",
-            localFolderPath = LOCAL_FOLDER_PATH,
-            remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
-            syncStatus = SyncStatus.SYNCED,
-            syncError = SyncError.NO_SYNC_ERROR
-        )
+        val folderPair = createFolderPair()
         val result = underTest(
             isBatteryLow = false,
             isUserOnWifi = true,
             isSyncOnlyByWifi = true,
-            syncs = listOf(sync),
+            isCharging = true,
+            isSyncOnlyWhenCharging = false,
+            syncs = listOf(folderPair),
             stalledIssues = listOf(mock(), mock())
         )
         Truth.assertThat(result).isEqualTo(SyncNotificationType.STALLED_ISSUE)
     }
 
     @Test
-    fun `test that it returns null when no conditions are met`() {
+    fun `test that it returns null when all conditions are normal`() {
+        val folderPair = createFolderPair()
         val result = underTest(
             isBatteryLow = false,
             isUserOnWifi = true,
             isSyncOnlyByWifi = true,
-            syncs = emptyList(),
+            isCharging = true,
+            isSyncOnlyWhenCharging = false,
+            syncs = listOf(folderPair),
             stalledIssues = emptyList()
         )
         Truth.assertThat(result).isNull()
     }
 
     @Test
-    fun `test that it returns CHANGE_SYNC_ROOT when local folder path is not an URI`() {
-        val firstSync = FolderPair(
-            id = 343L,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "Sync",
-            localFolderPath = LOCAL_FOLDER_PATH,
-            remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
-            syncStatus = SyncStatus.SYNCED,
-        )
-        val secondSync = FolderPair(
-            id = 6886L,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "Trip_to_NZ",
-            localFolderPath = "/path/to/trip_to_nz",
-            remoteFolder = RemoteFolder(NodeId(1244L), "NZ_trip"),
-            syncStatus = SyncStatus.SYNCED,
-        )
-        val result = underTest(
-            isBatteryLow = true,
-            isUserOnWifi = true,
-            isSyncOnlyByWifi = true,
-            syncs = listOf(firstSync, secondSync),
-            stalledIssues = emptyList()
-        )
-        Truth.assertThat(result).isEqualTo(SyncNotificationType.CHANGE_SYNC_ROOT)
-    }
-
-    @Test
-    fun `test that it returns CHANGE_SYNC_ROOT when syncError is COULD_NOT_CREATE_IGNORE_FILE`() {
-        val firstSync = FolderPair(
-            id = 343L,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "Sync",
-            localFolderPath = LOCAL_FOLDER_PATH,
-            remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
-            syncStatus = SyncStatus.SYNCED,
-            syncError = SyncError.COULD_NOT_CREATE_IGNORE_FILE
-        )
+    fun `test that it returns null when sync only by wifi is disabled and user is not on wifi`() {
+        val folderPair = createFolderPair()
         val result = underTest(
             isBatteryLow = false,
-            isUserOnWifi = true,
-            isSyncOnlyByWifi = true,
-            syncs = listOf(firstSync),
-            stalledIssues = emptyList()
-        )
-        Truth.assertThat(result).isEqualTo(SyncNotificationType.CHANGE_SYNC_ROOT)
-    }
-
-    @Test
-    fun `test that it returns null when all conditions are met and no issues exist`() {
-        val firstSync = FolderPair(
-            id = 343L,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "Sync",
-            localFolderPath = LOCAL_FOLDER_PATH,
-            remoteFolder = RemoteFolder(NodeId(1244L), "sync_mobile"),
-            syncStatus = SyncStatus.SYNCED,
-            syncError = SyncError.NO_SYNC_ERROR
-        )
-        val result = underTest(
-            isBatteryLow = false,
-            isUserOnWifi = true,
-            isSyncOnlyByWifi = true,
-            syncs = listOf(firstSync),
+            isUserOnWifi = false,
+            isSyncOnlyByWifi = false,
+            isCharging = true,
+            isSyncOnlyWhenCharging = false,
+            syncs = listOf(folderPair),
             stalledIssues = emptyList()
         )
         Truth.assertThat(result).isNull()
     }
 
-    private companion object {
-        const val LOCAL_FOLDER_PATH =
-            "content://com.android.externalstorage.documents/document/primary%3APHOTOS"
+    @Test
+    fun `test that it returns null when sync only when charging is disabled and device is not charging`() {
+        val folderPair = createFolderPair()
+        val result = underTest(
+            isBatteryLow = false,
+            isUserOnWifi = true,
+            isSyncOnlyByWifi = false,
+            isCharging = false,
+            isSyncOnlyWhenCharging = false,
+            syncs = listOf(folderPair),
+            stalledIssues = emptyList()
+        )
+        Truth.assertThat(result).isNull()
     }
+
+    private fun createFolderPair(
+        isLocalPathUri: Boolean = false,
+        syncError: SyncError = SyncError.NO_SYNC_ERROR,
+    ) = FolderPair(
+        id = 1L,
+        pairName = "Test Pair",
+        localFolderPath = if (isLocalPathUri) "/test/path" else "content://com.android.externalstorage.documents/document/primary%3APHOTOS",
+        remoteFolder = RemoteFolder(NodeId(1L), "Test Remote"),
+        syncStatus = SyncStatus.SYNCING,
+        syncType = SyncType.TYPE_TWOWAY,
+        syncError = syncError
+    )
 }

@@ -6,6 +6,7 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.BATTERY_LOW
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.ERROR
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.NOT_CHARGING
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.NOT_CONNECTED_TO_WIFI
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.STALLED_ISSUE
 import mega.privacy.android.feature.sync.domain.repository.SyncNotificationRepository
@@ -31,6 +32,8 @@ class GetSyncNotificationUseCase @Inject constructor(
         isSyncOnlyByWifi: Boolean,
         syncs: List<FolderPair>,
         stalledIssues: List<StalledIssue>,
+        isCharging: Boolean,
+        isSyncOnlyWhenCharging: Boolean,
     ): SyncNotificationMessage? {
         val isNetworkConstraintRespected = (isSyncOnlyByWifi && isUserOnWifi) || !isSyncOnlyByWifi
 
@@ -38,6 +41,10 @@ class GetSyncNotificationUseCase @Inject constructor(
             syncs.isEmpty() -> {
                 resetAllNotifications()
                 null
+            }
+
+            isCharging.not() && isSyncOnlyWhenCharging -> {
+                getDeviceIsNotChargingNotification()
             }
 
             isBatteryLow -> {
@@ -71,6 +78,7 @@ class GetSyncNotificationUseCase @Inject constructor(
 
     private suspend fun resetAllNotifications() {
         resetBatteryLowNotification()
+        resetDeviceNotChargingNotification()
         resetNetworkConstraintNotification()
         resetSyncErrorsNotification()
         resetSyncStalledIssuesNotification()
@@ -82,6 +90,14 @@ class GetSyncNotificationUseCase @Inject constructor(
                 syncNotificationManager.cancelNotification(notificationId = notificationId)
             }
         syncNotificationRepository.deleteDisplayedNotificationByType(BATTERY_LOW)
+    }
+
+    private suspend fun resetDeviceNotChargingNotification() {
+        syncNotificationRepository.getDisplayedNotificationsIdsByType(NOT_CHARGING)
+            .forEach { notificationId ->
+                syncNotificationManager.cancelNotification(notificationId = notificationId)
+            }
+        syncNotificationRepository.deleteDisplayedNotificationByType(NOT_CHARGING)
     }
 
     private suspend fun resetNetworkConstraintNotification() {
@@ -111,6 +127,13 @@ class GetSyncNotificationUseCase @Inject constructor(
     private suspend fun getBatteryLowNotification(): SyncNotificationMessage? =
         if (syncNotificationRepository.getDisplayedNotificationsByType(BATTERY_LOW).isEmpty()) {
             syncNotificationRepository.getBatteryLowNotification()
+        } else {
+            null
+        }
+
+    private suspend fun getDeviceIsNotChargingNotification(): SyncNotificationMessage? =
+        if (syncNotificationRepository.getDisplayedNotificationsByType(NOT_CHARGING).isEmpty()) {
+            syncNotificationRepository.getDeviceIsNotChargingNotification()
         } else {
             null
         }

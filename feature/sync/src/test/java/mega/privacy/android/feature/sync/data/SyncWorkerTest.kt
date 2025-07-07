@@ -15,6 +15,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -22,26 +23,21 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
-import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.sync.data.SyncWorker.Companion.SYNC_WORKER_RECHECK_DELAY
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
-import mega.privacy.android.feature.sync.domain.usecase.notifcation.GetSyncNotificationUseCase
+import mega.privacy.android.feature.sync.domain.usecase.notifcation.MonitorSyncNotificationsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotificationShownUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import org.junit.Before
@@ -72,11 +68,8 @@ class SyncWorkerTest {
     private val loginMutex: Mutex = mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
-    private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
-    private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
-    private val getSyncNotificationUseCase: GetSyncNotificationUseCase = mock()
-    private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase = mock()
+    private val monitorShouldSyncUseCase: MonitorShouldSyncUseCase = mock()
+    private val monitorSyncNotificationsUseCase: MonitorSyncNotificationsUseCase = mock()
     private val syncNotificationManager: SyncNotificationManager = mock()
     private val setSyncNotificationShownUseCase: SetSyncNotificationShownUseCase = mock()
     private val isRootNodeExistsUseCase: RootNodeExistsUseCase = mock()
@@ -111,28 +104,23 @@ class SyncWorkerTest {
             )
         )
         whenever(loginMutex.isLocked).thenReturn(false)
+        whenever(monitorShouldSyncUseCase()).thenReturn(flowOf(true))
+        whenever(monitorSyncNotificationsUseCase()).thenReturn(emptyFlow())
         whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
-        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(mock()))
-        whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(false))
-        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
         underTest = SyncWorker(
-            context,
-            workParams,
-            monitorSyncsUseCase,
-            loginMutex,
-            backgroundFastLoginUseCase,
-            monitorSyncStalledIssuesUseCase,
-            monitorBatteryInfoUseCase,
-            monitorSyncByWiFiUseCase,
-            monitorConnectivityUseCase,
-            getSyncNotificationUseCase,
-            isOnWifiNetworkUseCase,
-            syncNotificationManager,
-            setSyncNotificationShownUseCase,
-            pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
-            isRootNodeExistsUseCase,
-            syncPermissionsManager,
-            cookieEnabledCheckWrapper,
+            context = context,
+            workerParams = workParams,
+            monitorSyncsUseCase = monitorSyncsUseCase,
+            loginMutex = loginMutex,
+            monitorShouldSyncUseCase = monitorShouldSyncUseCase,
+            monitorSyncNotificationsUseCase = monitorSyncNotificationsUseCase,
+            backgroundFastLoginUseCase = backgroundFastLoginUseCase,
+            syncNotificationManager = syncNotificationManager,
+            setSyncNotificationShownUseCase = setSyncNotificationShownUseCase,
+            pauseResumeSyncsBasedOnBatteryAndWiFiUseCase = pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
+            isRootNodeExistsUseCase = isRootNodeExistsUseCase,
+            syncPermissionManager = syncPermissionsManager,
+            cookieEnabledCheckWrapper = cookieEnabledCheckWrapper,
         )
     }
 
@@ -211,35 +199,7 @@ class SyncWorkerTest {
     @Test
     fun `test that sync worker dispatches notifications`() = runTest {
         val notification: SyncNotificationMessage = mock()
-        val firstSync = FolderPair(
-            id = 1,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "first",
-            localFolderPath = "first",
-            remoteFolder = RemoteFolder(id = NodeId(1232L), name = "first"),
-            syncStatus = SyncStatus.SYNCED,
-            syncError = SyncError.ACTIVE_SYNC_SAME_PATH
-        )
-        val secondSync = FolderPair(
-            id = 2,
-            syncType = SyncType.TYPE_TWOWAY,
-            pairName = "second",
-            localFolderPath = "second",
-            remoteFolder = RemoteFolder(id = NodeId(2222L), name = "second"),
-            syncStatus = SyncStatus.SYNCED
-        )
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(firstSync, secondSync)))
-        whenever(isOnWifiNetworkUseCase()).thenReturn(true)
-        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, false)))
-        whenever(
-            getSyncNotificationUseCase(
-                isBatteryLow = false,
-                isUserOnWifi = true,
-                isSyncOnlyByWifi = false,
-                syncs = listOf(firstSync, secondSync),
-                stalledIssues = emptyList()
-            )
-        ).thenReturn(notification)
+        whenever(monitorSyncNotificationsUseCase()).thenReturn(flowOf(notification))
         whenever(syncPermissionsManager.isNotificationsPermissionGranted()).thenReturn(true)
         whenever(syncNotificationManager.isSyncNotificationDisplayed()).thenReturn(false)
 
@@ -279,41 +239,18 @@ class SyncWorkerTest {
     }
 
     @Test
-    fun `test that syncs are paused when battery is low and not charging`() = runTest {
-        val batteryInfo = BatteryInfo(level = 10, isCharging = false)
-        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(batteryInfo))
-        whenever(isOnWifiNetworkUseCase()).thenReturn(true)
-        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(mock())))
-        whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(false))
-        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+    fun `test that syncs are paused when should be paused`() = runTest {
+        whenever(monitorShouldSyncUseCase()).thenReturn(flowOf(false))
         underTest.doWork()
 
-        verify(pauseResumeSyncsBasedOnBatteryAndWiFiUseCase).invoke(
-            connectedToInternet = true,
-            syncOnlyByWifi = false,
-            batteryInfo = batteryInfo,
-            isUserOnWifi = true
-        )
+        verify(pauseResumeSyncsBasedOnBatteryAndWiFiUseCase).invoke(false)
     }
 
     @Test
-    fun `test that syncs are resumed when battery is not low and not charging`() = runTest {
-        val batteryInfo = BatteryInfo(level = 30, isCharging = false)
-        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(batteryInfo))
-        whenever(isOnWifiNetworkUseCase()).thenReturn(true)
-        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(mock())))
-        whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(false))
-        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+    fun `test that syncs are resumed when should be resumed`() = runTest {
+        whenever(monitorShouldSyncUseCase()).thenReturn(flowOf(true))
         underTest.doWork()
-
-        verify(pauseResumeSyncsBasedOnBatteryAndWiFiUseCase).invoke(
-            connectedToInternet = true,
-            syncOnlyByWifi = false,
-            batteryInfo = batteryInfo,
-            isUserOnWifi = true
-        )
+        verify(pauseResumeSyncsBasedOnBatteryAndWiFiUseCase).invoke(true)
     }
 
     @Test
@@ -337,22 +274,4 @@ class SyncWorkerTest {
 
             assertThat(result).isEqualTo(Result.retry())
         }
-
-    @Test
-    fun `test monitorNotifications handles exception from isOnWifiNetworkUseCase`() = runTest {
-        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(emptyList()))
-        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(mock()))
-        whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(false))
-        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-        whenever(isOnWifiNetworkUseCase()).thenThrow(RuntimeException("WiFi check failed"))
-
-        underTest.doWork()
-
-        verifyNoInteractions(
-            pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
-            syncNotificationManager,
-            syncPermissionsManager
-        )
-    }
 }
