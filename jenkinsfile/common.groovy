@@ -739,6 +739,41 @@ def fetchSlackChannelIdsByReleaseVersion(String version) {
 }
 
 
+/**
+ * Gets list of all module paths in the project by parsing output from printSubprojectPaths task.
+ * @return List of module paths like ["app", "domain", "feature/chat"]
+ */
+def getModuleList() {
+    // excluded modules
+    EXCLUDED_MODULES = [
+        'android-database-sqlcipher',
+        'baselineprofile',
+        'core',
+        'feature',
+        'shared',
+        'core/analytics',
+        'feature/payment',
+        'feature/shared',
+        'feature/transfers'
+    ]
+
+    def moduleListRaw = sh(
+        script: "./gradlew printSubprojectPaths --no-daemon -q",
+        returnStdout: true
+    ).trim()
+
+    def moduleList = moduleListRaw.readLines()
+        .findAll { it.startsWith("SUBPROJECT_PATH:") }
+        .collect { it.replace("SUBPROJECT_PATH:", "").trim() }
+        .findAll { !(it in EXCLUDED_MODULES) }
+
+    echo "MODULE_LIST: ${moduleList}"
+    return moduleList
+}
+
+
+
+
 return this
 
 

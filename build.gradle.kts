@@ -117,3 +117,12 @@ tasks.register("runUnitTest") {
     dependsOn(":shared:original-core-ui:testDebugUnitTestCoverage")
     dependsOn(":legacy-core-ui:testDebugUnitTestCoverage")
 }
+
+
+tasks.register("printSubprojectPaths") {
+    doLast {
+        rootProject.subprojects.forEach {
+            println("SUBPROJECT_PATH: " + it.path.removePrefix(":").replace(":", "/"))
+        }
+    }
+}

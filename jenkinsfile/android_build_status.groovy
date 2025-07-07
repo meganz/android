@@ -5,8 +5,6 @@ BUILD_STEP = ""
 GMS_APK_BUILD_LOG = "gms_build.log"
 QA_APK_BUILD_LOG = "qa_build.log"
 
-MODULE_LIST = ['app', 'domain', 'data', 'core/analytics/analytics-tracker', 'feature/chat', 'feature/devicecenter', 'feature/sync', 'shared/original-core-ui', 'shared/sync', 'core/formatter', 'legacy-core-ui']
-
 LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
 LINT_REPORT_SUMMARY_MAP = [:]
@@ -188,9 +186,10 @@ pipeline {
                         sh("rm -fv ${CONSOLE_LOG_FILE}")
                         sh("set")
                         sh("rm -fv unit_test_result*.zip")
-
                         sh("rm -frv $ARCHIVE_FOLDER")
                         sh("mkdir -p ${WORKSPACE}/${ARCHIVE_FOLDER}")
+                        
+                        MODULE_LIST = new ArrayList(common.getModuleList())
                     }
                 }
             }
@@ -486,12 +485,31 @@ static String wrapBuildWarnings(String rawWarning) {
  * [errorCount:20, errorMessage:None, fatalCount:10, informationCount:40, warningCount:30]
  */
 def generateLintSummary(String module) {
+    def reportsDir = "$WORKSPACE/${module}/build/reports"
+    
+    // Find lint XML result files, which matches "lint-*.xml"
+    def lintResultsFiles = sh(
+        script: "ls ${reportsDir}/lint-*.xml 2>/dev/null || true",
+        returnStdout: true
+    ).trim().split("\\r?\\n").findAll { it }
+
+    // Validate lint results exist
+    if (!lintResultsFiles) {
+        util.failPipeline("No lint-*.xml file found in ${reportsDir}")
+    }
+
+    // Process first lint results file
+    def lintResultsFile = lintResultsFiles[0]
     def targetFile = "${module}_processed-lint-results.json"
-    sh "./gradlew --no-daemon generateLintReport --lint-results $WORKSPACE/${module}/build/reports/lint-results.xml --target-file ${targetFile}"
+
+    // Generate JSON report from XML
+    sh "./gradlew --no-daemon generateLintReport --lint-results ${lintResultsFile} --target-file ${targetFile}"
+    
+    // Parse JSON report
     def lintJsonFile = readFile(targetFile)
     def lintJsonContent = new HashMap(new groovy.json.JsonSlurper().parseText(lintJsonFile))
+    
     print("lintSummary($module) = ${lintJsonContent}")
-
     return lintJsonContent
 }
 
@@ -574,3 +592,4 @@ def checkFatalErrors(def lintJsonContent) {
         util.failPipeline("!!!!!!!! There are ${fatalCount} fatal lint errors. Build is failing.")
     }
 }
+

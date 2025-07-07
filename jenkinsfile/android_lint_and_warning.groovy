@@ -7,8 +7,6 @@ GMS_APK_BUILD_LOG = "gms_build.log"
 BUILD_WARNING_FILE = "buildWarnings.json"
 WARNING_SOURCE_FILE = "warningResultLog.txt"
 
-MODULE_LIST = ['app', 'domain', 'data', 'core/analytics/analytics-tracker', 'feature/chat', 'feature/devicecenter', 'feature/sync', 'shared/original-core-ui', 'shared/sync', 'core/formatter', 'legacy-core-ui']
-
 LINT_REPORT_SUMMARY_MAP = [:]
 
 /**
@@ -87,8 +85,8 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Preparation'
-
                     common = load('jenkinsfile/common.groovy')
+                    MODULE_LIST = new ArrayList(common.getModuleList())
                 }
             }
         }
