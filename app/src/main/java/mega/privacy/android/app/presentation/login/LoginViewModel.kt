@@ -48,9 +48,7 @@ import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
-import mega.privacy.android.domain.exception.LoginBlockedAccount
 import mega.privacy.android.domain.exception.LoginException
-import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
@@ -308,13 +306,7 @@ class LoginViewModel @Inject constructor(
                         state.copy(themeMode = themeMode)
                     }
                 },
-                flow { emit(getFeatureFlagValueUseCase(AppFeatures.LoginRevamp)) }
-                    .catch { Timber.e(it) }
-                    .map { enabled ->
-                        { state: LoginState ->
-                            state.copy(isLoginNewDesignEnabled = enabled)
-                        }
-                    },
+
             ).collect {
                 _state.update(it)
             }
@@ -323,19 +315,12 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch { resetChatSettingsUseCase() }
 
         viewModelScope.launch {
-            val blockedTypes = if (getFeatureFlagValueUseCase(AppFeatures.LoginRevamp)) {
-                setOf(
-                    AccountBlockedType.TOS_COPYRIGHT,
-                    AccountBlockedType.TOS_NON_COPYRIGHT,
-                    AccountBlockedType.VERIFICATION_EMAIL,
-                    AccountBlockedType.SUBUSER_DISABLED
-                )
-            } else {
-                setOf(
-                    AccountBlockedType.TOS_COPYRIGHT,
-                    AccountBlockedType.TOS_NON_COPYRIGHT
-                )
-            }
+            val blockedTypes = setOf(
+                AccountBlockedType.TOS_COPYRIGHT,
+                AccountBlockedType.TOS_NON_COPYRIGHT,
+                AccountBlockedType.VERIFICATION_EMAIL,
+                AccountBlockedType.SUBUSER_DISABLED
+            )
 
             monitorAccountBlockedUseCase()
                 .filter { it.type in blockedTypes }
@@ -785,35 +770,21 @@ class LoginViewModel @Inject constructor(
         _state.update { loginState ->
             //If LoginBlockedAccount will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
             //If LoginLoggedOutFromOtherLocation will be handled in the Activity
-            if (loginState.isLoginNewDesignEnabled == true) {
-                val snackbarMessage = this.newError
-                    .takeIf {
-                        // in the new design we don't show snackbar for these errors
-                        this !is LoginTooManyAttempts
-                                && this !is LoginWrongEmailOrPassword
-                    }?.let { triggered(it) }
-                loginState.copy(
-                    isLoginInProgress = false,
-                    isLoginRequired = true,
-                    is2FAEnabled = is2FARequest,
-                    is2FARequired = false,
-                    fetchNodesUpdate = null,
-                    loginException = this,
-                    snackbarMessage = snackbarMessage ?: consumed()
-                )
-            } else {
-                val error = this.error
-                    .takeUnless { this is LoginLoggedOutFromOtherLocation || this is LoginBlockedAccount }
-                loginState.copy(
-                    isLoginInProgress = false,
-                    isLoginRequired = true,
-                    is2FAEnabled = is2FARequest,
-                    is2FARequired = false,
-                    fetchNodesUpdate = null,
-                    loginException = this.takeIf { exception -> exception is LoginLoggedOutFromOtherLocation },
-                    snackbarMessage = error?.let { triggered(it) } ?: consumed()
-                )
-            }
+            val snackbarMessage = this.newError
+                .takeIf {
+                    // in the new design we don't show snackbar for these errors
+                    this !is LoginTooManyAttempts
+                            && this !is LoginWrongEmailOrPassword
+                }?.let { triggered(it) }
+            loginState.copy(
+                isLoginInProgress = false,
+                isLoginRequired = true,
+                is2FAEnabled = is2FARequest,
+                is2FARequired = false,
+                fetchNodesUpdate = null,
+                loginException = this,
+                snackbarMessage = snackbarMessage ?: consumed()
+            )
         }
 
     private suspend fun LoginStatus.checkStatus(

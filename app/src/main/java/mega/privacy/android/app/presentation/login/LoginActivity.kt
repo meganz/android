@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.login
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -10,16 +8,13 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,11 +27,9 @@ import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.login.confirmemail.confirmationEmailScreen
 import mega.privacy.android.app.presentation.login.confirmemail.openConfirmationEmailScreen
-import mega.privacy.android.app.presentation.login.createaccount.CreateAccountScreen
 import mega.privacy.android.app.presentation.login.createaccount.createAccountScreen
 import mega.privacy.android.app.presentation.login.createaccount.openCreateAccountScreen
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
-import mega.privacy.android.app.presentation.login.onboarding.TourScreen
 import mega.privacy.android.app.presentation.login.onboarding.openTourScreen
 import mega.privacy.android.app.presentation.login.onboarding.tourScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
@@ -121,30 +114,7 @@ class LoginActivity : BaseActivity() {
         setContent {
             val uiState by viewModel.state.collectAsStateWithLifecycle()
             val navController = rememberNavController()
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination
             val focusManager = LocalFocusManager.current
-            val keyboardController = LocalSoftwareKeyboardController.current
-
-            val visibleFragment = when {
-                currentDestination?.hierarchy?.any {
-                    it.route == LoginScreen::class.qualifiedName
-                } == true -> Constants.LOGIN_FRAGMENT
-
-                currentDestination?.hierarchy?.any {
-                    it.route == CreateAccountScreen::class.qualifiedName
-                } == true -> Constants.CREATE_ACCOUNT_FRAGMENT
-
-                currentDestination?.hierarchy?.any {
-                    it.route == TourScreen::class.qualifiedName
-                } == true -> Constants.TOUR_FRAGMENT
-
-                else -> Constants.CONFIRM_EMAIL_FRAGMENT
-            }
-
-            LaunchedEffect(uiState.isLoginNewDesignEnabled, visibleFragment) {
-                restrictOrientation(uiState.isLoginNewDesignEnabled == true, visibleFragment)
-            }
 
             LaunchedEffect(uiState.isPendingToShowFragment) {
                 val fragmentType = uiState.isPendingToShowFragment
@@ -255,22 +225,6 @@ class LoginActivity : BaseActivity() {
      */
     fun showFragment(fragmentType: LoginFragmentType) {
         viewModel.setPendingFragmentToShow(fragmentType)
-    }
-
-    /**
-     * Restrict to portrait mode always for mobile devices and tablets (already restricted via Manifest).
-     * Allow the landscape mode only for tablets and only for TOUR_FRAGMENT.
-     */
-    @SuppressLint("SourceLockedOrientationActivity")
-    private fun restrictOrientation(isLoginNewDesignEnabled: Boolean, visibleFragment: Int) {
-        requestedOrientation =
-            if (isLoginNewDesignEnabled || visibleFragment == Constants.TOUR_FRAGMENT || visibleFragment == Constants.CREATE_ACCOUNT_FRAGMENT) {
-                Timber.d("Tour/create account screen landscape mode allowed")
-                ActivityInfo.SCREEN_ORIENTATION_FULL_USER
-            } else {
-                Timber.d("Other screens landscape mode restricted")
-                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
     }
 
     override fun shouldSetStatusBarTextColor() = false

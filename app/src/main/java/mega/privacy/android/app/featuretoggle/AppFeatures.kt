@@ -170,13 +170,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
         false,
     ),
 
-    /**
-     *  Login Revamp with new components
-     */
-    LoginRevamp(
-        "Login Revamp with new components",
-        true,
-    ),
+
 
     /**
      *  Registration Revamp with new components

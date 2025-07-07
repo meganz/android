@@ -34,7 +34,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.isIsHeartBeatAlive
 import mega.privacy.android.app.MegaApplication.Companion.setHeartBeatAlive
@@ -54,10 +53,8 @@ import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTI
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
-import mega.privacy.android.app.presentation.login.view.LoginView
 import mega.privacy.android.app.presentation.login.view.NewLoginView
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp
-import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountProtectionAlertActivity
 import mega.privacy.android.app.providers.FileProviderActivity
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -73,9 +70,6 @@ import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.LoginScreenEvent
 import nz.mega.sdk.MegaError
@@ -85,7 +79,6 @@ import javax.inject.Inject
 /**
  * Login fragment.
  *
- * @property getThemeMode [MonitorThemeModeUseCase]
  */
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -94,15 +87,12 @@ class LoginFragment : Fragment() {
     @LoginMutex
     lateinit var loginMutex: Mutex
 
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
-
     private val viewModel: LoginViewModel by activityViewModels()
 
     private val billingViewModel by activityViewModels<BillingViewModel>()
 
     private var insertMKDialog: AlertDialog? = null
-    private var confirmLogoutDialog: AlertDialog? = null
+
 
     private var intentExtras: Bundle? = null
     private var intentData: Uri? = null
@@ -118,11 +108,6 @@ class LoginFragment : Fragment() {
     ): View = ComposeView(requireContext()).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent { LoginScreen() }
-    }
-
-    override fun onDestroy() {
-        confirmLogoutDialog?.dismiss()
-        super.onDestroy()
     }
 
     @Composable
@@ -143,12 +128,6 @@ class LoginFragment : Fragment() {
 
         EventEffect(uiState.onBackPressedEvent, viewModel::consumedOnBackPressedEvent) {
             onBackPressed(uiState)
-        }
-
-        LaunchedEffect(uiState.isLoginRequired) {
-            if (uiState.isLoginRequired) {
-                confirmLogoutDialog?.dismiss()
-            }
         }
 
         LaunchedEffect(uiState.ongoingTransfersExist) {
@@ -178,64 +157,33 @@ class LoginFragment : Fragment() {
             }
         }
 
-        if (uiState.isLoginNewDesignEnabled == true) {
-            AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
-                LaunchedEffect(Unit) {
-                    Analytics.tracker.trackEvent(LoginScreenEvent)
-                }
-                NewLoginView(
-                    state = uiState,
-                    onEmailChanged = viewModel::onEmailChanged,
-                    onPasswordChanged = viewModel::onPasswordChanged,
-                    onLoginClicked = {
-                        LoginActivity.isBackFromLoginPage = false
-                        viewModel.onLoginClicked(false)
-                        billingViewModel.loadSkus()
-                        billingViewModel.loadPurchases()
-                    },
-                    onForgotPassword = { onForgotPassword(uiState.accountSession?.email) },
-                    onCreateAccount = ::onCreateAccount,
-                    onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
-                    on2FAChanged = viewModel::on2FAChanged,
-                    onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
-                    onBackPressed = { onBackPressed(uiState) },
-                    onReportIssue = ::openLoginIssueHelpdeskPage,
-                    onLoginExceptionConsumed = viewModel::setLoginErrorConsumed,
-                    onResetAccountBlockedEvent = viewModel::resetAccountBlockedEvent,
-                    onResendVerificationEmail = viewModel::resendVerificationEmail,
-                    onResetResendVerificationEmailEvent = viewModel::resetResendVerificationEmailEvent,
-                    stopLogin = viewModel::stopLogin,
-                )
+        AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
+            LaunchedEffect(Unit) {
+                Analytics.tracker.trackEvent(LoginScreenEvent)
             }
-        } else if (uiState.isLoginNewDesignEnabled == false) {
-            EventEffect(
-                event = uiState.accountBlockedEvent,
-                onConsumed = viewModel::resetAccountBlockedEvent
-            ) {
-                showBlockedDialogLegacy(it)
-            }
-            OriginalTheme(isDark = uiState.themeMode.isDarkMode()) {
-                LoginView(
-                    state = uiState,
-                    onEmailChanged = viewModel::onEmailChanged,
-                    onPasswordChanged = viewModel::onPasswordChanged,
-                    onLoginClicked = {
-                        LoginActivity.isBackFromLoginPage = false
-                        viewModel.onLoginClicked(false)
-                        billingViewModel.loadSkus()
-                        billingViewModel.loadPurchases()
-                    },
-                    onForgotPassword = { onForgotPassword(uiState.accountSession?.email) },
-                    onCreateAccount = ::onCreateAccount,
-                    onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
-                    on2FAPinChanged = viewModel::on2FAPinChanged,
-                    on2FAChanged = viewModel::on2FAChanged,
-                    onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
-                    onBackPressed = { onBackPressed(uiState) },
-                    onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
-                    onReportIssue = ::openLoginIssueHelpdeskPage,
-                )
-            }
+            NewLoginView(
+                state = uiState,
+                onEmailChanged = viewModel::onEmailChanged,
+                onPasswordChanged = viewModel::onPasswordChanged,
+                onLoginClicked = {
+                    LoginActivity.isBackFromLoginPage = false
+                    viewModel.onLoginClicked(false)
+                    billingViewModel.loadSkus()
+                    billingViewModel.loadPurchases()
+                },
+                onForgotPassword = { onForgotPassword(uiState.accountSession?.email) },
+                onCreateAccount = ::onCreateAccount,
+                onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
+                on2FAChanged = viewModel::on2FAChanged,
+                onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
+                onBackPressed = { onBackPressed(uiState) },
+                onReportIssue = ::openLoginIssueHelpdeskPage,
+                onLoginExceptionConsumed = viewModel::setLoginErrorConsumed,
+                onResetAccountBlockedEvent = viewModel::resetAccountBlockedEvent,
+                onResendVerificationEmail = viewModel::resendVerificationEmail,
+                onResetResendVerificationEmailEvent = viewModel::resetResendVerificationEmailEvent,
+                stopLogin = viewModel::stopLogin,
+            )
         }
 
         // Hide splash after UI is rendered, to prevent blinking
@@ -525,20 +473,6 @@ class LoginFragment : Fragment() {
         viewModel.intentSet()
     }
 
-    private fun showBlockedDialogLegacy(accountBlockedDetail: AccountBlockedDetail) {
-        if (accountBlockedDetail.type == AccountBlockedType.VERIFICATION_EMAIL) {
-            if (!MegaApplication.isBlockedDueToWeakAccount && !MegaApplication.isWebOpenDueToEmailVerification) {
-                startActivity(
-                    Intent(
-                        activity,
-                        WeakAccountProtectionAlertActivity::class.java
-                    )
-                )
-            }
-        } else if (!TextUtil.isTextEmpty(accountBlockedDetail.text)) {
-            Util.showErrorAlertDialog(accountBlockedDetail.text, false, activity)
-        }
-    }
 
     /**
      * Handles intent from confirmation email.
@@ -613,7 +547,7 @@ class LoginFragment : Fragment() {
             }
         }
 
-        confirmLogoutDialog?.dismiss()
+
         val loginActivity = requireActivity() as LoginActivity
         val isLoggedInToConfirmedAccount =
             !loginActivity.intent.getStringExtra(Constants.EXTRA_CONFIRMATION).isNullOrEmpty()
@@ -953,17 +887,6 @@ class LoginFragment : Fragment() {
         }
     }
 
-    /**
-     * Shows a confirmation dialog before cancelling the current in progress login.
-     */
-    private fun showConfirmLogoutDialog() {
-        confirmLogoutDialog = MaterialAlertDialogBuilder(requireContext())
-            .setCancelable(true)
-            .setMessage(getString(R.string.confirm_cancel_login))
-            .setPositiveButton(getString(R.string.general_positive_button)) { _, _ -> viewModel.stopLogin() }
-            .setNegativeButton(getString(R.string.general_negative_button), null)
-            .show()
-    }
 
     /**
      * Performs on back pressed.
@@ -984,11 +907,7 @@ class LoginFragment : Fragment() {
                     return
 
                 is2FARequired || multiFactorAuthState != null -> {
-                    if (isLoginNewDesignEnabled == true) {
-                        viewModel.stopLogin()
-                    } else {
-                        showConfirmLogoutDialog()
-                    }
+                    viewModel.stopLogin()
                 }
 
                 loginMutex.isLocked || isLoginInProgress || isFastLoginInProgress || fetchNodesUpdate != null ->

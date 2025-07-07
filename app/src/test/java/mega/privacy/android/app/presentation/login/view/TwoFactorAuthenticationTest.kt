@@ -22,9 +22,7 @@ class TwoFactorAuthenticationTest {
     @Test
     fun test_that_content_display_correctly() {
         createCompose(
-            state = LoginState(
-                isLoginNewDesignEnabled = true,
-            )
+            state = LoginState()
         )
 
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.lost_your_authenticator_device))
@@ -41,7 +39,6 @@ class TwoFactorAuthenticationTest {
     fun test_that_error_show_correctly() {
         createCompose(
             state = LoginState(
-                isLoginNewDesignEnabled = true,
                 multiFactorAuthState = MultiFactorAuthState.Failed
             )
         )
@@ -54,7 +51,6 @@ class TwoFactorAuthenticationTest {
     fun test_that_loading_indicator_shows_correctly() {
         createCompose(
             state = LoginState(
-                isLoginNewDesignEnabled = true,
                 multiFactorAuthState = MultiFactorAuthState.Checking
             )
         )

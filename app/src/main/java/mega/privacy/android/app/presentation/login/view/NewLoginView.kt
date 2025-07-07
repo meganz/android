@@ -86,6 +86,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
@@ -120,13 +121,17 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.view.NewChangeApiServerDialog
 import mega.privacy.android.app.presentation.extensions.login.newError
+import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
+import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.login.view.LoginTestTags.ACCOUNT_BLOCKED_DIALOG
 import mega.privacy.android.app.presentation.login.view.LoginTestTags.ACCOUNT_LOCKED_DIALOG
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.entity.login.FetchNodesUpdate
+import mega.privacy.android.domain.entity.login.TemporaryWaitingError
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.icon.pack.IconPack
@@ -906,4 +911,68 @@ private fun LandscapeLoginViewPreview(
     }
 }
 
+
+/**
+ * LoginState parameter provider for compose previews.
+ */
+private class LoginStateProvider : PreviewParameterProvider<LoginState> {
+    override val values = listOf(
+        LoginState(
+            isLoginRequired = true,
+            accountSession = AccountSession(email = "email@email.es"),
+            password = "Password",
+            isLocalLogoutInProgress = true
+        ),
+        LoginState(
+            isLoginRequired = true,
+            accountSession = AccountSession(email = ""),
+            emailError = LoginError.EmptyEmail,
+            password = "",
+            passwordError = LoginError.EmptyPassword
+        ),
+        LoginState(
+            isLoginInProgress = true,
+        ),
+        LoginState(
+            isLoginInProgress = true,
+            requestStatusProgress = Progress(0.2f)
+        ),
+        LoginState(
+            isLoginInProgress = true,
+            requestStatusProgress = Progress(0.7f)
+        ),
+        LoginState(
+            fetchNodesUpdate = FetchNodesUpdate(
+                progress = Progress(0.5F),
+                temporaryError = TemporaryWaitingError.ConnectivityIssues
+            ),
+        ),
+        LoginState(
+            is2FARequired = true,
+            twoFAPin = listOf("1", "2", "", "", "", "")
+        ),
+        LoginState(
+            multiFactorAuthState = MultiFactorAuthState.Failed,
+            twoFAPin = listOf("1", "2", "3", "4", "5", "6")
+        ),
+        LoginState(
+            multiFactorAuthState = MultiFactorAuthState.Checking,
+            twoFAPin = listOf("1", "2", "3", "4", "5", "6")
+        ),
+    ).asSequence()
+}
+
 private const val LONG_PRESS_DELAY = 5000L
+internal const val MEGA_LOGO_TEST_TAG = "MEGA_LOGO"
+internal const val FETCH_NODES_PROGRESS_TEST_TAG = "FETCH_NODES_PROGRESS"
+internal const val REQUEST_STATUS_PROGRESS_TEST_TAG = "login_in_progress:request_status_progress"
+internal const val CONNECTING_TO_SERVER_TAG =
+    "login_in_progress:login_in_progress_text_connecting_to_the_server"
+internal const val TWO_FA_PROGRESS_TEST_TAG = "TWO_FA_PROGRESS"
+internal const val ENTER_AUTHENTICATION_CODE_TAG =
+    "two_factor_authentication:text_enter_authentication_code"
+internal const val INVALID_CODE_TAG =
+    "two_factor_authentication:text_invalid_code"
+internal const val LOST_AUTHENTICATION_CODE_TAG =
+    "two_factor_authentication:text_mega_button_lost_authentication_code"
+
