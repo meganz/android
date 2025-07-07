@@ -18,6 +18,7 @@ internal fun LoggedInAppView(navController: NavHostController, credentials: User
             MegaApp(
                 navController = navController,
                 appState = appState,
+                onInteraction = viewModel::signalPresence,
             )
         }
 

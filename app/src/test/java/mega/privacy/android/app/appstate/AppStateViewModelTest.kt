@@ -5,9 +5,12 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -17,6 +20,7 @@ import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.navigation.Flagged
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.navigation.GetStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -32,6 +36,8 @@ import org.mockito.kotlin.KStubbing
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -40,6 +46,8 @@ class AppStateViewModelTest {
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val retryConnectionsAndSignalPresenceUseCase =
+        mock<RetryConnectionsAndSignalPresenceUseCase>()
 
     private val getStartScreenPreferenceDestinationUseCase =
         mock<GetStartScreenPreferenceDestinationUseCase>()
@@ -60,7 +68,8 @@ class AppStateViewModelTest {
             getFeatureFlagValueUseCase,
             getStartScreenPreferenceDestinationUseCase,
             monitorThemeModeUseCase,
-            monitorConnectivityUseCase
+            monitorConnectivityUseCase,
+            retryConnectionsAndSignalPresenceUseCase
         )
     }
 
@@ -342,6 +351,81 @@ class AppStateViewModelTest {
             }
     }
 
+    @Test
+    fun `test that signalPresence triggers retry connections and signal presence use case`() =
+        runTest {
+            stubConnectivity()
+            stubDefaultStartScreenPreference()
+            stubDefaultThemeMode()
+
+            retryConnectionsAndSignalPresenceUseCase.stub {
+                onBlocking { invoke() }.thenReturn(true)
+            }
+
+            val mainDestinations = stubDefaultMainNavigationItems()
+            initUnderTest(mainDestinations, emptySet())
+
+            // Wait for initial state to be emitted
+            underTest.state
+                .filterIsInstance<AppState.Data>()
+                .test {
+                    awaitItem()
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+            // Call signalPresence
+            underTest.signalPresence()
+
+            // Wait for debounce delay
+            delay(600L)
+
+            // Verify the use case was called
+            verify(retryConnectionsAndSignalPresenceUseCase).invoke()
+        }
+
+    @Test
+    fun `test that signalPresence debounces multiple calls`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher())
+
+        stubConnectivity()
+        stubDefaultStartScreenPreference()
+        stubDefaultThemeMode()
+
+        retryConnectionsAndSignalPresenceUseCase.stub {
+            onBlocking { invoke() }.thenReturn(true)
+        }
+
+        val mainDestinations = stubDefaultMainNavigationItems()
+        initUnderTest(mainDestinations, emptySet())
+
+        // Wait for initial state to be emitted
+        underTest.state
+            .filterIsInstance<AppState.Data>()
+            .test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+        // Call signalPresence multiple times rapidly
+        underTest.signalPresence()
+        underTest.signalPresence()
+        underTest.signalPresence()
+
+        // Advance time by less than debounce delay
+        advanceTimeBy(300L)
+
+        // Verify the use case was NOT called yet
+        verifyNoMoreInteractions(retryConnectionsAndSignalPresenceUseCase)
+
+        // Advance time past debounce delay
+        advanceTimeBy(300L)
+
+        // Verify the use case was called only once due to debouncing
+        verify(retryConnectionsAndSignalPresenceUseCase).invoke()
+
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+    }
+
     private fun initUnderTest(
         mainDestinations: Set<MainNavItem>,
         featureDestinations: Set<FeatureDestination>,
@@ -351,6 +435,7 @@ class AppStateViewModelTest {
             featureDestinations = featureDestinations,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
+            retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase,
         )
     }
 
