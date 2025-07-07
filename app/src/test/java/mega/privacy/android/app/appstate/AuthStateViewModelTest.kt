@@ -5,25 +5,33 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
+import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginInitialiser
 import mega.privacy.android.app.appstate.model.AuthState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -32,7 +40,6 @@ class AuthStateViewModelTest {
     private lateinit var underTest: AuthStateViewModel
     private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
     private val monitorUserCredentialsUseCase = mock<MonitorUserCredentialsUseCase>()
-
 
     @BeforeAll
     fun initialisation() {
@@ -46,12 +53,235 @@ class AuthStateViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        reset(monitorThemeModeUseCase, monitorUserCredentialsUseCase)
         initUnderTest()
+    }
+
+    @AfterEach
+    fun resetMocks() {
+        reset(monitorThemeModeUseCase, monitorUserCredentialsUseCase)
+    }
+
+    @Test
+    fun `test that app start initializers are called during initialization`() = runTest {
+        // Create local initializer mocks
+        val appStartInitialiser1 = mock<AppStartInitialiser>()
+        val appStartInitialiser2 = mock<AppStartInitialiser>()
+
+        // Setup default behavior
+        appStartInitialiser1.stub { onBlocking { invoke() }.thenReturn(Unit) }
+        appStartInitialiser2.stub { onBlocking { invoke() }.thenReturn(Unit) }
+
+        // Create ViewModel with initializers
+        initUnderTest(appStartInitialisers = setOf(appStartInitialiser1, appStartInitialiser2))
+
+        // Verify that app start initializers were called during ViewModel initialization
+        verify(appStartInitialiser1).invoke()
+        verify(appStartInitialiser2).invoke()
+    }
+
+    @Test
+    fun `test that pre login initializers are called when checking existing session`() = runTest {
+        // Create local initializer mocks
+        val preLoginInitialiser1 = mock<PreLoginInitialiser>()
+        val preLoginInitialiser2 = mock<PreLoginInitialiser>()
+
+        // Setup default behavior
+        preLoginInitialiser1.stub { onBlocking { invoke(any()) }.thenReturn(Unit) }
+        preLoginInitialiser2.stub { onBlocking { invoke(any()) }.thenReturn(Unit) }
+
+        val themeMode = ThemeMode.Light
+        monitorThemeModeUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+        }
+        monitorUserCredentialsUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(null))
+        }
+
+        // Create ViewModel with initializers
+        initUnderTest(
+            preLoginInitialisers = setOf(preLoginInitialiser1, preLoginInitialiser2),
+        )
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state).isInstanceOf(AuthState.RequireLogin::class.java)
+
+            // Verify pre-login initializers were called with null session
+            verify(preLoginInitialiser1).invoke(null)
+            verify(preLoginInitialiser2).invoke(null)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that pre login initializers are called with existing session`() = runTest {
+        // Create local initializer mocks
+        val preLoginInitialiser1 = mock<PreLoginInitialiser>()
+        val preLoginInitialiser2 = mock<PreLoginInitialiser>()
+
+        // Setup default behavior
+        preLoginInitialiser1.stub { onBlocking { invoke(any()) }.thenReturn(Unit) }
+        preLoginInitialiser2.stub { onBlocking { invoke(any()) }.thenReturn(Unit) }
+
+        val credentials = UserCredentials(
+            email = "test@example.com",
+            session = "existing-session",
+            firstName = "John",
+            lastName = "Doe",
+            myHandle = "123456789"
+        )
+        val themeMode = ThemeMode.Light
+        monitorThemeModeUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+        }
+        monitorUserCredentialsUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(credentials))
+        }
+
+        // Create ViewModel with initializers
+        initUnderTest(
+            preLoginInitialisers = setOf(preLoginInitialiser1, preLoginInitialiser2),
+        )
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state).isInstanceOf(AuthState.LoggedIn::class.java)
+
+            // Verify pre-login initializers were called with existing session
+            verify(preLoginInitialiser1).invoke("existing-session")
+            verify(preLoginInitialiser2).invoke("existing-session")
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that post login initializers are called when user logs in`() = runTest {
+        // Create local initializer mocks
+        val postLoginInitialiser1 = mock<PostLoginInitialiser>()
+        val postLoginInitialiser2 = mock<PostLoginInitialiser>()
+
+        // Setup default behavior
+        postLoginInitialiser1.stub { onBlocking { invoke(any()) }.thenReturn(Unit) }
+        postLoginInitialiser2.stub { onBlocking { invoke(any()) }.thenReturn(Unit) }
+
+        val credentials = UserCredentials(
+            email = "test@example.com",
+            session = "test-session",
+            firstName = "John",
+            lastName = "Doe",
+            myHandle = "123456789"
+        )
+        val themeMode = ThemeMode.Light
+        monitorThemeModeUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+        }
+        monitorUserCredentialsUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(credentials))
+        }
+
+        // Create ViewModel with initializers
+        initUnderTest(
+            postLoginInitialisers = setOf(postLoginInitialiser1, postLoginInitialiser2),
+        )
+
+        underTest.state.filterIsInstance<AuthState.LoggedIn>().test {
+            val state = awaitItem()
+            assertThat(state.themeMode).isEqualTo(themeMode)
+            assertThat(state.credentials).isEqualTo(credentials)
+
+            // Verify post-login initializers were called with the session
+            verify(postLoginInitialiser1).invoke("test-session")
+            verify(postLoginInitialiser2).invoke("test-session")
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that post login initializers are not called when user is not logged in`() = runTest {
+        // Create local initializer mocks
+        val postLoginInitialiser1 = mock<PostLoginInitialiser>()
+        val postLoginInitialiser2 = mock<PostLoginInitialiser>()
+
+        // Setup default behavior
+        postLoginInitialiser1.stub { onBlocking { invoke(any()) }.thenReturn(Unit) }
+        postLoginInitialiser2.stub { onBlocking { invoke(any()) }.thenReturn(Unit) }
+
+        val themeMode = ThemeMode.Light
+        monitorThemeModeUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+        }
+        monitorUserCredentialsUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(null))
+        }
+
+        // Create ViewModel with initializers
+        initUnderTest(
+            postLoginInitialisers = setOf(postLoginInitialiser1, postLoginInitialiser2),
+        )
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state).isInstanceOf(AuthState.RequireLogin::class.java)
+
+            // Verify post-login initializers were NOT called
+            verify(postLoginInitialiser1, never()).invoke(any())
+            verify(postLoginInitialiser2, never()).invoke(any())
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that initializers handle exceptions gracefully`() = runTest {
+        // Create local initializer mocks
+        val appStartInitialiser1 = mock<AppStartInitialiser>()
+        val preLoginInitialiser1 = mock<PreLoginInitialiser>()
+        val postLoginInitialiser1 = mock<PostLoginInitialiser>()
+
+        // Setup initializers to throw exceptions
+        appStartInitialiser1.stub { onBlocking { invoke() }.thenThrow(RuntimeException("App start error")) }
+        preLoginInitialiser1.stub { onBlocking { invoke(any()) }.thenThrow(RuntimeException("Pre login error")) }
+        postLoginInitialiser1.stub { onBlocking { invoke(any()) }.thenThrow(RuntimeException("Post login error")) }
+
+        val credentials = UserCredentials(
+            email = "test@example.com",
+            session = "test-session",
+            firstName = "John",
+            lastName = "Doe",
+            myHandle = "123456789"
+        )
+        val themeMode = ThemeMode.Light
+        monitorThemeModeUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+        }
+        monitorUserCredentialsUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(credentials))
+        }
+
+        // Create ViewModel with initializers
+        initUnderTest(
+            appStartInitialisers = setOf(appStartInitialiser1),
+            preLoginInitialisers = setOf(preLoginInitialiser1),
+            postLoginInitialisers = setOf(postLoginInitialiser1),
+        )
+
+        underTest.state.test {
+            val state = awaitItem()
+            // Should still reach logged in state despite initializer errors
+            assertThat(state).isInstanceOf(AuthState.LoggedIn::class.java)
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
     fun `test that initial state is loading`() = runTest {
+        monitorUserCredentialsUseCase.stub {
+            on { invoke() }.thenReturn(emptyFlow<UserCredentials>())
+        }
         assertThat(underTest.state.value).isEqualTo(AuthState.Loading(ThemeMode.System))
     }
 
@@ -313,10 +543,17 @@ class AuthStateViewModelTest {
         }
     }
 
-    private fun initUnderTest() {
+    private fun initUnderTest(
+        appStartInitialisers: Set<AppStartInitialiser> = emptySet(),
+        preLoginInitialisers: Set<PreLoginInitialiser> = emptySet(),
+        postLoginInitialisers: Set<PostLoginInitialiser> = emptySet(),
+    ) {
         underTest = AuthStateViewModel(
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            appStartInitialisers = appStartInitialisers,
+            preLoginInitialisers = preLoginInitialisers,
+            postLoginInitialisers = postLoginInitialisers,
         )
     }
 }
