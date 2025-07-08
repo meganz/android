@@ -205,7 +205,10 @@ internal fun NewConfirmEmailScreen(
     val isTablet = LocalDeviceType.current == DeviceType.Tablet
     val isPhoneLandscape =
         orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
-    val helpCentre = stringResource(id = sharedR.string.general_help_centre)
+    val helpCentre =
+        stringResource(id = sharedR.string.email_confirmation_content)
+            .substringAfter("[A]")
+            .substringBefore("[/A]")
 
     MegaScaffold(
         modifier = modifier.semantics { testTagsAsResourceId = true },
@@ -272,8 +275,7 @@ internal fun NewConfirmEmailScreen(
                         modifier = Modifier.padding(top = spacing.x16),
                         value = String.format(
                             stringResource(sharedR.string.email_confirmation_content),
-                            email,
-                            helpCentre
+                            email
                         ),
                         spanStyles = hashMapOf(
                             SpanIndicator('A') to SpanStyleWithAnnotation(
