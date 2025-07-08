@@ -45,6 +45,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINI
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NOT_ENOUGH_STORAGE
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NO_WIFI_CONNECTION
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.OUT_OF_SPACE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.START
@@ -55,6 +56,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
+import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BackupState
@@ -116,6 +118,7 @@ import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBack
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -199,6 +202,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -461,8 +465,18 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     private fun CoroutineScope.monitorConnectivityStatus() = launch {
         monitorConnectivityUseCase().collect {
-            isWifiConstraintSatisfied = it && isWifiNotSatisfiedUseCase().not()
+            val isWifiNotSatisfied = isWifiNotSatisfiedUseCase()
+            val isEnableNewNotification =
+                runCatching { getFeatureFlagValueUseCase(DataFeatures.CameraUploadsNotification) }
+                    .onFailure { error ->
+                        Timber.e(error)
+                    }.getOrDefault(false)
+            isWifiConstraintSatisfied = it && isWifiNotSatisfied.not()
+
             if (!isWifiConstraintSatisfied) {
+                if (isWifiNotSatisfied && isEnableNewNotification) {
+                    sendNoWifiConnectionStatus()
+                }
                 abortWork(reason = CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET)
             }
         }
@@ -1702,6 +1716,17 @@ class CameraUploadsWorker @AssistedInject constructor(
                     FOLDER_TYPE to cameraUploadsFolderType.ordinal
                 )
             )
+        }.onFailure {
+            Timber.w(it)
+        }
+    }
+
+    /**
+     * Notify observers that there is no wifi connection
+     */
+    private suspend fun sendNoWifiConnectionStatus() {
+        runCatching {
+            setProgress(workDataOf(STATUS_INFO to NO_WIFI_CONNECTION))
         }.onFailure {
             Timber.w(it)
         }

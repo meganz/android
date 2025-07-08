@@ -16,6 +16,13 @@ enum class DataFeatures(
     override val description: String,
     private val defaultValue: Boolean,
 ) : Feature {
+    /**
+     * Enable camera uploads new notification
+     */
+    CameraUploadsNotification(
+        "Enable camera uploads new notification",
+        false,
+    ),
 
     /**
      * Use new camera uploads records

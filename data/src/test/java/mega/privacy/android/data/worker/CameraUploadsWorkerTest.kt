@@ -49,6 +49,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTA
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOADED_BYTES
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.TOTAL_UPLOAD_BYTES
+import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.entity.BackupState
@@ -109,6 +110,7 @@ import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBack
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -234,6 +236,7 @@ internal class CameraUploadsWorkerTest {
         mock<ClearActiveTransfersIfFinishedUseCase>()
     private val checkEnableCameraUploadsStatusUseCase =
         mock<CheckEnableCameraUploadsStatusUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val foregroundInfo = ForegroundInfo(1, mock())
     private val primaryNodeHandle = 1111L
@@ -328,7 +331,8 @@ internal class CameraUploadsWorkerTest {
                 correctActiveTransfersUseCase = correctActiveTransfersUseCase,
                 clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
                 checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
-                getUploadFileSizeDifferenceUseCase = getUploadFileSizeDifferenceUseCase
+                getUploadFileSizeDifferenceUseCase = getUploadFileSizeDifferenceUseCase,
+                getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             )
         )
     }
@@ -1293,9 +1297,17 @@ internal class CameraUploadsWorkerTest {
             setupDefaultCheckConditionMocks()
             whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
             whenever(isWifiNotSatisfiedUseCase()).thenReturn(true)
+            whenever(
+                getFeatureFlagValueUseCase(DataFeatures.CameraUploadsNotification)
+            ).thenReturn(true)
+
+            val afterErrorEventData = workDataOf(
+                STATUS_INFO to CameraUploadsWorkerStatusConstant.NO_WIFI_CONNECTION,
+            )
 
             val result = underTest.doWork()
 
+            verify(underTest).setProgress(afterErrorEventData)
             verify(underTest).setProgress(
                 workDataOf(
                     STATUS_INFO to FINISHED,

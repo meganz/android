@@ -76,7 +76,13 @@ private fun navigateToLogin(shouldFinish: Boolean) {
             if (shouldFinish) {
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }
-            putExtra(Constants.LAUNCH_INTENT, activity.intent)
+            putExtra(
+                Constants.LAUNCH_INTENT,
+                activity.intent.apply {
+                    // remove flags that may cause issues when navigate from notification
+                    flags = 0
+                }
+            )
         }
         context.startActivity(intent)
         if (shouldFinish) {

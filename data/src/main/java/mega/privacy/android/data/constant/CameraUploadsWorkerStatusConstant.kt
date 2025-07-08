@@ -115,4 +115,9 @@ object CameraUploadsWorkerStatusConstant {
      * FINISHED_REASON key
      */
     const val FINISHED_REASON = "finished_reason"
+
+    /**
+     * No Wi-Fi Connection key
+     */
+    const val NO_WIFI_CONNECTION = "no_wifi_connection"
 }

@@ -14,6 +14,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.transfers.notification.OpenTransfersSectionIntentMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.wrapper.StringWrapper
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -54,6 +56,8 @@ class CameraUploadsNotificationManager @Inject constructor(
             Constants.NOTIFICATION_NOT_ENOUGH_STORAGE
         private const val OVER_STORAGE_QUOTA_NOTIFICATION_ID =
             Constants.NOTIFICATION_STORAGE_OVERQUOTA
+        private const val NO_WIFI_CONNECTION_NOTIFICATION_ID =
+            Constants.NOTIFICATION_NO_WIFI_CONNECTION
 
         private const val ACTION_CANCEL_CAM_SYNC = Constants.ACTION_CANCEL_CAM_SYNC
         private const val ACTION_SHOW_SETTINGS = Constants.ACTION_SHOW_SETTINGS
@@ -112,6 +116,8 @@ class CameraUploadsNotificationManager @Inject constructor(
                 currentFileIndex = cameraUploadsStatusInfo.currentFileIndex,
                 totalCount = cameraUploadsStatusInfo.totalCount,
             )
+
+            CameraUploadsStatusInfo.NoWifiConnection -> showNoWifiConnectionNotification()
         }
     }
 
@@ -123,6 +129,7 @@ class CameraUploadsNotificationManager @Inject constructor(
         isOngoing: Boolean = false,
         progress: Int? = null,
         isAutoCancel: Boolean = true,
+        action: NotificationCompat.Action? = null,
     ): Notification {
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
@@ -147,6 +154,7 @@ class CameraUploadsNotificationManager @Inject constructor(
             intent?.let { setContentIntent(intent) }
             progress?.let { setProgress(100, progress, false) }
             subText?.let { setSubText(subText) }
+            action?.let { addAction(action) }
             foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
         }
         return builder.build()
@@ -356,6 +364,28 @@ class CameraUploadsNotificationManager @Inject constructor(
             )
             notificationManager.notify(notificationId, notification)
         }
+    }
+
+    /**
+     *  Display a notification in case there is no Wi-Fi connection
+     */
+    private fun showNoWifiConnectionNotification() {
+        val action = NotificationCompat.Action.Builder(
+            R.drawable.mega_ic,
+            context.getString(sharedR.string.camera_uploads_notification_action_allow_mobile_data),
+            PendingIntent.getActivity(
+                context,
+                0,
+                Intent(context, SettingsCameraUploadsActivity::class.java),
+                PendingIntent.FLAG_IMMUTABLE
+            )
+        ).build()
+        val notification = createNotification(
+            title = context.getString(sharedR.string.camera_uploads_notification_title_paused_warning),
+            content = context.getString(sharedR.string.camera_uploads_notification_content_no_wifi_connection),
+            action = action,
+        )
+        notificationManager.notify(NO_WIFI_CONNECTION_NOTIFICATION_ID, notification)
     }
 
     /**

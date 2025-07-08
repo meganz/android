@@ -16,6 +16,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINI
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NOT_ENOUGH_STORAGE
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NO_WIFI_CONNECTION
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.OUT_OF_SPACE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.STATUS_INFO
@@ -201,6 +202,12 @@ class CameraUploadsStatusInfoMapperTest {
             WorkInfo.State.FAILED,
             WorkInfo.STOP_REASON_CANCELLED_BY_APP,
             CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_CANCELLED_BY_APP)
+        ),
+        Arguments.of(
+            workDataOf(STATUS_INFO to NO_WIFI_CONNECTION),
+            WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
+            CameraUploadsStatusInfo.NoWifiConnection
         ),
     )
 }
