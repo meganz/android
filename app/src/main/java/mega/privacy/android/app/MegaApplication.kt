@@ -13,6 +13,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
+import coil.ImageLoader as LegacyImageLoader
+import coil.ImageLoaderFactory as LegacyImageLoaderFactory
+import coil.decode.GifDecoder as LegacyGifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.decode.SvgDecoder as LegacySvgDecoder
+import coil.decode.VideoFrameDecoder as LegacyVideoFrameDecoder
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
@@ -42,6 +48,10 @@ import mega.privacy.android.app.fetcher.MegaAvatarFetcher
 import mega.privacy.android.app.fetcher.MegaAvatarKeyer
 import mega.privacy.android.app.fetcher.MegaThumbnailFetcher
 import mega.privacy.android.app.fetcher.MegaThumbnailKeyer
+import mega.privacy.android.app.fetcher.legacy.LegacyMegaAvatarFetcher
+import mega.privacy.android.app.fetcher.legacy.LegacyMegaAvatarKeyer
+import mega.privacy.android.app.fetcher.legacy.LegacyMegaThumbnailFetcher
+import mega.privacy.android.app.fetcher.legacy.LegacyMegaThumbnailKeyer
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
@@ -110,7 +120,7 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
-    SingletonImageLoader.Factory, Configuration.Provider {
+    LegacyImageLoaderFactory, SingletonImageLoader.Factory, Configuration.Provider {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
@@ -199,6 +209,12 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     internal lateinit var avatarFactory: MegaAvatarFetcher.Factory
 
     @Inject
+    internal lateinit var legacyThumbnailFactory: LegacyMegaThumbnailFetcher.Factory
+
+    @Inject
+    internal lateinit var legacyAvatarFactory: LegacyMegaAvatarFetcher.Factory
+
+    @Inject
     internal lateinit var updateApiServerUseCase: UpdateApiServerUseCase
 
     /**
@@ -263,6 +279,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         if (BuildConfig.ACTIVATE_GREETER) greeter.get().initialize()
     }
 
+    // Image loader for coil3
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         return ImageLoader.Builder(this)
             .components {
@@ -277,6 +294,25 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                 add(avatarFactory)
                 add(MegaThumbnailKeyer)
                 add(MegaAvatarKeyer)
+            }
+            .build()
+    }
+
+    // Legacy image loader for coil2
+    override fun newImageLoader(): LegacyImageLoader {
+        return LegacyImageLoader.Builder(this)
+            .components {
+                if (SDK_INT >= Build.VERSION_CODES.P) {
+                    add(ImageDecoderDecoder.Factory())
+                } else {
+                    add(LegacyGifDecoder.Factory())
+                }
+                add(LegacyVideoFrameDecoder.Factory())
+                add(LegacySvgDecoder.Factory())
+                add(legacyThumbnailFactory)
+                add(legacyAvatarFactory)
+                add(LegacyMegaThumbnailKeyer)
+                add(LegacyMegaAvatarKeyer)
             }
             .build()
     }
