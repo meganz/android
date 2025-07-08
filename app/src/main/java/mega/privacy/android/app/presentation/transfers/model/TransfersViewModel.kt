@@ -422,7 +422,7 @@ class TransfersViewModel @Inject constructor(
      */
     fun onActiveTransfersReorderConfirmed(transfer: InProgressTransfer) {
         reordering = false
-        uiState.value.activeTransfers.indexOf(transfer).takeIf { it >= 0 }
+        uiState.value.activeTransfers.indexOfFirst { it.tag == transfer.tag }.takeIf { it >= 0 }
             ?.let { destinationIndex ->
                 viewModelScope.launch {
                     runCatching {
