@@ -111,7 +111,7 @@ private fun HiddenNodesOnboardingAppBar(
                 onClick = onClickBack,
                 content = {
                     Icon(
-                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
                         contentDescription = null,
                         tint = black.takeIf { isLight } ?: white,
                     )
@@ -201,7 +201,7 @@ private fun HiddenNodesOnboardingContent(
             Spacer(modifier = Modifier.height(32.dp))
 
             HiddenNodesBenefit(
-                icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.EyeOff),
+                icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.EyeOff),
                 title = stringResource(id = sharedR.string.hidden_nodes_title_hide_files_folders_feature),
                 description = stringResource(id = sharedR.string.hidden_nodes_description_hide_files_folders_feature),
             )
@@ -217,7 +217,7 @@ private fun HiddenNodesOnboardingContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             HiddenNodesBenefit(
-                icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Eye),
+                icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eye),
                 title = stringResource(id = sharedR.string.hidden_nodes_title_visible_shared_files),
                 description = stringResource(id = sharedR.string.hidden_nodes_description_visible_shared_files),
             )

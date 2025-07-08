@@ -374,7 +374,7 @@ fun AlbumsView(
                                     .matchParentSize()
                             )
                             Icon(
-                                painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.Link01),
+                                painter = rememberVectorPainter(IconPack.Medium.Thin.Solid.Link01),
                                 contentDescription = "${(album.title as AlbumTitle.StringTitle).title} Exported",
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)

@@ -25,7 +25,7 @@ sealed interface VideoQueueMenuAction : MenuAction {
      * Video queue select action
      */
     object VideoQueueRemoveAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.X,
+        icon = IconPack.Medium.Thin.Outline.X,
         descriptionRes = R.string.general_remove,
         testTag = TEST_TAG_VIDEO_QUEUE_REMOVE_ACTION
     ), VideoQueueMenuAction {

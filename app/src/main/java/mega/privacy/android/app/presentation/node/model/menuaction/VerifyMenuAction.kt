@@ -14,7 +14,7 @@ import javax.inject.Inject
 class VerifyMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Outline.Key02)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.Key02)
 
     @Composable
     override fun getDescription() =

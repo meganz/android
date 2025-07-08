@@ -366,7 +366,7 @@ internal fun FolderLinkTopAppBar(
             if (showMenuActions) {
                 IconButton(onClick = onShareClicked) {
                     Image(
-                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ShareNetwork),
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork),
                         contentDescription = stringResource(id = R.string.general_share),
                         colorFilter = ColorFilter.tint(if (MaterialTheme.colors.isLight) Color.Black else Color.White)
                     )
@@ -377,7 +377,7 @@ internal fun FolderLinkTopAppBar(
                     onClick = onMoreClicked
                 ) {
                     Icon(
-                        IconPack.Medium.Regular.Outline.MoreVertical,
+                        IconPack.Medium.Thin.Outline.MoreVertical,
                         contentDescription = stringResource(id = R.string.label_more),
                         tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
                     )

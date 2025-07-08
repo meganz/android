@@ -884,7 +884,7 @@ private fun ScheduledMeetingDescriptionView(state: ChatInfoUiState) {
                             .wrapContentSize(Alignment.Center)
 
                     ) {
-                        Icon(painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Menu04),
+                        Icon(painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Menu04),
                             contentDescription = "Scheduled meeting description icon",
                             tint = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054)
                     }
@@ -1116,7 +1116,7 @@ private fun ParticipantItemView(
                 Row(modifier = Modifier.align(Alignment.Center)) {
                     ParticipantsPermissionView(participant)
                     Icon(modifier = Modifier.padding(start = 30.dp),
-                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                         contentDescription = "Three dots icon",
                         tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
                 }
@@ -1141,21 +1141,21 @@ private fun ParticipantsPermissionView(participant: ChatParticipant) {
     when (participant.privilege) {
         ChatRoomPermission.Moderator -> {
             Icon(
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.CheckCircle),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.CheckCircle),
                 contentDescription = "Permissions icon",
                 tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
         }
 
         ChatRoomPermission.Standard -> {
             Icon(
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Pen2),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Pen2),
                 contentDescription = "Permissions icon",
                 tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
         }
 
         ChatRoomPermission.ReadOnly -> {
             Icon(
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.Eye),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Solid.Eye),
                 contentDescription = "Permissions icon",
                 tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
         }

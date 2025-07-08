@@ -145,8 +145,8 @@ fun ChatTextField(
             .padding(end = 8.dp, bottom = 8.dp)
             .clickable { onEmojiClick() },
         painter = rememberVectorPainter(
-            if (isEmojiPickerShown) IconPack.Medium.Regular.Solid.EmojiSmile
-            else IconPack.Medium.Regular.Outline.EmojiSmile
+            if (isEmojiPickerShown) IconPack.Medium.Thin.Solid.EmojiSmile
+            else IconPack.Medium.Thin.Outline.EmojiSmile
         ),
         contentDescription = "Emoji Icon",
         tint = DSTokens.colors.icon.secondary

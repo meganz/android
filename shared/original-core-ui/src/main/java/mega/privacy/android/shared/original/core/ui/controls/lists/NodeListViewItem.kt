@@ -290,7 +290,7 @@ fun NodeListViewItem(
             }
             if (onMoreClicked != null) {
                 Icon(
-                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                     contentDescription = "More",
                     modifier = Modifier
                         .size(24.dp)

@@ -33,7 +33,7 @@ internal fun InfoBottomSheetTile(
     MenuActionListTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_INFO),
         text = stringResource(R.string.device_center_bottom_sheet_item_info),
-        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Info),
+        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Info),
         dividerType = dividerType,
         onActionClicked = onActionClicked,
     )

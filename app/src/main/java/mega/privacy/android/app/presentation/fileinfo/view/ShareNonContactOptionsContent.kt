@@ -68,14 +68,14 @@ fun ColumnScope.ShareNonContactOptionsContent(
     if (allowChangePermission) {
         MenuActionListTile(
             text = stringResource(id = R.string.file_properties_shared_folder_change_permissions),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Key02),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Key02),
             onActionClicked = onChangePermissionClicked,
             modifier = Modifier.testTag(SHARE_NON_CONTACT_OPTIONS_CHANGE_PERMISSION),
         )
     }
     MenuActionListTile(
         text = stringResource(id = R.string.context_remove),
-        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
+        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
         isDestructive = true,
         onActionClicked = onRemoveClicked,
         modifier = Modifier.testTag(SHARE_NON_CONTACT_OPTIONS_REMOVE),

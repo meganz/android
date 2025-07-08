@@ -63,7 +63,7 @@ internal fun LocationInfoView(
         Spacer(modifier = Modifier.height(verticalSpace.dp))
     }
     Icon(
-        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ChevronRight),
+        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
         modifier = Modifier.padding(top = 4.dp),
         tint = MaterialTheme.colors.onPrimary,
         contentDescription = null,

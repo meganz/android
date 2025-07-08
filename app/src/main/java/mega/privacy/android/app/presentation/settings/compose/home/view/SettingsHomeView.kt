@@ -247,7 +247,7 @@ private fun LazyListScope.listEntryPoints(
                 MegaText(text = stringResource(it.navData.title), textColor = TextColor.Primary)
             }
             MegaIcon(
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ChevronRight),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
                 tint = IconColor.Primary,
                 contentDescription = null,
             )

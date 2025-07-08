@@ -60,7 +60,7 @@ internal fun SharedInfoContactItemView(
         onClick = onMoreOptionsClick,
     ) {
         MegaIcon(
-            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
             contentDescription = "More options",
             tint = IconColor.Secondary,
         )

@@ -14,7 +14,7 @@ import javax.inject.Inject
 class ViewInFolderMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Outline.FolderOpen)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.FolderOpen)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.view_in_folder_label)

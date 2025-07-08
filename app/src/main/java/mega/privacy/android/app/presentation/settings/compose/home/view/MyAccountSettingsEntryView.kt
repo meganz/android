@@ -67,7 +67,7 @@ internal fun LazyListScope.myAccountSettingsEntryView(
                 }
             }
             MegaIcon(
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ChevronRight),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
                 contentDescription = null,
             )
         }

@@ -139,7 +139,7 @@ internal fun SharesScreen(
                                 },
                             ) {
                                 Icon(
-                                    painter = rememberVectorPainter(if (isTabShown) IconPack.Medium.Regular.Outline.Menu01 else IconPack.Medium.Regular.Outline.ArrowLeft),
+                                    painter = rememberVectorPainter(if (isTabShown) IconPack.Medium.Thin.Outline.Menu01 else IconPack.Medium.Thin.Outline.ArrowLeft),
                                     contentDescription = "Back button",
                                     tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
                                 )
@@ -153,7 +153,7 @@ internal fun SharesScreen(
                                 onClick = onSearchClick,
                             ) {
                                 Icon(
-                                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.SearchLarge),
+                                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.SearchLarge),
                                     contentDescription = "Search button",
                                     tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
                                 )
@@ -164,7 +164,7 @@ internal fun SharesScreen(
                                     onClick = onMoreClick,
                                 ) {
                                     Icon(
-                                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+                                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                                         contentDescription = "More button",
                                         tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
                                     )

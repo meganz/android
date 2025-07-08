@@ -18,7 +18,7 @@ class RestoreMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Outline.RotateCcw)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.RotateCcw)
 
     override val orderInCategory = 250
 

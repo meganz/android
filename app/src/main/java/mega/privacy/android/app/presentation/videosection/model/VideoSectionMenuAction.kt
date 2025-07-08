@@ -17,7 +17,7 @@ sealed interface VideoSectionMenuAction : MenuAction {
      * Video section download action
      */
     object VideoSectionDownloadAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.Download,
+        icon = IconPack.Medium.Thin.Outline.Download,
         descriptionRes = R.string.general_save_to_device,
         testTag = TEST_TAG_VIDEO_SECTION_DOWNLOAD_ACTION
     ), VideoSectionMenuAction {
@@ -28,7 +28,7 @@ sealed interface VideoSectionMenuAction : MenuAction {
      * Video section get link action
      */
     object VideoSectionGetLinkAction : MenuActionPlural(
-        icon = IconPack.Medium.Regular.Outline.Link01,
+        icon = IconPack.Medium.Thin.Outline.Link01,
         descriptionRes = sharedR.plurals.label_share_links,
         amount = 1,
         testTag = TEST_TAG_VIDEO_SECTION_GET_LINK_ACTION
@@ -40,7 +40,7 @@ sealed interface VideoSectionMenuAction : MenuAction {
      * Video section send to chat action
      */
     object VideoSectionSendToChatAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.MessageArrowUp,
+        icon = IconPack.Medium.Thin.Outline.MessageArrowUp,
         descriptionRes = R.string.context_send_file_to_chat,
         testTag = TEST_TAG_VIDEO_SECTION_SEND_TO_CHAT_ACTION
     ), VideoSectionMenuAction {
@@ -51,7 +51,7 @@ sealed interface VideoSectionMenuAction : MenuAction {
      * Video section share action
      */
     object VideoSectionShareAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.ShareNetwork,
+        icon = IconPack.Medium.Thin.Outline.ShareNetwork,
         descriptionRes = R.string.general_share,
         testTag = TEST_TAG_VIDEO_SECTION_SHARE_ACTION
     ), VideoSectionMenuAction {
@@ -152,7 +152,7 @@ sealed interface VideoSectionMenuAction : MenuAction {
      * Video section remove action
      */
     object VideoSectionRemoveAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.Trash,
+        icon = IconPack.Medium.Thin.Outline.Trash,
         descriptionRes = R.string.context_remove,
         testTag = TEST_TAG_VIDEO_SECTION_REMOVE_ACTION
     ), VideoSectionMenuAction {
@@ -163,7 +163,7 @@ sealed interface VideoSectionMenuAction : MenuAction {
      * Video section more action
      */
     object VideoSectionMoreAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.MoreVertical,
+        icon = IconPack.Medium.Thin.Outline.MoreVertical,
         descriptionRes = R.string.label_more,
         testTag = TEST_TAG_VIDEO_SECTION_MORE_ACTION
     ), VideoSectionMenuAction {
@@ -174,7 +174,7 @@ sealed interface VideoSectionMenuAction : MenuAction {
      * Video section video recently watched action
      */
     object VideoRecentlyWatchedAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.ClockPlay,
+        icon = IconPack.Medium.Thin.Outline.ClockPlay,
         descriptionRes = sharedR.string.video_section_title_video_recently_watched,
         testTag = TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_ACTION
     ), VideoSectionMenuAction {
@@ -185,7 +185,7 @@ sealed interface VideoSectionMenuAction : MenuAction {
      * Video section video recently watched action
      */
     object VideoRecentlyWatchedClearAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.Trash,
+        icon = IconPack.Medium.Thin.Outline.Trash,
         descriptionRes = R.string.general_clear,
         testTag = TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_CLEAR_ACTION
     ), VideoSectionMenuAction {
@@ -196,7 +196,7 @@ sealed interface VideoSectionMenuAction : MenuAction {
      * Video section sort by action
      */
     object VideoSectionSortByAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.SlidersVertical02,
+        icon = IconPack.Medium.Thin.Outline.SlidersVertical02,
         descriptionRes = R.string.action_sort_by,
         testTag = TEST_TAG_VIDEO_SECTION_SORT_BY_ACTION
     ), VideoSectionMenuAction {

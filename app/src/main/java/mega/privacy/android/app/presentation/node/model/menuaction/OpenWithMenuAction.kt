@@ -14,7 +14,7 @@ import javax.inject.Inject
 class OpenWithMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Outline.ExternalLink)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.ExternalLink)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.external_play)

@@ -924,7 +924,7 @@ private fun ImagePreviewTopBar(
                 if (isForwardMenuVisible) {
                     IconButton(onClick = onClickForward) {
                         Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.CornerUpRight),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.CornerUpRight),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_FORWARD),
@@ -935,7 +935,7 @@ private fun ImagePreviewTopBar(
                 if (isSaveToDeviceMenuVisible) {
                     IconButton(onClick = onClickSaveToDevice) {
                         Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Download),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Download),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SAVE_TO_DEVICE),
@@ -946,7 +946,7 @@ private fun ImagePreviewTopBar(
                 if (isManageLinkMenuVisible) {
                     IconButton(onClick = onClickGetLink) {
                         Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Link01),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Link01),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MANAGE_LINK),
@@ -957,7 +957,7 @@ private fun ImagePreviewTopBar(
                 if (isMagnifierMenuVisible) {
                     IconButton(onClick = onClickMagnifier) {
                         Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ZoomIn),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ZoomIn),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MAGNIFIER),
@@ -968,7 +968,7 @@ private fun ImagePreviewTopBar(
                 if (isSendToMenuVisible) {
                     IconButton(onClick = onClickSendTo) {
                         Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MessageArrowUp),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MessageArrowUp),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SEND_TO),
@@ -979,7 +979,7 @@ private fun ImagePreviewTopBar(
                 if (isMoreMenuVisible) {
                     IconButton(onClick = onClickMore) {
                         Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MORE),

@@ -18,7 +18,7 @@ class LeaveShareMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() = rememberVectorPainter(
-        IconPack.Medium.Regular.Outline.LogOut02)
+        IconPack.Medium.Thin.Outline.LogOut02)
 
     override val orderInCategory = 260
 

@@ -75,7 +75,7 @@ class HideBottomSheetMenuItem @Inject constructor(
                         )
                     } else {
                         Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.HelpCircle),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.HelpCircle),
                             contentDescription = null,
                             modifier = Modifier
                                 .size(24.dp)

@@ -18,7 +18,7 @@ class ShareMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Outline.ShareNetwork)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork)
 
     override val orderInCategory = 200
 

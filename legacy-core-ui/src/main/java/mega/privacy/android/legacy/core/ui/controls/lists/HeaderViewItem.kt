@@ -80,7 +80,7 @@ fun HeaderViewItem(
                     .size(16.dp)
                     .clickable { onEnterMediaDiscoveryClick() }
                     .testTag(MEDIA_DISCOVERY_TAG),
-                painter = rememberVectorPainter(IconPack.Small.Regular.Outline.Image01),
+                painter = rememberVectorPainter(IconPack.Small.Thin.Outline.Image01),
                 tint = IconColor.Secondary,
                 contentDescription = "Enter media discovery"
             )
@@ -94,9 +94,9 @@ fun HeaderViewItem(
                         onChangeViewTypeClick()
                     },
                 painter = if (isListView) {
-                    rememberVectorPainter(IconPack.Small.Regular.Outline.Grid4)
+                    rememberVectorPainter(IconPack.Small.Thin.Outline.Grid4)
                 } else {
-                    rememberVectorPainter(IconPack.Small.Regular.Outline.ListSmall)
+                    rememberVectorPainter(IconPack.Small.Thin.Outline.ListSmall)
                 },
                 tint = IconColor.Secondary,
                 contentDescription = "Toggle grid list"

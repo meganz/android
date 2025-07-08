@@ -13,7 +13,7 @@ import javax.inject.Inject
  */
 class DeletePermanentlyMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
-    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Regular.Outline.X)
+    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.X)
 
     @Composable
     override fun getDescription() =

@@ -14,7 +14,7 @@ import javax.inject.Inject
 class RemoveFavouriteMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Outline.HeartBroken)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.HeartBroken)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.file_properties_unfavourite)

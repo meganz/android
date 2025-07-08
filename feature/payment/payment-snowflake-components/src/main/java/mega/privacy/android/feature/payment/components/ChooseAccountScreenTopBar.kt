@@ -42,7 +42,7 @@ fun ChooseAccountScreenTopBar(
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .testTag(TEST_TAG_BACK_BUTTON),
-                icon = painterResource(mega.android.core.ui.R.drawable.ic_arrow_left),
+                icon = painterResource(mega.android.core.ui.R.drawable.ic_arrow_left_medium_thin_outline),
                 onClick = onBack,
             )
         } else {

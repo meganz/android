@@ -31,7 +31,7 @@ internal fun RenameDeviceBottomSheetTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_RENAME_DEVICE),
         dividerType = null,
         text = stringResource(R.string.device_center_bottom_sheet_item_rename),
-        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Edit),
+        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Edit),
         onActionClicked = onActionClicked,
     )
 }

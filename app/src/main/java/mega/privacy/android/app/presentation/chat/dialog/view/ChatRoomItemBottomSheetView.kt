@@ -204,7 +204,7 @@ internal fun ChatRoomItemBottomSheetView(
             if (item.isArchived) {
                 MenuItem(
                     modifier = Modifier.testTag("unarchive"),
-                    icon = IconPack.Medium.Regular.Outline.ArchiveArrowUp,
+                    icon = IconPack.Medium.Thin.Outline.ArchiveArrowUp,
                     text = R.string.general_unarchive,
                     description = "Unarchive",
                     onClick = onUnarchiveClick
@@ -214,7 +214,7 @@ internal fun ChatRoomItemBottomSheetView(
                     if (item.currentCallStatus == ChatRoomItemStatus.NotJoined) {
                         MenuItem(
                             modifier = Modifier.testTag("join_meeting"),
-                            icon = IconPack.Medium.Regular.Outline.VideoPlus,
+                            icon = IconPack.Medium.Thin.Outline.VideoPlus,
                             text = R.string.meetings_list_join_scheduled_meeting_option,
                             description = "Join meeting",
                             onClick = onStartMeetingClick
@@ -222,7 +222,7 @@ internal fun ChatRoomItemBottomSheetView(
                     } else if (item.currentCallStatus == ChatRoomItemStatus.NotStarted) {
                         MenuItem(
                             modifier = Modifier.testTag("start_meeting"),
-                            icon = IconPack.Medium.Regular.Outline.Video,
+                            icon = IconPack.Medium.Thin.Outline.Video,
                             text = R.string.meetings_list_start_scheduled_meeting_option,
                             description = "Start meeting",
                             onClick = onStartMeetingClick
@@ -233,7 +233,7 @@ internal fun ChatRoomItemBottomSheetView(
                     if (item.isRecurring() && !item.isCancelled) {
                         MenuItem(
                             modifier = Modifier.testTag("occurrences"),
-                            icon = IconPack.Medium.Regular.Outline.RotateCw,
+                            icon = IconPack.Medium.Thin.Outline.RotateCw,
                             text = R.string.meetings_list_recurring_meeting_occurrences_option,
                             description = "Occurrences",
                             onClick = onOccurrencesClick
@@ -244,7 +244,7 @@ internal fun ChatRoomItemBottomSheetView(
                     if (item.hasPermissions && item.schedId != null) {
                         MenuItem(
                             modifier = Modifier.testTag("edit"),
-                            icon = IconPack.Medium.Regular.Outline.Edit,
+                            icon = IconPack.Medium.Thin.Outline.Edit,
                             text = R.string.title_edit_profile_info,
                             description = "Edit",
                             onClick = onEditClick
@@ -256,7 +256,7 @@ internal fun ChatRoomItemBottomSheetView(
                 if (isGroup || item.hasPermissions) {
                     MenuItem(
                         modifier = Modifier.testTag("info"),
-                        icon = IconPack.Medium.Regular.Outline.Info,
+                        icon = IconPack.Medium.Thin.Outline.Info,
                         text = R.string.general_info,
                         description = "Info",
                         onClick = onInfoClick
@@ -268,7 +268,7 @@ internal fun ChatRoomItemBottomSheetView(
                 if (item.hasPermissions && (!isNoteToSelf || !item.isEmptyNoteToSelfChatRoom)) {
                     MenuItem(
                         modifier = Modifier.testTag("clear_chat_history"),
-                        icon = IconPack.Medium.Regular.Outline.Eraser,
+                        icon = IconPack.Medium.Thin.Outline.Eraser,
                         text = R.string.title_properties_chat_clear,
                         description = "Clear chat history",
                         onClick = onClearChatClick
@@ -280,7 +280,7 @@ internal fun ChatRoomItemBottomSheetView(
                     if (item.isMuted) {
                         MenuItem(
                             modifier = Modifier.testTag("unmute"),
-                            icon = IconPack.Medium.Regular.Outline.Bell,
+                            icon = IconPack.Medium.Thin.Outline.Bell,
                             text = R.string.general_unmute,
                             description = "Unmute",
                             onClick = onUnmuteClick
@@ -288,7 +288,7 @@ internal fun ChatRoomItemBottomSheetView(
                     } else {
                         MenuItem(
                             modifier = Modifier.testTag("mute"),
-                            icon = IconPack.Medium.Regular.Outline.BellOff,
+                            icon = IconPack.Medium.Thin.Outline.BellOff,
                             text = R.string.general_mute,
                             description = "Mute",
                             onClick = onMuteClick
@@ -300,7 +300,7 @@ internal fun ChatRoomItemBottomSheetView(
 
                 MenuItem(
                     modifier = Modifier.testTag("archive"),
-                    icon = IconPack.Medium.Regular.Outline.Archive,
+                    icon = IconPack.Medium.Thin.Outline.Archive,
                     text = R.string.general_archive,
                     description = "Archive",
                     onClick = {
@@ -313,7 +313,7 @@ internal fun ChatRoomItemBottomSheetView(
                         ChatDivider()
                         MenuItem(
                             modifier = Modifier.testTag("cancel"),
-                            icon = IconPack.Medium.Regular.Outline.Trash,
+                            icon = IconPack.Medium.Thin.Outline.Trash,
                             text = sharedR.string.general_dialog_cancel_button,
                             description = "Cancel",
                             tintRed = true,
@@ -325,7 +325,7 @@ internal fun ChatRoomItemBottomSheetView(
                         ChatDivider()
                         MenuItem(
                             modifier = Modifier.testTag("leave"),
-                            icon = IconPack.Medium.Regular.Outline.LogOut02,
+                            icon = IconPack.Medium.Thin.Outline.LogOut02,
                             text = R.string.general_leave,
                             description = "Leave",
                             tintRed = true,

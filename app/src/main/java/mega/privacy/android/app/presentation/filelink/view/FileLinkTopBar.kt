@@ -39,7 +39,7 @@ internal fun FileLinkTopBar(
 private class ShareMenuAction : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Outline.ShareNetwork)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.general_share)

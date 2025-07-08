@@ -82,14 +82,14 @@ fun ChatAttachFileBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(id = R.string.attachment_upload_panel_from_cloud),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Cloud),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Cloud),
             dividerType = null,
             onActionClicked = { openCloudDrivePicker(context, cloudDriveLauncher) },
             modifier = Modifier.testTag(TEST_TAG_SEND_FROM_CLOUD)
         )
         MenuActionListTile(
             text = stringResource(id = R.string.upload_files),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FileUpload),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FileUpload),
             dividerType = null,
             onActionClicked = { openFilePicker(localLauncher) },
             modifier = Modifier.testTag(TEST_TAG_SEND_FROM_LOCAL)

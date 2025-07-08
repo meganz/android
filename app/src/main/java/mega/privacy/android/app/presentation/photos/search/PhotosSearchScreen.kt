@@ -561,7 +561,7 @@ private fun PhotoCard(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Icon(
-                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                         contentDescription = null,
                         modifier = Modifier.clickable { onClickMenu(NodeId(photo.id)) },
                     )

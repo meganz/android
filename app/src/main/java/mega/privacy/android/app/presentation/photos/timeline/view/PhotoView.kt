@@ -139,7 +139,7 @@ fun PhotoView(
             || photo.isFavourite && currentZoomLevel == ZoomLevel.Grid_3
         ) {
             MegaIcon(
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.Heart),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Solid.Heart),
                 tint = IconColor.Inverse,
                 contentDescription = null,
                 modifier = Modifier
@@ -156,7 +156,7 @@ private fun SelectedIconView(
     modifier: Modifier,
 ) {
     MegaIcon(
-        painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.CheckCircle),
+        painter = rememberVectorPainter(IconPack.Medium.Thin.Solid.CheckCircle),
         contentDescription = null,
         modifier = modifier,
         tint = IconColor.Primary,

@@ -238,7 +238,7 @@ fun NewLoginView(
                                 },
                             ) {
                                 MegaIcon(
-                                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.HelpCircle),
+                                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.HelpCircle),
                                     tint = IconColor.Primary,
                                     contentDescription = "Report issue Icon"
                                 )

@@ -170,7 +170,7 @@ private fun NoLocationInfo() {
         horizontalArrangement = Arrangement.Start,
     ) {
         Icon(
-            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Info),
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Info),
             contentDescription = null,
             tint = MaterialTheme.colors.black_white,
             modifier = Modifier

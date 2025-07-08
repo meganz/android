@@ -125,7 +125,7 @@ private fun RowScope.DefaultActions(
         onClick = shareFolder,
     ) {
         MegaIcon(
-            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Folder),
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Folder),
             contentDescription = stringResource(R.string.context_share_folder),
             tint = IconColor.Primary,
         )
@@ -136,7 +136,7 @@ private fun RowScope.DefaultActions(
         onClick = { expanded = true },
     ) {
         MegaIcon(
-            rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
             contentDescription = "More items Icon",
             tint = IconColor.Primary,
         )
@@ -176,7 +176,7 @@ private fun RowScope.SelectModeActions(
         onClick = changePermissions,
     ) {
         MegaIcon(
-            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Key02),
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Key02),
             contentDescription = stringResource(R.string.file_properties_shared_folder_change_permissions),
             tint = IconColor.Primary,
         )
@@ -189,7 +189,7 @@ private fun RowScope.SelectModeActions(
         onClick = removeShare,
     ) {
         MegaIcon(
-            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
             contentDescription = stringResource(R.string.context_remove),
             tint = IconColor.Primary,
         )
@@ -200,7 +200,7 @@ private fun RowScope.SelectModeActions(
         onClick = { expanded = true },
     ) {
         MegaIcon(
-            rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
             contentDescription = "More items Icon",
             tint = IconColor.Primary,
         )

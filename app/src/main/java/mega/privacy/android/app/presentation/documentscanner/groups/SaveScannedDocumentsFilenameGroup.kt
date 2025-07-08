@@ -171,7 +171,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
                     .clickable(enabled = !isFocused) { focusRequester.requestFocus() }
                     .testTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_EDIT_FILENAME_IMAGE)
                     .alpha(if (isFocused) 0f else 1f),
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Pen2),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Pen2),
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.accent_900_accent_050),
                 contentDescription = "Edit Filename Image"
             )

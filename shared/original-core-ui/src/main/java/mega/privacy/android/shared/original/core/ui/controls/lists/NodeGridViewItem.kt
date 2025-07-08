@@ -151,7 +151,7 @@ fun NodeGridViewItem(
                                     .align(Alignment.Center)
                                     .size(32.dp)
                                     .testTag(VIDEO_PLAY_ICON_TEST_TAG),
-                                painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.PlayCircle),
+                                painter = rememberVectorPainter(IconPack.Medium.Thin.Solid.PlayCircle),
                                 contentDescription = "Play Icon",
                                 tint = DSTokens.colors.icon.onColor,
                             )
@@ -244,7 +244,7 @@ private fun Footer(
                     .padding(start = 8.dp)
                     .size(24.dp)
                     .testTag(GRID_VIEW_TAKEN_TEST_TAG),
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.AlertTriangle),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.AlertTriangle),
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.color_button_brand),
                 contentDescription = "Taken Down",
             )
@@ -252,7 +252,7 @@ private fun Footer(
         val optionIconSize = 32.dp
         if (onMenuClick != null) {
             Icon(
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                 tint = DSTokens.colors.icon.secondary,
                 contentDescription = "More",
                 modifier = Modifier
@@ -264,7 +264,7 @@ private fun Footer(
         } else {
             if (isSelected) {
                 Icon(
-                    painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.CheckCircle),
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Solid.CheckCircle),
                     tint = DSTokens.colors.icon.accent,
                     contentDescription = "Selected",
                     modifier = Modifier

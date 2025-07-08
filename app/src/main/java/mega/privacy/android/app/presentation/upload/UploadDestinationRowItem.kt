@@ -83,7 +83,7 @@ fun UploadDestinationRowItem(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
                             .size(16.dp),
-                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Pen2),
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Pen2),
                         contentDescription = "Edit",
                         tint = MaterialTheme.colors.onPrimary,
                     )

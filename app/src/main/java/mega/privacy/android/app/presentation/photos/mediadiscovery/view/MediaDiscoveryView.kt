@@ -584,7 +584,7 @@ private fun ListViewIconButton(
         onClick = onSwitchListView,
     ) {
         Icon(
-            painter = rememberVectorPainter(IconPack.Small.Regular.Outline.ListSmall),
+            painter = rememberVectorPainter(IconPack.Small.Thin.Outline.ListSmall),
             contentDescription = "",
             tint = MaterialTheme.colors.textColorSecondary
         )

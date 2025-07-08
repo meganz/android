@@ -45,7 +45,7 @@ internal fun FileVersionsView(
         modifier = Modifier
             .sizeIn(minWidth = textStartPadding)
             .padding(start = 16.dp),
-        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ClockRotate),
+        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ClockRotate),
         alignment = Alignment.CenterStart,
         contentDescription = "versions icon"
     )

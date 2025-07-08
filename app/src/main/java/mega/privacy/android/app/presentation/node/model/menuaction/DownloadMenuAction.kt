@@ -17,7 +17,7 @@ class DownloadMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getDescription() = stringResource(id = R.string.general_save_to_device)
 
     @Composable
-    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Regular.Outline.Download)
+    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.Download)
 
     override val orderInCategory = 140
 

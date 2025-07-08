@@ -50,7 +50,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(R.string.upload_files),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FileUpload),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FileUpload),
             dividerType = null,
             onActionClicked = {
                 Analytics.tracker.trackEvent(HomeUploadFilesMenuToolbarEvent)
@@ -60,7 +60,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(R.string.upload_folder),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FolderArrow),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FolderArrow),
             dividerType = DividerType.BigStartPadding,
             onActionClicked = {
                 Analytics.tracker.trackEvent(HomeUploadFolderMenuToolbarEvent)
@@ -70,7 +70,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(R.string.menu_scan_document),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FileScan),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FileScan),
             dividerType = null,
             onActionClicked = {
                 onScanDocumentClicked()
@@ -79,7 +79,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(R.string.menu_take_picture),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Camera),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Camera),
             dividerType = DividerType.BigStartPadding,
             onActionClicked = {
                 onCaptureClicked()
@@ -88,7 +88,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(R.string.action_create_txt),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FilePlus02),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FilePlus02),
             dividerType = null,
             onActionClicked = {
                 Analytics.tracker.trackEvent(HomeNewTextFileMenuToolbarEvent)
@@ -104,7 +104,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(sharedResR.string.device_center_sync_add_new_syn_button_option),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Sync01),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Sync01),
             dividerType = null,
             onActionClicked = {
                 onAddNewSyncClicked()
@@ -113,7 +113,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(sharedResR.string.device_center_sync_add_new_backup_button_option),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Database),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Database),
             dividerType = null,
             onActionClicked = {
                 onAddNewBackupClicked()
@@ -128,7 +128,7 @@ fun HomeFabOptionsBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(R.string.fab_label_new_chat),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.MessageChatCircle),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.MessageChatCircle),
             dividerType = null,
             onActionClicked = {
                 onNewChatClicked()

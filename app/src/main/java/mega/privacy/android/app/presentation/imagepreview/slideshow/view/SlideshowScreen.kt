@@ -326,7 +326,7 @@ private fun SlideshowBottomBar(
                 IconButton(onClick = onPlayOrPauseSlideshow) {
                     Icon(
                         painter = rememberVectorPainter(
-                            if (isPlaying) IconPack.Medium.Regular.Outline.Pause else IconPack.Medium.Regular.Outline.Play
+                            if (isPlaying) IconPack.Medium.Thin.Outline.Pause else IconPack.Medium.Thin.Outline.Play
                         ),
                         contentDescription = null,
                         tint = MaterialTheme.colors.black_white,

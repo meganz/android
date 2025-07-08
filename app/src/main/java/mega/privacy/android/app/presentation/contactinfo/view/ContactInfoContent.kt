@@ -55,7 +55,7 @@ internal fun ContactInfoContent(
     Divider(color = MaterialTheme.colors.grey_alpha_012_white_alpha_012)
     MenuActionListTile(
         text = stringResource(id = R.string.title_incoming_shares_explorer),
-        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FolderIncoming),
+        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FolderIncoming),
     ) {
         Text(
             text = pluralStringResource(
@@ -68,7 +68,7 @@ internal fun ContactInfoContent(
     }
     MenuActionListTile(
         text = stringResource(id = R.string.title_properties_chat_notifications_contact),
-        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Bell),
+        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Bell),
     ) {
         MegaSwitch(
             checked = true
@@ -76,22 +76,22 @@ internal fun ContactInfoContent(
     }
     MenuActionListTile(
         text = stringResource(id = R.string.title_properties_chat_share_contact),
-        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.UserRight),
+        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.UserRight),
     )
     VerifyCredentialsView(isVerified = uiState.areCredentialsVerified)
     if (uiState.chatRoom != null) {
         MenuActionListTile(
             text = stringResource(id = R.string.title_chat_shared_files_info),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.FileUpload),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FileUpload),
         )
         MenuActionListTile(
             text = stringResource(id = R.string.title_properties_manage_chat),
-            icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Eraser),
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser),
         )
     }
     MenuActionListTile(
         text = stringResource(id = R.string.title_properties_remove_contact),
-        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
+        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
         isDestructive = true,
         dividerType = null,
     )

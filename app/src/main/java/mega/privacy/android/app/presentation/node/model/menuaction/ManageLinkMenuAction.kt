@@ -16,7 +16,7 @@ class ManageLinkMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Solid.Link01)
+        rememberVectorPainter(IconPack.Medium.Thin.Solid.Link01)
 
     @Composable
     override fun getDescription() =

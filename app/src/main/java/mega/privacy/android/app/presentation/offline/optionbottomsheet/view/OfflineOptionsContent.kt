@@ -54,7 +54,7 @@ internal fun OfflineOptionsContent(
                 MenuActionListTile(
                     modifier = Modifier.testTag(INFO_ACTION_TEST_TAG),
                     text = stringResource(id = mega.privacy.android.app.R.string.general_info),
-                    icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Info),
+                    icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Info),
                     dividerType = DividerType.BigStartPadding,
                     onActionClicked = {
                         onOpenInfoClicked()
@@ -65,7 +65,7 @@ internal fun OfflineOptionsContent(
                     MenuActionListTile(
                         modifier = Modifier.testTag(OPEN_WITH_ACTION_TEST_TAG),
                         text = stringResource(id = mega.privacy.android.app.R.string.external_play),
-                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.ExternalLink),
+                        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.ExternalLink),
                         dividerType = DividerType.BigStartPadding,
                         onActionClicked = {
                             onOpenWithClicked(this@with)
@@ -77,7 +77,7 @@ internal fun OfflineOptionsContent(
                     MenuActionListTile(
                         modifier = Modifier.testTag(SHARE_ACTION_TEST_TAG),
                         text = stringResource(id = mega.privacy.android.app.R.string.general_share),
-                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.ShareNetwork),
+                        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork),
                         dividerType = DividerType.BigStartPadding,
                         onActionClicked = {
                             onShareNodeClicked(this@with)
@@ -87,7 +87,7 @@ internal fun OfflineOptionsContent(
                 MenuActionListTile(
                     modifier = Modifier.testTag(SAVE_TO_DEVICE_ACTION_TEST_TAG),
                     text = stringResource(id = mega.privacy.android.app.R.string.general_save_to_device),
-                    icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Download),
+                    icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Download),
                     dividerType = DividerType.BigStartPadding,
                     onActionClicked = {
                         onSaveToDeviceClicked()
@@ -96,7 +96,7 @@ internal fun OfflineOptionsContent(
                 MenuActionListTile(
                     modifier = Modifier.testTag(REMOVE_FROM_OFFLINE_ACTION_TEST_TAG),
                     text = stringResource(id = mega.privacy.android.app.R.string.context_delete_offline),
-                    icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
+                    icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
                     dividerType = null,
                     onActionClicked = {
                         onRemoveFromOfflineClicked()

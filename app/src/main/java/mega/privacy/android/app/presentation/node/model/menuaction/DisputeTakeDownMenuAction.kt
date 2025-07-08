@@ -16,7 +16,7 @@ class DisputeTakeDownMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getDescription() = stringResource(id = R.string.dispute_takendown_file)
 
     @Composable
-    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Regular.Outline.AlertTriangle)
+    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.AlertTriangle)
 
     override val orderInCategory = 100
 

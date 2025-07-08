@@ -21,34 +21,83 @@ import androidx.compose.ui.graphics.vector.ImageVector
  * different object hierarchies in the interface.
  */
 interface IconPackInterface {
+    /**
+     * small
+     */
     interface Small {
+        /**
+         * small_regular
+         */
         interface Regular {
+            /**
+             * small_regular_outline
+             */
+            interface Outline {}
+
+            /**
+             * small_regular_solid
+             */
+            interface Solid {}
+        }
+
+        /**
+         * small_thin
+         */
+        interface Thin {
+            /**
+             * small_thin_outline
+             */
             interface Outline {
+                val ArrowUp: ImageVector
+                val ArrowDown: ImageVector
+                val QueueLine: ImageVector
                 val Grid4: ImageVector
                 val ListSmall: ImageVector
                 val Image01: ImageVector
             }
 
-            interface Solid {
-            }
-        }
-
-        interface Thin {
-            interface Outline {
-                val ArrowUp: ImageVector
-                val ArrowDown: ImageVector
-                val QueueLine: ImageVector
-            }
-
-            interface Solid {
-
-            }
+            /**
+             * small_thin_solid
+             */
+            interface Solid {}
         }
     }
 
+    /**
+     * medium
+     */
     interface Medium {
+        /**
+         * medium_regular
+         */
         interface Regular {
+            /**
+             * medium_regular_outline
+             */
+            interface Outline {}
+
+            /**
+             * medium_regular_solid
+             */
+            interface Solid {}
+        }
+
+        /**
+         * medium_thin
+         */
+        interface Thin {
+            /**
+             * medium_thin_outline
+             */
             interface Outline {
+                val Square: ImageVector
+                val FileSearch02: ImageVector
+                val CheckStack: ImageVector
+                val MinusCircle: ImageVector
+                val fileQuestion01: ImageVector
+                val ArrowsUpDown: ImageVector
+                val VPN: ImageVector
+                val LockKeyholeCircle: ImageVector
                 val EmojiSmile: ImageVector
                 val Play: ImageVector
                 val Pause: ImageVector
@@ -136,6 +185,9 @@ interface IconPackInterface {
                 val Download: ImageVector
             }
 
+            /**
+             * medium_thin_solid
+             */
             interface Solid {
                 val EmojiSmile: ImageVector
                 val PlayCircle: ImageVector
@@ -143,33 +195,6 @@ interface IconPackInterface {
                 val Link01: ImageVector
                 val Heart: ImageVector
                 val CheckCircle: ImageVector
-
-            }
-        }
-
-        interface Thin {
-            interface Outline {
-                val Trash: ImageVector
-                val Square: ImageVector
-                val ExternalLink: ImageVector
-                val FileSearch02: ImageVector
-                val CheckStack: ImageVector
-                val MinusCircle: ImageVector
-                val Eraser: ImageVector
-                val MoreVertical: ImageVector
-                val Play: ImageVector
-                val Pause: ImageVector
-                val RotateCcw: ImageVector
-                val Link01: ImageVector
-                val fileQuestion01: ImageVector
-                val Cloud: ImageVector
-                val ArrowsUpDown: ImageVector
-                val VPN: ImageVector
-                val LockKeyholeCircle: ImageVector
-            }
-
-            interface Solid {
-
                 val CheckSquare: ImageVector
             }
         }

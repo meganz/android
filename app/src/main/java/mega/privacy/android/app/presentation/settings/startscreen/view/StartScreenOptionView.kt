@@ -93,7 +93,7 @@ fun StartScreenOptionView(
             )
             if (isSelected) {
                 MegaIcon(
-                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Check),
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Check),
                     tint = IconColor.Secondary,
                     contentDescription = null,
                     modifier = Modifier

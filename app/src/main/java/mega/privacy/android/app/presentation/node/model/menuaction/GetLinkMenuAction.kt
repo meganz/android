@@ -17,7 +17,7 @@ class GetLinkMenuAction @Inject constructor() : MenuActionWithIcon {
         pluralStringResource(id = sharedR.plurals.label_share_links, count = 1)
 
     @Composable
-    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Regular.Outline.Link01)
+    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.Link01)
 
 
     override val orderInCategory = 160

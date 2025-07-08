@@ -144,7 +144,7 @@ fun ChatCameraButton(
                         onTakePicture()
                     }
                 },
-            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Camera),
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Camera),
             contentDescription = "Take photo",
             contentScale = ContentScale.Inside
         )

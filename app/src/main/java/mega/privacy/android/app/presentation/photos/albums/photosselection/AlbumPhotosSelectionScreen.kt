@@ -201,7 +201,7 @@ fun AlbumPhotosSelectionScreen(
                     backgroundColor = accent_900,
                 ) {
                     Icon(
-                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Check),
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Check),
                         contentDescription = null,
                         tint = white.takeIf { isLight } ?: black,
                     )

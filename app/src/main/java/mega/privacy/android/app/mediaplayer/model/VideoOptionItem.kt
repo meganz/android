@@ -20,7 +20,7 @@ enum class VideoOptionItem(
      * The snapshot option
      */
     VIDEO_OPTION_SNAPSHOT(
-        icon = IconPack.Medium.Regular.Outline.Screenshot,
+        icon = IconPack.Medium.Thin.Outline.Screenshot,
         optionTitleId = R.string.media_player_video_option_snapshot_title
     ),
 
@@ -28,7 +28,7 @@ enum class VideoOptionItem(
      * The lock option
      */
     VIDEO_OPTION_LOCK(
-        icon = IconPack.Medium.Regular.Outline.Lock,
+        icon = IconPack.Medium.Thin.Outline.Lock,
         optionTitleId = R.string.media_player_video_option_lock_title
     ),
 
@@ -36,7 +36,7 @@ enum class VideoOptionItem(
      * The zoom to fill option
      */
     VIDEO_OPTION_ZOOM_TO_FILL(
-        icon = IconPack.Medium.Regular.Outline.Maximize02,
+        icon = IconPack.Medium.Thin.Outline.Maximize02,
         optionTitleId = R.string.media_player_video_option_zoom_to_fill_title
     ),
 
@@ -44,7 +44,7 @@ enum class VideoOptionItem(
      * The original option
      */
     VIDEO_OPTION_ORIGINAL(
-        icon = IconPack.Medium.Regular.Outline.Minimize02,
+        icon = IconPack.Medium.Thin.Outline.Minimize02,
         optionTitleId = R.string.media_player_video_option_original_title
     ),
 }

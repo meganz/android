@@ -133,7 +133,7 @@ fun ChatInputTextToolbar(
                         isInputExpanded = !isInputExpanded
                     },
                 painter = rememberVectorPainter(
-                    if (isInputExpanded) IconPack.Medium.Regular.Outline.Minimize02 else IconPack.Medium.Regular.Outline.Maximize02
+                    if (isInputExpanded) IconPack.Medium.Thin.Outline.Minimize02 else IconPack.Medium.Thin.Outline.Maximize02
                 ),
                 contentDescription = "Attachment icon",
                 tint = DSTokens.colors.icon.secondary,

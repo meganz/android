@@ -14,7 +14,7 @@ import javax.inject.Inject
 class OpenLocationMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Outline.FolderOpen)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.FolderOpen)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.search_open_location)

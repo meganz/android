@@ -63,7 +63,7 @@ internal fun BottomSheetContentLayout(
 
                     if (option.isSelected) {
                         Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Check),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Check),
                             tint = colorResource(id = R.color.accent_900),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)

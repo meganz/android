@@ -295,7 +295,7 @@ private fun MDHeader(
                 } else {
                     IconButton(onClick = onSaveToDeviceClicked) {
                         Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Download),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Download),
                             contentDescription = null,
                             tint = tealIconTint(),
                         )
@@ -304,7 +304,7 @@ private fun MDHeader(
                     if (showImportMenu) {
                         IconButton(onClick = onImportClicked) {
                             Icon(
-                                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.CloudUpload),
+                                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
                                 contentDescription = null,
                                 tint = tealIconTint(),
                             )

@@ -16,7 +16,7 @@ sealed interface VideoPlayerMenuAction : MenuAction {
      * Video player download action
      */
     object VideoPlayerDownloadAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.Download,
+        icon = IconPack.Medium.Thin.Outline.Download,
         descriptionRes = R.string.general_save_to_device,
         testTag = TEST_TAG_VIDEO_PLAYER_DOWNLOAD_ACTION
     ), VideoPlayerMenuAction {
@@ -27,7 +27,7 @@ sealed interface VideoPlayerMenuAction : MenuAction {
      * Video player share action
      */
     object VideoPlayerShareAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.ShareNetwork,
+        icon = IconPack.Medium.Thin.Outline.ShareNetwork,
         descriptionRes = R.string.general_share,
         testTag = TEST_TAG_VIDEO_PLAYER_SHARE_ACTION
     ), VideoPlayerMenuAction {
@@ -38,7 +38,7 @@ sealed interface VideoPlayerMenuAction : MenuAction {
      * Video player send to chat action
      */
     object VideoPlayerSendToChatAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.MessageArrowUp,
+        icon = IconPack.Medium.Thin.Outline.MessageArrowUp,
         descriptionRes = R.string.context_send_file_to_chat,
         testTag = TEST_TAG_VIDEO_PLAYER_SEND_TO_CHAT_ACTION
     ), VideoPlayerMenuAction {
@@ -49,7 +49,7 @@ sealed interface VideoPlayerMenuAction : MenuAction {
      * Video player get link action
      */
     object VideoPlayerGetLinkAction : MenuActionPlural(
-        icon = IconPack.Medium.Regular.Outline.Link01,
+        icon = IconPack.Medium.Thin.Outline.Link01,
         descriptionRes = sharedR.plurals.label_share_links,
         amount = 1,
         testTag = TEST_TAG_VIDEO_PLAYER_GET_LINK_ACTION
@@ -61,7 +61,7 @@ sealed interface VideoPlayerMenuAction : MenuAction {
      * Video player remove link action
      */
     object VideoPlayerRemoveLinkAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.LinkOff01,
+        icon = IconPack.Medium.Thin.Outline.LinkOff01,
         descriptionRes = R.string.context_remove_link_menu,
         testTag = TEST_TAG_VIDEO_PLAYER_REMOVE_LINK_ACTION
     ), VideoPlayerMenuAction {
@@ -162,7 +162,7 @@ sealed interface VideoPlayerMenuAction : MenuAction {
      * Video player chat import action
      */
     object VideoPlayerChatImportAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.CloudUpload,
+        icon = IconPack.Medium.Thin.Outline.CloudUpload,
         descriptionRes = R.string.add_to_cloud,
         testTag = TEST_TAG_VIDEO_PLAYER_CHAT_IMPORT_ACTION
     ), VideoPlayerMenuAction {
@@ -173,7 +173,7 @@ sealed interface VideoPlayerMenuAction : MenuAction {
      * Video player save for offline action
      */
     object VideoPlayerSaveForOfflineAction : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.ArrowDownCircle,
+        icon = IconPack.Medium.Thin.Outline.ArrowDownCircle,
         descriptionRes = R.string.file_properties_available_offline,
         testTag = TEST_TAG_VIDEO_PLAYER_SAVE_FOR_OFFLINE_ACTION
     ), VideoPlayerMenuAction {

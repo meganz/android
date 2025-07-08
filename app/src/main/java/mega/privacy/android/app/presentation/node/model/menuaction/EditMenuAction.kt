@@ -13,7 +13,7 @@ import javax.inject.Inject
  */
 class EditMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
-    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Regular.Outline.Edit)
+    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.Edit)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.title_edit_profile_info)

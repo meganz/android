@@ -20,7 +20,7 @@ class UnhideMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Outline.Eye)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.Eye)
 
     override val testTag: String = "menu_action:unhide"
 

@@ -81,21 +81,21 @@ class ContactRequestsPageFragment : Fragment() {
     private val incomingActions = listOf(
         BottomSheetActionInfo(
             R.string.contact_accept,
-            IconPack.Medium.Regular.Outline.CheckCircle,
+            IconPack.Medium.Thin.Outline.CheckCircle,
             false,
             ContactRequestAction.Accept,
             "contact_request_options_sheet:action_accept",
         ),
         BottomSheetActionInfo(
             R.string.contact_ignore,
-            IconPack.Medium.Regular.Outline.SlashCircle,
+            IconPack.Medium.Thin.Outline.SlashCircle,
             false,
             ContactRequestAction.Ignore,
             "contact_request_options_sheet:action_ignore",
         ),
         BottomSheetActionInfo(
             R.string.contact_decline,
-            IconPack.Medium.Regular.Outline.XCircle,
+            IconPack.Medium.Thin.Outline.XCircle,
             true,
             ContactRequestAction.Deny,
             "contact_request_options_sheet:action_deny",
@@ -105,14 +105,14 @@ class ContactRequestsPageFragment : Fragment() {
     private val outgoingActions = listOf(
         BottomSheetActionInfo(
             R.string.contact_reinvite,
-            IconPack.Medium.Regular.Outline.RotateCw,
+            IconPack.Medium.Thin.Outline.RotateCw,
             false,
             ContactRequestAction.Remind,
             "contact_request_options_sheet:action_remind",
         ),
         BottomSheetActionInfo(
             R.string.general_remove,
-            IconPack.Medium.Regular.Outline.X,
+            IconPack.Medium.Thin.Outline.X,
             true,
             ContactRequestAction.Delete,
             "contact_request_options_sheet:action_delete",

@@ -15,7 +15,7 @@ class TrashMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Outline.Trash)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.context_move_to_trash)

@@ -68,7 +68,7 @@ internal fun QRCodeTopBar(
                     onClick = onShare
                 ) {
                     Icon(
-                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ShareNetwork),
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork),
                         contentDescription = stringResource(id = R.string.general_share),
                         tint = MaterialTheme.colors.black_white
                     )
@@ -79,7 +79,7 @@ internal fun QRCodeTopBar(
                     onClick = onShowMoreClicked
                 ) {
                     Icon(
-                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                         contentDescription = stringResource(id = R.string.label_more),
                         tint = MaterialTheme.colors.black_white,
                     )

@@ -14,7 +14,7 @@ internal sealed interface CameraMenuAction : MenuActionWithIcon {
 
         @Composable
         override fun getIconPainter() =
-            rememberVectorPainter(IconPack.Medium.Regular.Outline.ZapOff)
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.ZapOff)
 
         override val testTag = "flash_off"
         override val orderInCategory = 1
@@ -25,7 +25,7 @@ internal sealed interface CameraMenuAction : MenuActionWithIcon {
         override fun getDescription(): String = stringResource(id = R.string.camera_flash_mode_on)
 
         @Composable
-        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Regular.Outline.Zap)
+        override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.Zap)
         override val testTag = "flash_on"
         override val orderInCategory = 2
     }
@@ -36,7 +36,7 @@ internal sealed interface CameraMenuAction : MenuActionWithIcon {
 
         @Composable
         override fun getIconPainter() =
-            rememberVectorPainter(IconPack.Medium.Regular.Outline.ZapAuto)
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.ZapAuto)
 
         override val testTag = "flash_auto"
         override val orderInCategory = 3
@@ -48,7 +48,7 @@ internal sealed interface CameraMenuAction : MenuActionWithIcon {
 
         @Composable
         override fun getIconPainter() =
-            rememberVectorPainter(IconPack.Medium.Regular.Outline.GearSix)
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.GearSix)
 
         override val testTag = "setting"
         override val orderInCategory = 4

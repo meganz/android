@@ -45,16 +45,16 @@ internal val ChatInfoAction.description: Int?
 
 internal val ChatInfoAction.icon: ImageVector?
     get() = when (this) {
-        ChatInfoAction.MeetingLink -> IconPack.Medium.Regular.Outline.Link01
+        ChatInfoAction.MeetingLink -> IconPack.Medium.Thin.Outline.Link01
         ChatInfoAction.ShareMeetingLink -> null
-        ChatInfoAction.ChatNotifications -> IconPack.Medium.Regular.Outline.Bell
-        ChatInfoAction.WaitingRoom -> IconPack.Medium.Regular.Outline.ClockUser
-        ChatInfoAction.AllowNonHostAddParticipants -> IconPack.Medium.Regular.Outline.Users
-        ChatInfoAction.ShareFiles, ChatInfoAction.Files -> IconPack.Medium.Regular.Outline.File02
-        ChatInfoAction.ShareMeetingLinkNonHosts -> IconPack.Medium.Regular.Outline.Link01
-        ChatInfoAction.ManageChatHistory, ChatInfoAction.ManageMeetingHistory -> IconPack.Medium.Regular.Outline.Eraser
+        ChatInfoAction.ChatNotifications -> IconPack.Medium.Thin.Outline.Bell
+        ChatInfoAction.WaitingRoom -> IconPack.Medium.Thin.Outline.ClockUser
+        ChatInfoAction.AllowNonHostAddParticipants -> IconPack.Medium.Thin.Outline.Users
+        ChatInfoAction.ShareFiles, ChatInfoAction.Files -> IconPack.Medium.Thin.Outline.File02
+        ChatInfoAction.ShareMeetingLinkNonHosts -> IconPack.Medium.Thin.Outline.Link01
+        ChatInfoAction.ManageChatHistory, ChatInfoAction.ManageMeetingHistory -> IconPack.Medium.Thin.Outline.Eraser
         ChatInfoAction.EnableEncryptedKeyRotation -> null
         ChatInfoAction.EnabledEncryptedKeyRotation -> null
-        ChatInfoAction.Archive -> IconPack.Medium.Regular.Outline.Archive
-        ChatInfoAction.Unarchive -> IconPack.Medium.Regular.Outline.ArchiveArrowUp
+        ChatInfoAction.Archive -> IconPack.Medium.Thin.Outline.Archive
+        ChatInfoAction.Unarchive -> IconPack.Medium.Thin.Outline.ArchiveArrowUp
     }

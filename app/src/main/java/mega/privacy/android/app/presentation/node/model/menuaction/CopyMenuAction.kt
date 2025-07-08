@@ -17,7 +17,7 @@ class CopyMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getDescription() = stringResource(id = R.string.context_copy)
 
     @Composable
-    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Regular.Outline.Copy01)
+    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.Copy01)
 
     override val orderInCategory = 240
 

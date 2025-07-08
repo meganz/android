@@ -124,7 +124,7 @@ fun ContactInfoTopAppBar(
 
         IconButton(modifier = Modifier.layoutId(BACK_ARROW), onClick = { onBackPress() }) {
             Icon(
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ArrowLeft),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ArrowLeft),
                 contentDescription = BACK_ARROW,
                 tint = primaryTextColorAlpha
             )
@@ -143,21 +143,21 @@ fun ContactInfoTopAppBar(
 private fun ActionItems(iconColor: Color) {
     IconButton(onClick = { /*TODO*/ }) {
         Icon(
-            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MessageArrowUp),
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MessageArrowUp),
             contentDescription = "",
             tint = iconColor
         )
     }
     IconButton(onClick = { /*TODO*/ }) {
         Icon(
-            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.FolderUsers),
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.FolderUsers),
             contentDescription = "",
             tint = iconColor
         )
     }
     IconButton(onClick = { /*TODO*/ }) {
         Icon(
-            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
             contentDescription = "",
             tint = iconColor
         )

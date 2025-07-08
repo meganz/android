@@ -220,7 +220,7 @@ fun NodeListViewItem(
                 Image(
                     modifier = thumbNailModifier
                         .testTag(SELECTED_TEST_TAG),
-                    painter =rememberVectorPainter(IconPack.Medium.Regular.Solid.CheckCircle),
+                    painter =rememberVectorPainter(IconPack.Medium.Thin.Solid.CheckCircle),
                     contentDescription = "Selected",
                 )
             } else {
@@ -253,7 +253,7 @@ fun NodeListViewItem(
             ) {
                 val (nodeInfo, threeDots, infoRow, availableOffline, sharesStatus) = createRefs()
                 Image(
-                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                     contentDescription = "3 dots",
                     modifier = Modifier
                         .constrainAs(threeDots) {
@@ -305,7 +305,7 @@ fun NodeListViewItem(
                             alignment = Alignment.Center,
                             modifier = iconModifier
                                 .testTag(FAVORITE_TEST_TAG),
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.Heart),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Solid.Heart),
                             contentDescription = "Favorite",
 
                             )
@@ -316,7 +316,7 @@ fun NodeListViewItem(
                             modifier = iconModifier
                                 .size(16.dp)
                                 .testTag(EXPORTED_TEST_TAG),
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Link01),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Link01),
                             contentDescription = "Link",
                             colorFilter = ColorFilter.tint(
                                 MaterialTheme.colors.textColorSecondary
@@ -328,7 +328,7 @@ fun NodeListViewItem(
                             alignment = Alignment.Center,
                             modifier = iconModifier
                                 .testTag(TAKEN_TEST_TAG),
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.AlertTriangle),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.AlertTriangle),
                             contentDescription = "Taken Down",
                             colorFilter = ColorFilter.tint(color = MaterialTheme.colors.color_button_brand)
                         )

@@ -14,7 +14,7 @@ import javax.inject.Inject
 class LabelMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() = rememberVectorPainter(
-        IconPack.Medium.Regular.Outline.TagSimple)
+        IconPack.Medium.Thin.Outline.TagSimple)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.file_properties_label)

@@ -41,7 +41,7 @@ internal fun FileLinkContent(
                 .padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 12.dp)
         ) {
             Image(
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Info),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Info),
                 contentDescription = "info icon",
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
             )

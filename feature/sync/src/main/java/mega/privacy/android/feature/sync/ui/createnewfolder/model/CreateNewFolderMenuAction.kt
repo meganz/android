@@ -14,7 +14,7 @@ import javax.inject.Inject
 class CreateNewFolderMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Outline.FolderPlus01)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.FolderPlus01)
 
     @Composable
     override fun getDescription() =

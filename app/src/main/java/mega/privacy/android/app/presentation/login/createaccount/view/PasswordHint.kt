@@ -143,7 +143,7 @@ private fun HintChecklistItem(
                     .size(16.dp)
                     .align(Alignment.CenterVertically)
                     .testTag(PASSWORD_HINT_CHECK_ICON_TAG + text),
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Check),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Check),
                 supportTint = SupportColor.Success,
                 contentDescription = text
             )
@@ -152,7 +152,7 @@ private fun HintChecklistItem(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .testTag(PASSWORD_HINT_CIRCLE_ICON_TAG + text),
-                painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.CircleSmall),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.CircleSmall),
                 tint = IconColor.Secondary,
                 contentDescription = text
             )

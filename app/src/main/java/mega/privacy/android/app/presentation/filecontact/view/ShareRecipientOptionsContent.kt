@@ -75,7 +75,7 @@ private fun Actions(
 ) {
     onInfoClicked?.let {
         ActionItem(
-            icon = IconPack.Medium.Regular.Outline.Info,
+            icon = IconPack.Medium.Thin.Outline.Info,
             text = stringResource(id = R.string.general_info),
             onClickListener = it,
             modifier = modifier.testTag(SHARE_CONTACT_OPTIONS_INFO),
@@ -84,14 +84,14 @@ private fun Actions(
     if (allowChangePermission) {
         ActionItem(
             text = stringResource(id = R.string.file_properties_shared_folder_change_permissions),
-            icon = IconPack.Medium.Regular.Outline.Key02,
+            icon = IconPack.Medium.Thin.Outline.Key02,
             onClickListener = onChangePermissionClicked,
             modifier = modifier.testTag(SHARE_CONTACT_OPTIONS_CHANGE_PERMISSION),
         )
     }
     ActionItem(
         text = stringResource(id = R.string.context_remove),
-        icon = IconPack.Medium.Regular.Outline.X,
+        icon = IconPack.Medium.Thin.Outline.X,
         iconTint = TextColor.Warning,
         textColor = TextColor.Warning,
         onClickListener = onRemoveClicked,

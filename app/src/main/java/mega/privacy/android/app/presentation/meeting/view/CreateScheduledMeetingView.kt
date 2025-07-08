@@ -404,7 +404,7 @@ private fun AddDescriptionButton(
                         .wrapContentSize(Alignment.TopCenter)
                 ) {
                     Icon(
-                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.Menu04),
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Menu04),
                         contentDescription = "${stringResource(id = R.string.meetings_schedule_meeting_add_description_label)} icon",
                         tint = MaterialTheme.colors.textColorSecondary
                     )

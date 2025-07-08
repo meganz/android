@@ -11,7 +11,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal sealed interface FileInfoMenuAction : MenuAction {
 
     object Download : MenuActionString(
-        IconPack.Medium.Regular.Outline.Download,
+        IconPack.Medium.Thin.Outline.Download,
         R.string.general_save_to_device,
         TEST_TAG_DOWNLOAD_ACTION
     ), FileInfoMenuAction {
@@ -19,19 +19,19 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object ShareFolder : MenuActionString(
-        IconPack.Medium.Regular.Outline.FolderUsers,
+        IconPack.Medium.Thin.Outline.FolderUsers,
         R.string.context_share_folder,
         TEST_TAG_SHARE_FOLDER_ACTION,
     ), FileInfoMenuAction
 
     object GetLink : MenuActionPlural(
-        IconPack.Medium.Regular.Solid.Link01,
+        IconPack.Medium.Thin.Solid.Link01,
         sharedR.plurals.label_share_links, 1,
         TEST_TAG_GET_LINK_ACTION,
     ), FileInfoMenuAction
 
     object SendToChat : MenuActionString(
-        IconPack.Medium.Regular.Outline.MessageArrowUp,
+        IconPack.Medium.Thin.Outline.MessageArrowUp,
         R.string.context_send_file_to_chat,
         TEST_TAG_SEND_CHAT_ACTION,
     ), FileInfoMenuAction {
@@ -46,13 +46,13 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object RemoveLink : MenuActionString(
-        IconPack.Medium.Regular.Outline.LinkOff01,
+        IconPack.Medium.Thin.Outline.LinkOff01,
         R.string.context_remove_link_menu,
         TEST_TAG_REMOVE_LINK_ACTION
     ), FileInfoMenuAction
 
     object DisputeTakedown : MenuActionString(
-        IconPack.Medium.Regular.Outline.AlertTriangle,
+        IconPack.Medium.Thin.Outline.AlertTriangle,
         R.string.dispute_takendown_file,
         TEST_TAG_DISPUTE_TAKE_DOWN_ACTION
     ), FileInfoMenuAction {
@@ -60,7 +60,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object Rename : MenuActionString(
-        IconPack.Medium.Regular.Outline.Pen2,
+        IconPack.Medium.Thin.Outline.Pen2,
         R.string.context_rename,
         TEST_TAG_RENAME_ACTION
     ), FileInfoMenuAction {
@@ -68,7 +68,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object Move : MenuActionString(
-        IconPack.Medium.Regular.Outline.Move,
+        IconPack.Medium.Thin.Outline.Move,
         R.string.general_move,
         TEST_TAG_MOVE_ACTION
     ), FileInfoMenuAction {
@@ -76,7 +76,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object Copy : MenuActionString(
-        IconPack.Medium.Regular.Outline.Copy01,
+        IconPack.Medium.Thin.Outline.Copy01,
         R.string.context_copy,
         TEST_TAG_COPY_ACTION
     ), FileInfoMenuAction {
@@ -84,7 +84,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object MoveToRubbishBin : MenuActionString(
-        IconPack.Medium.Regular.Outline.Trash,
+        IconPack.Medium.Thin.Outline.Trash,
         R.string.context_move_to_trash,
         TEST_TAG_RUBBISH_ACTION
     ), FileInfoMenuAction {
@@ -92,7 +92,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object Leave : MenuActionString(
-        IconPack.Medium.Regular.Outline.LogOut02,
+        IconPack.Medium.Thin.Outline.LogOut02,
         R.string.general_leave,
         TEST_TAG_LEAVE_ACTION
     ), FileInfoMenuAction {
@@ -118,13 +118,13 @@ internal sealed interface FileInfoMenuAction : MenuAction {
         ), SelectionModeAction
 
         object ChangePermission : MenuActionString(
-            IconPack.Medium.Regular.Outline.Key02,
+            IconPack.Medium.Thin.Outline.Key02,
             R.string.file_properties_shared_folder_change_permissions,
             TEST_TAG_CHANGE_PERMISSION_SELECT_MODE_ACTION
         ), SelectionModeAction
 
         object Remove : MenuActionString(
-            IconPack.Medium.Regular.Outline.X,
+            IconPack.Medium.Thin.Outline.X,
             R.string.context_remove,
             TEST_TAG_REMOVE_SELECT_MODE_ACTION
         ), SelectionModeAction

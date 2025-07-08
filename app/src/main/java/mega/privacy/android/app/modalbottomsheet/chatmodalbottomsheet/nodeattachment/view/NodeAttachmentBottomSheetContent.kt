@@ -50,7 +50,7 @@ internal fun NodeAttachmentBottomSheetContent(
                     MenuActionListTile(
                         modifier = Modifier.testTag(ADD_TO_CLOUD_DRIVE_ACTION_TEST_TAG),
                         text = stringResource(id = mega.privacy.android.app.R.string.add_to_cloud_node_chat),
-                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.CloudUpload),
+                        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
                         dividerType = DividerType.BigStartPadding,
                         onActionClicked = onImportClicked,
                     )
@@ -59,7 +59,7 @@ internal fun NodeAttachmentBottomSheetContent(
                 MenuActionListTile(
                     modifier = Modifier.testTag(SAVE_TO_DEVICE_ACTION_TEST_TAG),
                     text = stringResource(id = mega.privacy.android.app.R.string.general_save_to_device),
-                    icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Download),
+                    icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Download),
                     dividerType = DividerType.BigStartPadding,
                     onActionClicked = onSaveToDeviceClicked,
                 )
@@ -68,7 +68,7 @@ internal fun NodeAttachmentBottomSheetContent(
                     MenuActionListTile(
                         modifier = Modifier.testTag(AVAILABLE_OFFLINE_ACTION_TEST_TAG),
                         text = stringResource(id = mega.privacy.android.app.R.string.file_properties_available_offline),
-                        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.ArrowDownCircle),
+                        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.ArrowDownCircle),
                         dividerType = null,
                         trailingItem = {
                             MegaSwitch(

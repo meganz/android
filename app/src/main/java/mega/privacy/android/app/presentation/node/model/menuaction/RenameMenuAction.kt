@@ -19,7 +19,7 @@ class RenameMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getDescription() = stringResource(id = R.string.context_rename)
 
     @Composable
-    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Regular.Outline.Pen2)
+    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.Pen2)
 
     override val testTag: String = "menu_action:rename"
 

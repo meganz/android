@@ -195,7 +195,7 @@ fun RecentActionListViewItem(
 
             if (showMenuButton) {
                 Image(
-                    painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                     contentDescription = "3 dots",
                     modifier = Modifier
                         .align(Alignment.CenterVertically)

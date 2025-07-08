@@ -253,7 +253,7 @@ fun ParticipantInCallItem(
                                 IconButton(onClick = { onParticipantMoreOptionsClicked(participant) }) {
                                     Icon(
                                         modifier = Modifier.padding(start = 10.dp),
-                                        painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+                                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                                         contentDescription = "Three dots icon",
                                         tint = MaterialTheme.colors.grey_alpha_054_white_alpha_054
                                     )

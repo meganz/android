@@ -59,7 +59,7 @@ fun ExampleHomeScreen(content: String) {
                         Row() {
                             MegaIcon(
                                 modifier = Modifier.padding(16.dp),
-                                painter = rememberVectorPainter(IconPack.Small.Regular.Outline.Image01),
+                                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Camera),
                                 contentDescription = "Icon $index",
                                 tint = IconColor.Primary
                             )

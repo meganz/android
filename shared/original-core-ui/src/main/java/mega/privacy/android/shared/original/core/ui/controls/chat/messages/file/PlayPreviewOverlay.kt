@@ -37,7 +37,7 @@ fun PlayPreviewOverlay(
             .padding(4.dp)
             .size(32.dp),
         colorFilter = ColorFilter.tint(DSTokens.colors.icon.onColor),
-        painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.PlayCircle),
+        painter = rememberVectorPainter(IconPack.Medium.Thin.Solid.PlayCircle),
         contentDescription = "Play"
     )
     VideoDuration(

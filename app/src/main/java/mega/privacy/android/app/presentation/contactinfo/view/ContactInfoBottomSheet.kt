@@ -37,7 +37,7 @@ internal fun ContactInfoBottomSheet(
             Column {
                 MenuActionListTile(
                     text = stringResource(id = R.string.title_edit_profile_info),
-                    icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Pen2),
+                    icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Pen2),
                     onActionClicked = {
                         coroutineScope.launch { modalSheetState.hide() }
                         updateNickNameDialogVisibility(true)
@@ -45,7 +45,7 @@ internal fun ContactInfoBottomSheet(
                 )
                 MenuActionListTile(
                     text = stringResource(id = R.string.general_remove),
-                    icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.X),
+                    icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
                     dividerType = null,
                     onActionClicked = {
                         coroutineScope.launch { modalSheetState.hide() }

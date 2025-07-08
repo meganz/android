@@ -18,7 +18,7 @@ sealed interface ChatRoomMenuAction : MenuAction {
      * Audio call
      */
     class AudioCall(override val enabled: Boolean) : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.Phone01,
+        icon = IconPack.Medium.Thin.Outline.Phone01,
         descriptionRes = R.string.call_button,
         testTag = TEST_TAG_AUDIO_CALL_ACTION,
     ), ChatRoomMenuAction {
@@ -29,7 +29,7 @@ sealed interface ChatRoomMenuAction : MenuAction {
      * Video call
      */
     class VideoCall(override val enabled: Boolean) : MenuActionString(
-        icon = IconPack.Medium.Regular.Outline.Video,
+        icon = IconPack.Medium.Thin.Outline.Video,
         descriptionRes = R.string.video_button,
         testTag = TEST_TAG_VIDEO_CALL_ACTION,
     ), ChatRoomMenuAction {

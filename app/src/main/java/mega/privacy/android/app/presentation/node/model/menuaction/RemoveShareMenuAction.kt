@@ -17,7 +17,7 @@ class RemoveShareMenuAction @Inject constructor(
 
     @Composable
     override fun getIconPainter() =
-        rememberVectorPainter(IconPack.Medium.Regular.Outline.FolderGear01)
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.FolderGear01)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.context_clean_shares_menu)

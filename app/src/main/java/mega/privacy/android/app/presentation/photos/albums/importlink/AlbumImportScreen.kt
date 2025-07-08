@@ -438,7 +438,7 @@ private fun AlbumImportTopBar(
                     onClick = onShareLink,
                     content = {
                         Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Regular.Outline.ShareNetwork),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork),
                             contentDescription = null,
                             tint = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
                         )

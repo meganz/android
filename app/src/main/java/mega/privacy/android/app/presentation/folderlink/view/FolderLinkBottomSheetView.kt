@@ -140,7 +140,7 @@ private fun BottomSheetContent(
         MenuActionListTile(
             modifier = Modifier.testTag(Constants.BOTTOM_SHEET_SAVE),
             icon = rememberVectorPainter(
-                IconPack.Medium.Regular.Outline.Download),
+                IconPack.Medium.Thin.Outline.Download),
             text = stringResource(R.string.general_save_to_device),
             onActionClicked = {
                 coroutineScope.launch { modalSheetState.hide() }
@@ -150,7 +150,7 @@ private fun BottomSheetContent(
         if (showImport) {
             MenuActionListTile(
                 modifier = Modifier.testTag(Constants.BOTTOM_SHEET_IMPORT),
-                icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.CloudUpload),
+                icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
                 text = stringResource(R.string.add_to_cloud),
                 onActionClicked = {
                     coroutineScope.launch { modalSheetState.hide() }

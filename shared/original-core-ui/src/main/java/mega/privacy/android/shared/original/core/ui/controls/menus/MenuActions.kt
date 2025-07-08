@@ -119,7 +119,7 @@ private fun RowScope.OverflowDropDown(
     }
     Box(contentAlignment = Alignment.BottomEnd) {
         IconButtonWithTooltip(
-            iconPainter = rememberVectorPainter(IconPack.Medium.Regular.Outline.MoreVertical),
+            iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
             description = stringResource(id = R.string.abc_action_menu_overflow_description),
             onClick = { showMoreMenu = !showMoreMenu },
             modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE),

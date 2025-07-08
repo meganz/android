@@ -31,12 +31,12 @@ internal val ScheduleMeetingAction.description: Int?
 
 internal val ScheduleMeetingAction.icon: ImageVector?
     get() = when (this) {
-        ScheduleMeetingAction.Recurrence -> IconPack.Medium.Regular.Outline.RotateCw
+        ScheduleMeetingAction.Recurrence -> IconPack.Medium.Thin.Outline.RotateCw
         ScheduleMeetingAction.EndRecurrence -> null
-        ScheduleMeetingAction.MeetingLink -> IconPack.Medium.Regular.Outline.Link01
-        ScheduleMeetingAction.AddParticipants -> IconPack.Medium.Regular.Outline.UserPlus
-        ScheduleMeetingAction.SendCalendarInvite -> IconPack.Medium.Regular.Outline.CalendarArrowRight
-        ScheduleMeetingAction.AllowNonHostAddParticipants -> IconPack.Medium.Regular.Outline.Users
-        ScheduleMeetingAction.AddDescription -> IconPack.Medium.Regular.Outline.Menu04
-        ScheduleMeetingAction.WaitingRoom -> IconPack.Medium.Regular.Outline.ClockUser
+        ScheduleMeetingAction.MeetingLink -> IconPack.Medium.Thin.Outline.Link01
+        ScheduleMeetingAction.AddParticipants -> IconPack.Medium.Thin.Outline.UserPlus
+        ScheduleMeetingAction.SendCalendarInvite -> IconPack.Medium.Thin.Outline.CalendarArrowRight
+        ScheduleMeetingAction.AllowNonHostAddParticipants -> IconPack.Medium.Thin.Outline.Users
+        ScheduleMeetingAction.AddDescription -> IconPack.Medium.Thin.Outline.Menu04
+        ScheduleMeetingAction.WaitingRoom -> IconPack.Medium.Thin.Outline.ClockUser
     }

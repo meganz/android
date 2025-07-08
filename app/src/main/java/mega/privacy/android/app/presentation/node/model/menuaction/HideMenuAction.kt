@@ -19,7 +19,7 @@ class HideMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getDescription() = stringResource(id = R.string.general_hide_node)
 
     @Composable
-    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Regular.Outline.EyeOff)
+    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.EyeOff)
 
     override val testTag: String = "menu_action:hide"
 

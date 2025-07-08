@@ -17,7 +17,7 @@ class RemoveMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getDescription() = stringResource(id = R.string.general_remove)
 
     @Composable
-    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Regular.Outline.X)
+    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.X)
 
     override val orderInCategory = 230
 

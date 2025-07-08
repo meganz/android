@@ -61,7 +61,7 @@ internal fun RenameVideoPlaylistBottomSheetTile(
         modifier = Modifier.testTag(VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG),
         dividerType = null,
         text = stringResource(id = R.string.video_section_playlists_rename_playlist_dialog_title),
-        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Pen2),
+        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Pen2),
         onActionClicked = onActionClicked,
     )
 }
@@ -74,7 +74,7 @@ internal fun DeleteVideoPlaylistBottomSheetTile(
         modifier = Modifier.testTag(VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG),
         dividerType = null,
         text = stringResource(id = R.string.video_section_playlist_bottom_sheet_option_title_delete),
-        icon = rememberVectorPainter(IconPack.Medium.Regular.Outline.Trash),
+        icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash),
         onActionClicked = onActionClicked,
     )
 }
