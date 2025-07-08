@@ -151,7 +151,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     TransfersSection(
         "Enable new transfers fragment",
-        false
+        true
     ),
 
     /**
