@@ -15,7 +15,7 @@
 
     <item
         android:id="@+id/action_download_versions"
-        android:icon="@drawable/ic_download_medium_regular_outline"
+        android:icon="@drawable/ic_download_medium_thin_outline"
         android:orderInCategory="115"
         android:title="@string/general_save_to_device"
         app:iconTint="?attr/colorSecondary"
@@ -23,7 +23,7 @@
 
     <item
         android:id="@+id/action_revert_version"
-        android:icon="@drawable/ic_clock_rotate_medium_regular_outline"
+        android:icon="@drawable/ic_clock_rotate_medium_thin_outline"
         android:orderInCategory="120"
         android:title="@string/general_revert"
         app:iconTint="?attr/colorSecondary"

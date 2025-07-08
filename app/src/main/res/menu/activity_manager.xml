@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_return_call"
-        android:icon="@drawable/ic_phone_01_medium_regular_solid"
+        android:icon="@drawable/ic_phone_01_medium_thin_solid"
         android:orderInCategory="80"
         android:title="@string/call_in_progress_layout"
         android:visible="false"
@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/action_search"
-        android:icon="@drawable/ic_search_large_medium_regular_outline"
+        android:icon="@drawable/ic_search_large_medium_thin_outline"
         android:orderInCategory="95"
         android:title="@string/action_search"
         android:visible="false"
@@ -79,7 +79,7 @@
 
     <item
         android:id="@+id/action_menu_open_meeting"
-        android:icon="@drawable/ic_video_medium_regular_solid"
+        android:icon="@drawable/ic_video_medium_thin_solid"
         android:orderInCategory="180"
         android:title="@string/start_join_meeting"
         android:visible="false"

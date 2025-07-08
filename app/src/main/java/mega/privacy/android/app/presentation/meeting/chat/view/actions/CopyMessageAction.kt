@@ -15,7 +15,7 @@ import mega.privacy.mobile.analytics.event.ChatConversationCopyActionMenuItemEve
 
 internal class CopyMessageAction : MessageAction(
     text = R.string.context_copy,
-    icon = R.drawable.ic_icon_copy_medium_regular_outline,
+    icon = mega.privacy.android.icon.pack.R.drawable.ic_copy_01_medium_thin_outline,
     testTag = "action_copy",
     group = MessageActionGroup.Modify,
 ) {

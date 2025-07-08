@@ -105,7 +105,7 @@
                 android:id="@+id/option_view"
                 style="@style/BottomSheetOption"
                 android:text="@string/view_in_folder_label"
-                app:drawableStartCompat="@drawable/ic_search_large_medium_regular_outline" />
+                app:drawableStartCompat="@drawable/ic_search_large_medium_thin_outline" />
 
             <View
                 android:id="@+id/separator_open_with"
@@ -118,7 +118,7 @@
                 android:id="@+id/option_open_with"
                 style="@style/BottomSheetOption"
                 android:text="@string/external_play"
-                app:drawableStartCompat="@drawable/ic_external_link_medium_regular_outline" />
+                app:drawableStartCompat="@drawable/ic_external_link_medium_thin_outline" />
 
             <View
                 android:id="@+id/separator_get_link"
@@ -131,7 +131,7 @@
                 android:id="@+id/option_get_link"
                 style="@style/BottomSheetOption"
                 tools:text="Share Link"
-                app:drawableStartCompat="@drawable/ic_link_01_medium_regular_outline" />
+                app:drawableStartCompat="@drawable/ic_link_01_medium_thin_outline" />
 
             <View
                 android:id="@+id/separator_retry"
@@ -144,7 +144,7 @@
                 android:id="@+id/option_retry"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_retry"
-                app:drawableStartCompat="@drawable/ic_rotate_ccw_medium_regular_outline" />
+                app:drawableStartCompat="@drawable/ic_rotate_ccw_medium_thin_outline" />
 
             <View
                 android:id="@+id/separator_clear"
@@ -157,7 +157,7 @@
                 android:id="@+id/option_clear"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/general_clear"
-                app:drawableStartCompat="@drawable/ic_x_medium_regular_outline" />
+                app:drawableStartCompat="@drawable/ic_x_medium_thin_outline" />
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

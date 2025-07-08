@@ -41,7 +41,7 @@ internal fun CameraUploadsBottomSheetTile(
                 R.string.device_center_bottom_sheet_item_camera_uploads_disabled_status
             }
         ),
-        icon = iconPackR.drawable.ic_camera_medium_regular_outline,
+        icon = iconPackR.drawable.ic_camera_medium_thin_outline,
         dividerType = dividerType,
         onActionClicked = onActionClicked,
     )

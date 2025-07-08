@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,13 +11,14 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.mobile.analytics.event.ChatConversationShareActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationShareActionMenuItemEvent
 import timber.log.Timber
 
 internal class ShareMessageAction : MessageAction(
     text = R.string.general_share,
-    icon = iconPackR.drawable.ic_share_network_medium_regular_outline,
+    icon = iconPackR.drawable.ic_share_network_medium_thin_outline,
     testTag = "action_share",
     group = MessageActionGroup.Share,
 ) {

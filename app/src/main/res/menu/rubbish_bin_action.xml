@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/cab_menu_restore_from_rubbish"
-        android:icon="@drawable/ic_rotate_ccw_medium_regular_outline"
+        android:icon="@drawable/ic_rotate_ccw_medium_thin_outline"
         android:orderInCategory="100"
         android:title="@string/context_restore"
         app:iconTint="?attr/colorSecondary"
@@ -11,7 +11,7 @@
 
     <item
         android:id="@+id/cab_menu_delete"
-        android:icon="@drawable/ic_x_medium_regular_outline"
+        android:icon="@drawable/ic_x_medium_thin_outline"
         android:orderInCategory="110"
         android:title="@string/context_delete_offline"
         app:iconTint="?attr/colorSecondary"

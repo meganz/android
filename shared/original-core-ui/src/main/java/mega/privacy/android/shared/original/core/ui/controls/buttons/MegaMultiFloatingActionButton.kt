@@ -234,12 +234,12 @@ private fun MegaMultiFloatingActionButtonCollapsedPreview(
                 MegaMultiFloatingActionButton(
                     items = listOf(
                         MultiFloatingActionButtonItem(
-                            icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                            icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                             label = "Sync",
                             onClicked = {}
                         ),
                         MultiFloatingActionButtonItem(
-                            icon = painterResource(id = iconPackR.drawable.ic_database),
+                            icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                             label = "Backup",
                             onClicked = {}
                         ),
@@ -272,12 +272,12 @@ private fun MegaMultiFloatingActionButtonExpandedPreview(
                 MegaMultiFloatingActionButton(
                     items = listOf(
                         MultiFloatingActionButtonItem(
-                            icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                            icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                             label = "Sync",
                             onClicked = {}
                         ),
                         MultiFloatingActionButtonItem(
-                            icon = painterResource(id = iconPackR.drawable.ic_database),
+                            icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                             label = "Backup",
                             enabled = enabled,
                             onClicked = {}

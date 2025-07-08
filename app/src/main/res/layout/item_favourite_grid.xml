@@ -52,7 +52,7 @@
         <ImageView
             android:id="@+id/folder_grid_taken_down"
             style="@style/taken_down_icon"
-            android:src="@drawable/ic_alert_triangle_medium_regular_outline"
+            android:src="@drawable/ic_alert_triangle_medium_thin_outline"
             app:tint="@color/color_button_brand"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -76,7 +76,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginHorizontal="8dp"
-            android:src="@drawable/ic_check_circle_small_regular_solid"
+            android:src="@drawable/ic_check_circle_small_thin_solid"
             app:tint="?android:attr/colorAccent"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -121,7 +121,7 @@
                 android:layout_height="32dp"
                 android:background="@null"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_play_circle_medium_regular_solid"
+                android:src="@drawable/ic_play_circle_medium_thin_solid"
                 app:tint="@color/white"
                 tools:ignore="ContentDescription" />
 
@@ -193,7 +193,7 @@
                 android:layout_height="16dp"
                 android:layout_gravity="end|center_vertical"
                 android:background="@null"
-                android:src="@drawable/ic_alert_triangle_medium_regular_outline"
+                android:src="@drawable/ic_alert_triangle_medium_thin_outline"
                 app:tint="@color/color_button_brand"
                 tools:ignore="ContentDescription" />
 
@@ -214,7 +214,7 @@
                 android:layout_marginHorizontal="8dp"
                 android:visibility="gone"
                 android:layout_gravity="end|center_vertical"
-                android:src="@drawable/ic_check_circle_small_regular_solid"
+                android:src="@drawable/ic_check_circle_small_thin_solid"
                 app:tint="?android:attr/colorAccent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

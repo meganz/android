@@ -5,15 +5,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.ui.res.stringResource
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedResR
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.android.core.ui.theme.values.TextColor
 
 /**
  * A [Composable] Bottom Sheet Tile that displays "Add new sync"
@@ -29,7 +29,7 @@ internal fun AddNewSyncBottomSheetTile(
     MenuActionListTile(
         text = stringResource(id = sharedResR.string.device_center_add_sync_button_option),
         modifier = Modifier.testTag(TEST_TAG_BOTTOM_SHEET_TILE_ADD_NEW_SYNC),
-        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
         dividerType = dividerType,
         onActionClicked = onActionClicked,
         trailingItem = {

@@ -202,9 +202,9 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
 
             binding.listModeSwitch.setImageResource(
                 if (sortByViewModel?.isListView() == true)
-                    IconPackR.drawable.ic_grid_4_small_regular_outline
+                    IconPackR.drawable.ic_grid_4_small_thin_outline
                 else
-                    IconPackR.drawable.ic_list_small_small_regular_outline
+                    IconPackR.drawable.ic_list_small_small_thin_outline
             )
         }
     }

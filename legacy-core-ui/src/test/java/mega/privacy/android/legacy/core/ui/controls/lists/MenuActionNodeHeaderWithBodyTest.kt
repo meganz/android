@@ -24,7 +24,7 @@ internal class MenuActionNodeHeaderWithBodyTest {
             MenuActionNodeHeaderWithBody(
                 title = "Node Title",
                 body = "Node Body",
-                nodeIcon = R.drawable.ic_icon_mic_medium_regular_solid,
+                nodeIcon = mega.privacy.android.icon.pack.R.drawable.ic_mic_medium_thin_solid,
             )
         }
         composeTestRule.onNodeWithTag(HEADER_MAIN_CONTAINER).assertIsDisplayed()
@@ -39,7 +39,7 @@ internal class MenuActionNodeHeaderWithBodyTest {
             MenuActionNodeHeaderWithBody(
                 title = "Node Title",
                 body = "Node Body",
-                nodeIcon = R.drawable.ic_icon_mic_medium_regular_solid,
+                nodeIcon = mega.privacy.android.icon.pack.R.drawable.ic_mic_medium_thin_solid,
                 bodyIcon = R.drawable.ic_favorite,
             )
         }

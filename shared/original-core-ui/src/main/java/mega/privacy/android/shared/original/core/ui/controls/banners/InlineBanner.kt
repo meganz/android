@@ -147,7 +147,7 @@ fun InlineWarningBanner(
         modifier = modifier,
         titleStyle = titleStyle,
         messageStyle = messageStyle,
-        iconResId = mega.privacy.android.icon.pack.R.drawable.ic_alert_circle_regular_medium_outline,
+        iconResId = mega.privacy.android.icon.pack.R.drawable.ic_alert_circle_medium_thin_outline,
         iconColor = DSTokens.colors.support.warning,
         backgroundColor = DSTokens.colors.notifications.notificationWarning
     )

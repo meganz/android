@@ -1,6 +1,5 @@
 package mega.privacy.android.app.contacts.list
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -41,6 +40,7 @@ import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
+import mega.privacy.android.icon.pack.R as IconPackR
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -134,7 +134,7 @@ internal class ContactListViewModel @Inject constructor(
                                     ContactActionItem(
                                         Type.GROUPS,
                                         context.getString(R.string.section_groups),
-                                        IconPackR.drawable.ic_message_chat_circle_medium_regular_outline,
+                                        IconPackR.drawable.ic_message_chat_circle_medium_thin_outline,
                                     )
                                 )
                             )

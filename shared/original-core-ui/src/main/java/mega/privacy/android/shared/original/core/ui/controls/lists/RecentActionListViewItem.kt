@@ -235,7 +235,7 @@ private fun RecentActionListViewItemPreview() {
             firstLineText = "First line text",
             time = "12:00 PM",
             parentFolderName = "Folder Name",
-            actionIcon = IconPackR.drawable.ic_corner_up_right_medium_regular_outline
+            actionIcon = IconPackR.drawable.ic_corner_up_right_medium_thin_outline
         )
     }
 }
@@ -252,7 +252,7 @@ private fun RecentActionListViewItem2Preview() {
             shareIcon = IconPackR.drawable.ic_folder_incoming_medium_solid,
             time = "08:00 PM",
             parentFolderName = "Very Long Folder Name, Very Long Folder Name",
-            actionIcon = IconPackR.drawable.ic_corner_up_right_medium_regular_outline
+            actionIcon = IconPackR.drawable.ic_corner_up_right_medium_thin_outline
         )
     }
 }

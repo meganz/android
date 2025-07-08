@@ -249,7 +249,7 @@ fun VoiceClipRecorderView(
                             modifier = Modifier
                                 .padding(top = 12.dp)
                                 .size(18.dp),
-                            imageVector = ImageVector.vectorResource(R.drawable.ic_icon_lock_medium_regular_solid),
+                            imageVector = ImageVector.vectorResource(mega.privacy.android.icon.pack.R.drawable.ic_lock_medium_thin_solid),
                             tint = DSTokens.colors.icon.secondary,
                             contentDescription = null
                         )
@@ -257,7 +257,7 @@ fun VoiceClipRecorderView(
                             modifier = Modifier
                                 .padding(top = 34.dp)
                                 .size(18.dp),
-                            imageVector = ImageVector.vectorResource(R.drawable.ic_icon_chevron_up_medium_regular_outline),
+                            imageVector = ImageVector.vectorResource(mega.privacy.android.icon.pack.R.drawable.ic_chevron_up_medium_thin_outline),
                             tint = DSTokens.colors.icon.disabled,
                             contentDescription = null
                         )
@@ -456,7 +456,7 @@ private fun RecordScroller(modifier: Modifier = Modifier) {
     ) {
         Icon(
             modifier = Modifier.size(24.dp),
-            imageVector = ImageVector.vectorResource(R.drawable.ic_icon_mic_medium_regular_solid),
+            imageVector = ImageVector.vectorResource(mega.privacy.android.icon.pack.R.drawable.ic_mic_medium_thin_solid),
             contentDescription = null,
             tint = DSTokens.colors.icon.onColor,
         )
@@ -470,7 +470,7 @@ private fun SlideToCancel(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_icon_chevron_left_medium_regular_outline),
+            imageVector = ImageVector.vectorResource(mega.privacy.android.icon.pack.R.drawable.ic_chevron_left_medium_thin_outline),
             contentDescription = null,
             tint = DSTokens.colors.icon.onColorDisabled
         )

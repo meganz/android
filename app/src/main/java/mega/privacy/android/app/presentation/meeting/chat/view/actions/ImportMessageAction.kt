@@ -35,7 +35,7 @@ internal class ImportMessageAction(
     private val launchNameCollisionActivity: (Context, List<NameCollisionUiEntity>, ActivityResultLauncher<Intent>) -> Unit = ::openNameCollisionActivity,
 ) : MessageAction(
     text = R.string.general_import,
-    icon = R.drawable.ic_cloud_upload_medium_regular_outline,
+    icon = mega.privacy.android.icon.pack.R.drawable.ic_cloud_upload_medium_thin_outline,
     testTag = "import_node",
     group = MessageActionGroup.Transfer,
 ) {

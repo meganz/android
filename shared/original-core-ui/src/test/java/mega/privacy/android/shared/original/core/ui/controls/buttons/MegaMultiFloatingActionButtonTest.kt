@@ -1,16 +1,16 @@
 package mega.privacy.android.shared.original.core.ui.controls.buttons
 
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import mega.privacy.android.icon.pack.R as iconPackR
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,12 +26,12 @@ class MegaMultiFloatingActionButtonTest {
             MegaMultiFloatingActionButton(
                 items = listOf(
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                         label = "Sync",
                         onClicked = {},
                     ),
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_database),
+                        icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                         label = "Backup",
                         onClicked = {},
                     ),
@@ -51,12 +51,12 @@ class MegaMultiFloatingActionButtonTest {
             MegaMultiFloatingActionButton(
                 items = listOf(
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                         label = "Sync",
                         onClicked = {},
                     ),
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_database),
+                        icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                         label = "Backup",
                         onClicked = {},
                     ),
@@ -78,12 +78,12 @@ class MegaMultiFloatingActionButtonTest {
             MegaMultiFloatingActionButton(
                 items = listOf(
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                         label = "Sync",
                         onClicked = {},
                     ),
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_database),
+                        icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                         label = "Backup",
                         onClicked = {},
                     ),
@@ -102,12 +102,12 @@ class MegaMultiFloatingActionButtonTest {
             MegaMultiFloatingActionButton(
                 items = listOf(
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                         label = "Sync",
                         onClicked = {},
                     ),
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_database),
+                        icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                         label = "Backup",
                         onClicked = {},
                     ),
@@ -129,12 +129,12 @@ class MegaMultiFloatingActionButtonTest {
             MegaMultiFloatingActionButton(
                 items = listOf(
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                         label = "Sync",
                         onClicked = {},
                     ),
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_database),
+                        icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                         label = "Backup",
                         onClicked = {},
                     ),
@@ -164,12 +164,12 @@ class MegaMultiFloatingActionButtonTest {
             MegaMultiFloatingActionButton(
                 items = listOf(
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                         label = "Sync",
                         onClicked = { clicked = true },
                     ),
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_database),
+                        icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                         label = "Backup",
                         onClicked = {},
                     ),
@@ -191,13 +191,13 @@ class MegaMultiFloatingActionButtonTest {
             MegaMultiFloatingActionButton(
                 items = listOf(
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                         label = "Sync",
                         enabled = false,
                         onClicked = { clicked = true },
                     ),
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_database),
+                        icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                         label = "Backup",
                         onClicked = {},
                     ),
@@ -219,12 +219,12 @@ class MegaMultiFloatingActionButtonTest {
             MegaMultiFloatingActionButton(
                 items = listOf(
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                         label = "Sync",
                         onClicked = { clicked = true },
                     ),
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_database),
+                        icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                         label = "Backup",
                         onClicked = {},
                     ),
@@ -246,13 +246,13 @@ class MegaMultiFloatingActionButtonTest {
             MegaMultiFloatingActionButton(
                 items = listOf(
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                         label = "Sync",
                         enabled = false,
                         onClicked = { clicked = true },
                     ),
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_database),
+                        icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                         label = "Backup",
                         onClicked = {},
                     ),
@@ -274,12 +274,12 @@ class MegaMultiFloatingActionButtonTest {
             MegaMultiFloatingActionButton(
                 items = listOf(
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                         label = "Sync",
                         onClicked = { clicked = true },
                     ),
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_database),
+                        icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                         label = "Backup",
                         onClicked = {},
                     ),
@@ -301,13 +301,13 @@ class MegaMultiFloatingActionButtonTest {
             MegaMultiFloatingActionButton(
                 items = listOf(
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                        icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                         label = "Sync",
                         enabled = false,
                         onClicked = { clicked = true },
                     ),
                     MultiFloatingActionButtonItem(
-                        icon = painterResource(id = iconPackR.drawable.ic_database),
+                        icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                         label = "Backup",
                         onClicked = {},
                     ),

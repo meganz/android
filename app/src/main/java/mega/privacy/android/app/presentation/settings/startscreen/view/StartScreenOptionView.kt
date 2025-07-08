@@ -99,7 +99,7 @@ fun StartScreenOptionView(
                     modifier = Modifier
                         .padding(end = 20.dp)
                         .size(24.dp)
-                        .testTag(iconPackR.drawable.ic_check_medium_regular_outline.toString())
+                        .testTag(iconPackR.drawable.ic_check_medium_thin_outline.toString())
                 )
             }
         }
@@ -119,7 +119,7 @@ fun StartScreenOptionViewPreview(
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.background(MaterialTheme.colors.surface)) {
             StartScreenOptionView(
-                iconPackR.drawable.ic_mega_medium_regular_outline,
+                iconPackR.drawable.ic_mega_medium_thin_outline,
                 "Home",
                 isSelected = selected,
                 onClick = { selected = !selected },

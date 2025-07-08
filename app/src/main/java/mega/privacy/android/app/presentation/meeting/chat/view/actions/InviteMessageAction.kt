@@ -29,7 +29,7 @@ class InviteMessageAction(
     private val chatViewModel: ChatViewModel,
 ) : MessageAction(
     text = R.string.contact_invite,
-    icon = R.drawable.ic_icon_plus_circle_medium_regular_outline,
+    icon = mega.privacy.android.icon.pack.R.drawable.ic_plus_circle_medium_thin_outline,
     testTag = "action_invite",
     group = MessageActionGroup.Contact,
 ) {

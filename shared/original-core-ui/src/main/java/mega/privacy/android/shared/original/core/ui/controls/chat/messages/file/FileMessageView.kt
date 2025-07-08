@@ -148,7 +148,7 @@ private fun FileNoPreviewMessageNotMineViewPreview() {
         }
         FileMessageView(
             isMe = false,
-            fileTypeResId = iconPackR.drawable.ic_alert_circle_regular_medium_outline,
+            fileTypeResId = iconPackR.drawable.ic_alert_circle_medium_thin_outline,
             previewUri = resourceUri,
             duration = null,
             fileName = "Hello.pdf",
@@ -178,7 +178,7 @@ private fun FileNoPreviewMessageViewPreview(
         }
         FileMessageView(
             isMe = true,
-            fileTypeResId = iconPackR.drawable.ic_alert_circle_regular_medium_outline,
+            fileTypeResId = iconPackR.drawable.ic_alert_circle_medium_thin_outline,
             previewUri = resourceUri,
             duration = null,
             loadProgress = 0.6f,

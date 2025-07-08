@@ -189,7 +189,7 @@ internal fun SyncListScreen(
                     MegaMultiFloatingActionButton(
                         items = listOf(
                             MultiFloatingActionButtonItem(
-                                icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                                icon = painterResource(id = iconPackR.drawable.ic_sync_01_medium_thin_outline),
                                 label = stringResource(id = R.string.sync_toolbar_title),
                                 onClicked = {
                                     Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
@@ -198,7 +198,7 @@ internal fun SyncListScreen(
                                 },
                             ),
                             MultiFloatingActionButtonItem(
-                                icon = painterResource(id = iconPackR.drawable.ic_database),
+                                icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
                                 label = stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title),
                                 onClicked = {
                                     Analytics.tracker.trackEvent(AndroidBackupFABButtonPressedEvent)

@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_menu_get_link"
-        android:icon="@drawable/ic_link_01_medium_regular_solid"
+        android:icon="@drawable/ic_link_01_medium_thin_outline"
         android:orderInCategory="0"
         app:iconTint="?attr/colorSecondary"
         android:title="@string/context_get_link"
@@ -10,7 +10,7 @@
 
     <item
         android:id="@+id/action_delete"
-        android:icon="@drawable/ic_trash_medium_regular_outline"
+        android:icon="@drawable/ic_trash_medium_thin_outline"
         android:orderInCategory="1"
         android:title="@string/general_remove"
         app:iconTint="?attr/colorSecondary"

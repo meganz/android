@@ -141,7 +141,7 @@ private fun GridThumbnailViewPreview() {
     GridThumbnailView(
         contentDescription = "Thumbnail",
         data = null,
-        defaultImage = R.drawable.ic_folder_medium_regular_outline,
+        defaultImage = R.drawable.ic_folder_medium_thin_outline,
         modifier = Modifier,
     )
 }
@@ -152,7 +152,7 @@ private fun GridThumbnailViewPreviewWithData() {
     GridThumbnailView(
         contentDescription = "Thumbnail",
         data = "https://www.mega.com/favicon.ico",
-        defaultImage = R.drawable.ic_folder_medium_regular_outline,
+        defaultImage = R.drawable.ic_folder_medium_thin_outline,
         modifier = Modifier.size(172.dp),
     )
 }

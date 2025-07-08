@@ -215,12 +215,12 @@ private fun progressColor(transfersInfo: TransfersInfo, justCompleted: Boolean) 
 
 @DrawableRes
 private fun statusIconRes(transfersInfo: TransfersInfo, justCompleted: Boolean) =
-    if (justCompleted) iconPackR.drawable.ic_check_circle_small_regular_solid
+    if (justCompleted) iconPackR.drawable.ic_check_circle_small_thin_solid
     else with(transfersInfo) {
         when (status) {
-            TransfersStatus.Paused -> iconPackR.drawable.ic_pause_circle_small_regular_solid
-            TransfersStatus.OverQuota -> iconPackR.drawable.ic_alert_triangle_small_regular_solid
-            TransfersStatus.TransferError -> iconPackR.drawable.ic_alert_circle_small_regular_solid
+            TransfersStatus.Paused -> iconPackR.drawable.ic_pause_circle_small_thin_solid
+            TransfersStatus.OverQuota -> iconPackR.drawable.ic_alert_triangle_small_thin_solid
+            TransfersStatus.TransferError -> iconPackR.drawable.ic_alert_circle_small_thin_solid
             else -> null
         }
     }

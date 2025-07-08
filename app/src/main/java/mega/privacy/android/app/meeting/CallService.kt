@@ -1,6 +1,5 @@
 package mega.privacy.android.app.meeting
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Notification
@@ -51,6 +50,7 @@ import mega.privacy.android.domain.usecase.call.HangChatCallByChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallScreenOpenedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -367,7 +367,7 @@ class CallService : LifecycleService() {
                             )
                         )
 
-                val actionIcon = iconPackR.drawable.ic_phone_01_medium_regular_outline
+                val actionIcon = iconPackR.drawable.ic_phone_01_medium_thin_outline
                 val actionPendingIntent = getPendingIntent(call, notificationId + 1)
                 val actionTitle =
                     getString(R.string.button_notification_call_in_progress)
@@ -477,7 +477,7 @@ class CallService : LifecycleService() {
                                 )
                             )
                         )
-                val actionIcon = iconPackR.drawable.ic_phone_01_medium_regular_outline
+                val actionIcon = iconPackR.drawable.ic_phone_01_medium_thin_outline
                 val actionPendingIntent = getPendingIntent(call, notificationId + 1)
                 val actionTitle =
                     getString(R.string.button_notification_call_in_progress)

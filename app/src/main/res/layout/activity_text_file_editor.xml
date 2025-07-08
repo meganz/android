@@ -168,7 +168,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin_span"
-        android:src="@drawable/ic_edit_medium_regular_outline"
+        android:src="@drawable/ic_edit_medium_thin_outline"
         app:borderWidth="0dp"
         app:fabSize="normal"
         app:layout_constraintBottom_toTopOf="@id/name_text"

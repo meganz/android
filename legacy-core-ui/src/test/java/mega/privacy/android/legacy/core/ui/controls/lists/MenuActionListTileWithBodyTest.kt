@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.core.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,7 +23,7 @@ internal class MenuActionListTileWithBodyTest {
             MenuActionListTileWithBody(
                 title = "Tile Title",
                 body = "Tile Body",
-                icon = R.drawable.ic_icon_mic_medium_regular_solid
+                icon = mega.privacy.android.icon.pack.R.drawable.ic_mic_medium_thin_solid
             )
         }
         composeTestRule.onNodeWithTag(TILE_WITH_BODY_MAIN_CONTAINER).assertIsDisplayed()
@@ -40,7 +39,7 @@ internal class MenuActionListTileWithBodyTest {
             MenuActionListTileWithBody(
                 title = "Tile Title",
                 body = "Tile Body",
-                icon = R.drawable.ic_icon_mic_medium_regular_solid,
+                icon = mega.privacy.android.icon.pack.R.drawable.ic_mic_medium_thin_solid,
                 dividerType = null,
             )
         }

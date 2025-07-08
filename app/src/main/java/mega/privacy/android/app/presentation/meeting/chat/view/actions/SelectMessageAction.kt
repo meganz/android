@@ -5,19 +5,18 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
-import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ManagementMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.mobile.analytics.event.ChatConversationSelectActionMenuItemEvent
 
 internal class SelectMessageAction(
     private val chatViewModel: ChatViewModel,
 ) : MessageAction(
     text = R.string.general_select,
-    icon = R.drawable.ic_check_circle_medium_regular_outline,
+    icon = mega.privacy.android.icon.pack.R.drawable.ic_check_circle_medium_thin_outline,
     testTag = "action_select",
     group = MessageActionGroup.Select,
 ) {

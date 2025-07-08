@@ -13,7 +13,7 @@ internal class ResumeTransfersMessageAction(
     private val chatViewModel: ChatViewModel,
 ) : MessageAction(
     text = R.string.option_resume_transfers,
-    icon = R.drawable.ic_rotate_cw_medium_regular_solid,
+    icon = mega.privacy.android.icon.pack.R.drawable.ic_rotate_cw_medium_thin_outline,
     testTag = "action_resume_transfers",
     group = MessageActionGroup.Retry,
 ) {

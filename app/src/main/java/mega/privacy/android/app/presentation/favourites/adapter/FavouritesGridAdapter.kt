@@ -251,9 +251,9 @@ class FavouritesGridViewHolder(
                     )
                     listModeSwitch.setImageResource(
                         if (sortByHeaderViewModel?.isListView() == true)
-                            mega.privacy.android.icon.pack.R.drawable.ic_grid_4_small_regular_outline
+                            mega.privacy.android.icon.pack.R.drawable.ic_grid_4_small_thin_outline
                         else
-                            mega.privacy.android.icon.pack.R.drawable.ic_list_small_small_regular_outline
+                            mega.privacy.android.icon.pack.R.drawable.ic_list_small_small_thin_outline
                     )
                 }
 

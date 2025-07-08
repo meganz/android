@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +21,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
@@ -30,6 +29,7 @@ import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.NodeInfoTagsEnteredEvent
 
 /**
@@ -64,7 +64,7 @@ fun FileInfoTagsView(
             trailingItem = if (canEditTags) {
                 {
                     Icon(
-                        imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_chevron_right_medium_regular_outline),
+                        imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_chevron_right_medium_thin_outline),
                         contentDescription = "Add Tag",
                         modifier = Modifier.size(24.dp),
                         tint = MaterialTheme.colors.grey_alpha_038_white_alpha_038,

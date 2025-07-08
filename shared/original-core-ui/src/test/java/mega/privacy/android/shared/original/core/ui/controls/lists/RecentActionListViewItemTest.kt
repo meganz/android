@@ -1,10 +1,10 @@
 package mega.privacy.android.shared.original.core.ui.controls.lists
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.icon.pack.R as IconPackR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,8 +20,8 @@ class RecentActionListViewItemTest {
     private val parentFolderName = "Parent folder"
     private val time = "12:00 PM"
     private val icon = IconPackR.drawable.ic_folder_incoming_medium_solid
-    private val actionIcon = IconPackR.drawable.ic_arrow_ascending_medium_regular_outline
-    private val shareIcon = IconPackR.drawable.ic_share_network_medium_regular_outline
+    private val actionIcon = IconPackR.drawable.ic_arrow_ascending_medium_thin_outline
+    private val shareIcon = IconPackR.drawable.ic_share_network_medium_thin_outline
 
     @Test
     fun `test that recent action list item is displayed correctly when all information provided`() {

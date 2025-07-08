@@ -18,7 +18,7 @@ internal class DeleteMessageAction(
     private val chatViewModel: ChatViewModel,
 ) : MessageAction(
     text = R.string.context_delete,
-    icon = R.drawable.ic_trash_medium_regular_outline,
+    icon = mega.privacy.android.icon.pack.R.drawable.ic_trash_medium_thin_outline,
     testTag = "action_delete",
     group = MessageActionGroup.Delete,
 ) {

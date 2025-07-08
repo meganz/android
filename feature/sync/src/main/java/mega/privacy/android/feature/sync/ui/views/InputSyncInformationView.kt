@@ -1,8 +1,5 @@
 package mega.privacy.android.feature.sync.ui.views
 
-import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -25,9 +22,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreen
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.cards.MegaCardWithHeader
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
@@ -35,6 +34,7 @@ import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun InputSyncInformationView(
@@ -50,7 +50,7 @@ internal fun InputSyncInformationView(
             header = {
                 Header(
                     imageResource = when (syncType) {
-                        SyncType.TYPE_BACKUP -> iconPackR.drawable.ic_database
+                        SyncType.TYPE_BACKUP -> iconPackR.drawable.ic_database_medium_thin_outline
                         else -> CoreUiR.drawable.ic_sync
                     },
                     text = when (syncType) {

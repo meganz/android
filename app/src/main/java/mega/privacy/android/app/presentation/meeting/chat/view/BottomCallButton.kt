@@ -14,10 +14,10 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 @Composable
@@ -46,7 +46,7 @@ internal fun BottomCallButton(
         callInThisChat?.status == ChatCallStatus.UserNoPresent && !schedIsPending -> {
             BottomCallButton(
                 textId = if (isGroup) R.string.title_join_call else R.string.title_join_one_to_one_call,
-                iconId = R.drawable.ic_phone_01_medium_regular_outline,
+                iconId = mega.privacy.android.icon.pack.R.drawable.ic_phone_01_medium_thin_outline,
                 modifier = modifier.testTag(
                     if (isGroup) TEST_TAG_BOTTOM_JOIN_CALL_BUTTON
                     else TEST_TAG_BOTTOM_ANSWER_CALL_BUTTON
@@ -101,7 +101,7 @@ private fun JoinAnswerCallButtonPreview(
         Box {
             BottomCallButton(
                 textId = if (isGroup) R.string.title_join_call else R.string.title_join_one_to_one_call,
-                iconId = R.drawable.ic_phone_01_medium_regular_outline,
+                iconId = mega.privacy.android.icon.pack.R.drawable.ic_phone_01_medium_thin_outline,
                 onClick = {},
             )
         }

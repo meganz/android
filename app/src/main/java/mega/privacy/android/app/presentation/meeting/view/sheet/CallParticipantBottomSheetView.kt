@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.view.sheet
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -39,10 +38,11 @@ import mega.privacy.android.app.presentation.chat.list.view.ChatDivider
 import mega.privacy.android.app.presentation.chat.list.view.ChatUserStatusView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
+import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.domain.entity.ChatRoomPermission
 
 /**
  * Recurring Meeting Occurrence bottom sheet view
@@ -191,7 +191,7 @@ private fun BottomSheetContent(
                 if (!participant.callParticipantData.isContact && !participant.callParticipantData.isGuest && !participant.isMe) {
                     BottomSheetMenuItemView(
                         modifier = Modifier,
-                        res = iconPackR.drawable.ic_plus_circle_medium_regular_outline,
+                        res = iconPackR.drawable.ic_plus_circle_medium_thin_outline,
                         text = R.string.menu_add_contact,
                         description = "Add contact",
                         tintRed = false,
@@ -205,7 +205,7 @@ private fun BottomSheetContent(
 
                 if (participant.callParticipantData.isContact && !participant.isMe && !participant.callParticipantData.isGuest) {
                     BottomSheetMenuItemView(modifier = Modifier,
-                        res = iconPackR.drawable.ic_info_medium_regular_outline,
+                        res = iconPackR.drawable.ic_info_medium_thin_outline,
                         text = R.string.contact_properties_activity,
                         description = "Contact info",
                         tintRed = false,
@@ -219,7 +219,7 @@ private fun BottomSheetContent(
                 if (participant.isMe) {
                     BottomSheetMenuItemView(
                         modifier = Modifier,
-                        res = iconPackR.drawable.ic_info_medium_regular_outline,
+                        res = iconPackR.drawable.ic_info_medium_thin_outline,
                         text = R.string.group_chat_edit_profile_label,
                         description = "Edit profile",
                         tintRed = false,
@@ -234,7 +234,7 @@ private fun BottomSheetContent(
                 if (!participant.callParticipantData.isGuest && participant.callParticipantData.isContact && !participant.isMe) {
                     BottomSheetMenuItemView(
                         modifier = Modifier,
-                        res = iconPackR.drawable.ic_message_chat_circle_medium_regular_outline,
+                        res = iconPackR.drawable.ic_message_chat_circle_medium_thin_outline,
                         text = R.string.context_send_message,
                         description = "Send message",
                         tintRed = false,
@@ -266,7 +266,7 @@ private fun BottomSheetContent(
                 if (state.hasHostPermission() && !participant.isMe && participant.privilege != ChatRoomPermission.Moderator) {
                     BottomSheetMenuItemView(
                         modifier = Modifier,
-                        res = iconPackR.drawable.ic_user_king_medium_regular_outline,
+                        res = iconPackR.drawable.ic_user_king_medium_thin_outline,
                         text = R.string.make_moderator,
                         description = "Make host",
                         tintRed = false,
@@ -281,7 +281,7 @@ private fun BottomSheetContent(
                 if (state.hasHostPermission() && !participant.isMe && participant.privilege == ChatRoomPermission.Moderator) {
                     BottomSheetMenuItemView(
                         modifier = Modifier,
-                        res = iconPackR.drawable.ic_user_king_minus_medium_regular_outline,
+                        res = iconPackR.drawable.ic_user_king_minus_medium_thin_outline,
                         text = R.string.remove_moderator,
                         description = "Remove as host",
                         tintRed = false,
@@ -311,7 +311,7 @@ private fun BottomSheetContent(
                 if (state.hasHostPermission() && !participant.isMe) {
                     BottomSheetMenuItemView(
                         modifier = Modifier,
-                        res = iconPackR.drawable.ic_x_medium_regular_outline,
+                        res = iconPackR.drawable.ic_x_medium_thin_outline,
                         text = R.string.remove_participant_menu_item,
                         description = "Remove participant",
                         tintRed = true,

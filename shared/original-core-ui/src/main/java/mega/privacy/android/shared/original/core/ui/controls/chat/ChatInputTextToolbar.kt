@@ -235,7 +235,7 @@ fun ChatInputTextToolbar(
                             voiceClipRecorderState.value.event != VoiceClipRecordEvent.Lock,
                 ) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.ic_icon_mic_medium_regular_outline),
+                        imageVector = ImageVector.vectorResource(mega.privacy.android.icon.pack.R.drawable.ic_mic_medium_thin_outline),
                         contentDescription = "mic icon",
                         tint = DSTokens.colors.icon.secondary,
                         modifier = Modifier

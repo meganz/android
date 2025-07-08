@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.settings.startscreen.model
 
 import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.domain.entity.preference.StartScreen
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * Map [StartScreen] to [StartScreenOption]
@@ -19,7 +19,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
         StartScreenOption(
             startScreen = screen,
             title = R.string.section_cloud_drive,
-            icon = iconPackR.drawable.ic_folder_medium_regular_outline,
+            icon = iconPackR.drawable.ic_folder_medium_thin_outline,
         )
     }
 
@@ -27,7 +27,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
         StartScreenOption(
             startScreen = screen,
             title = R.string.settings_start_screen_photos_option,
-            icon = iconPackR.drawable.ic_camera_medium_regular_outline,
+            icon = iconPackR.drawable.ic_camera_medium_thin_outline,
         )
     }
 
@@ -35,7 +35,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
         StartScreenOption(
             startScreen = screen,
             title = R.string.home_section,
-            icon = iconPackR.drawable.ic_mega_medium_regular_outline,
+            icon = iconPackR.drawable.ic_mega_medium_thin_outline,
         )
     }
 
@@ -43,7 +43,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
         StartScreenOption(
             startScreen = screen,
             title = R.string.section_chat,
-            icon = iconPackR.drawable.ic_message_chat_circle_medium_regular_outline,
+            icon = iconPackR.drawable.ic_message_chat_circle_medium_thin_outline,
         )
     }
 
@@ -51,7 +51,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
         StartScreenOption(
             startScreen = screen,
             title = R.string.title_shared_items,
-            icon = iconPackR.drawable.ic_folder_users_medium_regular_outline,
+            icon = iconPackR.drawable.ic_folder_users_medium_thin_outline,
         )
     }
 }

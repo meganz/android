@@ -276,14 +276,14 @@ fun MediaDiscoveryBottomSheet(
             ) {
                 MenuItem(
                     modifier = Modifier,
-                    res = iconPackR.drawable.ic_file_upload_medium_regular_outline,
+                    res = iconPackR.drawable.ic_file_upload_medium_thin_outline,
                     text = R.string.upload_files,
                     description = "UploadFiles",
                     onClick = onUploadFiles
                 )
                 MenuItem(
                     modifier = Modifier,
-                    res = iconPackR.drawable.ic_camera_medium_regular_outline,
+                    res = iconPackR.drawable.ic_camera_medium_thin_outline,
                     text = R.string.menu_take_picture,
                     description = "Capture",
                     onClick = onCapture,

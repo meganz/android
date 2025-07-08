@@ -420,7 +420,7 @@ internal fun InviteContactScreen(
                 }
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_send_horizontal_medium_regular_outline),
+                    imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_send_horizontal_medium_thin_outline),
                     contentDescription = null,
                 )
             }
@@ -573,7 +573,7 @@ private fun ContactChipBar(
                     .padding(start = 10.dp)
                     .testTag(SELECTED_CONTACT_CHIP_TAG + it.getContactName()),
                 style = TransparentChipStyle,
-                trailingIcon = iconPackR.drawable.ic_x_circle_medium_regular_solid
+                trailingIcon = iconPackR.drawable.ic_x_circle_medium_thin_solid
             ) { onClick(it) }
         }
     }

@@ -95,13 +95,13 @@
                 android:id="@+id/option_view"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_view_contacts"
-                app:drawableStartCompat="@drawable/ic_info_medium_regular_outline" />
+                app:drawableStartCompat="@drawable/ic_info_medium_thin_outline" />
 
             <TextView
                 android:id="@+id/option_info"
                 style="@style/BottomSheetOption"
                 android:text="@string/file_properties_info_info_file"
-                app:drawableStartCompat="@drawable/ic_info_medium_regular_outline" />
+                app:drawableStartCompat="@drawable/ic_info_medium_thin_outline" />
 
             <View
                 android:id="@+id/separator_info"
@@ -115,13 +115,13 @@
                 android:id="@+id/option_start_conversation"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_send_message"
-                app:drawableStartCompat="@drawable/ic_message_chat_circle_medium_regular_outline" />
+                app:drawableStartCompat="@drawable/ic_message_chat_circle_medium_thin_outline" />
 
             <TextView
                 android:id="@+id/option_invite"
                 style="@style/BottomSheetOption"
                 android:text="@string/contact_invite"
-                app:drawableStartCompat="@drawable/ic_plus_circle_medium_regular_outline" />
+                app:drawableStartCompat="@drawable/ic_plus_circle_medium_thin_outline" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

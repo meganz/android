@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
@@ -51,7 +50,7 @@ internal fun AddReactionChip(
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_icon_add_small_regular_outline),
+            imageVector = ImageVector.vectorResource(mega.privacy.android.icon.pack.R.drawable.ic_emoji_add_small_thin_outline),
             contentDescription = null,
             tint = DSTokens.colors.icon.secondary,
         )

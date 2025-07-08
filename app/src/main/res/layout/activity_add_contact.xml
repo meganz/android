@@ -491,5 +491,5 @@
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentBottom="true"
 		android:layout_margin="16dp"
-		android:src="@drawable/ic_send_horizontal_medium_regular_outline" />
+		android:src="@drawable/ic_send_horizontal_medium_thin_outline" />
 </RelativeLayout>

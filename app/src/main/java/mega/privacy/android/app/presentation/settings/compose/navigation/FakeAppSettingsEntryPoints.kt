@@ -32,7 +32,7 @@ internal val appFeatureSettingsEntryPoints = setOf<FeatureSettingEntryPoint>(
     FeatureSettingEntryPoint(
         key = "file_management",
         title = R.string.settings_file_management_category,
-        icon = iconPackR.drawable.ic_gear_six_medium_regular_outline,
+        icon = iconPackR.drawable.ic_gear_six_medium_thin_outline,
         preferredOrdinal = 20,
         destination = FakeSetting1,
         analyticsEvent = FileManagementSettingsItemSelectedEvent,
@@ -40,7 +40,7 @@ internal val appFeatureSettingsEntryPoints = setOf<FeatureSettingEntryPoint>(
     FeatureSettingEntryPoint(
         key = "camera_uploads",
         title = R.string.settings_camera_upload_on,
-        icon = iconPackR.drawable.ic_gear_six_medium_regular_outline,
+        icon = iconPackR.drawable.ic_gear_six_medium_thin_outline,
         preferredOrdinal = 30,
         destination = FakeSetting1,
         analyticsEvent = CameraUploadsSettingsItemSelectedEvent,
@@ -48,7 +48,7 @@ internal val appFeatureSettingsEntryPoints = setOf<FeatureSettingEntryPoint>(
     FeatureSettingEntryPoint(
         key = "sync",
         title = mega.privacy.android.shared.resources.R.string.settings_section_sync,
-        icon = iconPackR.drawable.ic_gear_six_medium_regular_outline,
+        icon = iconPackR.drawable.ic_gear_six_medium_thin_outline,
         preferredOrdinal = 40,
         destination = FakeSetting1,
         analyticsEvent = SyncSettingsItemSelectedEvent,
@@ -56,7 +56,7 @@ internal val appFeatureSettingsEntryPoints = setOf<FeatureSettingEntryPoint>(
     FeatureSettingEntryPoint(
         key = "media",
         title = R.string.settings_media,
-        icon = iconPackR.drawable.ic_gear_six_medium_regular_outline,
+        icon = iconPackR.drawable.ic_gear_six_medium_thin_outline,
         preferredOrdinal = 50,
         destination = FakeSetting1,
         analyticsEvent = MediaSettingsItemSelectedEvent,
@@ -64,7 +64,7 @@ internal val appFeatureSettingsEntryPoints = setOf<FeatureSettingEntryPoint>(
     FeatureSettingEntryPoint(
         key = "chat_and_meetings",
         title = R.string.settings_chat_vibration,
-        icon = iconPackR.drawable.ic_gear_six_medium_regular_outline,
+        icon = iconPackR.drawable.ic_gear_six_medium_thin_outline,
         preferredOrdinal = 60,
         destination = FakeSetting1,
         analyticsEvent = ChatAndMeetingsSettingsItemSelectedEvent,
@@ -72,7 +72,7 @@ internal val appFeatureSettingsEntryPoints = setOf<FeatureSettingEntryPoint>(
     FeatureSettingEntryPoint(
         key = "advanced",
         title = R.string.settings_advanced_features,
-        icon = iconPackR.drawable.ic_gear_six_medium_regular_outline,
+        icon = iconPackR.drawable.ic_gear_six_medium_thin_outline,
         preferredOrdinal = 80,
         destination = FakeSetting1,
         analyticsEvent = AdvancedSettingsItemSelectedEvent,
@@ -84,7 +84,7 @@ internal val appMoreSettingsEntryPoints = setOf<MoreSettingEntryPoint>(
     MoreSettingEntryPoint(
         key = "help_and_feedback",
         title = R.string.settings_help,
-        icon = iconPackR.drawable.ic_gear_six_medium_regular_outline,
+        icon = iconPackR.drawable.ic_gear_six_medium_thin_outline,
         preferredOrdinal = 10,
         destination = FakeSetting2,
         analyticsEvent = HelpAndFeedbackSettingsItemSelectedEvent,
@@ -92,7 +92,7 @@ internal val appMoreSettingsEntryPoints = setOf<MoreSettingEntryPoint>(
     MoreSettingEntryPoint(
         key = "about",
         title = R.string.settings_about,
-        icon = iconPackR.drawable.ic_gear_six_medium_regular_outline,
+        icon = iconPackR.drawable.ic_gear_six_medium_thin_outline,
         preferredOrdinal = 20,
         destination = FakeSetting2,
         analyticsEvent = AboutSettingsItemSelectedEvent,

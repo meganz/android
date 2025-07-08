@@ -99,7 +99,7 @@
                 <TextView
                     style="@style/BottomSheetOption"
                     android:text="@string/title_edit_profile_info"
-                    app:drawableStartCompat="@drawable/ic_edit_medium_regular_outline"/>
+                    app:drawableStartCompat="@drawable/ic_edit_medium_thin_outline"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -112,7 +112,7 @@
             <TextView
                 android:id="@+id/properties_option"
                 style="@style/BottomSheetOption"
-                app:drawableStartCompat="@drawable/ic_info_medium_regular_outline"
+                app:drawableStartCompat="@drawable/ic_info_medium_thin_outline"
                 tools:text="Info"/>
 
             <LinearLayout
@@ -127,7 +127,7 @@
                 android:id="@+id/download_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_save_to_device"
-                app:drawableStartCompat="@drawable/ic_download_medium_regular_outline"/>
+                app:drawableStartCompat="@drawable/ic_download_medium_thin_outline"/>
 
             <LinearLayout
                 android:id="@+id/separator_download"
@@ -141,19 +141,19 @@
                 android:id="@+id/rename_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_rename"
-                app:drawableStartCompat="@drawable/ic_pen_2_medium_regular_outline"/>
+                app:drawableStartCompat="@drawable/ic_pen_2_medium_thin_outline"/>
 
             <TextView
                 android:id="@+id/move_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_move_to"
-                app:drawableStartCompat="@drawable/ic_move_medium_regular_outline"/>
+                app:drawableStartCompat="@drawable/ic_move_medium_thin_outline"/>
 
             <TextView
                 android:id="@+id/copy_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_copy"
-                app:drawableStartCompat="@drawable/ic_copy_01_medium_regular_outline"/>
+                app:drawableStartCompat="@drawable/ic_copy_01_medium_thin_outline"/>
 
             <LinearLayout
                 android:id="@+id/separator_modify"
@@ -167,13 +167,13 @@
                 android:id="@+id/leave_option"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/alert_leave_share"
-                app:drawableStartCompat="@drawable/ic_log_out_02_medium_regular_outline"/>
+                app:drawableStartCompat="@drawable/ic_log_out_02_medium_thin_outline"/>
 
             <TextView
                 android:id="@+id/rubbish_bin_option"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/context_move_to_trash"
-                app:drawableStartCompat="@drawable/ic_trash_medium_regular_outline"/>
+                app:drawableStartCompat="@drawable/ic_trash_medium_thin_outline"/>
 
         </LinearLayout>
 

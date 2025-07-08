@@ -70,7 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="9dp"
                     android:layout_weight="0"
-                    android:src="@drawable/ic_pen_2_medium_regular_outline"
+                    android:src="@drawable/ic_pen_2_medium_thin_outline"
                     android:visibility="gone"
                     app:tint="?android:attr/textColorSecondary" />
             </LinearLayout>
@@ -230,7 +230,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="start|center_vertical"
             android:layout_marginStart="16dp"
-            android:src="@drawable/ic_folder_users_medium_regular_outline"
+            android:src="@drawable/ic_folder_users_medium_thin_outline"
             app:tint="?android:attr/textColorSecondary" />
 
         <TextView
@@ -273,7 +273,7 @@
                 android:id="@+id/chat_group_contact_properties_chat_link_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_link_01_medium_regular_solid"
+                android:src="@drawable/ic_link_01_medium_thin_outline"
                 app:tint="?android:attr/textColorSecondary" />
 
         </RelativeLayout>

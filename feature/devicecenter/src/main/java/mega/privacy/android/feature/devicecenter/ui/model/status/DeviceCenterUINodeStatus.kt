@@ -1,14 +1,15 @@
 package mega.privacy.android.feature.devicecenter.ui.model.status
 
-import kotlinx.serialization.Serializable
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.core.R as CoreR
-import mega.privacy.android.feature.devicecenter.R as DeviceCenterR
-import mega.privacy.android.shared.resources.R as SharedR
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
+import kotlinx.serialization.Serializable
+import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.feature.devicecenter.R as DeviceCenterR
+import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus.Error
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
+import mega.privacy.android.shared.resources.R as SharedR
 
 /**
  * Sealed UI Node Status class that enumerates all possible UI Node Statuses with their respective information
@@ -34,7 +35,7 @@ sealed class DeviceCenterUINodeStatus(
     data object Unknown : DeviceCenterUINodeStatus(
         name = R.string.device_center_list_view_item_status_unknown_status,
         localizedErrorMessage = null,
-        icon = iconPackR.drawable.ic_help_circle_medium_regular_outline,
+        icon = iconPackR.drawable.ic_help_circle_medium_thin_outline,
         color = null,
     )
 
@@ -148,7 +149,7 @@ sealed class DeviceCenterUINodeStatus(
     data object AttentionNeeded : DeviceCenterUINodeStatus(
         name = SharedR.string.device_center_list_view_item_status_attention_needed,
         localizedErrorMessage = null,
-        icon = iconPackR.drawable.ic_alert_circle_regular_medium_outline,
+        icon = iconPackR.drawable.ic_alert_circle_medium_thin_outline,
         color = StatusColor.Error,
     )
 

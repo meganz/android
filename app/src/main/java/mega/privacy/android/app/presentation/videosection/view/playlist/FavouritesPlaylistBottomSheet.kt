@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
@@ -15,9 +13,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.FavouritesPlaylistBottomSheetOption
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun FavouritesPlaylistBottomSheet(
@@ -84,19 +84,19 @@ private fun getBottomSheetActions() =
     listOf(
         BottomSheetActionInfo(
             text = R.string.general_save_to_device,
-            icon = iconPackR.drawable.ic_download_medium_regular_outline,
+            icon = iconPackR.drawable.ic_download_medium_thin_outline,
             action = FavouritesPlaylistBottomSheetOption.Download,
             testTag = FAVOURITES_PLAYLIST_DOWNLOAD_BOTTOM_SHEET_TILE_TEST_TAG,
         ),
         BottomSheetActionInfo(
             text = R.string.context_send_file_to_chat,
-            icon = iconPackR.drawable.ic_message_arrow_up_medium_regular_outline,
+            icon = iconPackR.drawable.ic_message_arrow_up_medium_thin_outline,
             action = FavouritesPlaylistBottomSheetOption.SendToChat,
             testTag = FAVOURITES_PLAYLIST_SEND_TO_CHAT_BOTTOM_SHEET_TILE_TEST_TAG,
         ),
         BottomSheetActionInfo(
             text = R.string.general_share,
-            icon = iconPackR.drawable.ic_share_network_medium_regular_outline,
+            icon = iconPackR.drawable.ic_share_network_medium_thin_outline,
             action = FavouritesPlaylistBottomSheetOption.Share,
             testTag = FAVOURITES_PLAYLIST_SHARE_BOTTOM_SHEET_TILE_TEST_TAG,
         ),

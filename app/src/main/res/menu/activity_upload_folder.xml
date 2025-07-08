@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/action_search"
-        android:icon="@drawable/ic_search_large_medium_regular_outline"
+        android:icon="@drawable/ic_search_large_medium_thin_outline"
         android:title="@string/action_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:iconTint="?attr/colorControlNormal"

@@ -14,7 +14,7 @@ internal class EditMessageAction(
     private val chatViewModel: ChatViewModel,
 ) : MessageAction(
     text = R.string.title_edit_profile_info,
-    icon = R.drawable.ic_pen_2_medium_regular_outline,
+    icon = mega.privacy.android.icon.pack.R.drawable.ic_pen_2_medium_thin_outline,
     testTag = "action_edit",
     group = MessageActionGroup.Modify,
 ) {

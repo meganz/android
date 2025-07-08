@@ -529,7 +529,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         if (nodeInfo.typedNode.isOutShare()) {
                             optionShareFolder.setText(R.string.manage_share)
                             optionShareFolder.setCompoundDrawablesWithIntrinsicBounds(
-                                RPack.drawable.ic_gear_six_medium_regular_outline,
+                                RPack.drawable.ic_gear_six_medium_thin_outline,
                                 0,
                                 0,
                                 0
@@ -538,7 +538,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         } else {
                             optionShareFolder.setText(R.string.context_share_folder)
                             optionShareFolder.setCompoundDrawablesWithIntrinsicBounds(
-                                RPack.drawable.ic_folder_users_medium_regular_outline,
+                                RPack.drawable.ic_folder_users_medium_thin_outline,
                                 0,
                                 0,
                                 0
@@ -852,12 +852,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
                 optionFavourite.setText(if (nodeInfo.typedNode.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite)
                 optionFavourite.setCompoundDrawablesWithIntrinsicBounds(
-                    if (nodeInfo.typedNode.isFavourite) RPack.drawable.ic_heart_broken_medium_regular_outline else RPack.drawable.ic_heart_medium_regular_outline,
+                    if (nodeInfo.typedNode.isFavourite) RPack.drawable.ic_heart_broken_medium_thin_outline else RPack.drawable.ic_heart_medium_thin_outline,
                     0, 0, 0
                 )
                 optionHide.setText(if (accountType?.isPaid != true || isBusinessAccountExpired || !nodeInfo.typedNode.isMarkedSensitive) R.string.general_hide_node else R.string.general_unhide_node)
                 optionHide.setCompoundDrawablesWithIntrinsicBounds(
-                    if (accountType?.isPaid != true || isBusinessAccountExpired || !nodeInfo.typedNode.isMarkedSensitive) RPack.drawable.ic_eye_off_medium_regular_outline else RPack.drawable.ic_eye_medium_regular_outline,
+                    if (accountType?.isPaid != true || isBusinessAccountExpired || !nodeInfo.typedNode.isMarkedSensitive) RPack.drawable.ic_eye_off_medium_thin_outline else RPack.drawable.ic_eye_medium_thin_outline,
                     0,
                     0,
                     0

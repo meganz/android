@@ -274,7 +274,7 @@ private fun ChipPreviewWithLeadAndTrail(
             selected = selected,
             text = "Type",
             leadingIcon = R.drawable.ic_chevron_down,
-            trailingIcon = R.drawable.ic_icon_chevron_left_medium_regular_outline,
+            trailingIcon = mega.privacy.android.icon.pack.R.drawable.ic_chevron_left_medium_thin_outline,
         )
     }
 }

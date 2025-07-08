@@ -153,7 +153,7 @@ private class NoPreviewPreviewProvider : PreviewParameterProvider<NoPreviewPrevi
             ),
             NoPreviewPreviewParams(
                 isMe = isMe,
-                fileTypeResId = iconPackR.drawable.ic_alert_circle_regular_medium_outline,
+                fileTypeResId = iconPackR.drawable.ic_alert_circle_medium_thin_outline,
                 loadProgress = 0.6f,
                 fileName = "long long long file name.pdf",
                 fileSize = "30 MB",

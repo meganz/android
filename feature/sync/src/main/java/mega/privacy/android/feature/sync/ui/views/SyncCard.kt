@@ -189,11 +189,11 @@ private fun SyncCardHeader(
                         else -> stringResource(id = sharedR.string.sync_list_sync_state_up_to_date)
                     },
                     statusIcon = when {
-                        isLocalRootChangeNeeded -> iconPackR.drawable.ic_x_circle_medium_regular_outline
-                        hasStalledIssues -> iconPackR.drawable.ic_alert_circle_regular_medium_outline
+                        isLocalRootChangeNeeded -> iconPackR.drawable.ic_x_circle_medium_thin_outline
+                        hasStalledIssues -> iconPackR.drawable.ic_alert_circle_medium_thin_outline
                         status == SyncStatus.SYNCING -> coreR.drawable.ic_sync_02
                         status == SyncStatus.PAUSED -> coreR.drawable.ic_pause
-                        status == SyncStatus.ERROR -> iconPackR.drawable.ic_alert_circle_regular_medium_outline
+                        status == SyncStatus.ERROR -> iconPackR.drawable.ic_alert_circle_medium_thin_outline
                         status == SyncStatus.DISABLED -> coreR.drawable.ic_alert_triangle
                         else -> coreR.drawable.ic_check_circle
                     },
@@ -394,7 +394,7 @@ private fun SyncCardFooter(
                     Analytics.tracker.trackEvent(SyncCardOpenMegaFolderButtonPressedEvent)
                     onOpenMegaFolderClicked()
                 },
-                icon = iconPackR.drawable.ic_folder_open_medium_regular_outline,
+                icon = iconPackR.drawable.ic_folder_open_medium_thin_outline,
                 text = stringResource(id = sharedR.string.general_open_button),
             )
             if (syncType == SyncType.TYPE_CAMERA_UPLOADS || syncType == SyncType.TYPE_MEDIA_UPLOADS) {
@@ -422,7 +422,7 @@ private fun SyncCardFooter(
                     icon = if (isSyncRunning) {
                         coreR.drawable.ic_pause
                     } else {
-                        coreR.drawable.ic_play_circle_medium_regular_outline
+                        IconPackR.drawable.ic_play_circle_medium_thin_outline
                     },
                     text = if (isSyncRunning && !isLocalRootChangeNeeded) {
                         stringResource(id = R.string.sync_card_pause_sync)

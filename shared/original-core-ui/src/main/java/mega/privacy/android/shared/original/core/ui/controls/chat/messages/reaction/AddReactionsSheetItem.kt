@@ -22,7 +22,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
@@ -105,7 +104,7 @@ internal fun ReactionItem(
         )
     } ?: Icon(
         modifier = Modifier.size(24.dp),
-        imageVector = ImageVector.vectorResource(R.drawable.ic_icon_add_small_regular_outline),
+        imageVector = ImageVector.vectorResource(mega.privacy.android.icon.pack.R.drawable.ic_emoji_add_small_thin_outline),
         contentDescription = "Add more reactions",
         tint = DSTokens.colors.icon.secondary,
     )

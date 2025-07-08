@@ -43,13 +43,13 @@
                 android:gravity="center_vertical"
                 android:text="@string/button_copy_link"
                 style="@style/BottomSheetOption"
-                app:drawableStartCompat="@drawable/ic_copy_01_medium_regular_outline"/>
+                app:drawableStartCompat="@drawable/ic_copy_01_medium_thin_outline"/>
 
             <TextView
                 android:id="@+id/share_manage_chat_link_option"
                 android:text="@string/context_get_link"
                 style="@style/BottomSheetOption"
-                app:drawableStartCompat="@drawable/ic_share_network_medium_regular_outline"/>
+                app:drawableStartCompat="@drawable/ic_share_network_medium_thin_outline"/>
 
             <TextView
                 android:id="@+id/delete_manage_chat_link_option"

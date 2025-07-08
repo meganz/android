@@ -741,7 +741,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         )
         sendFileMenuItem?.icon = Util.mutateIconSecondary(
             this,
-            iconPackR.drawable.ic_message_arrow_up_medium_regular_outline,
+            iconPackR.drawable.ic_message_arrow_up_medium_thin_outline,
             R.color.white
         )
         if (viewModel.isOnline()) {
@@ -806,11 +806,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         drawableArrow = ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_white)?.mutate()
         drawableShare = ContextCompat.getDrawable(
             this,
-            iconPackR.drawable.ic_folder_users_medium_regular_outline
+            iconPackR.drawable.ic_folder_users_medium_thin_outline
         )?.mutate()
         drawableSend = ContextCompat.getDrawable(
             this,
-            iconPackR.drawable.ic_message_arrow_up_medium_regular_outline
+            iconPackR.drawable.ic_message_arrow_up_medium_thin_outline
         )?.mutate()
     }
 
