@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.achievements.freetrial.view.MegaPassFreeTrialScreen
+import mega.privacy.android.app.utils.Constants.MEGA_PASS_PACKAGE_NAME
 
 @Serializable
 data class MegaPassFreeTrial(
@@ -69,5 +70,3 @@ internal fun openInSpecificApp(context: Context, packageName: String) {
         )
     }
 }
-
-private const val MEGA_PASS_PACKAGE_NAME = "mega.pwm.android.app"

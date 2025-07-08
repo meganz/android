@@ -46,6 +46,7 @@ sealed interface NavDrawerItem {
         @StringRes override val title: Int,
         @StringRes val subTitle: Int,
         val link: String,
+        val appPackage: String? = null
     ) : NavDrawerItem
 }
 

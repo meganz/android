@@ -9,7 +9,9 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.achievements.AchievementsFeatureActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
+import mega.privacy.android.app.utils.Constants.MEGA_PASS_PACKAGE_NAME
 import mega.privacy.android.app.utils.Constants.MEGA_PASS_URL
+import mega.privacy.android.app.utils.Constants.MEGA_VPN_PACKAGE_NAME
 import mega.privacy.android.app.utils.Constants.MEGA_VPN_URL
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.mobile.analytics.event.PwmSmartBannerItemSelectedEvent
@@ -45,12 +47,12 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
 
             link.startsWith(MEGA_VPN_URL) -> {
                 Analytics.tracker.trackEvent(VpnSmartBannerItemSelectedEvent)
-                openInSpecificApp(context, link, MEGA_VPN_PACKAGE)
+                openInSpecificApp(context, link, MEGA_VPN_PACKAGE_NAME)
             }
 
             link.startsWith(MEGA_PASS_URL) -> {
                 Analytics.tracker.trackEvent(PwmSmartBannerItemSelectedEvent)
-                openInSpecificApp(context, link, MEGA_PASS_PACKAGE)
+                openInSpecificApp(context, link, MEGA_PASS_PACKAGE_NAME)
             }
 
             else -> {
@@ -89,7 +91,5 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
         private const val REFERRAL = "https://mega.nz/fm/refer"
         private const val SETTINGS = "https://mega.nz/appSettings"
         private const val TEXT_EDITOR = "https://mega.nz/newText"
-        private const val MEGA_VPN_PACKAGE = "mega.vpn.android.app"
-        private const val MEGA_PASS_PACKAGE = "mega.pwm.android.app"
     }
 }

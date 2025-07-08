@@ -1,7 +1,9 @@
 package mega.privacy.android.app.menu.navigation
 
+import mega.privacy.android.app.utils.Constants.MEGA_PASS_PACKAGE_NAME
 import mega.privacy.android.app.utils.Constants.MEGA_PASS_URL
 import mega.privacy.android.app.utils.Constants.MEGA_TRANSFER_IT_URL
+import mega.privacy.android.app.utils.Constants.MEGA_VPN_PACKAGE_NAME
 import mega.privacy.android.app.utils.Constants.MEGA_VPN_URL
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavDrawerItem
@@ -13,6 +15,7 @@ object MegaVpnItem : NavDrawerItem.PrivacySuite(
     title = sharedR.string.pro_plan_feature_vpn_title,
     subTitle = sharedR.string.menu_item_vpn_subtitle,
     link = MEGA_VPN_URL,
+    appPackage = MEGA_VPN_PACKAGE_NAME
 )
 
 object MegaPassItem : NavDrawerItem.PrivacySuite(
@@ -21,6 +24,7 @@ object MegaPassItem : NavDrawerItem.PrivacySuite(
     title = sharedR.string.pro_plan_feature_pass_title,
     subTitle = sharedR.string.menu_item_mega_pass_subtitle,
     link = MEGA_PASS_URL,
+    appPackage = MEGA_PASS_PACKAGE_NAME
 )
 
 object TransferItItem : NavDrawerItem.PrivacySuite(

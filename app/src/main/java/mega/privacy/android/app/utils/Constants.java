@@ -674,4 +674,6 @@ public class Constants {
     public static final String MEGA_VPN_URL = "https://vpn.mega.nz";
     public static final String MEGA_PASS_URL = "https://pwm.mega.nz";
     public static final String MEGA_TRANSFER_IT_URL = "https://transfer.it";
+    public static final String MEGA_VPN_PACKAGE_NAME = "mega.vpn.android.app";
+    public static final String MEGA_PASS_PACKAGE_NAME = "mega.pwm.android.app";
 }

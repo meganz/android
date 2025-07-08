@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.achievements.freetrial.view.MegaVPNFreeTrialScreen
+import mega.privacy.android.app.utils.Constants.MEGA_VPN_PACKAGE_NAME
 
 @Serializable
 data class MegaVPNFreeTrial(
@@ -48,5 +49,3 @@ fun NavController.navigateToMegaVPNFreeTrial(
         navOptions = navOptions
     )
 }
-
-internal const val MEGA_VPN_PACKAGE_NAME = "mega.vpn.android.app"
