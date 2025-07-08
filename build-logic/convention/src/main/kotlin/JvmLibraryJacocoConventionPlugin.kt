@@ -20,7 +20,6 @@ class JvmLibraryJacocoConventionPlugin : Plugin<Project> {
      * @param target the project to apply the configuration to
      */
     override fun apply(target: Project) {
-        println("JvmLibraryJacocoConventionPlugin applied to project ${target.name}")
         with(target) {
             pluginManager.apply("jacoco")
 

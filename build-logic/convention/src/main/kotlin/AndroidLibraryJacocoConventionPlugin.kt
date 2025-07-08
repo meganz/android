@@ -27,7 +27,6 @@ class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
      */
     override fun apply(target: Project) {
         with(target) {
-            println("AndroidLibraryJacocoConventionPlugin applied to project ${project.name}")
             pluginManager.apply("jacoco")
 
             extensions.create("mega-jacoco", MegaJacocoPluginExtension::class.java)

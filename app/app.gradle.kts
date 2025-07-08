@@ -27,12 +27,8 @@ import mega.privacy.android.build.shouldUsePrebuiltSdk
 plugins {
     alias(convention.plugins.mega.android.app)
     alias(convention.plugins.mega.android.application.compose)
-    alias(convention.plugins.mega.android.test)
-    alias(convention.plugins.mega.android.application.jacoco)
     alias(convention.plugins.mega.android.application.firebase)
-    alias(convention.plugins.mega.lint)
     alias(convention.plugins.mega.android.hilt)
-    alias(plugin.plugins.de.mannodermaus.android.junit5)
     alias(plugin.plugins.kotlin.serialisation)
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
