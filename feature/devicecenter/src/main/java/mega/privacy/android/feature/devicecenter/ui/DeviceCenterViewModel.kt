@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
+import mega.privacy.android.feature.devicecenter.ui.DeviceCenterViewModel.Companion.GET_DEVICES_REFRESH_INTERVAL
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
@@ -48,7 +49,7 @@ internal class DeviceCenterViewModel @Inject constructor(
     private val _state = MutableStateFlow(DeviceCenterUiState())
 
     /**
-     * The State of [DeviceCenterScreen]
+     * The State of [mega.privacy.android.feature.devicecenter.ui.view.DeviceCenterScreen]
      */
     val state: StateFlow<DeviceCenterUiState> = _state.asStateFlow()
 

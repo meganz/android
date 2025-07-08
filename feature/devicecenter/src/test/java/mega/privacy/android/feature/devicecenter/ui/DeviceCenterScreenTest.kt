@@ -15,13 +15,19 @@ import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.feature.devicecenter.ui.renamedevice.RENAME_DEVICE_DIALOG_TAG
+import mega.privacy.android.feature.devicecenter.ui.view.DEVICE_CENTER_NOTHING_SETUP_STATE
+import mega.privacy.android.feature.devicecenter.ui.view.DEVICE_CENTER_NO_NETWORK_STATE
+import mega.privacy.android.feature.devicecenter.ui.view.DEVICE_CENTER_OTHER_DEVICES_HEADER
+import mega.privacy.android.feature.devicecenter.ui.view.DEVICE_CENTER_THIS_DEVICE_HEADER
+import mega.privacy.android.feature.devicecenter.ui.view.DEVICE_CENTER_TOOLBAR
+import mega.privacy.android.feature.devicecenter.ui.view.DeviceCenterScreen
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Test class for [DeviceCenterScreen]
+ * Test class for [mega.privacy.android.feature.devicecenter.ui.view.DeviceCenterScreen]
  */
 @RunWith(AndroidJUnit4::class)
 internal class DeviceCenterScreenTest {

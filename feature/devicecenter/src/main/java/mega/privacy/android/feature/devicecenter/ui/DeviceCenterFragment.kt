@@ -37,6 +37,7 @@ import mega.privacy.android.feature.devicecenter.navigation.DeviceCenter
 import mega.privacy.android.feature.devicecenter.navigation.deviceCenterInfoNavGraph
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
+import mega.privacy.android.feature.devicecenter.ui.view.DeviceCenterScreen
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AndroidSyncNavigationItemEvent

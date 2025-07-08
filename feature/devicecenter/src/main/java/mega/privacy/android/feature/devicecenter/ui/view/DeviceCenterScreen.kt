@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.devicecenter.ui
+package mega.privacy.android.feature.devicecenter.ui.view
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -6,10 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberModalBottomSheetState
@@ -20,60 +17,31 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceBottomSheetBody
-import mega.privacy.android.feature.devicecenter.ui.lists.DeviceCenterListViewItem
 import mega.privacy.android.feature.devicecenter.ui.lists.loading.DeviceCenterLoadingScreen
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
-import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
-import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
-import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
-import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
-import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.feature.devicecenter.ui.renamedevice.RenameDeviceDialog
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import mega.privacy.android.shared.sync.ui.SyncEmptyState
 
 /**
- * Test tags for the Device Center Screen
- */
-internal const val DEVICE_CENTER_TOOLBAR = "device_center_screen:mega_app_bar"
-internal const val DEVICE_CENTER_THIS_DEVICE_HEADER =
-    "device_center_content:menu_action_header_this_device"
-internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
-    "device_center_content:menu_action_header_other_devices"
-internal const val DEVICE_CENTER_NO_NETWORK_STATE = "device_center_content:no_network_state"
-internal const val DEVICE_CENTER_NOTHING_SETUP_STATE = "device_center_content:nothing_setup_state"
-internal const val DEVICE_CENTER_NO_ITEMS_FOUND_STATE = "device_center_content:no_items_found_state"
-
-/**
- * A [Composable] that serves as the main View for the Device Center
+ * A [androidx.compose.runtime.Composable] that serves as the main View for the Device Center
  *
  * @param uiState The UI State
- * @param snackbarHostState The [SnackbarHostState]
+ * @param snackbarHostState The [androidx.compose.material.SnackbarHostState]
  * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
  * @param onDeviceMenuClicked Lambda that performs a specific action when a Device's Menu Icon is clicked
  * @param onBackupFolderClicked Lambda that performs a specific action when a Backup Folder is clicked
@@ -216,7 +184,7 @@ internal fun DeviceCenterScreen(
                                 onBackupFolderClicked = onBackupFolderClicked,
                                 onNonBackupFolderClicked = onNonBackupFolderClicked,
                                 onInfoClicked = onInfoOptionClicked,
-                                modifier = Modifier
+                                modifier = Modifier.Companion
                                     .background(MaterialTheme.colors.background)
                                     .consumeWindowInsets(paddingValues)
                             )
@@ -238,208 +206,6 @@ internal fun DeviceCenterScreen(
     )
 }
 
-@Composable
-private fun DeviceCenterAppBar(
-    uiState: DeviceCenterUiState,
-    selectedDevice: DeviceUINode?,
-    modalSheetState: ModalBottomSheetState,
-    coroutineScope: CoroutineScope,
-    onBackPressHandled: () -> Unit,
-    onActionPressed: ((MenuAction) -> Unit)?,
-    onSearchQueryChanged: (query: String) -> Unit,
-    onSearchCloseClicked: () -> Unit,
-    onSearchClicked: () -> Unit,
-) {
-    if (!uiState.isInitialLoadingFinished || !uiState.isNetworkConnected) {
-        MegaAppBar(
-            modifier = Modifier.testTag(DEVICE_CENTER_TOOLBAR),
-            appBarType = AppBarType.BACK_NAVIGATION,
-            title = selectedDevice?.name
-                ?: stringResource(R.string.device_center_top_app_bar_title),
-            elevation = 0.dp,
-            onNavigationPressed = {
-                if (modalSheetState.isVisible) {
-                    coroutineScope.launch { modalSheetState.hide() }
-                } else {
-                    onBackPressHandled()
-                }
-            },
-            onActionPressed = onActionPressed,
-            windowInsets = WindowInsets(0.dp),
-        )
-    } else {
-        LegacySearchAppBar(
-            searchWidgetState = uiState.searchWidgetState,
-            typedSearch = uiState.searchQuery,
-            onSearchTextChange = { onSearchQueryChanged(it) },
-            onCloseClicked = {
-                onSearchCloseClicked()
-            },
-            onBackPressed = {
-                if (modalSheetState.isVisible) {
-                    coroutineScope.launch { modalSheetState.hide() }
-                } else {
-                    onBackPressHandled()
-                }
-            },
-            onSearchClicked = { onSearchClicked() },
-            elevation = false,
-            title = selectedDevice?.name
-                ?: stringResource(R.string.device_center_top_app_bar_title),
-            hintId = if (uiState.itemsToDisplay.any { it is DeviceUINode }) {
-                R.string.device_center_top_app_bar_search_devices_hint
-            } else {
-                R.string.device_center_top_app_bar_search_syncs_hint
-            },
-            onActionPressed = onActionPressed,
-            actions = selectedDevice?.let {
-                val list = mutableListOf<MenuAction>(DeviceMenuAction.Rename)
-
-                when (uiState.selectedDevice) {
-                    is OwnDeviceUINode -> {
-                        if (uiState.isCameraUploadsEnabled) {
-                            list.add(DeviceMenuAction.Info)
-                        }
-                        list.add(DeviceMenuAction.CameraUploads)
-                    }
-
-                    else -> list.add(DeviceMenuAction.Info)
-                }
-
-                return@let list
-            },
-            isHideAfterSearch = true,
-            windowInsets = WindowInsets(0.dp),
-            modifier = Modifier.testTag(DEVICE_CENTER_TOOLBAR),
-        )
-    }
-}
-
-/**
- * A [Composable] which displays a No network connectivity state
- */
-@Composable
-private fun DeviceCenterNoNetworkState() {
-    SyncEmptyState(
-        iconId = iconPackR.drawable.ic_no_cloud,
-        iconSize = 144.dp,
-        iconDescription = "No network connectivity state",
-        textId = R.string.device_center_no_network_state,
-        testTag = DEVICE_CENTER_NO_NETWORK_STATE
-    )
-}
-
-/**
- * A [Composable] which displays a Nothing setup state
- */
-@Composable
-private fun DeviceCenterNothingSetupState() {
-    SyncEmptyState(
-        iconId = iconPackR.drawable.ic_folder_sync,
-        iconSize = 128.dp,
-        iconDescription = "No setup state",
-        textId = R.string.device_center_nothing_setup_state,
-        testTag = DEVICE_CENTER_NOTHING_SETUP_STATE
-    )
-}
-
-/**
- * A [Composable] which displays an Items not found state
- */
-@Composable
-private fun DeviceCenterNoItemsFound() {
-    SyncEmptyState(
-        iconId = iconPackR.drawable.ic_search_02,
-        iconSize = 128.dp,
-        iconDescription = "No results found for search",
-        textId = R.string.device_center_empty_screen_no_results,
-        testTag = DEVICE_CENTER_NO_ITEMS_FOUND_STATE
-    )
-}
-
-/**
- * A [Composable] that displays the User's Backup information
- *
- * @param itemsToDisplay The list of Backup Devices / Device Folders to be displayed
- * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
- * @param onDeviceMenuClicked Lambda that performs a specific action when a Device's Menu Icon is clicked
- * @param onBackupFolderClicked Lambda that performs a specific action when a Backup Folder is clicked
- * @param onInfoClicked Lambda that performs a specific action when the Info option is clicked
- * @param modifier The Modifier object
- */
-@Composable
-private fun DeviceCenterContent(
-    itemsToDisplay: List<DeviceCenterUINode>,
-    onDeviceClicked: (DeviceUINode) -> Unit,
-    onDeviceMenuClicked: (DeviceUINode) -> Unit,
-    onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit,
-    onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit,
-    onInfoClicked: (DeviceCenterUINode) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    if (itemsToDisplay.isNotEmpty()) {
-        val currentlyUsedDevices = itemsToDisplay.filterIsInstance<OwnDeviceUINode>()
-        val otherDevices = itemsToDisplay.filterIsInstance<OtherDeviceUINode>()
-        val deviceFolders = itemsToDisplay.filterIsInstance<DeviceFolderUINode>()
-
-        LazyColumn(
-            modifier = modifier,
-            state = LazyListState(),
-        ) {
-            // The User's Device Folders are shown
-            if (deviceFolders.isNotEmpty()) {
-                items(count = deviceFolders.size, key = {
-                    deviceFolders[it].id
-                }) { itemIndex ->
-                    DeviceCenterListViewItem(
-                        uiNode = deviceFolders[itemIndex],
-                        onBackupFolderClicked = onBackupFolderClicked,
-                        onNonBackupFolderClicked = onNonBackupFolderClicked,
-                        onInfoClicked = onInfoClicked,
-                    )
-                }
-                // The User's Devices are shown
-            } else {
-                if (currentlyUsedDevices.isNotEmpty()) {
-                    item {
-                        MenuActionHeader(
-                            modifier = Modifier.testTag(DEVICE_CENTER_THIS_DEVICE_HEADER),
-                            text = stringResource(R.string.device_center_list_view_item_header_this_device),
-                        )
-                    }
-                    items(count = currentlyUsedDevices.size, key = {
-                        currentlyUsedDevices[it].id
-                    }) { itemIndex ->
-                        DeviceCenterListViewItem(
-                            uiNode = currentlyUsedDevices[itemIndex],
-                            onDeviceClicked = onDeviceClicked,
-                            onDeviceMenuClicked = onDeviceMenuClicked,
-                        )
-                    }
-                }
-                if (otherDevices.isNotEmpty()) {
-                    item {
-                        MenuActionHeader(
-                            modifier = Modifier.testTag(DEVICE_CENTER_OTHER_DEVICES_HEADER),
-                            text = stringResource(R.string.device_center_list_view_item_header_other_devices),
-                        )
-                    }
-                    items(count = otherDevices.size, key = {
-                        otherDevices[it].id
-                    }) { itemIndex ->
-                        DeviceCenterListViewItem(
-                            uiNode = otherDevices[itemIndex],
-                            onDeviceClicked = onDeviceClicked,
-                            onDeviceMenuClicked = onDeviceMenuClicked,
-                        )
-                    }
-                }
-            }
-        }
-    } else {
-        DeviceCenterNothingSetupState()
-    }
-}
 
 /**
  * A Preview Composable which shows the No network connectivity state
@@ -652,118 +418,3 @@ private fun DeviceCenterInFolderViewPreview() {
         )
     }
 }
-
-/**
- * A Preview Composable that only displays content from the "This device" section
- */
-@CombinedThemePreviews
-@Composable
-private fun DeviceCenterContentWithOwnDeviceSectionOnlyPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
-        DeviceCenterContent(
-            itemsToDisplay = listOf(ownDeviceUINode),
-            onDeviceClicked = {},
-            onDeviceMenuClicked = {},
-            onBackupFolderClicked = {},
-            onNonBackupFolderClicked = {},
-            onInfoClicked = {}
-        )
-    }
-}
-
-/**
- * A Preview Composable that only displays content from the "Other devices" section
- */
-@CombinedThemePreviews
-@Composable
-private fun DeviceCenterContentWithOtherDevicesSectionOnlyPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
-        DeviceCenterContent(
-            itemsToDisplay = listOf(otherDeviceUINodeOne),
-            onDeviceClicked = {},
-            onDeviceMenuClicked = {},
-            onBackupFolderClicked = {},
-            onNonBackupFolderClicked = {},
-            onInfoClicked = {},
-        )
-    }
-}
-
-/**
- * A Preview Composable that displays content from both "This device" and "Other devices" sections
- */
-@CombinedThemePreviews
-@Composable
-private fun DeviceCenterContentWithBothDeviceSectionsPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
-        DeviceCenterContent(
-            itemsToDisplay = listOf(
-                ownDeviceUINode,
-                otherDeviceUINodeOne,
-                otherDeviceUINodeTwo,
-                otherDeviceUINodeThree,
-            ),
-            onDeviceClicked = {},
-            onDeviceMenuClicked = {},
-            onBackupFolderClicked = {},
-            onNonBackupFolderClicked = {},
-            onInfoClicked = {},
-        )
-    }
-}
-
-private val ownDeviceFolderUINode = NonBackupDeviceFolderUINode(
-    id = "ABCD-EFGH",
-    name = "Camera uploads",
-    icon = FolderIconType.CameraUploads,
-    status = DeviceCenterUINodeStatus.UpToDate,
-    rootHandle = 789012L,
-    localFolderPath = ""
-)
-
-private val ownDeviceFolderUINodeTwo = NonBackupDeviceFolderUINode(
-    id = "IJKL-MNOP",
-    name = "Media uploads",
-    icon = FolderIconType.CameraUploads,
-    status = DeviceCenterUINodeStatus.UpToDate,
-    rootHandle = 789012L,
-    localFolderPath = ""
-)
-
-private val ownDeviceUINode = OwnDeviceUINode(
-    id = "1234-5678",
-    name = "User's Pixel 6",
-    icon = DeviceIconType.Android,
-    status = DeviceCenterUINodeStatus.NothingSetUp,
-    folders = emptyList(),
-)
-
-private val ownDeviceUINodeTwo = OwnDeviceUINode(
-    id = "9876-5432",
-    name = "Samsung Galaxy S23",
-    icon = DeviceIconType.Android,
-    status = DeviceCenterUINodeStatus.UpToDate,
-    folders = listOf(ownDeviceFolderUINode, ownDeviceFolderUINodeTwo),
-)
-
-private val otherDeviceUINodeOne = OtherDeviceUINode(
-    id = "1A2B-3C4D",
-    name = "XXX' HP 360",
-    icon = DeviceIconType.Windows,
-    status = DeviceCenterUINodeStatus.UpToDate,
-    folders = emptyList(),
-)
-private val otherDeviceUINodeTwo = OtherDeviceUINode(
-    id = "5E6F-7G8H",
-    name = "HUAWEI P30",
-    icon = DeviceIconType.Android,
-    status = DeviceCenterUINodeStatus.Inactive,
-    folders = emptyList(),
-)
-private val otherDeviceUINodeThree = OtherDeviceUINode(
-    id = "9I1J-2K3L",
-    name = "Macbook Pro",
-    icon = DeviceIconType.Mac,
-    status = DeviceCenterUINodeStatus.Inactive,
-    folders = emptyList(),
-)
