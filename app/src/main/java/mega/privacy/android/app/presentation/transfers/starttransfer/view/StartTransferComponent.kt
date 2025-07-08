@@ -68,6 +68,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumePreviewTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelPreviewDownloadDialog
+import mega.privacy.android.app.presentation.transfers.view.dialog.LargeDownloadConfirmationDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.NotEnoughSpaceForUploadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -254,13 +255,13 @@ private fun StartTransferComponent(
     onResumeTransfers: () -> Unit,
     onAskedResumeTransfers: () -> Unit,
     snackBarHostState: SnackbarHostStateWrapper?,
-    onScanningFinished: (StartTransferEvent) -> Unit = {},
     navigateToStorageSettings: () -> Unit,
     onPreviewFile: (File) -> Unit,
     onPreviewOpened: () -> Unit,
     onCancelTransferConfirmed: () -> Unit,
     onCancelTransferCancelled: () -> Unit,
     onConsumeCancelTransferResult: () -> Unit,
+    onScanningFinished: (StartTransferEvent) -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -441,22 +442,14 @@ private fun StartTransferComponent(
         )
     }
     uiState.confirmLargeDownload?.let {
-        val textId = if (it.transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview) {
-            sharedR.string.alert_larger_file_preview
-        } else {
-            R.string.alert_larger_file
-        }
-
-        ConfirmationDialog(
-            title = stringResource(id = R.string.transfers_confirm_large_download_title),
-            text = stringResource(id = textId, it.sizeString),
-            buttonOption1Text = stringResource(id = R.string.transfers_confirm_large_download_button_start),
-            buttonOption2Text = stringResource(id = R.string.transfers_confirm_large_download_button_start_always),
-            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
-            onOption1 = {
+        val isPreview = it.transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview
+        LargeDownloadConfirmationDialog(
+            isPreviewDownload = isPreview,
+            sizeString = it.sizeString,
+            onAllow = {
                 onLargeDownloadAnswered(it.transferTriggerEvent, false)
             },
-            onOption2 = {
+            onAlwaysAllow = {
                 onLargeDownloadAnswered(it.transferTriggerEvent, true)
             },
             onDismiss = { onLargeDownloadAnswered(null, false) },
