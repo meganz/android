@@ -55,7 +55,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import mega.privacy.android.legacy.core.ui.R
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.ProvideDefaultMegaAppBarColors
 import mega.privacy.android.shared.original.core.ui.controls.menus.MenuActions
@@ -178,7 +177,7 @@ fun CollapsedSearchAppBar(
                     onClick = { onSearchClicked?.invoke() },
                 ) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_search),
+                        imageVector = ImageVector.vectorResource(id = mega.android.core.ui.R.drawable.ic_search_large_medium_thin_outline),
                         contentDescription = "Search Icon",
                         tint = iconColor
                     )

@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:text="@string/action_start_meeting_now"
-        app:drawableStartCompat="@drawable/ic_video_plus" />
+        app:drawableStartCompat="@drawable/ic_video_plus_medium_thin_outline" />
 
     <View
         android:id="@+id/divider_join"
@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:text="@string/join_meeting"
-        app:drawableStartCompat="@drawable/ic_video_join" />
+        app:drawableStartCompat="@drawable/ic_video_join_medium_thin_outline" />
 
     <View
         android:id="@+id/divider_schedule"
@@ -44,6 +44,6 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:text="@string/chat_schedule_meeting"
-        app:drawableStartCompat="@drawable/ic_calendar"
+        app:drawableStartCompat="@drawable/ic_calendar_01_medium_thin_outline"
         tools:visibility="visible" />
 </LinearLayout>

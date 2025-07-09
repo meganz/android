@@ -105,7 +105,7 @@ sealed class DeviceCenterUINodeStatus(
     data object NothingSetUp : DeviceCenterUINodeStatus(
         name = SharedR.string.device_center_list_view_item_status_nothing_setup,
         localizedErrorMessage = null,
-        icon = CoreR.drawable.ic_info,
+        icon = iconPackR.drawable.ic_alert_circle_small_thin_outline,
         color = null,
     )
 
@@ -116,7 +116,7 @@ sealed class DeviceCenterUINodeStatus(
     data object Disabled : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_disabled,
         localizedErrorMessage = null,
-        icon = CoreR.drawable.ic_alert_triangle,
+        icon = iconPackR.drawable.ic_alert_triangle_small_thin_outline,
         color = StatusColor.Warning,
     )
 
@@ -127,7 +127,7 @@ sealed class DeviceCenterUINodeStatus(
     data object Inactive : DeviceCenterUINodeStatus(
         name = SharedR.string.device_center_list_view_item_status_inactive,
         localizedErrorMessage = null,
-        icon = CoreR.drawable.ic_cloud_offline,
+        icon = iconPackR.drawable.ic_cloud_off_small_thin_outline,
         color = null,
     )
 
@@ -138,7 +138,7 @@ sealed class DeviceCenterUINodeStatus(
     data object Paused : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_paused,
         localizedErrorMessage = null,
-        icon = CoreR.drawable.ic_pause,
+        icon = iconPackR.drawable.ic_pause_small_thin_solid,
         color = null,
     )
 
@@ -149,7 +149,7 @@ sealed class DeviceCenterUINodeStatus(
     data object AttentionNeeded : DeviceCenterUINodeStatus(
         name = SharedR.string.device_center_list_view_item_status_attention_needed,
         localizedErrorMessage = null,
-        icon = iconPackR.drawable.ic_alert_circle_medium_thin_outline,
+        icon = iconPackR.drawable.ic_alert_circle_small_thin_outline,
         color = StatusColor.Error,
     )
 
@@ -162,7 +162,7 @@ sealed class DeviceCenterUINodeStatus(
     data class Error(val specificErrorMessage: Int?) : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_error,
         localizedErrorMessage = specificErrorMessage,
-        icon = CoreR.drawable.ic_x_circle,
+        icon = iconPackR.drawable.ic_x_circle_small_thin_outline,
         color = StatusColor.Error,
     )
 }

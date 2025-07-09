@@ -15,12 +15,13 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -45,7 +46,7 @@ fun AskGalleryPermissionView(
                 modifier = Modifier
                     .padding(start = 16.dp)
                     .size(24.dp),
-                painter = painterResource(id = R.drawable.ic_image_no_permission),
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Image01),
                 contentDescription = "Icon Photo",
                 tint = DSTokens.colors.icon.disabled
             )

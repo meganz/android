@@ -22,6 +22,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
@@ -46,6 +47,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAt
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButton
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButtonPlaceHolder
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -264,7 +266,7 @@ fun ChatToolbarBottomSheet(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             CellButton(
-                iconId = R.drawable.ic_attach_from_gallery,
+                iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Images),
                 itemName = stringResource(id = R.string.chat_attach_panel_gallery),
                 onItemClick = {
                     Analytics.tracker.trackEvent(ChatConversationGalleryMenuItemEvent)
@@ -273,7 +275,7 @@ fun ChatToolbarBottomSheet(
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_GALLERY)
             )
             CellButton(
-                iconId = R.drawable.ic_attach_from_file,
+                iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.File02),
                 itemName = pluralStringResource(id = R.plurals.general_num_files, count = 1),
                 onItemClick = {
                     Analytics.tracker.trackEvent(ChatConversationFileMenuItemEvent)
@@ -282,7 +284,7 @@ fun ChatToolbarBottomSheet(
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_FILE)
             )
             CellButton(
-                iconId = R.drawable.ic_attach_from_gif,
+                iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Gif),
                 itemName = stringResource(id = R.string.chat_room_toolbar_gif_option),
                 onItemClick = {
                     Analytics.tracker.trackEvent(ChatConversationGIFMenuItemEvent)
@@ -291,7 +293,7 @@ fun ChatToolbarBottomSheet(
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_GIF)
             )
             CellButton(
-                iconId = R.drawable.ic_attach_from_scan,
+                iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.FileScan),
                 itemName = stringResource(id = R.string.chat_room_toolbar_scan_option),
                 onItemClick = {
                     Analytics.tracker.trackEvent(ChatConversationScanMenuItemEvent)
@@ -307,7 +309,7 @@ fun ChatToolbarBottomSheet(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             CellButton(
-                iconId = R.drawable.ic_attach_from_location,
+                iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MapPin),
                 itemName = stringResource(id = R.string.chat_room_toolbar_location_option),
                 onItemClick = {
                     Analytics.tracker.trackEvent(ChatConversationLocationMenuItemEvent)
@@ -316,7 +318,7 @@ fun ChatToolbarBottomSheet(
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_LOCATION)
             )
             CellButton(
-                iconId = R.drawable.ic_attach_from_contact,
+                iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.User),
                 itemName = stringResource(id = R.string.attachment_upload_panel_contact),
                 onItemClick = {
                     Analytics.tracker.trackEvent(ChatConversationContactMenuItemEvent)

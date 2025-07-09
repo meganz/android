@@ -15,6 +15,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -24,11 +25,11 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.core.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 
 /**
  * Compose UI, which is used as List item, containing Image or Icon title and description. Currently is used on My Account screen
@@ -45,6 +46,39 @@ import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 @Composable
 fun ImageIconItem(
     @DrawableRes icon: Int,
+    @StringRes title: Int,
+    description: String,
+    isIconMode: Boolean,
+    modifier: Modifier = Modifier,
+    withDivider: Boolean = false,
+    testTag: String = "",
+    onClickListener: () -> Unit = {},
+) = ImageIconItem(
+    icon = painterResource(id = icon),
+    title = title,
+    description = description,
+    isIconMode = isIconMode,
+    modifier = modifier,
+    withDivider = withDivider,
+    testTag = testTag,
+    onClickListener = onClickListener
+)
+
+/**
+ * Compose UI, which is used as List item, containing Image or Icon title and description. Currently is used on My Account screen
+ *
+ * @param icon Painter for image or icon
+ * @param title String id for title
+ * @param description String for description
+ * @param isIconMode Boolean to show either icon or image
+ * @param modifier
+ * @param withDivider Boolean to show or hide divider
+ * @param testTag String for test tag, which will used to identify the item itself
+ * @param onClickListener to pass any function on click
+ */
+@Composable
+fun ImageIconItem(
+    icon: Painter,
     @StringRes title: Int,
     description: String,
     isIconMode: Boolean,
@@ -71,12 +105,13 @@ fun ImageIconItem(
 
         if (isIconMode) {
             Icon(
-                modifier = Modifier.constrainAs(iconImage) {
-                    top.linkTo(parent.top, 16.dp)
-                    start.linkTo(parent.start, 16.dp)
-                }
+                modifier = Modifier
+                    .constrainAs(iconImage) {
+                        top.linkTo(parent.top, 16.dp)
+                        start.linkTo(parent.start, 16.dp)
+                    }
                     .testTag(ICON_ITEM_TAG),
-                painter = painterResource(id = icon),
+                painter = icon,
                 contentDescription = stringResource(id = title),
             )
         } else {
@@ -89,23 +124,24 @@ fun ImageIconItem(
                         start.linkTo(parent.start, 16.dp)
                     }
                     .testTag(IMAGE_ITEM_TAG),
-                painter = painterResource(id = icon),
+                painter = icon,
                 contentDescription = stringResource(id = title)
             )
         }
 
         Text(
-            modifier = Modifier.constrainAs(titleTv) {
-                top.linkTo(parent.top, topMargin)
-                linkTo(
-                    start = parent.start,
-                    end = parent.end,
-                    startMargin = 72.dp,
-                    endMargin = 18.dp,
-                    bias = 0f
-                )
-                width = Dimension.fillToConstraints
-            }
+            modifier = Modifier
+                .constrainAs(titleTv) {
+                    top.linkTo(parent.top, topMargin)
+                    linkTo(
+                        start = parent.start,
+                        end = parent.end,
+                        startMargin = 72.dp,
+                        endMargin = 18.dp,
+                        bias = 0f
+                    )
+                    width = Dimension.fillToConstraints
+                }
                 .testTag(IMAGE_ICON_ITEM_TITLE_TAG),
             text = stringResource(id = title),
             style = MaterialTheme.typography.subtitle2.copy(
@@ -138,11 +174,12 @@ fun ImageIconItem(
         if (withDivider) {
             CustomDivider(
                 withStartPadding = false,
-                modifier = Modifier.constrainAs(divider) {
-                    top.linkTo(subtitleTv.bottom, topMargin)
-                    end.linkTo(parent.end)
-                    start.linkTo(parent.start, 144.dp)
-                }
+                modifier = Modifier
+                    .constrainAs(divider) {
+                        top.linkTo(subtitleTv.bottom, topMargin)
+                        end.linkTo(parent.end)
+                        start.linkTo(parent.start, 144.dp)
+                    }
                     .testTag(IMAGE_ICON_ITEM_DIVIDER_TAG),
             )
         }

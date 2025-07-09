@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -25,6 +26,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalThemeForPreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
+
 
 /**
  * Cell button usually used in bottom sheets or toolbars
@@ -37,6 +39,30 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 @Composable
 fun CellButton(
     @DrawableRes iconId: Int,
+    itemName: String,
+    onItemClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    type: CellButtonType = CellButtonType.On,
+    enabled: Boolean = true,
+) = CellButton(
+    iconPainter = painterResource(id = iconId),
+    itemName = itemName,
+    onItemClick = onItemClick,
+    modifier = modifier,
+    type = type,
+    enabled = enabled,
+)
+/**
+ * Cell button usually used in bottom sheets or toolbars
+ *
+ * @param iconId Icon resource id
+ * @param itemName Item name
+ * @param onItemClick Item click action
+ * @param modifier [Modifier]
+ */
+@Composable
+fun CellButton(
+    iconPainter: Painter,
     itemName: String,
     onItemClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -62,7 +88,7 @@ fun CellButton(
             )
     ) {
         Icon(
-            painter = painterResource(id = iconId),
+            painter = iconPainter,
             contentDescription = itemName,
             modifier = Modifier
                 .size(24.dp)

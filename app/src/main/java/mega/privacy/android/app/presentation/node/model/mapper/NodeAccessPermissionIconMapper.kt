@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.node.model.mapper
 
-import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.icon.pack.R as iconPackR
 import javax.inject.Inject
 
 /**
@@ -15,9 +15,9 @@ class NodeAccessPermissionIconMapper @Inject constructor() {
      * @param accessPermission
      */
     operator fun invoke(accessPermission: AccessPermission) = when (accessPermission) {
-        AccessPermission.READ -> R.drawable.ic_shared_read
-        AccessPermission.READWRITE -> R.drawable.ic_shared_read_write
-        AccessPermission.FULL -> R.drawable.ic_shared_fullaccess
+        AccessPermission.READ -> iconPackR.drawable.ic_eye_medium_thin_outline
+        AccessPermission.READWRITE -> iconPackR.drawable.ic_edit_medium_thin_outline
+        AccessPermission.FULL -> iconPackR.drawable.ic_star_medium_thin_outline
         else -> null
     }
 }

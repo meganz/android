@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -115,6 +116,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -586,7 +588,7 @@ private fun AccountInfoSection(
         )
 
         ImageIconItem(
-            icon = R.drawable.ic_contacts_connection,
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.User),
             title = sharedR.string.general_section_contacts,
             description = uiState.visibleContacts?.let {
                 pluralStringResource(id = R.plurals.my_account_connections, count = it, it)
@@ -599,7 +601,7 @@ private fun AccountInfoSection(
 
         if (uiState.isBusinessAccount.not()) {
             ImageIconItem(
-                icon = R.drawable.ic_achievement,
+                icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Rocket),
                 title = sharedR.string.general_section_achievements,
                 description = stringResource(id = R.string.achievements_subtitle),
                 isIconMode = true,
@@ -610,7 +612,7 @@ private fun AccountInfoSection(
         }
 
         ImageIconItem(
-            icon = R.drawable.ic_last_session,
+            icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.ClockUser),
             title = R.string.my_account_last_session,
             description = uiState.lastSession?.let {
                 TimeUtils.formatDateAndTime(

@@ -90,6 +90,15 @@ interface IconPackInterface {
              * medium_thin_outline
              */
             interface Outline {
+                val PlaySquare: ImageVector
+                val Rocket: ImageVector
+                val User: ImageVector
+                val MapPin: ImageVector
+                val Gif: ImageVector
+                val Images: ImageVector
+                val Image01: ImageVector
+                val PlusCircle: ImageVector
+                val VideoJoin: ImageVector
                 val Square: ImageVector
                 val FileSearch02: ImageVector
                 val CheckStack: ImageVector

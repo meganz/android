@@ -75,9 +75,9 @@ internal fun ShareFolderNode?.getSharesIcon(
             mega.privacy.android.core.R.drawable.ic_alert_triangle
         } else if (this.node.isIncomingShare) {
             when (shareData.access) {
-                AccessPermission.FULL -> R.drawable.ic_shared_fullaccess
-                AccessPermission.READWRITE -> R.drawable.ic_shared_read_write
-                else -> R.drawable.ic_shared_read
+                AccessPermission.FULL -> mega.privacy.android.icon.pack.R.drawable.ic_star_medium_thin_outline
+                AccessPermission.READWRITE -> mega.privacy.android.icon.pack.R.drawable.ic_edit_medium_thin_outline
+                else -> mega.android.core.ui.R.drawable.ic_eye_medium_thin_outline
             }
         } else null
     }

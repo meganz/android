@@ -128,7 +128,7 @@ internal class ContactListViewModel @Inject constructor(
                                     ContactActionItem(
                                         Type.REQUESTS,
                                         context.getString(R.string.section_requests),
-                                        R.drawable.ic_users,
+                                        IconPackR.drawable.ic_users_medium_thin_outline,
                                         it,
                                     ),
                                     ContactActionItem(

@@ -913,7 +913,7 @@ private fun ImagePreviewTopBar(
                 if (isSlideshowMenuVisible) {
                     IconButton(onClick = onClickSlideshow) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_slideshow),
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.PlaySquare),
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SLIDESHOW),

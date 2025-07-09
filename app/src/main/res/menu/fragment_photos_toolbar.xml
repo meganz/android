@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/action_photos_search"
-        android:icon="@drawable/ic_search"
+        android:icon="@drawable/ic_search_large_medium_thin_outline"
         android:orderInCategory="70"
         android:visible="true"
         app:iconTint="?attr/colorControlNormal"
@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/action_photos_filter"
-        android:icon="@drawable/ic_filter"
+        android:icon="@drawable/ic_filter_medium_thin_outline"
         android:orderInCategory="75"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"

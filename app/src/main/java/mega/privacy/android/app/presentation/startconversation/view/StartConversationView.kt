@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -50,6 +51,7 @@ import mega.privacy.android.app.presentation.search.view.EmptySearchView
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
@@ -248,7 +250,7 @@ private fun ActionButtons(
             verticalAlignment = Alignment.CenterVertically) {
             MegaIcon(
                 modifier = Modifier.padding(horizontal = 26.dp, vertical = 18.dp),
-                painter = painterResource(id = action.icon),
+                painter = rememberVectorPainter(action.icon),
                 contentDescription = "${action.name} icon",
                 tint = IconColor.Primary
             )
@@ -279,7 +281,7 @@ private fun InviteContactsButton(onInviteContactsClicked: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically) {
         MegaIcon(
             modifier = Modifier.padding(horizontal = 26.dp, vertical = 18.dp),
-            painter = painterResource(id = R.drawable.ic_invite_contacts),
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.PlusCircle),
             contentDescription = stringResource(id = R.string.invite_contacts) + "icon",
             tint = IconColor.Primary
         )

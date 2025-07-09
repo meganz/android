@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.extensions
 
+import androidx.compose.ui.graphics.vector.ImageVector
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
+import mega.privacy.android.icon.pack.IconPack
 
 internal val StartConversationAction.title: Int
     get() = when (this) {
@@ -10,9 +12,9 @@ internal val StartConversationAction.title: Int
         StartConversationAction.JoinMeeting -> R.string.join_meeting
     }
 
-internal val StartConversationAction.icon: Int
+internal val StartConversationAction.icon: ImageVector
     get() = when (this) {
-        StartConversationAction.NewGroup -> R.drawable.message_chat_circle
-        StartConversationAction.NewMeeting -> R.drawable.ic_new_meeting
-        StartConversationAction.JoinMeeting -> R.drawable.ic_join_meeting
+        StartConversationAction.NewGroup -> IconPack.Medium.Thin.Outline.MessageChatCircle
+        StartConversationAction.NewMeeting -> IconPack.Medium.Thin.Outline.VideoPlus
+        StartConversationAction.JoinMeeting -> IconPack.Medium.Thin.Outline.VideoJoin
     }
