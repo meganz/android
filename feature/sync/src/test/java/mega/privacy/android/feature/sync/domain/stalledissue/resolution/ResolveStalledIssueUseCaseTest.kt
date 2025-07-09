@@ -6,8 +6,8 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.usecase.file.DeleteDocumentFileByContentUriUseCase
-import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
+import mega.privacy.android.domain.usecase.file.DeleteDocumentFileBySyncContentUriUseCase
+import mega.privacy.android.domain.usecase.file.GetLastModifiedTimeForSyncContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByFingerprintAndParentNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
@@ -24,7 +24,6 @@ import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.RenameNodeWithTheSameNameUseCase
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.ResolveStalledIssueUseCase
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito
@@ -33,16 +32,19 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.io.File
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@OptIn(ExperimentalTime::class)
 class ResolveStalledIssueUseCaseTest {
 
-    private val deleteDocumentFileByContentUriUseCase: DeleteDocumentFileByContentUriUseCase =
+    private val deleteDocumentFileByContentUriUseCase: DeleteDocumentFileBySyncContentUriUseCase =
         mock()
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase = mock()
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
-    private val getFileByPathUseCase: GetFileByPathUseCase = mock()
+    private val getLastModifiedTimeForSyncContentUriUseCase: GetLastModifiedTimeForSyncContentUriUseCase =
+        mock()
     private val setSyncSolvedIssueUseCase: SetSyncSolvedIssueUseCase = mock()
     private val stalledIssueToSolvedIssueMapper: StalledIssueToSolvedIssueMapper = mock()
     private val renameNodeUseCase: RenameNodeUseCase = mock()
@@ -55,9 +57,9 @@ class ResolveStalledIssueUseCaseTest {
 
     private val underTest = ResolveStalledIssueUseCase(
         deleteDocumentFileByContentUriUseCase,
+        getLastModifiedTimeForSyncContentUriUseCase,
         moveNodesToRubbishUseCase,
         getNodeByHandleUseCase,
-        getFileByPathUseCase,
         setSyncSolvedIssueUseCase,
         renameNodeUseCase,
         moveNodeUseCase,
@@ -72,7 +74,7 @@ class ResolveStalledIssueUseCaseTest {
             deleteDocumentFileByContentUriUseCase,
             moveNodesToRubbishUseCase,
             getNodeByHandleUseCase,
-            getFileByPathUseCase,
+            getLastModifiedTimeForSyncContentUriUseCase,
             setSyncSolvedIssueUseCase,
             renameNodeUseCase,
             getNodeByFingerprintAndParentNodeUseCase,
@@ -127,6 +129,7 @@ class ResolveStalledIssueUseCaseTest {
             verifyNoInteractions(moveNodesToRubbishUseCase)
         }
 
+
     @Test
     fun `test that moveNodesToRubbishUseCase is invoked when resolutionActionType is CHOOSE_LATEST_MODIFIED_TIME and local file is the latest`() =
         runTest {
@@ -150,11 +153,12 @@ class ResolveStalledIssueUseCaseTest {
                 on { id } doReturn nodeId
                 on { modificationTime } doReturn remoteNodeModificationTimeInSeconds
             }
-            val localFile = mock<File> {
-                on { lastModified() } doReturn fileModificationTimeInMilliseconds
-            }
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(remoteNode)
-            whenever(getFileByPathUseCase(localPath)).thenReturn(localFile)
+            whenever(getLastModifiedTimeForSyncContentUriUseCase(UriPath(localPath))).thenReturn(
+                Instant.fromEpochMilliseconds(
+                    fileModificationTimeInMilliseconds
+                )
+            )
 
             underTest(stalledIssueResolutionAction, stalledIssue)
 
@@ -185,11 +189,12 @@ class ResolveStalledIssueUseCaseTest {
                 on { id } doReturn nodeId
                 on { modificationTime } doReturn remoteNodeModificationTimeInSeconds
             }
-            val localFile = mock<File> {
-                on { lastModified() } doReturn fileModificationTimeInMilliseconds
-            }
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(remoteNode)
-            whenever(getFileByPathUseCase(localPath)).thenReturn(localFile)
+            whenever(getLastModifiedTimeForSyncContentUriUseCase(UriPath(localPath))).thenReturn(
+                Instant.fromEpochMilliseconds(
+                    fileModificationTimeInMilliseconds
+                )
+            )
 
             underTest(stalledIssueResolutionAction, stalledIssue)
 
@@ -262,8 +267,7 @@ class ResolveStalledIssueUseCaseTest {
             })
         }
 
-    // suspend high order function cannot be mocked on Kotlin 2.0
-    @Disabled
+
     @Test
     fun `test that merge folders action results into folders merged to the biggest folder`() =
         runTest {
@@ -390,9 +394,6 @@ class ResolveStalledIssueUseCaseTest {
             on { id } doReturn nodeId
             on { modificationTime } doReturn remoteNodeModificationTimeInSeconds
         }
-        val localFile = mock<File> {
-            on { lastModified() } doReturn fileModificationTimeInMilliseconds
-        }
         val solvedIssue = SolvedIssue(
             syncId = syncId,
             nodeIds = listOf(nodeId),
@@ -400,7 +401,11 @@ class ResolveStalledIssueUseCaseTest {
             resolutionExplanation = stalledIssueResolutionAction.actionName
         )
         whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(remoteNode)
-        whenever(getFileByPathUseCase(localPath)).thenReturn(localFile)
+        whenever(getLastModifiedTimeForSyncContentUriUseCase(UriPath(localPath))).thenReturn(
+            Instant.fromEpochMilliseconds(
+                fileModificationTimeInMilliseconds
+            )
+        )
         whenever(
             stalledIssueToSolvedIssueMapper(
                 stalledIssue,

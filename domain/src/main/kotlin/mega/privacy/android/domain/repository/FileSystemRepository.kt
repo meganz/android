@@ -364,7 +364,7 @@ interface FileSystemRepository {
      * @param uriPath
      * @return true if the file is deleted successfully
      */
-    suspend fun deleteDocumentFileByContentUri(uriPath: UriPath): Boolean
+    suspend fun deleteSyncDocumentFileBySyncContentUri(uriPath: UriPath): Boolean
 
     /**
      * Get files in document folder
@@ -569,6 +569,16 @@ interface FileSystemRepository {
      */
     @OptIn(ExperimentalTime::class)
     suspend fun getLastModifiedTime(uriPath: UriPath): Instant?
+
+
+    /**
+     * Get the last modified time of a Sync Content URI [UriPath]
+     *
+     * @param uriPath [UriPath] to be obtained from
+     * @return the last modified time in milliseconds since epoch, or null if the time cannot be get
+     */
+    @OptIn(ExperimentalTime::class)
+    suspend fun getLastModifiedTimeForSyncContentUri(uriPath: UriPath): Instant?
 
     /**
      * Renames a document with incremented counter with the same name in the same folder.

@@ -402,7 +402,7 @@ internal class FileSystemRepositoryImplTest {
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
-    fun `test that deleteDocumentFileByContentUri deletes the file correctly`(expected: Boolean) =
+    fun `test that deleteSyncDocumentFileBySyncContentUri deletes the file correctly`(expected: Boolean) =
         runTest {
             mockStatic(Uri::class.java).use { _ ->
                 val fileName = "a.jpg"
@@ -415,13 +415,12 @@ internal class FileSystemRepositoryImplTest {
                     on { delete() } doReturn expected
                 }
                 whenever(
-                    documentFileWrapper.getDocumentFile(
+                    documentFileWrapper.getDocumentFileForSyncContentUri(
                         testUriPath.value,
-                        fileName
                     )
                 ).thenReturn(documentFile)
 
-                val actual = underTest.deleteDocumentFileByContentUri(testUriPath)
+                val actual = underTest.deleteSyncDocumentFileBySyncContentUri(testUriPath)
                 assertThat(actual).isEqualTo(expected)
             }
         }
@@ -634,6 +633,19 @@ internal class FileSystemRepositoryImplTest {
     }
 
     @Test
+    @OptIn(ExperimentalTime::class)
+    fun `test that getLastModifiedTimeForSyncContentUri invokes and returns correctly`() = runTest {
+        val uriPath = UriPath("filePath")
+        val lastModifiedTime = Instant.fromEpochMilliseconds(123456789L)
+
+        whenever(fileGateway.getLastModifiedTimeForSyncContentUri(uriPath)) doReturn lastModifiedTime
+
+        assertThat(underTest.getLastModifiedTimeForSyncContentUri(uriPath)).isEqualTo(
+            lastModifiedTime
+        )
+    }
+
+    @Test
     fun `test that renameDocumentWithTheSameName renames all documents with the same name`() =
         runTest {
             mockStatic(Uri::class.java).use {
@@ -651,9 +663,8 @@ internal class FileSystemRepositoryImplTest {
                 uriPaths.forEachIndexed { index, uriPath ->
                     whenever(Uri.parse(uriPath.value)) doReturn uris[index]
                     whenever(
-                        documentFileWrapper.getDocumentFile(
+                        documentFileWrapper.getDocumentFileForSyncContentUri(
                             uriPath.value,
-                            fileNames[index]
                         )
                     ).thenReturn(
                         documentFiles[index]

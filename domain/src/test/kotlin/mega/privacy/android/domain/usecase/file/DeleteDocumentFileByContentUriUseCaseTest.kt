@@ -17,11 +17,11 @@ import org.mockito.kotlin.whenever
 class DeleteDocumentFileByContentUriUseCaseTest {
 
     private val repository: FileSystemRepository = mock()
-    private lateinit var underTest: DeleteDocumentFileByContentUriUseCase
+    private lateinit var underTest: DeleteDocumentFileBySyncContentUriUseCase
 
     @BeforeAll
     fun setUp() {
-        underTest = DeleteDocumentFileByContentUriUseCase(repository)
+        underTest = DeleteDocumentFileBySyncContentUriUseCase(repository)
     }
 
     @BeforeEach
@@ -34,7 +34,9 @@ class DeleteDocumentFileByContentUriUseCaseTest {
     fun `test that delete a document file  by content uri returns correctly`(expected: Boolean) =
         runTest {
             val testUriPath = UriPath("content://test/file/path")
-            whenever(repository.deleteDocumentFileByContentUri(testUriPath)).thenReturn(expected)
+            whenever(repository.deleteSyncDocumentFileBySyncContentUri(testUriPath)).thenReturn(
+                expected
+            )
             Truth.assertThat(underTest(testUriPath)).isEqualTo(expected)
         }
 }

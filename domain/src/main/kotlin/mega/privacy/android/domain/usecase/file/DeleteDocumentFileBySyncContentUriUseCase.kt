@@ -9,7 +9,7 @@ import javax.inject.Inject
  * Delete a document file  By content URI use case
  *
  */
-class DeleteDocumentFileByContentUriUseCase @Inject constructor(
+class DeleteDocumentFileBySyncContentUriUseCase @Inject constructor(
     private val repository: FileSystemRepository,
 ) {
     /**
@@ -17,5 +17,5 @@ class DeleteDocumentFileByContentUriUseCase @Inject constructor(
      *
      */
     suspend operator fun invoke(uriPath: UriPath) =
-        repository.deleteDocumentFileByContentUri(uriPath)
+        repository.deleteSyncDocumentFileBySyncContentUri(uriPath)
 }

@@ -134,6 +134,44 @@ class DocumentFileFacade @Inject constructor(
         }
     }
 
+    override suspend fun getDocumentFileForSyncContentUri(uriString: String): DocumentFile? {
+        val uri = uriString.toUri()
+        return when {
+            DocumentsContract.isTreeUri(uri) -> fromTreeUri(uri)?.let { documentFile ->
+                val folderTree = getSyncFolderTreeFromPickedContentUri(uriString)
+                if (folderTree.isEmpty()) {
+                    return documentFile
+                }
+
+                findDocumentFileByFolderTree(documentFile, folderTree)
+            }
+
+            else -> fromSingleUri(uri)
+        }
+    }
+
+    private fun getSyncFolderTreeFromPickedContentUri(uriString: String): List<String> {
+        val documentPath = uriString.substringAfter("/document/")
+        if (documentPath == uriString) {
+            // No "/document/" found in URI
+            return emptyList()
+        }
+        val pathComponents =
+            documentPath.split("/").drop(1) // Drop the first component which is the storage ID
+        return pathComponents
+    }
+
+    fun findDocumentFileByFolderTree(rootDir: DocumentFile, segments: List<String>): DocumentFile? {
+        // Path should be like "A/B/c.txt or A/B/C"
+        var currentFile: DocumentFile? = rootDir
+
+        for (segment in segments.dropLast(1)) {
+            currentFile = currentFile?.findFile(segment)?.takeIf { it.isDirectory } ?: return null
+        }
+
+        return currentFile?.findFile(segments.lastOrNull() ?: return null)
+    }
+
     /**
      * Extracts the folder tree from the picked URI string.
      */

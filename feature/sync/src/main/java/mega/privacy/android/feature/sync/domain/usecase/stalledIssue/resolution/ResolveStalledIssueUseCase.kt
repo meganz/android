@@ -9,8 +9,8 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.usecase.file.DeleteDocumentFileByContentUriUseCase
-import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
+import mega.privacy.android.domain.usecase.file.DeleteDocumentFileBySyncContentUriUseCase
+import mega.privacy.android.domain.usecase.file.GetLastModifiedTimeForSyncContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
@@ -21,12 +21,13 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAct
 import mega.privacy.android.feature.sync.domain.mapper.StalledIssueToSolvedIssueMapper
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.SetSyncSolvedIssueUseCase
 import javax.inject.Inject
+import kotlin.time.ExperimentalTime
 
 internal class ResolveStalledIssueUseCase @Inject constructor(
-    private val deleteDocumentFileByContentUriUseCase: DeleteDocumentFileByContentUriUseCase,
+    private val deleteDocumentFileByContentUriUseCase: DeleteDocumentFileBySyncContentUriUseCase,
+    private val getLastModifiedTimeForSyncContentUriUseCase: GetLastModifiedTimeForSyncContentUriUseCase,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
-    private val getFileByPathUseCase: GetFileByPathUseCase,
     private val setSyncSolvedIssueUseCase: SetSyncSolvedIssueUseCase,
     private val renameNodeUseCase: RenameNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
@@ -46,6 +47,7 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     private suspend fun resolveIssue(
         stalledIssueResolutionAction: StalledIssueResolutionAction,
         stalledIssue: StalledIssue,
@@ -94,11 +96,12 @@ internal class ResolveStalledIssueUseCase @Inject constructor(
             }
 
             StalledIssueResolutionActionType.CHOOSE_LATEST_MODIFIED_TIME -> {
-                val localFile = getFileByPathUseCase(stalledIssue.localPaths.first())
+                val lastModifiedInstant =
+                    getLastModifiedTimeForSyncContentUriUseCase(UriPath(stalledIssue.localPaths.first()))
                 val remoteNode = getNodeByHandleUseCase(stalledIssue.nodeIds.first().longValue)
-                if (remoteNode is FileNode && localFile != null) {
+                if (remoteNode is FileNode && lastModifiedInstant != null) {
                     val remoteModifiedDateInSeconds = remoteNode.modificationTime
-                    val localModifiedDateInMilliseconds = localFile.lastModified()
+                    val localModifiedDateInMilliseconds = lastModifiedInstant.toEpochMilliseconds()
                     if (localModifiedDateInMilliseconds / 1000 > remoteModifiedDateInSeconds) {
                         moveNodesToRubbishUseCase(listOf(stalledIssue.nodeIds.first().longValue))
                     } else {

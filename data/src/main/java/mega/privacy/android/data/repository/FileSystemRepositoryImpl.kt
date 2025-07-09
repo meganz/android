@@ -329,14 +329,13 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileTypeInfoMapper(fileName, duration?.inWholeSeconds?.toInt() ?: 0)
         }
 
-    override suspend fun deleteFileByUri(uriString: String): Boolean = withContext(ioDispatcher) {
-        fileGateway.deleteFileByUri(uriString.toUri())
+    override suspend fun deleteFileByUri(uri: String): Boolean = withContext(ioDispatcher) {
+        fileGateway.deleteFileByUri(uri.toUri())
     }
 
-    override suspend fun deleteDocumentFileByContentUri(uriPath: UriPath) =
+    override suspend fun deleteSyncDocumentFileBySyncContentUri(uriPath: UriPath) =
         withContext(ioDispatcher) {
-            val uri = uriPath.value.toUri()
-            documentFileWrapper.getDocumentFile(uriPath.value, uri.lastPathSegment.toString())
+            documentFileWrapper.getDocumentFileForSyncContentUri(uriPath.value)
                 ?.delete() == true
         }
 
@@ -478,13 +477,21 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         fileGateway.getLastModifiedTime(uriPath)
     }
 
+    @OptIn(ExperimentalTime::class)
+    override suspend fun getLastModifiedTimeForSyncContentUri(uriPath: UriPath) =
+        withContext(ioDispatcher) {
+            fileGateway.getLastModifiedTimeForSyncContentUri(uriPath)
+        }
+
+
     override suspend fun renameDocumentWithTheSameName(uriPaths: List<UriPath>) =
         withContext(ioDispatcher) {
             uriPaths.forEachIndexed { index, uriPath ->
                 val uri = uriPath.value.toUri()
                 val fileName = uri.lastPathSegment ?: return@forEachIndexed
-                val documentFile = documentFileWrapper.getDocumentFile(uriPath.value, fileName)
-                    ?: return@forEachIndexed
+                val documentFile =
+                    documentFileWrapper.getDocumentFileForSyncContentUri(uriPath.value)
+                        ?: return@forEachIndexed
                 val counter = index + 1
 
                 val newName = generateNewName(fileName, counter)

@@ -616,4 +616,14 @@ interface FileGateway {
      */
     @ExperimentalTime
     fun getLastModifiedTimeSync(uriPath: UriPath): Instant?
+
+
+    /**
+     * Get the last modified time of a Document File [UriPath]
+     *
+     * @param uriPath [UriPath] to be obtained from
+     * @return the last modified time in milliseconds since epoch, or null if the time cannot be get
+     */
+    @ExperimentalTime
+    suspend fun getLastModifiedTimeForSyncContentUri(uriPath: UriPath): Instant?
 }

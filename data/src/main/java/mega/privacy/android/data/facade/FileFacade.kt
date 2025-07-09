@@ -1138,6 +1138,12 @@ internal class FileFacade @Inject constructor(
             }
         }?.let { Instant.fromEpochMilliseconds(it) }
 
+    @ExperimentalTime
+    override suspend fun getLastModifiedTimeForSyncContentUri(uriPath: UriPath) =
+        documentFileWrapper.getDocumentFileForSyncContentUri(uriPath.value)?.lastModified()
+            ?.takeIf { it > 0 }
+            ?.let { Instant.fromEpochMilliseconds(it) }
+
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val PHOTO_DIR = "MEGA Photos"

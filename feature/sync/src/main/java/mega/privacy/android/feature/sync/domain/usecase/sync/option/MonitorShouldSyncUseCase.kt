@@ -28,9 +28,9 @@ class MonitorShouldSyncUseCase @Inject constructor(
      */
     operator fun invoke(): Flow<Boolean> = combine(
         monitorConnectivityUseCase(),
-        monitorBatteryInfoUseCase(),
-        monitorSyncByWiFiUseCase(),
-        monitorSyncByChargingUseCase(),
+        monitorBatteryInfoUseCase().distinctUntilChanged(),
+        monitorSyncByWiFiUseCase().distinctUntilChanged(),
+        monitorSyncByChargingUseCase().distinctUntilChanged(),
     ) { connectedToInternet, batteryInfo, wiFiOnly, chargingOnly ->
         val internetAvailable = connectedToInternet
         val isUserOnWifi = runCatching { isOnWifiNetworkUseCase() }.getOrDefault(false)
@@ -39,7 +39,7 @@ class MonitorShouldSyncUseCase @Inject constructor(
         val batteryLevelAllowed = checkBatteryLevel(batteryInfo)
 
         internetAvailable && wifiAllowed && batteryAllowed && batteryLevelAllowed
-    }.distinctUntilChanged()
+    }
 
     /**
      * Checks if sync is allowed based on WiFi settings

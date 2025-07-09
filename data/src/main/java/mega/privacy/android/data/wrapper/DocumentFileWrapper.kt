@@ -132,4 +132,10 @@ interface DocumentFileWrapper {
      * @return the [DocumentFile] of the document file if found, null otherwise
      */
     suspend fun getDocumentFile(uriString: String, fileName: String): DocumentFile?
+
+    /**
+     * Get the document file for the given uri string for sync content uri.
+     * e.g  "content://com.android.externalstorage.documents/tree/primary:Recordings/document/primary:Recordings/A/B/c.txt"
+     */
+    suspend fun getDocumentFileForSyncContentUri(uriString: String): DocumentFile?
 }
