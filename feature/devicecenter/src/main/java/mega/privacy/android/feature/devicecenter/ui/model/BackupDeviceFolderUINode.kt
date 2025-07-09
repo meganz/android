@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.devicecenter.ui.model
 
-import kotlinx.serialization.Serializable
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 
@@ -16,7 +15,6 @@ import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUIN
  * @property status The Backup Folder Status
  * @property rootHandle The Backup Folder Root Handle
  */
-@Serializable
 data class BackupDeviceFolderUINode(
     override val id: String,
     override val name: String,

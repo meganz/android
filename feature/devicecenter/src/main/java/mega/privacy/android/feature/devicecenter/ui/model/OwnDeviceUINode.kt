@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.devicecenter.ui.model
 
-import kotlinx.serialization.Serializable
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 
@@ -13,7 +12,6 @@ import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUIN
  * @property status The Current Device Status from [DeviceCenterUINodeStatus]
  * @property folders The list of Folders linked to that Device as [DeviceFolderUINode] objects
  */
-@Serializable
 data class OwnDeviceUINode(
     override val id: String,
     override val name: String,

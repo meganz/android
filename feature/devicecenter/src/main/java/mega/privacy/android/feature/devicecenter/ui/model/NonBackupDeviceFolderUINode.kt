@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.devicecenter.ui.model
 
-import kotlinx.serialization.Serializable
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 
@@ -17,12 +16,11 @@ import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUIN
  * @property rootHandle The Folder Root Handle
  * @property localFolderPath The Folder Local Path
  */
-@Serializable
 data class NonBackupDeviceFolderUINode(
     override val id: String,
     override val name: String,
     override val icon: DeviceCenterUINodeIcon,
     override val status: DeviceCenterUINodeStatus,
     override val rootHandle: Long,
-    val localFolderPath: String
+    val localFolderPath: String,
 ) : DeviceFolderUINode

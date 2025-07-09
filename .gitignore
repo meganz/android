@@ -29,6 +29,7 @@
 .idea/migrations.xml
 .idea/caches/
 .idea/runConfigurations.xml
+.idea/deviceManager.xml
 
 # Sensitive or high-churn files:
 .idea/dataSources.ids
