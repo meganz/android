@@ -16,6 +16,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINI
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NOT_ENOUGH_STORAGE
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NO_NETWORK_CONNECTION
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NO_WIFI_CONNECTION
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.OUT_OF_SPACE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.PROGRESS
@@ -208,6 +209,12 @@ class CameraUploadsStatusInfoMapperTest {
             WorkInfo.State.RUNNING,
             WorkInfo.STOP_REASON_NOT_STOPPED,
             CameraUploadsStatusInfo.NoWifiConnection
+        ),
+        Arguments.of(
+            workDataOf(STATUS_INFO to NO_NETWORK_CONNECTION),
+            WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
+            CameraUploadsStatusInfo.NoNetworkConnection
         ),
     )
 }

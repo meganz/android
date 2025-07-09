@@ -92,6 +92,11 @@ sealed interface CameraUploadsStatusInfo {
     data object NoWifiConnection : CameraUploadsStatusInfo
 
     /**
+     * object used to notify that there is no network connection
+     */
+    data object NoNetworkConnection : CameraUploadsStatusInfo
+
+    /**
      *  object used to notify that Not Enough Storage on the Device
      *  @property cameraUploadsFolderType
      */

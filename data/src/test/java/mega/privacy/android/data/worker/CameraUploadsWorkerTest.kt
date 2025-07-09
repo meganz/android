@@ -1333,9 +1333,17 @@ internal class CameraUploadsWorkerTest {
     fun `test that worker returns failure when connection is lost`() = runTest {
         setupDefaultCheckConditionMocks()
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(false))
+        whenever(isWifiNotSatisfiedUseCase()).thenReturn(false)
+        whenever(
+            getFeatureFlagValueUseCase(DataFeatures.CameraUploadsNotification)
+        ).thenReturn(true)
+        val afterErrorEventData = workDataOf(
+            STATUS_INFO to CameraUploadsWorkerStatusConstant.NO_NETWORK_CONNECTION,
+        )
 
         val result = underTest.doWork()
 
+        verify(underTest).setProgress(afterErrorEventData)
         verify(underTest).setProgress(
             workDataOf(
                 STATUS_INFO to FINISHED,

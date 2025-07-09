@@ -45,6 +45,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINI
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NOT_ENOUGH_STORAGE
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NO_NETWORK_CONNECTION
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NO_WIFI_CONNECTION
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.OUT_OF_SPACE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.PROGRESS
@@ -474,8 +475,12 @@ class CameraUploadsWorker @AssistedInject constructor(
             isWifiConstraintSatisfied = it && isWifiNotSatisfied.not()
 
             if (!isWifiConstraintSatisfied) {
-                if (isWifiNotSatisfied && isEnableNewNotification) {
-                    sendNoWifiConnectionStatus()
+                if (isEnableNewNotification) {
+                    if (isWifiNotSatisfied) {
+                        sendNoWifiConnectionStatus()
+                    } else {
+                        sendNoNetworkConnectionStatus()
+                    }
                 }
                 abortWork(reason = CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET)
             }
@@ -1727,6 +1732,17 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun sendNoWifiConnectionStatus() {
         runCatching {
             setProgress(workDataOf(STATUS_INFO to NO_WIFI_CONNECTION))
+        }.onFailure {
+            Timber.w(it)
+        }
+    }
+
+    /**
+     * Notify observers that there is no network connection
+     */
+    private suspend fun sendNoNetworkConnectionStatus() {
+        runCatching {
+            setProgress(workDataOf(STATUS_INFO to NO_NETWORK_CONNECTION))
         }.onFailure {
             Timber.w(it)
         }

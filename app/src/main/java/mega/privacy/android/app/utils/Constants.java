@@ -277,6 +277,7 @@ public class Constants {
     public static final int NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT = 13;
     public static final int NOTIFICATION_STORAGE_OVERQUOTA = 14;
     public static final int NOTIFICATION_NO_WIFI_CONNECTION = 15;
+    public static final int NOTIFICATION_NO_NETWORK_CONNECTION = 16;
     public static final int NOTIFICATION_NOT_ENOUGH_STORAGE = 17;
     public static final int NOTIFICATION_VIDEO_COMPRESSION = 18;
     public static final int NOTIFICATION_CAMERA_UPLOADS_PRIMARY_FOLDER_UNAVAILABLE = 19;

@@ -58,6 +58,8 @@ class CameraUploadsNotificationManager @Inject constructor(
             Constants.NOTIFICATION_STORAGE_OVERQUOTA
         private const val NO_WIFI_CONNECTION_NOTIFICATION_ID =
             Constants.NOTIFICATION_NO_WIFI_CONNECTION
+        private const val NO_NETWORK_CONNECTION_NOTIFICATION_ID =
+            Constants.NOTIFICATION_NO_NETWORK_CONNECTION
 
         private const val ACTION_CANCEL_CAM_SYNC = Constants.ACTION_CANCEL_CAM_SYNC
         private const val ACTION_SHOW_SETTINGS = Constants.ACTION_SHOW_SETTINGS
@@ -118,6 +120,7 @@ class CameraUploadsNotificationManager @Inject constructor(
             )
 
             CameraUploadsStatusInfo.NoWifiConnection -> showNoWifiConnectionNotification()
+            CameraUploadsStatusInfo.NoNetworkConnection -> showNoNetworkConnectionNotification()
         }
     }
 
@@ -389,6 +392,17 @@ class CameraUploadsNotificationManager @Inject constructor(
     }
 
     /**
+     *  Display a notification in case there is no Network connection
+     */
+    private fun showNoNetworkConnectionNotification() {
+        val notification = createNotification(
+            title = context.getString(sharedR.string.camera_uploads_notification_title_paused_warning),
+            content = context.getString(sharedR.string.camera_uploads_notification_content_no_network_connection),
+        )
+        notificationManager.notify(NO_NETWORK_CONNECTION_NOTIFICATION_ID, notification)
+    }
+
+    /**
      * Get foregroundInfo for camera uploads worker
      */
     fun getForegroundInfo(): ForegroundInfo {
@@ -430,6 +444,8 @@ class CameraUploadsNotificationManager @Inject constructor(
             cancel(NOT_ENOUGH_STORAGE_NOTIFICATION_ID)
             cancel(OVER_STORAGE_QUOTA_NOTIFICATION_ID)
             cancel(COMPRESSION_NOTIFICATION_ID)
+            cancel(NO_WIFI_CONNECTION_NOTIFICATION_ID)
+            cancel(NO_NETWORK_CONNECTION_NOTIFICATION_ID)
         }
     }
 

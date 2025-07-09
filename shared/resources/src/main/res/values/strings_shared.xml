@@ -1337,4 +1337,6 @@
     <string name="alert_larger_file_preview_confirm_button">Preview now</string>
     <!-- Alert always allow button before download a big file for preview -->
     <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">Waiting for WIFI or mobile data</string>
 </resources>

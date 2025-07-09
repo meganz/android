@@ -120,4 +120,9 @@ object CameraUploadsWorkerStatusConstant {
      * No Wi-Fi Connection key
      */
     const val NO_WIFI_CONNECTION = "no_wifi_connection"
+
+    /**
+     * No network Connection key
+     */
+    const val NO_NETWORK_CONNECTION = "no_network_connection"
 }
