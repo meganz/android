@@ -1,20 +1,19 @@
 package mega.privacy.android.app.fetcher
 
 import android.webkit.MimeTypeMap
-import coil3.ImageLoader
-import coil3.decode.DataSource
-import coil3.decode.ImageSource
-import coil3.fetch.FetchResult
-import coil3.fetch.Fetcher
-import coil3.fetch.SourceFetchResult
-import coil3.request.Options
+import coil.ImageLoader
+import coil.decode.DataSource
+import coil.decode.ImageSource
+import coil.fetch.FetchResult
+import coil.fetch.Fetcher
+import coil.fetch.SourceResult
+import coil.request.Options
 import mega.privacy.android.domain.entity.node.thumbnail.ChatThumbnailRequest
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetChatThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPublicNodeThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
-import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 import javax.inject.Inject
 
@@ -40,8 +39,8 @@ internal class MegaThumbnailFetcher(
                 getThumbnailUseCase.get()(request.id.longValue, true)
             }
         } ?: throw NullPointerException("Thumbnail file is null")
-        return SourceFetchResult(
-            source = ImageSource(file = file.toOkioPath(), fileSystem = FileSystem.SYSTEM),
+        return SourceResult(
+            source = ImageSource(file = file.toOkioPath()),
             mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension),
             dataSource = DataSource.DISK
         )

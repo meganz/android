@@ -1,7 +1,7 @@
 package mega.privacy.android.app.fetcher
 
-import coil3.key.Keyer
-import coil3.request.Options
+import coil.key.Keyer
+import coil.request.Options
 import mega.privacy.android.domain.entity.node.thumbnail.ChatThumbnailRequest
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest

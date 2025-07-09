@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.contact.view
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import coil3.compose.rememberAsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 
 /**
  * Avatar with Uri

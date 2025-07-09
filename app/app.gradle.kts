@@ -260,9 +260,6 @@ dependencies {
     implementation(lib.coil.svg)
     implementation(lib.coil.video)
     implementation(lib.coil.compose)
-    implementation(lib.coil3.gif)
-    implementation(lib.coil3.svg)
-    implementation(lib.coil3.video)
     implementation(androidx.paging.compose)
     implementation(lib.kotlinx.collections.immutable)
     implementation(lib.mega.core.ui)
@@ -395,7 +392,6 @@ dependencies {
     // Live Data testing
     testImplementation(testlib.jraska.livedata.test)
     testImplementation(testlib.coil.test)
-    testImplementation(testlib.coil3.test)
 
     //QA
     "qaImplementation"(google.firebase.app.distribution)

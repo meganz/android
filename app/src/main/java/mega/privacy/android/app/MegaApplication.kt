@@ -13,19 +13,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
-import coil.ImageLoader as LegacyImageLoader
-import coil.ImageLoaderFactory as LegacyImageLoaderFactory
-import coil.decode.GifDecoder as LegacyGifDecoder
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
-import coil.decode.SvgDecoder as LegacySvgDecoder
-import coil.decode.VideoFrameDecoder as LegacyVideoFrameDecoder
-import coil3.ImageLoader
-import coil3.PlatformContext
-import coil3.SingletonImageLoader
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
-import coil3.svg.SvgDecoder
-import coil3.video.VideoFrameDecoder
+import coil.decode.SvgDecoder
+import coil.decode.VideoFrameDecoder
 import com.google.android.gms.ads.MobileAds
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
@@ -48,10 +41,6 @@ import mega.privacy.android.app.fetcher.MegaAvatarFetcher
 import mega.privacy.android.app.fetcher.MegaAvatarKeyer
 import mega.privacy.android.app.fetcher.MegaThumbnailFetcher
 import mega.privacy.android.app.fetcher.MegaThumbnailKeyer
-import mega.privacy.android.app.fetcher.legacy.LegacyMegaAvatarFetcher
-import mega.privacy.android.app.fetcher.legacy.LegacyMegaAvatarKeyer
-import mega.privacy.android.app.fetcher.legacy.LegacyMegaThumbnailFetcher
-import mega.privacy.android.app.fetcher.legacy.LegacyMegaThumbnailKeyer
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
@@ -120,7 +109,7 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
-    LegacyImageLoaderFactory, SingletonImageLoader.Factory, Configuration.Provider {
+    ImageLoaderFactory, Configuration.Provider {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
@@ -209,12 +198,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     internal lateinit var avatarFactory: MegaAvatarFetcher.Factory
 
     @Inject
-    internal lateinit var legacyThumbnailFactory: LegacyMegaThumbnailFetcher.Factory
-
-    @Inject
-    internal lateinit var legacyAvatarFactory: LegacyMegaAvatarFetcher.Factory
-
-    @Inject
     internal lateinit var updateApiServerUseCase: UpdateApiServerUseCase
 
     /**
@@ -279,12 +262,12 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         if (BuildConfig.ACTIVATE_GREETER) greeter.get().initialize()
     }
 
-    // Image loader for coil3
-    override fun newImageLoader(context: PlatformContext): ImageLoader {
+    override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
+            .respectCacheHeaders(false)
             .components {
                 if (SDK_INT >= Build.VERSION_CODES.P) {
-                    add(AnimatedImageDecoder.Factory())
+                    add(ImageDecoderDecoder.Factory())
                 } else {
                     add(GifDecoder.Factory())
                 }
@@ -294,25 +277,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                 add(avatarFactory)
                 add(MegaThumbnailKeyer)
                 add(MegaAvatarKeyer)
-            }
-            .build()
-    }
-
-    // Legacy image loader for coil2
-    override fun newImageLoader(): LegacyImageLoader {
-        return LegacyImageLoader.Builder(this)
-            .components {
-                if (SDK_INT >= Build.VERSION_CODES.P) {
-                    add(ImageDecoderDecoder.Factory())
-                } else {
-                    add(LegacyGifDecoder.Factory())
-                }
-                add(LegacyVideoFrameDecoder.Factory())
-                add(LegacySvgDecoder.Factory())
-                add(legacyThumbnailFactory)
-                add(legacyAvatarFactory)
-                add(LegacyMegaThumbnailKeyer)
-                add(LegacyMegaAvatarKeyer)
             }
             .build()
     }
