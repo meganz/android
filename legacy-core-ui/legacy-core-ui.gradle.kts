@@ -1,9 +1,6 @@
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
-    alias(convention.plugins.mega.android.test)
-    alias(convention.plugins.mega.android.library.jacoco)
-    alias(convention.plugins.mega.lint)
     alias(convention.plugins.mega.android.hilt)
     id("kotlin-android")
 }
@@ -48,6 +45,8 @@ dependencies {
 
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.junit5.api)
 
     debugImplementation(lib.kotlinpoet)
     debugImplementation(google.gson)

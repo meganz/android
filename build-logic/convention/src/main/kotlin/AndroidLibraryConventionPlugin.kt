@@ -21,6 +21,10 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("com.android.library")
                 apply("org.jetbrains.kotlin.android")
+                apply("mega.android.library.jacoco")
+                apply("mega.android.test")
+                apply("mega.lint")
+                apply("de.mannodermaus.android-junit5")
             }
 
             extensions.configure<LibraryExtension> {

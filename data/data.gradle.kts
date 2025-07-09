@@ -3,11 +3,7 @@ import mega.privacy.android.build.preBuiltSdkDependency
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.room)
-    alias(convention.plugins.mega.android.test)
-    alias(convention.plugins.mega.android.library.jacoco)
-    alias(convention.plugins.mega.lint)
     alias(convention.plugins.mega.android.hilt)
-    alias(plugin.plugins.de.mannodermaus.android.junit5)
     id("kotlin-android")
     kotlin("plugin.serialization") version "1.9.21"
 }

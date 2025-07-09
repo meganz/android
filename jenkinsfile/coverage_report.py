@@ -112,7 +112,10 @@ for line in lines:
 
 # This outputs a String in this format:
 # 1.20%=2079/173673
-print("{:.2f}%={}/{}".format(float(total_covered_lines)/float(total_lines) * 100, total_covered_lines, total_lines))
+if total_lines != 0:
+    print("{:.2f}%={}/{}".format(float(total_covered_lines)/float(total_lines) * 100, total_covered_lines, total_lines))
+else:
+    print("0.00%={}/{}".format(0, 0))
 
 
     

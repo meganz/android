@@ -16,4 +16,6 @@ dependencies {
     implementation(testlib.junit.jupiter.api)
 
     testImplementation(testlib.truth)
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.junit5.api)
 }

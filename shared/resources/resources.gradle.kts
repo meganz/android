@@ -1,6 +1,5 @@
 plugins {
     alias(convention.plugins.mega.android.library)
-    alias(convention.plugins.mega.lint)
     id("kotlin-android")
 }
 

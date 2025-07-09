@@ -1,6 +1,5 @@
 plugins {
     alias(convention.plugins.mega.android.library)
-    alias(convention.plugins.mega.android.test)
     alias(convention.plugins.mega.android.library.compose)
     alias(plugin.plugins.kotlin.serialisation)
     id("kotlin-parcelize")

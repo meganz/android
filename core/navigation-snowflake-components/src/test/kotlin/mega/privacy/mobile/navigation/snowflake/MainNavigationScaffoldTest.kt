@@ -52,7 +52,7 @@ class MainNavigationScaffoldTest {
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { _, label ->
+                mainNavItemIcon = { _, label, _ ->
                     TestIcon(label)
                 },
                 navContent = {}
@@ -77,7 +77,7 @@ class MainNavigationScaffoldTest {
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { _, label ->
+                mainNavItemIcon = { _, label, _ ->
                     TestIcon(label)
                 },
                 navContent = {}
@@ -104,7 +104,7 @@ class MainNavigationScaffoldTest {
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { _, label ->
+                mainNavItemIcon = { _, label, _ ->
                     TestIcon(label)
                 },
                 navContent = {}
@@ -129,7 +129,7 @@ class MainNavigationScaffoldTest {
                 mainNavItems = navItemsWithBadge,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = @Composable { _, label ->
+                mainNavItemIcon = @Composable { _, label, _ ->
                     TestIcon(label)
                 },
                 navContent = {}
@@ -154,7 +154,7 @@ class MainNavigationScaffoldTest {
                 mainNavItems = emptyNavItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = @Composable { _, label ->
+                mainNavItemIcon = @Composable { _, label, _ ->
                     TestIcon(label)
                 },
                 navContent = @Composable {
@@ -179,7 +179,7 @@ class MainNavigationScaffoldTest {
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { _, label ->
+                mainNavItemIcon = { _, label, _ ->
                     TestIcon(label)
                 },
                 navContent = {
@@ -213,7 +213,7 @@ class MainNavigationScaffoldTest {
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { _, label ->
+                mainNavItemIcon = { _, label, _ ->
                     TestIcon(label)
                 },
                 navContent = {}
@@ -250,7 +250,7 @@ class MainNavigationScaffoldTest {
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { _, label ->
+                mainNavItemIcon = { _, label, _ ->
                     TestIcon(label)
                 },
                 navContent = {}
@@ -280,7 +280,7 @@ class MainNavigationScaffoldTest {
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { _, label ->
+                mainNavItemIcon = { _, label, _ ->
                     TestIcon(label)
                 },
                 navContent = {}
@@ -319,7 +319,7 @@ class MainNavigationScaffoldTest {
                 mainNavItems = navItems,
                 onDestinationClick = onDestinationClick,
                 isSelected = isSelected,
-                mainNavItemIcon = { _, label ->
+                mainNavItemIcon = { _, label, _ ->
                     TestIcon(label)
                 },
                 navContent = {}
