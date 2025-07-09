@@ -194,7 +194,7 @@ class RecentActionBucketFragment : Fragment() {
         if (adapter == null) {
             adapter =
                 RecentActionBucketAdapter(
-                    activity,
+                    requireActivity(),
                     this,
                     nodes,
                     viewModel.bucket.value?.isMedia ?: false,
@@ -228,7 +228,7 @@ class RecentActionBucketFragment : Fragment() {
             listView.setHasFixedSize(true)
         } else {
             adapter?.setIsIncomingShare(viewModel.isInShare)
-            adapter?.setNodes(nodes)
+            adapter?.nodes = nodes
         }
     }
 
