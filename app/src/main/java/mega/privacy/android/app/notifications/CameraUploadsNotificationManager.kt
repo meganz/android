@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.transfers.notification.OpenTransfersSectionIntentMapper
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
@@ -379,8 +380,10 @@ class CameraUploadsNotificationManager @Inject constructor(
             PendingIntent.getActivity(
                 context,
                 0,
-                Intent(context, SettingsCameraUploadsActivity::class.java),
-                PendingIntent.FLAG_IMMUTABLE
+                Intent(context, SettingsCameraUploadsActivity::class.java).apply {
+                    putExtra(INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT, true)
+                },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         ).build()
         val notification = createNotification(

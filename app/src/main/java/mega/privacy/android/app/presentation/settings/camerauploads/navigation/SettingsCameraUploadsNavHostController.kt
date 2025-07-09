@@ -10,17 +10,19 @@ import androidx.navigation.compose.NavHost
  *
  * @param modifier The [Modifier]
  * @param navHostController The [NavHostController] of the feature
+ * @param isShowHowToUploadPrompt Boolean indicating whether to show the how-to upload prompt
  */
 @Composable
 internal fun SettingsCameraUploadsNavHostController(
     modifier: Modifier,
     navHostController: NavHostController,
+    isShowHowToUploadPrompt: Boolean,
 ) {
     NavHost(
         modifier = modifier,
         navController = navHostController,
-        startDestination = SETTINGS_CAMERA_UPLOADS_ROUTE,
+        startDestination = SettingsCameraUploads,
     ) {
-        settingsCameraUploadsScreen()
+        settingsCameraUploadsScreen(isShowHowToUploadPrompt)
     }
 }

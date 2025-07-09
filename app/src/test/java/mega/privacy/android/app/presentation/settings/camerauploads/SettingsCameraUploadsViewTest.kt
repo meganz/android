@@ -335,6 +335,16 @@ internal class SettingsCameraUploadsViewTest {
         }
     }
 
+    @Test
+    fun `test that the show how to upload prompt is shown is showHowToUploadPrompt is true`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            isShowHowToUploadPrompt = true,
+        )
+
+        composeTestRule.onNodeWithTag(HOW_TO_UPLOAD_DIALOG).assertIsDisplayed()
+    }
+
     private fun initializeComposeContent(
         isCameraUploadsEnabled: Boolean = false,
         isMediaUploadsEnabled: Boolean = false,
@@ -345,6 +355,7 @@ internal class SettingsCameraUploadsViewTest {
         showRelatedNewLocalFolderWarning: Boolean = false,
         uploadOptionUiItem: UploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
         videoQualityUiItem: VideoQualityUiItem = VideoQualityUiItem.Original,
+        isShowHowToUploadPrompt: Boolean = false,
     ) {
         composeTestRule.setContent {
             SettingsCameraUploadsView(
@@ -359,6 +370,7 @@ internal class SettingsCameraUploadsViewTest {
                     uploadOptionUiItem = uploadOptionUiItem,
                     videoQualityUiItem = videoQualityUiItem,
                 ),
+                isShowHowToUploadPrompt = isShowHowToUploadPrompt,
                 onBusinessAccountPromptDismissed = {},
                 onCameraUploadsProcessStarted = {},
                 onCameraUploadsStateChanged = {},

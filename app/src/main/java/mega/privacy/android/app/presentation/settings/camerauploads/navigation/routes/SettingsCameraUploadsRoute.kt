@@ -10,15 +10,18 @@ import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCame
 /**
  * A Route Composable to the main Settings Camera Uploads screen
  *
+ * @param isShowHowToUploadPrompt Boolean indicating whether to show the how-to upload prompt
  * @param viewModel The ViewModel responsible for all business logic
  */
 @Composable
 internal fun SettingsCameraUploadsRoute(
+    isShowHowToUploadPrompt: Boolean,
     viewModel: SettingsCameraUploadsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     SettingsCameraUploadsView(
         uiState = uiState,
+        isShowHowToUploadPrompt = isShowHowToUploadPrompt,
         onBusinessAccountPromptDismissed = viewModel::onBusinessAccountPromptDismissed,
         onCameraUploadsStateChanged = viewModel::onCameraUploadsStateChanged,
         onCameraUploadsProcessStarted = viewModel::onCameraUploadsProcessStarted,

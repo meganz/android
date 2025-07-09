@@ -11,9 +11,10 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 
 /**
  * A Composable holding all Settings Camera Uploads screens using the Navigation Controller
+ * @param isShowHowToUploadPrompt Boolean indicating whether to show the how-to upload prompt
  */
 @Composable
-internal fun SettingsCameraUploadsScreen() {
+internal fun SettingsCameraUploadsScreen(isShowHowToUploadPrompt: Boolean) {
     val navHostController = rememberNavController()
 
     MegaScaffold(
@@ -23,6 +24,7 @@ internal fun SettingsCameraUploadsScreen() {
         SettingsCameraUploadsNavHostController(
             modifier = Modifier.padding(padding),
             navHostController = navHostController,
+            isShowHowToUploadPrompt = isShowHowToUploadPrompt
         )
     }
 }

@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -31,6 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import mega.privacy.android.app.R
@@ -122,6 +122,7 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 @Composable
 internal fun SettingsCameraUploadsView(
     uiState: SettingsCameraUploadsUiState,
+    isShowHowToUploadPrompt: Boolean,
     onBusinessAccountPromptDismissed: () -> Unit,
     onCameraUploadsProcessStarted: () -> Unit,
     onCameraUploadsStateChanged: (Boolean) -> Unit,
@@ -147,12 +148,13 @@ internal fun SettingsCameraUploadsView(
     onVideoQualityUiItemSelected: (VideoQualityUiItem) -> Unit,
 ) {
     val context = LocalContext.current
+
     val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
     var showFileUploadPrompt by rememberSaveable { mutableStateOf(false) }
-    var showHowToUploadPrompt by rememberSaveable { mutableStateOf(false) }
+    var showHowToUploadPrompt by rememberSaveable { mutableStateOf(isShowHowToUploadPrompt) }
     var showVideoCompressionSizeInputPrompt by rememberSaveable { mutableStateOf(false) }
     var showVideoQualityPrompt by rememberSaveable { mutableStateOf(false) }
 
@@ -395,6 +397,7 @@ private fun SettingsCameraUploadsViewPreview(
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         SettingsCameraUploadsView(
             uiState = uiState,
+            isShowHowToUploadPrompt = false,
             onBusinessAccountPromptDismissed = {},
             onCameraUploadsProcessStarted = {},
             onCameraUploadsStateChanged = {},
