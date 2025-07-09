@@ -85,7 +85,7 @@
     <!-- Menu item to unselect all the elements of a list -->
     <string name="action_unselect_all">Tüm seçimleri kaldır</string>
     <!-- Menu item to change from list view to grid view -->
-    <string name="action_grid">Izgara görünümü</string>
+    <string name="action_grid">Küçük resim görünümü</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="action_export_master_key">Kurtarma anahtarını yedekle</string>
     <!-- Menu item to let the user cancel subscriptions -->
@@ -186,9 +186,9 @@
         <item quantity="other">Seçilen aktarımlar iptal edilecek.</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
-    <string name="section_cloud_drive">Bulut Depolama</string>
+    <string name="section_cloud_drive">Bulut depolama</string>
     <!-- Label to reference a recents section -->
-    <string name="section_recents">Son Etkinlikler</string>
+    <string name="section_recents">Son etkinlikler</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Medya Yüklemeleri</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
@@ -198,7 +198,7 @@
     <!-- title of the screen that shows all the shared items -->
     <string name="title_shared_items">Paylaşılan öğeler</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
-    <string name="section_rubbish_bin">Çöp Kutusu</string>
+    <string name="section_rubbish_bin">Çöp kutusu</string>
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
     <string name="section_contacts">Kişiler</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
@@ -338,7 +338,7 @@
     <!-- menu item -->
     <string name="context_send_file">Sohbete dosya gönder</string>
     <!-- menu item -->
-    <string name="context_send_contact">Sohbet etmek için kişiyi paylaş</string>
+    <string name="context_send_contact">Kişiyi sohbette paylaş</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_sharing_folder">Paylaşılıyor</string>
     <!-- Menu option to manage a shared folder. -->
@@ -596,7 +596,7 @@
     <string name="pin_lock_enter">Girin</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
-        <item quantity="one">%1$d başarısız şifre denemesi</item>
+        <item quantity="one">%1$d başarısız giriş kodu denemesi</item>
         <item quantity="other">%1$d başarısız giriş kodu denemesi</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
@@ -644,9 +644,9 @@
     <!-- category in sort by action -->
     <string name="sortby_size">Boyut</string>
     <!-- sort files by size largest first -->
-    <string name="sortby_size_largest_first">En büyük</string>
+    <string name="sortby_size_largest_first">Boyutça en büyük</string>
     <!-- sort files by size smallest first -->
-    <string name="sortby_size_smallest_first">En küçük</string>
+    <string name="sortby_size_smallest_first">Boyutça en küçük</string>
     <!-- sort option, sort media files by photos first -->
     <string name="sortby_type_photo_first">Fotoğraflar</string>
     <!-- sort option, sort media files by videos first -->
@@ -1090,8 +1090,8 @@
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
-        <item quantity="one">%1$d dosya zaten yüklendi</item>
-        <item quantity="other">%1$d dosya zaten yüklendi</item>
+        <item quantity="one">%1$d dosya zaten yüklenmiş</item>
+        <item quantity="other">%1$d dosya zaten yüklenmiş</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Toplam boyut: %1$s</string>
@@ -1443,7 +1443,7 @@
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Şununla paylaş</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[B]Çöp kutusu [/B][A]Boş[/A]</string>
+    <string name="context_empty_rubbish_bin">[B]Çöp kutusu [/B][A]boş[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Bulup depolamanızda [/B][A]dosya yok[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1652,7 +1652,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(beklemede)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">Gönderilen bağlantı önizlemelerini etkinleştir</string>
+    <string name="option_enable_chat_rich_preview">Gönderilen bağlantı ön izlemelerini etkinleştir</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">Her zaman izin ver</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -1660,7 +1660,7 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">Asla</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">Gönderilen bağlantı önizlemelerini etkinleştir</string>
+    <string name="title_enable_rich_links">Gönderilen bağlantı ön izlemelerini etkinleştir</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
     <string name="text_enable_rich_links">Sohbet içinde gönderdiğiniz belirli bağlantılar için, mevcut olduğunda ön izlemeler oluşturur. Bu ön izlemelerin alınmasının sıfır bilgi şifrelemesi ile korunmadığını unutmayın.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
@@ -1681,7 +1681,7 @@
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[B]Klasör[/B][A] boş[/A]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
-    <string name="type_message_hint_with_customized_title">“%s” grubuna mesaj yaz&#8230;</string>
+    <string name="type_message_hint_with_customized_title">“%s” ile mesajlaş&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
     <string name="settings_2fa">İki faktörlü kimlik doğrulama</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
@@ -1914,7 +1914,7 @@
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="subtitle_read_only_permissions">Salt okunur</string>
     <!-- Label shown the total space and the used space in an account -->
-    <string name="used_space">[A]%2$s alanın [/A][B]%1$s kadarı kullanılıyor[/B]</string>
+    <string name="used_space">[A]%2$s alanın [/A][B]%1$s’si kullanılıyor[/B]</string>
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
     <string name="staging_api_url_text">Bir test sunucusuna geçmek istediğinizden emin misiniz? Hesabınızda kurtarılamaz sorunlar yaşanabilir.</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
@@ -1940,7 +1940,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Sıkıştırılacak videoların boyutu şundan büyükse</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Otomatik çöp Kutusu boşaltmayı devre dışı bırakmak veya daha uzun bir saklama süresi ayarlamak için planlarımızdan birine abone olmanız gerekir.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Otomatik Çöp kutusu boşaltmayı devre dışı bırakmak veya daha uzun bir saklama süresi ayarlamak için planlarımızdan birine abone olmanız gerekir.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">gün</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2008,7 +2008,7 @@
     <!-- Subtitle of the historic notification for a reminder new contact request -->
     <string name="notification_reminder_contact_request">[A]Hatırlatma: [/A][B]%s [/B][C]kişilerinize eklenmek için size istek gönderdi.[/C]</string>
     <!-- Title of the historic notification for a contact request cancelled -->
-    <string name="title_contact_request_notification_cancelled">Kişi talebi iptal edildi</string>
+    <string name="title_contact_request_notification_cancelled">Kişi isteği iptal edildi</string>
     <!-- Subtitle of the historic notification for contact request cancelled -->
     <string name="subtitle_contact_request_notification_cancelled">[A]%s [/A][B]kişilerinize eklenme isteğini iptal etti.[/B]</string>
     <!-- Title of the historic notification when an user deletes you as contact -->
@@ -2320,7 +2320,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">MEGA\’nın şifreli sohbeti ile kişilerinizi davet edin ve güvenli bir şekilde sohbet etmeye başlayın.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Merhaba, MEGA\’da bana katılın ve ücretsiz, güvenli, şifreli depolama ve iletişimin keyfini çıkarın. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Merhaba, MEGA\’da bana katılın ve ücretsiz, güvenli bir şekilde şifrelenmiş depolama ve iletişimin keyfini çıkarın. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Sohbet bağlantısı yok.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2342,7 +2342,7 @@
     <!-- Title of the create account screen -->
     <string name="create_account_title">MEGA hesabı oluşturun</string>
     <!-- Label to reference a recents section -->
-    <string name="recents_label">Son Etkinlikler</string>
+    <string name="recents_label">Son etkinlikler</string>
     <!-- Label to reference a chats section -->
     <string name="chats_label">Sohbetler</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
@@ -2697,15 +2697,15 @@
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
     <string name="files_required_permissions_warning">MEGA\’nın, paylaşım için dosyalarınıza erişmek üzere izninize ihtiyacı var.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
-    <string name="file_properties_favourite">Favorilere ekle</string>
+    <string name="file_properties_favourite">Favori</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Favorilerden kaldır</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Etiketle</string>
+    <string name="file_properties_label">İşaret</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Etiketi kaldır</string>
     <!-- Title text to show label selector. -->
-    <string name="title_label">Etiket</string>
+    <string name="title_label">İşaret</string>
     <!-- A user can mark a folder or file with red colour. -->
     <string name="label_red">Kırmızı</string>
     <!-- A user can mark a folder or file with orange colour. -->
@@ -2769,7 +2769,7 @@
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">Dosya güncellenemedi. Lütfen tekrar deneyin.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
-    <string name="error_opening_file">Dosya çok büyük olduğundan açılamaz ve önizlenemez.</string>
+    <string name="error_opening_file">Dosya çok büyük olduğundan açılamaz ve ön izlenemez.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
     <string name="file_without_extension">Uzantısız dosya (.%1$s)</string>
     <!-- Error shown when the user writes a file name without extension -->
@@ -2816,13 +2816,13 @@
     <string name="warning_share_owner_storage_quota">Hedef kullanıcının depolama kotası aşıldığı için dosya gönderilemiyor.</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 öğe Çöp Kutusuna taşındı ancak diğeri taşınamadı. Lütfen daha sonra tekrar deneyin.</item>
-        <item quantity="other">1 öğe Çöp Kutusuna taşındı ancak %d öğe taşınamadı. Lütfen daha sonra tekrar deneyin.</item>
+        <item quantity="one">1 öğe Çöp kutusuna taşındı ancak diğeri taşınamadı. Lütfen daha sonra tekrar deneyin.</item>
+        <item quantity="other">1 öğe Çöp kutusuna taşındı ancak %d öğe taşınamadı. Lütfen daha sonra tekrar deneyin.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">%d öğe Çöp Kutusuna taşındı ancak diğeri taşınamadı. Lütfen daha sonra tekrar deneyin.</item>
-        <item quantity="other">%d öğe Çöp Kutusuna taşındı ancak 1 öğe taşınamadı. Lütfen daha sonra tekrar deneyin.</item>
+        <item quantity="one">%d öğe Çöp kutusuna taşındı ancak diğeri taşınamadı. Lütfen daha sonra tekrar deneyin.</item>
+        <item quantity="other">%d öğe Çöp kutusuna taşındı ancak 1 öğe taşınamadı. Lütfen daha sonra tekrar deneyin.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
@@ -2836,13 +2836,13 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">%d öğe Çöp Kutusuna taşındı</item>
-        <item quantity="other">%d öğe Çöp Kutusuna taşındı</item>
+        <item quantity="one">%d öğe Çöp kutusuna taşındı</item>
+        <item quantity="other">%d öğe Çöp kutusuna taşındı</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">%d öğe Çöp Kutusuna taşınamadı</item>
-        <item quantity="other">%d öğe Çöp Kutusuna taşınamadı</item>
+        <item quantity="one">%d öğe Çöp kutusuna taşınamadı</item>
+        <item quantity="other">%d öğe Çöp kutusuna taşınamadı</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
@@ -3104,7 +3104,7 @@
     <!-- Title of the menu when the select tracks on playlist page-->
     <string name="title_select_tracks">Parçaları seç</string>
     <!-- Action button to upload files. -->
-    <string name="upload_files">Dosyaları yükle</string>
+    <string name="upload_files">Dosya yükle</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Klasör yükle</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
@@ -3527,7 +3527,7 @@
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">Galeri görünümü</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Yalnızca görüntü veya video içeren klasörleri görsel bir ızgarada açın. Ortamı küçük resimlere göre gezinin ve tarihe göre filtreleyin.</string>
+    <string name="settings_media_discovery_view_context">Yalnızca görüntü veya video içeren klasörleri ızgara görünümünde açın. Ortamı küçük resimlere göre gezinin ve tarihe göre filtreleyin.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
     <string name="cloud_drive_media_discovery_banner_context">Bu klasör yalnızca görüntü ve video içerdiği için otomatik olarak galeri görünümünde açtık. Görsel içeriğinizin keyfini daha sürükleyici bir düzende çıkarabilirsiniz. Bunu Ayarlar\’dan devre dışı bırakabilirsiniz.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
@@ -4342,7 +4342,7 @@
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Ses</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_title_choose_right_plan">Kendiniz için doğru planı seçin</string>
+    <string name="account_upgrade_account_title_choose_right_plan">Kendinize uygun olan planı seçin</string>
     <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_tab_monthly">Aylık</string>
     <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -4372,7 +4372,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite\’da 90 güne kadar, Pro&#160;I, II ve III\’de ise 180 güne kadar silinen verileri geri sarma</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Çöp kutusu temizliğini 7 gün ile 10 yıl arasında planlayın</string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Çöp kutusu temizliğini 7 gün ila 10 yıl arasında planlayın</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">Pro&#160;Lite satın al</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->

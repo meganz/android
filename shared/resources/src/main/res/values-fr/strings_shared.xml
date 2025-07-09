@@ -858,8 +858,8 @@
     <string name="document_scanning_settings_non_matching_file_extension_error_message">L\’extension de fichier ne correspond pas au type de fichier</string>
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Une extension de fichier est nécessaire</string>
-    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">Pour prévisualiser ce fichier, MEGA doit le télécharger. %1$s sera téléchargé.</string>
+    <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">MEGA récupérera une copie temporaire de ce fichier afin que vous puissiez le prévisualiser. Il ne sera ni enregistré ni disponible en dehors de l\’application. %1$s sera téléchargé.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Finalisation de l\’opération&#160;: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -973,7 +973,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Confirmation par courriel</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">Nous avons envoyé un e-mail à [P]%s[/P] avec un lien. Cliquez sur le lien pour vérifier votre adresse e-mail et activer votre compte. \n\nSi vous n\’avez pas reçu l\’e-mail, vérifiez votre dossier spam ou réessayez. Pour tout autre problème, veuillez consulter notre [A]%s[/A].</string>
+    <string name="email_confirmation_content">Nous avons envoyé un e-mail à [P]%s[/P] contenant un lien. Cliquez sur le lien pour vérifier votre adresse e-mail et activer votre compte. \n\nSi vous n\’avez pas reçu l\’e-mail, vérifiez votre dossier spam ou réessayez. Pour toute autre question, veuillez consulter notre [A]Centre d\’assistance[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Renvoyer</string>
     <!-- General change email address -->
@@ -1223,7 +1223,7 @@
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">Les abonnements sont renouvelés automatiquement pour des périodes d\’abonnement successives de même durée et au même prix que la période initiale choisie.\n\nVous pouvez résilier votre abonnement à tout moment, mais au plus tard 24 heures avant la date d\’échéance de votre prochain abonnement. [A]Apprenez à gérer votre abonnement dans vos paramètres[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]Conditions d\’utilisation et politique de confidentialité[/A]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]Conditions générales d\’utilisation[/A] et [B]Politique de confidentialité[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">Obtenir davantage avec un abonnement Pro</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1318,4 +1318,40 @@
     <string name="transfers_resume_all_button">Tout reprendre</string>
     <!-- Sync over quota warning title -->
     <string name="sync_storage_over_quota_warning_title">La synchronisation est interrompue. Votre abonnement MEGA est à court d\’espace de stockage</string>
+    <!-- Label for contacts -->
+    <string name="general_section_contacts">Contacts</string>
+    <!-- Label for achievements -->
+    <string name="general_section_achievements">Objectifs</string>
+    <!-- Label for device centre -->
+    <string name="general_section_device_centre">Centre des appareils</string>
+    <!-- Label for transfers -->
+    <string name="general_section_transfers">Transferts</string>
+    <!-- Label for offline files -->
+    <string name="general_section_offline_files">Fichiers hors ligne</string>
+    <!-- Label for rubbish bin -->
+    <string name="general_section_rubbish_bin">Corbeille</string>
+    <!-- Subtitle for VPN -->
+    <string name="menu_item_vpn_subtitle">VPN haute vitesse</string>
+    <!-- Subtitle for MEGA PASS -->
+    <string name="menu_item_mega_pass_subtitle">Stockez vos mots de passe en toute sécurité et remplissez-les automatiquement</string>
+    <!-- Subtitle for transfer.it -->
+    <string name="menu_item_transfer_it_subtitle">Transferts de fichiers rapides et sécurisés</string>
+    <!-- Label for transfer it -->
+    <string name="general_section_transfer_it">Transfer.it</string>
+    <!-- Label for Menu -->
+    <string name="general_menu">Menu</string>
+    <!-- Connection type option in Sync Settings Screen -->
+    <string name="settings_sync_connection_type_title">Connection type</string>
+    <!-- The camera uploads notification title to reminder the camera uploads paused-->
+    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <!-- The camera uploads notification content to reminder there is no wifi connection-->
+    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <!-- The camera uploads notification action text to allow mobile data-->
+    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <!-- Alert title before download a big file for preview. -->
+    <string name="alert_larger_file_preview_title">Prévisualisation du fichier volumineux</string>
+    <!-- Alert confirm button before download a big file for preview -->
+    <string name="alert_larger_file_preview_confirm_button">Prévisualiser maintenant</string>
+    <!-- Alert always allow button before download a big file for preview -->
+    <string name="alert_larger_file_preview_always_allow_button">Toujours autoriser les prévisualisations</string>
 </resources>

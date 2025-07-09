@@ -877,7 +877,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">Đảo Bảo Bí Mật</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">Bạn hiện có đăng&#160;nhập vào một tài&#160;khoản MEGA khác. Hãy đăng&#160;xuất và mở lại đường liên&#160;kết để đặt lại mật&#160;khẩu.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">Đường liên kết này đã hết hạn, xin thử lạI cái khác.</string>
     <!-- Text shown after searching and no results found -->
@@ -1362,7 +1362,7 @@
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
     <string name="save_cloud_drive">Tới Ổ&#160;Mây</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
-    <string name="save_file_system">Vào file system</string>
+    <string name="save_file_system">Vào hệ&#160;thống tệp</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Bất cứ ai có tài khoản MEGA quét mã ảnh QR này sẽ được tự động thêm vào danh sách tên liên lạc của bạn.</string>
     <!-- Text shown when it has been copied the QR code link -->
@@ -1623,7 +1623,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Bật xem trước đường liên kết đã gửi</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generates previews for certain links you send in chat, when available. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">Tạo bản xem trước của các đường liên&#160;kết bạn gửi trong chat lúc khả&#160;thi. Lưu&#160;ý rằng việc truy&#160;xuất các bản xem trước này không có được bảo&#160;vệ bởi mã&#160;hóa vô kiến&#160;thức.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Xin đặt một mật khẩu mạnh hơn</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2359,7 +2359,7 @@
     <!-- Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts -->
     <string name="contacts_sent">Đã gửi %s tên liên&#160;lạc.</string>
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
-    <string name="my_chat_files_folder">Tệp đã gửi trong chát</string>
+    <string name="my_chat_files_folder">Các tệp trong chat của tôi</string>
     <!-- Error shown when it was not possible to create a folder for any reason -->
     <string name="error_creating_folder">Lỗi. Thư mục %1$s chưa được tạo</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
@@ -3189,7 +3189,7 @@
     <!-- Informs about what is expected after choose the option move and merge for a name collision. -->
     <string name="warning_move_and_merge">Hợp nhất thư mục ở vị trí này với thư mục bạn đang muốn chuyển vào sau đây.</string>
     <!-- Move and merge action button for a name collision. -->
-    <string name="move_and_merge">Chuyển vào và hợp lại</string>
+    <string name="move_and_merge">Chuyển vào và hợp nhất</string>
     <!-- Informs about what is expected after choose the option upload and merge for a name collision. -->
     <string name="warning_upload_and_merge">Hợp nhất thư mục của vị trí này với thư mục đang được đăng tải lên.</string>
     <!-- Upload and merge action button for a name collision. -->
@@ -3353,7 +3353,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]Không có tệp tin nào trong [/B][A]sao lưu dự phòng[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">Đây là thư mục chứa các tệp tin và thư mục đã được sao lưu dự phòng. Các mục lưu dự phòng là dạng “chỉ-được-xem” để phòng tránh bị chỉnh sửa trong Ổ&#160;Mây của bạn.Bạn có thể lưu dự phòng dữ liệu của mình từ máy tính lên MEGA bằng cách sử dụng App MEGA cho Máy&#160;Tính.</string>
+    <string name="backups_empty_state_body">Đây là thư mục chứa các tệp tin và thư mục đã được sao lưu dự phòng. Các mục lưu dự phòng là dạng “chỉ-được-xem” để phòng tránh bị chỉnh sửa trong Ổ&#160;Mây của bạn.\nBạn có thể lưu dự phòng dữ liệu của mình từ máy tính lên MEGA bằng cách sử dụng App MEGA cho Máy&#160;Tính.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong.\nKiểm&#160;tra hộp thư email của quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;cáo.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -3439,9 +3439,9 @@
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">Xem kiểu triển&#160;lãm</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
+    <string name="settings_media_discovery_view_context">Mở thư&#160;mục chỉ có chứa hình&#160;ảnh hoặc video trong giao&#160;diện khuôn lưới trực&#160;quan. Duyệt phương&#160;tiện số ở dạng hình thu nhỏ và xếp lọc theo ngày.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in gallery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Bởi vì thư&#160;mục này chỉ có chứa hoàn&#160;toàn là hình&#160;ảnh và videos, chúng&#160;tôi đã tự&#160;động đặt Xem kiểu triển&#160;lãm. Giúp bạn trải&#160;nghiệm nội&#160;dung hình&#160;ảnh của mình với bố&#160;cục sống&#160;động hơn. Tính&#160;năng này có thể tắt đi trong Thiết&#160;Đặt.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Thiết Đặt</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4485,9 +4485,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Nguyên gốc</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Gallery view in subfolders</string>
+    <string name="settings_media_discovery_sub_folder_title">Xem kiểu triển&#160;lãm trong các thư&#160;mục con</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in gallery view</string>
+    <string name="settings_media_discovery_sub_folder_context">Hình&#160;ảnh và video từ bên trong các thư&#160;mục con sẽ được bao gồm trong xem kiểu triển&#160;lãm</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Không có kết&#160;quả</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4565,7 +4565,7 @@
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
     <string name="meetings_call_recording_stopped_snackbar_message">%1$s đã chấm&#160;dứt ghi âm hình</string>
     <!-- Name of the Gallery item in the attachment panel, in chat, for attaching files from Gallery -->
-    <string name="chat_attach_panel_gallery">Thư Viện Phim Ảnh</string>
+    <string name="chat_attach_panel_gallery">Kho ảnh</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Không&#160;có quảng&#160;cáo</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
@@ -4623,7 +4623,7 @@
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Chi&#160;tiết gói đăng&#160;ký</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
-    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Cho phép truy&#160;cập vào Thư&#160;viện Hình&#160;ảnh của bạn</string>
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Cho phép truy&#160;cập vào Kho&#160;ảnh của bạn</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Cho phép quyền truy&#160;cập</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
@@ -4745,9 +4745,9 @@
     <!-- Search drop down chips filter type file type videos -->
     <string name="search_dropdown_chip_filter_type_file_type_video">Video</string>
     <!-- Search drop down chips filter type file type audio -->
-    <string name="search_dropdown_chip_filter_type_file_type_audio">Thoại</string>
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Âm thanh</string>
     <!-- Search drop down chips filter type file type documents -->
-    <string name="search_dropdown_chip_filter_type_file_type_documents">Tài Liệu</string>
+    <string name="search_dropdown_chip_filter_type_file_type_documents">Tài liệu</string>
     <!-- Search drop down chips filter type date added -->
     <string name="search_dropdown_chip_filter_type_date_added">Ngày đã thêm</string>
     <!-- Search drop down chips filter type last modified -->
@@ -4811,7 +4811,7 @@
     <!-- Image or Video no map location info-->
     <string name="file_properties_info_map_location_no_location_info">Không có thông&#160;tin vị&#160;trí</string>
     <!-- Logout warning dialog title if user has offline files or transfers in progress -->
-    <string name="logout_warning_dialog_title">Việc đăng&#160; xuất ngsy bây giờ sẽ làm mất đi&#160;dữ liệu</string>
+    <string name="logout_warning_dialog_title">Việc đăng&#160; xuất ngay bây giờ sẽ làm mất đi&#160;dữ liệu</string>
     <!-- Logout warning dialog positive button text -->
     <string name="logout_warning_dialog_positive_button">Vẫn cứ đăng xuất</string>
     <!-- Logout warning dialog message if offline files exists -->

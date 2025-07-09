@@ -832,8 +832,8 @@
     <string name="document_scanning_settings_non_matching_file_extension_error_message">파일 확장자가 파일 형식과 일치하지 않습니다</string>
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">파일 확장자가 필요합니다</string>
-    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">이 파일을 미리 보려면, MEGA가 다운로드 하여야 합니다. %1$s를/을 다운로드할 것입니다.</string>
+    <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">MEGA will fetch a temporary copy of this file so you can preview it. It won’t be saved or available outside the app. %1$s will be downloaded.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">작업 완료 중: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -941,7 +941,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">이메일 확인</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">우리가 [P]%s[/P]로 링크가 있는 이메일을 보냈습니다. 당신의 이메일 주소를 확인하고 계정을 활성화하려면 링크를 탭하세요.\n\n만약 이메일을 받지 못 했다면 스팸 폴더를 확인하거나 다시 시도하세요. 다른 문제가 있다면 [A]%s[/A]에 방문하세요.</string>
+    <string name="email_confirmation_content">우리가 [P]%s[/P]로 링크가 있는 이메일을 보냈습니다. 당신의 이메일 주소를 확인하고 계정을 활성화하려면 링크를 탭하세요.\n\n만약 이메일을 받지 못 했다면 스팸 폴더를 확인하거나 다시 시도하세요. 다른 문제가 있다면 [A]고객센터[/A]에 방문하세요.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">재발송</string>
     <!-- General change email address -->
@@ -1191,7 +1191,7 @@
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">구독은 처음 선택한 기간과 같은 구독 기간 그리고 같은 가격으로 연속적으로 자동 갱신됩니다.\n\n요금제 구독은 다음 결제일 24시간 전까지 언제든 취소할 수 있습니다. [A]설정에서 구독을 관리하는 방법에 대해 더 알아보세요[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]이용 약관과 개인정보 처리 방침[/A]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]이용 약관[/A]과 [B]개인정보 처리 방침[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">Pro 요금제로 더 받기</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1207,7 +1207,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
     <string name="choose_account_screen_transfer_quota_label">%1$s 전송</string>
     <!-- General month label -->
-    <string name="general_month">/month</string>
+    <string name="general_month">/월</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">매달 %1$s</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
@@ -1269,13 +1269,13 @@
     <!-- Label for the current plan badge in the pro plan card -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">현재 요금제</string>
     <!-- Error message when achievements status is unavailable -->
-    <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
+    <string name="achievement_status_unavailable">지금 도전 과제의 진행 상황을 볼 수 없습니다. 나중에 다시 시도하세요.</string>
     <!-- Warning indicating that the transfer quota limit has been reached -->
     <string name="transfers_transfer_quota_banner_title">더 많은 전송 할당량 받기</string>
     <!-- Warning indicating that the storage quota limit has been reached -->
-    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <string name="transfers_storage_quota_banner_title">더 많은 저장소 할당량 받기</string>
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
-    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <string name="transfers_storage_and_transfer_quota_banner_title">더 많은 저장소와 전송 할당량 받기</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">고객센터</string>
     <!-- Warning informing the transfers queue has been paused -->
@@ -1284,4 +1284,40 @@
     <string name="transfers_resume_all_button">모두 재개</string>
     <!-- Sync over quota warning title -->
     <string name="sync_storage_over_quota_warning_title">당신의 MEGA 요금제의 저장소를 다 써서, 동기화가 일시정지 되었습니다</string>
+    <!-- Label for contacts -->
+    <string name="general_section_contacts">연락처</string>
+    <!-- Label for achievements -->
+    <string name="general_section_achievements">도전 과제</string>
+    <!-- Label for device centre -->
+    <string name="general_section_device_centre">장치 센터</string>
+    <!-- Label for transfers -->
+    <string name="general_section_transfers">전송</string>
+    <!-- Label for offline files -->
+    <string name="general_section_offline_files">오프라인 파일</string>
+    <!-- Label for rubbish bin -->
+    <string name="general_section_rubbish_bin">휴지통</string>
+    <!-- Subtitle for VPN -->
+    <string name="menu_item_vpn_subtitle">고속 VPN</string>
+    <!-- Subtitle for MEGA PASS -->
+    <string name="menu_item_mega_pass_subtitle">암호를 안전하게 저장하고 자동 완성</string>
+    <!-- Subtitle for transfer.it -->
+    <string name="menu_item_transfer_it_subtitle">빠르고, 안전한 파일 전송</string>
+    <!-- Label for transfer it -->
+    <string name="general_section_transfer_it">Transfer.it</string>
+    <!-- Label for Menu -->
+    <string name="general_menu">메뉴</string>
+    <!-- Connection type option in Sync Settings Screen -->
+    <string name="settings_sync_connection_type_title">Connection type</string>
+    <!-- The camera uploads notification title to reminder the camera uploads paused-->
+    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <!-- The camera uploads notification content to reminder there is no wifi connection-->
+    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <!-- The camera uploads notification action text to allow mobile data-->
+    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <!-- Alert title before download a big file for preview. -->
+    <string name="alert_larger_file_preview_title">Previewing large file</string>
+    <!-- Alert confirm button before download a big file for preview -->
+    <string name="alert_larger_file_preview_confirm_button">Preview now</string>
+    <!-- Alert always allow button before download a big file for preview -->
+    <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
 </resources>

@@ -57,7 +57,7 @@
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="general_sync_message_unknown_error">Bilinmeyen bir hata oluştu. Lütfen support@mega.nz ile iletişime geçin.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="general_sync_message_node_in_rubbish_bin">MEGA klasörü Çöp Kutusu\’nda olduğu için klasör senkronize edilemez veya yedeklenemez</string>
+    <string name="general_sync_message_node_in_rubbish_bin">MEGA klasörü Çöp kutusunda olduğu için klasör senkronize edilemez veya yedeklenemez</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="general_sync_message_cannot_locate_local_drive_now">Cihazınızdaki klasör şu anda bulunamıyor. Lütfen daha sonra tekrar deneyin.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
@@ -85,7 +85,7 @@
     <!-- Search drop down chips filter type file type images -->
     <string name="search_dropdown_chip_filter_type_file_type_images">Görüntüler</string>
     <!-- Search drop down chips filter type file type videos -->
-    <string name="search_dropdown_chip_filter_type_file_type_video">Videolar</string>
+    <string name="search_dropdown_chip_filter_type_file_type_video">Video</string>
     <!-- Search drop down chips filter type file type audio -->
     <string name="search_dropdown_chip_filter_type_file_type_audio">Ses</string>
     <!-- Search drop down chips filter type file type documents -->
@@ -834,7 +834,7 @@
     <!-- Label for the button or menu option to add a new backup -->
     <string name="device_center_sync_add_new_backup_button_option">Yeni yedekleme ekle</string>
     <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
-    <string name="transfers_notification_title_preview_download">“%1$s” önizlemeye hazır</string>
+    <string name="transfers_notification_title_preview_download">“%1$s” ön izlemeye hazır</string>
     <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
     <string name="transfers_notification_preview_action">Ön izle</string>
     <!-- Title for the OS dialog shown with available apps to open a file -->
@@ -845,8 +845,8 @@
     <string name="document_scanning_settings_non_matching_file_extension_error_message">Dosya uzantısı dosya türüyle eşleşmiyor</string>
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Dosya uzantısı gerekli</string>
-    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">Bu dosyayı önizlemek için MEGA\’nın onu indirmesi gerekiyor. %1$s indirilecek.</string>
+    <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">MEGA, ön izleyebilmeniz için bu dosyanın geçici bir kopyasını alacaktır. Bu kopya kaydedilmeyecek veya uygulama dışında kullanılamayacaktır. %1$s indirilecektir.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">İşlem tamamlanıyor: %%%1$d</string>
     <!-- Add to album files existed message -->
@@ -870,7 +870,7 @@
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
     <string name="transfers_preview_paused_dialog_title">Aktarımlar duraklatıldı</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">“%1$s” dosyasını önizlemek için duraklatılmış aktarımlara devam etmeniz gerekecek</string>
+    <string name="transfers_preview_paused_dialog_text">“%1$s” dosyasını ön izlemek için duraklatılmış aktarımlara devam etmeniz gerekecek</string>
     <!--SD Card text shown as title in FileStorage screen -->
     <string name="general_sd_card">SD kart</string>
     <!--The title of the Login page-->
@@ -957,7 +957,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">E-posta onayı</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">[P]%s[/P] adresine bağlantı içeren bir e-posta gönderdik. E-posta adresinizi doğrulamak ve hesabınızı etkinleştirmek için bağlantıya dokunun. \n\nE-postayı almadıysanız, spam klasörünüzü kontrol edin veya tekrar deneyin. Diğer tüm sorunlar için lütfen [A]%s[/A] adresini ziyaret edin.</string>
+    <string name="email_confirmation_content">[P]%s[/P] adresine bağlantı içeren bir e-posta gönderdik. E-posta adresinizi doğrulamak ve hesabınızı etkinleştirmek için bağlantıya dokunun. \n\nE-postayı almadıysanız, spam klasörünüzü kontrol edin veya tekrar deneyin. Diğer tüm sorunlar için lütfen [A]Yardım Merkezimizi[/A] ziyaret edin.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Yeniden gönder</string>
     <!-- General change email address -->
@@ -1033,7 +1033,7 @@
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_title">Ön izleme iptal edilsin mi?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_text">Artık bu dosyayı önizleyemeyeceksiniz</string>
+    <string name="transfers_cancel_preview_download_warning_text">Artık bu dosyayı ön izleyemeyeceksiniz</string>
     <!-- Warning text informing that a file preview failed to load. -->
     <string name="transfers_fake_preview_screen_general_error">Ön izleme yüklenemedi, lütfen tekrar deneyin</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
@@ -1073,7 +1073,7 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">Dosyaları ve klasörleri gizle</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Bulut depolamanızdaki hassas dosyaları kolayca gizli ve gözden uzak tutun. Varsayılan olarak, gizli dosyalar bulut depolamanızda, Fotoğraflar ve Son Etkinlikler bölümünde görünmez.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Bulut depolamanızdaki hassas dosyaları kolayca gizli ve gözden uzak tutun. Varsayılan olarak, gizli dosyalar bulut depolamanızda, Fotoğraflar ve Son etkinlikler bölümünde görünmez.</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">Görünürlüğü kolayca kontrol edin</string>
     <!-- Hidden nodes description: control visibility feature -->
@@ -1199,7 +1199,7 @@
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
     <string name="pro_plan_benefit_host_calls_unlimited">Sınırsız katılımcıyla ve zaman kısıtlaması olmadan arama ve toplantı düzenleyin</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
-    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Çöp kutusu temizliğini 7 gün ile 10 yıl arasında planlayın</string>
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Çöp kutusu temizliğini 7 gün ila 10 yıl arasında planlayın</string>
     <!-- Benefit: Priority support -->
     <string name="pro_plan_benefit_priority_support">Öncelikli destek</string>
     <!-- Subscription page information section title at the bottom of the page-->
@@ -1207,7 +1207,7 @@
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">Abonelikler, seçilen ilk dönemle aynı süredeki ardışık abonelik dönemleri için otomatik olarak yenilenir.\n\nPlan aboneliğinizi istediğiniz zaman, ancak bir sonraki abonelik ödemenizin vadesinden en geç 24 saat önce iptal edebilirsiniz. [A]Ayarlarınızdan aboneliğinizi nasıl yöneteceğinizi öğrenin[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]Hizmet Şartları ve Gizlilik Politikası[/A]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]Hizmet Şartları[/A] ve [B]Gizlilik Politikası[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">Pro planıyla daha fazlasını elde edin</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1298,7 +1298,43 @@
     <!-- Warning informing the transfers queue has been paused -->
     <string name="transfers_all_transfers_paused_warning">Tüm transferler duraklatıldı</string>
     <!-- Button for resuming the transfers queue -->
-    <string name="transfers_resume_all_button">Resume all</string>
+    <string name="transfers_resume_all_button">Tümünü devam ettir</string>
     <!-- Sync over quota warning title -->
     <string name="sync_storage_over_quota_warning_title">Senkronizasyon duraklatıldı, MEGA planınızın depolama alanı doldu</string>
+    <!-- Label for contacts -->
+    <string name="general_section_contacts">Kişiler</string>
+    <!-- Label for achievements -->
+    <string name="general_section_achievements">Başarılar</string>
+    <!-- Label for device centre -->
+    <string name="general_section_device_centre">Cihaz merkezi</string>
+    <!-- Label for transfers -->
+    <string name="general_section_transfers">Aktarımlar</string>
+    <!-- Label for offline files -->
+    <string name="general_section_offline_files">Çevrim dışı dosyalar</string>
+    <!-- Label for rubbish bin -->
+    <string name="general_section_rubbish_bin">Çöp kutusu</string>
+    <!-- Subtitle for VPN -->
+    <string name="menu_item_vpn_subtitle">Yüksek hızlı VPN</string>
+    <!-- Subtitle for MEGA PASS -->
+    <string name="menu_item_mega_pass_subtitle">Şifrelerinizi güvenli bir şekilde saklayın ve otomatik olarak doldurun</string>
+    <!-- Subtitle for transfer.it -->
+    <string name="menu_item_transfer_it_subtitle">Hızlı ve güvenli dosya transferleri</string>
+    <!-- Label for transfer it -->
+    <string name="general_section_transfer_it">Transfer.it</string>
+    <!-- Label for Menu -->
+    <string name="general_menu">Menü</string>
+    <!-- Connection type option in Sync Settings Screen -->
+    <string name="settings_sync_connection_type_title">Bağlantı şekli</string>
+    <!-- The camera uploads notification title to reminder the camera uploads paused-->
+    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <!-- The camera uploads notification content to reminder there is no wifi connection-->
+    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <!-- The camera uploads notification action text to allow mobile data-->
+    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <!-- Alert title before download a big file for preview. -->
+    <string name="alert_larger_file_preview_title">Büyük dosyanın ön izlemesi</string>
+    <!-- Alert confirm button before download a big file for preview -->
+    <string name="alert_larger_file_preview_confirm_button">Hemen ön izle</string>
+    <!-- Alert always allow button before download a big file for preview -->
+    <string name="alert_larger_file_preview_always_allow_button">Ön izlemelere her zaman izin ver</string>
 </resources>

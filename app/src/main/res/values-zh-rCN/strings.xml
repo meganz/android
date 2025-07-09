@@ -877,7 +877,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">保密性</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">你登录了另一个MEGA帐户。请登出后再次打开密码重置链接。</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">此取消链接已过期，请再试一次。</string>
     <!-- Text shown after searching and no results found -->
@@ -1623,7 +1623,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">启用链接发送预览</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generates previews for certain links you send in chat, when available. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">为你在聊天中发送的某些链接生成预览，如果有的话。请注意，检索这些预览不受零知识加密的保护。</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">请输入一个较强的密码</string>
     <!-- title of the notification for an acceptance of a contact request -->

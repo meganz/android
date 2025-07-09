@@ -871,8 +871,8 @@
     <string name="document_scanning_settings_non_matching_file_extension_error_message">Plik nie pasuje do typu pliku</string>
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Potrzebne jest rozszerzenie pliku</string>
-    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">Aby wyświetlić podgląd tego pliku, MEGA musi go pobrać. %1$s zostanie pobrany.</string>
+    <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">MEGA pobierze tymczasową kopię tego pliku, abyś mógł go podejrzeć. Nie zostanie on zapisany ani dostępny poza aplikacją. %1$s zostanie pobrany.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Zakończenie operacji: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -989,7 +989,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Potwierdzenie e-mail</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">Wysłaliśmy email na [P]%s[/P] z linkiem. Kliknij link, aby zweryfikować swój adres email i aktywować konto. \n\nJeśli nie otrzymałeś emaila, sprawdź katalog ze spamem lub spróbuj ponownie. W przypadku jakichkolwiek innych problemów, odwiedź naszą [A]%s[/A].</string>
+    <string name="email_confirmation_content">Wysłaliśmy email na [P]%s[/P] z linkiem. Kliknij link, aby zweryfikować swój adres email i aktywować konto. \n\nJeśli nie otrzymałeś emaila, sprawdź katalog ze spamem lub spróbuj ponownie. W przypadku jakichkolwiek innych problemów, odwiedź naszą [A]centrum pomocy[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Wyślij ponownie</string>
     <!-- General change email address -->
@@ -1239,7 +1239,7 @@
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">Subskrypcje są odnawiane automatycznie na kolejne okresy subskrypcji o tej samej długości i w tej samej cenie, co wybrany początkowy okres.\n\nMożesz anulować subskrypcję planu w dowolnym momencie, ale nie później niż 24 godziny przed terminem następnej płatności za subskrypcję. [A]Dowiedz się, jak zarządzać swoją subskrypcją w ustawieniach[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]Regulamin i Polityka prywatności[/A]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]Regulamin[/A] i [B]Polityka prywatności[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">Zyskaj więcej dzięki planowi Pro</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1335,4 +1335,40 @@
     <string name="transfers_resume_all_button">Wznów wszystko</string>
     <!-- Sync over quota warning title -->
     <string name="sync_storage_over_quota_warning_title">Synchronizacja wstrzymana, Twój plan MEGA wyczerpał pojemność</string>
+    <!-- Label for contacts -->
+    <string name="general_section_contacts">Kontakty</string>
+    <!-- Label for achievements -->
+    <string name="general_section_achievements">Osiągnięcia</string>
+    <!-- Label for device centre -->
+    <string name="general_section_device_centre">Centrum urządzeń</string>
+    <!-- Label for transfers -->
+    <string name="general_section_transfers">Ruch</string>
+    <!-- Label for offline files -->
+    <string name="general_section_offline_files">Offline pliki</string>
+    <!-- Label for rubbish bin -->
+    <string name="general_section_rubbish_bin">Kosz</string>
+    <!-- Subtitle for VPN -->
+    <string name="menu_item_vpn_subtitle">Szybki VPN</string>
+    <!-- Subtitle for MEGA PASS -->
+    <string name="menu_item_mega_pass_subtitle">Bezpiecznie przechowuj i automatycznie wypełniaj swoje hasło</string>
+    <!-- Subtitle for transfer.it -->
+    <string name="menu_item_transfer_it_subtitle">Szybkie, bezpieczne transfery plików</string>
+    <!-- Label for transfer it -->
+    <string name="general_section_transfer_it">Transfer.it</string>
+    <!-- Label for Menu -->
+    <string name="general_menu">Menu</string>
+    <!-- Connection type option in Sync Settings Screen -->
+    <string name="settings_sync_connection_type_title">Typ połączenia</string>
+    <!-- The camera uploads notification title to reminder the camera uploads paused-->
+    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <!-- The camera uploads notification content to reminder there is no wifi connection-->
+    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <!-- The camera uploads notification action text to allow mobile data-->
+    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <!-- Alert title before download a big file for preview. -->
+    <string name="alert_larger_file_preview_title">Podgląd dużego pliku</string>
+    <!-- Alert confirm button before download a big file for preview -->
+    <string name="alert_larger_file_preview_confirm_button">Zobacz teraz</string>
+    <!-- Alert always allow button before download a big file for preview -->
+    <string name="alert_larger_file_preview_always_allow_button">Zawsze zezwalaj na podglądy</string>
 </resources>

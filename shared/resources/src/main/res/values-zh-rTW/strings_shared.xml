@@ -832,8 +832,8 @@
     <string name="document_scanning_settings_non_matching_file_extension_error_message">副檔名與檔案類型不匹配</string>
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">需要副檔名</string>
-    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">為了預覽此檔案，MEGA需要下載它。將下載%1$s。</string>
+    <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">MEGA將取得此檔案的暫存副本，以便您可進行預覽。該副本不會在應用程式之外的地方儲存或使用。將下載%1$s的資料。</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">完成進度：%1$d%%</string>
     <!-- Add to album files existed message -->
@@ -941,7 +941,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">電子郵件確認</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">我們已向[P]%s[/P]發送了一封內含連結的電子郵件。點擊連結以驗證您的電子郵件地址並啟動您的帳戶。\n\n如果您沒有收到該電子郵件，請檢查您的垃圾郵件資料夾或重試。如有任何其它問題，請前往我們的[A]%s[/A]。</string>
+    <string name="email_confirmation_content">我們已向[P]%s[/P]發送了一封內含連結的電子郵件。點擊連結以驗證您的電子郵件地址來啟動您的帳戶。\n\n如果您沒有收到該電子郵件，請檢查您的垃圾郵件資料夾或重試。如有任何其它問題，請前往我們的[A]幫助中心[/A]。</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">重新發送</string>
     <!-- General change email address -->
@@ -1191,7 +1191,7 @@
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">訂閱會自動續訂，續期期間和價格都與初始訂閱相同。\n\n您可以隨時取消您的M方案訂閱，但最晚必須在下一次訂閱付款生效前的24小時前取消。[A]瞭解如何在設定中管理您的訂閱。[/A]</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]服務條款和隱私權政策[/A]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]服務條款[/A]和[B]隱私權政策[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">透過Pro方案獲得更多功能</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1284,4 +1284,40 @@
     <string name="transfers_resume_all_button">全部恢復</string>
     <!-- Sync over quota warning title -->
     <string name="sync_storage_over_quota_warning_title">同步已暫停，您的MEGA方案的儲存空間已用完</string>
+    <!-- Label for contacts -->
+    <string name="general_section_contacts">聯絡人</string>
+    <!-- Label for achievements -->
+    <string name="general_section_achievements">成就獎勵</string>
+    <!-- Label for device centre -->
+    <string name="general_section_device_centre">裝置中心</string>
+    <!-- Label for transfers -->
+    <string name="general_section_transfers">傳輸</string>
+    <!-- Label for offline files -->
+    <string name="general_section_offline_files">離線存取檔案</string>
+    <!-- Label for rubbish bin -->
+    <string name="general_section_rubbish_bin">垃圾筒</string>
+    <!-- Subtitle for VPN -->
+    <string name="menu_item_vpn_subtitle">高速VPN</string>
+    <!-- Subtitle for MEGA PASS -->
+    <string name="menu_item_mega_pass_subtitle">安全地儲存和自動填入您的密碼</string>
+    <!-- Subtitle for transfer.it -->
+    <string name="menu_item_transfer_it_subtitle">快速、安全的檔案傳輸</string>
+    <!-- Label for transfer it -->
+    <string name="general_section_transfer_it">Transfer.it</string>
+    <!-- Label for Menu -->
+    <string name="general_menu">選單</string>
+    <!-- Connection type option in Sync Settings Screen -->
+    <string name="settings_sync_connection_type_title">連線類型</string>
+    <!-- The camera uploads notification title to reminder the camera uploads paused-->
+    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <!-- The camera uploads notification content to reminder there is no wifi connection-->
+    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <!-- The camera uploads notification action text to allow mobile data-->
+    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <!-- Alert title before download a big file for preview. -->
+    <string name="alert_larger_file_preview_title">預覽大檔案</string>
+    <!-- Alert confirm button before download a big file for preview -->
+    <string name="alert_larger_file_preview_confirm_button">現在預覽</string>
+    <!-- Alert always allow button before download a big file for preview -->
+    <string name="alert_larger_file_preview_always_allow_button">始終允許預覽</string>
 </resources>

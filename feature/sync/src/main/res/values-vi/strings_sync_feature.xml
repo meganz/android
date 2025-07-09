@@ -127,7 +127,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Có lỗi cục&#160;bộ ngăn&#160;cản truy&#160;cập thư&#160;mục</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Lỗi hệ thống tệp ngăn truy cập thư mục.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Mục tiêu nằm quá sâu trong cấu&#160;trúc thư&#160;mục của bạn.\nHãy di chuyển nó đến một vị&#160;trí ít sâu hơn 64&#160;thư&#160;mục.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -145,5 +145,5 @@
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Đang chờ cho quá&#160;trình quét kết&#160;thúc để xác&#160;định xem có tệp&#160;tin nào đã di chuyển hay bị xóa.</string>
     <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
+    <string name="sync_change_root_uri_warning_title">Một số thư mục không thể đồng bộ hóa hoặc được sao lưu vì ứng dụng MEGA đã mất quyền truy cập các thư mục cục bộ. Nhấn Tiếp tục để thêm lại quyền cho từng thư mục bị ảnh hưởng.</string>
 </resources>

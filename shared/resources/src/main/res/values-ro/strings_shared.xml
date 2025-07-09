@@ -858,8 +858,8 @@
     <string name="document_scanning_settings_non_matching_file_extension_error_message">Extensia de fişier nu corespunde tipului de fişier</string>
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Extensia de fișier este necesară</string>
-    <!-- Alert text before download a file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">Pentru a previzualiza acest fișier, MEGA trebuie să îl descarce. %1$s va fi descărcat.</string>
+    <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
+    <string name="alert_larger_file_preview">MEGA va prelua o copie temporară a acestui fișier, astfel încât să îl puteți previzualiza. Nu va fi salvat sau disponibil în afara aplicației. %1$s va fi descărcat.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Finalizarea operațiunii: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -973,7 +973,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Confirmare prin e-mail</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]%s[/A].</string>
+    <string name="email_confirmation_content">Am trimis un e-mail la [P]%s[/P] cu un link. Atingeți linkul pentru a vă confirma adresa de e-mail și pentru a vă activa contul. \n\nDacă nu ați primit e-mailul, verificați folderul de spam sau încercați din nou. Pentru orice alte probleme, vă rugăm să accesați [A]Centrul de ajutor[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Retrimite</string>
     <!-- General change email address -->
@@ -1223,7 +1223,7 @@
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">Abonamentele sunt reînnoite automat pentru perioade succesive de abonament cu aceeași durată și la același preț ca perioada inițială aleasă.\n\nVă puteți anula abonamentul la abonament oricând, dar nu mai târziu de 24 de ore înainte de scadența următoarei plăți a abonamentului. [A]Aflați cum să vă gestionați abonamentul în setări[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]Termenii de utilizare a serviciului și Politica de confidențialitate[/A]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]Termenii de utilizare a serviciului[/A] și [B]Politica de Confidențialitate[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">Obțineți mai mult cu un abonament Pro</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1239,7 +1239,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
     <string name="choose_account_screen_transfer_quota_label">%1$s transferuri</string>
     <!-- General month label -->
-    <string name="general_month">/month</string>
+    <string name="general_month">/lună</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s pe lună</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
@@ -1303,13 +1303,13 @@
     <!-- Label for the current plan badge in the pro plan card -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Abonamentul actual</string>
     <!-- Error message when achievements status is unavailable -->
-    <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
+    <string name="achievement_status_unavailable">Momentan starea realizărilor tale nu este disponibilă. Încercați din nou mai târziu.</string>
     <!-- Warning indicating that the transfer quota limit has been reached -->
     <string name="transfers_transfer_quota_banner_title">Obține o cotă de transfer mai mare</string>
     <!-- Warning indicating that the storage quota limit has been reached -->
-    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <string name="transfers_storage_quota_banner_title">Obțineți mai multă cotă de stocare</string>
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
-    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <string name="transfers_storage_and_transfer_quota_banner_title">Obțineți mai mult spațiu de stocare și cotă de transfer</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">Centru de ajutor</string>
     <!-- Warning informing the transfers queue has been paused -->
@@ -1318,4 +1318,40 @@
     <string name="transfers_resume_all_button">Reluați toate</string>
     <!-- Sync over quota warning title -->
     <string name="sync_storage_over_quota_warning_title">Sincronizarea a fost întreruptă. Planul dvs. MEGA a rămas fără spațiu de stocare.</string>
+    <!-- Label for contacts -->
+    <string name="general_section_contacts">Contacte</string>
+    <!-- Label for achievements -->
+    <string name="general_section_achievements">Realizări</string>
+    <!-- Label for device centre -->
+    <string name="general_section_device_centre">Centrul de dispozitive</string>
+    <!-- Label for transfers -->
+    <string name="general_section_transfers">Transferuri</string>
+    <!-- Label for offline files -->
+    <string name="general_section_offline_files">Fișiere offline</string>
+    <!-- Label for rubbish bin -->
+    <string name="general_section_rubbish_bin">Coș de gunoi</string>
+    <!-- Subtitle for VPN -->
+    <string name="menu_item_vpn_subtitle">VPN de mare viteză</string>
+    <!-- Subtitle for MEGA PASS -->
+    <string name="menu_item_mega_pass_subtitle">Stocarea și completarea automată a parolelor în siguranță</string>
+    <!-- Subtitle for transfer.it -->
+    <string name="menu_item_transfer_it_subtitle">Transferuri rapide și sigure de fișiere</string>
+    <!-- Label for transfer it -->
+    <string name="general_section_transfer_it">Transfer.it</string>
+    <!-- Label for Menu -->
+    <string name="general_menu">Meniu</string>
+    <!-- Connection type option in Sync Settings Screen -->
+    <string name="settings_sync_connection_type_title">Tipul conexiunii</string>
+    <!-- The camera uploads notification title to reminder the camera uploads paused-->
+    <string name="camera_uploads_notification_title_paused_warning">Încărcările de la cameră sunt întrerupte</string>
+    <!-- The camera uploads notification content to reminder there is no wifi connection-->
+    <string name="camera_uploads_notification_content_no_wifi_connection">Conectați-vă la WiFi sau permiteți datele mobile</string>
+    <!-- The camera uploads notification action text to allow mobile data-->
+    <string name="camera_uploads_notification_action_allow_mobile_data">Permiteți datele mobile</string>
+    <!-- Alert title before download a big file for preview. -->
+    <string name="alert_larger_file_preview_title">Previzualizarea fișierului mare</string>
+    <!-- Alert confirm button before download a big file for preview -->
+    <string name="alert_larger_file_preview_confirm_button">Previzualizați acum</string>
+    <!-- Alert always allow button before download a big file for preview -->
+    <string name="alert_larger_file_preview_always_allow_button">Permiteți întotdeauna previzualizările</string>
 </resources>
