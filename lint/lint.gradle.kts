@@ -21,4 +21,6 @@ dependencies {
     testImplementation(testlib.junit)
     testImplementation(tools.lint)
     testImplementation(tools.lint.tests)
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.junit5.api)
 }

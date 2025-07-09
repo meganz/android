@@ -23,6 +23,9 @@ class JvmLibraryConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("kotlin")
+                apply("mega.jvm.test")
+                apply("mega.jvm.jacoco")
+                apply("mega.lint")
             }
             configureKotlin()
             setJvmToolChainVersion()

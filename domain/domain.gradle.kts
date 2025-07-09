@@ -1,8 +1,5 @@
 plugins {
     alias(convention.plugins.mega.jvm.library)
-    alias(convention.plugins.mega.jvm.test)
-    alias(convention.plugins.mega.jvm.jacoco)
-    alias(convention.plugins.mega.lint)
     alias(convention.plugins.mega.jvm.hilt)
     alias(plugin.plugins.kotlin.serialisation)
 }

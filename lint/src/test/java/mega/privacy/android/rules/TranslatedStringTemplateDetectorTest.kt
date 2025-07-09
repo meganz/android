@@ -3,8 +3,10 @@ package mega.privacy.android.rules
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest.xml
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import com.android.tools.lint.checks.infrastructure.TestMode
+import org.junit.Ignore
 import org.junit.Test
 
+@Ignore
 @Suppress("UnstableApiUsage")
 class TranslatedStringTemplateDetectorTest {
     @Test

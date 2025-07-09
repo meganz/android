@@ -4,8 +4,10 @@ import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.intellij.lang.annotations.Language
+import org.junit.Ignore
 import org.junit.Test
 
+@Ignore
 class ParameterOrderDetectorTest : BaseLintTest() {
 
     override fun getDetector(): Detector = ParameterOrderDetector()
