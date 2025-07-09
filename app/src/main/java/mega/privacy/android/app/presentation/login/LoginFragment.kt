@@ -2,36 +2,37 @@ package mega.privacy.android.app.presentation.login
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.InputType
 import android.util.Base64
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.LinearLayout
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
@@ -58,13 +59,11 @@ import mega.privacy.android.app.presentation.settings.startscreen.util.StartScre
 import mega.privacy.android.app.providers.FileProviderActivity
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.LAUNCH_INTENT
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountBlockedType
@@ -91,9 +90,6 @@ class LoginFragment : Fragment() {
 
     private val billingViewModel by activityViewModels<BillingViewModel>()
 
-    private var insertMKDialog: AlertDialog? = null
-
-
     private var intentExtras: Bundle? = null
     private var intentData: Uri? = null
     private var intentAction: String? = null
@@ -113,6 +109,13 @@ class LoginFragment : Fragment() {
     @Composable
     private fun LoginScreen() {
         val uiState by viewModel.state.collectAsStateWithLifecycle()
+        val context = LocalContext.current
+        val keyboardController = LocalSoftwareKeyboardController.current
+        var showIncorrectRkDialog by rememberSaveable { mutableStateOf(false) }
+        var recoveryKeyInput by rememberSaveable(uiState.recoveryKeyLink) { mutableStateOf("") }
+        var recoveryKeyError by rememberSaveable(uiState.recoveryKeyLink) {
+            mutableStateOf<String?>(null)
+        }
 
         EventEffect(uiState.checkRecoveryKeyEvent, viewModel::onCheckRecoveryKeyEventConsumed) {
             if (it.isSuccess) {
@@ -121,19 +124,16 @@ class LoginFragment : Fragment() {
             } else {
                 val e = it.exceptionOrNull()
                 Timber.e(e)
-                val code = (e as? MegaException)?.errorCode ?: Int.MIN_VALUE
-                handleRkError(code)
+                when ((e as? MegaException)?.errorCode ?: Int.MIN_VALUE) {
+                    MegaError.API_EKEY -> showIncorrectRkDialog = true
+                    MegaError.API_EBLOCKED -> viewModel.setSnackbarMessageId(R.string.error_reset_account_blocked)
+                    else -> viewModel.setSnackbarMessageId(R.string.general_text_error)
+                }
             }
         }
 
         EventEffect(uiState.onBackPressedEvent, viewModel::consumedOnBackPressedEvent) {
             onBackPressed(uiState)
-        }
-
-        LaunchedEffect(uiState.ongoingTransfersExist) {
-            if (uiState.ongoingTransfersExist == true) {
-                showCancelTransfersDialog()
-            }
         }
 
         LaunchedEffect(uiState.intentState) {
@@ -171,11 +171,13 @@ class LoginFragment : Fragment() {
                     billingViewModel.loadSkus()
                     billingViewModel.loadPurchases()
                 },
-                onForgotPassword = { onForgotPassword(uiState.accountSession?.email) },
-                onCreateAccount = ::onCreateAccount,
+                onForgotPassword = { onForgotPassword(context, uiState.accountSession?.email) },
+                onCreateAccount = {
+                    viewModel.setPendingFragmentToShow(LoginFragmentType.CreateAccount)
+                },
                 onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
                 on2FAChanged = viewModel::on2FAChanged,
-                onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
+                onLostAuthenticatorDevice = { onLostAuthenticationDevice(context) },
                 onBackPressed = { onBackPressed(uiState) },
                 onReportIssue = ::openLoginIssueHelpdeskPage,
                 onLoginExceptionConsumed = viewModel::setLoginErrorConsumed,
@@ -184,6 +186,65 @@ class LoginFragment : Fragment() {
                 onResetResendVerificationEmailEvent = viewModel::resetResendVerificationEmailEvent,
                 stopLogin = viewModel::stopLogin,
             )
+
+            if (uiState.ongoingTransfersExist == true) {
+                BasicDialog(
+                    title = "",
+                    description = stringResource(id = R.string.login_warning_abort_transfers),
+                    positiveButtonText = stringResource(id = sharedR.string.login_text),
+                    onPositiveButtonClicked = {
+                        viewModel.onLoginClicked(true)
+                        viewModel.resetOngoingTransfers()
+                    },
+                    negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
+                    onNegativeButtonClicked = {
+                        viewModel.resetOngoingTransfers()
+                    },
+                    dismissOnClickOutside = false,
+                    dismissOnBackPress = false
+                )
+            }
+
+            if (showIncorrectRkDialog) {
+                BasicDialog(
+                    title = stringResource(id = sharedR.string.recovery_key_error_title),
+                    description = stringResource(id = sharedR.string.recovery_key_error_description),
+                    positiveButtonText = stringResource(id = R.string.general_ok),
+                    onPositiveButtonClicked = {
+                        showIncorrectRkDialog = false
+                    }
+                )
+            }
+
+            val recoveryKeyLink = uiState.recoveryKeyLink
+            if (recoveryKeyLink != null) {
+                BasicInputDialog(
+                    title = stringResource(id = R.string.title_dialog_insert_MK),
+                    description = stringResource(id = R.string.text_dialog_insert_MK),
+                    inputLabel = stringResource(id = R.string.edit_text_insert_mk),
+                    inputValue = recoveryKeyInput,
+                    onValueChange = {
+                        recoveryKeyInput = it
+                        if (recoveryKeyError != null) recoveryKeyError = null
+                    },
+                    errorText = recoveryKeyError,
+                    positiveButtonText = stringResource(id = R.string.general_ok),
+                    onPositiveButtonClicked = {
+                        val value = recoveryKeyInput.trim()
+                        if (value.isEmpty()) {
+                            recoveryKeyError = context.getString(R.string.invalid_string)
+                        } else {
+                            keyboardController?.hide()
+                            viewModel.checkRecoveryKey(recoveryKeyLink, value)
+                            viewModel.onRecoveryKeyConsumed()
+                        }
+                    },
+                    negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
+                    onNegativeButtonClicked = {
+                        viewModel.onRecoveryKeyConsumed()
+                    },
+                )
+            }
         }
 
         // Hide splash after UI is rendered, to prevent blinking
@@ -222,16 +283,15 @@ class LoginFragment : Fragment() {
                     val isLoggedIn = intent.getBooleanExtra(LoginActivity.EXTRA_IS_LOGGED_IN, false)
                     if (link != null && !isLoggedIn) {
                         Timber.d("Link to resetPass: %s", link)
-                        showDialogInsertMKToChangePass(link)
+                        viewModel.onRequestRecoveryKey(link)
                         viewModel.intentSet()
                     }
                     return
                 }
 
                 Constants.ACTION_PASS_CHANGED -> {
-                    when (val code = intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
+                    when (intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
                         MegaError.API_OK -> viewModel.setSnackbarMessageId(R.string.pass_changed_alert)
-                        else -> handleRkError(code)
                     }
                     viewModel.intentSet()
                     return
@@ -800,77 +860,6 @@ class LoginFragment : Fragment() {
         finish()
     }
 
-    /**
-     * Shows a dialog for changing password.
-     *
-     * @param link Reset password link.
-     */
-    private fun showDialogInsertMKToChangePass(link: String) {
-        Timber.d("link: %s", link)
-        val layout = LinearLayout(requireContext())
-        layout.orientation = LinearLayout.VERTICAL
-        val params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        params.setMargins(
-            Util.scaleWidthPx(20, resources.displayMetrics),
-            Util.scaleHeightPx(20, resources.displayMetrics),
-            Util.scaleWidthPx(17, resources.displayMetrics),
-            0
-        )
-        val input = EditText(requireContext())
-        layout.addView(input, params)
-        input.setSingleLine()
-        input.hint = getString(R.string.edit_text_insert_mk)
-        input.setTextColor(getThemeColor(requireContext(), android.R.attr.textColorSecondary))
-        input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-        input.imeOptions = EditorInfo.IME_ACTION_DONE
-        input.inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-        input.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                onSubmitRK(input, link)
-            } else {
-                Timber.d("Other IME%s", actionId)
-            }
-            false
-        }
-        input.setImeActionLabel(getString(R.string.general_add), EditorInfo.IME_ACTION_DONE)
-        val builder = MaterialAlertDialogBuilder(
-            requireContext(),
-            R.style.ThemeOverlay_Mega_MaterialAlertDialog
-        ).setTitle(getString(R.string.title_dialog_insert_MK))
-            .setMessage(getString(R.string.text_dialog_insert_MK))
-            .setPositiveButton(getString(R.string.general_ok), null)
-            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
-            .setView(layout)
-            .setOnDismissListener {
-                activity?.let {
-                    Util.hideKeyboard(it, InputMethodManager.HIDE_NOT_ALWAYS)
-                }
-            }
-        insertMKDialog = builder.create().apply {
-            show()
-            getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                onSubmitRK(input, link)
-            }
-        }
-    }
-
-    private fun onSubmitRK(input: EditText, link: String) {
-        Timber.d("OK BUTTON PASSWORD")
-        val value = input.text.toString().trim { it <= ' ' }
-        if (value == "" || value.isEmpty()) {
-            Timber.w("Input is empty")
-            input.error = getString(R.string.invalid_string)
-            input.requestFocus()
-        } else {
-            Timber.d("Positive button pressed - reset pass")
-            viewModel.checkRecoveryKey(link, value)
-            insertMKDialog?.dismiss()
-        }
-    }
-
     private fun navigateToChangePassword(link: String, value: String) {
         val intent = Intent(requireContext(), ChangePasswordActivity::class.java)
         intent.action = Constants.ACTION_RESET_PASS_FROM_LINK
@@ -878,15 +867,6 @@ class LoginFragment : Fragment() {
         intent.putExtra(IntentConstants.EXTRA_MASTER_KEY, value)
         startActivity(intent)
     }
-
-    private fun handleRkError(code: Int) {
-        when (code) {
-            MegaError.API_EKEY -> showAlertIncorrectRK()
-            MegaError.API_EBLOCKED -> viewModel.setSnackbarMessageId(R.string.error_reset_account_blocked)
-            else -> viewModel.setSnackbarMessageId(R.string.general_text_error)
-        }
-    }
-
 
     /**
      * Performs on back pressed.
@@ -921,30 +901,6 @@ class LoginFragment : Fragment() {
         }
     }
 
-    /**
-     * Shows the cancel transfers dialog.
-     */
-    private fun showCancelTransfersDialog() = AlertDialog.Builder(requireContext()).apply {
-        setMessage(R.string.login_warning_abort_transfers)
-        setPositiveButton(sharedR.string.login_text) { _, _ -> viewModel.onLoginClicked(true) }
-        setNegativeButton(sharedR.string.general_dialog_cancel_button) { _, _ -> viewModel.resetOngoingTransfers() }
-        setCancelable(false)
-        show()
-    }
-
-    /**
-     * Shows a warning informing the Recovery Key is not correct.
-     */
-    private fun showAlertIncorrectRK() {
-        Timber.d("showAlertIncorrectRK")
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(sharedR.string.recovery_key_error_title))
-            .setMessage(getString(sharedR.string.recovery_key_error_description))
-            .setCancelable(false)
-            .setPositiveButton(getString(R.string.general_ok), null)
-            .show()
-    }
-
     private fun getFolderLinkIntent(): Intent {
         return Intent(requireContext(), FolderLinkComposeActivity::class.java)
     }
@@ -953,27 +909,23 @@ class LoginFragment : Fragment() {
         return Intent(requireContext(), FileLinkComposeActivity::class.java)
     }
 
-    private fun onForgotPassword(typedEmail: String?) {
-        Timber.d("Click on button_forgot_pass")
-        context.launchUrl(
-            if (typedEmail.isNullOrEmpty()) {
-                RECOVERY_URL
-            } else {
-                RECOVERY_URL_EMAIL + Base64.encodeToString(typedEmail.toByteArray(), Base64.DEFAULT)
-                    .replace("\n", "")
-            }
-        )
-    }
-
-    private fun onCreateAccount() {
-        (requireActivity() as LoginActivity).showFragment(LoginFragmentType.CreateAccount)
-    }
-
-    private fun onLostAuthenticationDevice() {
-        context.launchUrl(RECOVERY_URL)
-    }
-
     companion object {
         private const val LOGIN_HELP_URL = "https://help.mega.io/accounts/login-issues"
     }
+}
+
+private fun onLostAuthenticationDevice(context: Context) {
+    context.launchUrl(RECOVERY_URL)
+}
+
+private fun onForgotPassword(context: Context, typedEmail: String?) {
+    Timber.d("Click on button_forgot_pass")
+    context.launchUrl(
+        if (typedEmail.isNullOrEmpty()) {
+            RECOVERY_URL
+        } else {
+            RECOVERY_URL_EMAIL + Base64.encodeToString(typedEmail.toByteArray(), Base64.DEFAULT)
+                .replace("\n", "")
+        }
+    )
 }

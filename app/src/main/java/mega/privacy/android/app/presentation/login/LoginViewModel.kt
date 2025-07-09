@@ -306,8 +306,7 @@ class LoginViewModel @Inject constructor(
                         state.copy(themeMode = themeMode)
                     }
                 },
-
-            ).collect {
+                ).collect {
                 _state.update(it)
             }
         }
@@ -924,7 +923,8 @@ class LoginViewModel @Inject constructor(
                         isLoginRequired = true,
                         is2FAEnabled = false,
                         is2FARequired = false,
-                        snackbarMessage = messageId?.let { triggered(exception.error) } ?: consumed()
+                        snackbarMessage = messageId?.let { triggered(exception.error) }
+                            ?: consumed()
                     )
                 }
             }
@@ -1228,6 +1228,22 @@ class LoginViewModel @Inject constructor(
      */
     fun consumedOnBackPressedEvent() {
         _state.update { it.copy(onBackPressedEvent = consumed) }
+    }
+
+    /**
+     * On request recovery key
+     *
+     * @param link the recovery key link
+     */
+    fun onRequestRecoveryKey(link: String) {
+        _state.update { it.copy(recoveryKeyLink = link) }
+    }
+
+    /**
+     * On recovery key consumed
+     */
+    fun onRecoveryKeyConsumed() {
+        _state.update { it.copy(recoveryKeyLink = null) }
     }
 
     companion object {

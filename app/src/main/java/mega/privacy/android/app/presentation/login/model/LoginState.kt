@@ -97,6 +97,7 @@ data class LoginState(
     val checkRecoveryKeyEvent: StateEventWithContent<Result<RkLink>> = consumed(),
     val onBackPressedEvent: StateEvent = consumed,
     val shouldShowUpgradeAccount: Boolean = false,
+    val recoveryKeyLink: String? = null,
 ) {
 
     /**
