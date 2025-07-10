@@ -24,11 +24,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import coil.Coil.imageLoader
-import coil.request.ImageRequest
-import coil.request.SuccessResult
-import coil.transform.RoundedCornersTransformation
-import coil.util.CoilUtils.dispose
+import coil3.SingletonImageLoader
+import coil3.asDrawable
+import coil3.asImage
+import coil3.request.ImageRequest
+import coil3.request.SuccessResult
+import coil3.request.crossfade
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
+import coil3.util.CoilUtils
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.MimeTypeThumbnail
@@ -710,7 +714,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         holder.textViewFileName?.text = node.name
         holder.videoInfoLayout?.visibility = View.GONE
 
-        holder.imageViewThumb?.apply { dispose(this) }
+        holder.imageViewThumb?.apply { CoilUtils.dispose(this) }
         if (node.isTakenDown) {
             holder.textViewFileNameForFile?.apply {
                 setTextColor(
@@ -796,30 +800,36 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             if (node.hasThumbnail()) {
                 holder.imageViewThumb?.apply {
                     visibility = View.VISIBLE
-                    imageLoader(context).enqueue(
-                        ImageRequest.Builder(context)
-                            .data(fromHandle(node.handle))
-                            .target(this)
-                            .crossfade(true)
-                            .transformations(
-                                RoundedCornersTransformation(
-                                    context.resources
-                                        .getDimensionPixelSize(R.dimen.thumbnail_corner_radius)
-                                        .toFloat()
-                                )
+                    val imageRequest = ImageRequest.Builder(context)
+                        .data(fromHandle(node.handle))
+                        .target { drawable ->
+                            this.setImageDrawable(
+                                drawable.asDrawable(context.resources)
                             )
-                            .listener(object : ImageRequest.Listener {
+                        }
+                        .transformations(
+                            RoundedCornersTransformation(
+                                context.resources.getDimension(R.dimen.thumbnail_corner_radius)
+                            )
+                        )
+                        .crossfade(true)
+                        .listener(
+                            object : ImageRequest.Listener {
                                 override fun onSuccess(
                                     request: ImageRequest,
                                     result: SuccessResult,
                                 ) {
+                                    super.onSuccess(request, result)
                                     holder.fileGridIconForFile?.visibility = View.GONE
                                 }
-                            })
-                            .build()
-                    )
-                }
 
+                            })
+                        .build()
+
+                    SingletonImageLoader
+                        .get(context)
+                        .enqueue(imageRequest)
+                }
             }
 
             if (isMultipleSelect) {
@@ -945,7 +955,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         }
 
         holder.imageView?.visibility = View.VISIBLE
-        holder.imageView?.let { dispose(it) }
+        holder.imageView?.let { CoilUtils.dispose(it) }
         if (node.isFolder) {
             Timber.d("Node is folder")
             holder.itemLayout?.background = null
@@ -1167,43 +1177,48 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
 
     private fun loadThumbnail(node: MegaNode, target: ImageView) {
         target.apply {
-            imageLoader(context).enqueue(
-                ImageRequest.Builder(context)
-                    .placeholder(typeForName(node.name).iconResourceId)
-                    .data(fromHandle(node.handle))
-                    .target(target)
-                    .crossfade(true)
-                    .transformations(
-                        RoundedCornersTransformation(
-                            context.resources
-                                .getDimensionPixelSize(R.dimen.thumbnail_corner_radius).toFloat()
-                        )
+            val iconRes = typeForName(node.name).iconResourceId
+            val placeholder = ContextCompat.getDrawable(context, iconRes)?.asImage()
+            val imageRequest = ImageRequest.Builder(context)
+                .placeholder(placeholder)
+                .data(fromHandle(node.handle))
+                .target { drawable ->
+                    this.setImageDrawable(
+                        drawable.asDrawable(context.resources)
                     )
-                    .listener(object : ImageRequest.Listener {
-                        override fun onSuccess(request: ImageRequest, result: SuccessResult) {
-                            val params = target.layoutParams as RelativeLayout.LayoutParams
-                            params.height = TypedValue.applyDimension(
-                                TypedValue.COMPLEX_UNIT_DIP,
-                                36f,
-                                context.resources.displayMetrics
-                            ).toInt()
-                            params.width = TypedValue.applyDimension(
-                                TypedValue.COMPLEX_UNIT_DIP,
-                                36f,
-                                context.resources.displayMetrics
-                            ).toInt()
-                            val left = TypedValue.applyDimension(
-                                TypedValue.COMPLEX_UNIT_DIP,
-                                6f,
-                                context.resources.displayMetrics
-                            ).toInt()
-                            params.setMargins(left, 0, 0, 0)
+                }
+                .crossfade(true)
+                .transformations(
+                    RoundedCornersTransformation(
+                        context.resources.getDimension(R.dimen.thumbnail_corner_radius)
+                    )
+                )
+                .listener(object : ImageRequest.Listener {
+                    override fun onSuccess(request: ImageRequest, result: SuccessResult) {
+                        val params = target.layoutParams as RelativeLayout.LayoutParams
+                        params.height = TypedValue.applyDimension(
+                            TypedValue.COMPLEX_UNIT_DIP,
+                            36f,
+                            context.resources.displayMetrics
+                        ).toInt()
+                        params.width = TypedValue.applyDimension(
+                            TypedValue.COMPLEX_UNIT_DIP,
+                            36f,
+                            context.resources.displayMetrics
+                        ).toInt()
+                        val left = TypedValue.applyDimension(
+                            TypedValue.COMPLEX_UNIT_DIP,
+                            6f,
+                            context.resources.displayMetrics
+                        ).toInt()
+                        params.setMargins(left, 0, 0, 0)
 
-                            target.layoutParams = params
-                        }
-                    })
-                    .build()
-            )
+                        target.layoutParams = params
+                    }
+                })
+                .build()
+
+            SingletonImageLoader.get(context).enqueue(imageRequest)
         }
     }
 
