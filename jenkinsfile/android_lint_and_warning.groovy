@@ -86,7 +86,7 @@ pipeline {
                 script {
                     BUILD_STEP = 'Preparation'
                     common = load('jenkinsfile/common.groovy')
-                    MODULE_LIST = new ArrayList(common.getModuleList())
+                    MODULE_LIST = common.getModuleList()
                 }
             }
         }

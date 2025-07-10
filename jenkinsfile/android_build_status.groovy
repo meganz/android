@@ -305,7 +305,7 @@ pipeline {
                                     sh "./gradlew --no-daemon lint"
                                 }
 
-                                def lintModuleList = new ArrayList(common.getModuleList())
+                                def lintModuleList = common.getModuleList()
 
                                 lintModuleList.each { module ->
                                     def lintJsonContent = generateLintSummary(module)

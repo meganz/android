@@ -743,7 +743,7 @@ def fetchSlackChannelIdsByReleaseVersion(String version) {
  * Gets list of all module paths in the project by parsing output from printSubprojectPaths task.
  * @return List of module paths like ["app", "domain", "feature/chat"]
  */
-def getModuleList() {
+ArrayList<String> getModuleList() {
     // excluded modules
     EXCLUDED_MODULES = [
         'android-database-sqlcipher',
@@ -768,7 +768,7 @@ def getModuleList() {
         .findAll { !(it in EXCLUDED_MODULES) }
 
     print("MODULE_LIST: ${moduleList}")
-    return moduleList
+    return new ArrayList<String>(moduleList)
 }
 
 /**
@@ -777,7 +777,7 @@ def getModuleList() {
  * 
  * @return List of module paths like ["app", "domain", "feature/chat"] that contain unit tests
  */
-def getUnitTestModuleList() {
+ArrayList<String> getUnitTestModuleList() {
     def unitTestModuleListRaw = sh(
         script: "./gradlew printModulesWithUnitTest --no-daemon -q",
         returnStdout: true
@@ -788,10 +788,8 @@ def getUnitTestModuleList() {
         .collect { it.replace("UNIT-TEST-MODULE:", "").trim() }
 
     print("UNIT_TEST_MODULE_LIST: ${moduleList}")
-    return moduleList
+    return new ArrayList<String>(moduleList)
 }
-
-
 
 
 return this
