@@ -25,4 +25,5 @@ internal data class ImagePreviewState(
     val isMagnifierMode: Boolean = false,
     val isBusinessAccountExpired: Boolean = false,
     val isOnline: Boolean = false,
+    val openPhotoEditorEvent: StateEventWithContent<Pair<ImageNode, String>> = consumed(),
 )

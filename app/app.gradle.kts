@@ -342,6 +342,9 @@ dependencies {
     implementation(lib.commonmark.java)
     implementation(google.ump)
 
+    // Photo editor
+    implementation(lib.ucropnedit)
+
     // Debug
     debugImplementation(lib.nocturn)
     debugImplementation(lib.xray)

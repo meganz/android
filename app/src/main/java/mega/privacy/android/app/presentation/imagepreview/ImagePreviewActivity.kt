@@ -3,8 +3,10 @@ package mega.privacy.android.app.presentation.imagepreview
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.Gravity
 import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
 import androidx.activity.compose.setContent
@@ -19,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -27,7 +30,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.yalantis.ucrop.UCrop
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -88,6 +93,7 @@ import mega.privacy.mobile.analytics.event.PlaySlideshowMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -169,6 +175,7 @@ class ImagePreviewActivity : BaseActivity() {
                     darkIcons = !isDarkMode
                 )
             }
+            val uiState by viewModel.state.collectAsStateWithLifecycle()
             OriginalTheme(isDark = isDarkMode) {
                 PasscodeContainer(
                     passcodeCryptObjectFactory = passcodeCryptObjectFactory,
@@ -177,6 +184,7 @@ class ImagePreviewActivity : BaseActivity() {
                             ImagePreviewScreen(
                                 snackbarHostState = snackbarHostState,
                                 onClickBack = ::finish,
+                                onClickEdit = viewModel::launchPhotoEditor,
                                 onClickVideoPlay = ::playVideo,
                                 onClickSlideshow = ::playSlideshow,
                                 onClickInfo = ::checkInfo,
@@ -221,6 +229,12 @@ class ImagePreviewActivity : BaseActivity() {
                         }
                     }
                 )
+            }
+            EventEffect(
+                event = uiState.openPhotoEditorEvent,
+                onConsumed = { viewModel.onOpenPhotoEditorEventConsumed() },
+            ) { (imageNode, imagePath) ->
+                openPhotoEditor(imagePath.toUri(), imageNode.name)
             }
         }
         setupFlow()
@@ -464,6 +478,36 @@ class ImagePreviewActivity : BaseActivity() {
             putExtra("type", viewType)
         }
         addToAlbumLauncher.launch(intent)
+    }
+
+    private val activityResultLauncherUCrop =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // handleCropResult(result.data!!)
+                return@registerForActivityResult
+            }
+
+            if (result.resultCode == UCrop.RESULT_ERROR) {
+                // handleCropError(result.data!!)
+            }
+        }
+
+    private fun openPhotoEditor(uri: Uri, destinationFileName: String) {
+        var uCrop = UCrop.of(uri, Uri.fromFile(File(cacheDir, destinationFileName)))
+        uCrop.withOptions(
+            UCrop.Options().apply {
+                setFreeStyleCropEnabled(true)
+                setCompressionQuality(90)
+                setToolbarTitle(getString(R.string.title_edit_profile_info))
+                setToolbarTitleTextGravity(Gravity.START)
+                setToolbarColor(getColor(R.color.dark_grey))
+                setStatusBarColor(getColor(R.color.dark_grey))
+                setRootViewBackgroundColor(getColor(R.color.black))
+                setToolbarWidgetColor(getColor(R.color.white))
+                setActiveControlsWidgetColor(getColor(R.color.white))
+            }
+        )
+        uCrop.start(this@ImagePreviewActivity, activityResultLauncherUCrop)
     }
 
     private fun playSlideshow() {

@@ -70,6 +70,11 @@ allprojects {
             url =
                 uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mega-telephoto")
         }
+
+        maven {
+            url =
+                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mega-ucrop-n-edit")
+        }
     }
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor(5, "minutes")

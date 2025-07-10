@@ -26,6 +26,7 @@ telephoto = "0.16.0"
 mega-core-ui = "2.170.20250708103141"
 kotlinx-collections-immutable = "0.3.7"
 commonmark-java = "0.24.0"
+ucropnedit = "4.1.2"
 
 [libraries]
 bannerviewpager = { module = "com.github.zhpanvip:BannerViewPager", version.ref = "bannerviewpager" }
@@ -81,6 +82,7 @@ mega-core-ui = { group = "mega.android.core", name  = "ui", version.ref = "mega-
 mega-core-ui-tokens = { group = "mega.android.core", name  = "ui-tokens", version.ref = "mega-core-ui"}
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
 commonmark-java = {module = "org.commonmark:commonmark", version.ref = "commonmark-java"}
+ucropnedit = { module = "com.github.jens-muenker.mega:ucropnedit", version.ref = "ucropnedit" }
 
 [bundles]
 logging = ["logging-slf4j", "logging-logback", "logging-timber"]

@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
@@ -408,6 +409,19 @@ class ImagePreviewViewModel @Inject constructor(
                 && imageNode.type !is GifFileTypeInfo
     }
 
+    suspend fun isPhotoEditorMenuVisible(imageNode: ImageNode): Boolean {
+        return runCatching { getFeatureFlagValueUseCase(AppFeatures.PhotoEditor) }
+            .getOrDefault(false) && imageNode.type.mimeType in
+                setOf(
+                    "image/jpeg",
+                    "image/jpg",
+                    "image/png",
+                    "image/bmp",
+                    "image/x-ms-bmp",
+                    "image/heif"
+                )
+    }
+
     suspend fun monitorImageResult(imageNode: ImageNode): Flow<ImageResult> {
         return if (imageNode.serializedData?.contains("local") == true) {
             flow {
@@ -435,7 +449,7 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     fun setFullScreenMode(
-        isFullScreenMode: Boolean
+        isFullScreenMode: Boolean,
     ) {
         _state.update {
             it.copy(
@@ -883,6 +897,32 @@ class ImagePreviewViewModel @Inject constructor(
      */
     fun isInOfflineMode() =
         imagePreviewFetcherSource == ImagePreviewFetcherSource.OFFLINE && !state.value.isOnline
+
+    fun launchPhotoEditor(imageNode: ImageNode) {
+        viewModelScope.launch {
+            runCatching {
+                monitorImageResult(imageNode).collectLatest {
+                    val highestResolutionUri = it.fullSizeUri
+                    if (it.isFullyLoaded && highestResolutionUri != null) {
+                        _state.update { state ->
+                            state.copy(
+                                openPhotoEditorEvent = triggered(
+                                    Pair(
+                                        imageNode,
+                                        highestResolutionUri
+                                    )
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun onOpenPhotoEditorEventConsumed() {
+        _state.update { it.copy(openPhotoEditorEvent = consumed()) }
+    }
 
     companion object {
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"

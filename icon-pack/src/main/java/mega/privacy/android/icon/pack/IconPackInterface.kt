@@ -192,6 +192,7 @@ interface IconPackInterface {
                 val Info: ImageVector
                 val Check: ImageVector
                 val Download: ImageVector
+                val SlidersHorizontal01: ImageVector
             }
 
             /**

@@ -177,4 +177,18 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
+    <style name="Theme.Mega.PhotoEditor" parent="Theme.Mega">
+        <item name="android:statusBarColor">@color/color_background_pageBackground</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/color_background_pageBackground</item>
+        <item name="colorPrimary">@color/dark_grey</item>
+        <item name="colorSecondary">@color/accent_050</item>
+        <item name="colorPrimaryVariant">@color/dark_grey</item>
+        <item name="colorSurface">@color/dark_grey</item>
+        <item name="colorError">@color/red_400</item>
+        <item name="colorOnPrimary">@color/white_alpha_087</item>
+        <item name="colorOnSecondary">@color/dark_grey</item>
+        <item name="colorControlNormal">@color/white_alpha_087</item>
+    </style>
 </resources>

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.imagepreview.view
 
 /** AppBar options test tags */
 internal const val IMAGE_PREVIEW_APP_BAR_BACK = "image_preview_app_bar:icon_back"
+internal const val IMAGE_PREVIEW_APP_BAR_EDIT = "image_preview_app_bar:icon_edit"
 internal const val IMAGE_PREVIEW_APP_BAR_SLIDESHOW = "image_preview_app_bar:icon_slideshow"
 internal const val IMAGE_PREVIEW_APP_BAR_FORWARD = "image_preview_app_bar:icon_forward"
 internal const val IMAGE_PREVIEW_APP_BAR_SAVE_TO_DEVICE =

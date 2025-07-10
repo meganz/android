@@ -128,6 +128,7 @@ import mega.privacy.mobile.analytics.event.MagnifierMenuItemEvent
 internal fun ImagePreviewScreen(
     onClickBack: () -> Unit,
     onClickVideoPlay: (ImageNode) -> Unit,
+    onClickEdit: (ImageNode) -> Unit,
     onClickSlideshow: () -> Unit,
     onClickInfo: (ImageNode) -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -318,6 +319,7 @@ internal fun ImagePreviewScreen(
                         ) {
                             ImagePreviewTopBar(
                                 imageNode = imageNode,
+                                showEditMenu = viewModel::isPhotoEditorMenuVisible,
                                 showSlideshowMenu = viewModel::isSlideshowMenuVisible,
                                 showForwardMenu = viewModel::isForwardMenuVisible,
                                 showSaveToDeviceMenu = viewModel::isSaveToDeviceMenuVisible,
@@ -326,6 +328,7 @@ internal fun ImagePreviewScreen(
                                 showSendToMenu = viewModel::isSendToChatMenuVisible,
                                 showMoreMenu = viewModel::isMoreMenuVisible,
                                 onClickBack = onClickBack,
+                                onClickEdit = { onClickEdit(imageNode) },
                                 onClickSlideshow = onClickSlideshow,
                                 onClickForward = { onClickSendTo(imageNode) },
                                 onClickSaveToDevice = onClickSaveToDevice,
@@ -847,6 +850,7 @@ private fun ImageContent(
 @Composable
 private fun ImagePreviewTopBar(
     imageNode: ImageNode,
+    showEditMenu: suspend (ImageNode) -> Boolean,
     showSlideshowMenu: suspend (ImageNode) -> Boolean,
     showForwardMenu: suspend (ImageNode) -> Boolean,
     showSaveToDeviceMenu: suspend (ImageNode) -> Boolean,
@@ -855,6 +859,7 @@ private fun ImagePreviewTopBar(
     showSendToMenu: suspend (ImageNode) -> Boolean,
     showMoreMenu: suspend (ImageNode) -> Boolean,
     onClickBack: () -> Unit,
+    onClickEdit: () -> Unit,
     onClickSlideshow: () -> Unit,
     onClickForward: () -> Unit,
     onClickSaveToDevice: () -> Unit,
@@ -910,10 +915,25 @@ private fun ImagePreviewTopBar(
                     value = showMoreMenu(imageNode)
                 }
 
+                val isEditMenuVisible by produceState(false, imageNode) {
+                    value = showEditMenu(imageNode)
+                }
+
+                if (isEditMenuVisible) {
+                    IconButton(onClick = onClickEdit) {
+                        Icon(
+                            imageVector = IconPack.Medium.Thin.Outline.SlidersHorizontal01,
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.black_white,
+                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_EDIT).size(22.dp),
+                        )
+                    }
+                }
+
                 if (isSlideshowMenuVisible) {
                     IconButton(onClick = onClickSlideshow) {
                         Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.PlaySquare),
+                            imageVector = IconPack.Medium.Thin.Outline.PlaySquare,
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SLIDESHOW),

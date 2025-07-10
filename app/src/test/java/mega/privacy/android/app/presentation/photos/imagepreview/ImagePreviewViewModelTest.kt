@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewVideoLauncher
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
@@ -26,6 +27,8 @@ import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageM
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -68,6 +71,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -592,6 +596,105 @@ class ImagePreviewViewModelTest {
                 val state = expectMostRecentItem()
                 assertThat(state.copyMoveException).isEqualTo(runtimeException)
             }
+        }
+
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/bmp",
+            "image/x-ms-bmp",
+            "image/heif"
+        ]
+    )
+    internal fun `test that isPhotoEditorMenuVisible returns true when feature flag is enabled and mime type is supported`(
+        mimeType: String,
+    ) =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { type } doReturn StaticImageFileTypeInfo(
+                    mimeType,
+                    mimeType.substringAfterLast("/")
+                )
+            }
+            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
+
+            val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+            assertThat(result).isTrue()
+        }
+
+    @Test
+    internal fun `test that isPhotoEditorMenuVisible returns false when feature flag is disabled`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
+            }
+            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(false)
+
+            val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    internal fun `test that isPhotoEditorMenuVisible returns false when feature flag throws exception`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
+            }
+            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenThrow(
+                RuntimeException(
+                    "Feature flag error"
+                )
+            )
+
+            val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+            assertThat(result).isFalse()
+        }
+
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "image/webp",
+            "image/gif",
+            "image/raw",
+            "image/svg+xml",
+            "image/tiff",
+            "image/tga"
+        ]
+    )
+    internal fun `test that isPhotoEditorMenuVisible returns false when mime type is not supported`(
+        mimeType: String,
+    ) =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { type } doReturn StaticImageFileTypeInfo(
+                    mimeType,
+                    mimeType.substringAfterLast("/")
+                )
+            }
+            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
+
+            val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    internal fun `test that isPhotoEditorMenuVisible returns false when node type is video`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { type } doReturn VideoFileTypeInfo("video/mp4", "mp4", Duration.parse("10s"))
+            }
+            whenever(getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)).thenReturn(true)
+
+            val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+            assertThat(result).isFalse()
         }
 
     @Test
