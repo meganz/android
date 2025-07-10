@@ -130,7 +130,7 @@ class AppStateViewModel @Inject constructor(
         badgeText: String?,
     ): NavigationItem = NavigationItem(
         destination = mainNavItem.destination,
-        iconRes = mainNavItem.iconRes,
+        icon = mainNavItem.icon,
         label = mainNavItem.label,
         preferredSlot = mainNavItem.preferredSlot,
         analyticsEventIdentifier = mainNavItem.analyticsEventIdentifier,

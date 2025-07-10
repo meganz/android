@@ -1,5 +1,8 @@
 package mega.privacy.android.app.appstate
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -90,6 +93,7 @@ class AppStateViewModelTest {
             on { availableOffline }.thenReturn(true)
             on { label }.thenReturn(android.R.string.ok)
             on { analyticsEventIdentifier }.thenReturn(mock())
+            on { icon }.thenReturn(Icons.Default.Home)
         }
 
         val expected = setOf(mainNavItem)
@@ -122,6 +126,7 @@ class AppStateViewModelTest {
             on { availableOffline }.thenReturn(true)
             on { label }.thenReturn(android.R.string.ok)
             on { analyticsEventIdentifier }.thenReturn(mock())
+            on { icon }.thenReturn(Icons.Default.Home)
         }
         val disabledFeature = mock<Feature>()
         getFeatureFlagValueUseCase.stub {
@@ -138,6 +143,7 @@ class AppStateViewModelTest {
                 on { availableOffline }.thenReturn(true)
                 on { label }.thenReturn(android.R.string.cancel)
                 on { analyticsEventIdentifier }.thenReturn(mock())
+                on { icon }.thenReturn(Icons.Default.Settings)
             }
         }
         val mainDestinations = setOf(expected, notExpected as MainNavItem)
@@ -164,6 +170,7 @@ class AppStateViewModelTest {
             on { availableOffline }.thenReturn(true)
             on { label }.thenReturn(android.R.string.ok)
             on { analyticsEventIdentifier }.thenReturn(mock())
+            on { icon }.thenReturn(Icons.Default.Home)
         }
         val enabledFeature = mock<Feature>()
         getFeatureFlagValueUseCase.stub {
@@ -180,6 +187,7 @@ class AppStateViewModelTest {
                 on { availableOffline }.thenReturn(true)
                 on { label }.thenReturn(android.R.string.cancel)
                 on { analyticsEventIdentifier }.thenReturn(mock())
+                on { icon }.thenReturn(Icons.Default.Settings)
             }
         }
         val mainDestinations = setOf(expected, alsoExpected as MainNavItem)
@@ -279,6 +287,7 @@ class AppStateViewModelTest {
             on { availableOffline }.thenReturn(true)
             on { analyticsEventIdentifier }.thenReturn(mock())
             on { label }.thenReturn(android.R.string.ok)
+            on { icon }.thenReturn(Icons.Default.Home)
         }
         val expected = setOf(mainNavItem)
 
@@ -305,6 +314,7 @@ class AppStateViewModelTest {
                 on { availableOffline }.thenReturn(false)
                 on { analyticsEventIdentifier }.thenReturn(mock())
                 on { label }.thenReturn(android.R.string.ok)
+                on { icon }.thenReturn(Icons.Default.Home)
             }
             val expected = setOf(mainNavItem)
 
@@ -330,6 +340,7 @@ class AppStateViewModelTest {
             on { availableOffline }.thenReturn(false)
             on { analyticsEventIdentifier }.thenReturn(mock())
             on { label }.thenReturn(android.R.string.ok)
+            on { icon }.thenReturn(Icons.Default.Home)
         }
         val expected = setOf(mainNavItem)
 
@@ -467,6 +478,7 @@ class AppStateViewModelTest {
         on { availableOffline }.thenReturn(true)
         on { analyticsEventIdentifier }.thenReturn(mock())
         on { label }.thenReturn(android.R.string.ok)
+        on { icon }.thenReturn(Icons.Default.Home)
     })
 
     private fun stubConnectivity(connected: Boolean = true) {

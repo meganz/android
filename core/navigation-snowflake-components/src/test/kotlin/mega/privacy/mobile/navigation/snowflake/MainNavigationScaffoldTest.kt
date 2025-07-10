@@ -1,11 +1,20 @@
 package mega.privacy.mobile.navigation.snowflake
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -197,13 +206,13 @@ class MainNavigationScaffoldTest {
     fun test_that_only_first_four_items_and_last_item_are_displayed_when_more_than_four_are_added() {
 
         val navItems = listOf(
-            createMockNavItem(android.R.string.ok, 1, PreferredSlot.Ordered(1)),
-            createMockNavItem(android.R.string.cancel, 2, PreferredSlot.Ordered(2)),
-            createMockNavItem(android.R.string.copy, 3, PreferredSlot.Ordered(3)),
-            createMockNavItem(android.R.string.cut, 4, PreferredSlot.Ordered(4)),
-            createMockNavItem(android.R.string.paste, 5, PreferredSlot.Ordered(5)),
-            createMockNavItem(android.R.string.selectAll, 6, PreferredSlot.Ordered(6)),
-            createMockNavItem(android.R.string.dialog_alert_title, 7, PreferredSlot.Last)
+            createMockNavItem(android.R.string.ok, Icons.Default.Home, PreferredSlot.Ordered(1)),
+            createMockNavItem(android.R.string.cancel, Icons.Default.Settings, PreferredSlot.Ordered(2)),
+            createMockNavItem(android.R.string.copy, Icons.Default.Search, PreferredSlot.Ordered(3)),
+            createMockNavItem(android.R.string.cut, Icons.Default.Person, PreferredSlot.Ordered(4)),
+            createMockNavItem(android.R.string.paste, Icons.Default.Star, PreferredSlot.Ordered(5)),
+            createMockNavItem(android.R.string.selectAll, Icons.Default.Info, PreferredSlot.Ordered(6)),
+            createMockNavItem(android.R.string.dialog_alert_title, Icons.Default.Menu, PreferredSlot.Last)
         ).toImmutableSet()
         val onDestinationClick: (Any) -> Unit = mock()
         val isSelected: (Any) -> Boolean = { false }
@@ -239,8 +248,8 @@ class MainNavigationScaffoldTest {
     @Test
     fun test_that_all_items_are_displayed_if_only_one_item_and_last_are_passed() {
         val navItems = listOf(
-            createMockNavItem(android.R.string.ok, 1, PreferredSlot.Ordered(1)),
-            createMockNavItem(android.R.string.dialog_alert_title, 2, PreferredSlot.Last)
+            createMockNavItem(android.R.string.ok, Icons.Default.Home, PreferredSlot.Ordered(1)),
+            createMockNavItem(android.R.string.dialog_alert_title, Icons.Default.Menu, PreferredSlot.Last)
         ).toImmutableSet()
         val onDestinationClick: (Any) -> Unit = mock()
         val isSelected: (Any) -> Boolean = { false }
@@ -266,11 +275,11 @@ class MainNavigationScaffoldTest {
     @Test
     fun test_that_five_items_are_displayed_if_five_or_more_items_are_passed_and_no_last_item_is_passed() {
         val navItems = listOf(
-            createMockNavItem(android.R.string.ok, 1, PreferredSlot.Ordered(1)),
-            createMockNavItem(android.R.string.cancel, 2, PreferredSlot.Ordered(2)),
-            createMockNavItem(android.R.string.copy, 3, PreferredSlot.Ordered(3)),
-            createMockNavItem(android.R.string.cut, 4, PreferredSlot.Ordered(4)),
-            createMockNavItem(android.R.string.paste, 5, PreferredSlot.Ordered(5))
+            createMockNavItem(android.R.string.ok, Icons.Default.Home, PreferredSlot.Ordered(1)),
+            createMockNavItem(android.R.string.cancel, Icons.Default.Settings, PreferredSlot.Ordered(2)),
+            createMockNavItem(android.R.string.copy, Icons.Default.Search, PreferredSlot.Ordered(3)),
+            createMockNavItem(android.R.string.cut, Icons.Default.Person, PreferredSlot.Ordered(4)),
+            createMockNavItem(android.R.string.paste, Icons.Default.Star, PreferredSlot.Ordered(5))
         ).toImmutableSet()
         val onDestinationClick: (Any) -> Unit = mock()
         val isSelected: (Any) -> Boolean = { false }
@@ -305,7 +314,7 @@ class MainNavigationScaffoldTest {
         val navItems = listOf(
             createMockNavItem(
                 label = android.R.string.ok,
-                iconRes = 1,
+                icon = Icons.Default.Home,
                 preferredSlot = PreferredSlot.Ordered(1),
                 navigationEventIdentifier = expected,
             ),
@@ -334,17 +343,17 @@ class MainNavigationScaffoldTest {
     private fun createTestNavItems() = listOf(
         createMockNavItem(
             label = android.R.string.ok,
-            iconRes = 1,
+            icon = Icons.Default.Home,
             preferredSlot = PreferredSlot.Ordered(1)
         ),
         createMockNavItem(
             label = android.R.string.cancel,
-            iconRes = 2,
+            icon = Icons.Default.Settings,
             preferredSlot = PreferredSlot.Ordered(2)
         ),
         createMockNavItem(
             label = android.R.string.copy,
-            iconRes = 3,
+            icon = Icons.Default.Search,
             preferredSlot = PreferredSlot.Last
         )
     ).toImmutableSet()
@@ -352,25 +361,25 @@ class MainNavigationScaffoldTest {
     private fun createTestNavItemsWithBadge() = listOf(
         createMockNavItem(
             label = android.R.string.ok,
-            iconRes = 1,
+            icon = Icons.Default.Home,
             preferredSlot = PreferredSlot.Ordered(1)
         ),
         createMockNavItem(
             label = android.R.string.cancel,
-            iconRes = 2,
+            icon = Icons.Default.Settings,
             preferredSlot = PreferredSlot.Ordered(2),
             badgeText = "5"
         ),
         createMockNavItem(
             label = android.R.string.copy,
-            iconRes = 3,
+            icon = Icons.Default.Search,
             preferredSlot = PreferredSlot.Last
         )
     ).toImmutableSet()
 
     private fun createMockNavItem(
         label: Int,
-        iconRes: Int,
+        icon: ImageVector,
         preferredSlot: PreferredSlot,
         enabled: Boolean = true,
         badgeText: String? = null,
@@ -378,7 +387,7 @@ class MainNavigationScaffoldTest {
     ): NavigationItem {
         return NavigationItem(
             destination = TestHomeScreen,
-            iconRes = iconRes,
+            icon = icon,
             label = label,
             isEnabled = enabled,
             badgeText = badgeText,

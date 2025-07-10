@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -30,9 +31,9 @@ fun MainNavigationScaffold(
     mainNavItems: ImmutableSet<NavigationItem>,
     onDestinationClick: (Any) -> Unit,
     isSelected: (Any) -> Boolean,
-    mainNavItemIcon: @Composable (Int, String, Modifier) -> Unit = { icon, label, modifier ->
+    mainNavItemIcon: @Composable (ImageVector, String, Modifier) -> Unit = { icon, label, modifier ->
         MainNavigationIcon(
-            iconRes = icon,
+            icon = icon,
             label = label,
             modifier = modifier
         )
@@ -80,7 +81,7 @@ fun MainNavigationScaffold(
                     item(
                         icon = {
                             mainNavItemIcon(
-                                navItem.iconRes,
+                                navItem.icon,
                                 stringResource(navItem.label),
                                 Modifier.testTag(navItem.testTag),
                             )

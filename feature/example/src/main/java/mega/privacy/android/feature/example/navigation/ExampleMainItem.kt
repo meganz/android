@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.example.navigation
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraphBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -9,7 +9,7 @@ import mega.privacy.android.feature.example.presentation.HomeScreen
 import mega.privacy.android.feature.example.presentation.HomeScreen2
 import mega.privacy.android.feature.example.presentation.exampleHomeScreen
 import mega.privacy.android.feature.example.presentation.otherExampleHomeScreen
-import mega.privacy.android.icon.pack.R as IconPack
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.PreferredSlot
@@ -21,8 +21,7 @@ class ExampleMainItem : MainNavItem {
     override val screen: NavGraphBuilder.(NavigationHandler) -> Unit =
         { navigationHandler -> exampleHomeScreen() }
 
-    @DrawableRes
-    override val iconRes: Int = IconPack.drawable.ic_cloud
+    override val icon: ImageVector = IconPack.Medium.Thin.Outline.MessageChatCircle
     override val badge: Flow<String?>? = null
 
     @StringRes
@@ -37,8 +36,7 @@ class OtherExampleMainItem : MainNavItem {
     override val screen: NavGraphBuilder.(NavigationHandler) -> Unit =
         { navigationHandler -> otherExampleHomeScreen(navigationHandler::navigate) }
 
-    @DrawableRes
-    override val iconRes: Int = IconPack.drawable.ic_vpn
+    override val icon: ImageVector = IconPack.Medium.Thin.Outline.GearSix
     override val badge: Flow<String?>? = flow {
         var count = 0
         while (true) {

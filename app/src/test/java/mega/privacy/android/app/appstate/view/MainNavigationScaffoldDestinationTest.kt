@@ -15,6 +15,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.serialization.Serializable
 import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
@@ -123,7 +124,7 @@ class MainNavigationScaffoldDestinationTest {
         testTag: String,
     ) = NavigationItem(
         destination = destination,
-        iconRes = android.R.drawable.ic_menu_more,
+        icon = IconPack.Medium.Thin.Outline.Menu01,
         label = android.R.string.ok,
         isEnabled = true,
         analyticsEventIdentifier = mock<NavigationEventIdentifier>(),
