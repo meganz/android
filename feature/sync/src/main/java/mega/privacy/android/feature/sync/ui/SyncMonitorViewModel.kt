@@ -99,7 +99,6 @@ class SyncMonitorViewModel @Inject constructor(
         if (monitorNotificationsJob == null || monitorNotificationsJob?.isCancelled == true) {
             monitorNotificationsJob =
                 monitorSyncNotificationsUseCase()
-                    .distinctUntilChanged()
                     .catch { Timber.e("Error Monitoring SyncNotification $it") }
                     .onEach { notification ->
                         notification?.let {

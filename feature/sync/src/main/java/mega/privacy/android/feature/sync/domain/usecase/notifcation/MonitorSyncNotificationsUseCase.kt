@@ -26,12 +26,12 @@ class MonitorSyncNotificationsUseCase @Inject constructor(
     private val monitorSyncByChargingUseCase: MonitorSyncByChargingUseCase,
 ) {
     operator fun invoke() = combine(
-        monitorSyncStalledIssuesUseCase(),
-        monitorSyncsUseCase(),
-        monitorBatteryInfoUseCase(),
-        monitorSyncByWiFiUseCase(),
-        monitorConnectivityUseCase(),
-        monitorSyncByChargingUseCase()
+        monitorSyncStalledIssuesUseCase().distinctUntilChanged(),
+        monitorSyncsUseCase().distinctUntilChanged(),
+        monitorBatteryInfoUseCase().distinctUntilChanged(),
+        monitorSyncByWiFiUseCase().distinctUntilChanged(),
+        monitorConnectivityUseCase().distinctUntilChanged(),
+        monitorSyncByChargingUseCase().distinctUntilChanged()
     ) { flows ->
         val stalledIssues = flows[0] as List<StalledIssue>
         val syncs = flows[1] as List<FolderPair>
@@ -39,15 +39,14 @@ class MonitorSyncNotificationsUseCase @Inject constructor(
         val syncByWifi = flows[3] as Boolean
         val isConnectedToInternet = flows[4] as Boolean
         val isSyncByChargingOnly = flows[5] as Boolean
-        val isUserOnWifi = isOnWifiNetworkUseCase()
         getSyncNotificationUseCase(
             isBatteryLow = batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging,
-            isUserOnWifi = isConnectedToInternet && isUserOnWifi,
+            isUserOnWifi = isConnectedToInternet && isOnWifiNetworkUseCase(),
             isSyncOnlyByWifi = syncByWifi,
             syncs = syncs,
             isCharging = batteryInfo.isCharging,
             isSyncOnlyWhenCharging = isSyncByChargingOnly,
             stalledIssues = stalledIssues
         )
-    }.distinctUntilChanged()
+    }
 }

@@ -26,12 +26,12 @@ class MonitorSyncNotificationTypeUseCase @Inject constructor(
     private val monitorSyncByChargingUseCase: MonitorSyncByChargingUseCase,
 ) {
     operator fun invoke() = combine(
-        monitorSyncStalledIssuesUseCase(),
-        monitorSyncsUseCase(),
-        monitorBatteryInfoUseCase(),
-        monitorSyncByWiFiUseCase(),
-        monitorConnectivityUseCase(),
-        monitorSyncByChargingUseCase()
+        monitorSyncStalledIssuesUseCase().distinctUntilChanged(),
+        monitorSyncsUseCase().distinctUntilChanged(),
+        monitorBatteryInfoUseCase().distinctUntilChanged(),
+        monitorSyncByWiFiUseCase().distinctUntilChanged(),
+        monitorConnectivityUseCase().distinctUntilChanged(),
+        monitorSyncByChargingUseCase().distinctUntilChanged()
     ) { flows ->
         val stalledIssues = flows[0] as List<StalledIssue>
         val syncs = flows[1] as List<FolderPair>
@@ -48,5 +48,5 @@ class MonitorSyncNotificationTypeUseCase @Inject constructor(
             isSyncOnlyWhenCharging = isSyncByChargingOnly,
             stalledIssues = stalledIssues
         )
-    }.distinctUntilChanged()
+    }
 }

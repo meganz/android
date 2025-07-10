@@ -1339,4 +1339,10 @@
     <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
     <!-- The camera uploads notification content to reminder there is no network connection-->
     <string name="camera_uploads_notification_content_no_network_connection">Waiting for WIFI or mobile data</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">Power Settings</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">Sync always</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
 </resources>
