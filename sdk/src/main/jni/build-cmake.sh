@@ -97,8 +97,9 @@ for ABI in ${BUILD_ARCHS}; do
     esac
 
     echo "* Configuring MEGA SDK - ${ABI}"
-    cmake -B ${BUILD_DIR} \
-        -S megachat/sdk/third-party/mega \
+    cmake --preset mega-android \
+        -B ${BUILD_DIR} \
+        -S mega/sdk \
         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
         -DBUILD_SHARED_LIBS=ON \
         -DANDROID_NDK=${NDK_ROOT} \
@@ -109,18 +110,7 @@ for ABI in ${BUILD_ARCHS}; do
         -DANDROID_PLATFORM=android-${ANDROID_API_LEVEL} \
         -DVCPKG_ROOT=${VCPKG_ROOT} \
         -DVCPKG_TARGET_TRIPLET=${VCPKG_TRIPLET} \
-        -DENABLE_CHAT=ON \
-        -DENABLE_JAVA_BINDINGS=ON \
-        -DENABLE_SDKLIB_EXAMPLES=OFF \
-        -DENABLE_SDKLIB_TESTS=OFF \
-        -DCMAKE_ANDROID_API=${ANDROID_API_LEVEL} \
-        -DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON \
-        -DUSE_PDFIUM=OFF \
-        -DENABLE_CHAT=ON \
-        -DUSE_FREEIMAGE=OFF \
-        -DUSE_FFMPEG=OFF \
-        -DUSE_LIBUV=ON \
-        -DUSE_READLINE=OFF &>> ${LOG_FILE}
+        -DCMAKE_ANDROID_API=${ANDROID_API_LEVEL} &>> ${LOG_FILE}
     echo "* Building MEGA SDK - ${ABI}"
     cmake --build "${BUILD_DIR}" -j "${JOBS}" &>> ${LOG_FILE}
 done
@@ -149,7 +139,10 @@ for ABI in ${BUILD_ARCHS}; do
 
     echo "* Configuring MEGA Chat SDK - ${ABI}"
 
-    cmake -B ${BUILD_DIR} -S megachat/sdk \
+    cmake --preset mega-android \
+        -B ${BUILD_DIR} \
+        -S megachat/sdk \
+        -DSDK_DIR=mega/sdk \
         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
         -DBUILD_SHARED_LIBS=ON \
         -DANDROID_NDK=${NDK_ROOT} \
@@ -157,22 +150,15 @@ for ABI in ${BUILD_ARCHS}; do
         -DCMAKE_SYSTEM_NAME=Android \
         -DCMAKE_ANDROID_ARCH_ABI=${ABI} \
         -DANDROID_ABI=${ABI} \
-        -DENABLE_JAVA_BINDINGS=ON \
         -DANDROID_PLATFORM=android-${ANDROID_API_LEVEL} \
         -DVCPKG_ROOT=${VCPKG_ROOT} \
         -DVCPKG_TARGET_TRIPLET=${VCPKG_TRIPLET} \
-        -DCMAKE_ANDROID_API=${ANDROID_API_LEVEL} \
-        -DENABLE_CHATLIB_QTAPP=OFF \
-        -DENABLE_CHATLIB_MEGACLC=OFF \
-        -DENABLE_QT_BINDINGS=OFF \
-        -DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON &>> ${LOG_FILE}
+        -DCMAKE_ANDROID_API=${ANDROID_API_LEVEL} &>> ${LOG_FILE}
 
     echo "* Building MEGA Chat SDK - ${ABI}"
     cmake --build "${BUILD_DIR}" -j "${JOBS}" &>> ${LOG_FILE}
 
 done
-
-echo "* Task finished OK"
 
 end_time=$SECONDS
 total_time=$((end_time - start_time))
