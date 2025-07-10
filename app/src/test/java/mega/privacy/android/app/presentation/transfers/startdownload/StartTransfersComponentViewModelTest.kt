@@ -37,6 +37,7 @@ import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -1223,6 +1224,54 @@ class StartTransfersComponentViewModelTest {
                 )
 
                 verify(deleteCompletedTransfersByIdUseCase)(retriedTransferIds)
+            }
+
+        @Test
+        fun `test that state is updated with NotSufficientSpace event when insufficient space for downloads`() =
+            runTest {
+                commonStub()
+
+                whenever(getOfflinePathForNodeUseCase(any())) doReturn DESTINATION
+                whenever(shouldPromptToSaveDestinationUseCase()) doReturn true
+                whenever(
+                    insertPendingDownloadsForNodesUseCase(
+                        retryDownloadEvent.nodes,
+                        UriPath(retryDownloadEvent.downloadLocation),
+                        retryDownloadEvent.isHighPriority,
+                        retryDownloadEvent.appData,
+                    )
+                ).thenAnswer { throw NotEnoughStorageException() }
+
+                underTest.startTransfer(retryDownloadsEvent)
+
+                underTest.uiState.map { it.oneOffViewEvent }.test {
+                    assertThat(awaitItem())
+                        .isEqualTo(triggered(StartTransferEvent.Message.NotSufficientSpace))
+                }
+            }
+
+        @Test
+        fun `test that state is not updated with NotSufficientSpace event when sufficient space for downloads`() =
+            runTest {
+                commonStub()
+
+                whenever(getOfflinePathForNodeUseCase(any())) doReturn DESTINATION
+                whenever(shouldPromptToSaveDestinationUseCase()) doReturn true
+                whenever(
+                    insertPendingDownloadsForNodesUseCase(
+                        retryDownloadEvent.nodes,
+                        UriPath(retryDownloadEvent.downloadLocation),
+                        retryDownloadEvent.isHighPriority,
+                        retryDownloadEvent.appData,
+                    )
+                ) doReturn Unit
+
+                underTest.startTransfer(retryDownloadsEvent)
+
+                underTest.uiState.map { it.oneOffViewEvent }.test {
+                    assertThat(awaitItem())
+                        .isNotEqualTo(triggered(StartTransferEvent.Message.NotSufficientSpace))
+                }
             }
     }
 

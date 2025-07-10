@@ -210,6 +210,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private suspend fun retryTransfers(transferTriggerEvent: TransferTriggerEvent.RetryTransfers) {
         var retryUploads = false
         var retryDownloads = false
+        var notEnoughStorage = false
         var shouldPromptToSaveDestination = false
         var defaultLocation: String? = null
 
@@ -253,14 +254,23 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         } else {
                             null
                         })?.let { location ->
-                            retryDownloads = true
-                            add(id)
-                            insertPendingDownloadsForNodesUseCase(
-                                event.nodes,
-                                UriPath(location),
-                                event.isHighPriority,
-                                event.appData
-                            )
+                            runCatching {
+                                insertPendingDownloadsForNodesUseCase(
+                                    event.nodes,
+                                    UriPath(location),
+                                    event.isHighPriority,
+                                    event.appData
+                                )
+                            }.onSuccess {
+                                retryDownloads = true
+                                add(id)
+                            }.onFailure {
+                                if (it is NotEnoughStorageException) {
+                                    notEnoughStorage = true
+                                } else {
+                                    Timber.e(it)
+                                }
+                            }
                         }
                     }
 
@@ -282,6 +292,14 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 }
             }
         }.let { retriedTransferIds ->
+            if (notEnoughStorage) {
+                _uiState.update { state ->
+                    state.copy(
+                        oneOffViewEvent = triggered(StartTransferEvent.Message.NotSufficientSpace)
+                    )
+                }
+            }
+
             if (retriedTransferIds.isNotEmpty()) {
                 viewModelScope.launch {
                     when {
