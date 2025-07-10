@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.filestorage
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
@@ -56,6 +55,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.util.Stack
 
@@ -70,7 +70,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
     private lateinit var lastPositionStack: Stack<Int>
     private lateinit var viewContainer: RelativeLayout
     private var contentText: TextView? = null
-    private var listView: RecyclerView? = null
+    private lateinit var listView: RecyclerView
     private var mLayoutManager: LinearLayoutManager? = null
     private var emptyImageView: ImageView? = null
     private var emptyTextView: TextView? = null
@@ -214,11 +214,11 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                 is FileStorageUiState.Loaded -> {
                     checkMenuVisibility(it.currentFolder?.uriPath)
                     contentText?.text = it.currentFolderPath
-                    adapter?.setFiles(it.children)
+                    adapter?.currentFiles = it.children
                     showEmptyState()
                     it.getHighlightFilePosition()?.let { highlightFilePosition ->
                         Handler(Looper.getMainLooper()).post {
-                            val smoothScroller = CenterSmoothScroller(listView?.context)
+                            val smoothScroller = CenterSmoothScroller(listView.context)
                             smoothScroller.targetPosition = highlightFilePosition
                             mLayoutManager?.startSmoothScroll(smoothScroller)
                         }
@@ -502,7 +502,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
             }
             changeFolder(document.uriPath)
         } else if (mode == Mode.BROWSE_FILES) {
-            adapter?.getItem(position)?.let {
+            adapter?.getDocumentAt(position)?.let {
                 viewModel.documentClicked(it)
             } ?: run {
                 showSnackbar(
