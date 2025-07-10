@@ -1,5 +1,8 @@
 @Library('jenkins-android-shared-lib') _
 
+BUILD_START_TIME = System.currentTimeMillis()
+
+
 BUILD_STEP = ""
 
 GMS_APK_BUILD_LOG = "gms_build.log"
@@ -99,7 +102,6 @@ pipeline {
             script {
                 common = load('jenkinsfile/common.groovy')
 
-
                 // download Jenkins console log
                 common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
@@ -109,14 +111,16 @@ pipeline {
                 String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
 
                 // upload unit test report if unit test fail
-
                 String unitTestResult = ""
                 for (def module in UNIT_TEST_RESULT_LINK_MAP.keySet()) {
                     String result = UNIT_TEST_RESULT_LINK_MAP[module]
                     unitTestResult += "<br>$module Unit Test: [$module test report](${result})"
                 }
 
-                def failureMessage = ":x: Build Failed(Build: ${env.BUILD_NUMBER})" +
+                // Calculate build duration
+                String duration = getBuildDurationStr()
+
+                def failureMessage = ":x: Build Failed(Build: ${env.BUILD_NUMBER}) (Duration: ${duration})" +
                         "<br/>Failure Stage: ${BUILD_STEP}" +
                         "<br/>Last Commit Message: ${getLastCommitMessage()}" +
                         "Last Commit ID: ${env.GIT_COMMIT}" +
@@ -137,12 +141,13 @@ pipeline {
                                 "<b>WIP:</b> from the beginning of MR title."
                         common.sendToMR(skipMessage)
                     } else {
-                        String buildMessage = ":white_check_mark: Build Succeeded!(Build: ${env.BUILD_NUMBER})\n\n" +
-                                "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
-                                "**Build Warnings:**\n" + getBuildWarnings() + "\n\n"
-
                         String coverageMessage = buildLintSummaryTable(JSON_LINT_REPORT_LINK, LINT_REPORT_SUMMARY_MAP) + "\n\n" +
                                 COVERAGE_SUMMARY
+
+                        String duration = getBuildDurationStr()
+                        String buildMessage = ":white_check_mark: Build Succeeded!(Build: ${env.BUILD_NUMBER}) (Duration: ${duration})\n\n" +
+                                "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
+                                "**Build Warnings:**\n" + getBuildWarnings() + "\n\n"
 
                         // Create the String to be posted as a comment in Gitlab
                         String mergeRequestMessage
@@ -541,5 +546,18 @@ def checkFatalErrors(def lintJsonContent) {
     if (fatalCount > 0) {
         util.failPipeline("!!!!!!!! There are ${fatalCount} fatal lint errors. Build is failing.")
     }
+}
+
+/**
+ * Get the build duration in minutes and seconds.
+ *
+ * @return A String that contains the build duration in minutes and seconds.
+ */
+String getBuildDurationStr() {
+    long BUILD_END_TIME = System.currentTimeMillis()
+    long durationMillis = BUILD_END_TIME - BUILD_START_TIME
+    int minutes = (int)(durationMillis / 1000 / 60)
+    int seconds = (int)((int)(durationMillis / 1000) % 60)
+    return String.format("%dm %02ds", minutes, seconds)
 }
 
