@@ -302,12 +302,14 @@ class FolderLinkRepositoryImplTest {
             val imageNode = mock<TypedImageNode>()
             whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
             whenever(megaSearchFilterMapper(NodeId(megaNode.handle))).thenReturn(filter)
+
             val child = mock<MegaNode>() {
                 on { name }.thenReturn("name")
                 on { duration }.thenReturn(0)
             }
             megaApiFolderGateway.stub {
                 onBlocking { getChildren(filter, expectedOrder, token) }.thenReturn(listOf(child))
+                onBlocking { authorizeNode(child.handle) }.thenReturn(child)
             }
             whenever(
                 fileTypeInfoMapper(
@@ -319,8 +321,9 @@ class FolderLinkRepositoryImplTest {
             whenever(imageNodeMapper(any(), any(), any(), anyOrNull())).thenReturn(imageNode)
             val id = 1L
             val order = 0
-            whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
             val actual = underTest.getFolderLinkImageNodes(id, order)
             assertThat(actual).containsExactly(imageNode)
+
+            verify(megaApiFolderGateway).authorizeNode(child.handle)
         }
 }

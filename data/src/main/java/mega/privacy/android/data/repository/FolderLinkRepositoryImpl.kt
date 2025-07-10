@@ -162,7 +162,11 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
             val token = cancelTokenProvider.getOrCreateCancelToken()
             val filter = megaSearchFilterMapper(parentHandle = NodeId(handle))
             megaApiFolderGateway.getChildren(filter, order ?: MegaApiJava.ORDER_NONE, token)
-                .mapNotNull { convertToImageNode(it) }
+                .mapNotNull { node ->
+                    megaApiFolderGateway
+                        .authorizeNode(node.handle)
+                        ?.let { convertToImageNode(it) }
+                }
         }
 
     private suspend fun convertToImageNode(node: MegaNode): ImageNode? {
