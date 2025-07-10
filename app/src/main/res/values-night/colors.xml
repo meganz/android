@@ -374,7 +374,7 @@
     <color name="color_text_inverse">#FF303233</color>
     <color name="color_background_surface_1">#FF303233</color>
     <color name="color_background_surface_2">#494A4D</color>
-    <color name="color_background_pageBackground">#FF18191A</color>
+    <color name="color_background_pageBackground">#FF151616</color>
     <color name="color_link_primary">#69A3FB</color>
     <color name="color_support_success">#09BF5B</color>
     <color name="color_components_interactive">#FB6361</color>

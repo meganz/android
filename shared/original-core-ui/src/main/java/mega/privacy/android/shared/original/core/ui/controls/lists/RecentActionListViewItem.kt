@@ -27,12 +27,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -194,9 +196,10 @@ fun RecentActionListViewItem(
             }
 
             if (showMenuButton) {
-                Image(
+                MegaIcon(
                     painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                     contentDescription = "3 dots",
+                    tint = IconColor.Secondary,
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .clickable {

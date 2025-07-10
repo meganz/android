@@ -50,7 +50,7 @@ private annotation class ArabicLocale
 @Preview(
     showBackground = true,
     locale = "en",
-    backgroundColor = 0xFF18191A,
+    backgroundColor = 0xFF151616,
     name = "1-Dark theme",
     group = "themes",
     uiMode = Configuration.UI_MODE_NIGHT_YES,
@@ -74,7 +74,7 @@ annotation class CombinedThemePreviews
 @Preview(
     showBackground = true,
     locale = "en",
-    backgroundColor = 0xFF18191A,
+    backgroundColor = 0xFF151616,
     name = "1-Dark theme",
     group = "themes",
     uiMode = Configuration.UI_MODE_NIGHT_YES,
@@ -94,7 +94,7 @@ annotation class CombinedThemeComponentPreviews
 @Preview(
     showBackground = true,
     locale = "en",
-    backgroundColor = 0xFF18191A,
+    backgroundColor = 0xFF151616,
     name = "1-Dark theme",
     group = "themes",
     uiMode = Configuration.UI_MODE_NIGHT_YES,
@@ -118,7 +118,7 @@ annotation class CombinedThemeTabletLandscapePreviews
 @Preview(
     showBackground = true,
     locale = "en",
-    backgroundColor = 0xFF18191A,
+    backgroundColor = 0xFF151616,
     name = "1-Dark theme",
     group = "themes",
     uiMode = Configuration.UI_MODE_NIGHT_YES,
@@ -157,7 +157,7 @@ annotation class CombinedTextAndThemePreviews
 @Preview(
     showBackground = true,
     locale = "en",
-    backgroundColor = 0xFF18191A,
+    backgroundColor = 0xFF151616,
     name = "1-Dark theme",
     group = "themes",
     uiMode = Configuration.UI_MODE_NIGHT_YES,
