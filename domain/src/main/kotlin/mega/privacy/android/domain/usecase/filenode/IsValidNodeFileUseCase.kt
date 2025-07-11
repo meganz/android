@@ -21,8 +21,7 @@ class IsValidNodeFileUseCase @Inject constructor(private val fingerprintReposito
     suspend operator fun invoke(
         node: FileNode,
         file: File,
-    ): Boolean =
-        file.canRead() && file.length() == node.size && node.fingerprint == fingerprintRepository.getFingerprint(
-            file.absolutePath
-        )
+    ): Boolean = file.canRead() && file.length() == node.size
+// && node.fingerprint == fingerprintRepository.getFingerprint(file.absolutePath)
+// Add the check once fingerprint mismatch issue is resolved in SDK, SAO-2917
 }
