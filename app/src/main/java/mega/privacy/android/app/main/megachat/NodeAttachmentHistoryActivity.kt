@@ -114,7 +114,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     private var materialToolBar: MaterialToolbar? = null
 
     var container: RelativeLayout? = null
-    var listView: RecyclerView? = null
+    private var listView: RecyclerView? = null
     var mLayoutManager: LinearLayoutManager? = null
 //    var emptyLayout: RelativeLayout? = null
 //    var emptyTextView: TextView? = null
@@ -123,7 +123,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 //    var importIcon: MenuItem? = null
 //    private var thumbViewMenuItem: MenuItem? = null
 
-    var messages: ArrayList<MegaChatMessage>? = null
+    private var chatMessages: ArrayList<MegaChatMessage>? = null
     private var bufferMessages: ArrayList<MegaChatMessage>? = null
 
     @JvmField
@@ -278,10 +278,10 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
             chatRoom = megaChatApi.getChatRoom(chatId)
 
             if (chatRoom != null) {
-                messages = ArrayList()
+                chatMessages = ArrayList()
                 bufferMessages = ArrayList()
 
-                if (messages?.isNotEmpty() == true) {
+                if (chatMessages?.isNotEmpty() == true) {
                     emptyLayout.visibility = View.GONE
                     listView?.visibility = View.VISIBLE
                 } else {
@@ -293,16 +293,18 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                 if (resultOpen) {
                     Timber.d("Node history opened correctly")
 
-                    messages = ArrayList()
+                    chatMessages = ArrayList()
 
                     if (adapter == null) {
-                        adapter = NodeAttachmentHistoryAdapter(this, messages, listView)
+                        adapter = NodeAttachmentHistoryAdapter(this, listView).apply {
+                            messages = chatMessages
+                        }
                     }
 
                     listView?.setAdapter(adapter)
-                    adapter?.isMultipleSelect = false
+                    adapter?.multipleSelect = false
 
-                    adapter?.setMessages(messages)
+                    adapter?.messages = chatMessages
 
                     isLoadingHistory = true
                     Timber.d("A->loadAttachments")
@@ -461,7 +463,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.findItem(R.id.action_select).setVisible(messages?.isNotEmpty() == true)
+        menu.findItem(R.id.action_select).setVisible(chatMessages?.isNotEmpty() == true)
 
         menu.findItem(R.id.action_unselect).setVisible(false)
         menu.findItem(R.id.action_grid).setVisible(false)
@@ -493,8 +495,8 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
     fun activateActionMode() {
         Timber.d("activateActionMode")
-        if (adapter?.isMultipleSelect == false) {
-            adapter?.isMultipleSelect = true
+        if (adapter?.multipleSelect == false) {
+            adapter?.multipleSelect = true
             notifyDataSetChanged()
             actionMode = startSupportActionMode(ActionBarCallBack())
         }
@@ -502,7 +504,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
     // Clear all selected items
     private fun clearSelections() {
-        if (adapter?.isMultipleSelect == true) {
+        if (adapter?.multipleSelect == true) {
             adapter?.clearSelections()
         }
     }
@@ -510,10 +512,10 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     fun selectAll() {
         Timber.d("selectAll")
         if (adapter != null) {
-            if (adapter?.isMultipleSelect == true) {
+            if (adapter?.multipleSelect == true) {
                 adapter?.selectAll()
             } else {
-                adapter?.isMultipleSelect = true
+                adapter?.multipleSelect = true
                 adapter?.selectAll()
 
                 actionMode = startSupportActionMode(ActionBarCallBack())
@@ -526,10 +528,10 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         Timber.d("Position: %s", position)
         megaChatApi.signalPresenceActivity()
 
-        if (position < (messages?.size ?: 0)) {
-            val m = messages?.get(position)
+        if (position < (chatMessages?.size ?: 0)) {
+            val m = chatMessages?.get(position)
 
-            if (adapter?.isMultipleSelect == true) {
+            if (adapter?.multipleSelect == true) {
                 adapter?.toggleSelection(position)
                 if (adapter?.selectedMessages?.isNotEmpty() == true) {
                     updateActionModeTitle()
@@ -673,7 +675,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
             Timber.w(
                 "DO NOTHING: Position (%d) is more than size in messages (size: %d)",
                 position,
-                messages?.size
+                chatMessages?.size
             )
         }
     }
@@ -682,7 +684,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         var currentNodeHandle = MegaApiJava.INVALID_HANDLE
         val messageIds: MutableList<Long> = ArrayList()
 
-        messages?.forEach { message ->
+        chatMessages?.forEach { message ->
             messageIds.add(message.msgId)
             if (message.msgId == msgId) {
                 currentNodeHandle = message.megaNodeList[0].handle
@@ -725,7 +727,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
      * Disable selection
      */
     fun hideMultipleSelect() {
-        adapter?.isMultipleSelect = false
+        adapter?.multipleSelect = false
         if (actionMode != null) {
             actionMode?.finish()
         }
@@ -845,7 +847,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
             Timber.d("onDestroyActionMode")
             adapter?.clearSelections()
             notifyDataSetChanged()
-            adapter?.isMultipleSelect = false
+            adapter?.multipleSelect = false
             checkScroll()
         }
 
@@ -948,7 +950,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         }
     }
 
-    fun showConfirmationDeleteMessages(messages: ArrayList<MegaChatMessage?>?, chat: MegaChatRoom) {
+    fun showConfirmationDeleteMessages(messages: ArrayList<MegaChatMessage>?, chat: MegaChatRoom) {
         Timber.d("Chat ID: %s", chat.chatId)
 
         val dialogClickListener =
@@ -1120,14 +1122,14 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                         Timber.d("Node Handle: %s", node.handle)
                         bufferMessages?.add(msg)
                         Timber.d("Size of buffer: %s", bufferMessages?.size)
-                        Timber.d("Size of messages: %s", messages?.size)
+                        Timber.d("Size of messages: %s", chatMessages?.size)
                     }
                 }
             }
         } else {
             Timber.d("Message is NULL: end of history")
             val bufferSize = bufferMessages?.size ?: 0
-            val listSize = messages?.size ?: 0
+            val listSize = chatMessages?.size ?: 0
             if ((bufferSize + listSize) >= NUMBER_MESSAGES_TO_LOAD) {
                 fullHistoryReceivedOnLoad()
                 isLoadingHistory = false
@@ -1153,7 +1155,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     }
 
     private fun fullHistoryReceivedOnLoad() {
-        Timber.d("Messages size: %s", messages?.size)
+        Timber.d("Messages size: %s", chatMessages?.size)
 
         if (bufferMessages?.isNotEmpty() == true) {
             Timber.d("Buffer size: %s", bufferMessages?.size)
@@ -1162,13 +1164,15 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
             bufferMessages?.listIterator()?.let {
                 while (it.hasNext()) {
-                    messages?.add(it.next())
+                    chatMessages?.add(it.next())
                 }
             }
 
-            if (messages?.isNotEmpty() == true) {
+            if (chatMessages?.isNotEmpty() == true) {
                 if (adapter == null) {
-                    adapter = NodeAttachmentHistoryAdapter(this, messages, listView)
+                    adapter = NodeAttachmentHistoryAdapter(this, listView).apply {
+                        messages = chatMessages
+                    }
                     listView?.layoutManager = mLayoutManager
                     listView?.addItemDecoration(SimpleDividerItemDecoration(this))
                     listView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -1178,9 +1182,11 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                         }
                     })
                     listView?.adapter = adapter
-                    adapter?.setMessages(messages)
+                    adapter?.messages = chatMessages
                 } else {
-                    bufferMessages?.size?.let { adapter?.loadPreviousMessages(messages, it) }
+                    bufferMessages?.size?.let {
+                        adapter?.loadPreviousMessages(chatMessages, it)
+                    }
                 }
             }
             bufferMessages?.clear()
@@ -1200,23 +1206,25 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         Timber.d("TYPE: %s", msg.type)
 
         var lastIndex = 0
-        if (messages?.isEmpty() == true) {
-            messages?.add(msg)
+        if (chatMessages?.isEmpty() == true) {
+            chatMessages?.add(msg)
         } else {
             Timber.d("Status of message: %s", msg.status)
 
-            while ((messages?.get(lastIndex)?.msgIndex ?: -1) > msg.msgIndex) {
+            while ((chatMessages?.get(lastIndex)?.msgIndex ?: -1) > msg.msgIndex) {
                 lastIndex++
             }
 
             Timber.d("Append in position: %s", lastIndex)
-            messages?.add(lastIndex, msg)
+            chatMessages?.add(lastIndex, msg)
         }
 
         //Create adapter
         if (adapter == null) {
             Timber.d("Create adapter")
-            adapter = NodeAttachmentHistoryAdapter(this, messages, listView)
+            adapter = NodeAttachmentHistoryAdapter(this, listView).apply {
+                messages = chatMessages
+            }
             listView?.layoutManager = mLayoutManager
             listView?.addItemDecoration(SimpleDividerItemDecoration(this))
             listView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -1226,14 +1234,14 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                 }
             })
             listView?.adapter = adapter
-            adapter?.setMessages(messages)
+            adapter?.messages = chatMessages
         } else {
             Timber.d("Update adapter with last index: %s", lastIndex)
             if (lastIndex < 0) {
                 Timber.d("Arrives the first message of the chat")
-                adapter?.setMessages(messages)
+                adapter?.messages = chatMessages
             } else {
-                adapter?.addMessage(messages, lastIndex + 1)
+                adapter?.addMessage(chatMessages, lastIndex + 1)
                 adapter?.notifyItemChanged(lastIndex)
             }
         }
@@ -1249,7 +1257,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
         var indexToChange = -1
 
-        messages?.listIterator()?.let {
+        chatMessages?.listIterator()?.let {
             while (it.hasNext()) {
                 val messageToCheck = it.next()
                 if (messageToCheck.tempId == msgid) {
@@ -1264,12 +1272,12 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         }
 
         if (indexToChange != -1) {
-            messages?.removeAt(indexToChange)
-            Timber.d("Removed index: %d, Messages size: %d", indexToChange, messages?.size)
+            chatMessages?.removeAt(indexToChange)
+            Timber.d("Removed index: %d, Messages size: %d", indexToChange, chatMessages?.size)
 
-            adapter?.removeMessage(indexToChange, messages)
+            adapter?.removeMessage(indexToChange, chatMessages)
 
-            if (messages?.isEmpty() == true) {
+            if (chatMessages?.isEmpty() == true) {
                 findViewById<RelativeLayout>(R.id.empty_layout_node_history).visibility =
                     View.VISIBLE
                 listView?.visibility = View.GONE
@@ -1284,7 +1292,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     override fun onTruncate(api: MegaChatApiJava, msgid: Long) {
         Timber.d("Message ID: %s", msgid)
         invalidateOptionsMenu()
-        messages?.clear()
+        chatMessages?.clear()
         notifyDataSetChanged()
         listView?.visibility = View.GONE
         findViewById<RelativeLayout>(R.id.empty_layout_node_history).visibility = View.VISIBLE
@@ -1307,7 +1315,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     fun checkScroll() {
         if (listView != null) {
             val withElevation = listView?.canScrollVertically(-1) ?: false
-                    || (adapter != null && adapter?.isMultipleSelect == true)
+                    || (adapter != null && adapter?.multipleSelect == true)
             val elevation = resources.getDimension(R.dimen.toolbar_elevation)
             materialToolBar?.elevation = if (withElevation) elevation else 0f
         }
