@@ -95,9 +95,9 @@ data class LoginState(
     val accountBlockedEvent: StateEventWithContent<AccountBlockedDetail> = consumed(),
     val resendVerificationEmailEvent: StateEventWithContent<Boolean> = consumed(),
     val checkRecoveryKeyEvent: StateEventWithContent<Result<RkLink>> = consumed(),
-    val onBackPressedEvent: StateEvent = consumed,
     val shouldShowUpgradeAccount: Boolean = false,
     val recoveryKeyLink: String? = null,
+    val shouldShowNotificationPermission: Boolean = false,
 ) {
 
     /**

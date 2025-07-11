@@ -149,11 +149,7 @@ class LoginActivity : BaseActivity() {
                 composable("start") {
                     // no-op, we checking start destination in the view model
                 }
-                loginScreen(
-                    onBackPressed = {
-                        viewModel.triggerOnBackPressedEvent()
-                    }
-                )
+                loginScreen()
                 createAccountScreen(
                     onBackPressed = {
                         viewModel.setPendingFragmentToShow(LoginFragmentType.Tour)

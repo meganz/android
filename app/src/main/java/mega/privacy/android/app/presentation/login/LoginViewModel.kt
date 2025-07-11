@@ -143,7 +143,7 @@ class LoginViewModel @Inject constructor(
     private val getLastRegisteredEmailUseCase: GetLastRegisteredEmailUseCase,
     private val clearLastRegisteredEmailUseCase: ClearLastRegisteredEmailUseCase,
     private val installReferrerHandler: InstallReferrerHandler,
-    @LoginMutex private val loginMutex: Mutex,
+    @LoginMutex val loginMutex: Mutex,
     private val clearUserCredentialsUseCase: ClearUserCredentialsUseCase,
     private val getHistoricalProcessExitReasonsUseCase: GetHistoricalProcessExitReasonsUseCase,
     private val enableRequestStatusMonitorUseCase: EnableRequestStatusMonitorUseCase,
@@ -306,7 +306,15 @@ class LoginViewModel @Inject constructor(
                         state.copy(themeMode = themeMode)
                     }
                 },
-                ).collect {
+                flow {
+                    emit(shouldShowNotificationReminderUseCase())
+                }.catch { Timber.e(it) }
+                    .map { shouldShowNotificationPermission ->
+                        { state: LoginState ->
+                            state.copy(shouldShowNotificationPermission = shouldShowNotificationPermission)
+                        }
+                    },
+            ).collect {
                 _state.update(it)
             }
         }
@@ -1208,26 +1216,6 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             setLoggedOutFromAnotherLocationUseCase(false)
         }
-    }
-
-    suspend fun shouldShowNotificationPermission(): Boolean {
-        return runCatching {
-            shouldShowNotificationReminderUseCase()
-        }.getOrDefault(false)
-    }
-
-    /**
-     * Trigger on back pressed event
-     */
-    fun triggerOnBackPressedEvent() {
-        _state.update { it.copy(onBackPressedEvent = triggered) }
-    }
-
-    /**
-     * Consumed on back pressed event
-     */
-    fun consumedOnBackPressedEvent() {
-        _state.update { it.copy(onBackPressedEvent = consumed) }
     }
 
     /**

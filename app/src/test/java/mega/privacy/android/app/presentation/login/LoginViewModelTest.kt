@@ -155,7 +155,9 @@ internal class LoginViewModelTest {
         mock()
     private val savedStateHandle = mock<SavedStateHandle>()
     private val shouldShowNotificationReminderUseCase =
-        mock<ShouldShowNotificationReminderUseCase>()
+        mock<ShouldShowNotificationReminderUseCase> {
+            onBlocking { invoke() }.thenReturn(false)
+        }
     private val shouldShowUpgradeAccountUseCase = mock<ShouldShowUpgradeAccountUseCase>()
     private val ephemeralCredentialManager = mock<EphemeralCredentialManager>()
     private val resumeTransfersForNotLoggedInInstanceUseCase =
@@ -630,23 +632,6 @@ internal class LoginViewModelTest {
         advanceUntilIdle()
         verify(setLoggedOutFromAnotherLocationUseCase).invoke(false)
     }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that should show notification reminder returns correct value`(value: Boolean) =
-        runTest {
-            whenever(shouldShowNotificationReminderUseCase()) doReturn value
-
-            assertThat(underTest.shouldShowNotificationPermission()).isEqualTo(value)
-        }
-
-    @Test
-    fun `test that should show notification reminder returns false when use case throws exception`() =
-        runTest {
-            whenever(shouldShowNotificationReminderUseCase()).thenThrow(RuntimeException())
-
-            assertThat(underTest.shouldShowNotificationPermission()).isFalse()
-        }
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
