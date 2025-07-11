@@ -31,6 +31,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.yalantis.ucrop.UCrop
+import com.yalantis.ucrop.UCropActivity.Companion.SCALE
+import com.yalantis.ucrop.view.OverlayView.Companion.FREESTYLE_CROP_MODE_ENABLE_WITH_PASS_THROUGH
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.launchIn
@@ -87,6 +89,8 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ImagePreviewGetLinkMenuItemEvent
+import mega.privacy.mobile.analytics.event.PhotoEditorMenuItemEvent
 import mega.privacy.mobile.analytics.event.PhotoPreviewSaveToDeviceMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
 import mega.privacy.mobile.analytics.event.PlaySlideshowMenuToolbarEvent
@@ -184,7 +188,10 @@ class ImagePreviewActivity : BaseActivity() {
                             ImagePreviewScreen(
                                 snackbarHostState = snackbarHostState,
                                 onClickBack = ::finish,
-                                onClickEdit = viewModel::launchPhotoEditor,
+                                onClickEdit = {
+                                    Analytics.tracker.trackEvent(PhotoEditorMenuItemEvent)
+                                    viewModel.launchPhotoEditor(it)
+                                },
                                 onClickVideoPlay = ::playVideo,
                                 onClickSlideshow = ::playSlideshow,
                                 onClickInfo = ::checkInfo,
@@ -376,6 +383,7 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun getNodeLink(imageNode: ImageNode) {
+        Analytics.tracker.trackEvent(ImagePreviewGetLinkMenuItemEvent)
         if (getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning()
             return
@@ -482,13 +490,21 @@ class ImagePreviewActivity : BaseActivity() {
 
     private val activityResultLauncherUCrop =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                // handleCropResult(result.data!!)
-                return@registerForActivityResult
-            }
+            val data = result.data ?: return@registerForActivityResult
+            when (result.resultCode) {
+                RESULT_OK -> {
+                    val uri = UCrop.getOutput(data)
+                    viewModel.uploadCurrentEditedImage(uri ?: return@registerForActivityResult)
+                }
 
-            if (result.resultCode == UCrop.RESULT_ERROR) {
-                // handleCropError(result.data!!)
+                UCrop.RESULT_ERROR -> {
+                    val error = UCrop.getError(data)
+                    showSnackbar(
+                        SNACKBAR_TYPE,
+                        error?.message ?: getString(R.string.general_text_error),
+                        INVALID_HANDLE
+                    )
+                }
             }
         }
 
@@ -496,15 +512,25 @@ class ImagePreviewActivity : BaseActivity() {
         var uCrop = UCrop.of(uri, Uri.fromFile(File(cacheDir, destinationFileName)))
         uCrop.withOptions(
             UCrop.Options().apply {
-                setFreeStyleCropEnabled(true)
+                setFreeStyleCropMode(FREESTYLE_CROP_MODE_ENABLE_WITH_PASS_THROUGH)
                 setCompressionQuality(90)
                 setToolbarTitle(getString(R.string.title_edit_profile_info))
                 setToolbarTitleTextGravity(Gravity.START)
                 setToolbarColor(getColor(R.color.dark_grey))
                 setStatusBarColor(getColor(R.color.dark_grey))
+                setCropGridCornerColor(getColor(R.color.color_support_info))
                 setRootViewBackgroundColor(getColor(R.color.black))
                 setToolbarWidgetColor(getColor(R.color.white))
                 setActiveControlsWidgetColor(getColor(R.color.white))
+                setImageToCropBoundsAnimDuration(200)
+                setAllowedGestures(
+                    tabRotate = SCALE,
+                    tabScale = SCALE,
+                    tabAspectRatio = SCALE,
+                )
+                setDiscardDialogMessage(getString(sharedR.string.general_dialog_title_discard_changes))
+                setDiscardDialogCancelText(getString(R.string.button_cancel))
+                setDiscardDialogDiscardText(getString(R.string.settings_help_report_issue_discard_button))
             }
         )
         uCrop.start(this@ImagePreviewActivity, activityResultLauncherUCrop)

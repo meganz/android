@@ -512,8 +512,8 @@ internal fun ImagePreviewScreen(
         )
 
         StartTransferComponent(
-            event = viewState.downloadEvent,
-            onConsumeEvent = viewModel::consumeDownloadEvent,
+            event = viewState.transferEvent,
+            onConsumeEvent = viewModel::consumeTransferEvent,
             snackBarHostState = scaffoldState.snackbarHostState,
             navigateToStorageSettings = navigateToStorageSettings,
         )

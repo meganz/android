@@ -294,26 +294,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">No solved issues</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">You hold the keys</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">Encrypted chat</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">Create your network</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">Your photos in the cloud</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">MEGA meeting</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access your files.</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud Drive.</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA.</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Zero-knowledge encrypted video meeting.</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]New feature: Raise hand[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -1338,11 +1318,15 @@
     <!-- Alert always allow button before download a big file for preview -->
     <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
     <!-- The camera uploads notification content to reminder there is no network connection-->
-    <string name="camera_uploads_notification_content_no_network_connection">Waiting for WIFI or mobile data</string>
+    <string name="camera_uploads_notification_content_no_network_connection">Waiting for WiFi or mobile data</string>
     <!-- Settings title  for sync power options -->
-    <string name="settings_sync_power_settings_title">Power Settings</string>
+    <string name="settings_sync_power_settings_title">Power settings</string>
     <!-- Sync always label for sync power options -->
     <string name="settings_sync_power_always_title">Sync always</string>
     <!-- Sync only when charging label for sync power options -->
     <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">Uploading your edits as a new file</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">Discard changes?</string>
 </resources>

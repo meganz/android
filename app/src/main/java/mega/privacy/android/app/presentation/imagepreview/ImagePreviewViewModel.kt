@@ -1,16 +1,17 @@
 package mega.privacy.android.app.presentation.imagepreview
 
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +25,9 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
@@ -41,11 +44,14 @@ import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -68,9 +74,12 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActio
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
+import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.mobile.analytics.core.event.type.AnalyticsEvent
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -78,7 +87,6 @@ import javax.inject.Inject
 /**
  * ViewModel for business logic regarding the image preview.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ImagePreviewViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
@@ -111,7 +119,10 @@ class ImagePreviewViewModel @Inject constructor(
     private val clearImageResultUseCase: ClearImageResultUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase,
+    private val getNodeAccessPermission: GetNodeAccessPermission,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[IMAGE_NODE_FETCHER_SOURCE] ?: ImagePreviewFetcherSource.TIMELINE
@@ -410,8 +421,26 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     suspend fun isPhotoEditorMenuVisible(imageNode: ImageNode): Boolean {
-        return runCatching { getFeatureFlagValueUseCase(AppFeatures.PhotoEditor) }
-            .getOrDefault(false) && imageNode.type.mimeType in
+        val isFeatureFlagEnabled = runCatching {
+            getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)
+        }.getOrDefault(false)
+        val hasWritePermission = runCatching {
+            getNodeAccessPermission(imageNode.id) in setOf(
+                AccessPermission.READWRITE,
+                AccessPermission.FULL,
+                AccessPermission.OWNER
+            )
+        }.getOrDefault(false)
+        val isValidSource = imagePreviewFetcherSource in setOf(
+            ImagePreviewFetcherSource.DEFAULT,
+            ImagePreviewFetcherSource.TIMELINE,
+            ImagePreviewFetcherSource.ALBUM_CONTENT,
+            ImagePreviewFetcherSource.MEDIA_DISCOVERY,
+            ImagePreviewFetcherSource.CLOUD_DRIVE,
+            ImagePreviewFetcherSource.FAVOURITE,
+            ImagePreviewFetcherSource.SHARED_ITEMS,
+        )
+        return isFeatureFlagEnabled && isValidSource && hasWritePermission && imageNode.type.mimeType in
                 setOf(
                     "image/jpeg",
                     "image/jpg",
@@ -496,7 +525,7 @@ class ImagePreviewViewModel @Inject constructor(
                 _state.value.currentImageNode?.let { node ->
                     _state.update {
                         it.copy(
-                            downloadEvent = triggered(
+                            transferEvent = triggered(
                                 TransferTriggerEvent.CopyOfflineNode(listOf(node.id))
                             )
                         )
@@ -573,7 +602,7 @@ class ImagePreviewViewModel @Inject constructor(
             val event = eventBuilder(typedNode)
             _state.update {
                 it.copy(
-                    downloadEvent = triggered(event)
+                    transferEvent = triggered(event)
                 )
             }
         } ?: run {
@@ -582,11 +611,11 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     /**
-     * Consume download event
+     * Consume transfer event
      */
-    fun consumeDownloadEvent() {
+    fun consumeTransferEvent() {
         _state.update {
-            it.copy(downloadEvent = consumed())
+            it.copy(transferEvent = consumed())
         }
     }
 
@@ -922,6 +951,36 @@ class ImagePreviewViewModel @Inject constructor(
 
     fun onOpenPhotoEditorEventConsumed() {
         _state.update { it.copy(openPhotoEditorEvent = consumed()) }
+    }
+
+    fun uploadCurrentEditedImage(uri: Uri) {
+        viewModelScope.launch {
+            val currentImageNode = _state.value.currentImageNode ?: return@launch
+            val path = uri.path ?: return@launch
+            val destinationId = currentImageNode.parentId
+            runCatching {
+                val fileCollision = FileNameCollision(
+                    collisionHandle = currentImageNode.id.longValue,
+                    name = currentImageNode.name,
+                    size = currentImageNode.size,
+                    lastModified = currentImageNode.modificationTime,
+                    parentHandle = destinationId.longValue,
+                    path = UriPath(path)
+                )
+                val renameName = getNodeNameCollisionRenameNameUseCase(fileCollision)
+                _state.update { state ->
+                    state.copy(
+                        transferEvent = triggered(
+                            TransferTriggerEvent.StartUpload.Files(
+                                pathsAndNames = mapOf(path to renameName),
+                                destinationId = destinationId,
+                                specificStartMessage = context.getString(sharedR.string.photo_editor_upload_message)
+                            )
+                        )
+                    )
+                }
+            }
+        }
     }
 
     companion object {

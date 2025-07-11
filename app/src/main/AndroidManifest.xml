@@ -746,7 +746,8 @@
         <activity android:name=".presentation.filecontact.FileContactListComposeActivity" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
-            android:theme="@style/Theme.Mega.PhotoEditor" />
+            android:theme="@style/Theme.Mega.PhotoEditor"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

@@ -18,7 +18,7 @@ internal data class ImagePreviewState(
     val resultMessage: String = "",
     val copyMoveException: Throwable? = null,
     val nameCollision: NameCollision? = null,
-    val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
+    val transferEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val showDeletedMessage: Boolean = false,
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean? = null,

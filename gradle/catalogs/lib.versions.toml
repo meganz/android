@@ -26,7 +26,7 @@ telephoto = "0.16.0"
 mega-core-ui = "2.170.20250708103141"
 kotlinx-collections-immutable = "0.3.7"
 commonmark-java = "0.24.0"
-ucropnedit = "4.1.2"
+ucropnedit = "4.1.4"
 
 [libraries]
 bannerviewpager = { module = "com.github.zhpanvip:BannerViewPager", version.ref = "bannerviewpager" }
