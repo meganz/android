@@ -40,12 +40,10 @@ import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.presentation.verification.model.SmsVerificationTextState
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 import java.util.Timer
 import java.util.TimerTask
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SMSVerificationTextActivity : PasscodeActivity(),
@@ -72,8 +70,6 @@ class SMSVerificationTextActivity : PasscodeActivity(),
     private var isUserLocked = false
     private val resendTimeLimit = 30 * 1000
 
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
     private var legacyListener: MegaRequestListenerInterface? = null
 
     private val viewModel by viewModels<SMSVerificationTextViewModel>()

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.mediaplayer
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.app.Dialog
 import android.content.BroadcastReceiver
@@ -140,7 +139,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerInfoMenuItemEvent
@@ -169,12 +168,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
     @VideoPlayer
     @Inject
     lateinit var mediaPlayerGateway: MediaPlayerGateway
-
-    /**
-     * Inject [GetFeatureFlagValueUseCase] to the Fragment
-     */
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     @IoDispatcher

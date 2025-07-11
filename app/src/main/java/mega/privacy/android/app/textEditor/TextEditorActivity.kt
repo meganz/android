@@ -101,7 +101,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificati
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.TextEditorCloseMenuToolbarEvent
@@ -144,12 +143,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         private const val STATE_SHOWN = 0
         private const val STATE_HIDDEN = 1
     }
-
-    /**
-     * Use case to get feature flag
-     */
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * Mega navigator

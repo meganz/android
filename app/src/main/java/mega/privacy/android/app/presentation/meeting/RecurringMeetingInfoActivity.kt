@@ -45,8 +45,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class RecurringMeetingInfoActivity : PasscodeActivity() {
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase

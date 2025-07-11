@@ -29,7 +29,6 @@ import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -52,9 +51,6 @@ class ContactAttachmentActivity : PasscodeActivity(), MegaRequestListenerInterfa
     MegaChatRequestListenerInterface, View.OnClickListener {
 
     private lateinit var binding: ActivityContactAttachmentChatBinding
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var navigator: MegaNavigator

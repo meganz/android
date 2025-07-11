@@ -31,7 +31,9 @@ import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -39,6 +41,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.TransferOverquotaLayoutBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.PermissionRequester
@@ -102,6 +105,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorSslVerificationFailedUseCase
@@ -167,6 +171,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     @Inject
     lateinit var saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * Monitor Chat Signal Presence Use Case
@@ -248,9 +255,19 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
-        collectFlow(billingViewModel.billingUpdateEvent) {
-            if (it is BillingEvent.OnPurchaseUpdate) {
-                onPurchasesUpdated(it.purchases, it.activeSubscription)
+        collectFlow(
+            combine(
+                flow { emit(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) },
+                billingViewModel.billingUpdateEvent,
+                ::Pair
+            )
+        ) { (singleActivityFlagEnabled, billingEvent) ->
+            if (billingEvent is BillingEvent.OnPurchaseUpdate) {
+                onPurchasesUpdated(
+                    purchases = billingEvent.purchases,
+                    activeSubscription = billingEvent.activeSubscription,
+                    singleActivityFlagEnabled = singleActivityFlagEnabled
+                )
                 billingViewModel.markHandleBillingEvent()
             }
         }
@@ -1106,6 +1123,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     private fun onPurchasesUpdated(
         purchases: List<MegaPurchase>,
         activeSubscription: MegaPurchase?,
+        singleActivityFlagEnabled: Boolean,
     ) {
         val type: PurchaseType = if (purchases.isNotEmpty()) {
             val purchase = purchases.first()
@@ -1114,11 +1132,16 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             if (billingViewModel.isPurchased(purchase)) {
                 //payment has been processed
                 Timber.d(
-                    "Purchase " + sku + " successfully, subscription type is: "
-                            + getSubscriptionType(sku, this) + ", subscription renewal type is: "
-                            + getSubscriptionRenewalType(sku, this)
+                    "Purchase $sku successfully, subscription type is: ${
+                        getSubscriptionType(
+                            sku,
+                            this
+                        )
+                    }, subscription renewal type is: ${getSubscriptionRenewalType(sku, this)}"
                 )
-                RatingHandlerImpl(this).updateTransactionFlag(true)
+                if (singleActivityFlagEnabled.not()) {
+                    RatingHandlerImpl(this).updateTransactionFlag(true)
+                }
                 PurchaseType.SUCCESS
             } else {
                 //payment is being processed or in unknown state

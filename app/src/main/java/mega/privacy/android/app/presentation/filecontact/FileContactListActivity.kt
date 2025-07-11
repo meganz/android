@@ -49,7 +49,6 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.node.MoveRequestResult
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaEvent
@@ -71,9 +70,6 @@ import javax.inject.Inject
 internal class FileContactListActivity : PasscodeActivity(), View.OnClickListener,
     MegaGlobalListenerInterface, FileContactsListBottomSheetDialogListener,
     OnSharedFolderUpdatedCallBack {
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper

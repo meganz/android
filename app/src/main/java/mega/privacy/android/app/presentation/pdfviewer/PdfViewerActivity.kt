@@ -89,7 +89,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentPreviewHideNodeMenuItemEvent
@@ -203,8 +202,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         }
     }
 
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     override fun shouldSetStatusBarTextColor() = false
 

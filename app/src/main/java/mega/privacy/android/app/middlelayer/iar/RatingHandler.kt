@@ -3,6 +3,7 @@ package mega.privacy.android.app.middlelayer.iar
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.presentation.extensions.getStorageState
@@ -123,7 +124,8 @@ abstract class RatingHandler(val context: Context) {
 
         // Exclude ODQ & OBQ accounts
         if (megaApi.bandwidthOverquotaDelay > 0
-            && getStorageState() == StorageState.PayWall) {
+            && getStorageState() == StorageState.PayWall
+        ) {
             return false
         }
 
@@ -174,7 +176,8 @@ abstract class RatingHandler(val context: Context) {
         return null
     }
 
-    fun updateTransactionFlag(flag: Boolean) = updateSpValueByKey(PREFERENCE_PURCHASE_TRANSACTION, flag)
+    fun updateTransactionFlag(flag: Boolean) =
+        updateSpValueByKey(PREFERENCE_PURCHASE_TRANSACTION, flag)
 
     private fun isPurchasedTransaction() = getSpValueByKey(PREFERENCE_PURCHASE_TRANSACTION)
 
@@ -185,13 +188,14 @@ abstract class RatingHandler(val context: Context) {
 
     private fun updateSpValueByKey(key: String, value: Boolean) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        sharedPreferences.edit().putBoolean(key, value).apply()
+        sharedPreferences.edit { putBoolean(key, value) }
     }
 
 
     companion object {
         // The size limitation, 10 Mb
         const val SIZE_LIMIT = 10
+
         // The speed limitation, 2 Mb
         const val SPEED_LIMIT = 2
 
@@ -199,7 +203,6 @@ abstract class RatingHandler(val context: Context) {
         const val SHARED_NUM_LIMIT = 4
 
         const val CONTACTS_NUMBER_LIMIT = 5
-        const val REFERRAL_BONUS_NUM_LIMIT = 3
 
         const val PREFERENCE_SHOW_RATING = "show_rating_"
         const val PREFERENCE_PURCHASE_TRANSACTION = "purchase_transaction_"

@@ -54,7 +54,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -74,12 +73,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
      */
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    /**
-     * [GetFeatureFlagValueUseCase]
-     */
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * MegaNavigator

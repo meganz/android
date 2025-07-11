@@ -1,6 +1,5 @@
 package mega.privacy.android.app.myAccount.editProfile
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -78,8 +77,8 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaChatApi
 import timber.log.Timber
 import java.io.File
@@ -131,9 +130,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     private var changeNameDialog: AlertDialog? = null
     private var changeEmailDialog: AlertDialog? = null
     private var deletePhotoDialog: AlertDialog? = null
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val selectPhotoLauncher =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->

@@ -74,7 +74,6 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -105,9 +104,6 @@ class FileInfoActivity : BaseActivity() {
      */
     @Inject
     lateinit var megaNavigator: MegaNavigator
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper

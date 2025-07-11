@@ -75,7 +75,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -95,12 +94,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
      */
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    /**
-     * [GetFeatureFlagValueUseCase]
-     */
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * Mapper to get the icon of a file type

@@ -306,7 +306,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
@@ -418,12 +417,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      */
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    /**
-     * [GetFeatureFlagValueUseCase]
-     */
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var cookieDialogHandler: CookieDialogHandler

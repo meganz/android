@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Color
 import android.graphics.PixelFormat
-import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
@@ -21,6 +20,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
@@ -89,7 +89,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AudioPlayerHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -98,8 +97,6 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
-import androidx.core.net.toUri
 
 /**
  * Extending MediaPlayerActivity is to declare portrait in manifest,
@@ -126,12 +123,6 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
         }
     }
-
-    /**
-     * Inject [GetFeatureFlagValueUseCase] to the Fragment
-     */
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private var serviceGateway: MediaPlayerServiceGateway? = null
     private var playerServiceGateway: PlayerServiceViewModelGateway? = null

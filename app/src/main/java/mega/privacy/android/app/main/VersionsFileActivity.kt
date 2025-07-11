@@ -51,7 +51,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
@@ -110,9 +109,6 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private var deleteVersionConfirmationDialog: AlertDialog? = null
     private var checkPermissionRevertVersionDialog: AlertDialog? = null
     private var deleteVersionHistoryDialog: AlertDialog? = null
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
