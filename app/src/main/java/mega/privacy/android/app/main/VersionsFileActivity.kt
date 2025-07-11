@@ -179,17 +179,17 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 binding.recyclerViewVersionsFile.visibility = View.VISIBLE
 
                 adapter?.let {
-                    it.setNodes(nodeVersions)
-                    it.isMultipleSelect = false
+                    it.nodes = nodeVersions
+                    it.multipleSelect = false
                 } ?: run {
                     adapter =
                         VersionsFileAdapter(
                             this,
-                            nodeVersions,
                             binding.recyclerViewVersionsFile
                         ).also {
+                            it.nodes = nodeVersions
                             binding.recyclerViewVersionsFile.adapter = it
-                            it.isMultipleSelect = false
+                            it.multipleSelect = false
                         }
                 }
 
@@ -281,7 +281,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
             Timber.d("onDestroyActionMode")
             adapter?.run {
                 clearSelections()
-                isMultipleSelect = false
+                multipleSelect = false
             }
         }
 
@@ -327,7 +327,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
             aB,
             (binding.recyclerViewVersionsFile.canScrollVertically(-1) &&
                     binding.recyclerViewVersionsFile.visibility == View.VISIBLE
-                    ) || adapter?.isMultipleSelect ?: false,
+                    ) || adapter?.multipleSelect == true,
             outMetrics
         )
     }
@@ -484,7 +484,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
     // Clear all selected items
     private fun clearSelections() {
         adapter?.let {
-            if (it.isMultipleSelect) {
+            if (it.multipleSelect) {
                 it.clearSelections()
             }
         }
@@ -497,10 +497,10 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("selectAll")
         adapter?.let {
             if (it.itemCount > 1) {
-                if (it.isMultipleSelect) {
+                if (it.multipleSelect) {
                     it.selectAllPreviousVersions()
                 } else {
-                    it.isMultipleSelect = true
+                    it.multipleSelect = true
                     it.selectAllPreviousVersions()
                     actionMode = startSupportActionMode(ActionBarCallBack())
                 }
@@ -510,7 +510,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     fun showSelectMenuItem(): Boolean =
-        adapter?.let { it.isMultipleSelect } ?: false
+        adapter?.multipleSelect == true
 
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
         if (request.type == MegaRequest.TYPE_SHARE) {
@@ -522,7 +522,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("onRequestFinish: %s", request.type)
         Timber.d("onRequestFinish: %s", request.requestString)
 
-        adapter?.takeIf { it.isMultipleSelect }?.let {
+        adapter?.takeIf { it.multipleSelect }?.let {
             it.clearSelections()
             hideMultipleSelect()
         }
@@ -595,7 +595,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
             val vNode = it[position]
             val mimetype = MimeTypeList.typeForName(vNode.name)
             when {
-                adapter?.isMultipleSelect == true -> {
+                adapter?.multipleSelect == true -> {
                     adapter!!.toggleSelection(position)
                     updateActionModeTitle()
                 }
@@ -766,7 +766,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * Disable selection
      */
     fun hideMultipleSelect() {
-        adapter?.isMultipleSelect = false
+        adapter?.multipleSelect = false
         actionMode?.finish()
     }
 
@@ -881,10 +881,11 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
             Timber.d("After update - nodeVersions size: %s", nodeVersions?.size)
 
             adapter?.apply {
-                setNodes(nodeVersions)
-                notifyDataSetChanged()
+                this.nodes = nodeVersions
             } ?: run {
-                adapter = VersionsFileAdapter(this, nodeVersions, binding.recyclerViewVersionsFile)
+                adapter = VersionsFileAdapter(this, binding.recyclerViewVersionsFile).apply {
+                    this.nodes = nodeVersions
+                }
                 binding.recyclerViewVersionsFile.adapter = adapter
             }
 
