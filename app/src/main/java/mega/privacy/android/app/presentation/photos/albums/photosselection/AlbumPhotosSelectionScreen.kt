@@ -19,12 +19,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -41,18 +40,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionViewModel.Companion.MAX_SELECTION_NUM
@@ -68,14 +67,10 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.theme.accent_900
-import mega.privacy.android.shared.original.core.ui.theme.black
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.white
-import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
+import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AddItemsToExistingAlbumFABEvent
 import mega.privacy.mobile.analytics.event.AddItemsToNewAlbumFABEvent
@@ -94,7 +89,6 @@ fun AlbumPhotosSelectionScreen(
     onCompletion: (albumId: AlbumId, numCommittedPhotos: Int) -> Unit = { _, _ -> },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val isLight = MaterialTheme.colors.isLight
     val lazyGridState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -198,12 +192,11 @@ fun AlbumPhotosSelectionScreen(
                             selectedPhotoIds = state.selectedPhotoIds,
                         )
                     },
-                    backgroundColor = accent_900,
                 ) {
-                    Icon(
+                    MegaIcon(
                         painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Check),
-                        contentDescription = null,
-                        tint = white.takeIf { isLight } ?: black,
+                        contentDescription = "Add photos to album",
+                        tint = IconColor.InverseAccent,
                     )
                 }
             }
@@ -253,34 +246,34 @@ private fun AlbumPhotosSelectionHeader(
     onSelectAllClicked: () -> Unit,
     onClearSelectionClicked: () -> Unit,
 ) {
-    val isLight = MaterialTheme.colors.isLight
-
     TopAppBar(
         title = {
             Column {
                 if (numSelectedPhotos > 0) {
-                    Text(
+                    MegaText(
                         text = "$numSelectedPhotos",
-                        color = accent_900,
-                        fontWeight = FontWeight.W500,
-                        style = MaterialTheme.typography.subtitle1,
+                        textColor = TextColor.Primary,
+                        style = MaterialTheme.typography.subtitle1.copy(
+                            fontWeight = FontWeight.W500,
+                        ),
                     )
                 } else {
-                    Text(
+                    MegaText(
                         text = stringResource(
                             id = R.string.photos_album_selection_title,
                             album?.title.orEmpty(),
                         ),
-                        fontWeight = FontWeight.W500,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.subtitle1,
+                        overflow = LongTextBehaviour.Ellipsis(1),
+                        textColor = TextColor.Primary,
+                        style = MaterialTheme.typography.subtitle1.copy(
+                            fontWeight = FontWeight.W500,
+                        ),
                     )
 
                     if (isLocationDetermined) {
-                        Text(
+                        MegaText(
                             text = selectedLocation.text(),
-                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                            textColor = TextColor.Secondary,
                             style = MaterialTheme.typography.caption,
                         )
                     }
@@ -289,45 +282,47 @@ private fun AlbumPhotosSelectionHeader(
         },
         navigationIcon = {
             IconButton(onClick = onBackClicked) {
-                Icon(
+                MegaIcon(
                     painter = painterResource(id = R.drawable.ic_arrow_back_white),
                     contentDescription = null,
-                    tint = accent_900.takeIf {
-                        numSelectedPhotos > 0
-                    } ?: (black.takeIf { isLight } ?: white),
+                    tint = IconColor.Primary,
                 )
             }
         },
         actions = {
             if (showFilterMenu) {
                 IconButton(onClick = onFilterClicked) {
-                    Icon(
+                    MegaIcon(
                         painter = painterResource(id = R.drawable.ic_filter_light),
                         contentDescription = null,
-                        tint = accent_900.takeIf {
-                            numSelectedPhotos > 0
-                        } ?: (black.takeIf { isLight } ?: white),
+                        tint = IconColor.Primary,
                     )
                 }
             }
 
             if (numSelectedPhotos > 0) {
                 IconButton(onClick = onMoreClicked) {
-                    Icon(
+                    MegaIcon(
                         painter = painterResource(id = R.drawable.ic_dots_vertical_white),
                         contentDescription = null,
-                        tint = accent_900,
+                        tint = IconColor.Primary,
                     )
                 }
 
                 DropdownMenu(expanded = showMoreMenu, onDismissRequest = onMoreDismissed) {
                     if (showSelectAllMenu) {
                         DropdownMenuItem(onClick = onSelectAllClicked) {
-                            Text(text = stringResource(id = R.string.action_select_all))
+                            MegaText(
+                                text = stringResource(id = R.string.action_select_all),
+                                textColor = TextColor.Primary,
+                            )
                         }
                     }
                     DropdownMenuItem(onClick = onClearSelectionClicked) {
-                        Text(text = stringResource(id = R.string.action_unselect_all))
+                        MegaText(
+                            text = stringResource(id = R.string.action_unselect_all),
+                            textColor = TextColor.Primary,
+                        )
                     }
                 }
             }
@@ -403,37 +398,31 @@ private fun SelectLocationDialog(
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                         verticalAlignment = CenterVertically,
                     ) {
+                        val isSelected = location == selectedLocation
+
                         RadioButton(
-                            selected = location == selectedLocation,
+                            selected = isSelected,
                             onClick = null,
                         )
                         Spacer(modifier = Modifier.size(16.dp))
-                        Text(
+                        MegaText(
                             text = location.text(),
-                            color = if (isLight) {
-                                grey_alpha_087.takeIf {
-                                    location == selectedLocation
-                                } ?: grey_alpha_054
-                            } else {
-                                white_alpha_087.takeIf {
-                                    location == selectedLocation
-                                } ?: white_alpha_054
-                            },
-                            fontWeight = FontWeight.W400,
-                            style = MaterialTheme.typography.subtitle2,
+                            textColor = if (isSelected) TextColor.Primary else TextColor.Secondary,
+                            style = MaterialTheme.typography.subtitle2.copy(
+                                fontWeight = FontWeight.W400
+                            ),
                         )
                     }
                     Spacer(modifier = Modifier.size(4.dp))
                 }
-                Text(
+                MegaText(
                     text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     modifier = Modifier
                         .align(Alignment.End)
                         .padding(top = 8.dp, end = 16.dp, bottom = 16.dp)
                         .clickable { onDialogDismissed() },
-                    color = accent_900,
-                    fontWeight = FontWeight.W500,
-                    style = MaterialTheme.typography.button,
+                    textColor = TextColor.Primary,
+                    style = MaterialTheme.typography.button.copy(fontWeight = FontWeight.W500),
                 )
             }
         }
@@ -458,9 +447,9 @@ private fun MaxSelectionDialog(
 ) {
     MegaDialog(
         body = {
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.photos_album_selection_dialog_body),
-                color = grey_alpha_054.takeIf { MaterialTheme.colors.isLight } ?: white_alpha_054,
+                textColor = TextColor.Secondary,
             )
         },
         onDismissRequest = onDialogDismissed,
@@ -471,12 +460,10 @@ private fun MaxSelectionDialog(
             TextButton(
                 onClick = onDialogDismissed,
             ) {
-                Text(
+                MegaText(
                     text = stringResource(id = R.string.general_ok),
                     style = MaterialTheme.typography.button,
-                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.accent_050) else colorResource(
-                        id = R.color.accent_900
-                    )
+                    textColor = TextColor.Primary
                 )
             }
         },
@@ -546,23 +533,25 @@ private fun EmptyStateContent(modifier: Modifier = Modifier) {
 
             val text = stringResource(id = R.string.timeline_empty_media)
 
-            Text(
+            MegaText(
                 text = text.substring(0, text.indexOf(placeHolderStart)),
-                color = colorResource(id = R.color.grey_054_white_054),
+                textColor = TextColor.Secondary,
             )
 
-            Text(
+            MegaText(
                 text = text.substring(
                     text.indexOf(placeHolderStart),
                     text.indexOf(placeHolderEnd)
                 ).replace("[B]", ""),
-                color = colorResource(id = R.color.grey_087_white_087),
-                fontWeight = FontWeight.ExtraBold,
+                textColor = TextColor.Primary,
+                style = LocalTextStyle.current.copy(
+                    fontWeight = FontWeight.ExtraBold
+                )
             )
 
-            Text(
+            MegaText(
                 text = text.substring(text.indexOf(placeHolderEnd)).replace("[/B]", ""),
-                color = colorResource(id = R.color.grey_054_white_054),
+                textColor = TextColor.Secondary,
             )
         }
     }
