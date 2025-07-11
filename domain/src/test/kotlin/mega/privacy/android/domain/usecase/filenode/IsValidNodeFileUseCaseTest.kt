@@ -47,40 +47,40 @@ class IsValidNodeFileUseCaseTest {
             assertThat(actual).isEqualTo(expected)
         }
 
-
-    @Test
-    fun `test that if file can be read also node size matches file length but fingerprint mismatch then it returns false`() =
-        runTest {
-            val expected = false
-            val size = 1L
-            val filePath = "testPath"
-            val nodeFingerPrint = "#test1"
-            val fileFingerPrint = "#test2"
-            whenever(file.canRead()).thenReturn(true)
-            whenever(file.length()).thenReturn(size)
-            whenever(file.absolutePath).thenReturn(filePath)
-            whenever(node.size).thenReturn(size)
-            whenever(node.fingerprint).thenReturn(nodeFingerPrint)
-            whenever(fingerprintRepository.getFingerprint(filePath)).thenReturn(fileFingerPrint)
-            val actual = underTest(node, file)
-            assertThat(actual).isEqualTo(expected)
-        }
-
-    @Test
-    fun `test that if file can be read also node size matches file length and fingerprint matches then it returns true`() =
-        runTest {
-            val expected = true
-            val size = 1L
-            val filePath = "testPath"
-            val fingerPrint = "#test"
-            whenever(file.canRead()).thenReturn(true)
-            whenever(file.length()).thenReturn(size)
-            whenever(file.absolutePath).thenReturn(filePath)
-            whenever(node.size).thenReturn(size)
-            whenever(node.fingerprint).thenReturn(fingerPrint)
-            whenever(fingerprintRepository.getFingerprint(filePath)).thenReturn(fingerPrint)
-            val actual = underTest(node, file)
-            assertThat(actual).isEqualTo(expected)
-        }
+// Add the fingerprint check once the issue is resolved in SDK, SAO-2917
+//    @Test
+//    fun `test that if file can be read also node size matches file length but fingerprint mismatch then it returns false`() =
+//        runTest {
+//            val expected = false
+//            val size = 1L
+//            val filePath = "testPath"
+//            val nodeFingerPrint = "#test1"
+//            val fileFingerPrint = "#test2"
+//            whenever(file.canRead()).thenReturn(true)
+//            whenever(file.length()).thenReturn(size)
+//            whenever(file.absolutePath).thenReturn(filePath)
+//            whenever(node.size).thenReturn(size)
+//            whenever(node.fingerprint).thenReturn(nodeFingerPrint)
+//            whenever(fingerprintRepository.getFingerprint(filePath)).thenReturn(fileFingerPrint)
+//            val actual = underTest(node, file)
+//            assertThat(actual).isEqualTo(expected)
+//        }
+//
+//    @Test
+//    fun `test that if file can be read also node size matches file length and fingerprint matches then it returns true`() =
+//        runTest {
+//            val expected = true
+//            val size = 1L
+//            val filePath = "testPath"
+//            val fingerPrint = "#test"
+//            whenever(file.canRead()).thenReturn(true)
+//            whenever(file.length()).thenReturn(size)
+//            whenever(file.absolutePath).thenReturn(filePath)
+//            whenever(node.size).thenReturn(size)
+//            whenever(node.fingerprint).thenReturn(fingerPrint)
+//            whenever(fingerprintRepository.getFingerprint(filePath)).thenReturn(fingerPrint)
+//            val actual = underTest(node, file)
+//            assertThat(actual).isEqualTo(expected)
+//        }
 
 }
