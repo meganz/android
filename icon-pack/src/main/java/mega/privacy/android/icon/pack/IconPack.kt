@@ -14,6 +14,8 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArchiveArro
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArchiveImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArrowDownCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArrowLeftImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArrowUpCircleImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArrowsUpDownCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArrowsUpDownImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineBellImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineBellOffImageVector
@@ -28,10 +30,12 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineClockPlayIm
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineClockRotateImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineClockUserImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCloudImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCloudOffImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCloudUploadImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCopy01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCornerUpRightImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineDatabaseImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineDevicesImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineDownloadImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineEditImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineEmojiSmileImageVector
@@ -53,6 +57,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFolderPlus0
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFolderUsersImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineGearSixImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineGifImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineHardDriveImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineHeartBrokenImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineHeartImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineHelpCircleImageVector
@@ -88,6 +93,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineRotateCwIma
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineScreenshotImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSearchLargeImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShareNetworkImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShieldImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShieldInfoImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSlashCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSlidersHorizontal01ImageVector
@@ -99,6 +105,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTrashImageV
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineUserImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineUserPlusImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineUserRightImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineUserSquareImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineUsersImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVPNImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVideoImageVector
@@ -147,8 +154,14 @@ public object IconPack : IconPackInterface {
                 override val ArrowLeft: ImageVector by lazy {
                         createMediumThinOutlineArrowLeftImageVector() }
 
+                override val ArrowUpCircle: ImageVector by lazy {
+                        createMediumThinOutlineArrowUpCircleImageVector() }
+
                 override val ArrowsUpDown: ImageVector by lazy {
                         createMediumThinOutlineArrowsUpDownImageVector() }
+
+                override val ArrowsUpDownCircle: ImageVector by lazy {
+                        createMediumThinOutlineArrowsUpDownCircleImageVector() }
 
                 override val Bell: ImageVector by lazy { createMediumThinOutlineBellImageVector() }
 
@@ -188,6 +201,9 @@ public object IconPack : IconPackInterface {
                 override val Cloud: ImageVector by lazy { createMediumThinOutlineCloudImageVector()
                         }
 
+                override val CloudOff: ImageVector by lazy {
+                        createMediumThinOutlineCloudOffImageVector() }
+
                 override val CloudUpload: ImageVector by lazy {
                         createMediumThinOutlineCloudUploadImageVector() }
 
@@ -199,6 +215,9 @@ public object IconPack : IconPackInterface {
 
                 override val Database: ImageVector by lazy {
                         createMediumThinOutlineDatabaseImageVector() }
+
+                override val Devices: ImageVector by lazy {
+                        createMediumThinOutlineDevicesImageVector() }
 
                 override val Download: ImageVector by lazy {
                         createMediumThinOutlineDownloadImageVector() }
@@ -259,6 +278,9 @@ public object IconPack : IconPackInterface {
                         createMediumThinOutlineGearSixImageVector() }
 
                 override val Gif: ImageVector by lazy { createMediumThinOutlineGifImageVector() }
+
+                override val HardDrive: ImageVector by lazy {
+                        createMediumThinOutlineHardDriveImageVector() }
 
                 override val Heart: ImageVector by lazy { createMediumThinOutlineHeartImageVector()
                         }
@@ -360,6 +382,9 @@ public object IconPack : IconPackInterface {
                 override val ShareNetwork: ImageVector by lazy {
                         createMediumThinOutlineShareNetworkImageVector() }
 
+                override val Shield: ImageVector by lazy {
+                        createMediumThinOutlineShieldImageVector() }
+
                 override val ShieldInfo: ImageVector by lazy {
                         createMediumThinOutlineShieldInfoImageVector() }
 
@@ -391,6 +416,9 @@ public object IconPack : IconPackInterface {
 
                 override val UserRight: ImageVector by lazy {
                         createMediumThinOutlineUserRightImageVector() }
+
+                override val UserSquare: ImageVector by lazy {
+                        createMediumThinOutlineUserSquareImageVector() }
 
                 override val Users: ImageVector by lazy { createMediumThinOutlineUsersImageVector()
                         }

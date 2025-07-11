@@ -193,6 +193,13 @@ interface IconPackInterface {
                 val Check: ImageVector
                 val Download: ImageVector
                 val SlidersHorizontal01: ImageVector
+                val Shield: ImageVector
+                val HardDrive: ImageVector
+                val UserSquare: ImageVector
+                val Devices: ImageVector
+                val ArrowsUpDownCircle: ImageVector
+                val CloudOff: ImageVector
+                val ArrowUpCircle: ImageVector
             }
 
             /**
