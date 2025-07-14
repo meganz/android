@@ -1458,10 +1458,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 if (intent.action != null) {
                     if (intent.action == Constants.ACTION_EXPORT_MASTER_KEY || intent.action == Constants.ACTION_OPEN_MEGA_LINK || intent.action == Constants.ACTION_OPEN_MEGA_FOLDER_LINK) {
                         openLink = true
-                    } else if (intent.action == Constants.ACTION_CANCEL_CAM_SYNC) {
-                        viewModel.stopAndDisableCameraUploads()
-                        finish()
-                        return true
                     }
                 }
             }
@@ -1913,11 +1909,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     private fun handleRedirectIntentActions(intent: Intent?): Boolean {
         intent ?: return false
-        if (intent.action == Constants.ACTION_CANCEL_CAM_SYNC) {
-            viewModel.stopAndDisableCameraUploads()
-            finish()
-            return true
-        }
         managerRedirectIntentMapper(
             intent = intent,
         )?.let { redirectIntent ->
@@ -2842,31 +2833,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
                 Constants.ACTION_PRE_OVERQUOTA_STORAGE -> {
                     showOverQuotaAlert(true)
-                }
-
-                Constants.ACTION_CANCEL_CAM_SYNC -> {
-                    Timber.d("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC")
-                    drawerItem = DrawerItem.TRANSFERS
-                    transferPageViewModel.setTransfersTab(
-                        intent.serializable(TRANSFERS_TAB) ?: TransfersTab.PENDING_TAB
-                    )
-                    selectDrawerItem(drawerItem)
-                    val text: String = getString(R.string.cam_sync_cancel_sync)
-                    val builder = MaterialAlertDialogBuilder(this)
-                    builder.setMessage(text)
-                    builder.setPositiveButton(
-                        getString(R.string.general_yes)
-                    ) { _: DialogInterface?, _: Int ->
-                        viewModel.stopAndDisableCameraUploads()
-                        transferPageFragment?.destroyActionMode()
-                    }
-                    builder.setNegativeButton(getString(R.string.general_no), null)
-                    val dialog = builder.create()
-                    try {
-                        dialog.show()
-                    } catch (ex: Exception) {
-                        Timber.e(ex)
-                    }
                 }
 
                 Constants.ACTION_SHOW_TRANSFERS -> {

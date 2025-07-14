@@ -114,7 +114,6 @@ public class Constants {
     public static final String HELP_CENTRE_HOME_URL = "https://help.mega.io";
     public static final String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
     public static final String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
-    public static final String ACTION_CANCEL_CAM_SYNC = "CANCEL_CAM_SYNC";
     public static final String ACTION_IMPORT_LINK_FETCH_NODES = "IMPORT_LINK_FETCH_NODES";
     public static final String ACTION_FILE_EXPLORER_UPLOAD = "FILE_EXPLORER_UPLOAD";
     public static final String ACTION_FILE_PROVIDER = "ACTION_FILE_PROVIDER";

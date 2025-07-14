@@ -34,7 +34,6 @@ import mega.privacy.android.app.presentation.login.onboarding.openTourScreen
 import mega.privacy.android.app.presentation.login.onboarding.tourScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.shared.original.core.ui.utils.setupSplashExitAnimation
@@ -234,29 +233,6 @@ class LoginActivity : BaseActivity() {
             .setTitle(getString(R.string.title_alert_logged_out))
             .setMessage(getString(R.string.error_server_expired_session))
             .setPositiveButton(getString(R.string.general_ok), null)
-            .show()
-    }
-
-    public override fun onResume() {
-        Timber.d("onResume")
-        super.onResume()
-
-        if (intent?.action != null) {
-            when (intent.action) {
-                Constants.ACTION_CANCEL_CAM_SYNC -> showCancelCUWarning()
-            }
-        }
-    }
-
-    private fun showCancelCUWarning() {
-        Timber.d("ACTION_CANCEL_CAM_SYNC")
-        val title = getString(R.string.cam_sync_syncing)
-        val text = getString(R.string.cam_sync_cancel_sync)
-
-        Util.getCustomAlertBuilder(this, title, text, null)
-            .setPositiveButton(getString(R.string.general_yes)) { _, _ ->
-                viewModel.stopCameraUploads()
-            }.setNegativeButton(getString(R.string.general_no), null)
             .show()
     }
 
