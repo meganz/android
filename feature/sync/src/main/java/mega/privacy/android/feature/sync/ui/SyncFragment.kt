@@ -1,7 +1,5 @@
 package mega.privacy.android.feature.sync.ui
 
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedResR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,16 +26,20 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.navigation.getSyncRoute
+import mega.privacy.android.feature.sync.navigation.Sync
+import mega.privacy.android.feature.sync.navigation.SyncList
+import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.navigation.syncNavGraph
 import mega.privacy.android.feature.sync.navigation.syncStopBackupNavGraph
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.shared.sync.ui.SyncEmptyState
 import timber.log.Timber
 import javax.inject.Inject
@@ -92,6 +94,9 @@ class SyncFragment : Fragment() {
                             shouldNavigateToSyncList = activity?.intent?.getBooleanExtra(
                                 SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, false
                             ) == false,
+                            newFolderDetail = activity?.intent?.getParcelableExtra(
+                                SyncHostActivity.EXTRA_NEW_FOLDER_DETAIL,
+                            ),
                             shouldOpenStopBackup = activity?.intent?.getBooleanExtra(
                                 SyncHostActivity.EXTRA_OPEN_SELECT_STOP_BACKUP_DESTINATION, false
                             ) == true,
@@ -108,12 +113,13 @@ class SyncFragment : Fragment() {
     private fun AndroidSyncFeatureNavigation(
         animatedNavController: NavHostController,
         shouldNavigateToSyncList: Boolean,
+        newFolderDetail: SyncNewFolder?,
         shouldOpenStopBackup: Boolean = false,
     ) {
         val context = LocalContext.current
         NavHost(
             navController = animatedNavController,
-            startDestination = getSyncRoute(),
+            startDestination = Sync,
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },
             popEnterTransition = { EnterTransition.None },
@@ -135,6 +141,7 @@ class SyncFragment : Fragment() {
                     openUpgradeAccountPage = {
                         megaNavigator.openUpgradeAccount(context)
                     },
+                    startDestination = newFolderDetail ?: SyncList(),
                     shouldNavigateToSyncList = shouldNavigateToSyncList,
                 )
             }

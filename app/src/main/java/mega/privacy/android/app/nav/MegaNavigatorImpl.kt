@@ -68,8 +68,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
-import mega.privacy.android.feature.sync.navigation.getSyncListRoute
-import mega.privacy.android.feature.sync.navigation.getSyncNewFolderRoute
+import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.settings.SettingsNavigator
@@ -443,9 +442,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openSyncs(context: Context) {
-        context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
-            data = "https://mega.nz/${getSyncListRoute()}".toUri()
-        })
+        context.startActivity(Intent(context, SyncHostActivity::class.java))
     }
 
     override fun openNewSync(
@@ -457,14 +454,15 @@ internal class MegaNavigatorImpl @Inject constructor(
         remoteFolderName: String?,
     ) {
         context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
-            data = "https://mega.nz/${
-                getSyncNewFolderRoute(
+            putExtra(
+                SyncHostActivity.EXTRA_NEW_FOLDER_DETAIL,
+                SyncNewFolder(
                     syncType = syncType,
                     isFromManagerActivity = isFromManagerActivity,
                     remoteFolderHandle = remoteFolderHandle,
-                    remoteFolderName = remoteFolderName
+                    remoteFolderName = remoteFolderName,
                 )
-            }".toUri()
+            )
             putExtra(SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, isFromCloudDrive)
         })
     }
