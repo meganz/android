@@ -414,12 +414,6 @@ class ImagePreviewViewModel @Inject constructor(
                 (imageNode.type is ImageFileTypeInfo || imageNode.type is VideoFileTypeInfo)
     }
 
-    suspend fun isMagnifierMenuVisible(imageNode: ImageNode): Boolean {
-        return Build.VERSION.SDK_INT >= 28
-                && imageNode.type is ImageFileTypeInfo
-                && imageNode.type !is GifFileTypeInfo
-    }
-
     suspend fun isPhotoEditorMenuVisible(imageNode: ImageNode): Boolean {
         val isFeatureFlagEnabled = runCatching {
             getFeatureFlagValueUseCase(AppFeatures.PhotoEditor)
@@ -911,12 +905,6 @@ class ImagePreviewViewModel @Inject constructor(
             albumTitle = params.getString(AlbumContentImageNodeFetcher.ALBUM_TITLE),
             albumId = params.getLong(AlbumContentImageNodeFetcher.CUSTOM_ALBUM_ID)
         )
-    }
-
-    fun switchMagnifierMode() {
-        _state.update {
-            it.copy(isMagnifierMode = !it.isMagnifierMode)
-        }
     }
 
     fun clearImageResultCache() = clearImageResultUseCase(false)

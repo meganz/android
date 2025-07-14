@@ -8,18 +8,11 @@ import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,13 +21,10 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -66,10 +56,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -78,7 +66,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -118,7 +105,6 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsis
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
-import mega.privacy.android.shared.original.core.ui.theme.grey_100
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ImagePreviewHideNodeMenuToolBarEvent
@@ -177,7 +163,6 @@ internal fun ImagePreviewScreen(
         var showRemoveDialog by rememberSaveable { mutableStateOf(false) }
 
         val inFullScreenMode = viewState.inFullScreenMode
-        val isMagnifierMode = viewState.isMagnifierMode
         val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
         val context = LocalContext.current
         val pagerState = rememberPagerState(
@@ -274,11 +259,7 @@ internal fun ImagePreviewScreen(
         }
 
         BackHandler {
-            if (!isMagnifierMode) {
-                onClickBack()
-            } else {
-                viewModel.switchMagnifierMode()
-            }
+            onClickBack()
         }
 
         MegaScaffold(
@@ -291,12 +272,11 @@ internal fun ImagePreviewScreen(
                 ImagePreviewContent(
                     modifier = Modifier
                         .background(
-                            color = (Color.Black.takeIf { flickOffsetFraction == 0f && (inFullScreenMode || isMagnifierMode) }
+                            color = (Color.Black.takeIf { flickOffsetFraction == 0f && inFullScreenMode }
                                 ?: MaterialTheme.colors.white_black).copy(alpha = 1f - flickOffsetFraction),
                         )
                         .padding(innerPadding),
                     pagerState = pagerState,
-                    isMagnifierMode = isMagnifierMode,
                     imageNodes = imageNodes,
                     currentImageNodeIndex = currentImageNodeIndex,
                     currentImageNode = currentImageNode,
@@ -309,10 +289,9 @@ internal fun ImagePreviewScreen(
                     },
                     onSwitchFullScreenMode = viewModel::setFullScreenMode,
                     onClickVideoPlay = onClickVideoPlay,
-                    onCloseMagnifier = viewModel::switchMagnifierMode,
                     topAppBar = { imageNode ->
                         AnimatedVisibility(
-                            visible = !inFullScreenMode && !isMagnifierMode,
+                            visible = !inFullScreenMode,
                             enter = slideInVertically(initialOffsetY = { -it }),
                             exit = slideOutVertically(targetOffsetY = { -it })
                         ) {
@@ -343,7 +322,7 @@ internal fun ImagePreviewScreen(
                     },
                     bottomAppBar = { currentImageNode, index ->
                         AnimatedVisibility(
-                            visible = !inFullScreenMode && !isMagnifierMode,
+                            visible = !inFullScreenMode,
                             enter = slideInVertically(initialOffsetY = { it }),
                             exit = slideOutVertically(targetOffsetY = { it })
                         ) {
@@ -525,7 +504,6 @@ private fun ImagePreviewContent(
     imageNodes: List<ImageNode>,
     currentImageNodeIndex: Int,
     currentImageNode: ImageNode,
-    isMagnifierMode: Boolean,
     onImageTap: () -> Unit,
     onSwitchFullScreenMode: (Boolean) -> Unit,
     onFlick: (Float) -> Unit,
@@ -535,94 +513,61 @@ private fun ImagePreviewContent(
     getImagePath: suspend (ImageResult?) -> String?,
     getErrorImagePath: suspend (ImageResult?) -> String?,
     onClickVideoPlay: (ImageNode) -> Unit,
-    onCloseMagnifier: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isDraggingMagnifier by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = modifier.fillMaxSize()) {
-        if (!isMagnifierMode) {
-            HorizontalPager(
-                modifier = Modifier.fillMaxSize(),
-                state = pagerState,
-                beyondViewportPageCount = 1,
-                key = {
-                    imageNodes.getOrNull(it)?.id?.longValue ?: "${System.currentTimeMillis()}_$it"
-                },
-            ) { index ->
-                val imageNode = imageNodes.getOrNull(index)
-                if (imageNode != null) {
-                    val imageResultTriple by produceState<Triple<Int, String?, String?>>(
-                        initialValue = Triple(0, null, null),
-                        key1 = imageNode,
-                    ) {
-                        downloadImage(imageNode).collectLatest { imageResult ->
-                            value = Triple(
-                                imageResult.getProgressPercentage() ?: 0,
-                                getImagePath(imageResult),
-                                getErrorImagePath(imageResult)
-                            )
+
+        HorizontalPager(
+            modifier = Modifier.fillMaxSize(),
+            state = pagerState,
+            beyondViewportPageCount = 1,
+            key = {
+                imageNodes.getOrNull(it)?.id?.longValue ?: "${System.currentTimeMillis()}_$it"
+            },
+        ) { index ->
+            val imageNode = imageNodes.getOrNull(index)
+            if (imageNode != null) {
+                val imageResultTriple by produceState<Triple<Int, String?, String?>>(
+                    initialValue = Triple(0, null, null),
+                    key1 = imageNode,
+                ) {
+                    downloadImage(imageNode).collectLatest { imageResult ->
+                        value = Triple(
+                            imageResult.getProgressPercentage() ?: 0,
+                            getImagePath(imageResult),
+                            getErrorImagePath(imageResult)
+                        )
+                    }
+                }
+
+                val (progress, imagePath, fallbackImagePath) = imageResultTriple
+
+                val zoomableState = rememberZoomableState(
+                    zoomSpec = ZoomSpec(maxZoomFactor = Int.MAX_VALUE.toFloat())
+                )
+                SideEffect {
+                    if (index != pagerState.currentPage) {
+                        coroutineScope.launch {
+                            zoomableState.resetZoom()
                         }
                     }
-
-                    val (progress, imagePath, fallbackImagePath) = imageResultTriple
-
-                    val zoomableState = rememberZoomableState(
-                        zoomSpec = ZoomSpec(maxZoomFactor = Int.MAX_VALUE.toFloat())
-                    )
-                    SideEffect {
-                        if (index != pagerState.currentPage) {
-                            coroutineScope.launch {
-                                zoomableState.resetZoom()
-                            }
-                        }
-                    }
-                    val imageState = rememberZoomableImageState(zoomableState)
-
-                    ImagePreviewContent(
-                        imageNode = imageNode,
-                        progress = progress,
-                        imagePath = imagePath,
-                        errorImagePath = fallbackImagePath,
-                        isMagnifierMode = isMagnifierMode,
-                        imageState = imageState,
-                        onImageTap = onImageTap,
-                        onSwitchFullScreenMode = onSwitchFullScreenMode,
-                        onFlick = onFlick,
-                        onClickVideoPlay = onClickVideoPlay,
-                        onDragMagnifier = {}
-                    )
                 }
-            }
-        } else {
-            val imageResultTriple by produceState<Triple<Int, String?, String?>>(
-                initialValue = Triple(0, null, null),
-                key1 = currentImageNode
-            ) {
-                downloadImage(currentImageNode).collectLatest { imageResult ->
-                    value = Triple(
-                        imageResult.getProgressPercentage() ?: 0,
-                        getImagePath(imageResult),
-                        getErrorImagePath(imageResult)
-                    )
-                }
-            }
+                val imageState = rememberZoomableImageState(zoomableState)
 
-            val (progress, imagePath, fallbackImagePath) = imageResultTriple
-
-            ImagePreviewContent(
-                imageNode = currentImageNode,
-                progress = progress,
-                imagePath = imagePath,
-                errorImagePath = fallbackImagePath,
-                isMagnifierMode = isMagnifierMode,
-                onImageTap = onImageTap,
-                onClickVideoPlay = onClickVideoPlay,
-                onSwitchFullScreenMode = onSwitchFullScreenMode,
-                onFlick = onFlick,
-                onDragMagnifier = { isDraggingMagnifier = it },
-            )
+                ImagePreviewContent(
+                    imageNode = imageNode,
+                    progress = progress,
+                    imagePath = imagePath,
+                    errorImagePath = fallbackImagePath,
+                    imageState = imageState,
+                    onImageTap = onImageTap,
+                    onSwitchFullScreenMode = onSwitchFullScreenMode,
+                    onFlick = onFlick,
+                    onClickVideoPlay = onClickVideoPlay,
+                )
+            }
         }
 
         Box(
@@ -639,36 +584,6 @@ private fun ImagePreviewContent(
                 .align(Alignment.BottomCenter),
         ) {
             bottomAppBar(currentImageNode, currentImageNodeIndex)
-        }
-
-        if (isMagnifierMode) {
-            AnimatedVisibility(
-                visible = !isDraggingMagnifier,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(grey_100)
-                            .clickable { onCloseMagnifier() },
-                        contentAlignment = Alignment.Center,
-                        content = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_close),
-                                contentDescription = "",
-                                modifier = Modifier.size(12.dp),
-                                tint = Color.Unspecified,
-                            )
-                        },
-                    )
-                }
-            }
         }
     }
 }
@@ -708,10 +623,8 @@ private fun ImagePreviewContent(
     progress: Int,
     imagePath: String?,
     errorImagePath: String?,
-    isMagnifierMode: Boolean,
     onImageTap: () -> Unit,
     onClickVideoPlay: (ImageNode) -> Unit,
-    onDragMagnifier: (Boolean) -> Unit,
     onSwitchFullScreenMode: (Boolean) -> Unit,
     onFlick: (Float) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -745,10 +658,8 @@ private fun ImagePreviewContent(
                 }
             } ?: errorImagePath,
             enableZoom = !isVideo,
-            isMagnifierMode = isMagnifierMode,
             imageState = imageState ?: rememberZoomableImageState(),
             onImageTap = onImageTap,
-            onDragMagnifier = onDragMagnifier,
         )
         if (isVideo) {
             IconButton(
@@ -787,22 +698,11 @@ private fun ImageContent(
     errorImagePath: String?,
     imageState: ZoomableImageState,
     enableZoom: Boolean,
-    isMagnifierMode: Boolean,
     onImageTap: () -> Unit,
-    onDragMagnifier: (Boolean) -> Unit,
 ) {
-
-    val modifier = if (isMagnifierMode) {
-        Modifier
-            .fillMaxSize()
-            .magnifierEffect(onDragMagnifier)
-    } else {
-        Modifier
-            .fillMaxSize()
-    }
-
     Box(
-        modifier = modifier,
+        modifier = Modifier
+            .fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         var imagePath by remember(fullSizePath) {
@@ -826,7 +726,7 @@ private fun ImageContent(
         ZoomableAsyncImage(
             model = request,
             state = imageState,
-            gesturesEnabled = enableZoom && !isMagnifierMode && !isThumbnailFile,
+            gesturesEnabled = enableZoom && !isThumbnailFile,
             contentDescription = "Image Preview",
             modifier = Modifier.fillMaxSize(),
             onClick = {
@@ -903,7 +803,9 @@ private fun ImagePreviewTopBar(
                             imageVector = IconPack.Medium.Thin.Outline.SlidersHorizontal01,
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
-                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_EDIT).size(22.dp),
+                            modifier = Modifier
+                                .testTag(IMAGE_PREVIEW_APP_BAR_EDIT)
+                                .size(22.dp),
                         )
                     }
                 }
@@ -1000,41 +902,4 @@ private fun ImagePreviewBottomBar(
             }
         }
     }
-}
-
-@Composable
-private fun Modifier.magnifierEffect(
-    onDragMagnifier: (Boolean) -> Unit,
-): Modifier {
-    var offsetMagnifier by remember { mutableStateOf(Offset.Unspecified) }
-    var isDraggingMagnifier by remember { mutableStateOf(false) }
-    return this
-        .pointerInput(Unit) {
-            detectDragGestures(
-                onDragEnd = {
-                    onDragMagnifier(false)
-                    isDraggingMagnifier = false
-                },
-                onDragStart = {
-                    onDragMagnifier(true)
-                    isDraggingMagnifier = true
-                },
-                onDrag = { change, _ ->
-                    offsetMagnifier = change.position
-                }
-            )
-        }
-        .then(
-            if (offsetMagnifier == Offset.Unspecified) {
-                Modifier
-            } else {
-                Modifier.magnifier(
-                    sourceCenter = { offsetMagnifier },
-                    magnifierCenter = { offsetMagnifier },
-                    zoom = 3.0f,
-                    size = DpSize(164.dp, 164.dp),
-                    clip = true,
-                )
-            }
-        )
 }
