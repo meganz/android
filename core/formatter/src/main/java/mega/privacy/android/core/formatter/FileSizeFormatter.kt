@@ -1,8 +1,10 @@
 package mega.privacy.android.core.formatter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import java.text.DecimalFormat
 
+@SuppressLint("StringFormatInvalid")
 fun formatFileSize(size: Long, context: Context): String {
     val format = DecimalFormat("#.##")
     val kilobyte = 1024f

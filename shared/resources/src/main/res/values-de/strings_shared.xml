@@ -271,7 +271,7 @@
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Die Uploads werden pausiert, bis Sie Ihr Gerät an ein Ladegerät anschließen. Die Uploads bleiben auch dann pausiert, wenn der Ladestand weniger als 20&#160;% beträgt.</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body" formatted="false">Die Uploads werden pausiert, bis Sie Ihr Gerät an ein Ladegerät anschließen. Die Uploads bleiben auch dann pausiert, wenn der Ladestand weniger als 20&#160;% beträgt.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Neue Synchronisierung hinzufügen</string>
     <!-- Text for the Sync solved issues chip -->
@@ -1217,7 +1217,7 @@
     <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_tab_yearly">Jährlich</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to">Sparen Sie bis zu 16% bei jährlicher Abrechnung</string>
+    <string name="account_upgrade_account_label_save_up_to" formatted="false">Sparen Sie bis zu 16% bei jährlicher Abrechnung</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s Speicherplatz</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
