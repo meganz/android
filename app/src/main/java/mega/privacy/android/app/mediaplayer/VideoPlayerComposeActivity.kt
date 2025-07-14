@@ -4,18 +4,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
-import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-import android.database.ContentObserver
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.provider.Settings
-import android.provider.Settings.System.ACCELEROMETER_ROTATION
-import android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
-import android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
 import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
 import androidx.activity.compose.setContent
@@ -189,24 +181,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
             }
         }
 
-    private val rotationContentObserver by lazy(LazyThreadSafetyMode.NONE) {
-        object : ContentObserver(Handler(mainLooper)) {
-            override fun onChange(selfChange: Boolean) {
-                val rotationMode = Settings.System.getInt(
-                    contentResolver,
-                    ACCELEROMETER_ROTATION,
-                    SCREEN_BRIGHTNESS_MODE_MANUAL
-                )
-                requestedOrientation =
-                    if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                        SCREEN_ORIENTATION_SENSOR
-                    } else {
-                        SCREEN_ORIENTATION_UNSPECIFIED
-                    }
-            }
-        }
-    }
-
     private val selectImportFolderLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val toHandle = result.data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
@@ -279,7 +253,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
         Analytics.tracker.trackEvent(VideoPlayerScreenEvent)
         enableEdgeToEdge()
         setupImmersiveMode()
-        observeRotationSettingsChange()
         val player = createPlayer()
         videoPlayerViewModel.initRepeatToggleMode()
         setContent {
@@ -366,14 +339,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
         if (shouldAutoReplay) {
             videoPlayerViewModel.updatePlaybackStateWithReplay(true)
         }
-    }
-
-    private fun observeRotationSettingsChange() {
-        contentResolver.registerContentObserver(
-            Settings.System.getUriFor(ACCELEROMETER_ROTATION),
-            true,
-            rotationContentObserver
-        )
     }
 
     private fun createPlayer(): ExoPlayer {
@@ -737,7 +702,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        contentResolver.unregisterContentObserver(rotationContentObserver)
         mediaPlayerGateway.playerStop()
         mediaPlayerGateway.playerRelease()
         AudioPlayerService.resumeAudioPlayer(this)
