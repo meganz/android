@@ -105,12 +105,24 @@ internal fun NewChooseAccountScreen(
     val transparent = position == 0 && currentHeaderHeightPx > topBarHeightPx
     val alpha by animateFloatAsState(targetValue = if (transparent) 0f else 1f)
 
-    val proFeatures = remember {
+    // Compute highest storage capacity among available subscriptions
+    val highestStorageSubscription = uiState.localisedSubscriptionsList.maxByOrNull { it.storage }
+    val highestStorageString = if (highestStorageSubscription != null) {
+        val formattedSize = highestStorageSubscription.formatStorageSize()
+        stringResource(id = formattedSize.unit, formattedSize.size)
+    } else {
+        "16 TB"
+    }
+
+    val proFeatures = remember(highestStorageString) {
         listOf(
             ProFeature(
                 icon = IconPack.Medium.Thin.Outline.Cloud,
                 title = context.getString(sharedR.string.pro_plan_feature_storage_title),
-                description = context.getString(sharedR.string.pro_plan_feature_storage_desc),
+                description = context.getString(
+                    sharedR.string.pro_plan_feature_storage_desc,
+                    highestStorageString
+                ),
                 testTag = "pro_plan:feature:storage"
             ),
             ProFeature(

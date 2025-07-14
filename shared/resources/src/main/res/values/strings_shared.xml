@@ -1144,8 +1144,8 @@
     <string name="pro_plan_features_section_title">You’ll get:</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Generous storage</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Store up to 16&#160;TB of data</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">Store up to %1$s of data</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Transfer sharing</string>
     <!-- Description for transfer sharing feature -->
