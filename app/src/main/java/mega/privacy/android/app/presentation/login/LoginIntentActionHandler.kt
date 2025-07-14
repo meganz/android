@@ -51,7 +51,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
     val activity = LocalActivity.current ?: return
 
     val readyToFinish = remember {
-        { loginUiState: LoginState ->
+        ReadyToFinish@{ loginUiState: LoginState ->
             activity.intent?.apply {
                 Timber.d("Intent not null")
 
@@ -61,7 +61,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                     intentShareInfo -> {
                         Timber.d("Intent to share")
                         toSharePage(activity)
-                        return@apply
+                        return@ReadyToFinish
                     }
 
                     Constants.ACTION_FILE_EXPLORER_UPLOAD == action && Constants.TYPE_TEXT_PLAIN == type -> {
@@ -86,7 +86,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                 .setType(Constants.TYPE_TEXT_PLAIN)
                         )
                         activity.finish()
-                        return@apply
+                        return@ReadyToFinish
                     }
 
                     Constants.ACTION_REFRESH == action -> {
@@ -95,7 +95,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                             setResult(Activity.RESULT_OK)
                             finish()
                         }
-                        return@apply
+                        return@ReadyToFinish
                     }
                 }
             }
