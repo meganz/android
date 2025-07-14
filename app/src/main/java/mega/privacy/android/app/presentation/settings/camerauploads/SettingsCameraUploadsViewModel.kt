@@ -432,28 +432,34 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
      * @param enabled true if Camera Uploads should be enabled
      */
     fun onCameraUploadsStateChanged(enabled: Boolean) {
-        viewModelScope.launch {
-            runCatching {
-                if (isConnectedToInternetUseCase()) {
-                    if (enabled) {
-                        // Check if the Media Permissions have been granted before continuing the
-                        // process of enabling Camera Uploads
-                        _uiState.update { it.copy(requestMediaPermissions = triggered) }
-                    } else {
-                        // Disable Camera Uploads
-                        setCameraUploadsEnabled(false)
-                        stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable)
-                        broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsDisabled)
-                        Analytics.tracker.trackEvent(CameraUploadsDisabledEvent)
-                    }
+        runCatching {
+            if (isConnectedToInternetUseCase()) {
+                if (enabled) {
+                    // Check if the Media Permissions have been granted before continuing the
+                    // process of enabling Camera Uploads
+                    _uiState.update { it.copy(requestMediaPermissions = triggered) }
                 } else {
-                    Timber.d("User must be connected to the Internet to update the Camera Uploads state")
-                    showGenericErrorSnackbar()
+                    disableCameraUploads()
                 }
-            }.onFailure { exception ->
-                Timber.e(exception, "An error occurred when changing the Camera Uploads state")
+            } else {
+                Timber.d("User must be connected to the Internet to update the Camera Uploads state")
                 showGenericErrorSnackbar()
             }
+        }.onFailure { exception ->
+            Timber.e(exception, "An error occurred when changing the Camera Uploads state")
+            showGenericErrorSnackbar()
+        }
+    }
+
+    /**
+     * Disables Camera Uploads.
+     */
+    fun disableCameraUploads() {
+        viewModelScope.launch {
+            setCameraUploadsEnabled(false)
+            stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable)
+            broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsDisabled)
+            Analytics.tracker.trackEvent(CameraUploadsDisabledEvent)
         }
     }
 

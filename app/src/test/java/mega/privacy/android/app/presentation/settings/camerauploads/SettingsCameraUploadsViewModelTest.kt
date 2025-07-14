@@ -82,6 +82,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.shared.resources.R as SharedR
+import mega.privacy.mobile.analytics.event.CameraUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
 import mega.privacy.mobile.analytics.event.MediaUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.MediaUploadsEnabledEvent
@@ -712,6 +713,26 @@ internal class SettingsCameraUploadsViewModelTest {
                 }
             }
         }
+
+        @Test
+        fun `test that disableCameraUploads updates state and invokes correctly`() =
+            runTest {
+                initializeUnderTest(isCameraUploadsEnabled = false)
+
+                underTest.disableCameraUploads()
+
+                underTest.uiState.test {
+                    val actual = awaitItem()
+                    assertThat(actual.isCameraUploadsEnabled).isFalse()
+                    assertThat(actual.isMediaUploadsEnabled).isFalse()
+                }
+
+                verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
+                verify(broadcastCameraUploadsSettingsActionUseCase)
+                    .invoke(CameraUploadsSettingsAction.CameraUploadsDisabled)
+
+                assertThat(analyticsExtension.events.first()).isEqualTo(CameraUploadsDisabledEvent)
+            }
 
         private fun providerParamsToCheckEnableCameraUploadsStatus() = listOf(
             Arguments.of(false, EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS),

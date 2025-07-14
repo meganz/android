@@ -1326,7 +1326,9 @@
     <!-- Sync only when charging label for sync power options -->
     <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
     <!-- Message shown when uploading edited image as a new file -->
-    <string name="photo_editor_upload_message">Uploading your edits as a new file</string>
+    <string name="photo_editor_upload_message">Uploading edits as a new file</string>
     <!-- Dialog title asking user to discard changes -->
     <string name="general_dialog_title_discard_changes">Discard changes?</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">Disable Camera uploads?</string>
 </resources>
