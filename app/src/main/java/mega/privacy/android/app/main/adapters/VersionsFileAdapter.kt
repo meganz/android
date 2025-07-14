@@ -1,12 +1,15 @@
 package mega.privacy.android.app.main.adapters
 
 import android.content.Context
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RoundRectShape
 import android.util.SparseBooleanArray
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnLongClickListener
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
@@ -21,6 +24,7 @@ import coil3.asImage
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.transformations
+import coil3.size.Scale
 import coil3.transform.RoundedCornersTransformation
 import coil3.util.CoilUtils.dispose
 import mega.privacy.android.app.MegaApplication
@@ -257,7 +261,6 @@ class VersionsFileAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolderVersion, position: Int) {
-        val position = holder.adapterPosition
         Timber.d("Position: %s", position)
 
         val node = getItem(position) as MegaNode
@@ -330,6 +333,11 @@ class VersionsFileAdapter(
                             .imageView
                             .setImageDrawable(drawable.asDrawable(context.resources))
                     }
+                    .size(
+                        context.resources
+                            .getDimensionPixelSize(R.dimen.non_default_thumbnail_size)
+                    )
+                    .scale(Scale.FILL)
                     .transformations(
                         RoundedCornersTransformation(
                             context.resources.getDimension(
