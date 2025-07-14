@@ -1994,16 +1994,6 @@ interface MegaApiGateway {
     fun getContactLink(handle: Long, listener: MegaRequestListenerInterface)
 
     /**
-     * Check valid node file
-     *
-     * @param node The [MegaNode] to check
-     * @param nodeFile The [File] to check
-     *
-     * @return True if the [MegaNode] File is valid
-     */
-    fun checkValidNodeFile(node: MegaNode, nodeFile: File?): Boolean
-
-    /**
      * Initialize the change of the email address associated to the account.
      *
      *
@@ -2267,7 +2257,7 @@ interface MegaApiGateway {
         filter: MegaSearchFilter,
         order: Int,
         megaCancelToken: MegaCancelToken,
-        megaSearchPage: MegaSearchPage? = null
+        megaSearchPage: MegaSearchPage? = null,
     ): List<MegaNode>
 
     /**
@@ -2280,7 +2270,7 @@ interface MegaApiGateway {
         filter: MegaSearchFilter,
         order: Int,
         megaCancelToken: MegaCancelToken,
-        megaSearchPage: MegaSearchPage? = null
+        megaSearchPage: MegaSearchPage? = null,
     ): List<MegaNode>
 
     /**
