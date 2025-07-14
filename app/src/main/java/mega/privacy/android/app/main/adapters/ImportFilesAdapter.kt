@@ -12,11 +12,16 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
-import coil.Coil.imageLoader
-import coil.request.ImageRequest
-import coil.transform.RoundedCornersTransformation
+import coil3.SingletonImageLoader
+import coil3.asDrawable
+import coil3.asImage
+import coil3.request.ImageRequest
+import coil3.request.transformations
+import coil3.size.Scale
+import coil3.transform.RoundedCornersTransformation
 import com.google.android.material.textfield.TextInputLayout
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
@@ -180,20 +185,33 @@ internal class ImportFilesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
                     || typeForName(file.name).isVideo
                     || typeForName(file.name).isVideoMimeType
                 ) {
-                    imageLoader(context).enqueue(
-                        ImageRequest.Builder(context)
-                            .placeholder(typeForName(file.name).iconResourceId)
-                            .data(file.getUriString())
-                            .target(holder.thumbnail)
-                            .transformations(
-                                RoundedCornersTransformation(
-                                    context.resources.getDimensionPixelSize(
-                                        R.dimen.thumbnail_corner_radius
-                                    ).toFloat()
-                                )
+                    val placeholder = ContextCompat.getDrawable(
+                        context,
+                        typeForName(file.name).iconResourceId
+                    )?.asImage()
+                    val imageRequest = ImageRequest.Builder(context)
+                        .placeholder(placeholder)
+                        .data(file.getUriString())
+                        .size(
+                            context
+                                .resources
+                                .getDimensionPixelSize(R.dimen.default_thumbnail_size)
+                        )
+                        .transformations(
+                            RoundedCornersTransformation(
+                                context.resources.getDimensionPixelSize(
+                                    R.dimen.thumbnail_corner_radius
+                                ).toFloat()
                             )
-                            .build()
-                    )
+                        )
+                        .scale(Scale.FILL)
+                        .target { image ->
+                            holder.thumbnail.setImageDrawable(
+                                image.asDrawable(context.resources)
+                            )
+                        }
+                        .build()
+                    SingletonImageLoader.get(context).enqueue(imageRequest)
                 } else {
                     holder.thumbnail.setImageResource(typeForName(file.name).iconResourceId)
                 }
