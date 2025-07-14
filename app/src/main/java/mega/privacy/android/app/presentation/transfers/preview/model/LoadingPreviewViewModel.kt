@@ -52,10 +52,14 @@ class LoadingPreviewViewModel @Inject constructor(
         checkArgs()
         getTransfer()
         monitorTransferEvents()
+
+        loadingPreviewInfo.transferTag?.let {
+            checkTransferTagToCancel(it)
+        }
     }
 
     private fun checkArgs() {
-        if (loadingPreviewInfo.transferUniqueId == null) {
+        if (loadingPreviewInfo.transferUniqueId == null && loadingPreviewInfo.transferTag == null) {
             Timber.e("No transferUniqueId provided")
             _uiState.update { state -> state.copy(error = NoTransferToShowException()) }
         }
@@ -115,6 +119,9 @@ class LoadingPreviewViewModel @Inject constructor(
                             }
 
                             is TransferEvent.TransferFinishEvent -> {
+                                appScope.launch {
+                                    broadcastTransferTagToCancelUseCase(null)
+                                }
                                 if (event.error == null) {
                                     _uiState.update { state ->
                                         state.copy(
@@ -164,12 +171,5 @@ class LoadingPreviewViewModel @Inject constructor(
      */
     fun onNewIntent(transferTagToCancel: Int) {
         checkTransferTagToCancel(transferTagToCancel)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        appScope.launch {
-            broadcastTransferTagToCancelUseCase(null)
-        }
     }
 }

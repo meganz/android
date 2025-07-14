@@ -12,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -90,11 +91,13 @@ class LoadingPreviewViewModelTest {
     private fun initSavedStateHandle(
         transferUniqueId: Long? = null,
         transferPath: String? = null,
+        transferTag: Int? = null,
     ) {
         savedStateHandle = SavedStateHandle.Companion.invoke(
             route = LoadingPreviewInfo(
                 transferUniqueId = transferUniqueId,
                 transferPath = transferPath,
+                transferTag = transferTag,
             )
         )
     }
@@ -128,6 +131,18 @@ class LoadingPreviewViewModelTest {
         verifyNoInteractions(monitorTransferEventsUseCase)
         verifyNoInteractions(broadcastTransferTagToCancelUseCase)
     }
+
+    @Test
+    fun `test that when transfer unique id nor tag are not provided, state is updated with error`() =
+        runTest {
+            initSavedStateHandle()
+
+            initTest()
+
+            underTest.uiState.map { it.error }.test {
+                assertThat(awaitItem()).isInstanceOf(NoTransferToShowException::class.java)
+            }
+        }
 
     @Test
     fun `test that when transfer is not found but file is, state is updated with path`() =
@@ -390,6 +405,43 @@ class LoadingPreviewViewModelTest {
 
             underTest.uiState.test {
                 assertThat(awaitItem().error).isNull()
+            }
+
+            verify(broadcastTransferTagToCancelUseCase).invoke(transferTagToCancel)
+        }
+
+    @Test
+    fun `test that any finis event invokes BroadcastTransferTagToCancelUseCase`() = runTest {
+        val transfer = mock<Transfer> {
+            on { this.uniqueId } doReturn transferUniqueId
+            on { this.fileName } doReturn fileName
+        }
+        val event = mock<TransferEvent.TransferFinishEvent> {
+            on { this.transfer } doReturn transfer
+        }
+
+        initSavedStateHandle(transferUniqueId = transferUniqueId)
+        commonStub(transfer = transfer, flow = flowOf(event))
+
+        initTest()
+
+        verify(broadcastTransferTagToCancelUseCase).invoke(null)
+    }
+
+    @Test
+    fun `test that BroadcastTransferTagToCancelUseCase is invoked if transfer tag to cancel is received and state is updated with error when there is no transfer unique id`() =
+        runTest {
+            val transferTagToCancel = 1234
+
+            initSavedStateHandle(transferTag = transferTagToCancel)
+            commonStub(transfer = null)
+
+            whenever(broadcastTransferTagToCancelUseCase(transferTagToCancel)) doReturn Unit
+
+            initTest()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().error).isInstanceOf(NoTransferToShowException::class.java)
             }
 
             verify(broadcastTransferTagToCancelUseCase).invoke(transferTagToCancel)
