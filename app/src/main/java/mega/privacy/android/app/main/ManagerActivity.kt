@@ -2721,7 +2721,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
         drawerItem = when (megaApi.getAccess(parentIntentN)) {
             MegaShare.ACCESS_READ, MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_FULL -> {
-                incomingSharesViewModel.setCurrentHandle(handleIntent)
+                incomingSharesViewModel.setCurrentHandle(
+                    handleIntent,
+                    highlightedNames = highlightedNames,
+                )
                 DrawerItem.SHARED_ITEMS
             }
 

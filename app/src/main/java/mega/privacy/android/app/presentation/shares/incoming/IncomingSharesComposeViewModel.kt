@@ -290,11 +290,13 @@ class IncomingSharesComposeViewModel @Inject constructor(
      * Updates the current Handle [IncomingSharesState.currentHandle]
      *
      * @param handle The new node handle to be set
+     * @param highlightedNames the list of names of the nodes we want to highlight
      */
     fun setCurrentHandle(
         handle: Long,
         updateLoadingState: Boolean = false,
         refreshNodes: Boolean = true,
+        highlightedNames: List<String>? = null,
     ) =
         viewModelScope.launch {
             val handleStack =
@@ -312,7 +314,7 @@ class IncomingSharesComposeViewModel @Inject constructor(
                 )
             }
             if (refreshNodes)
-                refreshNodesState()
+                refreshNodesState(highlightedNames)
         }
 
     /**
@@ -341,7 +343,9 @@ class IncomingSharesComposeViewModel @Inject constructor(
         setPendingRefreshNodes()
     }
 
-    private suspend fun refreshNodesState() {
+    private suspend fun refreshNodesState(
+        highlightedNames: List<String>? = null,
+    ) {
         val currentHandle = _state.value.currentHandle
         val isRootNode = _state.value.isInRootLevel
 
@@ -360,7 +364,7 @@ class IncomingSharesComposeViewModel @Inject constructor(
         val childrenNodes = getIncomingSharesChildrenNodeUseCase(currentHandle)
         val sortOrder = if (isRootNode) getOthersSortOrder() else getCloudSortOrder()
         checkIfSelectedFolderIsSharedByVerifiedContact()
-        val nodeUIItems = getNodeUiItems(childrenNodes)
+        val nodeUIItems = getNodeUiItems(childrenNodes, highlightedNames)
         _state.update {
             it.copy(
                 nodesList = nodeUIItems,
@@ -381,18 +385,27 @@ class IncomingSharesComposeViewModel @Inject constructor(
     /**
      * This will map list of [Node] to [NodeUIItem]
      */
-    private fun getNodeUiItems(nodeList: List<ShareNode>): List<NodeUIItem<ShareNode>> {
+    private fun getNodeUiItems(
+        nodeList: List<ShareNode>,
+        highlightedNames: List<String>? = null,
+    ): List<NodeUIItem<ShareNode>> {
         with(state.value) {
+            val existingHighlightedIds = state.value.nodesList
+                .filter { it.isHighlighted }
+                .map { it.node.id }
             return nodeList.mapIndexed { index, node ->
                 val isSelected = selectedNodes.find { it.id.longValue == node.id.longValue } != null
                 val fileDuration = if (node is FileNode) {
                     fileDurationMapper(node.type)?.let { durationInSecondsTextMapper(it) }
                 } else null
+                val isHighlighted = existingHighlightedIds.contains(node.id)
+                        || highlightedNames?.contains(node.name) == true
                 NodeUIItem(
                     node = node,
                     isSelected = if (nodesList.size > index) isSelected else false,
                     isInvisible = if (nodesList.size > index) nodesList[index].isInvisible else false,
                     fileDuration = fileDuration,
+                    isHighlighted = isHighlighted
                 )
             }
         }

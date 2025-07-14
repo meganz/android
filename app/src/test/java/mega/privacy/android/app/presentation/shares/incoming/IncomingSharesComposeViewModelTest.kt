@@ -185,6 +185,21 @@ class IncomingSharesComposeViewModelTest {
         }
 
     @Test
+    fun `test that the node is highlighted correctly`() =
+        runTest {
+            val currentHandle = 123456789L
+            val highlightedName = "node name"
+            val node = mock<TypedFolderNode>()
+            val child = mock<ShareFileNode> {
+                on { name }.thenReturn(highlightedName)
+            }
+            whenever(getNodeByIdUseCase.invoke(NodeId(currentHandle))).thenReturn(node)
+            whenever(getIncomingSharesChildrenNodeUseCase(currentHandle)).thenReturn(listOf(child))
+            underTest.setCurrentHandle(currentHandle, highlightedNames = listOf(highlightedName))
+            assertThat(underTest.state.value.nodesList.singleOrNull()?.isHighlighted).isTrue()
+        }
+
+    @Test
     fun `test that the nodes are returned when setting the file browser handle`() =
         runTest {
             val newValue = 123456789L
