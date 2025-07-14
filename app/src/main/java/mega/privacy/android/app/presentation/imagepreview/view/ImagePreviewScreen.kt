@@ -122,7 +122,6 @@ import mega.privacy.android.shared.original.core.ui.theme.grey_100
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ImagePreviewHideNodeMenuToolBarEvent
-import mega.privacy.mobile.analytics.event.MagnifierMenuItemEvent
 
 @Composable
 internal fun ImagePreviewScreen(
@@ -324,8 +323,6 @@ internal fun ImagePreviewScreen(
                                 showForwardMenu = viewModel::isForwardMenuVisible,
                                 showSaveToDeviceMenu = viewModel::isSaveToDeviceMenuVisible,
                                 showManageLinkMenu = viewModel::isGetLinkMenuVisible,
-                                showMagnifierMenu = viewModel::isMagnifierMenuVisible,
-                                showSendToMenu = viewModel::isSendToChatMenuVisible,
                                 showMoreMenu = viewModel::isMoreMenuVisible,
                                 onClickBack = onClickBack,
                                 onClickEdit = { onClickEdit(imageNode) },
@@ -333,13 +330,6 @@ internal fun ImagePreviewScreen(
                                 onClickForward = { onClickSendTo(imageNode) },
                                 onClickSaveToDevice = onClickSaveToDevice,
                                 onClickGetLink = { onClickGetLink(imageNode) },
-                                onClickMagnifier = {
-                                    coroutineScope.launch {
-                                        Analytics.tracker.trackEvent(MagnifierMenuItemEvent)
-                                        viewModel.switchMagnifierMode()
-                                    }
-                                },
-                                onClickSendTo = { onClickSendTo(imageNode) },
                                 onClickMore = {
                                     coroutineScope.launch {
                                         modalSheetState.show()
@@ -855,8 +845,6 @@ private fun ImagePreviewTopBar(
     showForwardMenu: suspend (ImageNode) -> Boolean,
     showSaveToDeviceMenu: suspend (ImageNode) -> Boolean,
     showManageLinkMenu: suspend (ImageNode) -> Boolean,
-    showMagnifierMenu: suspend (ImageNode) -> Boolean,
-    showSendToMenu: suspend (ImageNode) -> Boolean,
     showMoreMenu: suspend (ImageNode) -> Boolean,
     onClickBack: () -> Unit,
     onClickEdit: () -> Unit,
@@ -864,8 +852,6 @@ private fun ImagePreviewTopBar(
     onClickForward: () -> Unit,
     onClickSaveToDevice: () -> Unit,
     onClickGetLink: () -> Unit,
-    onClickMagnifier: () -> Unit,
-    onClickSendTo: () -> Unit,
     onClickMore: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -901,14 +887,6 @@ private fun ImagePreviewTopBar(
 
                 val isManageLinkMenuVisible by produceState(false, imageNode) {
                     value = showManageLinkMenu(imageNode)
-                }
-
-                val isMagnifierMenuVisible by produceState(false, imageNode) {
-                    value = showMagnifierMenu(imageNode)
-                }
-
-                val isSendToMenuVisible by produceState(false, imageNode) {
-                    value = showSendToMenu(imageNode)
                 }
 
                 val isMoreMenuVisible by produceState(false, imageNode) {
@@ -970,28 +948,6 @@ private fun ImagePreviewTopBar(
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MANAGE_LINK),
-                        )
-                    }
-                }
-
-                if (isMagnifierMenuVisible) {
-                    IconButton(onClick = onClickMagnifier) {
-                        Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ZoomIn),
-                            contentDescription = null,
-                            tint = MaterialTheme.colors.black_white,
-                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MAGNIFIER),
-                        )
-                    }
-                }
-
-                if (isSendToMenuVisible) {
-                    IconButton(onClick = onClickSendTo) {
-                        Icon(
-                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MessageArrowUp),
-                            contentDescription = null,
-                            tint = MaterialTheme.colors.black_white,
-                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SEND_TO),
                         )
                     }
                 }

@@ -18,7 +18,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
 
     PhotoEditor(
         "Enable photo editor in image viewer",
-        false,
+        true,
     ),
 
     CameraActivityInCloudDrive(
