@@ -13,11 +13,13 @@ import mega.privacy.android.app.presentation.transfers.preview.model.LoadingPrev
  *
  * @param transferPath The path of the transfer where the file is being downloaded for preview.
  * @param transferUniqueId The unique ID of the transfer to preview.
+ * @param transferTag The tag of the transfer to preview, used for cancellation.
  */
 @Serializable
 class LoadingPreviewInfo(
     val transferPath: String? = null,
     val transferUniqueId: Long? = null,
+    val transferTag: Int? = null,
 )
 
 internal fun NavGraphBuilder.loadingPreviewScreen(

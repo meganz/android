@@ -71,12 +71,16 @@ class LoadingPreviewActivity : AppCompatActivity() {
                             val transferUniqueId =
                                 intent?.getLongExtra(EXTRA_TRANSFER_UNIQUE_ID, -1)
                                     .takeUnless { it == -1L }
+                            val transferTag =
+                                intent.getIntExtra(EXTRA_TRANSFER_TAG, -1)
+                                    .takeUnless { it == -1 }
 
                             NavHost(
                                 navController = navHostController,
                                 startDestination = LoadingPreviewInfo(
                                     transferPath = transferPath,
                                     transferUniqueId = transferUniqueId,
+                                    transferTag = transferTag,
                                 ),
                                 modifier = Modifier.navigationBarsPadding(),
                             ) {
