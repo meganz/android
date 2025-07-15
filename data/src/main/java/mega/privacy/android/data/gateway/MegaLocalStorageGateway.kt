@@ -102,42 +102,42 @@ interface MegaLocalStorageGateway {
     suspend fun setUserHasLoggedIn()
 
     /**
-     * Get storage download location
+     * Get download location
      *
-     * @return storageDownloadLocation path as [String]
+     * @return downloadLocation path as [String]
      */
-    suspend fun getStorageDownloadLocation(): String?
+    suspend fun getDownloadLocation(): String?
 
     /**
      * Get always ask for storage download location value
      *
      * @return isStorageAskAlways as [Boolean]
      */
-    suspend fun isStorageAskAlways(): Boolean
+    suspend fun isAskForDownloadLocation(): Boolean
 
     /**
      * Set to always ask for storage download location
      *
      * @param isStorageAskAlways
      */
-    suspend fun setStorageAskAlways(isStorageAskAlways: Boolean)
+    suspend fun setAskForDownloadLocation(isStorageAskAlways: Boolean)
 
     /**
-     * @return if should ask the user about download location
+     * @return if should ask the user about set the download location as default
      */
-    suspend fun isAskSetDownloadLocation(): Boolean
+    suspend fun isShouldPromptToSaveDestination(): Boolean
 
     /**
-     * Set if should ask the user about download location
+     * Set if should ask the user to save the download location
      */
-    suspend fun setAskSetDownloadLocation(value: Boolean)
+    suspend fun setShouldPromptToSaveDestination(value: Boolean)
 
     /**
      * Set storage download location
      *
-     * @param storageDownloadLocation
+     * @param downloadLocation
      */
-    suspend fun setStorageDownloadLocation(storageDownloadLocation: String?)
+    suspend fun setDownloadLocation(downloadLocation: String?)
 
     /**
      * @return ask for confirmation before large downloads preference

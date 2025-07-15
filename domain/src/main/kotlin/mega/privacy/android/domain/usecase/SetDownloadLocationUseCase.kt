@@ -4,9 +4,9 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import javax.inject.Inject
 
 /**
- * Pass through use case to set storage download location path
+ * Pass through use case to set download location path
  */
-class SetStorageDownloadLocationUseCase @Inject constructor(
+class SetDownloadLocationUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository
 ) {
     /**
@@ -14,6 +14,6 @@ class SetStorageDownloadLocationUseCase @Inject constructor(
      * @param location as folder path [String]
      */
     suspend operator fun invoke(location: String) {
-        settingsRepository.setStorageDownloadLocation(location)
+        settingsRepository.setDownloadLocation(location)
     }
 }

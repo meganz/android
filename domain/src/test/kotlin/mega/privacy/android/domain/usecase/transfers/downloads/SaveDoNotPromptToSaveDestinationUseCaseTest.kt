@@ -28,7 +28,7 @@ class SaveDoNotPromptToSaveDestinationUseCaseTest {
     fun `test that settings repository setAskSetDownloadLocation is set to false when this use case is invoked`() =
         runTest {
             underTest()
-            verify(settingsRepository).setAskSetDownloadLocation(false)
+            verify(settingsRepository).setShouldPromptToSaveDestination(false)
         }
 
 }

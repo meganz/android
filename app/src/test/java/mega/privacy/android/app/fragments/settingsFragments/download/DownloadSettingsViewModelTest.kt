@@ -4,11 +4,11 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.usecase.GetDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.GetStorageDownloadDefaultPathUseCase
-import mega.privacy.android.domain.usecase.GetStorageDownloadLocationUseCase
-import mega.privacy.android.domain.usecase.IsStorageDownloadAskAlwaysUseCase
-import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
-import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.IsAskForDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsExternalStorageContentUriUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -29,22 +29,22 @@ import org.mockito.kotlin.whenever
 class DownloadSettingsViewModelTest {
     private lateinit var underTest: DownloadSettingsViewModel
 
-    private val setStorageDownloadAskAlwaysUseCase = mock<SetStorageDownloadAskAlwaysUseCase>()
-    private val setStorageDownloadLocationUseCase = mock<SetStorageDownloadLocationUseCase>()
-    private val isStorageDownloadAskAlwaysUseCase = mock<IsStorageDownloadAskAlwaysUseCase>()
-    private val getStorageDownloadLocationUseCase = mock<GetStorageDownloadLocationUseCase>()
+    private val setAskForDownloadLocationUseCase = mock<SetAskForDownloadLocationUseCase>()
+    private val setDownloadLocationUseCase = mock<SetDownloadLocationUseCase>()
+    private val isAskForDownloadLocationUseCase = mock<IsAskForDownloadLocationUseCase>()
+    private val getDownloadLocationUseCase = mock<GetDownloadLocationUseCase>()
     private val getStorageDownloadDefaultPathUseCase = mock<GetStorageDownloadDefaultPathUseCase>()
     private val isExternalStorageContentUriUseCase = mock<IsExternalStorageContentUriUseCase>()
     private val getExternalPathByContentUriUseCase = mock<GetExternalPathByContentUriUseCase>()
 
     @BeforeAll
     fun setUp() = runTest {
-        whenever(isStorageDownloadAskAlwaysUseCase()) doReturn false
+        whenever(isAskForDownloadLocationUseCase()) doReturn false
         underTest = DownloadSettingsViewModel(
-            setStorageDownloadAskAlwaysUseCase,
-            setStorageDownloadLocationUseCase,
-            isStorageDownloadAskAlwaysUseCase,
-            getStorageDownloadLocationUseCase,
+            setAskForDownloadLocationUseCase,
+            setDownloadLocationUseCase,
+            isAskForDownloadLocationUseCase,
+            getDownloadLocationUseCase,
             getStorageDownloadDefaultPathUseCase,
             isExternalStorageContentUriUseCase,
             getExternalPathByContentUriUseCase,
@@ -54,10 +54,10 @@ class DownloadSettingsViewModelTest {
     @BeforeEach
     fun cleanUp() {
         reset(
-            setStorageDownloadAskAlwaysUseCase,
-            setStorageDownloadLocationUseCase,
-            isStorageDownloadAskAlwaysUseCase,
-            getStorageDownloadLocationUseCase,
+            setAskForDownloadLocationUseCase,
+            setDownloadLocationUseCase,
+            isAskForDownloadLocationUseCase,
+            getDownloadLocationUseCase,
             getStorageDownloadDefaultPathUseCase,
             isExternalStorageContentUriUseCase,
             getExternalPathByContentUriUseCase,
@@ -71,7 +71,7 @@ class DownloadSettingsViewModelTest {
 
         underTest.setDownloadLocation(expected)
 
-        verify(setStorageDownloadLocationUseCase)(expected)
+        verify(setDownloadLocationUseCase)(expected)
     }
 
     @Test
@@ -82,7 +82,7 @@ class DownloadSettingsViewModelTest {
 
         underTest.setDownloadLocation(null)
 
-        verify(setStorageDownloadLocationUseCase)(expected)
+        verify(setDownloadLocationUseCase)(expected)
     }
 
     @Test

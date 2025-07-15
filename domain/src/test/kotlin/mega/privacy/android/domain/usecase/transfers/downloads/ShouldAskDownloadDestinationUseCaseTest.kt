@@ -49,8 +49,8 @@ class ShouldAskDownloadDestinationUseCaseTest {
     fun `test that use case returns true when the destination is not set`(
         askAlwaysSetting: Boolean,
     ) = runTest {
-        whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(null)
-        whenever(settingsRepository.isStorageAskAlways()).thenReturn(askAlwaysSetting)
+        whenever(settingsRepository.getDownloadLocation()).thenReturn(null)
+        whenever(settingsRepository.isAskForDownloadLocation()).thenReturn(askAlwaysSetting)
         assertThat(underTest()).isTrue()
     }
 
@@ -59,8 +59,8 @@ class ShouldAskDownloadDestinationUseCaseTest {
     fun `test that use case returns true when ask always is true`(
         destinationSet: Boolean,
     ) = runTest {
-        whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(if (destinationSet) "destination" else null)
-        whenever(settingsRepository.isStorageAskAlways()).thenReturn(true)
+        whenever(settingsRepository.getDownloadLocation()).thenReturn(if (destinationSet) "destination" else null)
+        whenever(settingsRepository.isAskForDownloadLocation()).thenReturn(true)
         assertThat(underTest()).isTrue()
     }
 
@@ -68,8 +68,8 @@ class ShouldAskDownloadDestinationUseCaseTest {
     fun `test that use case returns false when the destination is set and valid and ask always is false`() =
         runTest {
             val destination = "destination"
-            whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
-            whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(destination)
+            whenever(settingsRepository.isAskForDownloadLocation()).thenReturn(false)
+            whenever(settingsRepository.getDownloadLocation()).thenReturn(destination)
             whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
                 .thenReturn(true)
             whenever(fileSystemRepository.doesUriPathExist(UriPath(destination))).thenReturn(true)
@@ -82,8 +82,8 @@ class ShouldAskDownloadDestinationUseCaseTest {
         expected: Boolean,
     ) = runTest {
         val destination = "destination"
-        whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(destination)
-        whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
+        whenever(settingsRepository.getDownloadLocation()).thenReturn(destination)
+        whenever(settingsRepository.isAskForDownloadLocation()).thenReturn(false)
         whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
             .thenReturn(!expected)
         whenever(fileSystemRepository.doesUriPathExist(UriPath(destination))).thenReturn(true)
@@ -96,8 +96,8 @@ class ShouldAskDownloadDestinationUseCaseTest {
         expected: Boolean,
     ) = runTest {
         val destination = "destination"
-        whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(destination)
-        whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
+        whenever(settingsRepository.getDownloadLocation()).thenReturn(destination)
+        whenever(settingsRepository.isAskForDownloadLocation()).thenReturn(false)
         whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
             .thenReturn(true)
         whenever(fileSystemRepository.doesUriPathExist(UriPath(destination))).thenReturn(!expected)
@@ -108,30 +108,30 @@ class ShouldAskDownloadDestinationUseCaseTest {
     fun `test that destination settings are reset when file doesn't have permission anymore`() =
         runTest {
             val destination = "destination"
-            whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(destination)
-            whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
+            whenever(settingsRepository.getDownloadLocation()).thenReturn(destination)
+            whenever(settingsRepository.isAskForDownloadLocation()).thenReturn(false)
             whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
                 .thenReturn(false)
             whenever(fileSystemRepository.doesUriPathExist(UriPath(destination))).thenReturn(true)
             underTest()
-            verify(settingsRepository).setAskSetDownloadLocation(true)
-            verify(settingsRepository).setStorageAskAlways(true)
-            verify(settingsRepository).setStorageDownloadLocation(null)
+            verify(settingsRepository).setShouldPromptToSaveDestination(true)
+            verify(settingsRepository).setAskForDownloadLocation(true)
+            verify(settingsRepository).setDownloadLocation(null)
         }
 
     @Test
     fun `test that destination settings are reset to true when file doesn't exist anymore`() =
         runTest {
             val destination = "destination"
-            whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(destination)
-            whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
+            whenever(settingsRepository.getDownloadLocation()).thenReturn(destination)
+            whenever(settingsRepository.isAskForDownloadLocation()).thenReturn(false)
             whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
                 .thenReturn(true)
             whenever(fileSystemRepository.doesUriPathExist(UriPath(destination))).thenReturn(false)
             underTest()
-            verify(settingsRepository).setAskSetDownloadLocation(true)
-            verify(settingsRepository).setStorageAskAlways(true)
-            verify(settingsRepository).setStorageDownloadLocation(null)
+            verify(settingsRepository).setShouldPromptToSaveDestination(true)
+            verify(settingsRepository).setAskForDownloadLocation(true)
+            verify(settingsRepository).setDownloadLocation(null)
         }
 
 
@@ -140,8 +140,8 @@ class ShouldAskDownloadDestinationUseCaseTest {
         runTest {
             val destination = "/defaultDestination"
             whenever(getStorageDownloadDefaultPathUseCase()).thenReturn(destination)
-            whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(destination)
-            whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
+            whenever(settingsRepository.getDownloadLocation()).thenReturn(destination)
+            whenever(settingsRepository.isAskForDownloadLocation()).thenReturn(false)
             whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
                 .thenReturn(false)
             whenever(fileSystemRepository.doesUriPathExist(UriPath(destination))).thenReturn(true)
@@ -153,8 +153,8 @@ class ShouldAskDownloadDestinationUseCaseTest {
         runTest {
             val destination = "/defaultDestination"
             whenever(getStorageDownloadDefaultPathUseCase()).thenReturn(destination)
-            whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(destination)
-            whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
+            whenever(settingsRepository.getDownloadLocation()).thenReturn(destination)
+            whenever(settingsRepository.isAskForDownloadLocation()).thenReturn(false)
             whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
                 .thenReturn(true)
             whenever(fileSystemRepository.doesUriPathExist(UriPath(destination))).thenReturn(false)
@@ -167,8 +167,8 @@ class ShouldAskDownloadDestinationUseCaseTest {
         expected: Boolean,
     ) = runTest {
         val destination = "destination"
-        whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(destination)
-        whenever(settingsRepository.isStorageAskAlways()).thenReturn(false)
+        whenever(settingsRepository.getDownloadLocation()).thenReturn(destination)
+        whenever(settingsRepository.isAskForDownloadLocation()).thenReturn(false)
         whenever(fileSystemRepository.hasPersistedPermission(UriPath(destination), true))
             .thenReturn(true)
         whenever(fileSystemRepository.doesUriPathExist(UriPath(destination))).thenReturn(true)

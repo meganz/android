@@ -165,42 +165,42 @@ internal class DefaultSettingsRepositoryTest {
 
     @ParameterizedTest(name = "expected: {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that megaLocalStorageGateway value is returned when isAskSetDownloadLocation is invoked`(
+    fun `test that megaLocalStorageGateway value is returned when isShouldPromptToSaveDestination is invoked`(
         expected: Boolean,
     ) =
         runTest {
-            whenever(megaLocalStorageGateway.isAskSetDownloadLocation()).thenReturn(expected)
-            assertThat(underTest.isAskSetDownloadLocation()).isEqualTo(expected)
+            whenever(megaLocalStorageGateway.isShouldPromptToSaveDestination()).thenReturn(expected)
+            assertThat(underTest.isShouldPromptToSaveDestination()).isEqualTo(expected)
         }
 
     @ParameterizedTest(name = "expected: {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that megaLocalStorageGateway is set with correct value when setAskSetDownloadLocation is invoked`(
+    fun `test that megaLocalStorageGateway is set with correct value when setShouldPromptToSaveDestination is invoked`(
         expected: Boolean,
     ) =
         runTest {
-            underTest.setAskSetDownloadLocation(expected)
-            verify(megaLocalStorageGateway).setAskSetDownloadLocation(expected)
+            underTest.setShouldPromptToSaveDestination(expected)
+            verify(megaLocalStorageGateway).setShouldPromptToSaveDestination(expected)
         }
 
     @ParameterizedTest(name = "expected: {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that megaLocalStorageGateway value is returned when isStorageAskAlways is invoked`(
+    fun `test that megaLocalStorageGateway value is returned when isAskForDownloadLocation is invoked`(
         expected: Boolean,
     ) =
         runTest {
-            whenever(megaLocalStorageGateway.isStorageAskAlways()).thenReturn(expected)
-            assertThat(underTest.isStorageAskAlways()).isEqualTo(expected)
+            whenever(megaLocalStorageGateway.isAskForDownloadLocation()).thenReturn(expected)
+            assertThat(underTest.isAskForDownloadLocation()).isEqualTo(expected)
         }
 
     @ParameterizedTest(name = "expected: {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that megaLocalStorageGateway is set with correct value when setStorageAskAlways is invoked`(
+    fun `test that megaLocalStorageGateway is set with correct value when setAskForDownloadLocation is invoked`(
         expected: Boolean,
     ) =
         runTest {
-            underTest.setStorageAskAlways(expected)
-            verify(megaLocalStorageGateway).setStorageAskAlways(expected)
+            underTest.setAskForDownloadLocation(expected)
+            verify(megaLocalStorageGateway).setAskForDownloadLocation(expected)
         }
 
     @ParameterizedTest(name = "expected: {0}")

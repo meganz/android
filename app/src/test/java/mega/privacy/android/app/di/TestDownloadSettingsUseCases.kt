@@ -5,10 +5,10 @@ import dagger.Provides
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.settings.download.DownloadSettingsUseCases
+import mega.privacy.android.domain.usecase.GetDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.GetStorageDownloadDefaultPathUseCase
-import mega.privacy.android.domain.usecase.GetStorageDownloadLocationUseCase
-import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
-import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import org.mockito.kotlin.mock
 
@@ -18,10 +18,10 @@ import org.mockito.kotlin.mock
     components = [ViewModelComponent::class]
 )
 object TestDownloadSettingsUseCases {
-    val getDownloadLocationPath = mock<GetStorageDownloadLocationUseCase>()
-    val setDownloadLocationPath = mock<SetStorageDownloadLocationUseCase>()
+    val getDownloadLocationPath = mock<GetDownloadLocationUseCase>()
+    val setDownloadLocationPath = mock<SetDownloadLocationUseCase>()
     val getStorageDownloadAskAlways = mock<ShouldPromptToSaveDestinationUseCase>()
-    val setStorageDownloadAskAlways = mock<SetStorageDownloadAskAlwaysUseCase>()
+    val setStorageDownloadAskAlways = mock<SetAskForDownloadLocationUseCase>()
     val getDefaultDownloadPath = mock<GetStorageDownloadDefaultPathUseCase>()
 
     @Provides
@@ -29,11 +29,11 @@ object TestDownloadSettingsUseCases {
         getDefaultDownloadPath
 
     @Provides
-    fun provideGetDownloadLocationPath(): GetStorageDownloadLocationUseCase =
+    fun provideGetDownloadLocationPath(): GetDownloadLocationUseCase =
         getDownloadLocationPath
 
     @Provides
-    fun provideSetDownloadLocationPath(): SetStorageDownloadLocationUseCase =
+    fun provideSetDownloadLocationPath(): SetDownloadLocationUseCase =
         setDownloadLocationPath
 
     @Provides
@@ -41,6 +41,6 @@ object TestDownloadSettingsUseCases {
         getStorageDownloadAskAlways
 
     @Provides
-    fun provideSetStorageAskAlways(): SetStorageDownloadAskAlwaysUseCase =
+    fun provideSetStorageAskAlways(): SetAskForDownloadLocationUseCase =
         setStorageDownloadAskAlways
 }

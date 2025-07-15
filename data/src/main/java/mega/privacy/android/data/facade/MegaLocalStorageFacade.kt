@@ -86,25 +86,25 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.get().setFirstTime(false)
     }
 
-    override suspend fun getStorageDownloadLocation(): String? =
+    override suspend fun getDownloadLocation(): String? =
         dbHandler.get().preferences?.storageDownloadLocation
 
-    override suspend fun isStorageAskAlways(): Boolean =
+    override suspend fun isAskForDownloadLocation(): Boolean =
         dbHandler.get().preferences?.storageAskAlways?.toBoolean() ?: true
 
-    override suspend fun setStorageAskAlways(isStorageAskAlways: Boolean) {
+    override suspend fun setAskForDownloadLocation(isStorageAskAlways: Boolean) {
         dbHandler.get().setStorageAskAlways(isStorageAskAlways)
     }
 
-    override suspend fun isAskSetDownloadLocation(): Boolean =
+    override suspend fun isShouldPromptToSaveDestination(): Boolean =
         dbHandler.get().askSetDownloadLocation
 
-    override suspend fun setAskSetDownloadLocation(value: Boolean) {
+    override suspend fun setShouldPromptToSaveDestination(value: Boolean) {
         dbHandler.get().askSetDownloadLocation = value
     }
 
-    override suspend fun setStorageDownloadLocation(storageDownloadLocation: String?) {
-        dbHandler.get().setStorageDownloadLocation(storageDownloadLocation)
+    override suspend fun setDownloadLocation(downloadLocation: String?) {
+        dbHandler.get().setStorageDownloadLocation(downloadLocation)
     }
 
     override suspend fun isAskBeforeLargeDownloads() =

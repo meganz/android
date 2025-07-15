@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.settingsFragments.download.model.DownloadSettingsState
+import mega.privacy.android.domain.usecase.GetDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.GetStorageDownloadDefaultPathUseCase
-import mega.privacy.android.domain.usecase.GetStorageDownloadLocationUseCase
-import mega.privacy.android.domain.usecase.IsStorageDownloadAskAlwaysUseCase
-import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
-import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.IsAskForDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.domain.usecase.file.IsExternalStorageContentUriUseCase
 import timber.log.Timber
@@ -23,10 +23,10 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class DownloadSettingsViewModel @Inject constructor(
-    private val setStorageDownloadAskAlwaysUseCase: SetStorageDownloadAskAlwaysUseCase,
-    private val setStorageDownloadLocationUseCase: SetStorageDownloadLocationUseCase,
-    private val isStorageDownloadAskAlwaysUseCase: IsStorageDownloadAskAlwaysUseCase,
-    private val getStorageDownloadLocationUseCase: GetStorageDownloadLocationUseCase,
+    private val setAskForDownloadLocationUseCase: SetAskForDownloadLocationUseCase,
+    private val setDownloadLocationUseCase: SetDownloadLocationUseCase,
+    private val isAskForDownloadLocationUseCase: IsAskForDownloadLocationUseCase,
+    private val getDownloadLocationUseCase: GetDownloadLocationUseCase,
     private val getStorageDownloadDefaultPathUseCase: GetStorageDownloadDefaultPathUseCase,
     private val isExternalStorageContentUriUseCase: IsExternalStorageContentUriUseCase,
     private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
@@ -41,10 +41,10 @@ class DownloadSettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            isStorageDownloadAskAlwaysUseCase().also { askAlways ->
+            isAskForDownloadLocationUseCase().also { askAlways ->
                 _uiState.update { it.copy(isAskAlwaysChecked = askAlways) }
                 if (!askAlways) {
-                    setDownloadLocation(getStorageDownloadLocationUseCase())
+                    setDownloadLocation(getDownloadLocationUseCase())
                 }
             }
         }
@@ -57,7 +57,7 @@ class DownloadSettingsViewModel @Inject constructor(
         try {
             val downloadLocation =
                 if (location.isNullOrEmpty()) getStorageDownloadDefaultPathUseCase() else location
-            setStorageDownloadLocationUseCase(downloadLocation)
+            setDownloadLocationUseCase(downloadLocation)
             val path = takeIf { isExternalStorageContentUriUseCase(downloadLocation) }?.let {
                 getExternalPathByContentUriUseCase(downloadLocation)
             } ?: downloadLocation
@@ -71,7 +71,7 @@ class DownloadSettingsViewModel @Inject constructor(
      * Invoke when user's ask for download location configuration changed
      */
     fun onStorageAskAlwaysChanged(isChecked: Boolean) = viewModelScope.launch {
-        setStorageDownloadAskAlwaysUseCase(isChecked)
+        setAskForDownloadLocationUseCase(isChecked)
         if (!isChecked) {
             setDownloadLocation(_uiState.value.downloadLocationPath)
         }

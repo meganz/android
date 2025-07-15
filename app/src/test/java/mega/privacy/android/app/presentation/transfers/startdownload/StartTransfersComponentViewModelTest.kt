@@ -38,8 +38,8 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
-import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
-import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
@@ -61,7 +61,7 @@ import mega.privacy.android.domain.usecase.transfers.chatuploads.SetAskedResumeT
 import mega.privacy.android.domain.usecase.transfers.chatuploads.ShouldAskForResumeTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
@@ -116,8 +116,8 @@ class StartTransfersComponentViewModelTest {
         mock<IsAskBeforeLargeDownloadsSettingUseCase>()
     private val setAskBeforeLargeDownloadsSettingUseCase =
         mock<SetAskBeforeLargeDownloadsSettingUseCase>()
-    private val getOrCreateStorageDownloadLocationUseCase =
-        mock<GetOrCreateStorageDownloadLocationUseCase>()
+    private val getOrCreateDownloadLocationUseCase =
+        mock<GetOrCreateDownloadLocationUseCase>()
     private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
     private val getCurrentDownloadSpeedUseCase = mock<GetCurrentDownloadSpeedUseCase>()
     private val getFilePreviewDownloadPathUseCase = mock<GetFilePreviewDownloadPathUseCase>()
@@ -125,8 +125,8 @@ class StartTransfersComponentViewModelTest {
     private val shouldPromptToSaveDestinationUseCase = mock<ShouldPromptToSaveDestinationUseCase>()
     private val saveDoNotPromptToSaveDestinationUseCase =
         mock<SaveDoNotPromptToSaveDestinationUseCase>()
-    private val setStorageDownloadAskAlwaysUseCase = mock<SetStorageDownloadAskAlwaysUseCase>()
-    private val setStorageDownloadLocationUseCase = mock<SetStorageDownloadLocationUseCase>()
+    private val setAskForDownloadLocationUseCase = mock<SetAskForDownloadLocationUseCase>()
+    private val setDownloadLocationUseCase = mock<SetDownloadLocationUseCase>()
     private val sendChatAttachmentsUseCase = mock<SendChatAttachmentsUseCase>()
     private val shouldAskForResumeTransfersUseCase = mock<ShouldAskForResumeTransfersUseCase>()
     private val setAskedResumeTransfersUseCase = mock<SetAskedResumeTransfersUseCase>()
@@ -199,7 +199,7 @@ class StartTransfersComponentViewModelTest {
     private fun initTest() {
         underTest = StartTransfersComponentViewModel(
             getOfflinePathForNodeUseCase = getOfflinePathForNodeUseCase,
-            getOrCreateStorageDownloadLocationUseCase = getOrCreateStorageDownloadLocationUseCase,
+            getOrCreateDownloadLocationUseCase = getOrCreateDownloadLocationUseCase,
             getFilePreviewDownloadPathUseCase = getFilePreviewDownloadPathUseCase,
             clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
@@ -212,8 +212,8 @@ class StartTransfersComponentViewModelTest {
             shouldAskDownloadDestinationUseCase = shouldAskDownloadDestinationUseCase,
             shouldPromptToSaveDestinationUseCase = shouldPromptToSaveDestinationUseCase,
             saveDoNotPromptToSaveDestinationUseCase = saveDoNotPromptToSaveDestinationUseCase,
-            setStorageDownloadAskAlwaysUseCase = setStorageDownloadAskAlwaysUseCase,
-            setStorageDownloadLocationUseCase = setStorageDownloadLocationUseCase,
+            setAskForDownloadLocationUseCase = setAskForDownloadLocationUseCase,
+            setDownloadLocationUseCase = setDownloadLocationUseCase,
             sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
             shouldAskForResumeTransfersUseCase = shouldAskForResumeTransfersUseCase,
             setAskedResumeTransfersUseCase = setAskedResumeTransfersUseCase,
@@ -249,7 +249,7 @@ class StartTransfersComponentViewModelTest {
     fun resetMocks() {
         reset(
             getOfflinePathForNodeUseCase,
-            getOrCreateStorageDownloadLocationUseCase,
+            getOrCreateDownloadLocationUseCase,
             getFilePreviewDownloadPathUseCase,
             clearActiveTransfersIfFinishedUseCase,
             isConnectedToInternetUseCase,
@@ -262,8 +262,8 @@ class StartTransfersComponentViewModelTest {
             shouldAskDownloadDestinationUseCase,
             shouldPromptToSaveDestinationUseCase,
             saveDoNotPromptToSaveDestinationUseCase,
-            setStorageDownloadAskAlwaysUseCase,
-            setStorageDownloadLocationUseCase,
+            setAskForDownloadLocationUseCase,
+            setDownloadLocationUseCase,
             sendChatAttachmentsUseCase,
             shouldAskForResumeTransfersUseCase,
             setAskedResumeTransfersUseCase,
@@ -508,7 +508,7 @@ class StartTransfersComponentViewModelTest {
     fun `test that setStorageDownloadAskAlwaysUseCase is set to true when alwaysAskForDestination is invoked`() =
         runTest {
             underTest.alwaysAskForDestination()
-            verify(setStorageDownloadAskAlwaysUseCase).invoke(true)
+            verify(setAskForDownloadLocationUseCase).invoke(true)
         }
 
     @Test
@@ -526,18 +526,18 @@ class StartTransfersComponentViewModelTest {
         }
 
     @Test
-    fun `test that setStorageDownloadLocationUseCase is invoked when saveDestination is invoked`() =
+    fun `test that setDownloadLocationUseCase is invoked when saveDestination is invoked`() =
         runTest {
             val destination = "destination"
             underTest.saveDestination(destination)
-            verify(setStorageDownloadLocationUseCase).invoke(destination)
+            verify(setDownloadLocationUseCase).invoke(destination)
         }
 
     @Test
     fun `test that setStorageDownloadAskAlwaysUseCase is set to false when saveDestination is invoked`() =
         runTest {
             underTest.saveDestination("destination")
-            verify(setStorageDownloadAskAlwaysUseCase).invoke(false)
+            verify(setAskForDownloadLocationUseCase).invoke(false)
         }
 
     @Test
@@ -673,7 +673,7 @@ class StartTransfersComponentViewModelTest {
         runTest {
             commonStub()
             whenever(shouldAskDownloadDestinationUseCase()).thenReturn(false)
-            whenever(getOrCreateStorageDownloadLocationUseCase()).thenReturn(DESTINATION)
+            whenever(getOrCreateDownloadLocationUseCase()).thenReturn(DESTINATION)
             val nodeId = NodeId(1)
             underTest.startDownloadWithoutConfirmation(
                 TransferTriggerEvent.CopyOfflineNode(listOf(nodeId)),
@@ -691,7 +691,7 @@ class StartTransfersComponentViewModelTest {
                 on { toString() } doReturn sourceUri
             }
             whenever(shouldAskDownloadDestinationUseCase()).thenReturn(false)
-            whenever(getOrCreateStorageDownloadLocationUseCase()).thenReturn(DESTINATION)
+            whenever(getOrCreateDownloadLocationUseCase()).thenReturn(DESTINATION)
             underTest.startDownloadWithoutConfirmation(
                 TransferTriggerEvent.CopyUri(
                     "name",
@@ -1202,11 +1202,11 @@ class StartTransfersComponentViewModelTest {
             }
 
         @Test
-        fun `test that insertPendingDownloadsForNodesUseCase, insertPendingUploadsForFilesUseCase anddeleteCompletedTransfersByIdUseCase are invoked with correct parameters for uploads and downloads`() =
+        fun `test that insertPendingDownloadsForNodesUseCase, insertPendingUploadsForFilesUseCase and deleteCompletedTransfersByIdUseCase are invoked with correct parameters for uploads and downloads`() =
             runTest {
                 commonStub()
 
-                whenever(getOrCreateStorageDownloadLocationUseCase()) doReturn DESTINATION
+                whenever(getOrCreateDownloadLocationUseCase()) doReturn DESTINATION
 
                 underTest.startTransfer(retryUploadAndDownloadEvent)
 
@@ -1515,7 +1515,7 @@ class StartTransfersComponentViewModelTest {
         whenever(node.parentId).thenReturn(parentId)
         whenever(parentNode.id).thenReturn(parentId)
 
-        whenever(getOrCreateStorageDownloadLocationUseCase()).thenReturn(DESTINATION)
+        whenever(getOrCreateDownloadLocationUseCase()).thenReturn(DESTINATION)
 
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(1)

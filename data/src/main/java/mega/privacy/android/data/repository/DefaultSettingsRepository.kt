@@ -214,33 +214,34 @@ internal class DefaultSettingsRepository @Inject constructor(
     override fun monitorOfflineWarningMessageVisibility(): Flow<Boolean?> =
         uiPreferencesGateway.monitorOfflineWarningMessageVisibility()
 
-    override suspend fun setDefaultStorageDownloadLocation() {
+    override suspend fun setDefaultDownloadLocation() {
         val defaultDownloadLocation = fileGateway.buildDefaultDownloadDir()
         defaultDownloadLocation.mkdirs()
-        megaLocalStorageGateway.setStorageDownloadLocation(defaultDownloadLocation.absolutePath)
+        megaLocalStorageGateway.setDownloadLocation(defaultDownloadLocation.absolutePath)
     }
 
-    override suspend fun getStorageDownloadLocation(): String? {
-        return megaLocalStorageGateway.getStorageDownloadLocation()
+    override suspend fun getDownloadLocation(): String? {
+        return megaLocalStorageGateway.getDownloadLocation()
     }
 
-    override suspend fun isStorageAskAlways(): Boolean {
-        return megaLocalStorageGateway.isStorageAskAlways()
+    override suspend fun isAskForDownloadLocation(): Boolean {
+        return megaLocalStorageGateway.isAskForDownloadLocation()
     }
 
-    override suspend fun setStorageAskAlways(isStorageAskAlways: Boolean) =
-        megaLocalStorageGateway.setStorageAskAlways(isStorageAskAlways)
+    override suspend fun setAskForDownloadLocation(askForDownloadLocation: Boolean) =
+        megaLocalStorageGateway.setAskForDownloadLocation(askForDownloadLocation)
 
-    override suspend fun isAskSetDownloadLocation() = withContext(ioDispatcher) {
-        megaLocalStorageGateway.isAskSetDownloadLocation()
+    override suspend fun isShouldPromptToSaveDestination() = withContext(ioDispatcher) {
+        megaLocalStorageGateway.isShouldPromptToSaveDestination()
     }
 
-    override suspend fun setAskSetDownloadLocation(value: Boolean) = withContext(ioDispatcher) {
-        megaLocalStorageGateway.setAskSetDownloadLocation(value)
-    }
+    override suspend fun setShouldPromptToSaveDestination(value: Boolean) =
+        withContext(ioDispatcher) {
+            megaLocalStorageGateway.setShouldPromptToSaveDestination(value)
+        }
 
-    override suspend fun setStorageDownloadLocation(storageDownloadLocation: String?) =
-        megaLocalStorageGateway.setStorageDownloadLocation(storageDownloadLocation)
+    override suspend fun setDownloadLocation(downloadLocation: String?) =
+        megaLocalStorageGateway.setDownloadLocation(downloadLocation)
 
     override suspend fun isAskBeforeLargeDownloads() =
         megaLocalStorageGateway.isAskBeforeLargeDownloads()

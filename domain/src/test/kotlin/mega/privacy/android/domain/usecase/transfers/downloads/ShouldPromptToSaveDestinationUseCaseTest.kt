@@ -28,10 +28,10 @@ class ShouldPromptToSaveDestinationUseCaseTest {
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
-    fun `test that invoke returns AskDownloadLocation from settings repository`(
+    fun `test that invoke returns isShouldPromptToSaveDestination from settings repository`(
         expected: Boolean,
     ) = runTest {
-        whenever(settingsRepository.isAskSetDownloadLocation()).thenReturn(expected)
+        whenever(settingsRepository.isShouldPromptToSaveDestination()).thenReturn(expected)
         val actual = underTest()
         assertThat(actual).isEqualTo(expected)
     }

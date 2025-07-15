@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Pass through use case to get storage download location path checking if it's not null, if it's null it first sets it to default location
  */
-class GetOrCreateStorageDownloadLocationUseCase @Inject constructor(
+class GetOrCreateDownloadLocationUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository,
 ) {
     /**
@@ -14,8 +14,8 @@ class GetOrCreateStorageDownloadLocationUseCase @Inject constructor(
      * @return Download Location Path as [String]
      */
     suspend operator fun invoke(): String? =
-        settingsRepository.getStorageDownloadLocation() ?: run {
-            settingsRepository.setDefaultStorageDownloadLocation()
-            settingsRepository.getStorageDownloadLocation()
+        settingsRepository.getDownloadLocation() ?: run {
+            settingsRepository.setDefaultDownloadLocation()
+            settingsRepository.getDownloadLocation()
         }
 }

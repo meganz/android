@@ -35,14 +35,14 @@ class DefaultSetInitialCUPreferencesTest {
     @Test
     fun `test that initial value for settingsRepository setAskDownloadLocation is set`() = runTest {
         underTest()
-        verify(settingsRepository).setAskSetDownloadLocation(true)
+        verify(settingsRepository).setShouldPromptToSaveDestination(true)
     }
 
     @Test
-    fun `test that initial value for settingsRepository setDefaultStorageDownloadLocation is set`() =
+    fun `test that initial value for settingsRepository setDefaultDownloadLocation is set`() =
         runTest {
             underTest()
-            verify(settingsRepository).setDefaultStorageDownloadLocation()
+            verify(settingsRepository).setDefaultDownloadLocation()
         }
 
     @Test

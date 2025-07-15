@@ -109,47 +109,47 @@ interface SettingsRepository {
     suspend fun setShowHiddenItems(enabled: Boolean)
 
     /**
-     * Set the default storage download location
+     * Set the default storage download location as current download location
      */
-    suspend fun setDefaultStorageDownloadLocation()
+    suspend fun setDefaultDownloadLocation()
 
     /**
      * Get Storage download location
      *
      * @return storageDownloadLocation as File Path
      */
-    suspend fun getStorageDownloadLocation(): String?
+    suspend fun getDownloadLocation(): String?
 
     /**
-     * Get always ask for storage download location value
+     * Get ask for download location value
      *
-     * @return isStorageAskAlways as [Boolean]
+     * @return askForDownloadLocation as [Boolean]
      */
-    suspend fun isStorageAskAlways(): Boolean
+    suspend fun isAskForDownloadLocation(): Boolean
 
     /**
-     * Set to always ask for storage download location
+     * Set to ask for storage download location
      *
-     * @param isStorageAskAlways
+     * @param askForDownloadLocation
      */
-    suspend fun setStorageAskAlways(isStorageAskAlways: Boolean)
+    suspend fun setAskForDownloadLocation(askForDownloadLocation: Boolean)
 
     /**
      * @return if should ask the user about set the download location as default
      */
-    suspend fun isAskSetDownloadLocation(): Boolean
+    suspend fun isShouldPromptToSaveDestination(): Boolean
 
     /**
-     * Set if should ask the user about set the download location as default
+     * Set if should ask the user to save the download location
      */
-    suspend fun setAskSetDownloadLocation(value: Boolean)
+    suspend fun setShouldPromptToSaveDestination(value: Boolean)
 
     /**
-     * Set Storage download location
+     * Set download location
      *
-     * @param storageDownloadLocation
+     * @param downloadLocation
      */
-    suspend fun setStorageDownloadLocation(storageDownloadLocation: String?)
+    suspend fun setDownloadLocation(downloadLocation: String?)
 
     /**
      * @return ask for confirmation before large downloads preference

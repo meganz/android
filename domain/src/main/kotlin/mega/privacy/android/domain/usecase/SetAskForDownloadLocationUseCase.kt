@@ -4,9 +4,9 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import javax.inject.Inject
 
 /**
- * Pass through use case to set Ask Always state
+ * Pass through use case to set Ask for download location
  */
-class SetStorageDownloadAskAlwaysUseCase @Inject constructor(
+class SetAskForDownloadLocationUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository,
 ) {
     /**
@@ -14,6 +14,6 @@ class SetStorageDownloadAskAlwaysUseCase @Inject constructor(
      * @param isChecked as [Boolean]
      */
     suspend operator fun invoke(isChecked: Boolean) {
-        settingsRepository.setStorageAskAlways(isChecked)
+        settingsRepository.setAskForDownloadLocation(isChecked)
     }
 }

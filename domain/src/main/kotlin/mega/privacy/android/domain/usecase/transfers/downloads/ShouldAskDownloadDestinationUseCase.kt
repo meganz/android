@@ -19,9 +19,9 @@ class ShouldAskDownloadDestinationUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke(): Boolean {
-        if (settingsRepository.isStorageAskAlways()) return true
+        if (settingsRepository.isAskForDownloadLocation()) return true
         else {
-            val uriPath = settingsRepository.getStorageDownloadLocation()
+            val uriPath = settingsRepository.getDownloadLocation()
                 ?.let { UriPath(it) } ?: return true
 
             val hasPermission = fileSystemRepository.hasPersistedPermission(uriPath, true)
@@ -35,10 +35,10 @@ class ShouldAskDownloadDestinationUseCase @Inject constructor(
                 return false
             } else {
                 // if saved path does not exist anymore or permission is lost, we'll ask the user again if they want to save it as default or not
-                settingsRepository.setAskSetDownloadLocation(true)
+                settingsRepository.setShouldPromptToSaveDestination(true)
                 // in the meanwhile we'll ask a new destination
-                settingsRepository.setStorageAskAlways(true)
-                settingsRepository.setStorageDownloadLocation(null)
+                settingsRepository.setAskForDownloadLocation(true)
+                settingsRepository.setDownloadLocation(null)
                 return true
             }
         }

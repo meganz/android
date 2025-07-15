@@ -40,8 +40,8 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
-import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
-import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
@@ -63,7 +63,7 @@ import mega.privacy.android.domain.usecase.transfers.chatuploads.SetAskedResumeT
 import mega.privacy.android.domain.usecase.transfers.chatuploads.ShouldAskForResumeTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
@@ -94,7 +94,7 @@ import kotlin.time.Duration.Companion.seconds
 @HiltViewModel
 internal class StartTransfersComponentViewModel @Inject constructor(
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase,
-    private val getOrCreateStorageDownloadLocationUseCase: GetOrCreateStorageDownloadLocationUseCase,
+    private val getOrCreateDownloadLocationUseCase: GetOrCreateDownloadLocationUseCase,
     private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
@@ -107,8 +107,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val shouldAskDownloadDestinationUseCase: ShouldAskDownloadDestinationUseCase,
     private val shouldPromptToSaveDestinationUseCase: ShouldPromptToSaveDestinationUseCase,
     private val saveDoNotPromptToSaveDestinationUseCase: SaveDoNotPromptToSaveDestinationUseCase,
-    private val setStorageDownloadAskAlwaysUseCase: SetStorageDownloadAskAlwaysUseCase,
-    private val setStorageDownloadLocationUseCase: SetStorageDownloadLocationUseCase,
+    private val setAskForDownloadLocationUseCase: SetAskForDownloadLocationUseCase,
+    private val setDownloadLocationUseCase: SetDownloadLocationUseCase,
     private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
     private val shouldAskForResumeTransfersUseCase: ShouldAskForResumeTransfersUseCase,
     private val setAskedResumeTransfersUseCase: SetAskedResumeTransfersUseCase,
@@ -222,7 +222,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 .getOrDefault(false)
 
             if (shouldPromptToSaveDestination.not()) {
-                defaultLocation = runCatching { getOrCreateStorageDownloadLocationUseCase() }
+                defaultLocation = runCatching { getOrCreateDownloadLocationUseCase() }
                     .onFailure { Timber.e(it) }
                     .getOrNull()
             }
@@ -365,7 +365,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                                 )
                             }
                         } else {
-                            runCatching { getOrCreateStorageDownloadLocationUseCase() }
+                            runCatching { getOrCreateDownloadLocationUseCase() }
                                 .onFailure { Timber.e(it) }
                                 .getOrNull()?.let { location ->
                                     startDownloadNodes(transferTriggerEvent, location)
@@ -691,8 +691,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 saveDoNotPromptToSaveDestinationUseCase()
-                setStorageDownloadLocationUseCase(destination)
-                setStorageDownloadAskAlwaysUseCase(false)
+                setDownloadLocationUseCase(destination)
+                setAskForDownloadLocationUseCase(false)
             }.onFailure {
                 Timber.e("Error saving the destination:\n$it")
             }
@@ -706,7 +706,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 saveDoNotPromptToSaveDestinationUseCase()
-                setStorageDownloadAskAlwaysUseCase(true)
+                setAskForDownloadLocationUseCase(true)
             }.onFailure {
                 Timber.e("Error saving the don't save destination again prompt:\n$it")
             }
