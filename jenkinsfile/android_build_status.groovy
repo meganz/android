@@ -110,11 +110,23 @@ pipeline {
                 String folder = "android-build/MR-${mrNumber}"
                 String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
 
-                // upload unit test report if unit test fail
+                // upload unit test report if unit test fail, wrapped in a collapsible details tag
                 String unitTestResult = ""
-                for (def module in UNIT_TEST_RESULT_LINK_MAP.keySet()) {
-                    String result = UNIT_TEST_RESULT_LINK_MAP[module]
-                    unitTestResult += "<br>$module Unit Test: [$module test report](${result})"
+                if (!UNIT_TEST_RESULT_LINK_MAP.isEmpty()) {
+                    unitTestResult += "<details><summary><b>Unit Test Results</b></summary>"
+
+                    boolean first = true
+                    for (def module in UNIT_TEST_RESULT_LINK_MAP.keySet()) {
+                        String result = UNIT_TEST_RESULT_LINK_MAP[module]
+                        if (first) {
+                            unitTestResult += "$module Unit Test: [$module test report](${result})"
+                            first = false
+                        } else {
+                            unitTestResult += "<br>$module Unit Test: [$module test report](${result})"
+                        }
+                    }
+
+                    unitTestResult += "</details>"
                 }
 
                 // Calculate build duration
