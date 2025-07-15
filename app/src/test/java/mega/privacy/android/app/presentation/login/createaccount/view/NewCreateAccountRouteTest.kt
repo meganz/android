@@ -26,7 +26,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
-class NewCreateAccountScreenTest {
+class NewCreateAccountRouteTest {
 
     @get:Rule
     val composeRule = createComposeRule()

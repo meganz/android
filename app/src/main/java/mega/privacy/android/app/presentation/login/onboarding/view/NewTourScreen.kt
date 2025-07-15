@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -74,7 +75,9 @@ internal fun NewTourRoute(
 
     AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
         NewTourScreen(
-            modifier = Modifier.fillMaxSize().semantics { testTagsAsResourceId = true },
+            modifier = Modifier
+                .fillMaxSize()
+                .semantics { testTagsAsResourceId = true },
             onLoginClick = {
                 Timber.d("onLoginClick")
                 activityViewModel.setPendingFragmentToShow(LoginFragmentType.Login)
@@ -111,6 +114,7 @@ internal fun NewTourScreen(
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { Int.MAX_VALUE })
     Column(
         modifier = modifier
+            .systemBarsPadding()
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -338,9 +342,7 @@ private fun ButtonsColumn(
                 .then(
                     Modifier.adaptiveWidth(isTablet, 16.dp)
                 )
-                // Temporary add bottom padding to avoid the buttons over the bottom navigation bar
-                // it will be removed when all the fragments are migrated to full Compose
-                .padding(bottom = spacing.x56)
+                .padding(bottom = spacing.x20)
                 .height(spacing.x48),
             text = stringResource(id = sharedR.string.login_text),
             onClick = onLoginClick

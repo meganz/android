@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.login.createaccount.view
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -30,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
@@ -40,6 +41,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -52,6 +54,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import mega.android.core.ui.components.LinkSpannedText
@@ -69,6 +72,7 @@ import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.preview.CombinedThemePreviewsTablet
+import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.devicetype.DeviceType
@@ -76,6 +80,9 @@ import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.LinkColor
 import mega.privacy.android.app.R
+import mega.privacy.android.app.extensions.launchUrl
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.EMAIL_CHAR_LIMIT
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_CONFIRM_PASSWORD
@@ -93,6 +100,7 @@ import mega.privacy.android.app.presentation.login.createaccount.view.CreateAcco
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.PASSWORD_HINT
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.TERMS_CONDITION_CHECKBOX
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.TOOLBAR
+import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
 import mega.privacy.android.app.utils.Constants.TERMS_OF_SERVICE_URL
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
@@ -100,43 +108,55 @@ import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun NewCreateAccountRoute(
-    uiState: CreateAccountUIState,
-    onNavigateToLogin: () -> Unit,
-    onBackIconPressed: () -> Unit,
-    openLink: (String) -> Unit,
-    setTemporalDataForAccountCreation: (EphemeralCredentials) -> Unit,
+    activityViewModel: LoginViewModel,
     modifier: Modifier = Modifier,
     viewModel: CreateAccountViewModel = hiltViewModel(),
 ) {
-    val snackBarHostState = remember { SnackbarHostState() }
-    NewCreateAccountScreen(
-        uiState = uiState,
-        snackBarHostState = snackBarHostState,
-        onFirstNameInputChanged = viewModel::onFirstNameInputChanged,
-        onLastNameInputChanged = viewModel::onLastNameInputChanged,
-        onEmailInputChanged = viewModel::onEmailInputChanged,
-        onPasswordInputChanged = viewModel::onPasswordInputChanged,
-        onConfirmPasswordInputChanged = viewModel::onConfirmPasswordInputChanged,
-        onCreateAccountClicked = viewModel::createAccount,
-        onTermsOfServiceAgreedChanged = viewModel::termsOfServiceAgreedChanged,
-        onLoginClicked = onNavigateToLogin,
-        openLink = openLink,
-        onResetCreateAccountStatusEvent = viewModel::resetCreateAccountStatusEvent,
-        onResetShowAgreeToTermsEvent = viewModel::resetShowAgreeToTermsEvent,
-        onCreateAccountSuccess = {
-            setTemporalDataForAccountCreation(it)
-            viewModel.onCreateAccountSuccess(it)
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    BackHandler(
+        onBack = {
+            activityViewModel.setPendingFragmentToShow(LoginFragmentType.Tour)
         },
-        onBackIconPressed = onBackIconPressed,
-        onNetworkWarningShown = viewModel::networkWarningShown,
-        modifier = modifier.fillMaxSize()
     )
+    val snackBarHostState = remember { SnackbarHostState() }
+    AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
+        NewCreateAccountScreen(
+            uiState = uiState,
+            snackBarHostState = snackBarHostState,
+            onFirstNameInputChanged = viewModel::onFirstNameInputChanged,
+            onLastNameInputChanged = viewModel::onLastNameInputChanged,
+            onEmailInputChanged = viewModel::onEmailInputChanged,
+            onPasswordInputChanged = viewModel::onPasswordInputChanged,
+            onConfirmPasswordInputChanged = viewModel::onConfirmPasswordInputChanged,
+            onCreateAccountClicked = viewModel::createAccount,
+            onTermsOfServiceAgreedChanged = viewModel::termsOfServiceAgreedChanged,
+            onLoginClicked = {
+                activityViewModel.setPendingFragmentToShow(LoginFragmentType.Login)
+            },
+            openLink = { url ->
+                context.launchUrl(url)
+            },
+            onResetCreateAccountStatusEvent = viewModel::resetCreateAccountStatusEvent,
+            onResetShowAgreeToTermsEvent = viewModel::resetShowAgreeToTermsEvent,
+            onCreateAccountSuccess = { credentials ->
+                activityViewModel.setTemporalCredentials(credentials)
+                activityViewModel.setIsWaitingForConfirmAccount()
+                viewModel.onCreateAccountSuccess(credentials)
+            },
+            onBackIconPressed = {
+                onBackPressedDispatcher?.onBackPressed()
+            },
+            onNetworkWarningShown = viewModel::networkWarningShown,
+            modifier = modifier.fillMaxSize()
+        )
+    }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun NewCreateAccountScreen(
     uiState: CreateAccountUIState,

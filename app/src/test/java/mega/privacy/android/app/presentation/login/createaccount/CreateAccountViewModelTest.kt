@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -16,22 +17,21 @@ import kotlinx.coroutines.test.setMain
 import mega.android.authentication.domain.usecase.regex.DoesTextContainMixedCaseUseCase
 import mega.android.authentication.domain.usecase.regex.DoesTextContainNumericUseCase
 import mega.android.authentication.domain.usecase.regex.DoesTextContainSpecialCharacterUseCase
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_CONFIRM_PASSWORD
-import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_E2EE
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_EMAIL
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_FIRST_NAME
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_LAST_NAME
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_PASSWORD
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_TERMS_OF_SERVICE
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountStatus
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsEmailValidUseCase
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
@@ -61,7 +61,6 @@ class CreateAccountViewModelTest {
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase = mock()
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase = mock()
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val doesTextContainSpecialCharacterUseCase: DoesTextContainSpecialCharacterUseCase =
         mock()
     private val doesTextContainNumericUseCase: DoesTextContainNumericUseCase = mock()
@@ -72,6 +71,9 @@ class CreateAccountViewModelTest {
     private lateinit var underTest: CreateAccountViewModel
     private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val applicationScope: CoroutineScope = CoroutineScope(testDispatcher)
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock {
+        on { invoke() }.thenReturn(flowOf(ThemeMode.System))
+    }
 
     @BeforeAll
     fun initViewModel() {
@@ -86,11 +88,11 @@ class CreateAccountViewModelTest {
             saveEphemeralCredentialsUseCase = saveEphemeralCredentialsUseCase,
             clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase,
             saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             applicationScope = applicationScope,
             doesTextContainSpecialCharacterUseCase = doesTextContainSpecialCharacterUseCase,
             doesTextContainNumericUseCase = doesTextContainNumericUseCase,
             doesTextContainMixedCaseUseCase = doesTextContainMixedCaseUseCase,
+            monitorThemeModeUseCase = monitorThemeModeUseCase
         )
     }
 
@@ -104,7 +106,6 @@ class CreateAccountViewModelTest {
             saveEphemeralCredentialsUseCase,
             clearEphemeralCredentialsUseCase,
             saveLastRegisteredEmailUseCase,
-            getFeatureFlagValueUseCase,
             doesTextContainSpecialCharacterUseCase,
             doesTextContainNumericUseCase,
             doesTextContainMixedCaseUseCase,
@@ -115,19 +116,6 @@ class CreateAccountViewModelTest {
     @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
-    }
-
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that ui state is updated based on value from RegistrationRevamp feature flag on init`(
-        value: Boolean,
-    ) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
-        initViewModel()
-        underTest.uiState.test {
-            assertThat(awaitItem().isNewRegistrationUiEnabled).isEqualTo(value)
-        }
     }
 
     @Test
@@ -208,28 +196,12 @@ class CreateAccountViewModelTest {
         }
 
     @Test
-    fun `test that end to end encryption is saved to savedStateHandle and ui state is set when e2eeAgreed is checked`() =
-        runTest {
-            underTest.e2eeAgreedChanged(true)
-
-            assertThat(savedStateHandle.get<Boolean>(KEY_E2EE)).isTrue()
-
-            underTest.uiState.test {
-                assertThat(awaitItem().isE2EEAgreed).isTrue()
-            }
-        }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that password is saved to savedStateHandle when onPasswordInputChanged is called`(
-        value: Boolean,
-    ) =
+    fun `test that password is saved to savedStateHandle when onPasswordInputChanged is called`() =
         runTest {
             val password = "password"
             val passwordStrength = PasswordStrength.GOOD
             whenever(getPasswordStrengthUseCase(password)).thenReturn(passwordStrength)
             whenever(getPasswordStrengthUseCase(password)).thenReturn(passwordStrength)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
             initViewModel()
             underTest.onPasswordInputChanged(password)
 
@@ -256,7 +228,6 @@ class CreateAccountViewModelTest {
             val password = "passwo"
             val passwordStrength = PasswordStrength.WEAK
             whenever(getPasswordStrengthUseCase(password)).thenReturn(passwordStrength)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(true)
             initViewModel()
             underTest.onPasswordInputChanged(password)
 
@@ -272,7 +243,6 @@ class CreateAccountViewModelTest {
             val password = "password1234"
             val passwordStrength = PasswordStrength.GOOD
             whenever(getPasswordStrengthUseCase(password)).thenReturn(passwordStrength)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(true)
             initViewModel()
             underTest.onPasswordInputChanged(password)
 
@@ -289,7 +259,6 @@ class CreateAccountViewModelTest {
             val password = "password1234"
             val passwordStrength = PasswordStrength.GOOD
             whenever(getPasswordStrengthUseCase(password)).thenReturn(passwordStrength)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(true)
             whenever(doesTextContainNumericUseCase(password)).thenReturn(value)
             initViewModel()
             underTest.onPasswordInputChanged(password)
@@ -306,7 +275,6 @@ class CreateAccountViewModelTest {
             val password = "password1234"
             val passwordStrength = PasswordStrength.GOOD
             whenever(getPasswordStrengthUseCase(password)).thenReturn(passwordStrength)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(true)
             whenever(doesTextContainMixedCaseUseCase(password)).thenReturn(value)
             initViewModel()
             underTest.onPasswordInputChanged(password)
@@ -324,7 +292,6 @@ class CreateAccountViewModelTest {
             val password = "password1234"
             val passwordStrength = PasswordStrength.GOOD
             whenever(getPasswordStrengthUseCase(password)).thenReturn(passwordStrength)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(true)
             whenever(doesTextContainSpecialCharacterUseCase(password)).thenReturn(value)
             initViewModel()
             underTest.onPasswordInputChanged(password)
@@ -345,7 +312,6 @@ class CreateAccountViewModelTest {
             val passwordStrength = PasswordStrength.GOOD
             underTest.onConfirmPasswordInputChanged(confirmPassword)
             whenever(getPasswordStrengthUseCase(password)).thenReturn(passwordStrength)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
             initViewModel()
             underTest.onPasswordInputChanged(password)
 
@@ -361,7 +327,6 @@ class CreateAccountViewModelTest {
             val password = "password"
             val passwordStrength = PasswordStrength.GOOD
             whenever(getPasswordStrengthUseCase(password)).thenReturn(passwordStrength)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
             initViewModel()
             underTest.onPasswordInputChanged(password)
 
@@ -377,7 +342,6 @@ class CreateAccountViewModelTest {
             val password = ""
             val passwordStrength = PasswordStrength.INVALID
             whenever(getPasswordStrengthUseCase(password)).thenReturn(passwordStrength)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
             initViewModel()
             underTest.onPasswordInputChanged(password)
 
@@ -394,7 +358,6 @@ class CreateAccountViewModelTest {
             val password = "password"
             val passwordStrength = PasswordStrength.GOOD
             whenever(getPasswordStrengthUseCase(password)).thenReturn(passwordStrength)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
             initViewModel()
             underTest.onConfirmPasswordInputChanged(password)
             underTest.onPasswordInputChanged(password)
@@ -430,7 +393,6 @@ class CreateAccountViewModelTest {
         runTest {
             whenever(getPasswordStrengthUseCase(any())).thenReturn(PasswordStrength.INVALID)
             whenever(isEmailValidUseCase(any())).thenReturn(true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
 
             initViewModel()
             initInputFields()
@@ -451,7 +413,6 @@ class CreateAccountViewModelTest {
         runTest {
             whenever(getPasswordStrengthUseCase(any())).thenReturn(PasswordStrength.VERY_WEAK)
             whenever(isEmailValidUseCase(any())).thenReturn(true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
 
             initViewModel()
             initInputFields()
@@ -474,7 +435,6 @@ class CreateAccountViewModelTest {
         runTest {
             whenever(getPasswordStrengthUseCase(any())).thenReturn(PasswordStrength.GOOD)
             whenever(isEmailValidUseCase(any())).thenReturn(true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
 
             initViewModel()
             initInputFields()
@@ -498,7 +458,6 @@ class CreateAccountViewModelTest {
         runTest {
             whenever(getPasswordStrengthUseCase(any())).thenReturn(PasswordStrength.GOOD)
             whenever(isEmailValidUseCase(any())).thenReturn(true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
 
             initViewModel()
             initInputFields()
@@ -516,34 +475,10 @@ class CreateAccountViewModelTest {
         }
 
     @Test
-    fun `test that create account is not invoked when end to end encryption is not agreed for legacy design`() =
+    fun `test that create account is not invoked when there is no internet`() =
         runTest {
             whenever(getPasswordStrengthUseCase(any())).thenReturn(PasswordStrength.GOOD)
             whenever(isEmailValidUseCase(any())).thenReturn(true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(false)
-
-            initViewModel()
-            initInputFields()
-
-            underTest.e2eeAgreedChanged(false)
-
-            underTest.createAccount()
-
-            verifyNoInteractions(createAccountUseCase)
-
-            underTest.uiState.test {
-                val item = awaitItem()
-                assertThat(item.isE2EEAgreed).isFalse()
-            }
-        }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that create account is not invoked when there is no internet`(value: Boolean) =
-        runTest {
-            whenever(getPasswordStrengthUseCase(any())).thenReturn(PasswordStrength.GOOD)
-            whenever(isEmailValidUseCase(any())).thenReturn(true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
 
             initViewModel()
             initInputFields()
@@ -561,17 +496,13 @@ class CreateAccountViewModelTest {
         }
 
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that create account success event is triggered when account creation is successful`(
-        value: Boolean,
-    ) =
+    @Test
+    fun `test that create account success event is triggered when account creation is successful`() =
         runTest {
             val credentials = mock<EphemeralCredentials>()
             whenever(getPasswordStrengthUseCase(any())).thenReturn(PasswordStrength.GOOD)
             whenever(createAccountUseCase(any(), any(), any(), any())).thenReturn(credentials)
             whenever(isEmailValidUseCase(any())).thenReturn(true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
             connectivityFlow.emit(true)
 
             initViewModel()
@@ -593,11 +524,8 @@ class CreateAccountViewModelTest {
             }
         }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that create account error event is triggered when account creation throws Unknown error`(
-        value: Boolean,
-    ) =
+    @Test
+    fun `test that create account error event is triggered when account creation throws Unknown error`() =
         runTest {
             whenever(getPasswordStrengthUseCase(any())).thenReturn(PasswordStrength.GOOD)
             whenever(
@@ -609,7 +537,6 @@ class CreateAccountViewModelTest {
                 )
             ).thenAnswer { throw CreateAccountException.Unknown(mock()) }
             whenever(isEmailValidUseCase(any())).thenReturn(true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
             connectivityFlow.emit(true)
 
             initViewModel()
@@ -631,11 +558,8 @@ class CreateAccountViewModelTest {
             }
         }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that create account error event is triggered when account creation throws AccountAlreadyExists error`(
-        value: Boolean,
-    ) =
+    @Test
+    fun `test that create account error event is triggered when account creation throws AccountAlreadyExists error`() =
         runTest {
             whenever(getPasswordStrengthUseCase(any())).thenReturn(PasswordStrength.GOOD)
             whenever(
@@ -647,7 +571,6 @@ class CreateAccountViewModelTest {
                 )
             ).thenAnswer { throw CreateAccountException.AccountAlreadyExists }
             whenever(isEmailValidUseCase(any())).thenReturn(true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp)).thenReturn(value)
             connectivityFlow.emit(true)
 
             initInputFields()
@@ -700,6 +623,5 @@ class CreateAccountViewModelTest {
         underTest.onPasswordInputChanged("password")
         underTest.onConfirmPasswordInputChanged("password")
         underTest.termsOfServiceAgreedChanged(true)
-        underTest.e2eeAgreedChanged(true)
     }
 }

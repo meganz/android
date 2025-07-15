@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import mega.android.authentication.domain.usecase.regex.DoesTextContainMixedCaseUseCase
 import mega.android.authentication.domain.usecase.regex.DoesTextContainNumericUseCase
 import mega.android.authentication.domain.usecase.regex.DoesTextContainSpecialCharacterUseCase
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountStatus
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountUIState
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
@@ -23,8 +22,8 @@ import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsEmailValidUseCase
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
@@ -45,10 +44,10 @@ class CreateAccountViewModel @Inject constructor(
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val doesTextContainNumericUseCase: DoesTextContainNumericUseCase,
     private val doesTextContainMixedCaseUseCase: DoesTextContainMixedCaseUseCase,
     private val doesTextContainSpecialCharacterUseCase: DoesTextContainSpecialCharacterUseCase,
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateAccountUIState())
@@ -60,34 +59,21 @@ class CreateAccountViewModel @Inject constructor(
 
     init {
         monitorConnectivity()
-        setupInitialState()
+        monitorThemeMode()
+    }
+
+    private fun monitorThemeMode() {
+        viewModelScope.launch {
+            monitorThemeModeUseCase().collect { themeMode ->
+                _uiState.update { it.copy(themeMode = themeMode) }
+            }
+        }
     }
 
     private fun monitorConnectivity() {
         viewModelScope.launch {
             monitorConnectivityUseCase().collect {
                 _uiState.update { state -> state.copy(isConnected = it) }
-            }
-        }
-    }
-
-    private fun setupInitialState() {
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.RegistrationRevamp).let { flag ->
-                    _uiState.update { state ->
-                        state.copy(
-                            isNewRegistrationUiEnabled = flag,
-                        )
-                    }
-                }
-            }.onFailure {
-                Timber.e(it)
-                _uiState.update { state ->
-                    state.copy(
-                        isNewRegistrationUiEnabled = false
-                    )
-                }
             }
         }
     }
@@ -109,9 +95,8 @@ class CreateAccountViewModel @Inject constructor(
 
     private fun isEmailValid(): Boolean {
         val email: String = savedStateHandle[KEY_EMAIL] ?: ""
-        val isNewRegistrationUiEnabled = _uiState.value.isNewRegistrationUiEnabled == true
         val isEmailLengthExceeded = email.length > EMAIL_CHAR_LIMIT
-        return if (isEmailLengthExceeded && isNewRegistrationUiEnabled) {
+        return if (isEmailLengthExceeded) {
             _uiState.update { it.copy(isEmailLengthExceeded = true) }
             false
         } else {
@@ -145,12 +130,6 @@ class CreateAccountViewModel @Inject constructor(
     private suspend fun validatePassword(password: String?): Boolean {
         val passwordStrength = getPasswordStrength(password)
         _uiState.update { it.copy(passwordStrength = passwordStrength) }
-
-        val isNewRegistrationUiEnabled = _uiState.value.isNewRegistrationUiEnabled == true
-
-        if (!isNewRegistrationUiEnabled) {
-            return passwordStrength !in listOf(PasswordStrength.INVALID, PasswordStrength.VERY_WEAK)
-        }
 
         val isPasswordLengthSufficient =
             (password?.length ?: 0) >= MIN_PASSWORD_LENGTH_DESIGN_REVAMP
@@ -219,33 +198,17 @@ class CreateAccountViewModel @Inject constructor(
         _uiState.update { it.copy(isTermsOfServiceAgreed = isChecked) }
     }
 
-    internal fun e2eeAgreedChanged(isChecked: Boolean) {
-        savedStateHandle[KEY_E2EE] = isChecked
-        _uiState.update {
-            it.copy(isE2EEAgreed = isChecked)
-        }
-    }
-
     /**
      * Create account after validating all inputs and if terms are agreed and connected to network
      */
     internal fun createAccount() = viewModelScope.launch {
-        val isNewRegistrationUiEnabled = _uiState.value.isNewRegistrationUiEnabled
         val areAllInputsValid = areAllInputsValid()
         val areTermsAgreed = areTermsAgreed()
 
-        if (isNewRegistrationUiEnabled != true) {
-            if (!areAllInputsValid) return@launch
-            if (!areTermsAgreed) {
-                _uiState.update { it.copy(showAgreeToTermsEvent = triggered) }
-                return@launch
-            }
-        } else {
-            if (!areTermsAgreed) {
-                _uiState.update { it.copy(showAgreeToTermsEvent = triggered) }
-            }
-            if (!areAllInputsValid || !areTermsAgreed) return@launch
+        if (!areTermsAgreed) {
+            _uiState.update { it.copy(showAgreeToTermsEvent = triggered) }
         }
+        if (!areAllInputsValid || !areTermsAgreed) return@launch
 
         // Check if connected to network
         if (_uiState.value.isConnected.not()) {
@@ -294,10 +257,7 @@ class CreateAccountViewModel @Inject constructor(
 
     }
 
-    private fun areTermsAgreed() = if (_uiState.value.isNewRegistrationUiEnabled != true) {
-        _uiState.value.isTermsOfServiceAgreed == true && _uiState.value.isE2EEAgreed == true
-    } else _uiState.value.isTermsOfServiceAgreed == true
-
+    private fun areTermsAgreed() = _uiState.value.isTermsOfServiceAgreed == true
 
     /**
      * Validate all input to create account

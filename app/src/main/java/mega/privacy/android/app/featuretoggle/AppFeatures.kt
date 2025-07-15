@@ -175,16 +175,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
         false,
     ),
 
-
-
-    /**
-     *  Registration Revamp with new components
-     */
-    RegistrationRevamp(
-        "Registration Revamp with new components",
-        true,
-    ),
-
     /**
      *  Onboarding Revamp with new components
      */

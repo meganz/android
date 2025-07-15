@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.login.createaccount.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 
 /**
@@ -48,10 +49,6 @@ data class CreateAccountUIState(
      * Input state of terms of service if it is checked
      */
     val isTermsOfServiceAgreed: Boolean? = null,
-    /**
-     * Input state of End to End Encryption if it is checked
-     */
-    val isE2EEAgreed: Boolean? = null,
 
     /**
      * Whether to inform user to agree to terms
@@ -68,11 +65,6 @@ data class CreateAccountUIState(
      */
     val showNoNetworkWarning: Boolean = false,
 
-    /**
-     * Is New Design Revamp enabled
-     */
-    val isNewRegistrationUiEnabled: Boolean? = null,
-
     val isEmailLengthExceeded: Boolean? = null,
 
     val isPasswordLengthSufficient: Boolean? = null,
@@ -82,4 +74,9 @@ data class CreateAccountUIState(
     val doesPasswordContainNumeric: Boolean = false,
 
     val doesPasswordContainSpecialCharacter: Boolean = false,
+
+    /**
+     * Theme mode of the application
+     */
+    val themeMode: ThemeMode = ThemeMode.System,
 )

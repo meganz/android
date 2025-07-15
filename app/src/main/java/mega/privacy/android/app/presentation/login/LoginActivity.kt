@@ -150,9 +150,7 @@ class LoginActivity : BaseActivity() {
                 }
                 loginScreen()
                 createAccountScreen(
-                    onBackPressed = {
-                        viewModel.setPendingFragmentToShow(LoginFragmentType.Tour)
-                    }
+                    activityViewModel = viewModel,
                 )
                 tourScreen(
                     activityViewModel = viewModel,
