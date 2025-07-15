@@ -7,12 +7,13 @@ import com.android.billingclient.api.Purchase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.usecase.billing.LaunchPurchaseFlow
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
-import mega.privacy.android.domain.usecase.billing.MonitorBillingEvent
+import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
 import mega.privacy.android.domain.usecase.billing.QuerySkus
 import timber.log.Timber
@@ -28,7 +29,7 @@ class BillingViewModel @Inject constructor(
     private val querySkus: QuerySkus,
     private val queryPurchase: QueryPurchase,
     private val launchPurchaseFlow: LaunchPurchaseFlow,
-    monitorBillingEvent: MonitorBillingEvent,
+    monitorBillingEventUseCase: MonitorBillingEventUseCase,
 ) : ViewModel() {
     private val _skus = MutableStateFlow<List<MegaSku>>(emptyList())
 
@@ -56,9 +57,11 @@ class BillingViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            monitorBillingEvent().collect {
-                _billingUpdateEvent.value = it
-            }
+            monitorBillingEventUseCase()
+                .catch { Timber.e(it, "Failed to monitor billing event") }
+                .collect {
+                    _billingUpdateEvent.value = it
+                }
         }
     }
 

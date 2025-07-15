@@ -24,6 +24,11 @@ data class MegaPurchase(
     val state: Int = 0,
 
     /**
+     * Mega State of the purchase.
+     */
+    val megaPurchaseState: MegaPurchaseState = MegaPurchaseState.Unspecified,
+
+    /**
      * Token of the purchase.
      */
     val token: String? = null,

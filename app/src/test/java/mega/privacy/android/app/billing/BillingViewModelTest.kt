@@ -9,7 +9,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
-import mega.privacy.android.domain.usecase.billing.MonitorBillingEvent
+import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
 import mega.privacy.android.domain.usecase.billing.QuerySkus
 import org.junit.jupiter.api.BeforeEach
@@ -28,7 +28,7 @@ internal class BillingViewModelTest {
     private val queryPurchase = mock<QueryPurchase>()
     private val launchPurchaseFlow = mock<LaunchPurchaseFlow>()
     private val eventFlow = MutableSharedFlow<BillingEvent>()
-    private val monitorBillingEvent = mock<MonitorBillingEvent> {
+    private val monitorBillingEventUseCase = mock<MonitorBillingEventUseCase> {
         onBlocking { invoke() }.thenReturn(eventFlow)
     }
 
@@ -42,7 +42,7 @@ internal class BillingViewModelTest {
             querySkus = querySkus,
             queryPurchase = queryPurchase,
             launchPurchaseFlow = launchPurchaseFlow,
-            monitorBillingEvent = monitorBillingEvent,
+            monitorBillingEventUseCase = monitorBillingEventUseCase,
         )
     }
 
