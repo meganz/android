@@ -292,15 +292,28 @@ private fun onViewInFolder(
     activity: Activity,
 ) {
     with(completedTransfer) {
-        Intent(activity, ManagerActivity::class.java).apply {
-            if (completedTransfer.type.isDownloadType()) {
-                val path = parentUri.toString().takeUnless { it.isBlank() } ?: path
-                action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
-                putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOffline == true)
-                putExtra(FileStorageActivity.EXTRA_PATH, path)
-                putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, arrayListOf(fileName))
+        if (completedTransfer.type.isDownloadType()) {
+            val isOffline = isOffline == true
+            val path = parentUri.toString().takeUnless { it.isBlank() } ?: path
 
-            } else {
+            Intent(
+                activity,
+                if (isOffline) ManagerActivity::class.java else FileStorageActivity::class.java
+            ).apply {
+                if (isOffline) {
+                    action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
+                    putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, true)
+                } else {
+                    action = FileStorageActivity.Mode.BROWSE_FILES.action
+                }
+                putExtra(FileStorageActivity.EXTRA_PATH, path)
+                putStringArrayListExtra(
+                    FileStorageActivity.EXTRA_FILE_NAMES,
+                    arrayListOf(fileName)
+                )
+            }
+        } else {
+            Intent(activity, ManagerActivity::class.java).apply {
                 action = Constants.ACTION_OPEN_FOLDER
                 putExtra(Constants.INTENT_EXTRA_KEY_PARENT_HANDLE, parentHandle)
                 putStringArrayListExtra(FileStorageActivity.EXTRA_FILE_NAMES, arrayListOf(fileName))
