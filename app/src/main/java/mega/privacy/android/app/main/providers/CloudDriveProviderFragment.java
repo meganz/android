@@ -275,14 +275,16 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
         }
 
         if (adapter == null) {
-            adapter = new MegaProviderAdapter(context, this, nodes, parentHandle, listView, emptyImageView, CLOUD_DRIVE_PROVIDER_ADAPTER);
+            adapter = new MegaProviderAdapter(context, this, listView, CLOUD_DRIVE_PROVIDER_ADAPTER);
+            adapter.nodes = nodes;
+            adapter.parentHandle = parentHandle;
         }
 
         listView.setAdapter(adapter);
-        adapter.setParentHandle(parentHandle);
+        adapter.parentHandle = parentHandle;
         setNodes(nodes);
 
-        adapter.setPositionClicked(-1);
+        adapter.positionClicked = -1;
 
         return v;
     }
@@ -350,7 +352,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
                 if (context instanceof FileProviderActivity) {
                     ((FileProviderActivity) context).setParentHandle(parentHandle);
                 }
-                adapter.setParentHandle(parentHandle);
+                adapter.parentHandle = parentHandle;
                 nodes = megaApi.getChildren(nodes.get(position));
                 setNodes(nodes);
                 listView.scrollToPosition(0);
@@ -367,7 +369,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
     public int onBackPressed() {
         Timber.d("onBackPressed");
 
-        parentHandle = adapter.getParentHandle();
+        parentHandle = adapter.parentHandle;
 
         MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
         if (parentNode != null) {
@@ -402,7 +404,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
             if (lastVisiblePosition >= 0) {
                 mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
             }
-            adapter.setParentHandle(parentHandle);
+            adapter.parentHandle = parentHandle;
             if (context instanceof FileProviderActivity) {
                 ((FileProviderActivity) context).setParentHandle(parentHandle);
 
@@ -418,13 +420,13 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
     }
 
     public long getParentHandle() {
-        return adapter.getParentHandle();
+        return adapter.parentHandle;
     }
 
     public void setParentHandle(long parentHandle) {
         this.parentHandle = parentHandle;
         if (adapter != null) {
-            adapter.setParentHandle(parentHandle);
+            adapter.parentHandle = parentHandle;
         }
 
         if (context instanceof FileProviderActivity) {

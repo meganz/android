@@ -8,7 +8,6 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
@@ -255,16 +254,18 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
         }
 
         if (adapter == null) {
-            adapter = new MegaProviderAdapter(context, this, nodes, parentHandle, listView, emptyImageView, INCOMING_SHARES_PROVIDER_ADAPTER);
+            adapter = new MegaProviderAdapter(context, this, listView, INCOMING_SHARES_PROVIDER_ADAPTER);
+            adapter.nodes = nodes;
+            adapter.parentHandle = parentHandle;
         }
         listView.setAdapter(adapter);
 
         if (parentHandle == -1) {
             findNodes();
             setNodes(nodes);
-            adapter.setParentHandle(-1);
+            adapter.parentHandle = -1;
         } else {
-            adapter.setParentHandle(parentHandle);
+            adapter.parentHandle = parentHandle;
             MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
             if (parentNode != null) {
                 nodes = megaApi.getChildren(parentNode);
@@ -276,7 +277,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
                 findNodes();
                 setNodes(nodes);
                 parentHandle = -1;
-                adapter.setParentHandle(-1);
+                adapter.parentHandle = -1;
                 changeActionBarTitle(getString(R.string.file_provider_title));
                 if (context instanceof FileProviderActivity) {
                     ((FileProviderActivity) context).setParentHandle(parentHandle);
@@ -285,7 +286,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
             }
         }
 
-        adapter.setPositionClicked(-1);
+        adapter.positionClicked = -1;
 
         return v;
     }
@@ -381,7 +382,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
                     ((FileProviderActivity) context).incParentHandle = parentHandle;
                     Timber.d("The parent handle change to: %s", parentHandle);
                 }
-                adapter.setParentHandle(parentHandle);
+                adapter.parentHandle = parentHandle;
                 nodes = megaApi.getChildren(nodes.get(position));
                 setNodes(nodes);
                 listView.scrollToPosition(0);
@@ -425,11 +426,11 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
             if (lastVisiblePosition >= 0) {
                 mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
             }
-            adapter.setParentHandle(parentHandle);
+            adapter.parentHandle = parentHandle;
 
             return 3;
         } else if (deepBrowserTree > 0) {
-            parentHandle = adapter.getParentHandle();
+            parentHandle = adapter.parentHandle;
             if (context instanceof FileProviderActivity) {
                 ((FileProviderActivity) context).incParentHandle = parentHandle;
                 Timber.d("The parent handle change to: %s", parentHandle);
@@ -461,7 +462,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
                 if (lastVisiblePosition >= 0) {
                     mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
                 }
-                adapter.setParentHandle(parentHandle);
+                adapter.parentHandle = parentHandle;
                 return 2;
             }
             return 2;
@@ -479,7 +480,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
     }
 
     public long getParentHandle() {
-        return adapter.getParentHandle();
+        return adapter.parentHandle;
     }
 
     public void setParentHandle(long parentHandle) {
@@ -490,7 +491,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
             Timber.d("The parent handle change to: %s", parentHandle);
         }
         if (adapter != null) {
-            adapter.setParentHandle(parentHandle);
+            adapter.parentHandle = parentHandle;
         }
     }
 
