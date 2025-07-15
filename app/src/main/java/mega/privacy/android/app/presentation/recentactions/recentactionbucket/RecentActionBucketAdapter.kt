@@ -14,9 +14,9 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil3.SingletonImageLoader
-import coil3.asDrawable
 import coil3.asImage
 import coil3.request.ImageRequest
+import coil3.request.target
 import coil3.request.transformations
 import coil3.transform.RoundedCornersTransformation
 import coil3.util.CoilUtils
@@ -157,13 +157,7 @@ class RecentActionBucketAdapter(
                 val imageRequest = ImageRequest.Builder(context)
                     .placeholder(placeholder)
                     .data(fromHandle(megaNode.handle))
-                    .target { drawable ->
-                        holder
-                            .thumbnailMedia
-                            .setImageDrawable(
-                                drawable.asDrawable(context.resources)
-                            )
-                    }
+                    .target(holder.thumbnailMedia)
                     .transformations(
                         RoundedCornersTransformation(
                             radius = context.resources.getDimension(R.dimen.thumbnail_corner_radius),
@@ -229,9 +223,7 @@ class RecentActionBucketAdapter(
                     val imageRequest = ImageRequest.Builder(context)
                         .placeholder(placeholder)
                         .data(fromHandle(megaNode.handle))
-                        .target { drawable ->
-                            holder.thumbnailList.setImageDrawable(drawable.asDrawable(context.resources))
-                        }
+                        .target(holder.thumbnailList)
                         .transformations(
                             RoundedCornersTransformation(
                                 radius = context.resources.getDimension(R.dimen.thumbnail_corner_radius),

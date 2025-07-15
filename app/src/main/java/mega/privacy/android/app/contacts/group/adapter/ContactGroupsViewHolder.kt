@@ -2,8 +2,10 @@ package mega.privacy.android.app.contacts.group.adapter
 
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import coil.transform.CircleCropTransformation
+import coil3.asImage
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.CircleCropTransformation
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.databinding.ItemContactGroupBinding
 
@@ -21,7 +23,7 @@ class ContactGroupsViewHolder(
         binding.imgPrivate.isVisible = !item.isPublic
         binding.imgThumbnailFirst.load(item.firstUser.avatar) {
             transformations(CircleCropTransformation())
-            placeholder(item.firstUser.getImagePlaceholder(itemView.context))
+            placeholder(item.firstUser.getImagePlaceholder(itemView.context).asImage())
             listener(onError = { _, _ ->
                 binding.imgThumbnailFirst.setImageDrawable(
                     item.firstUser.getImagePlaceholder(itemView.context)
@@ -30,7 +32,7 @@ class ContactGroupsViewHolder(
         }
         binding.imgThumbnailLast.load(item.lastUser.avatar) {
             transformations(CircleCropTransformation())
-            placeholder(item.lastUser.getImagePlaceholder(itemView.context))
+            placeholder(item.lastUser.getImagePlaceholder(itemView.context).asImage())
             listener(onError = { _, _ ->
                 binding.imgThumbnailLast.setImageDrawable(
                     item.lastUser.getImagePlaceholder(itemView.context)

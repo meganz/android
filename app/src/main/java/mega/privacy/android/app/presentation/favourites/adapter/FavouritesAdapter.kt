@@ -16,8 +16,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.viewbinding.ViewBinding
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import coil3.asImage
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFavouriteBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
@@ -179,8 +181,13 @@ class FavouritesViewHolder(
                                     Util.dp2px(Constants.THUMB_CORNER_RADIUS_DP).toFloat()
                                 )
                             )
-                            placeholder(favourite.icon)
-                            error(favourite.icon)
+
+                            val placeholder = ContextCompat.getDrawable(
+                                context,
+                                favourite.icon
+                            )?.asImage()
+                            placeholder(placeholder)
+                            error(placeholder)
                         }
                         textViewSettings(
                             textView = itemFilename,

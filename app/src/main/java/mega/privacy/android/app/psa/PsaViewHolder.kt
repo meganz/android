@@ -5,7 +5,7 @@ import android.net.Uri
 import android.text.TextUtils
 import android.view.View
 import androidx.core.view.isVisible
-import coil.load
+import coil3.load
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PsaLayoutBinding
 import mega.privacy.android.app.extensions.launchUrl

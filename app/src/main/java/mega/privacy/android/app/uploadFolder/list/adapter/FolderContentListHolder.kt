@@ -1,13 +1,14 @@
 package mega.privacy.android.app.uploadFolder.list.adapter
 
-import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.icon.pack.R as IconPackR
 import android.net.Uri
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import coil.transform.RoundedCornersTransformation
-import coil.util.CoilUtils
+import coil3.asImage
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
+import coil3.util.CoilUtils
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.databinding.ItemFolderContentBinding
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
@@ -16,6 +17,8 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 
 /**
  * RecyclerView's ViewHolder to show FolderContent Data info in a list view.
@@ -44,7 +47,12 @@ class FolderContentListHolder(
                             setImageResource(CoreUiR.drawable.ic_select_folder)
                         } else {
                             load(item.uri) {
-                                placeholder(MimeTypeList.typeForName(item.name).iconResourceId)
+                                val iconResId = MimeTypeList.typeForName(item.name).iconResourceId
+                                val placeholder = ContextCompat.getDrawable(
+                                    binding.root.context,
+                                    iconResId
+                                )?.asImage()
+                                placeholder(placeholder)
                                 transformations(
                                     RoundedCornersTransformation(
                                         dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
@@ -52,9 +60,7 @@ class FolderContentListHolder(
                                 )
                                 listener(
                                     onError = { _, _ ->
-                                        setImageResource(
-                                            MimeTypeList.typeForName(item.name).iconResourceId
-                                        )
+                                        setImageResource(iconResId)
                                     }
                                 )
                             }

@@ -25,11 +25,11 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil3.SingletonImageLoader
-import coil3.asDrawable
 import coil3.asImage
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.crossfade
+import coil3.request.target
 import coil3.request.transformations
 import coil3.transform.RoundedCornersTransformation
 import coil3.util.CoilUtils
@@ -802,11 +802,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                     visibility = View.VISIBLE
                     val imageRequest = ImageRequest.Builder(context)
                         .data(fromHandle(node.handle))
-                        .target { drawable ->
-                            this.setImageDrawable(
-                                drawable.asDrawable(context.resources)
-                            )
-                        }
+                        .target(this)
                         .transformations(
                             RoundedCornersTransformation(
                                 context.resources.getDimension(R.dimen.thumbnail_corner_radius)
@@ -1182,11 +1178,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             val imageRequest = ImageRequest.Builder(context)
                 .placeholder(placeholder)
                 .data(fromHandle(node.handle))
-                .target { drawable ->
-                    this.setImageDrawable(
-                        drawable.asDrawable(context.resources)
-                    )
-                }
+                .target(this)
                 .crossfade(true)
                 .transformations(
                     RoundedCornersTransformation(

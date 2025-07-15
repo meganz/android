@@ -4,12 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import coil3.asImage
+import coil3.load
+import coil3.request.crossfade
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -140,7 +144,11 @@ class VersionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 )
                 if (node.hasThumbnail()) {
                     versionsFileThumbnail.load(ThumbnailRequest(NodeId(node.handle))) {
-                        placeholder(typeForName(node.name).iconResourceId)
+                        val placeholder = ContextCompat.getDrawable(
+                            requireContext(),
+                            typeForName(node.name).iconResourceId
+                        )?.asImage()
+                        placeholder(placeholder)
                         crossfade(true)
                         transformations(
                             RoundedCornersTransformation(

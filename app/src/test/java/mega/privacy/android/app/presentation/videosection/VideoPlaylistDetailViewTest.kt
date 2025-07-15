@@ -9,10 +9,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import coil.Coil
-import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
-import coil.test.FakeImageLoaderEngine
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_MORE_ACTION
@@ -30,7 +27,6 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PL
 import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailView
 import mega.privacy.android.domain.entity.node.NodeId
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,15 +39,6 @@ import kotlin.time.Duration.Companion.seconds
 class VideoPlaylistDetailViewTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
-
-    @Before
-    fun setUp() {
-        val engine = FakeImageLoaderEngine.Builder().build()
-        val imageLoader = ImageLoader.Builder(composeTestRule.activity)
-            .components { add(engine) }
-            .build()
-        Coil.setImageLoader(imageLoader)
-    }
 
     private val playlist = mock<VideoPlaylistUIEntity> {
         on { id }.thenReturn(NodeId(1L))

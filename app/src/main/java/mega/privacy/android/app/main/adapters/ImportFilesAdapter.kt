@@ -16,9 +16,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
 import coil3.SingletonImageLoader
-import coil3.asDrawable
 import coil3.asImage
 import coil3.request.ImageRequest
+import coil3.request.target
 import coil3.request.transformations
 import coil3.size.Scale
 import coil3.transform.RoundedCornersTransformation
@@ -205,11 +205,7 @@ internal class ImportFilesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
                             )
                         )
                         .scale(Scale.FILL)
-                        .target { image ->
-                            holder.thumbnail.setImageDrawable(
-                                image.asDrawable(context.resources)
-                            )
-                        }
+                        .target(holder.thumbnail)
                         .build()
                     SingletonImageLoader.get(context).enqueue(imageRequest)
                 } else {

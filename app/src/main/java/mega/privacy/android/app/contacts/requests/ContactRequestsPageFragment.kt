@@ -32,8 +32,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import coil.transform.CircleCropTransformation
+import coil3.asImage
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.CircleCropTransformation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -250,7 +252,7 @@ class ContactRequestsPageFragment : Fragment() {
                     )
                 ) {
                     transformations(CircleCropTransformation())
-                    placeholder(item.placeholder)
+                    placeholder(item.placeholder.asImage())
                 }
                 view.findViewById<ImageButton>(R.id.btn_more).isVisible =
                     false

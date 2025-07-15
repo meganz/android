@@ -16,8 +16,9 @@ import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R

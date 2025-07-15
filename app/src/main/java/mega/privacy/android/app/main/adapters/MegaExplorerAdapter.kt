@@ -21,9 +21,11 @@ import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import coil.dispose
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import coil3.dispose
+import coil3.load
+import coil3.request.crossfade
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R

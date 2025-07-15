@@ -4,8 +4,8 @@ import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import coil.util.CoilUtils
+import coil3.load
+import coil3.util.CoilUtils
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R

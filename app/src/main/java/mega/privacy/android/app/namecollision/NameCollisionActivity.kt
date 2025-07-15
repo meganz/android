@@ -12,8 +12,9 @@ import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MimeTypeList

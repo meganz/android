@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.adapters
 
-import mega.privacy.android.core.R as CoreUiR
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,8 +10,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import coil3.load
+import coil3.request.crossfade
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
@@ -21,6 +22,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest

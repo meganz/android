@@ -21,8 +21,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import coil3.asImage
+import coil3.load
+import coil3.request.crossfade
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import com.google.android.material.datepicker.MaterialStyledDatePickerDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -441,7 +444,11 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             return
         } else if (node?.hasThumbnail() == true) {
             binding.nodeThumbnail.load(ThumbnailRequest(NodeId(node.handle))) {
-                placeholder(typeForName(node.name).iconResourceId)
+                val placeholder = ContextCompat.getDrawable(
+                    requireContext(),
+                    typeForName(node.name).iconResourceId
+                )?.asImage()
+                placeholder(placeholder)
                 crossfade(true)
                 transformations(
                     RoundedCornersTransformation(

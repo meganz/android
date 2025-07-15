@@ -3,7 +3,7 @@ package mega.privacy.android.app.adapters.viewHolders
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
+import coil3.load
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.GiphyInterface
 import mega.privacy.android.app.objects.Data

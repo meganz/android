@@ -7,10 +7,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import coil.Coil
-import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
-import coil.test.FakeImageLoaderEngine
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
@@ -21,7 +18,6 @@ import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEOS_
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEOS_LIST_TEST_TAG
 import mega.privacy.android.domain.entity.node.NodeId
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,15 +29,6 @@ import org.mockito.kotlin.mock
 class AllVideosViewTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
-
-    @Before
-    fun setUp() {
-        val engine = FakeImageLoaderEngine.Builder().build()
-        val imageLoader = ImageLoader.Builder(composeTestRule.activity)
-            .components { add(engine) }
-            .build()
-        Coil.setImageLoader(imageLoader)
-    }
 
     private fun setComposeContent(
         items: List<VideoUIEntity> = emptyList(),

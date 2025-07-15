@@ -1,6 +1,5 @@
 package mega.privacy.android.app.contacts.list.dialog
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.content.DialogInterface
 import android.os.Bundle
@@ -14,8 +13,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import coil.load
-import coil.transform.CircleCropTransformation
+import coil3.asImage
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.CircleCropTransformation
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.ContactAvatar
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
 
@@ -211,7 +213,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             data = ContactAvatar(id = UserId(contact.handle))
         ) {
             transformations(CircleCropTransformation())
-            placeholder(contact.placeholder)
+            placeholder(contact.placeholder.asImage())
         }
 
         contact.statusColor?.let { color ->

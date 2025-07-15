@@ -7,10 +7,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import coil.Coil
-import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
-import coil.test.FakeImageLoaderEngine
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
@@ -24,7 +21,6 @@ import mega.privacy.android.app.presentation.videosection.view.videoselected.Vid
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,15 +34,6 @@ class VideoSelectedViewTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
-
-    @Before
-    fun setUp() {
-        val engine = FakeImageLoaderEngine.Builder().build()
-        val imageLoader = ImageLoader.Builder(composeTestRule.activity)
-            .components { add(engine) }
-            .build()
-        Coil.setImageLoader(imageLoader)
-    }
 
     private fun setComposeContent(
         uiState: VideoSelectedState = VideoSelectedState(),

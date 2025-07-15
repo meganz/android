@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate
-import coil.load
+import coil3.load
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
 import mega.privacy.android.app.databinding.ActivityGiphyViewerBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets

@@ -13,10 +13,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import coil.Coil
-import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
-import coil.test.FakeImageLoaderEngine
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_COLLECTION_TITLE_ICON_CONTENT_DESCRIPTION
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_COLLECTION_TITLE_TEST_TAG
@@ -35,7 +32,6 @@ import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_I
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
 import mega.privacy.android.icon.pack.R
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -101,15 +97,6 @@ class VideoItemViewTest {
                 highlightText = highlightText
             )
         }
-    }
-
-    @Before
-    fun setUp() {
-        val engine = FakeImageLoaderEngine.Builder().build()
-        val imageLoader = ImageLoader.Builder(composeTestRule.activity)
-            .components { add(engine) }
-            .build()
-        Coil.setImageLoader(imageLoader)
     }
 
     @Test

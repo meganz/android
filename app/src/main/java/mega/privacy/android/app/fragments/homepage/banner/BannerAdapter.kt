@@ -2,8 +2,9 @@ package mega.privacy.android.app.fragments.homepage.banner
 
 import android.widget.ImageView
 import android.widget.TextView
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import com.zhpan.bannerview.BaseBannerAdapter
 import com.zhpan.bannerview.BaseViewHolder
 import mega.privacy.android.app.R
@@ -11,6 +12,7 @@ import mega.privacy.android.app.fragments.homepage.main.HomePageViewModel
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.debounceClick
 import mega.privacy.android.domain.entity.banner.Banner
+import timber.log.Timber
 
 class BannerAdapter(private val viewModel: HomePageViewModel) : BaseBannerAdapter<Banner>() {
 
@@ -38,11 +40,21 @@ class BannerAdapter(private val viewModel: HomePageViewModel) : BaseBannerAdapte
         val dismissImage: ImageView = holder.findViewById(R.id.imageView_dismiss)
 
         data?.let {
+            val imageUrl = it.imageLocation.plus(it.image)
             background.load(it.imageLocation.plus(it.backgroundImage)) {
                 transformations(RoundedCornersTransformation(Util.dp2px(6f).toFloat()))
             }
-            image.load(it.imageLocation.plus(it.image)) {
+            image.load(imageUrl) {
+                Timber.d("BannerAdapter:: Loading image: $imageUrl")
                 size(Util.dp2px(100f))
+                listener(
+                    onError = { _, error ->
+                        Timber.e("BannerAdapter:: Error loading image: $error")
+                    },
+                    onSuccess = { _, _ ->
+                        Timber.d("BannerAdapter:: Successfully loaded image: $imageUrl")
+                    }
+                )
             }
             title.text = it.title
             description.text = it.description

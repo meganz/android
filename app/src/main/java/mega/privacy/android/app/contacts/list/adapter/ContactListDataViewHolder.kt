@@ -3,8 +3,10 @@ package mega.privacy.android.app.contacts.list.adapter
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import coil.transform.CircleCropTransformation
+import coil3.asImage
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.CircleCropTransformation
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.ItemContactDataBinding
 
@@ -27,7 +29,7 @@ class ContactListDataViewHolder(
             data = item.avatarUri ?: item.placeholder
         ) {
             transformations(CircleCropTransformation())
-            placeholder(item.placeholder)
+            placeholder(item.placeholder.asImage())
         }
         if (item.statusColor != null) {
             val color = ContextCompat.getColor(itemView.context, item.statusColor)

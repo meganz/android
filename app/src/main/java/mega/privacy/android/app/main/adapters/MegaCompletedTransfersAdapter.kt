@@ -9,8 +9,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor

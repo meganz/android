@@ -1,12 +1,15 @@
 package mega.privacy.android.app.getLink.adapter
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.Context
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import coil3.asImage
+import coil3.load
+import coil3.request.crossfade
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import com.zhpan.bannerview.utils.BannerUtils.dp2px
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -20,6 +23,7 @@ import mega.privacy.android.app.utils.Constants.THUMB_MARGIN_DP
 import mega.privacy.android.app.utils.Constants.THUMB_SIZE_DP
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.icon.pack.R as IconPackR
 
 /**
  * RecyclerView.ViewHolder to draw data items in [LinksAdapter].
@@ -63,7 +67,11 @@ class LinkViewHolder(
 
             item.node.hasThumbnail() -> {
                 binding.thumbnailImage.load(ThumbnailRequest(NodeId(item.node.handle))) {
-                    placeholder(MimeTypeList.typeForName(node.name).iconResourceId)
+                    val placeholder = ContextCompat.getDrawable(
+                        binding.root.context,
+                        MimeTypeList.typeForName(node.name).iconResourceId
+                    )?.asImage()
+                    placeholder(placeholder)
                     crossfade(true)
                     transformations(
                         RoundedCornersTransformation(

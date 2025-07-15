@@ -31,7 +31,7 @@ dependencies {
     implementation(androidx.material3.adaptive.layout)
     implementation(androidx.material3.adaptive.navigation)
     implementation(androidx.material3.window)
-    implementation(lib.coil)
+    implementation(lib.coil3)
     implementation(lib.coil.compose)
 
     //test

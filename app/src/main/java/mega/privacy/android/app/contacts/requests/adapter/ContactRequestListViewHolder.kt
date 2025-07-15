@@ -1,8 +1,10 @@
 package mega.privacy.android.app.contacts.requests.adapter
 
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import coil.transform.CircleCropTransformation
+import coil3.asImage
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.CircleCropTransformation
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.databinding.ItemContactRequestBinding
 import mega.privacy.android.domain.entity.user.ContactAvatar
@@ -25,7 +27,7 @@ class ContactRequestListViewHolder(
             data = ContactAvatar(email = item.email, id = UserId(item.handle))
         ) {
             transformations(CircleCropTransformation())
-            placeholder(item.placeholder)
+            placeholder(item.placeholder.asImage())
         }
     }
 }

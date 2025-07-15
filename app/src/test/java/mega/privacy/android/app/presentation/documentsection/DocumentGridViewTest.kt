@@ -7,10 +7,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import coil.Coil
-import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
-import coil.test.FakeImageLoaderEngine
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.presentation.documentsection.view.DOCUMENT_SECTION_GRID_ITEM_VIEW_TEST_TAG
@@ -18,7 +15,6 @@ import mega.privacy.android.app.presentation.documentsection.view.DocumentGridVi
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.icon.pack.R
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,15 +27,6 @@ import org.mockito.kotlin.verify
 class DocumentGridViewTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
-
-    @Before
-    fun setUp() {
-        val engine = FakeImageLoaderEngine.Builder().build()
-        val imageLoader = ImageLoader.Builder(composeTestRule.activity)
-            .components { add(engine) }
-            .build()
-        Coil.setImageLoader(imageLoader)
-    }
 
     private fun setComposeContent(
         items: List<DocumentUiEntity>,

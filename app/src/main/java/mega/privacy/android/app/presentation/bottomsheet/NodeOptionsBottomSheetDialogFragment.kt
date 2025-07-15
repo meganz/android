@@ -23,8 +23,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import coil.load
-import coil.transform.RoundedCornersTransformation
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onStart
@@ -967,16 +968,18 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     load(ThumbnailRequest(typedNode.id)) {
                         size(Util.dp2px(Constants.THUMB_SIZE_DP.toFloat()))
 
-                        transformations(buildList {
-                            if (typedNode.isMarkedSensitive || typedNode.isSensitiveInherited) {
-                                add(BlurTransformation(requireContext(), radius = 16f))
-                            }
-                            add(
-                                RoundedCornersTransformation(
-                                    Util.dp2px(Constants.THUMB_CORNER_RADIUS_DP).toFloat()
+                        transformations(
+                            buildList {
+                                if (typedNode.isMarkedSensitive || typedNode.isSensitiveInherited) {
+                                    add(BlurTransformation(requireContext(), radius = 16f))
+                                }
+                                add(
+                                    RoundedCornersTransformation(
+                                        Util.dp2px(Constants.THUMB_CORNER_RADIUS_DP).toFloat()
+                                    )
                                 )
-                            )
-                        })
+                            }
+                        )
 
                         listener(
                             onSuccess = { _, _ ->
