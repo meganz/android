@@ -11,5 +11,6 @@ internal data class SettingsSyncUiState(
     val syncDebrisSizeInBytes: Long? = null,
     val showSyncFrequency: Boolean = false,
     val syncFrequency: SyncFrequency = SyncFrequency.EVERY_15_MINUTES,
-    @StringRes val snackbarMessage: Int? = null
+    val shouldShowCleanSolvedIssueMenuItem: Boolean = false,
+    @StringRes val snackbarMessage: List<Int>? = null,
 )

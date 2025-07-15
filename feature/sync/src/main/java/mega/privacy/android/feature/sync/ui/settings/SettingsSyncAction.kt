@@ -14,6 +14,13 @@ internal sealed class SettingsSyncAction {
 
     // Other Actions
     data object ClearDebrisClicked : SettingsSyncAction()
+
+    // Sync Frequency Settings Actions
     data class SyncFrequencySelected(val frequency: SyncFrequency) : SettingsSyncAction()
+
+    // Snackbar Actions
     data object SnackbarShown : SettingsSyncAction()
+
+    // Clear Sync Resolved Issues
+    data object ClearSyncResolvedIssuesClicked : SettingsSyncAction()
 }

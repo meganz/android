@@ -7,6 +7,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.sync.R as syncR
+import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
+import mega.privacy.android.feature.sync.domain.usecase.solvedissue.ClearSyncSolvedIssuesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ClearSyncDebrisUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncDebrisSizeInBytesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByChargingUseCase
@@ -20,23 +24,26 @@ import mega.privacy.android.feature.sync.ui.model.SyncFrequency
 import mega.privacy.android.feature.sync.ui.model.SyncPowerOption
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncAction
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncViewModel
-import mega.privacy.android.shared.resources.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SettingsSyncViewModelTest {
+internal class SettingsSyncViewModelTest {
 
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
     private val monitorSyncByChargingUseCase: MonitorSyncByChargingUseCase = mock()
@@ -47,6 +54,8 @@ class SettingsSyncViewModelTest {
     private val getSyncFrequencyUseCase: GetSyncFrequencyUseCase = mock()
     private val setSyncFrequencyUseCase: SetSyncFrequencyUseCase = mock()
     private val setSyncByChargingUseCase = mock<SetSyncByChargingUseCase>()
+    private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase = mock()
+    private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase = mock()
 
     private lateinit var underTest: SettingsSyncViewModel
 
@@ -70,7 +79,8 @@ class SettingsSyncViewModelTest {
             clearSyncDebrisUseCase,
             getFeatureFlagValueUseCase,
             getSyncFrequencyUseCase,
-            setSyncFrequencyUseCase
+            setSyncFrequencyUseCase,
+            monitorSyncSolvedIssuesUseCase,
         )
     }
 
@@ -177,7 +187,7 @@ class SettingsSyncViewModelTest {
         underTest.handleAction(SettingsSyncAction.ClearDebrisClicked)
 
         underTest.uiState.test {
-            assertThat(awaitItem().snackbarMessage).isEqualTo(R.string.settings_sync_debris_cleared_message)
+            assertThat(awaitItem().snackbarMessage).isEqualTo(listOf(sharedR.string.settings_sync_debris_cleared_message))
         }
     }
 
@@ -235,25 +245,47 @@ class SettingsSyncViewModelTest {
             verify(setSyncFrequencyUseCase).invoke(frequency.minutes)
         }
 
-    @Test
-    fun `test that after changing sync network option snackbar is shown`() = runTest {
-        initViewModel()
-        underTest.handleAction(SettingsSyncAction.SyncConnectionTypeSelected(SyncConnectionType.WiFiOnly))
+    @ParameterizedTest
+    @EnumSource(SyncConnectionType::class)
+    fun `test that after changing sync network option snackbar is shown`(option: SyncConnectionType) =
+        runTest {
+            initViewModel()
+            underTest.handleAction(SettingsSyncAction.SyncConnectionTypeSelected(option))
+            val stringRes = when (option) {
+                SyncConnectionType.WiFiOnly -> syncR.string.sync_dialog_message_wifi_only
+                SyncConnectionType.WiFiOrMobileData -> syncR.string.sync_dialog_message_wifi_or_mobile_data
+            }
 
-        underTest.uiState.test {
-            assertThat(awaitItem().snackbarMessage).isEqualTo(R.string.settings_sync_option_updated_message)
+            underTest.uiState.test {
+                assertThat(awaitItem().snackbarMessage).isEqualTo(
+                    listOf(
+                        sharedR.string.settings_sync_message_prefix,
+                        stringRes
+                    )
+                )
+            }
         }
-    }
 
-    @Test
-    fun `test that after changing sync power option snackbar is shown`() = runTest {
-        initViewModel()
-        underTest.handleAction(SettingsSyncAction.SyncPowerOptionSelected(SyncPowerOption.SyncOnlyWhenCharging))
+    @ParameterizedTest
+    @EnumSource(SyncPowerOption::class)
+    fun `test that after changing sync power option snackbar is shown`(option: SyncPowerOption) =
+        runTest {
+            initViewModel()
+            val stringRes = when (option) {
+                SyncPowerOption.SyncAlways -> sharedR.string.settings_sync_power_always_title
+                SyncPowerOption.SyncOnlyWhenCharging -> sharedR.string.settings_sync_battery_sync_only_when_charging_title
+            }
+            underTest.handleAction(SettingsSyncAction.SyncPowerOptionSelected(option))
 
-        underTest.uiState.test {
-            assertThat(awaitItem().snackbarMessage).isEqualTo(R.string.settings_sync_option_updated_message)
+            underTest.uiState.test {
+                assertThat(awaitItem().snackbarMessage).isEqualTo(
+                    listOf(
+                        sharedR.string.settings_sync_message_prefix,
+                        stringRes
+                    )
+                )
+            }
         }
-    }
 
     @Test
     fun `test that after changing sync frequency snackbar is shown`() = runTest {
@@ -261,21 +293,60 @@ class SettingsSyncViewModelTest {
         underTest.handleAction(SettingsSyncAction.SyncFrequencySelected(SyncFrequency.EVERY_30_MINUTES))
 
         underTest.uiState.test {
-            assertThat(awaitItem().snackbarMessage).isEqualTo(R.string.settings_sync_option_updated_message)
+            assertThat(awaitItem().snackbarMessage).isEqualTo(listOf(sharedR.string.settings_sync_option_updated_message))
         }
+    }
+
+    @Test
+    fun `test that shouldShowCleanSolvedIssueMenuItem is true when monitorSyncSolvedIssuesUseCase emits non-empty list`() =
+        runTest {
+            val solvedIssues = listOf(mock<SolvedIssue>()) // Fixed: actual non-empty list
+            whenever(monitorSyncSolvedIssuesUseCase()).thenReturn(flowOf(solvedIssues))
+
+            initViewModel()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().shouldShowCleanSolvedIssueMenuItem).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that clearSyncDebrisUseCase is called when ClearDebrisClicked action is handled`() =
+        runTest {
+            initViewModel()
+
+            underTest.handleAction(SettingsSyncAction.ClearDebrisClicked)
+
+            verify(clearSyncDebrisUseCase).invoke()
+        }
+
+    @Test
+    fun `test that debris size is refreshed after clearing debris`() = runTest {
+        val initialDebrisSize = 100L
+        val clearedDebrisSize = 0L
+        whenever(getSyncDebrisSizeUseCase()).thenReturn(initialDebrisSize, clearedDebrisSize)
+        whenever(clearSyncDebrisUseCase()).thenReturn(Unit)
+
+        initViewModel()
+        underTest.handleAction(SettingsSyncAction.ClearDebrisClicked)
+
+        verify(getSyncDebrisSizeUseCase, times(2)).invoke()
+        verify(clearSyncDebrisUseCase).invoke()
     }
 
     private fun initViewModel() {
         underTest = SettingsSyncViewModel(
-            monitorSyncByWiFiUseCase,
-            monitorSyncByChargingUseCase,
-            setSyncByWiFiUseCase,
-            setSyncByChargingUseCase,
-            getSyncDebrisSizeUseCase,
-            clearSyncDebrisUseCase,
-            getFeatureFlagValueUseCase,
-            getSyncFrequencyUseCase,
-            setSyncFrequencyUseCase
+            monitorSyncByWiFiUseCase = monitorSyncByWiFiUseCase,
+            monitorSyncByChargingUseCase = monitorSyncByChargingUseCase,
+            setSyncByWiFiUseCase = setSyncByWiFiUseCase,
+            setSyncByChargingUseCase = setSyncByChargingUseCase,
+            getSyncDebrisSizeUseCase = getSyncDebrisSizeUseCase,
+            clearSyncDebrisUseCase = clearSyncDebrisUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getSyncFrequencyUseCase = getSyncFrequencyUseCase,
+            setSyncFrequencyUseCase = setSyncFrequencyUseCase,
+            monitorSyncSolvedIssuesUseCase = monitorSyncSolvedIssuesUseCase,
+            clearSyncSolvedIssuesUseCase = clearSyncSolvedIssuesUseCase
         )
     }
 }

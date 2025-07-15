@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.sync.R as syncR
+import mega.privacy.android.feature.sync.domain.usecase.solvedissue.ClearSyncSolvedIssuesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ClearSyncDebrisUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncDebrisSizeInBytesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByChargingUseCase
@@ -22,6 +25,7 @@ import mega.privacy.android.feature.sync.ui.model.SyncConnectionType
 import mega.privacy.android.feature.sync.ui.model.SyncFrequency
 import mega.privacy.android.feature.sync.ui.model.SyncPowerOption
 import mega.privacy.android.shared.resources.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,6 +41,8 @@ internal class SettingsSyncViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getSyncFrequencyUseCase: GetSyncFrequencyUseCase,
     private val setSyncFrequencyUseCase: SetSyncFrequencyUseCase,
+    private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase,
+    private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsSyncUiState())
@@ -46,6 +52,7 @@ internal class SettingsSyncViewModel @Inject constructor(
         monitorSyncSettings()
         fetchSyncDebris()
         loadSyncFrequency()
+        monitorSolvedIssue()
     }
 
     private fun monitorSyncSettings() {
@@ -97,6 +104,18 @@ internal class SettingsSyncViewModel @Inject constructor(
         }
     }
 
+    private fun monitorSolvedIssue() {
+        viewModelScope.launch {
+            monitorSyncSolvedIssuesUseCase().catch { Timber.e(it) }.collect {
+                _uiState.update { state ->
+                    state.copy(
+                        shouldShowCleanSolvedIssueMenuItem = it.isNotEmpty()
+                    )
+                }
+            }
+        }
+    }
+
     fun handleAction(action: SettingsSyncAction) {
         when (action) {
             is SettingsSyncAction.SyncConnectionTypeSelected -> {
@@ -128,9 +147,13 @@ internal class SettingsSyncViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         syncFrequency = action.frequency,
-                        snackbarMessage = R.string.settings_sync_option_updated_message
+                        snackbarMessage = listOf(R.string.settings_sync_option_updated_message)
                     )
                 }
+            }
+
+            is SettingsSyncAction.ClearSyncResolvedIssuesClicked -> {
+                onClearSyncOptionsPressed()
             }
         }
     }
@@ -148,8 +171,17 @@ internal class SettingsSyncViewModel @Inject constructor(
                     }
                 }
             }.onSuccess {
+                val stringRes = when (option) {
+                    SyncConnectionType.WiFiOnly -> syncR.string.sync_dialog_message_wifi_only
+                    SyncConnectionType.WiFiOrMobileData -> syncR.string.sync_dialog_message_wifi_or_mobile_data
+                }
                 _uiState.update {
-                    it.copy(snackbarMessage = R.string.settings_sync_option_updated_message)
+                    it.copy(
+                        snackbarMessage = listOf(
+                            sharedR.string.settings_sync_message_prefix,
+                            stringRes
+                        )
+                    )
                 }
             }.onFailure(Timber::e)
         }
@@ -168,8 +200,17 @@ internal class SettingsSyncViewModel @Inject constructor(
                     }
                 }
             }.onSuccess {
+                val stringRes = when (option) {
+                    SyncPowerOption.SyncAlways -> sharedR.string.settings_sync_power_always_title
+                    SyncPowerOption.SyncOnlyWhenCharging -> sharedR.string.settings_sync_battery_sync_only_when_charging_title
+                }
                 _uiState.update {
-                    it.copy(snackbarMessage = R.string.settings_sync_option_updated_message)
+                    it.copy(
+                        snackbarMessage = listOf(
+                            sharedR.string.settings_sync_message_prefix,
+                            stringRes
+                        )
+                    )
                 }
             }.onFailure(Timber::e)
         }
@@ -181,7 +222,7 @@ internal class SettingsSyncViewModel @Inject constructor(
                 clearSyncDebrisUseCase()
             }.onSuccess {
                 _uiState.update {
-                    it.copy(snackbarMessage = R.string.settings_sync_debris_cleared_message)
+                    it.copy(snackbarMessage = listOf(R.string.settings_sync_debris_cleared_message))
                 }
                 fetchSyncDebris()
             }.onFailure(Timber::e)
@@ -197,6 +238,16 @@ internal class SettingsSyncViewModel @Inject constructor(
                     it.copy(syncDebrisSizeInBytes = debrisSize)
                 }
             }.onFailure(Timber::e)
+        }
+    }
+
+    private fun onClearSyncOptionsPressed() {
+        viewModelScope.launch {
+            runCatching {
+                clearSyncSolvedIssuesUseCase()
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 }

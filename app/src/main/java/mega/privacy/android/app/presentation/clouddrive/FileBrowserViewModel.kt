@@ -438,7 +438,7 @@ class FileBrowserViewModel @Inject constructor(
     private suspend fun getNodeUiItems(
         nodeList: List<TypedNode>,
         highlightedNodeId: NodeId? = null,
-        highlightedNames: Set<String>? = null
+        highlightedNames: Set<String>? = null,
     ): List<NodeUIItem<TypedNode>> = withContext(defaultDispatcher) {
         val existingNodeList = state.value.nodesList
         val selectedHandles = state.value.selectedNodeHandles.toSet()
@@ -1032,6 +1032,14 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun onTabChanged(tab: CloudDriveTab) {
         _state.update { it.copy(selectedTab = tab) }
+    }
+
+    fun showSyncSettings() {
+        _state.update { it.copy(showSyncSettings = true) }
+    }
+
+    fun onConsumeSyncSettings() {
+        _state.update { it.copy(showSyncSettings = false) }
     }
 
     suspend fun doesUriPathExists(uriPath: UriPath) =

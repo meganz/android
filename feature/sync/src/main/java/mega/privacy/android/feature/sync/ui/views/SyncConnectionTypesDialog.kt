@@ -4,12 +4,15 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.model.SyncConnectionType
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedRes
+import mega.privacy.mobile.analytics.event.SyncOptionSelected
+import mega.privacy.mobile.analytics.event.SyncOptionSelectedEvent
 
 @Composable
 internal fun SyncConnectionTypesDialog(
@@ -25,6 +28,19 @@ internal fun SyncConnectionTypesDialog(
         ),
         onOptionSelected = {
             onSyncNetworkOptionsClicked(it)
+            when (it) {
+                SyncConnectionType.WiFiOrMobileData -> {
+                    Analytics.tracker.trackEvent(
+                        SyncOptionSelectedEvent(SyncOptionSelected.SelectionType.SyncOptionWifiAndMobileSelected)
+                    )
+                }
+
+                SyncConnectionType.WiFiOnly -> {
+                    Analytics.tracker.trackEvent(
+                        SyncOptionSelectedEvent(SyncOptionSelected.SelectionType.SyncOptionWifiOnlySelected)
+                    )
+                }
+            }
         },
         initialSelectedOption = selectedOption,
         onDismissRequest = onDismiss,

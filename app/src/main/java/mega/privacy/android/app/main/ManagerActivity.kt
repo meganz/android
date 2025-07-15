@@ -312,6 +312,7 @@ import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncMonitorState
 import mega.privacy.android.feature.sync.ui.SyncMonitorViewModel
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
+import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetView
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
 import mega.privacy.android.navigation.MegaNavigator
@@ -527,6 +528,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private lateinit var freePlanLimitParticipantsDialogComposeView: ComposeView
     private lateinit var syncPromotionBottomSheetComposeView: ComposeView
     private lateinit var fabOptionsBottomSheetComposeView: ComposeView
+    private lateinit var syncSettingsBottomSheetComposeView: ComposeView
     private lateinit var requestStatusProgressComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var navigationView: NavigationView
@@ -934,6 +936,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             ViewCompat.onApplyWindowInsets(syncPromotionBottomSheetComposeView, windowInsets)
             ViewCompat.onApplyWindowInsets(fabOptionsBottomSheetComposeView, windowInsets)
             ViewCompat.onApplyWindowInsets(freePlanLimitParticipantsDialogComposeView, windowInsets)
+            ViewCompat.onApplyWindowInsets(syncSettingsBottomSheetComposeView, windowInsets)
             findViewById<LinearLayout>(R.id.fragment_layout).updatePadding(bottom = insets.bottom)
             // Set minimum height so that system bar padding is there when both bottom nav and ads are hidden
             findViewById<LinearLayout>(R.id.bottom_navigation_container).minimumHeight =
@@ -1034,6 +1037,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         syncPromotionBottomSheetComposeView =
             findViewById(R.id.sync_promotion_bottom_sheet_compose_view)
         fabOptionsBottomSheetComposeView = findViewById(R.id.options_bottom_sheet_compose_view)
+        syncSettingsBottomSheetComposeView =
+            findViewById(R.id.sync_settings_bottom_sheet_compose_view)
         requestStatusProgressComposeView =
             findViewById(R.id.request_status_progress_compose_view)
         adsContainerView = findViewById(R.id.ads_web_compose_view)
@@ -1130,6 +1135,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         setRequestStatusProgressComposeView()
         setSyncPromotionBottomSheetComposeView()
         setFabOptionsBottomSheetComposeView()
+        setSyncSettingsBottomSheetComposeView()
 
         freePlanLimitParticipantsDialogComposeView.apply {
             isVisible = true
@@ -1219,6 +1225,50 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 val isDark = themeMode.isDarkMode()
                 OriginalTheme(isDark = isDark) {
                     RequestStatusProgressContainer()
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun setSyncSettingsBottomSheetComposeView() {
+        syncSettingsBottomSheetComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val isDark = themeMode.isDarkMode()
+                val state by fileBrowserViewModel.state.collectAsStateWithLifecycle()
+                val syncSettingsBottomSheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Hidden,
+                    confirmValueChange = {
+                        true
+                    },
+                    skipHalfExpanded = true
+                )
+                var showSyncSettings by rememberSaveable {
+                    mutableStateOf(false)
+                }
+                OriginalTheme(isDark = isDark) {
+                    LaunchedEffect(state.showSyncSettings) {
+                        if (state.showSyncSettings) {
+                            showSyncSettings = true
+                            syncSettingsBottomSheetState.show()
+                            fileBrowserViewModel.onConsumeSyncSettings()
+                        }
+                    }
+                    LaunchedEffect(syncSettingsBottomSheetState.currentValue) {
+                        if (syncSettingsBottomSheetState.currentValue == ModalBottomSheetValue.Hidden) {
+                            showSyncSettings = false
+                        }
+                    }
+                    SyncSettingsBottomSheetView(
+                        modalSheetState = syncSettingsBottomSheetState,
+                        sheetElevation = if (syncSettingsBottomSheetState.isVisible) ModalBottomSheetDefaults.Elevation else 0.dp,
+                        shouldShowBottomSheet = showSyncSettings
+                    ) {
+                        showSyncSettings = false
+                    }
                 }
             }
         }
@@ -2161,6 +2211,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 val shouldVisible = it == CloudDriveTab.CLOUD
                 searchMenuItem?.isVisible = shouldVisible
                 openLinkMenuItem?.isVisible = shouldVisible
+                moreMenuItem?.isVisible = !shouldVisible
                 fabButton.isInvisible =
                     (!shouldVisible || fileBrowserViewModel.isMediaDiscoveryOpen())
             }
@@ -4514,6 +4565,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         ) {
                             searchMenuItem?.isVisible = true
                         }
+                    } else {
+                        moreMenuItem?.isVisible = true
                     }
                 }
 
@@ -4791,13 +4844,18 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
 
             R.id.action_more -> {
-                showNodeOptionsPanel(
-                    getCurrentParentNode(
-                        currentParentHandle,
-                        Constants.INVALID_VALUE
-                    ),
-                    hideHiddenActions = drawerItem == DrawerItem.SHARED_ITEMS
-                )
+                if (fileBrowserViewModel.state().selectedTab != CloudDriveTab.SYNC) {
+                    showNodeOptionsPanel(
+                        getCurrentParentNode(
+                            currentParentHandle,
+                            Constants.INVALID_VALUE
+                        ),
+                        hideHiddenActions = drawerItem == DrawerItem.SHARED_ITEMS
+                    )
+                } else {
+                    Timber.d("Sync settings selected in sync tab")
+                    fileBrowserViewModel.showSyncSettings()
+                }
                 true
             }
 

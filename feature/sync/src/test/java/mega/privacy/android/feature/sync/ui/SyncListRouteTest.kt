@@ -1,8 +1,10 @@
 package mega.privacy.android.feature.sync.ui
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -15,6 +17,8 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.feature.sync.ui.settings.SettingsSyncUiState
+import mega.privacy.android.feature.sync.ui.settings.SettingsSyncViewModel
 import mega.privacy.android.feature.sync.ui.synclist.SOLVED_ISSUES_CHIP_TEST_TAG
 import mega.privacy.android.feature.sync.ui.synclist.STALLED_ISSUES_CHIP_TEST_TAG
 import mega.privacy.android.feature.sync.ui.synclist.SYNC_FOLDERS_CHIP_TEST_TAG
@@ -62,9 +66,11 @@ class SyncListRouteTest {
     private val syncStalledIssuesViewModel: SyncStalledIssuesViewModel = mock()
     private val syncStalledIssuesState: StateFlow<SyncStalledIssuesState> = mock()
     private val syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel = mock()
+    private val settingsSyncViewModel: SettingsSyncViewModel = mock()
     private val syncSolvedIssuesState: StateFlow<SyncSolvedIssuesState> = mock()
     private val syncIssueNotificationViewModel: SyncIssueNotificationViewModel = mock()
     private val syncMonitorState: StateFlow<SyncMonitorState> = mock()
+    private val syncSettingsState: StateFlow<SettingsSyncUiState> = mock()
 
     private val synUiItems = listOf(
         SyncUiItem(
@@ -92,12 +98,14 @@ class SyncListRouteTest {
                 syncUiItems = synUiItems,
             )
         )
+        whenever(syncSettingsState.value).thenReturn(SettingsSyncUiState())
         whenever(syncFoldersViewModel.uiState).thenReturn(syncFoldersUiState)
         whenever(syncStalledIssuesState.value).thenReturn(SyncStalledIssuesState(emptyList()))
         whenever(syncStalledIssuesViewModel.state).thenReturn(syncStalledIssuesState)
         whenever(syncSolvedIssuesState.value).thenReturn(SyncSolvedIssuesState(mock()))
         whenever(syncSolvedIssuesViewModel.state).thenReturn(syncSolvedIssuesState)
         whenever(syncIssueNotificationViewModel.state).thenReturn(syncMonitorState)
+        whenever(settingsSyncViewModel.uiState).thenReturn(syncSettingsState)
     }
 
     private fun setComposeContent() {
@@ -113,6 +121,7 @@ class SyncListRouteTest {
                 syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                 syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
                 syncIssueNotificationViewModel = syncIssueNotificationViewModel,
+                settingsSyncViewModel = settingsSyncViewModel,
                 onOpenMegaFolderClicked = {},
                 onCameraUploadsSettingsClicked = {},
             )
@@ -174,4 +183,29 @@ class SyncListRouteTest {
         composeTestRule.onNodeWithTag(SOLVED_ISSUES_CHIP_TEST_TAG).performClick()
         assertThat(analyticsRule.events).contains(SyncListSolvedIssuesButtonPressedEvent)
     }
+
+    @Test
+    fun `test that settings sync snackbar is shown when message is set`() {
+        val snackbarMessages = listOf(sharedR.string.settings_sync_debris_cleared_message)
+        whenever(syncSettingsState.value).thenReturn(
+            SettingsSyncUiState(snackbarMessage = snackbarMessages)
+        )
+
+        setComposeContent()
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(snackbarMessages.first()))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that SyncListRoute displays correct device name in title`() {
+        val expectedDeviceName = "Test Device"
+        whenever(state.value).thenReturn(SyncListState(deviceName = expectedDeviceName))
+
+        setComposeContent()
+
+        // Verify the device name is displayed as title
+        composeTestRule.onNodeWithText(expectedDeviceName).assertIsDisplayed()
+    }
+
 }

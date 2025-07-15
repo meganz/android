@@ -20,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.ui.model.SyncConnectionType
 import mega.privacy.android.feature.sync.ui.model.SyncFrequency
 import mega.privacy.android.feature.sync.ui.model.SyncPowerOption
@@ -33,10 +32,6 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R
-import mega.privacy.mobile.analytics.event.SyncOptionSelected
-import mega.privacy.mobile.analytics.event.SyncOptionSelectedEvent
-import mega.privacy.mobile.analytics.event.SyncPowerOptionSelected
-import mega.privacy.mobile.analytics.event.SyncPowerOptionSelectedEvent
 
 @Composable
 internal fun SettingsSyncRoute(
@@ -133,20 +128,6 @@ internal fun SettingSyncScreen(
             },
             selectedOption = uiState.syncConnectionType,
             onSyncNetworkOptionsClicked = { selectedSyncNetworkOption ->
-                when (selectedSyncNetworkOption) {
-                    SyncConnectionType.WiFiOrMobileData -> {
-                        Analytics.tracker.trackEvent(
-                            SyncOptionSelectedEvent(SyncOptionSelected.SelectionType.SyncOptionWifiAndMobileSelected)
-                        )
-                    }
-
-                    SyncConnectionType.WiFiOnly -> {
-                        Analytics.tracker.trackEvent(
-                            SyncOptionSelectedEvent(SyncOptionSelected.SelectionType.SyncOptionWifiOnlySelected)
-                        )
-                    }
-                }
-
                 syncConnectionTypeSelected(selectedSyncNetworkOption)
                 showSyncConnectionTypeDialog = false
             },
@@ -159,19 +140,6 @@ internal fun SettingSyncScreen(
             },
             selectedOption = uiState.syncPowerOption,
             onSyncPowerOptionsClicked = { selectedSyncPowerOption ->
-                when (selectedSyncPowerOption) {
-                    SyncPowerOption.SyncAlways -> {
-                        Analytics.tracker.trackEvent(
-                            SyncPowerOptionSelectedEvent(SyncPowerOptionSelected.SelectionType.SyncAlways)
-                        )
-                    }
-
-                    SyncPowerOption.SyncOnlyWhenCharging -> {
-                        Analytics.tracker.trackEvent(
-                            SyncPowerOptionSelectedEvent(SyncPowerOptionSelected.SelectionType.SyncOnlyWhenCharging)
-                        )
-                    }
-                }
                 syncPowerOptionSelected(selectedSyncPowerOption)
                 showSyncPowerOptionsDialog = false
             },
@@ -204,9 +172,7 @@ internal fun SettingSyncScreen(
     LaunchedEffect(key1 = uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { message ->
             scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                context.resources.getString(
-                    message
-                )
+                message.joinToString(separator = " ") { context.getString(it) }
             )
             snackbarShown()
         }

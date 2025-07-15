@@ -1331,4 +1331,6 @@
     <string name="general_dialog_title_discard_changes">Discard changes?</string>
     <!-- Dialog title asking user to disable camera uploads -->
     <string name="settings_camera_uploads_disable_warning">Disable Camera uploads?</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">Sync changed to:</string>
 </resources>

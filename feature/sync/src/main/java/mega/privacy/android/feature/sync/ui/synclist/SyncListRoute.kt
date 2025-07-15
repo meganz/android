@@ -1,29 +1,33 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.feature.sync.ui.settings.SettingsSyncAction
+import mega.privacy.android.feature.sync.ui.settings.SettingsSyncViewModel
+import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetContent
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLocalFileEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseRemoteFileEvent
-import mega.privacy.mobile.analytics.event.AndroidSyncClearResolvedIssuesEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncMergeFoldersEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncRemoveDuplicatesAndRemoveRestEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncRemoveDuplicatesEvent
@@ -72,6 +76,7 @@ fun SyncListRoute(
         syncStalledIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
         syncSolvedIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
         syncIssueNotificationViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
+        settingsSyncViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
         isInCloudDrive = isInCloudDrive,
         viewModel = hiltViewModel(),
         selectedChip = selectedChip,
@@ -94,18 +99,18 @@ internal fun SyncListRoute(
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
     syncIssueNotificationViewModel: SyncIssueNotificationViewModel,
+    settingsSyncViewModel: SettingsSyncViewModel,
     isInCloudDrive: Boolean = false,
     viewModel: SyncListViewModel = hiltViewModel(),
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val syncSettingsState by settingsSyncViewModel.uiState.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
-
-    val message = state.snackbarMessage?.let {
-        stringResource(id = it)
-    }
+    val modalSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val coroutineScope = rememberCoroutineScope()
 
     SyncListScreen(
         isInCloudDrive = isInCloudDrive,
@@ -154,12 +159,13 @@ internal fun SyncListRoute(
         },
         snackBarHostState = snackBarHostState,
         syncPermissionsManager = syncPermissionsManager,
-        actions = prepareMenuActions(state),
+        actions = listOf(SyncListMenuAction.MoreActionMenu),
         onActionPressed = {
             when (it) {
-                is SyncListMenuAction.ClearSyncOptions -> {
-                    Analytics.tracker.trackEvent(AndroidSyncClearResolvedIssuesEvent)
-                    viewModel.onClearSyncOptionsPressed()
+                is SyncListMenuAction.MoreActionMenu -> {
+                    coroutineScope.launch {
+                        modalSheetState.show()
+                    }
                 }
             }
         },
@@ -174,19 +180,34 @@ internal fun SyncListRoute(
         onFabExpanded = onFabExpanded,
     )
 
+    val context = LocalContext.current
     LaunchedEffect(key1 = state.snackbarMessage) {
-        message?.let {
-            snackBarHostState.showAutoDurationSnackbar(it)
+        state.snackbarMessage?.let { message ->
+            snackBarHostState.showAutoDurationSnackbar(
+                context.resources.getString(
+                    message
+                )
+            )
             viewModel.handleAction(SyncListAction.SnackBarShown)
         }
     }
 
-}
-
-private fun prepareMenuActions(state: SyncListState): List<MenuAction> {
-    val menuActionList = mutableListOf<MenuAction>()
-    if (state.shouldShowCleanSolvedIssueMenuItem) {
-        menuActionList.add(SyncListMenuAction.ClearSyncOptions)
+    LaunchedEffect(key1 = syncSettingsState.snackbarMessage) {
+        syncSettingsState.snackbarMessage?.let { message ->
+            snackBarHostState.showAutoDurationSnackbar(
+                message.joinToString(separator = " ") { context.getString(it) }
+            )
+            settingsSyncViewModel.handleAction(SettingsSyncAction.SnackbarShown)
+        }
     }
-    return menuActionList
+
+    SyncSettingsBottomSheetContent(
+        viewModel = settingsSyncViewModel,
+        modalSheetState = modalSheetState,
+        shouldShowBottomSheet = isInCloudDrive.not()
+    ) {
+        coroutineScope.launch {
+            modalSheetState.hide()
+        }
+    }
 }

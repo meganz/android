@@ -4,11 +4,14 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.ui.model.SyncPowerOption
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedRes
+import mega.privacy.mobile.analytics.event.SyncPowerOptionSelected
+import mega.privacy.mobile.analytics.event.SyncPowerOptionSelectedEvent
 
 @Composable
 internal fun SyncPowerOptionsDialog(
@@ -24,6 +27,19 @@ internal fun SyncPowerOptionsDialog(
         ),
         onOptionSelected = {
             onSyncPowerOptionsClicked(it)
+            when (it) {
+                SyncPowerOption.SyncAlways -> {
+                    Analytics.tracker.trackEvent(
+                        SyncPowerOptionSelectedEvent(SyncPowerOptionSelected.SelectionType.SyncAlways)
+                    )
+                }
+
+                SyncPowerOption.SyncOnlyWhenCharging -> {
+                    Analytics.tracker.trackEvent(
+                        SyncPowerOptionSelectedEvent(SyncPowerOptionSelected.SelectionType.SyncOnlyWhenCharging)
+                    )
+                }
+            }
         },
         initialSelectedOption = selectedOption,
         onDismissRequest = onDismiss,

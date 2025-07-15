@@ -1,21 +1,26 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
-import mega.privacy.android.feature.sync.R
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
+import mega.privacy.android.core.R as appR
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 
 /**
  * Sync menu action
  */
 internal sealed interface SyncListMenuAction : MenuAction {
 
-    /**
-     * Clear resolved issues
-     */
-    object ClearSyncOptions : MenuActionWithoutIcon(
-        descriptionRes = R.string.sync_menu_clear_issues,
-        testTag = CLEAN_SOLVED_ISSUES_ACTION_TEST_TAG,
-    ), SyncListMenuAction
+    object MoreActionMenu : MenuActionWithIcon, SyncListMenuAction {
+        @Composable
+        override fun getIconPainter() =
+            painterResource(id = appR.drawable.ic_universal_more)
+
+        @Composable
+        override fun getDescription() = ""
+        override val testTag: String = CLEAN_SOLVED_ISSUES_ACTION_TEST_TAG
+    }
+
 
     companion object {
         /**

@@ -7,6 +7,7 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.feature.sync.ui.settings.SettingsSyncViewModel
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
@@ -42,24 +43,8 @@ internal fun NavGraphBuilder.syncNavGraph(
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
     syncIssueNotificationViewModel: SyncIssueNotificationViewModel,
+    settingsSyncViewModel: SettingsSyncViewModel,
 ) {
-
-    /**
-     * Method to specifically navigate from syncNewFolderRoute to syncListRoute
-     * It avoids duplicated navigation due the use of shortcuts, deep links, etc.
-     */
-    fun navFromNewFolderRouteToListRoute() {
-        navController.navigate(
-            SyncList()
-        ) {
-            popUpTo(SyncNewFolder()) {
-                inclusive = true
-            }
-        }
-        if (navController.previousBackStackEntry?.destination?.route == navController.currentBackStackEntry?.destination?.route) {
-            navController.popBackStack()
-        }
-    }
 
     syncEmptyDestination(onNavigateToNewFolder = { navController.navigate(SyncNewFolder()) })
     syncNewFolderDestination(
@@ -67,7 +52,9 @@ internal fun NavGraphBuilder.syncNavGraph(
         navController = navController,
         shouldNavigateToSyncList = shouldNavigateToSyncList,
         openUpgradeAccountPage = openUpgradeAccountPage,
-        popToSyncListView = ::navFromNewFolderRouteToListRoute,
+        popToSyncListView = {
+            navController.navFromNewFolderRouteToListRoute()
+        },
     )
     syncMegaPickerDestination(
         syncPermissionsManager = syncPermissionsManager,
@@ -103,7 +90,19 @@ internal fun NavGraphBuilder.syncNavGraph(
         syncStalledIssuesViewModel = syncStalledIssuesViewModel,
         syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
         syncIssueNotificationViewModel = syncIssueNotificationViewModel,
+        settingsSyncViewModel = settingsSyncViewModel
     )
 }
 
-
+/**
+ * Method to specifically navigate from syncNewFolderRoute to syncListRoute
+ * It avoids duplicated navigation due the use of shortcuts, deep links, etc.
+ */
+private fun NavController.navFromNewFolderRouteToListRoute() {
+    navigate(SyncList()) {
+        popUpTo(SyncNewFolder()) { inclusive = true }
+    }
+    if (previousBackStackEntry?.destination?.route == currentBackStackEntry?.destination?.route) {
+        popBackStack()
+    }
+}
