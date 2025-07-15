@@ -13,8 +13,14 @@ data object SettingsCameraUploads
  *
  * @param isShowHowToUploadPrompt Boolean indicating whether to show the how-to upload prompt
  */
-internal fun NavGraphBuilder.settingsCameraUploadsScreen(isShowHowToUploadPrompt: Boolean) {
+internal fun NavGraphBuilder.settingsCameraUploadsScreen(
+    isShowHowToUploadPrompt: Boolean,
+    isShowDisableCameraUploads: Boolean,
+) {
     composable<SettingsCameraUploads> {
-        SettingsCameraUploadsRoute(isShowHowToUploadPrompt)
+        SettingsCameraUploadsRoute(
+            isShowHowToUploadPrompt,
+            isShowDisableCameraUploads,
+        )
     }
 }

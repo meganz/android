@@ -59,6 +59,7 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivity
+import mega.privacy.android.app.presentation.settings.camerauploads.INTENT_EXTRA_KEY_SHOW_DISABLE_CU
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
@@ -221,7 +222,13 @@ class SettingsFragment :
         val key = preference.key
         when (key) {
             KEY_FEATURES_CAMERA_UPLOAD -> {
-                startActivity(Intent(context, SettingsCameraUploadsActivity::class.java))
+                startActivity(Intent(context, SettingsCameraUploadsActivity::class.java).also {
+                    val showDisableCU =
+                        arguments?.getBoolean(INTENT_EXTRA_KEY_SHOW_DISABLE_CU, false)
+                            ?: false
+
+                    it.putExtra(INTENT_EXTRA_KEY_SHOW_DISABLE_CU, showDisableCU)
+                })
             }
 
             KEY_FEATURES_SYNC -> {

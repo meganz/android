@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.settings.camerauploads
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,6 +45,8 @@ class SettingsCameraUploadsActivity : ComponentActivity() {
 
         val isShowHowToUploadPrompt =
             intent.getBooleanExtra(INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT, false)
+        val isShowDisableCameraUploads =
+            intent.getBooleanExtra(INTENT_EXTRA_KEY_SHOW_DISABLE_CU, false)
 
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -57,7 +58,8 @@ class SettingsCameraUploadsActivity : ComponentActivity() {
                         content = {
                             PsaContainer {
                                 SettingsCameraUploadsScreen(
-                                    isShowHowToUploadPrompt
+                                    isShowHowToUploadPrompt,
+                                    isShowDisableCameraUploads,
                                 )
                             }
                         },
@@ -67,3 +69,5 @@ class SettingsCameraUploadsActivity : ComponentActivity() {
         }
     }
 }
+
+const val INTENT_EXTRA_KEY_SHOW_DISABLE_CU = "SHOW_DISABLE_CU"

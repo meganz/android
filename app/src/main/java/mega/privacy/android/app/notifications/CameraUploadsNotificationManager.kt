@@ -12,9 +12,16 @@ import androidx.core.app.NotificationCompat
 import androidx.work.ForegroundInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.settings.SettingsActivity
+import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
+import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
+import mega.privacy.android.app.presentation.settings.camerauploads.INTENT_EXTRA_KEY_SHOW_DISABLE_CU
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
+import mega.privacy.android.app.presentation.settings.compose.SettingsHomeActivity
+import mega.privacy.android.app.presentation.settings.model.CameraUploadsTargetPreference
 import mega.privacy.android.app.presentation.transfers.notification.OpenTransfersSectionIntentMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT
@@ -22,6 +29,7 @@ import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
@@ -36,6 +44,7 @@ class CameraUploadsNotificationManager @Inject constructor(
     private val stringWrapper: StringWrapper,
     private val getVideoCompressionSizeLimitUseCase: GetVideoCompressionSizeLimitUseCase,
     private val openTransfersSectionIntentMapper: OpenTransfersSectionIntentMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
 
     companion object {
@@ -128,6 +137,8 @@ class CameraUploadsNotificationManager @Inject constructor(
         content: String,
         subText: String? = null,
         intent: PendingIntent? = null,
+        actionText: String? = null,
+        actionIntent: PendingIntent? = null,
         isOngoing: Boolean = false,
         progress: Int? = null,
         isAutoCancel: Boolean = true,
@@ -157,6 +168,15 @@ class CameraUploadsNotificationManager @Inject constructor(
             progress?.let { setProgress(100, progress, false) }
             subText?.let { setSubText(subText) }
             action?.let { addAction(action) }
+            actionIntent?.let {
+                addAction(
+                    NotificationCompat.Action.Builder(
+                        IconPackR.drawable.ic_stat_camera_uploads_running,
+                        actionText,
+                        actionIntent
+                    ).build()
+                )
+            }
             foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
         }
         return builder.build()
@@ -183,19 +203,43 @@ class CameraUploadsNotificationManager @Inject constructor(
         areUploadsPaused: Boolean,
     ) {
         getDefaultPendingIntent()?.let { defaultPendingIntent ->
-            val content = stringWrapper.getProgressSize(totalUploadedBytes, totalUploadBytes)
+            val content = context.getString(
+                if (areUploadsPaused)
+                    R.string.upload_service_notification_paused
+                else
+                    R.string.upload_service_notification,
+                totalUploaded,
+                totalToUpload
+            )
+            val subText = stringWrapper.getProgressSize(totalUploadedBytes, totalUploadBytes)
+            val actionIntent = (if (getFeatureFlagValueUseCase(AppFeatures.SettingsComposeUI)) {
+                SettingsHomeActivity.getIntent(context, CameraUploadsTargetPreference).also {
+                    it.putExtra(INTENT_EXTRA_KEY_SHOW_DISABLE_CU, true)
+                }
+            } else {
+                Intent(context, SettingsActivity::class.java).apply {
+                    putExtra(INITIAL_PREFERENCE, CameraUploadsTargetPreference.preferenceId)
+                    putExtra(
+                        NAVIGATE_TO_INITIAL_PREFERENCE,
+                        CameraUploadsTargetPreference.requiresNavigation
+                    )
+                    putExtra(INTENT_EXTRA_KEY_SHOW_DISABLE_CU, true)
+                }
+            }).let {
+                PendingIntent.getActivity(
+                    context,
+                    0,
+                    it,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            }
             val notification = createNotification(
-                title = context.getString(
-                    if (areUploadsPaused)
-                        R.string.upload_service_notification_paused
-                    else
-                        R.string.upload_service_notification,
-                    totalUploaded,
-                    totalToUpload
-                ),
+                title = context.getString(R.string.section_photo_sync),
                 content = content,
-                subText = content,
+                subText = subText,
                 intent = defaultPendingIntent,
+                actionText = context.getString(R.string.verify_2fa_subtitle_diable_2fa),
+                actionIntent = actionIntent,
                 isAutoCancel = false,
                 isOngoing = true,
                 progress = progress,

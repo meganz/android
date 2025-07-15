@@ -371,6 +371,7 @@ internal class SettingsCameraUploadsViewTest {
                     videoQualityUiItem = videoQualityUiItem,
                 ),
                 isShowHowToUploadPrompt = isShowHowToUploadPrompt,
+                isShowDisableCameraUploads = false,
                 onBusinessAccountPromptDismissed = {},
                 onCameraUploadsProcessStarted = {},
                 onCameraUploadsStateChanged = {},
@@ -394,6 +395,7 @@ internal class SettingsCameraUploadsViewTest {
                 onSnackbarMessageConsumed = {},
                 onUploadOptionUiItemSelected = {},
                 onVideoQualityUiItemSelected = {},
+                onDisableCameraUploads = {},
             )
         }
     }

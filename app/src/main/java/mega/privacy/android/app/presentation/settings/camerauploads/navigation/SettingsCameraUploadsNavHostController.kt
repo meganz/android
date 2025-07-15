@@ -17,12 +17,16 @@ internal fun SettingsCameraUploadsNavHostController(
     modifier: Modifier,
     navHostController: NavHostController,
     isShowHowToUploadPrompt: Boolean,
+    isShowDisableCameraUploads: Boolean,
 ) {
     NavHost(
         modifier = modifier,
         navController = navHostController,
         startDestination = SettingsCameraUploads,
     ) {
-        settingsCameraUploadsScreen(isShowHowToUploadPrompt)
+        settingsCameraUploadsScreen(
+            isShowHowToUploadPrompt,
+            isShowDisableCameraUploads,
+        )
     }
 }

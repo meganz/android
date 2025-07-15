@@ -16,12 +16,14 @@ import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCame
 @Composable
 internal fun SettingsCameraUploadsRoute(
     isShowHowToUploadPrompt: Boolean,
+    isShowDisableCameraUploads: Boolean,
     viewModel: SettingsCameraUploadsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     SettingsCameraUploadsView(
         uiState = uiState,
         isShowHowToUploadPrompt = isShowHowToUploadPrompt,
+        isShowDisableCameraUploads = isShowDisableCameraUploads,
         onBusinessAccountPromptDismissed = viewModel::onBusinessAccountPromptDismissed,
         onCameraUploadsStateChanged = viewModel::onCameraUploadsStateChanged,
         onCameraUploadsProcessStarted = viewModel::onCameraUploadsProcessStarted,
@@ -45,5 +47,6 @@ internal fun SettingsCameraUploadsRoute(
         onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
         onUploadOptionUiItemSelected = viewModel::onUploadOptionUiItemSelected,
         onVideoQualityUiItemSelected = viewModel::onVideoQualityUiItemSelected,
+        onDisableCameraUploads = viewModel::disableCameraUploads,
     )
 }

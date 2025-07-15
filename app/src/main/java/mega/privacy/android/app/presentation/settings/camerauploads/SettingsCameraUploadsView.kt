@@ -36,6 +36,7 @@ import de.palm.composestateevents.StateEvent
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.business.BusinessAccountPromptHandler
+import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.DisableCameraUploadsDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FileUploadDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HowToUploadDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.RelatedNewLocalFolderWarningDialog
@@ -123,6 +124,7 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 internal fun SettingsCameraUploadsView(
     uiState: SettingsCameraUploadsUiState,
     isShowHowToUploadPrompt: Boolean,
+    isShowDisableCameraUploads: Boolean,
     onBusinessAccountPromptDismissed: () -> Unit,
     onCameraUploadsProcessStarted: () -> Unit,
     onCameraUploadsStateChanged: (Boolean) -> Unit,
@@ -146,6 +148,7 @@ internal fun SettingsCameraUploadsView(
     onSnackbarMessageConsumed: () -> Unit,
     onUploadOptionUiItemSelected: (UploadOptionUiItem) -> Unit,
     onVideoQualityUiItemSelected: (VideoQualityUiItem) -> Unit,
+    onDisableCameraUploads: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -157,6 +160,7 @@ internal fun SettingsCameraUploadsView(
     var showHowToUploadPrompt by rememberSaveable { mutableStateOf(isShowHowToUploadPrompt) }
     var showVideoCompressionSizeInputPrompt by rememberSaveable { mutableStateOf(false) }
     var showVideoQualityPrompt by rememberSaveable { mutableStateOf(false) }
+    var showDisableCameraUploads by rememberSaveable { mutableStateOf(isShowDisableCameraUploads) }
 
     val cameraUploadsLocalFolderLauncher = launchFolderPicker(
         onFolderSelected = { uri ->
@@ -280,6 +284,12 @@ internal fun SettingsCameraUploadsView(
                     onWarningDismissed = onRelatedNewLocalFolderWarningDismissed,
                 )
             }
+            if (showDisableCameraUploads) {
+                DisableCameraUploadsDialog(
+                    onDisable = onDisableCameraUploads,
+                    onDismiss = { showDisableCameraUploads = false },
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -398,6 +408,7 @@ private fun SettingsCameraUploadsViewPreview(
         SettingsCameraUploadsView(
             uiState = uiState,
             isShowHowToUploadPrompt = false,
+            isShowDisableCameraUploads = false,
             onBusinessAccountPromptDismissed = {},
             onCameraUploadsProcessStarted = {},
             onCameraUploadsStateChanged = {},
@@ -421,6 +432,7 @@ private fun SettingsCameraUploadsViewPreview(
             onSnackbarMessageConsumed = {},
             onUploadOptionUiItemSelected = {},
             onVideoQualityUiItemSelected = {},
+            onDisableCameraUploads = {},
         )
     }
 }
