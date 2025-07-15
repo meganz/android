@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
@@ -90,10 +89,6 @@ internal class ManagerDrawerViewModelTest {
                 MutableStateFlow(
                     StorageStateEvent(
                         1L,
-                        "",
-                        0L,
-                        "",
-                        EventType.Storage,
                         StorageState.Change,
                     )
                 )

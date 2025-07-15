@@ -47,7 +47,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.call.ChatCall
@@ -224,10 +223,6 @@ internal class ChatViewModelTest {
         onBlocking { invoke() } doReturn MutableStateFlow(
             StorageStateEvent(
                 handle = 1L,
-                eventString = "",
-                number = 0L,
-                text = "",
-                type = EventType.Storage,
                 storageState = StorageState.Unknown
             )
         )
@@ -400,10 +395,6 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
             StorageStateEvent(
                 handle = 1L,
-                eventString = "",
-                number = 0L,
-                text = "",
-                type = EventType.Storage,
                 storageState = StorageState.Unknown
             )
         )
@@ -872,10 +863,6 @@ internal class ChatViewModelTest {
         val updateFlow = MutableStateFlow(
             StorageStateEvent(
                 handle = 1L,
-                eventString = "",
-                number = 0L,
-                text = "",
-                type = EventType.Storage,
                 storageState = StorageState.Unknown  // initial state is [StorageState.Unknown]
             )
         )
@@ -887,10 +874,6 @@ internal class ChatViewModelTest {
         updateFlow.emit(
             StorageStateEvent(
                 handle = 1L,
-                eventString = "",
-                number = 0L,
-                text = "",
-                type = EventType.Storage,
                 storageState = state
             )
         )

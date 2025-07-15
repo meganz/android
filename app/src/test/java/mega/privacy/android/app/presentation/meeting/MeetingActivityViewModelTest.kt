@@ -22,7 +22,6 @@ import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtens
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.DeviceGateway
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
@@ -72,11 +71,11 @@ import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -215,7 +214,7 @@ class MeetingActivityViewModelTest {
         wheneverBlocking { monitorChatSessionUpdatesUseCase() } doReturn emptyFlow()
         wheneverBlocking { monitorChatRoomUpdatesUseCase(chatId) } doReturn emptyFlow()
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
-            StorageStateEvent(1L, "", 0L, "", EventType.Unknown, StorageState.Unknown)
+            StorageStateEvent(1L, StorageState.Unknown)
         )
         wheneverBlocking { monitorUserUpdates() } doReturn emptyFlow()
         wheneverBlocking { monitorScheduledMeetingUpdatesUseCase() } doReturn emptyFlow()

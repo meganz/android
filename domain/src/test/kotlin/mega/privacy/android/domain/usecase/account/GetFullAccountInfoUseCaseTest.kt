@@ -3,13 +3,12 @@ package mega.privacy.android.domain.usecase.account
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
-import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.GetPricing
+import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -42,7 +41,7 @@ class GetFullAccountInfoUseCaseTest {
     @Test
     fun `test that monitorStorageStateEvent return StorageState Unknown then following call`() {
         runTest {
-            val event = StorageStateEvent(0L, "", 0L, "", EventType.Storage, StorageState.Unknown)
+            val event = StorageStateEvent(0L, StorageState.Unknown)
             whenever(monitorStorageStateEventUseCase()).thenReturn(MutableStateFlow(event))
             underTest()
             verify(getPaymentMethodUseCase).invoke(true)
@@ -56,7 +55,7 @@ class GetFullAccountInfoUseCaseTest {
     @Test
     fun `test that monitorStorageStateEvent return differ StorageState Unknown then following call`() {
         runTest {
-            val event = StorageStateEvent(0L, "", 0L, "", EventType.Storage, StorageState.Green)
+            val event = StorageStateEvent(0L, StorageState.Green)
             whenever(monitorStorageStateEventUseCase()).thenReturn(MutableStateFlow(event))
             underTest()
             verify(getPaymentMethodUseCase).invoke(true)

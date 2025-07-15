@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.repository.NotificationsRepository
@@ -49,7 +48,7 @@ class MonitorStorageStateUseCaseTest {
         getCurrentStorageStateUseCase.stub { onBlocking { invoke() }.thenReturn(StorageState.Unknown) }
         notificationsRepository.stub {
             on { monitorEvent() }.thenReturn(flow {
-                emit(StorageStateEvent(1L, "", 0L, "", EventType.Storage, expected))
+                emit(StorageStateEvent(1L, expected))
                 awaitCancellation()
             })
         }

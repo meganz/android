@@ -16,7 +16,6 @@ import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.NodeId
@@ -199,10 +198,6 @@ class TrackInfoViewModelTest {
     fun `test getStorageState is returned correctly`() {
         val exampleStorageStateEvent = StorageStateEvent(
             handle = 1L,
-            eventString = "eventString",
-            number = 0L,
-            text = "text",
-            type = EventType.Storage,
             storageState = StorageState.PayWall
         )
         val storageFlow: MutableStateFlow<StorageStateEvent> =

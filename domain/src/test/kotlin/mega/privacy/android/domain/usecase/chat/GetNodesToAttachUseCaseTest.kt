@@ -3,7 +3,6 @@ package mega.privacy.android.domain.usecase.chat
 import com.google.common.truth.Truth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.NodeId
@@ -51,10 +50,6 @@ class GetNodesToAttachUseCaseTest {
             MutableStateFlow(
                 StorageStateEvent(
                     handle = 1L,
-                    eventString = "",
-                    number = 0L,
-                    text = "",
-                    type = EventType.Storage,
                     storageState = StorageState.PayWall
                 )
             )
@@ -73,10 +68,6 @@ class GetNodesToAttachUseCaseTest {
             MutableStateFlow(
                 StorageStateEvent(
                     handle = 1L,
-                    eventString = "",
-                    number = 0L,
-                    text = "",
-                    type = EventType.Storage,
                     storageState = StorageState.Unknown
                 )
             )

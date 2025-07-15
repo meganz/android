@@ -5,8 +5,8 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.EventType
-import mega.privacy.android.domain.entity.NormalEvent
+import mega.privacy.android.domain.entity.CommitDbEvent
+import mega.privacy.android.domain.entity.DisconnectEvent
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.repository.NotificationsRepository
@@ -23,19 +23,11 @@ class MonitorStorageStateEventUseCaseTest {
 
     private val exampleStorageStateEvent = StorageStateEvent(
         handle = 1L,
-        eventString = "eventString",
-        number = 0L,
-        text = "text",
-        type = EventType.Storage,
         storageState = StorageState.Unknown
     )
 
-    private val exampleNormalEvent = NormalEvent(
+    private val exampleNormalEvent = CommitDbEvent(
         handle = 1L,
-        eventString = "eventString",
-        number = 0L,
-        text = "text",
-        type = EventType.CommitDb,
     )
 
     @Test
@@ -74,18 +66,15 @@ class MonitorStorageStateEventUseCaseTest {
         runTest {
             whenever(notificationsRepository.monitorEvent()).thenReturn(
                 flowOf(
-                    exampleNormalEvent.copy(type = EventType.CommitDb),
+                    mock<CommitDbEvent>(),
                     exampleStorageStateEvent.copy(
-                        type = EventType.Storage,
                         storageState = StorageState.Red
                     ),
-                    exampleNormalEvent.copy(type = EventType.Disconnect),
+                    mock<DisconnectEvent>(),
                     exampleStorageStateEvent.copy(
-                        type = EventType.Storage,
                         storageState = StorageState.Green
                     ),
                     exampleStorageStateEvent.copy(
-                        type = EventType.Storage,
                         storageState = StorageState.Orange
                     ),
                 )

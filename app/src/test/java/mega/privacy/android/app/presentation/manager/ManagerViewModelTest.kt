@@ -43,7 +43,6 @@ import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
@@ -204,10 +203,6 @@ class ManagerViewModelTest {
             MutableStateFlow(
                 StorageStateEvent(
                     handle = 0L,
-                    eventString = "",
-                    number = 0L,
-                    text = "",
-                    type = EventType.Storage,
                     storageState = StorageState.Unknown,
                 )
             )

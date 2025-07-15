@@ -1,21 +1,15 @@
 package mega.privacy.android.domain.entity
 
+import mega.privacy.android.domain.entity.account.AccountBlockedType
+
 /**
  * Event class that from MegaSDK
  *
  * @property handle
- * @property eventString
- * @property number
- * @property text
- * @property type
  */
-abstract class Event(
-    open val handle: Long,
-    open val eventString: String,
-    open val number: Long,
-    open val text: String,
-    open val type: EventType,
-)
+interface Event {
+    val handle: Long
+}
 
 /**
  * Sub type of [Event] for Storage Event
@@ -24,20 +18,62 @@ abstract class Event(
  */
 data class StorageStateEvent(
     override val handle: Long,
-    override val eventString: String,
-    override val number: Long,
-    override val text: String,
-    override val type: EventType,
     val storageState: StorageState,
-) : Event(handle, eventString, number, text, type)
+) : Event
 
-/**
- * Sub type of [Event] for normal types
- */
-data class NormalEvent(
+
+data class RequestStatusProgressEvent(
     override val handle: Long,
-    override val eventString: String,
-    override val number: Long,
-    override val text: String,
-    override val type: EventType,
-) : Event(handle, eventString, number, text, type)
+    val progress: Long,
+) : Event
+
+data class AccountBlockedEvent(
+    override val handle: Long,
+    val type: AccountBlockedType,
+    val text: String,
+) : Event
+
+data class CommitDbEvent(
+    override val handle: Long,
+) : Event
+
+data class AccountConfirmationEvent(
+    override val handle: Long,
+) : Event
+
+data class ChangeToHttpsEvent(
+    override val handle: Long,
+) : Event
+
+data class DisconnectEvent(
+    override val handle: Long,
+) : Event
+
+data class NodesCurrentEvent(
+    override val handle: Long,
+) : Event
+
+data class MediaInfoReadyEvent(
+    override val handle: Long,
+) : Event
+
+data class StorageSumChangedEvent(
+    override val handle: Long,
+) : Event
+
+data class BusinessStatusEvent(
+    override val handle: Long,
+) : Event
+
+data class KeyModifiedEvent(
+    override val handle: Long,
+) : Event
+
+data class MiscFlagsReadyEvent(
+    override val handle: Long,
+) : Event
+
+data class UnknownEvent(
+    override val handle: Long,
+) : Event
+

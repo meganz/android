@@ -19,7 +19,6 @@ import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.NodeId
@@ -163,7 +162,7 @@ class TransfersViewModelTest {
         )
         wheneverBlocking { monitorInProgressTransfersUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
-            StorageStateEvent(1L, "", 0L, "", EventType.Unknown, StorageState.Unknown)
+            StorageStateEvent(1L, StorageState.Unknown)
         )
         wheneverBlocking { monitorTransferOverQuotaUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorPausedTransfersUseCase() }.thenReturn(emptyFlow())
@@ -227,10 +226,6 @@ class TransfersViewModelTest {
         val flow = MutableStateFlow(
             StorageStateEvent(
                 1L,
-                "",
-                0L,
-                "",
-                EventType.Unknown,
                 storageState = StorageState.Unknown,
             )
         )
@@ -246,10 +241,6 @@ class TransfersViewModelTest {
             flow.emit(
                 StorageStateEvent(
                     1L,
-                    "",
-                    0L,
-                    "",
-                    EventType.Unknown,
                     storageState = storageState,
                 )
             )
@@ -262,10 +253,6 @@ class TransfersViewModelTest {
                 flow.emit(
                     StorageStateEvent(
                         1L,
-                        "",
-                        0L,
-                        "",
-                        EventType.Unknown,
                         storageState = StorageState.Green,
                     )
                 )
@@ -308,10 +295,6 @@ class TransfersViewModelTest {
             val storageQuotaflow = MutableStateFlow(
                 StorageStateEvent(
                     1L,
-                    "",
-                    0L,
-                    "",
-                    EventType.Unknown,
                     storageState = StorageState.Unknown,
                 )
             )
@@ -328,10 +311,6 @@ class TransfersViewModelTest {
                 storageQuotaflow.emit(
                     StorageStateEvent(
                         1L,
-                        "",
-                        0L,
-                        "",
-                        EventType.Unknown,
                         storageState = StorageState.Red,
                     )
                 )

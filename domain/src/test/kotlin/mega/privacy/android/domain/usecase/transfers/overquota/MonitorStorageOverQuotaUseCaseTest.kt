@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.repository.TransferRepository
@@ -57,10 +56,6 @@ class MonitorStorageOverQuotaUseCaseTest {
         val expected = storageState == StorageState.Red || storageState == StorageState.PayWall
         val storageStateEvent = StorageStateEvent(
             handle = 1L,
-            eventString = "",
-            number = 0L,
-            text = "",
-            type = EventType.Storage,
             storageState = storageState
         )
         val storageStateFlow = MutableStateFlow(storageStateEvent)

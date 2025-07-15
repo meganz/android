@@ -20,7 +20,7 @@ class AccountBlockedDetailMapperTest {
 
     @BeforeAll
     fun setup() {
-        underTest = AccountBlockedDetailMapper()
+        underTest = AccountBlockedDetailMapper(AccountBlockedTypeMapper())
     }
 
     @ParameterizedTest(name = "when type number is {0}")

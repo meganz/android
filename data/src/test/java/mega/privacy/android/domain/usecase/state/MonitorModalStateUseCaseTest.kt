@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -167,10 +166,6 @@ class MonitorModalStateUseCaseTest {
                     MutableStateFlow(
                         StorageStateEvent(
                             0L,
-                            "",
-                            0L,
-                            "",
-                            EventType.Storage,
                             StorageState.PayWall
                         )
                     )

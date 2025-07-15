@@ -1,10 +1,10 @@
 package mega.privacy.android.domain.usecase.requeststatus
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.RequestStatusProgressEvent
 import mega.privacy.android.domain.repository.NotificationsRepository
 import javax.inject.Inject
 
@@ -19,10 +19,10 @@ class MonitorRequestStatusProgressEventUseCase @Inject constructor(
      */
     operator fun invoke(): Flow<Progress?> = notificationsRepository
         .monitorEvent()
-        .filter { it.type == EventType.RequestStatusProgress }
+        .filterIsInstance<RequestStatusProgressEvent>()
         .map {
-            if (it.number > -1L) {
-                Progress(current = it.number, total = 1000)
+            if (it.progress > -1L) {
+                Progress(current = it.progress, total = 1000)
             } else {
                 null
             }

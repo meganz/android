@@ -13,7 +13,6 @@ import mega.privacy.android.app.presentation.documentscanner.model.DocumentScann
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -292,10 +291,6 @@ internal class ContactFileListViewModelTest {
             MutableStateFlow(
                 StorageStateEvent(
                     handle = 1L,
-                    eventString = "eventString",
-                    number = 0L,
-                    text = "text",
-                    type = EventType.Storage,
                     storageState = StorageState.Red
                 )
             )

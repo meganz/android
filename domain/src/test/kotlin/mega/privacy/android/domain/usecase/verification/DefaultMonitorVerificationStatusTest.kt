@@ -7,7 +7,6 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.verification.OptInVerification
@@ -31,10 +30,6 @@ class DefaultMonitorVerificationStatusTest {
             MutableStateFlow(
                 StorageStateEvent(
                     handle = 123L,
-                    eventString = "",
-                    number = 123L,
-                    text = "",
-                    type = EventType.Storage,
                     storageState = StorageState.Unknown
                 )
             )
@@ -102,13 +97,8 @@ class DefaultMonitorVerificationStatusTest {
                     MutableStateFlow(
                         StorageStateEvent(
                             handle = 123L,
-                            eventString = "",
-                            number = 123L,
-                            text = "",
-                            type = EventType.AccountBlocked,
                             storageState = StorageState.PayWall
                         )
-
                     )
                 )
             }

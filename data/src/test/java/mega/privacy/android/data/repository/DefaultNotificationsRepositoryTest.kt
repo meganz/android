@@ -21,8 +21,7 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.ContactAlert
-import mega.privacy.android.domain.entity.EventType
-import mega.privacy.android.domain.entity.NormalEvent
+import mega.privacy.android.domain.entity.NodesCurrentEvent
 import mega.privacy.android.domain.entity.notifications.PromoNotification
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
@@ -246,19 +245,12 @@ class DefaultNotificationsRepositoryTest {
 
     @Test
     fun `test that event is returned if found`() = runTest {
-        val expectedEvent = NormalEvent(
+        val expectedEvent = NodesCurrentEvent(
             handle = 1L,
-            text = "expected text",
-            number = 2L,
-            type = EventType.NodesCurrent,
-            eventString = "expected event string"
         )
         val megaEvent = mock<MegaEvent> {
             on { type }.thenReturn(MegaEvent.EVENT_NODES_CURRENT)
             on { handle }.thenReturn(expectedEvent.handle)
-            on { text }.thenReturn(expectedEvent.text)
-            on { number }.thenReturn(expectedEvent.number)
-            on { eventString }.thenReturn(expectedEvent.eventString)
         }
         val globalUpdate = GlobalUpdate.OnEvent(megaEvent)
         whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
@@ -272,19 +264,12 @@ class DefaultNotificationsRepositoryTest {
 
     @Test
     fun `test that multiple events are returned if found`() = runTest {
-        val expectedEvent = NormalEvent(
+        val expectedEvent = NodesCurrentEvent(
             handle = 1L,
-            text = "expected text",
-            number = 2L,
-            type = EventType.NodesCurrent,
-            eventString = "expected event string"
         )
         val megaEvent = mock<MegaEvent> {
             on { type }.thenReturn(MegaEvent.EVENT_NODES_CURRENT)
             on { handle }.thenReturn(expectedEvent.handle)
-            on { text }.thenReturn(expectedEvent.text)
-            on { number }.thenReturn(expectedEvent.number)
-            on { eventString }.thenReturn(expectedEvent.eventString)
         }
         val globalUpdate = GlobalUpdate.OnEvent(megaEvent)
         whenever(megaApiGateway.globalUpdates).thenReturn(

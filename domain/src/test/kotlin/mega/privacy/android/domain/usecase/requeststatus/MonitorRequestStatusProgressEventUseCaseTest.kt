@@ -5,9 +5,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.AccountConfirmationEvent
 import mega.privacy.android.domain.entity.Event
-import mega.privacy.android.domain.entity.EventType
-import mega.privacy.android.domain.entity.NormalEvent
+import mega.privacy.android.domain.entity.RequestStatusProgressEvent
 import mega.privacy.android.domain.repository.NotificationsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,13 +27,10 @@ class MonitorRequestStatusProgressEventUseCaseTest {
 
     @Test
     fun `test that RequestStatusProgress events are filtered when invoked`() = runTest {
-        val event1 = mock<NormalEvent> {
-            on { type } doReturn EventType.RequestStatusProgress
-            on { number } doReturn 500L
+        val event1 = mock<RequestStatusProgressEvent> {
+            on { progress } doReturn 500L
         }
-        val event2 = mock<NormalEvent> {
-            on { type } doReturn EventType.AccountConfirmation
-        }
+        val event2 = mock<AccountConfirmationEvent>()
         val eventsFlow: Flow<Event> = flowOf(event1, event2)
         whenever(notificationsRepository.monitorEvent()) doReturn (eventsFlow)
 
@@ -45,9 +42,8 @@ class MonitorRequestStatusProgressEventUseCaseTest {
 
     @Test
     fun `test that progress is set to null when number is -1L`() = runTest {
-        val event = mock<NormalEvent> {
-            on { type } doReturn EventType.RequestStatusProgress
-            on { number } doReturn -1L
+        val event = mock<RequestStatusProgressEvent> {
+            on { progress } doReturn -1L
         }
         val eventsFlow: Flow<Event> = flowOf(event)
         whenever(notificationsRepository.monitorEvent()) doReturn (eventsFlow)
