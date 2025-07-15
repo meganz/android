@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaSessionHelper
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
@@ -49,6 +50,7 @@ import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
+import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
@@ -59,9 +61,13 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.monitoring.CrashReporter
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.TrackAudioPlaybackInfoUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.mobile.analytics.event.AudioPlayerIsActivatedEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerLoopPlayingItemEnabledEvent
@@ -100,6 +106,12 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
     @Inject
     lateinit var crashReporter: CrashReporter
 
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var trackAudioPlaybackInfoUseCase: TrackAudioPlaybackInfoUseCase
+
     private val binder by lazy { MediaPlayerServiceBinder(this, viewModelGateway) }
 
     private val metadata = MutableLiveData<Metadata>()
@@ -122,6 +134,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
     private var currentNotification: Notification? = null
 
     private var adapterType = INVALID_VALUE
+
+    private var playbackPositionStatus = PlaybackPositionStatus.Initial
 
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
@@ -246,7 +260,9 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                         state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> setPaused(true)
 
                         state == MEDIA_PLAYER_STATE_READY -> {
-                            if (!mediaPlayerGateway.getPlayWhenReady()) {
+                            if (!mediaPlayerGateway.getPlayWhenReady() &&
+                                playbackPositionStatus != PlaybackPositionStatus.DialogShowing
+                            ) {
                                 setPlayWhenReady(true)
                             }
                             if (!isNotificationCreated) {
@@ -376,6 +392,22 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                         MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
                         intent?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)?.let {
                             adapterType = it
+                        }
+
+                        val isEnabled =
+                            getFeatureFlagValueUseCase(AppFeatures.AudioPlaybackPosition)
+                        if (isEnabled) {
+                            trackAudioPlaybackInfoUseCase {
+                                val handle =
+                                    mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLongOrNull()
+                                        ?: -1
+                                MediaPlaybackInfo(
+                                    mediaHandle = handle,
+                                    totalDuration = mediaPlayerGateway.getCurrentItemDuration(),
+                                    currentPosition = mediaPlayerGateway.getCurrentPlayingPosition(),
+                                    mediaType = MediaType.Audio
+                                )
+                            }
                         }
                     }
                 }
@@ -591,6 +623,12 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
     }
 
     override fun getCurrentAdapterType(): Int = adapterType
+
+    override fun updatePlaybackPositionStatus(value: PlaybackPositionStatus) {
+        playbackPositionStatus = value
+    }
+
+    override fun getPlaybackPositionStatus(): PlaybackPositionStatus = playbackPositionStatus
 
     override fun playing() = mediaPlayerGateway.mediaPlayerIsPlaying()
 

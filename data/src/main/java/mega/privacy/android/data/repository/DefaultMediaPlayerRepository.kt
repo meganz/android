@@ -332,6 +332,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     override suspend fun deleteMediaPlaybackInfo(mediaHandle: Long) {
         megaLocalRoomGateway.deletePlaybackInfo(mediaHandle)
+        latestAudioPlaybackInfo = null
     }
 
     override suspend fun clearAllPlaybackInfos() {

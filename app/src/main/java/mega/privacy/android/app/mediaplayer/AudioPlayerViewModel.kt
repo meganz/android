@@ -13,7 +13,6 @@ import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.AudioPlayerUiState
 import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
-import mega.privacy.android.app.mediaplayer.model.PlaybackPositionState
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetMediaPlaybackInfoUseCase
@@ -49,6 +48,7 @@ class AudioPlayerViewModel @Inject constructor(
         handle: Long,
         name: String,
         status: PlaybackPositionStatus = playbackPositionStatus,
+        playbackPositionStatusCallback: (PlaybackPositionStatus) -> Unit,
     ) {
         playbackPositionJob?.cancel()
         playbackPositionJob = viewModelScope.launch {
@@ -66,9 +66,10 @@ class AudioPlayerViewModel @Inject constructor(
                                 currentPlayingItemName = name
                             )
                         }
+                        playbackPositionStatusCallback(playbackPositionStatus)
                     }
 
-                    else -> updatePlaybackPositionStatus(status)
+                    else -> updatePlaybackPositionStatus(status, playbackPosition)
                 }
             }
         }

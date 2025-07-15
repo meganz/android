@@ -5,6 +5,7 @@ import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 
 /**
  * The media player service gateway
@@ -116,4 +117,18 @@ interface MediaPlayerServiceGateway {
      * @return the current adapter type
      */
     fun getCurrentAdapterType(): Int
+
+    /**
+     * Update playback position status
+     *
+     * @param value the playback position status to update
+     */
+    fun updatePlaybackPositionStatus(value: PlaybackPositionStatus)
+
+    /**
+     * Get playback position status
+     *
+     * @return the current playback position status
+     */
+    fun getPlaybackPositionStatus(): PlaybackPositionStatus
 }

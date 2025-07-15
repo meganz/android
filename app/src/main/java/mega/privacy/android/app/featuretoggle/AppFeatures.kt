@@ -15,6 +15,10 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
  */
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
+    AudioPlaybackPosition(
+        "Enable audio playback position feature",
+        false
+    ),
 
     PhotoEditor(
         "Enable photo editor in image viewer",

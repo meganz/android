@@ -102,6 +102,7 @@ class AudioPlayerViewModelTest {
     @Test
     fun `test that state is updated correctly when checkPlaybackPositionOfPlayingItem invoked, and playback position status is Initial`() =
         runTest {
+            val mockPlaybackPositionStatusCallback = mock<(PlaybackPositionStatus) -> Unit>()
             val testPlaybackInfo = mock<MediaPlaybackInfo> {
                 on { mediaHandle }.thenReturn(testHandle)
                 on { currentPosition }.thenReturn(testPosition)
@@ -109,7 +110,12 @@ class AudioPlayerViewModelTest {
             whenever(getMediaPlaybackInfoUseCase(testHandle)).thenReturn(testPlaybackInfo)
             initUnderTest()
 
-            underTest.checkPlaybackPositionOfPlayingItem(testHandle, testName)
+            underTest.checkPlaybackPositionOfPlayingItem(
+                testHandle,
+                testName,
+                PlaybackPositionStatus.Initial,
+                mockPlaybackPositionStatusCallback
+            )
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
@@ -117,6 +123,7 @@ class AudioPlayerViewModelTest {
                 assertThat(actual.playbackPosition).isEqualTo(testPosition)
                 assertThat(actual.currentPlayingHandle).isEqualTo(testHandle)
                 assertThat(actual.currentPlayingItemName).isEqualTo(testName)
+                verify(mockPlaybackPositionStatusCallback).invoke(PlaybackPositionStatus.DialogShowing)
             }
         }
 

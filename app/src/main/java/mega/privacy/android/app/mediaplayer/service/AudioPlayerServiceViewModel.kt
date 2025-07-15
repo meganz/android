@@ -98,7 +98,6 @@ import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
@@ -118,6 +117,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudiosByPa
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioShuffleEnabledUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SaveAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -179,10 +179,10 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val setAudioShuffleEnabledUseCase: SetAudioShuffleEnabledUseCase,
     private val setAudioRepeatModeUseCase: SetAudioRepeatModeUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
+    private val saveAudioPlaybackInfoUseCase: SaveAudioPlaybackInfoUseCase,
     monitorAudioBackgroundPlayEnabledUseCase: MonitorAudioBackgroundPlayEnabledUseCase,
     monitorAudioShuffleEnabledUseCase: MonitorAudioShuffleEnabledUseCase,
     monitorAudioRepeatModeUseCase: MonitorAudioRepeatModeUseCase,
@@ -476,7 +476,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                             getAudioNodesByParentHandleUseCase(
                                 parentHandle = parent.id.longValue,
                                 order = getSortOrderFromIntent(intent)
-                            )?.let { children ->
+                            ).let { children ->
                                 buildPlaySourcesByTypedAudioNodes(
                                     type = type,
                                     typedAudioNodes = children,
@@ -514,7 +514,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                             getAudiosByParentHandleFromMegaApiFolderUseCase(
                                 parentHandle = parent.id.longValue,
                                 order = order
-                            )?.let { children ->
+                            ).let { children ->
                                 buildPlaySourcesByTypedAudioNodes(
                                     type = type,
                                     typedAudioNodes = children,
@@ -760,7 +760,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                                 }
                             }
                         }
-                    }.onFailure { Timber.e(it) }
+                    }.onFailure { error -> Timber.e(error) }
                 }
             }
             cancellableJobs[JOB_KEY_UPDATE_THUMBNAIL] = updateThumbnailJob
@@ -1132,6 +1132,10 @@ class AudioPlayerServiceViewModel @Inject constructor(
         )
         postPlayingThumbnail()
         mediaItemTransitionState.update { handle }
+        cancellableJobs[JOB_KEY_AUDIO_PLAYBACK_INFO]?.cancel()
+        cancellableJobs[JOB_KEY_AUDIO_PLAYBACK_INFO] = sharingScope.launch {
+            saveAudioPlaybackInfoUseCase()
+        }
     }
 
     private fun updatePlayingPosition(handle: Long, playlistItems: List<PlaylistItem>) {
@@ -1283,6 +1287,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 megaApiHttpServerStop()
                 megaApiFolderHttpServerStopUseCase()
             }
+            saveAudioPlaybackInfoUseCase()
         }
         cancellableJobs.values.map {
             it.cancel()
@@ -1402,5 +1407,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
         private const val JOB_KEY_SET_SHUFFLE = "JOB_KEY_SET_SHUFFLE"
         private const val JOB_KEY_SET_AUDIO_REPEAT_MODE = "JOB_KEY_SET_AUDIO_REPEAT_MODE"
         private const val JOB_KEY_MONITOR_TRANSFER = "JOB_KEY_MONITOR_TRANSFER"
+        private const val JOB_KEY_AUDIO_PLAYBACK_INFO = "JOB_KEY_AUDIO_PLAYBACK_INFO"
     }
 }

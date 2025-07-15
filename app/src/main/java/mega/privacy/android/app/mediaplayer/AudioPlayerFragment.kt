@@ -39,7 +39,9 @@ import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
+import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util.isOnline
@@ -220,11 +222,17 @@ class AudioPlayerFragment : Fragment() {
 
                     viewLifecycleOwner.collectFlow(gateway.monitorMediaItemTransitionState()) { handle ->
                         handle?.let {
-                            val name = gateway.getPlaylistItem(it.toString())?.nodeName ?: ""
+                            val name = gateway.getPlaylistItem(it.toString())?.nodeName
+                                ?: activity?.intent?.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)
+                                ?: ""
                             audioViewModel.checkPlaybackPositionOfPlayingItem(
                                 handle = handle,
-                                name = name
-                            )
+                                name = name,
+                                status = serviceGateway?.getPlaybackPositionStatus()
+                                    ?: PlaybackPositionStatus.Initial
+                            ) { status ->
+                                serviceGateway?.updatePlaybackPositionStatus(status)
+                            }
                         }
                     }
                 }
@@ -302,7 +310,10 @@ class AudioPlayerFragment : Fragment() {
                         showPlaybackDialog = uiState.showPlaybackDialog,
                         currentPlayingItemName = uiState.currentPlayingItemName ?: "",
                         playbackPosition = uiState.playbackPosition ?: 0,
-                        onPlaybackPositionStatusUpdated = audioViewModel::updatePlaybackPositionStatus,
+                        onPlaybackPositionStatusUpdated = { status ->
+                            audioViewModel.updatePlaybackPositionStatus(status)
+                            serviceGateway?.updatePlaybackPositionStatus(status)
+                        }
                     )
                 }
             }
