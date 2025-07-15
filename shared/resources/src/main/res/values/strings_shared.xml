@@ -1325,6 +1325,14 @@
     <string name="settings_sync_power_always_title">Sync always</string>
     <!-- Sync only when charging label for sync power options -->
     <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">Resume audio?</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">“%1$s” will resume from %2$s.</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">Resume</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">Restart</string>
     <!-- Message shown when uploading edited image as a new file -->
     <string name="photo_editor_upload_message">Uploading edits as a new file</string>
     <!-- Dialog title asking user to discard changes -->

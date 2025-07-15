@@ -43,6 +43,7 @@ import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_D
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChange1XEvent
@@ -177,20 +178,20 @@ class AudioPlayerFragment : Fragment() {
                 }
             }
 
-            serviceViewModelGateway?.let {
+            serviceViewModelGateway?.let { gateway ->
                 if (!playlistObserved) {
                     playlistObserved = true
-                    viewLifecycleOwner.collectFlow(it.playlistUpdate()) { info ->
+                    viewLifecycleOwner.collectFlow(gateway.playlistUpdate()) { info ->
                         Timber.d("MediaPlayerService observed playlist ${info.first.size} items")
 
                         playerViewHolder?.togglePlaylistEnabled(
                             requireContext(),
                             info.first,
-                            it.shuffleEnabled()
+                            gateway.shuffleEnabled()
                         )
                     }
 
-                    viewLifecycleOwner.collectFlow(it.retryUpdate()) { isRetry ->
+                    viewLifecycleOwner.collectFlow(gateway.retryUpdate()) { isRetry ->
                         when {
                             !isRetry && retryFailedDialog == null -> {
                                 retryFailedDialog = MaterialAlertDialogBuilder(requireContext())
@@ -214,6 +215,16 @@ class AudioPlayerFragment : Fragment() {
                                 retryFailedDialog?.dismiss()
                                 retryFailedDialog = null
                             }
+                        }
+                    }
+
+                    viewLifecycleOwner.collectFlow(gateway.monitorMediaItemTransitionState()) { handle ->
+                        handle?.let {
+                            val name = gateway.getPlaylistItem(it.toString())?.nodeName ?: ""
+                            audioViewModel.checkPlaybackPositionOfPlayingItem(
+                                handle = handle,
+                                name = name
+                            )
                         }
                     }
                 }
@@ -254,6 +265,7 @@ class AudioPlayerFragment : Fragment() {
                 viewHolder.speedPlaybackButton.setOnClickListener {
                     audioViewModel.updateIsSpeedPopupShown(true)
                 }
+                initPlaybackPositionDialog(viewHolder.playbackPositionDialog)
             }
         }
     }
@@ -274,6 +286,24 @@ class AudioPlayerFragment : Fragment() {
                         audioViewModel.updateCurrentSpeedPlaybackItem(speedPlaybackItem)
                         audioViewModel.updateIsSpeedPopupShown(false)
                     }
+                }
+            }
+        }
+    }
+
+    private fun initPlaybackPositionDialog(composeView: ComposeView) {
+        composeView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val uiState by audioViewModel.uiState.collectAsStateWithLifecycle()
+                OriginalTheme(isDark = isSystemInDarkTheme()) {
+                    PlaybackPositionDialog(
+                        type = MediaType.Audio,
+                        showPlaybackDialog = uiState.showPlaybackDialog,
+                        currentPlayingItemName = uiState.currentPlayingItemName ?: "",
+                        playbackPosition = uiState.playbackPosition ?: 0,
+                        onPlaybackPositionStatusUpdated = audioViewModel::updatePlaybackPositionStatus,
+                    )
                 }
             }
         }

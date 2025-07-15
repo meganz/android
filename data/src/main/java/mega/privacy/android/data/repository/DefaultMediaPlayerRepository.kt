@@ -292,7 +292,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         return handles.mapNotNull { handle ->
             megaApi.getMegaNodeByHandle(handle)
         }.map { node ->
-            convertToTypedAudioNode(node = node, offline = offlineMap?.get(node.handle.toString()))
+            convertToTypedAudioNode(node = node, offline = offlineMap[node.handle.toString()])
         }
     }
 
@@ -301,12 +301,12 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         return handles.mapNotNull { handle ->
             megaApi.getMegaNodeByHandle(handle)
         }.map { node ->
-            convertToTypedVideoNode(node = node, offline = offlineMap?.get(node.handle.toString()))
+            convertToTypedVideoNode(node = node, offline = offlineMap[node.handle.toString()])
         }
     }
 
     private suspend fun getAllOfflineNodeHandle() =
-        megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
+        megaLocalRoomGateway.getAllOfflineInfo().associateBy { it.handle }
 
     override suspend fun getVideoNodeByHandle(handle: Long, attemptFromFolderApi: Boolean) =
         withContext(ioDispatcher) {
@@ -351,7 +351,9 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     }
 
     override suspend fun getMediaPlaybackInfo(handle: Long): MediaPlaybackInfo? =
-        megaLocalRoomGateway.getMediaPlaybackInfo(handle)
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getMediaPlaybackInfo(handle)
+        }
 
     private suspend fun getMegaNodeByHandle(nodeId: NodeId, attemptFromFolderApi: Boolean = false) =
         megaApi.getMegaNodeByHandle(nodeId.longValue)
@@ -453,13 +455,13 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                         .let { infoMap ->
                             // If the playbackInfoMap is empty, using the local information
                             // else using the current playbackInfoMap
-                            if (playbackInfoMap.isEmpty()) {
+                            if (playbackInfoMap.isEmpty() && infoMap != null) {
                                 playbackInfoMap.putAll(infoMap)
                             }
                         }
-                }.onFailure {
+                }.onFailure { error ->
                     // Log the error jsonString and clear it.
-                    Timber.d(it, "The error jsonString: $jsonString")
+                    Timber.e(error, "The error jsonString: $jsonString")
                     playbackInfoMap.clear()
                     appPreferencesGateway.putString(
                         PREFERENCE_KEY_VIDEO_EXIT_TIME,

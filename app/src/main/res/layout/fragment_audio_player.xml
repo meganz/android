@@ -12,4 +12,10 @@
         app:default_artwork="@drawable/ic_default_audio_cover"
         app:player_layout_id="@layout/audio_player_view"
         app:surface_type="none" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/playback_position_dialog"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </FrameLayout>
