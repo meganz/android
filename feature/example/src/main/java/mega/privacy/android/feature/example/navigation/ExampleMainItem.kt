@@ -3,6 +3,7 @@ package mega.privacy.android.feature.example.navigation
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraphBuilder
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import mega.privacy.android.feature.example.presentation.HomeScreen
@@ -34,14 +35,19 @@ class ExampleMainItem : MainNavItem {
 class OtherExampleMainItem : MainNavItem {
     override val destination: Any = HomeScreen2
     override val screen: NavGraphBuilder.(NavigationHandler) -> Unit =
-        { navigationHandler -> otherExampleHomeScreen(navigationHandler::navigate) }
+        { navigationHandler ->
+            otherExampleHomeScreen(
+                onNavigate = navigationHandler::navigate,
+                resultFlow = navigationHandler::monitorResult
+            )
+        }
 
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.GearSix
     override val badge: Flow<String?>? = flow {
         var count = 0
         while (true) {
             emit(count.toString())
-            kotlinx.coroutines.delay(5000) // Emit "New" every 5 seconds
+            delay(5000) // Emit "New" every 5 seconds
             count++
         }
     }

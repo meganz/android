@@ -2,6 +2,8 @@ package mega.privacy.android.app.menu.navigation
 
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
+import mega.privacy.android.navigation.destination.ExampleLegacyScreen
+import mega.privacy.android.navigation.destination.Secondary
 import mega.privacy.android.shared.resources.R as sharedR
 
 object CurrentPlanItem : NavDrawerItem.Account(
@@ -18,15 +20,15 @@ object StorageItem : NavDrawerItem.Account(
 )
 
 object ContactsItem : NavDrawerItem.Account(
-    destination = Unit,
+    destination = ExampleLegacyScreen("From Contacts menu item"),
     icon = IconPack.Medium.Thin.Outline.UserSquare,
-    title = sharedR.string.general_section_contacts
+    title = sharedR.string.general_section_contacts,
 )
 
 object AchievementsItem : NavDrawerItem.Account(
-    destination = Unit,
+    destination = Secondary,
     icon = IconPack.Medium.Thin.Outline.Rocket,
-    title = sharedR.string.general_section_achievements
+    title = sharedR.string.general_section_achievements,
 )
 
 object SharedItemsItem : NavDrawerItem.Account(

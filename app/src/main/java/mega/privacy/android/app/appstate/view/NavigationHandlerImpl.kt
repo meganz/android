@@ -1,6 +1,7 @@
 package mega.privacy.android.app.appstate.view
 
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.flow.mapNotNull
 import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
@@ -27,4 +28,18 @@ class NavigationHandlerImpl(
             popUpTo(0) { inclusive = true }
         }
     }
+
+    override fun <T> returnResult(key: String, value: T) {
+        navController.previousBackStackEntry?.savedStateHandle?.set(key = key, value = value)
+        navController.popBackStack()
+    }
+
+    override fun <T> monitorResult(key: String) =
+        navController.currentBackStackEntryFlow.mapNotNull {
+            if (it.savedStateHandle.contains(key)) {
+                val result = it.savedStateHandle.get<T>(key)
+                it.savedStateHandle.remove<T>(key)
+                result
+            } else null
+        }
 }

@@ -2,10 +2,8 @@ package mega.privacy.android.feature.example.presentation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import kotlinx.serialization.Serializable
+import mega.privacy.android.navigation.destination.Secondary
 
-@Serializable
-data object Secondary
 
 fun NavGraphBuilder.exampleSecondaryScreen(
     onBack: () -> Unit,

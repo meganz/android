@@ -80,6 +80,8 @@ fun ExampleHomeScreen(content: String) {
 fun ExampleHomeScreen2(
     logout: () -> Unit,
     navigateToFeature: () -> Unit,
+    navigateToFeatureForResult: () -> Unit,
+    receivedResult: Int?,
 ) {
     Column(
         modifier = Modifier,
@@ -96,5 +98,16 @@ fun ExampleHomeScreen2(
             modifier = Modifier.padding(16.dp),
             text = "Navigate to Feature",
         )
+        MegaOutlinedButton(
+            onClick = navigateToFeatureForResult,
+            modifier = Modifier.padding(16.dp),
+            text = "Navigate to Feature for result",
+        )
+        receivedResult?.let {
+            MegaText(
+                text = "Received result: $it",
+                textColor = TextColor.Primary
+            )
+        }
     }
 }

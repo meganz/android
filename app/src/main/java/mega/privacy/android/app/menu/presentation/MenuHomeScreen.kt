@@ -191,7 +191,7 @@ private fun AccountItem(
     item: NavDrawerItem.Account,
     onNavigate: () -> Unit,
 ) {
-    val isClickEnabled = item.actionLabel != null
+    val hasActionLabel = item.actionLabel != null
     val subtitle by item.subTitle?.collectAsState(null) ?: remember { mutableStateOf(null) }
     FlexibleLineListItem(
         modifier = Modifier
@@ -221,7 +221,7 @@ private fun AccountItem(
                 contentDescription = "arrow right",
             )
         },
-        enableClick = isClickEnabled,
+        enableClick = hasActionLabel.not(),
         onClickListener = onNavigate
     )
 }
