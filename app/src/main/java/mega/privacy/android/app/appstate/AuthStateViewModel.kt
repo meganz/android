@@ -10,10 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
-import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginInitialiser
+import mega.privacy.android.app.appstate.initialisation.AuthInitialiser
 import mega.privacy.android.app.appstate.model.AuthState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -29,13 +26,11 @@ import javax.inject.Inject
 class AuthStateViewModel @Inject constructor(
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
-    appStartInitialisers: Set<@JvmSuppressWildcards AppStartInitialiser>,
-    private val preLoginInitialisers: Set<@JvmSuppressWildcards PreLoginInitialiser>,
-    private val postLoginInitialisers: Set<@JvmSuppressWildcards PostLoginInitialiser>,
+    private val authInitialiser: AuthInitialiser,
 ) : ViewModel() {
 
     init {
-        handleAppStartInitialisers(appStartInitialisers)
+        authInitialiser.onAppStart()
     }
 
     val state: StateFlow<AuthState> by lazy {
@@ -43,7 +38,7 @@ class AuthStateViewModel @Inject constructor(
             when (val session = credentials?.session) {
                 null -> AuthState.RequireLogin(themeMode)
                 else -> {
-                    runPostLoginInitialisers(session)
+                    authInitialiser.onPostLogin(session)
                     AuthState.LoggedIn(themeMode, credentials)
                 }
             }
@@ -60,48 +55,12 @@ class AuthStateViewModel @Inject constructor(
     private fun getStateValues(): Flow<Pair<ThemeMode, UserCredentials?>> {
         return monitorUserCredentialsUseCase().onFirst(
             predicate = { true },
-            action = { runPreLoginInitialisers(it?.session) }).flatMapLatest { credentials ->
+            action = { authInitialiser.onPreLogin(it?.session) }).flatMapLatest { credentials ->
             monitorThemeModeUseCase().catch {
                 Timber.e(it, "Error monitoring theme mode")
                 emit(ThemeMode.System)
             }.map { themeMode ->
                 Pair(themeMode, credentials)
-            }
-        }
-    }
-
-    private fun handleAppStartInitialisers(appStartInitialisers: Set<@JvmSuppressWildcards AppStartInitialiser>) {
-        appStartInitialisers.forEach {
-            viewModelScope.launch {
-                try {
-                    it()
-                } catch (e: Exception) {
-                    Timber.e(e, "Error during auth viewmodel initialisation")
-                }
-            }
-        }
-    }
-
-    private fun runPreLoginInitialisers(session: String?) {
-        preLoginInitialisers.forEach { initialiser ->
-            viewModelScope.launch {
-                try {
-                    initialiser(session)
-                } catch (e: Exception) {
-                    Timber.e(e, "Error during pre-login initialisation")
-                }
-            }
-        }
-    }
-
-    private fun runPostLoginInitialisers(session: String) {
-        postLoginInitialisers.forEach { initialiser ->
-            viewModelScope.launch {
-                try {
-                    initialiser(session)
-                } catch (e: Exception) {
-                    Timber.e(e, "Error during post-login initialisation")
-                }
             }
         }
     }
