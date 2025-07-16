@@ -65,6 +65,8 @@ include(":navigation")
 include(":shared:original-core-ui")
 include(":shared:resources")
 include(":shared:sync")
+include(":feature:cloud-drive:cloud-drive")
+include(":feature:cloud-drive:cloud-drive-snowflake-components")
 
 // Configure modules to use their own name as the build file name
 // app/build.gradle.kts -> app/app.gradle.kts

@@ -207,6 +207,7 @@ dependencies {
     implementation(project(":core:navigation-snowflake-components"))
     implementation(project(":core:navigation-contract"))
     "qaImplementation"(project(":feature:example"))
+    "qaImplementation"(project(":feature:cloud-drive:cloud-drive"))
     preBuiltSdkDependency(rootProject.extra)
 
     //Test Modules
