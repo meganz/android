@@ -40,7 +40,7 @@ import mega.privacy.mobile.analytics.event.AndroidSyncClearResolvedIssuesEvent
 fun SyncSettingsBottomSheetView(
     modalSheetState: ModalBottomSheetState =
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
-    sheetElevation: Dp = ModalBottomSheetDefaults.Elevation,
+    sheetElevation: Dp,
     shouldShowBottomSheet: Boolean,
     onOptionSelected: () -> Unit = { }, // Callback for when an option is selected, if needed
 ) {
@@ -70,7 +70,7 @@ internal fun SyncSettingsBottomSheetContent(
             },
             modalSheetState = modalSheetState,
             sheetElevation = sheetElevation,
-            bottomInsetPadding = false,
+            bottomInsetPadding = true,
             expandedRoundedCorners = true,
             sheetBody = {
                 Column {

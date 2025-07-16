@@ -156,8 +156,6 @@
     <string name="first_name_text">First name</string>
     <!-- Last name of the user -->
     <string name="lastname_text">Last name</string>
-    <!-- text placed on the checkbox of acceptation of the Terms of Service -->
-    <string name="tos">I agree with MEGA’s [A]Terms of Service[/A]</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">I understand that [B]if I lose my password, I may lose my data[/B]. Read more about [A]MEGA’s end-to-end encryption[/A].</string>
     <!-- warning dialog -->
@@ -172,8 +170,6 @@
     <string name="error_passwords_dont_match">Passwords do not match</string>
     <!-- when creating the account -->
     <string name="error_email_registered">This email address has already signed up for an account with MEGA</string>
-    <!--  -->
-    <string name="create_account_creating_account">Connecting to the server: Creating account</string>
     <!--  -->
     <string name="cancel_all_transfer_confirmation">Cancel all transfers?</string>
     <!-- Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible). -->
@@ -458,10 +454,6 @@
     <string name="cam_sync_wifi">Wi-Fi only</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi or mobile data</string>
-    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
-    <string name="cam_sync_syncing">Camera uploads in progress</string>
-    <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Do you want to stop Camera uploads?</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Checking for files to be uploaded</string>
     <!-- title of the notification when camera upload is initializing -->
