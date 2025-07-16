@@ -744,19 +744,6 @@ def fetchSlackChannelIdsByReleaseVersion(String version) {
  * @return List of module paths like ["app", "domain", "feature/chat"]
  */
 ArrayList<String> getModuleList() {
-    // excluded modules
-    EXCLUDED_MODULES = [
-        'android-database-sqlcipher',
-        'baselineprofile',
-        'core',
-        'feature',
-        'shared',
-        'core/analytics',
-        'feature/payment',
-        'feature/shared',
-        'feature/transfers'
-    ]
-
     def moduleListRaw = sh(
         script: "./gradlew printSubprojectPaths --no-daemon -q",
         returnStdout: true
@@ -765,7 +752,14 @@ ArrayList<String> getModuleList() {
     def moduleList = moduleListRaw.readLines()
         .findAll { it.startsWith("SUBPROJECT_PATH:") }
         .collect { it.replace("SUBPROJECT_PATH:", "").trim() }
-        .findAll { !(it in EXCLUDED_MODULES) }
+        .findAll {
+            // Filter out modules that do not have a gradle.kts file
+            def files = sh(
+                    script: "ls -1 ${WORKSPACE}/${it}",
+                    returnStdout: true
+            ).trim().readLines()
+            files?.any { fileName -> fileName.endsWith("gradle.kts") } ?: false
+        }
 
     print("MODULE_LIST: ${moduleList}")
     return new ArrayList<String>(moduleList)
@@ -773,7 +767,6 @@ ArrayList<String> getModuleList() {
 
 /**
  * Gets list of all modules that have unit tests by parsing output from printModulesWithUnitTest task.
- * Excludes modules defined in EXCLUDED_MODULES.
  * 
  * @return List of module paths like ["app", "domain", "feature/chat"] that contain unit tests
  */

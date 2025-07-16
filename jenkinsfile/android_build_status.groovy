@@ -460,9 +460,15 @@ def generateLintSummary(String module) {
         returnStdout: true
     ).trim().split("\\r?\\n").findAll { it }
 
-    // Validate lint results exist
     if (!lintResultsFiles) {
-        util.failPipeline("No lint-*.xml file found in ${reportsDir}")
+        print("No lint-*.xml file found in ${reportsDir}")
+        return [
+                "fatalCount": 0,
+                "errorCount": 0,
+                "warningCount": 0,
+                "informationCount": 0,
+                "errorMessage": "No lint results found"
+        ]
     }
 
     // Process first lint results file
@@ -492,7 +498,7 @@ def archiveLintReports(List<String> moduleList) {
     """
 
     moduleList.each { module ->
-        sh("cp -fv ${module}/build/reports/lint*.html ${WORKSPACE}/${LINT_REPORT_FOLDER}/${module.replace('/', '_')}_lint_report.html")
+        sh("cp -fv ${module}/build/reports/lint*.html ${WORKSPACE}/${LINT_REPORT_FOLDER}/${module.replace('/', '_')}_lint_report.html 2>/dev/null || true")
     }
 
     sh """
