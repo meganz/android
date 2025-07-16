@@ -47,7 +47,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.feature.shared.components.BottomSheetAction
+import mega.privacy.android.core.snowflakecomponents.BottomSheetAction
 import mega.privacy.android.feature.transfers.components.CompletedTransferBottomSheetHeader
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR

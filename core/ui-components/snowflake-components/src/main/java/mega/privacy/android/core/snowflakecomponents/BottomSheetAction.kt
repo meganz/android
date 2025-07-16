@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.shared.components
+package mega.privacy.android.core.snowflakecomponents
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row

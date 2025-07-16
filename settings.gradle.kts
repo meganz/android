@@ -55,7 +55,6 @@ include(":feature:chat")
 include(":feature:devicecenter")
 include(":feature:example")
 include(":feature:payment:payment-snowflake-components")
-include(":feature:shared:shared-snowflake-components")
 include(":feature:sync")
 include(":feature:transfers:transfers-snowflake-components")
 include(":icon-pack")
@@ -68,6 +67,8 @@ include(":shared:sync")
 include(":feature:cloud-drive:cloud-drive")
 include(":feature:cloud-drive:cloud-drive-snowflake-components")
 include(":core:ui-components:node-components")
+include(":core:ui-components:snowflake-components")
+
 
 // Configure modules to use their own name as the build file name
 // app/build.gradle.kts -> app/app.gradle.kts

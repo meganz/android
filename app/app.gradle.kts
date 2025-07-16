@@ -203,7 +203,7 @@ dependencies {
     implementation(project(":feature:chat"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))
     implementation(project(":feature:payment:payment-snowflake-components"))
-    implementation(project(":feature:shared:shared-snowflake-components"))
+    implementation(project(":core:ui-components:snowflake-components"))
     implementation(project(":core:navigation-snowflake-components"))
     implementation(project(":core:navigation-contract"))
     "qaImplementation"(project(":feature:example"))
