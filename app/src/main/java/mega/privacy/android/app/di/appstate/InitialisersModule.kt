@@ -9,6 +9,7 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginInitialiser
+import mega.privacy.android.app.appstate.initialisation.postlogin.PurchaseReviewInitialiser
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -37,5 +38,10 @@ class InitialisersModule {
         PostLoginInitialiser { session ->
             useCase(session)
         }
+
+    @Provides
+    @IntoSet
+    fun providePurchaseReviewInitialiser(initialiser: PurchaseReviewInitialiser): PostLoginInitialiser =
+        initialiser
 
 }

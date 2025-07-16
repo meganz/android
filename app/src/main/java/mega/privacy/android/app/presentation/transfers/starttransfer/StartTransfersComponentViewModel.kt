@@ -137,6 +137,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val broadcastTransferTagToCancelUseCase: BroadcastTransferTagToCancelUseCase,
     private val deleteCompletedTransfersByIdUseCase: DeleteCompletedTransfersByIdUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val ratingHandler: RatingHandlerImpl,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -802,7 +803,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     }.collect { (transferTotals, paused) ->
                         if (checkShowDownloadRating && !paused && transferTotals.totalFileTransfers > 0) {
                             val currentDownloadSpeed = getCurrentDownloadSpeedUseCase()
-                            RatingHandlerImpl().showRatingBaseOnSpeedAndSize(
+                            ratingHandler.showRatingBaseOnSpeedAndSize(
                                 size = transferTotals.totalBytes,
                                 speed = currentDownloadSpeed.toLong(),
                                 listener = object : OnCompleteListener {
@@ -1018,7 +1019,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     }.collect { (transferTotals, paused) ->
                         if (checkShowUploadRating && !paused && transferTotals.totalFileTransfers > 0) {
                             val currentUploadSpeed = getCurrentUploadSpeedUseCase()
-                            RatingHandlerImpl().showRatingBaseOnSpeedAndSize(
+                            ratingHandler.showRatingBaseOnSpeedAndSize(
                                 size = transferTotals.totalBytes,
                                 speed = currentUploadSpeed,
                                 listener = object : OnCompleteListener {

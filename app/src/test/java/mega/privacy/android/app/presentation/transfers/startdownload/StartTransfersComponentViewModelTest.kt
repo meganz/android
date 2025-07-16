@@ -26,6 +26,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveD
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
@@ -167,6 +168,7 @@ class StartTransfersComponentViewModelTest {
     private val broadcastTransferTagToCancelUseCase = mock<BroadcastTransferTagToCancelUseCase>()
     private val deleteCompletedTransfersByIdUseCase = mock<DeleteCompletedTransfersByIdUseCase>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
+    private val ratingHandlerImpl = mock<RatingHandlerImpl>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -187,6 +189,7 @@ class StartTransfersComponentViewModelTest {
         isEditMode = false,
         fromHomePage = false
     )
+
     private val startUploadEvent =
         TransferTriggerEvent.StartUpload.Files(mapOf("foo" to null), NodeId(34678L))
 
@@ -241,7 +244,8 @@ class StartTransfersComponentViewModelTest {
             monitorTransferTagToCancelUseCase = monitorTransferTagToCancelUseCase,
             broadcastTransferTagToCancelUseCase = broadcastTransferTagToCancelUseCase,
             deleteCompletedTransfersByIdUseCase = deleteCompletedTransfersByIdUseCase,
-            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            ratingHandler = ratingHandlerImpl,
         )
     }
 
