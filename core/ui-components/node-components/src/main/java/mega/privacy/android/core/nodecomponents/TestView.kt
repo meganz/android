@@ -1,4 +1,4 @@
-package mega.privacy.android.core.uicomponents
+package mega.privacy.android.core.nodecomponents
 
 import androidx.compose.runtime.Composable
 import mega.android.core.ui.components.MegaText
