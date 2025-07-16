@@ -12,12 +12,12 @@ import mega.privacy.android.app.presentation.login.onboarding.view.NewTourRoute
 data object TourScreen
 
 internal fun NavGraphBuilder.tourScreen(
-    activityViewModel: LoginViewModel,
+    sharedViewModel: LoginViewModel,
     onBackPressed: () -> Unit,
 ) {
     composable<TourScreen> {
         NewTourRoute(
-            activityViewModel = activityViewModel,
+            activityViewModel = sharedViewModel,
             onBackPressed = onBackPressed,
         )
     }

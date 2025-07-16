@@ -11,12 +11,12 @@ import mega.privacy.android.app.presentation.login.LoginViewModel
 data object ConfirmationEmailScreen
 
 internal fun NavGraphBuilder.confirmationEmailScreen(
-    activityViewModel: LoginViewModel,
+    sharedViewModel: LoginViewModel,
     onBackPressed: () -> Unit,
 ) {
     composable<ConfirmationEmailScreen> {
         NewConfirmEmailGraph(
-            activityViewModel = activityViewModel,
+            activityViewModel = sharedViewModel,
             onBackPressed = onBackPressed,
         )
     }

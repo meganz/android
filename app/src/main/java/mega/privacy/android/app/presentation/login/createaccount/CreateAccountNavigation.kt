@@ -14,11 +14,11 @@ import mega.privacy.android.app.presentation.login.createaccount.view.NewCreateA
 data object CreateAccountRoute
 
 internal fun NavGraphBuilder.createAccountScreen(
-    activityViewModel: LoginViewModel,
+    sharedViewModel: LoginViewModel,
 ) {
     composable<CreateAccountRoute> {
         NewCreateAccountRoute(
-            activityViewModel = activityViewModel,
+            activityViewModel = sharedViewModel,
             modifier = Modifier.fillMaxSize(),
         )
     }

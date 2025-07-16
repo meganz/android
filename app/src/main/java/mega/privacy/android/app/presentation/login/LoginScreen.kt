@@ -16,8 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
-import androidx.fragment.app.FragmentActivity
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
@@ -47,13 +45,14 @@ import timber.log.Timber
  *
  */
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    viewModel: LoginViewModel,
+    billingViewModel: BillingViewModel
+) {
     val context = LocalContext.current
-    val activity = LocalActivity.current as FragmentActivity
+    val activity = LocalActivity.current
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-    val viewModel = hiltViewModel<LoginViewModel>(viewModelStoreOwner = activity)
-    val billingViewModel = hiltViewModel<BillingViewModel>(viewModelStoreOwner = activity)
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -87,7 +86,7 @@ fun LoginScreen() {
     BackHandler {
         with(uiState) {
             when {
-                Constants.ACTION_REFRESH == activity.intent?.action || Constants.ACTION_REFRESH_API_SERVER == activity.intent?.action ->
+                Constants.ACTION_REFRESH == activity?.intent?.action || Constants.ACTION_REFRESH_API_SERVER == activity?.intent?.action ->
                     return@BackHandler
 
                 is2FARequired || multiFactorAuthState != null -> {
@@ -95,7 +94,7 @@ fun LoginScreen() {
                 }
 
                 viewModel.loginMutex.isLocked || isLoginInProgress || isFastLoginInProgress || fetchNodesUpdate != null ->
-                    activity.moveTaskToBack(true)
+                    activity?.moveTaskToBack(true)
 
                 else -> {
                     LoginActivity.isBackFromLoginPage = true
