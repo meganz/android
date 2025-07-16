@@ -17,7 +17,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
     AudioPlaybackPosition(
         "Enable audio playback position feature",
-        false
+        true
     ),
 
     PhotoEditor(
