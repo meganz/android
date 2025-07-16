@@ -21,7 +21,7 @@ enum class DataFeatures(
      */
     CameraUploadsNotification(
         "Enable camera uploads new notification",
-        false,
+        true,
     ),
 
     /**
