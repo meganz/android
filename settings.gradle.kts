@@ -67,6 +67,7 @@ include(":shared:resources")
 include(":shared:sync")
 include(":feature:cloud-drive:cloud-drive")
 include(":feature:cloud-drive:cloud-drive-snowflake-components")
+include(":core:ui-components:node-components")
 
 // Configure modules to use their own name as the build file name
 // app/build.gradle.kts -> app/app.gradle.kts
@@ -103,5 +104,6 @@ buildCache {
 
 fun shouldUsePrebuiltSdk(): Boolean =
     System.getenv("USE_PREBUILT_SDK")?.let { it != "false" } ?: true
+
 fun isServerBuild(): Boolean = System.getenv("BUILD_NUMBER") != null
 
