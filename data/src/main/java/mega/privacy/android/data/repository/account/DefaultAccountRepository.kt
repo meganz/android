@@ -51,7 +51,6 @@ import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
-import mega.privacy.android.data.mapper.account.AccountBlockedDetailMapper
 import mega.privacy.android.data.mapper.account.RecoveryKeyToFileMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
@@ -132,7 +131,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property cacheGateway                 [CacheGateway]
  * @property appEventGateway              [AppEventGateway]
  * @property ephemeralCredentialsGateway  [EphemeralCredentialsGateway]
- * @property accountBlockedDetailMapper   [AccountBlockedDetailMapper]
  * @property megaLocalRoomGateway         [MegaLocalRoomGateway]
  * @property fileGateway                  [FileGateway]
  * @property recoveryKeyToFileMapper      [RecoveryKeyToFileMapper]
@@ -170,7 +168,6 @@ internal class DefaultAccountRepository @Inject constructor(
     private val passwordStrengthMapper: PasswordStrengthMapper,
     private val appEventGateway: AppEventGateway,
     private val ephemeralCredentialsGateway: Lazy<EphemeralCredentialsGateway>,
-    private val accountBlockedDetailMapper: AccountBlockedDetailMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val fileGateway: FileGateway,
     private val recoveryKeyToFileMapper: RecoveryKeyToFileMapper,
@@ -714,7 +711,7 @@ internal class DefaultAccountRepository @Inject constructor(
             (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
                 .cancelAll()
         } catch (e: Exception) {
-            Timber.e("EXCEPTION removing all the notifications", e)
+            Timber.e(e, "EXCEPTION removing all the notifications")
         }
     }
 
@@ -914,13 +911,6 @@ internal class DefaultAccountRepository @Inject constructor(
         Timber.d("Retrying pending connections...")
         megaApiGateway.retryPendingConnections()
     }
-
-    override suspend fun broadcastAccountBlocked(type: Long, text: String) =
-        withContext(ioDispatcher) {
-            appEventGateway.broadcastAccountBlocked(accountBlockedDetailMapper(type, text))
-        }
-
-    override fun monitorAccountBlocked() = appEventGateway.monitorAccountBlocked()
 
     override suspend fun getLoggedInUserId() = withContext(ioDispatcher) {
         megaApiGateway.myUser?.handle?.let { UserId(it) }

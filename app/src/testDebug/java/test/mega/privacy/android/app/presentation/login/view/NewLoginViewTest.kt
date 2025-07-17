@@ -11,7 +11,7 @@ import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.view.LoginTestTags
 import mega.privacy.android.app.presentation.login.view.NewLoginView
-import mega.privacy.android.domain.entity.account.AccountBlockedDetail
+import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
@@ -154,7 +154,8 @@ class NewLoginViewTest {
         setupRule(
             state = stateWithLoginRequired.copy(
                 accountBlockedEvent = triggered(
-                    AccountBlockedDetail(
+                    AccountBlockedEvent(
+                        handle = -1L,
                         type = AccountBlockedType.TOS_COPYRIGHT,
                         text = fromId(sharedR.string.dialog_account_suspended_ToS_copyright_message)
                     )
@@ -173,7 +174,8 @@ class NewLoginViewTest {
         setupRule(
             state = stateWithLoginRequired.copy(
                 accountBlockedEvent = triggered(
-                    AccountBlockedDetail(
+                    AccountBlockedEvent(
+                        handle = -1L,
                         type = AccountBlockedType.TOS_NON_COPYRIGHT,
                         text = fromId(sharedR.string.dialog_account_suspended_ToS_non_copyright_message)
                     )
@@ -193,7 +195,8 @@ class NewLoginViewTest {
         setupRule(
             state = stateWithLoginRequired.copy(
                 accountBlockedEvent = triggered(
-                    AccountBlockedDetail(
+                    AccountBlockedEvent(
+                        handle = -1L,
                         type = AccountBlockedType.SUBUSER_DISABLED,
                         text = fromId(sharedR.string.error_business_disabled)
                     )
@@ -213,7 +216,8 @@ class NewLoginViewTest {
         setupRule(
             state = stateWithLoginRequired.copy(
                 accountBlockedEvent = triggered(
-                    AccountBlockedDetail(
+                    AccountBlockedEvent(
+                        handle = -1L,
                         type = AccountBlockedType.VERIFICATION_EMAIL,
                         text = fromId(sharedR.string.login_account_suspension_email_verification_message)
                     )
@@ -232,7 +236,8 @@ class NewLoginViewTest {
         setupRule(
             state = stateWithLoginRequired.copy(
                 accountBlockedEvent = triggered(
-                    AccountBlockedDetail(
+                    AccountBlockedEvent(
+                        handle = -1L,
                         type = AccountBlockedType.VERIFICATION_SMS,
                         text = "sms verification"
                     )
@@ -251,7 +256,8 @@ class NewLoginViewTest {
         setupRule(
             state = stateWithLoginRequired.copy(
                 accountBlockedEvent = triggered(
-                    AccountBlockedDetail(
+                    AccountBlockedEvent(
+                        handle = -1L,
                         type = AccountBlockedType.SUBUSER_REMOVED,
                         text = "business user removed"
                     )

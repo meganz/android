@@ -126,8 +126,8 @@ import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.login.view.LoginTestTags.ACCOUNT_BLOCKED_DIALOG
 import mega.privacy.android.app.presentation.login.view.LoginTestTags.ACCOUNT_LOCKED_DIALOG
+import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.Progress
-import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
@@ -335,7 +335,7 @@ private fun RequireLogin(
     val passwordRequester = remember { FocusRequester() }
     var wrongCredentials by remember { mutableStateOf(false) }
     var tooManyAttempts by remember { mutableStateOf(false) }
-    var accountBlockedDetail by remember { mutableStateOf<AccountBlockedDetail?>(null) }
+    var accountBlockedEvent by remember { mutableStateOf<AccountBlockedEvent?>(null) }
     var titleOffset by remember { mutableIntStateOf(0) }
     var emailFieldOffset by remember { mutableIntStateOf(0) }
     var isEmailFieldFocused by remember { mutableStateOf(false) }
@@ -370,7 +370,7 @@ private fun RequireLogin(
     }
 
     EventEffect(event = state.accountBlockedEvent, onConsumed = onResetAccountBlockedEvent) {
-        accountBlockedDetail = it
+        accountBlockedEvent = it
     }
 
     val resendVerificationEmailSuccessMessage =
@@ -387,7 +387,7 @@ private fun RequireLogin(
         } else {
             resendVerificationEmailFailureMessage
         }
-        accountBlockedDetail = null
+        accountBlockedEvent = null
         stopLogin()
         snackbarHostState.showSnackbar(
             message = message,
@@ -610,7 +610,7 @@ private fun RequireLogin(
                 }
             )
 
-            accountBlockedDetail?.let {
+            accountBlockedEvent?.let {
                 if (it.type == AccountBlockedType.TOS_COPYRIGHT || it.type == AccountBlockedType.TOS_NON_COPYRIGHT || it.type == AccountBlockedType.SUBUSER_DISABLED) {
                     BasicDialog(
                         modifier = Modifier.testTag(ACCOUNT_BLOCKED_DIALOG),
@@ -618,7 +618,7 @@ private fun RequireLogin(
                         description = it.text,
                         positiveButtonText = stringResource(id = sharedR.string.document_scanning_error_dialog_confirm_button),
                         onPositiveButtonClicked = {
-                            accountBlockedDetail = null
+                            accountBlockedEvent = null
                         }
                     )
                 } else if (it.type == AccountBlockedType.VERIFICATION_EMAIL) {
@@ -628,7 +628,7 @@ private fun RequireLogin(
                         description = it.text,
                         negativeButtonText = stringResource(id = sharedR.string.document_scanning_error_dialog_confirm_button),
                         onNegativeButtonClicked = {
-                            accountBlockedDetail = null
+                            accountBlockedEvent = null
                             stopLogin()
                         },
                         positiveButtonText = stringResource(id = sharedR.string.general_resend_email),

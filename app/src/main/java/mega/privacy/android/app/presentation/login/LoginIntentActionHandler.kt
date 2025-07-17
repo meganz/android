@@ -31,8 +31,8 @@ import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import nz.mega.sdk.MegaError
 import timber.log.Timber
@@ -563,9 +563,10 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                             )
                         ) {
                             viewModel.triggerAccountBlockedEvent(
-                                AccountBlockedDetail(
-                                    accountBlockedType,
-                                    accountBlockedString
+                                AccountBlockedEvent(
+                                    handle = -1L,
+                                    type = accountBlockedType,
+                                    text = accountBlockedString
                                 )
                             )
                         }

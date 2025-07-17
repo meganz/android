@@ -3,7 +3,6 @@ package mega.privacy.android.data.gateway
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate
-import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
@@ -249,18 +248,6 @@ internal interface AppEventGateway {
      * Broadcast chat signal presence if network signal is available
      */
     suspend fun broadcastChatSignalPresence()
-
-    /**
-     * Broadcast blocked account.
-     *
-     * @param accountBlockedDetail [AccountBlockedDetail]
-     */
-    suspend fun broadcastAccountBlocked(accountBlockedDetail: AccountBlockedDetail)
-
-    /**
-     * Monitors blocked account.
-     */
-    fun monitorAccountBlocked(): Flow<AccountBlockedDetail>
 
     /**
      * Monitor scheduled meeting canceled.

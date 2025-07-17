@@ -34,8 +34,6 @@ import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
-import mega.privacy.android.data.mapper.account.AccountBlockedDetailMapper
-import mega.privacy.android.data.mapper.account.AccountBlockedTypeMapper
 import mega.privacy.android.data.mapper.account.RecoveryKeyToFileMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
@@ -136,7 +134,6 @@ class DefaultAccountRepositoryTest {
     private val passwordStrengthMapper = mock<PasswordStrengthMapper>()
     private val myAccountCredentialsMapper = mock<MyAccountCredentialsMapper>()
     private val ephemeralCredentialsGateway = mock<EphemeralCredentialsGateway>()
-    private val accountBlockedDetailMapper = AccountBlockedDetailMapper(AccountBlockedTypeMapper())
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val fileGateway = mock<FileGateway>()
     private val recoveryKeyToFileMapper = mock<RecoveryKeyToFileMapper>()
@@ -256,7 +253,6 @@ class DefaultAccountRepositoryTest {
             passwordStrengthMapper = passwordStrengthMapper,
             appEventGateway = appEventGateway,
             ephemeralCredentialsGateway = { ephemeralCredentialsGateway },
-            accountBlockedDetailMapper = accountBlockedDetailMapper,
             megaLocalRoomGateway = megaLocalRoomGateway,
             fileGateway = fileGateway,
             recoveryKeyToFileMapper = recoveryKeyToFileMapper,

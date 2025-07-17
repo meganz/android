@@ -61,7 +61,7 @@ internal class EventMapper @Inject constructor(
             AccountBlockedEvent(
                 handle = megaEvent.handle,
                 type = accountBlockedTypeMapper(megaEvent.number),
-                text = megaEvent.text,
+                text = megaEvent.text.orEmpty(),
             )
         }
 

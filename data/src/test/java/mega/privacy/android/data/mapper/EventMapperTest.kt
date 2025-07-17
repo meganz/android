@@ -96,4 +96,14 @@ class EventMapperTest {
         assertThat(underTest(megaEvent)).isInstanceOf(StorageStateEvent::class.java)
     }
 
+    @Test
+    fun `test that blocked account event with null text returns empty string`() {
+        megaEvent.stub {
+            on { type }.thenReturn(MegaEvent.EVENT_ACCOUNT_BLOCKED)
+            on { text }.thenReturn(null)
+        }
+        val actual = underTest(megaEvent)
+        assertThat(actual).isInstanceOf(AccountBlockedEvent::class.java)
+        assertThat((actual as AccountBlockedEvent).text).isEmpty()
+    }
 }

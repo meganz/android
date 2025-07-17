@@ -29,7 +29,7 @@ class BaseViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             monitorAccountBlockedUseCase().collect {
-                _state.update { state -> state.copy(accountBlockedDetail = it) }
+                _state.update { state -> state.copy(accountBlockedEvent = it) }
             }
         }
         viewModelScope.launch {
@@ -40,10 +40,10 @@ class BaseViewModel @Inject constructor(
     }
 
     /**
-     * Sets accountBlockedDetail in state as null.
+     * Sets accountBlockedEvent in state as null.
      */
     fun onAccountBlockedConsumed() =
-        _state.update { state -> state.copy(accountBlockedDetail = null) }
+        _state.update { state -> state.copy(accountBlockedEvent = null) }
 
     /**
      * Sets showExpiredBusinessAlert in state as false

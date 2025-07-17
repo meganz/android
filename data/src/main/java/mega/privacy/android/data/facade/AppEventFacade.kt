@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate
-import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
@@ -43,7 +42,6 @@ internal class AppEventFacade @Inject constructor(
     private val isWaitingForOtherParticipantsEnded = MutableSharedFlow<Pair<Long, Boolean>>()
     private val leaveChat = MutableSharedFlow<Long>()
     private val chatSignalPresence = MutableSharedFlow<Unit>()
-    private val accountBlocked = MutableSharedFlow<AccountBlockedDetail>()
     private val scheduledMeetingCanceled = MutableSharedFlow<Int>()
 
     private val _isSMSVerificationShownState = MutableStateFlow(false)
@@ -181,10 +179,6 @@ internal class AppEventFacade @Inject constructor(
 
     override fun monitorChatSignalPresence(): Flow<Unit> = chatSignalPresence.asSharedFlow()
 
-    override suspend fun broadcastAccountBlocked(accountBlockedDetail: AccountBlockedDetail) =
-        accountBlocked.emit(accountBlockedDetail)
-
-    override fun monitorAccountBlocked() = accountBlocked.asSharedFlow()
     override fun monitorScheduledMeetingCanceled(): Flow<Int> =
         scheduledMeetingCanceled.toSharedFlow(appScope)
 

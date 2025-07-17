@@ -40,7 +40,7 @@ import mega.privacy.android.app.presentation.login.model.RkLink
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.account.AccountBlockedDetail
+import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
@@ -1129,8 +1129,8 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun triggerAccountBlockedEvent(accountBlockedDetail: AccountBlockedDetail) {
-        _state.update { it.copy(accountBlockedEvent = triggered(accountBlockedDetail)) }
+    fun triggerAccountBlockedEvent(accountBlockedEvent: AccountBlockedEvent) {
+        _state.update { it.copy(accountBlockedEvent = triggered(accountBlockedEvent)) }
     }
 
     fun resetAccountBlockedEvent() {

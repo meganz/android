@@ -17,7 +17,7 @@ import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.account.AccountBlockedDetail
+import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.shared.original.core.ui.utils.setupSplashExitAnimation
 import timber.log.Timber
 import javax.inject.Inject
@@ -116,8 +116,8 @@ class LoginActivity : BaseActivity() {
 
     override fun shouldSetStatusBarTextColor() = false
 
-    fun showAccountBlockedDialog(accountBlockedDetail: AccountBlockedDetail) {
-        viewModel.triggerAccountBlockedEvent(accountBlockedDetail)
+    fun showAccountBlockedDialog(accountBlockedEvent: AccountBlockedEvent) {
+        viewModel.triggerAccountBlockedEvent(accountBlockedEvent)
     }
 
     override val allowToShowOverQuotaWarning: Boolean = false

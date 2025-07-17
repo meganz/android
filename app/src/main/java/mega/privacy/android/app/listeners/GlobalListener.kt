@@ -41,7 +41,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.account.BroadcastAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
@@ -86,7 +85,6 @@ class GlobalListener @Inject constructor(
     private val broadcastMyAccountUpdateUseCase: BroadcastMyAccountUpdateUseCase,
     private val getNotificationCountUseCase: GetNotificationCountUseCase,
     private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
-    private val broadcastAccountBlockedUseCase: BroadcastAccountBlockedUseCase,
     private val getIncomingContactRequestsNotificationListUseCase: GetIncomingContactRequestsNotificationListUseCase,
     private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
     private val shouldShowRichLinkWarningUseCase: ShouldShowRichLinkWarningUseCase,
@@ -285,7 +283,6 @@ class GlobalListener @Inject constructor(
 
             MegaEvent.EVENT_ACCOUNT_BLOCKED -> {
                 Timber.d("EVENT_ACCOUNT_BLOCKED: %s", event.number)
-                applicationScope.launch { broadcastAccountBlockedUseCase(event.number, event.text) }
             }
 
             MegaEvent.EVENT_BUSINESS_STATUS -> sendBroadcastUpdateAccountDetails()

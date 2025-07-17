@@ -279,11 +279,12 @@ pipeline {
                                     try {
                                         sh "./gradlew --no-daemon runAllUnitTestsWithCoverage"
                                     } finally {
-                                        
-                                        moduleList.each { module ->
+
+                                        for (int i = 0; i < moduleList.size(); i++) {
+                                            String module = moduleList[i]
                                             UNIT_TEST_RESULT_LINK_MAP.put(
-                                                module, 
-                                                unitTestArchiveLink("${module}/build/unittest/html", "unit_test_result_${module.replace('/', '_')}.zip")
+                                                    module,
+                                                    unitTestArchiveLink("${module}/build/unittest/html", "unit_test_result_${module.replace('/', '_')}.zip")
                                             )
                                         }
                                     }

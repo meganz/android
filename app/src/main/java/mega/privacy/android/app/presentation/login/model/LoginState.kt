@@ -6,9 +6,9 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.messageId
+import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.TemporaryWaitingError
@@ -92,7 +92,7 @@ data class LoginState(
     val requestStatusProgress: Progress? = null,
     val isFirstTimeLaunch: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.System,
-    val accountBlockedEvent: StateEventWithContent<AccountBlockedDetail> = consumed(),
+    val accountBlockedEvent: StateEventWithContent<AccountBlockedEvent> = consumed(),
     val resendVerificationEmailEvent: StateEventWithContent<Boolean> = consumed(),
     val checkRecoveryKeyEvent: StateEventWithContent<Result<RkLink>> = consumed(),
     val shouldShowUpgradeAccount: Boolean = false,

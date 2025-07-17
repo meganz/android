@@ -94,8 +94,8 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.PurchaseType
-import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
@@ -274,7 +274,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
         collectFlow(viewModel.state) { uiState ->
             with(uiState) {
-                accountBlockedDetail?.apply {
+                accountBlockedEvent?.apply {
                     checkWhyAmIBlocked(this)
                     viewModel.onAccountBlockedConsumed()
                 }
@@ -827,10 +827,10 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * Method to show an alert or error when the account has been suspended
      * for any reason
      *
-     * @param accountBlockedDetail [AccountBlockedDetail]
+     * @param accountBlockedEvent [AccountBlockedEvent]
      */
-    private fun checkWhyAmIBlocked(accountBlockedDetail: AccountBlockedDetail) {
-        when (accountBlockedDetail.type) {
+    private fun checkWhyAmIBlocked(accountBlockedEvent: AccountBlockedEvent) {
+        when (accountBlockedEvent.type) {
             AccountBlockedType.NOT_BLOCKED -> {}
             AccountBlockedType.TOS_COPYRIGHT -> megaChatApi.logout(
                 ChatLogoutListener {
@@ -892,7 +892,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 )
             }
 
-            else -> Util.showErrorAlertDialog(accountBlockedDetail.text, false, this)
+            else -> Util.showErrorAlertDialog(accountBlockedEvent.text, false, this)
         }
     }
 
@@ -910,9 +910,10 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         if (!TextUtil.isTextEmpty(accountBlockedString)) {
             if (this is LoginActivity) {
                 this.showAccountBlockedDialog(
-                    AccountBlockedDetail(
-                        accountBlockedType,
-                        accountBlockedString
+                    AccountBlockedEvent(
+                        handle = -1L,
+                        type = accountBlockedType,
+                        text = accountBlockedString
                     )
                 )
             } else {
