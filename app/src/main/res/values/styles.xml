@@ -754,7 +754,7 @@
     </style>
 
     <style name="Widget.Mega.SearchView" parent="Widget.AppCompat.SearchView.ActionBar">
-        <item name="searchIcon">@drawable/ic_search_large_medium_thin_outline</item>
+        <item name="searchIcon">@drawable/ic_search</item>
         <item name="searchHintIcon">@null</item>
         <item name="background">@null</item>
     </style>
