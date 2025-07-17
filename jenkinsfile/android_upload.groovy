@@ -345,6 +345,25 @@ pipeline {
             }
         }
 
+        stage('Upload Firebase Crashlytics symbol files') {
+            when {
+                expression { triggerByDeliverQaCmd() }
+            }
+            steps {
+                script {
+                    util.useArtifactory() {
+                        BUILD_STEP = 'Upload Firebase Crashlytics symbol files'
+
+                        common.downloadAndExtractNativeSymbols()
+                        sh """
+                            cd $WORKSPACE
+                            ./gradlew --no-daemon app:uploadCrashlyticsSymbolFileGmsRelease
+                        """
+                    }
+                }
+            }
+        }
+
         stage('Build APK(GMS)') {
             when {
                 expression { triggerByDeliverQaCmd() || triggerByPushToDevelop() }
