@@ -10,9 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,8 +25,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaClickableText
 import mega.android.core.ui.components.MegaText as MegaText3
 import mega.android.core.ui.components.indicators.LargeHUD
@@ -44,89 +39,9 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
-import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationField
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.resources.R as sharedR
-
-
-/**
- * Legacy Two Factor Authentication screen.
- * @param state LoginState object.
- * @param on2FAPinChanged Callback to notify the pin changed.
- * @param on2FAChanged Callback to notify the 2FA changed.
- * @param onLostAuthenticatorDevice Callback to notify the user lost the authenticator device.
- * @param onFirstTime2FAConsumed Callback to notify the first time 2FA consumed.
- * @param modifier Modifier.
- */
-@Composable
-fun LegacyTwoFactorAuthentication(
-    state: LoginState,
-    on2FAPinChanged: (String, Int) -> Unit,
-    on2FAChanged: (String) -> Unit,
-    onLostAuthenticatorDevice: () -> Unit,
-    onFirstTime2FAConsumed: () -> Unit,
-    modifier: Modifier = Modifier,
-) = Box(
-    modifier = modifier
-        .fillMaxWidth()
-) {
-    val scrollState = rememberScrollState()
-    val isChecking2FA = state.multiFactorAuthState == MultiFactorAuthState.Checking
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        val isError = state.multiFactorAuthState == MultiFactorAuthState.Failed
-        MegaText(
-            text = stringResource(id = R.string.explain_confirm_2fa),
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 40.dp)
-                .testTag(ENTER_AUTHENTICATION_CODE_TAG),
-            style = MaterialTheme.typography.subtitle1,
-            textAlign = TextAlign.Center,
-            textColor = TextColor.Secondary,
-        )
-        TwoFactorAuthenticationField(
-            twoFAPin = state.twoFAPin,
-            isError = isError,
-            on2FAPinChanged = on2FAPinChanged,
-            on2FAChanged = on2FAChanged,
-            requestFocus = state.isFirstTime2FA,
-            onRequestFocusConsumed = onFirstTime2FAConsumed
-        )
-        if (isError) {
-            MegaText(
-                text = stringResource(id = R.string.pin_error_2fa),
-                modifier = Modifier
-                    .padding(start = 10.dp, top = 18.dp, end = 10.dp)
-                    .testTag(INVALID_CODE_TAG),
-                style = MaterialTheme.typography.caption,
-                textColor = TextColor.Error,
-            )
-        }
-        TextMegaButton(
-            textId = R.string.lost_your_authenticator_device,
-            onClick = onLostAuthenticatorDevice,
-            modifier = Modifier
-                .padding(top = if (isError) 0.dp else 29.dp, bottom = 40.dp)
-                .testTag(LOST_AUTHENTICATION_CODE_TAG)
-        )
-    }
-
-    if (isChecking2FA) {
-        MegaCircularProgressIndicator(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .testTag(TWO_FA_PROGRESS_TEST_TAG)
-        )
-    }
-}
 
 /**
  * New Two Factor Authentication screen.
