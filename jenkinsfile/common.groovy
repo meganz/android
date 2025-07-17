@@ -513,8 +513,7 @@ def getRecentChangeList(input) {
 String releaseNotes(releaseNoteFile) {
     String release_notes = sh(
             script: """
-                cd ${WORKSPACE}/jenkinsfile/
-                cat $releaseNoteFile
+                cat ${WORKSPACE}/$releaseNoteFile
                 """,
             returnStdout: true).trim()
     return release_notes

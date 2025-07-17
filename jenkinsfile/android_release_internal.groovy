@@ -25,7 +25,7 @@ ARTIFACTORY_BUILD_INFO = "buildinfo.txt"
 /**
  * Default release notes content files
  */
-RELEASE_NOTES = "default_release_notes.json"
+RELEASE_NOTES = "jenkinsfile/default_release_notes.json"
 
 /**
  * common.groovy file with common methods

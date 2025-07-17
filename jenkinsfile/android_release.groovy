@@ -27,8 +27,7 @@ ARTIFACTORY_BUILD_INFO = "buildinfo.txt"
 /**
  * Default release notes content files
  */
-RELEASE_NOTES = "default_release_notes.json"
-MAJOR_RELEASE_NOTES = "major_release_notes.json"
+RELEASE_NOTES_FILE = "jenkinsfile/major_release_notes.json"
 RELEASE_NOTES_CONTENT = ""
 
 /**
@@ -449,13 +448,9 @@ pipeline {
                             string(credentialsId: 'ANDROID_TRANSIFIX_AUTHORIZATION_TOKEN', variable: 'TRANSIFEX_TOKEN'),
                             gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')
                     ]) {
-                        if (isMajorRelease(common)) {
-                            sh './gradlew --no-daemon readReleaseNotes'
-                            RELEASE_NOTES_CONTENT = common.releaseNotes(MAJOR_RELEASE_NOTES)
-                            println("Major release notes: ${RELEASE_NOTES_CONTENT}")
-                        } else {
-                            RELEASE_NOTES_CONTENT = common.releaseNotes(RELEASE_NOTES)
-                        }
+                        sh './gradlew --no-daemon readReleaseNotes'
+                        RELEASE_NOTES_CONTENT = common.releaseNotes(RELEASE_NOTES_FILE)
+                        println("Major release notes: ${RELEASE_NOTES_CONTENT}")
                     }
 
                     def parameters = parseDeliverAppStoreParameters(env.gitlabTriggerPhrase)
