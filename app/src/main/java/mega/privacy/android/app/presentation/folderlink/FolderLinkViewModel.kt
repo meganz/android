@@ -32,8 +32,10 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
@@ -463,6 +465,10 @@ class FolderLinkViewModel @Inject constructor(
                             title = result.rootNode?.name ?: ""
                         )
                     }
+
+                    folderSubHandle?.let {
+                        handleMediaFolderNavigation()
+                    }
                 }
                 .onFailure { throwable ->
                     _state.update {
@@ -709,8 +715,8 @@ class FolderLinkViewModel @Inject constructor(
             }.mapNotNull {
                 runCatching {
                     mapNodeToPublicLinkUseCase(it as UnTypedNode, null)
-                }.onFailure {
-                    Timber.e(it)
+                }.onFailure { error ->
+                    Timber.e(error)
                 }.getOrNull()
             }
             _state.update {
@@ -1022,5 +1028,46 @@ class FolderLinkViewModel @Inject constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun stopAudioPlayerServiceWithoutLogin() = applicationScope.launch {
         if (!isUserLoggedInUseCase()) stopAudioService()
+    }
+
+    /**
+     * Handle media folder navigation for specific sub-handles
+     * This function navigates to a media folder if the sub-handle corresponds to an image or video node
+     */
+    private fun handleMediaFolderNavigation() {
+        viewModelScope.launch {
+            _state.value.folderSubHandle?.let { subHandle ->
+                _state.value.nodesList.firstOrNull { nodeUIItem ->
+                    nodeUIItem.base64Id == subHandle
+                }?.let { nodeUIItem ->
+                    if (nodeUIItem.node is FileNode &&
+                        (nodeUIItem.node.type is ImageFileTypeInfo || nodeUIItem.node.type is VideoFileTypeInfo)
+                    ) {
+                        openFile(nodeUIItem)
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Open file using NodeUIItem
+     * This method triggers the file opening event for the Activity to handle
+     *
+     * @param nodeUIItem The NodeUIItem to open
+     */
+    fun openFile(nodeUIItem: NodeUIItem<TypedNode>) {
+        _state.update {
+            it.copy(openFileNodeEvent = triggered(nodeUIItem))
+        }
+    }
+
+    /**
+     * Reset and notify that openFileNodeEvent is consumed
+     */
+    fun resetOpenFileNodeEvent() {
+        _state.update {
+            it.copy(openFileNodeEvent = consumed())
+        }
     }
 }

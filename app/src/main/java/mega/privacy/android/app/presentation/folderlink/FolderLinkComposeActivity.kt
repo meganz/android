@@ -295,6 +295,13 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 showCopyResult(copyResultText = resultText, throwable = throwable)
             }
 
+            EventEffect(
+                event = uiState.openFileNodeEvent,
+                onConsumed = viewModel::resetOpenFileNodeEvent
+            ) { nodeUIItem ->
+                handleFileOpening(nodeUIItem)
+            }
+
             BackHandler {
                 viewModel.handleBackPress()
             }
@@ -341,70 +348,78 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         if (viewModel.isMultipleNodeSelected()) {
             viewModel.onItemLongClick(nodeUIItem)
         } else {
-            if (nodeUIItem.node is FolderNode) {
-                viewModel.openFolder(nodeUIItem)
-            } else if (nodeUIItem.node is FileNode) {
-                val fileNode = nodeUIItem.node
-                val nameType = MimeTypeList.typeForName(fileNode.name)
-                when {
-                    nameType.isImage -> {
-                        lifecycleScope.launch {
-                            val parentNodeLongValue =
-                                viewModel.state.value.parentNode?.id?.longValue ?: 0
-                            val intent = ImagePreviewActivity.createIntent(
-                                context = this@FolderLinkComposeActivity,
-                                imageSource = ImagePreviewFetcherSource.FOLDER_LINK,
-                                menuOptionsSource = ImagePreviewMenuSource.FOLDER_LINK,
-                                anchorImageNodeId = fileNode.id,
-                                isForeign = true,
-                                params = mapOf(
-                                    FolderLinkImageNodeFetcher.PARENT_ID to parentNodeLongValue,
-                                ),
-                            )
-                            viewModel.updateImageIntent(intent)
-                        }
-                    }
+            handleFileOpening(nodeUIItem)
+        }
+    }
 
-                    nameType.isVideoMimeType || nameType.isAudio -> {
-                        lifecycleScope.launch {
-                            if (fileNode is TypedFileNode) {
-                                runCatching {
-                                    val contentUri =
-                                        viewModel.getNodeContentUri(fileNode = fileNode)
-                                    megaNavigator.openMediaPlayerActivityByFileNode(
-                                        context = this@FolderLinkComposeActivity,
-                                        contentUri = contentUri,
-                                        fileNode = fileNode,
-                                        isFolderLink = true,
-                                        viewType = FOLDER_LINK_ADAPTER,
-                                    )
-                                }.onFailure {
-                                    Toast.makeText(
-                                        this@FolderLinkComposeActivity,
-                                        getString(R.string.intent_not_available),
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
+    /**
+     * Handle file opening based on file type
+     * This method handles opening files using NodeUIItem
+     */
+    private fun handleFileOpening(nodeUIItem: NodeUIItem<TypedNode>) {
+        if (nodeUIItem.node is FolderNode) {
+            viewModel.openFolder(nodeUIItem)
+        } else if (nodeUIItem.node is FileNode) {
+            val fileNode = nodeUIItem.node
+            val nameType = MimeTypeList.typeForName(fileNode.name)
+            when {
+                nameType.isImage -> {
+                    lifecycleScope.launch {
+                        val parentNodeLongValue =
+                            viewModel.state.value.parentNode?.id?.longValue ?: 0
+                        val intent = ImagePreviewActivity.createIntent(
+                            context = this@FolderLinkComposeActivity,
+                            imageSource = ImagePreviewFetcherSource.FOLDER_LINK,
+                            menuOptionsSource = ImagePreviewMenuSource.FOLDER_LINK,
+                            anchorImageNodeId = fileNode.id,
+                            isForeign = true,
+                            params = mapOf(
+                                FolderLinkImageNodeFetcher.PARENT_ID to parentNodeLongValue,
+                            ),
+                        )
+                        viewModel.updateImageIntent(intent)
+                    }
+                }
+
+                nameType.isVideoMimeType || nameType.isAudio -> {
+                    lifecycleScope.launch {
+                        if (fileNode is TypedFileNode) {
+                            runCatching {
+                                val contentUri =
+                                    viewModel.getNodeContentUri(fileNode = fileNode)
+                                megaNavigator.openMediaPlayerActivityByFileNode(
+                                    context = this@FolderLinkComposeActivity,
+                                    contentUri = contentUri,
+                                    fileNode = fileNode,
+                                    isFolderLink = true,
+                                    viewType = FOLDER_LINK_ADAPTER,
+                                )
+                            }.onFailure {
+                                Toast.makeText(
+                                    this@FolderLinkComposeActivity,
+                                    getString(R.string.intent_not_available),
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
                     }
+                }
 
-                    nameType.isPdf -> {
-                        val intent =
-                            Intent(this@FolderLinkComposeActivity, PdfViewerActivity::class.java)
-                        viewModel.updatePdfIntent(intent, fileNode, nameType.type)
-                    }
+                nameType.isPdf -> {
+                    val intent =
+                        Intent(this@FolderLinkComposeActivity, PdfViewerActivity::class.java)
+                    viewModel.updatePdfIntent(intent, fileNode, nameType.type)
+                }
 
-                    nameType.isOpenableTextFile(fileNode.size) -> {
-                        val intent =
-                            Intent(this@FolderLinkComposeActivity, TextEditorActivity::class.java)
-                        viewModel.updateTextEditorIntent(intent, fileNode)
-                    }
+                nameType.isOpenableTextFile(fileNode.size) -> {
+                    val intent =
+                        Intent(this@FolderLinkComposeActivity, TextEditorActivity::class.java)
+                    viewModel.updateTextEditorIntent(intent, fileNode)
+                }
 
-                    else -> {
-                        Timber.w("Unknown File Type")
-                        viewModel.openOtherTypeFile(this, fileNode)
-                    }
+                else -> {
+                    Timber.w("Unknown File Type")
+                    viewModel.openOtherTypeFile(this, fileNode)
                 }
             }
         }
@@ -453,6 +468,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         try {
             startActivity(intent)
         } catch (e: Exception) {
+            Timber.e(e)
             Toast.makeText(
                 this,
                 getString(R.string.intent_not_available),

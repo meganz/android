@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property showLoginEvent             Event to show login screen
  * @property finishActivityEvent        Event to finish the activity
  * @property openFile                   State to handle file opening
+ * @property openFileNodeEvent          State to handle open a file node
  * @property downloadEvent              Event to download nodes with DownloadsWorker
  * @property importNode                 Node to import
  * @property selectImportLocation       State to open location selection
@@ -72,6 +73,7 @@ data class FolderLinkState(
     val collisionsEvent: StateEventWithContent<List<NameCollision>> = consumed(),
     val copyResultEvent: StateEventWithContent<Pair<String?, Throwable?>> = consumed(),
     val openFile: StateEventWithContent<Intent> = consumed(),
+    val openFileNodeEvent: StateEventWithContent<NodeUIItem<TypedNode>> = consumed(),
     val downloadEvent: StateEventWithContent<TransferTriggerEvent.DownloadTriggerEvent> = consumed(),
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
     val shouldShowAdsForLink: Boolean = false,

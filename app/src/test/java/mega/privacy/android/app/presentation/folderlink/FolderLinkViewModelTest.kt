@@ -20,6 +20,9 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.attachmen
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FolderInfo
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
@@ -82,6 +85,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -244,6 +248,7 @@ class FolderLinkViewModelTest {
             assertThat(initial.finishActivityEvent).isEqualTo(consumed)
             assertThat(initial.importNode).isNull()
             assertThat(initial.openFile).isInstanceOf(consumed().javaClass)
+            assertThat(initial.openFileNodeEvent).isEqualTo(consumed())
             assertThat(initial.selectImportLocation).isEqualTo(consumed)
             assertThat(initial.errorState).isEqualTo(LinkErrorState.NoError)
             assertThat(initial.snackBarMessage).isEqualTo(-1)
@@ -831,6 +836,249 @@ class FolderLinkViewModelTest {
             underTest.state.test {
                 val newValue = expectMostRecentItem()
                 assertThat(newValue.shouldShowAdsForLink).isEqualTo(shouldShowAdsForLink)
+            }
+        }
+
+    @Test
+    fun `test that openFile triggers openFileNodeEvent`() = runTest {
+        val nodeUIItem = mock<NodeUIItem<TypedNode>>()
+
+        underTest.openFile(nodeUIItem)
+
+        underTest.state.test {
+            val result = awaitItem()
+            assertThat(result.openFileNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((result.openFileNodeEvent as StateEventWithContentTriggered).content).isEqualTo(
+                nodeUIItem
+            )
+        }
+    }
+
+    @Test
+    fun `test that openFile with different nodeUIItems triggers different events`() = runTest {
+        val nodeUIItem1 = mock<NodeUIItem<TypedNode>>()
+        val nodeUIItem2 = mock<NodeUIItem<TypedNode>>()
+
+        underTest.state.test {
+            underTest.openFile(nodeUIItem1)
+            val result1 = expectMostRecentItem()
+            assertThat((result1.openFileNodeEvent as StateEventWithContentTriggered).content).isEqualTo(
+                nodeUIItem1
+            )
+
+            underTest.resetOpenFileNodeEvent()
+            val resetResult = expectMostRecentItem()
+            assertThat(resetResult.openFileNodeEvent).isEqualTo(consumed())
+
+            underTest.openFile(nodeUIItem2)
+            val result2 = expectMostRecentItem()
+            assertThat((result2.openFileNodeEvent as StateEventWithContentTriggered).content).isEqualTo(
+                nodeUIItem2
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that resetOpenFileNodeEvent consumes the event`() = runTest {
+        val nodeUIItem = mock<NodeUIItem<TypedNode>>()
+
+        underTest.openFile(nodeUIItem)
+        underTest.resetOpenFileNodeEvent()
+
+        underTest.state.test {
+            val result = awaitItem()
+            assertThat(result.openFileNodeEvent).isEqualTo(consumed())
+        }
+    }
+
+    @Test
+    fun `test that fetchNodes with subHandle does not trigger openFileNodeEvent when folderSubHandle not set`() =
+        runTest {
+            val subHandle = "testSubHandle"
+            val imageFileNode = mock<TypedFileNode> {
+                on { type }.thenReturn(
+                    StaticImageFileTypeInfo(
+                        mimeType = "image/jpeg",
+                        extension = "jpg"
+                    )
+                )
+            }
+
+            val fetchFolderNodeResult = FetchFolderNodesResult(
+                rootNode = mock(),
+                parentNode = mock(),
+                childrenNodes = listOf(imageFileNode)
+            )
+
+            whenever(fetchFolderNodesUseCase(subHandle)).thenReturn(fetchFolderNodeResult)
+
+            underTest.state.test {
+                underTest.fetchNodes(subHandle)
+
+                val finalState = expectMostRecentItem()
+                assertThat(finalState.openFileNodeEvent).isEqualTo(consumed())
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that fetchNodes with subHandle does not trigger openFileNodeEvent for video files when folderSubHandle not set`() =
+        runTest {
+            val subHandle = "testSubHandle"
+            val videoFileNode = mock<TypedFileNode> {
+                on { type }.thenReturn(
+                    VideoFileTypeInfo(
+                        extension = "mp4",
+                        mimeType = "video",
+                        duration = Duration.INFINITE
+                    )
+                )
+            }
+
+            val fetchFolderNodeResult = FetchFolderNodesResult(
+                rootNode = mock(),
+                parentNode = mock(),
+                childrenNodes = listOf(videoFileNode)
+            )
+
+            whenever(fetchFolderNodesUseCase(subHandle)).thenReturn(fetchFolderNodeResult)
+
+            underTest.state.test {
+                underTest.fetchNodes(subHandle)
+
+                val finalState = expectMostRecentItem()
+                assertThat(finalState.openFileNodeEvent).isEqualTo(consumed())
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that openFile method works correctly with NodeUIItem`() = runTest {
+        val imageFileNode = mock<TypedFileNode> {
+            on { type }.thenReturn(
+                StaticImageFileTypeInfo(
+                    mimeType = "image/jpeg",
+                    extension = "jpg"
+                )
+            )
+        }
+        val nodeUIItem = NodeUIItem<TypedNode>(
+            node = imageFileNode,
+            isSelected = false,
+            isInvisible = false
+        )
+
+        underTest.state.test {
+            underTest.openFile(nodeUIItem)
+
+            val finalState = expectMostRecentItem()
+            assertThat(finalState.openFileNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            val triggeredEvent = finalState.openFileNodeEvent as StateEventWithContentTriggered
+            assertThat(triggeredEvent.content).isEqualTo(nodeUIItem)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that fetchNodes with subHandle does not trigger openFileNodeEvent for non-media files`() =
+        runTest {
+            val subHandle = "testSubHandle"
+            val textFileNode = mock<TypedFileNode> {
+                on { type }.thenReturn(mock<TextFileTypeInfo>())
+            }
+
+            val fetchFolderNodeResult = FetchFolderNodesResult(
+                rootNode = mock(),
+                parentNode = mock(),
+                childrenNodes = listOf(textFileNode)
+            )
+
+            whenever(fetchFolderNodesUseCase(subHandle)).thenReturn(fetchFolderNodeResult)
+
+            underTest.state.test {
+                underTest.fetchNodes(subHandle)
+
+                val finalState = expectMostRecentItem()
+                assertThat(finalState.openFileNodeEvent).isEqualTo(consumed())
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that fetchNodes with subHandle does not trigger openFileNodeEvent for folders`() =
+        runTest {
+            val subHandle = "testSubHandle"
+            val folderNode = mock<TypedFolderNode>()
+
+            val fetchFolderNodeResult = FetchFolderNodesResult(
+                rootNode = mock(),
+                parentNode = mock(),
+                childrenNodes = listOf(folderNode)
+            )
+
+            whenever(fetchFolderNodesUseCase(subHandle)).thenReturn(fetchFolderNodeResult)
+
+            underTest.state.test {
+                underTest.fetchNodes(subHandle)
+
+                val finalState = expectMostRecentItem()
+                assertThat(finalState.openFileNodeEvent).isEqualTo(consumed())
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that fetchNodes with null subHandle does not trigger openFileNodeEvent`() = runTest {
+        val fetchFolderNodeResult = FetchFolderNodesResult(
+            rootNode = mock(),
+            parentNode = mock(),
+            childrenNodes = listOf(mock<TypedFileNode>())
+        )
+
+        whenever(fetchFolderNodesUseCase(null)).thenReturn(fetchFolderNodeResult)
+
+        underTest.state.test {
+            underTest.fetchNodes(null)
+
+            val finalState = expectMostRecentItem()
+            assertThat(finalState.openFileNodeEvent).isEqualTo(consumed())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that fetchNodes with subHandle does not trigger openFileNodeEvent when no media files found`() =
+        runTest {
+            val subHandle = "testSubHandle"
+            val nonMediaFileNode = mock<TypedFileNode> {
+                on { type }.thenReturn(mock<TextFileTypeInfo>())
+            }
+
+            val fetchFolderNodeResult = FetchFolderNodesResult(
+                rootNode = mock(),
+                parentNode = mock(),
+                childrenNodes = listOf(nonMediaFileNode)
+            )
+
+            whenever(fetchFolderNodesUseCase(subHandle)).thenReturn(fetchFolderNodeResult)
+
+            underTest.state.test {
+                underTest.fetchNodes(subHandle)
+
+                // Get the final state after fetchNodes completes
+                val finalState = expectMostRecentItem()
+                assertThat(finalState.openFileNodeEvent).isEqualTo(consumed())
+
+                // Consume any remaining events
+                cancelAndConsumeRemainingEvents()
             }
         }
 }
