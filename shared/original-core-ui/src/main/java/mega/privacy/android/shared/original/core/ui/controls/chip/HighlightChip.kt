@@ -32,6 +32,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
+@Deprecated("Use the version from core-ui library")
 fun HighlightChip(
     text: String,
     highlightText: String,

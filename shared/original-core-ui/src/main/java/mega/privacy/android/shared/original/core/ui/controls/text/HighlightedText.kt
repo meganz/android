@@ -33,6 +33,7 @@ import mega.privacy.android.shared.original.core.ui.utils.normalize
  * @param style Text style
  * @param overflow Overflow option
  */
+@Deprecated("Use the version from core-ui library")
 @Composable
 fun HighlightedText(
     text: String,
@@ -71,6 +72,7 @@ fun HighlightedText(
  * @param style Text style
  * @param overflow Overflow option
  */
+@Deprecated("Use the version from core-ui library")
 @Composable
 fun HighlightedText(
     text: AnnotatedString,

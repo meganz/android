@@ -59,7 +59,9 @@ interface IconPackInterface {
             /**
              * small_thin_solid
              */
-            interface Solid {}
+            interface Solid {
+                val Heart: ImageVector
+            }
         }
     }
 

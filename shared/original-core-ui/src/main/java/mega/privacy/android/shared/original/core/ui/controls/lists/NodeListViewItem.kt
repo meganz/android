@@ -73,6 +73,7 @@ import mega.privacy.android.shared.original.core.ui.utils.normalize
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
+@Deprecated("Use the version of core-ui library")
 fun NodeListViewItem(
     title: String,
     subtitle: String,

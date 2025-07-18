@@ -160,6 +160,7 @@ fun NodeListViewItem(
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
+@Deprecated("Use the version of core-ui library")
 fun NodeListViewItem(
     isSelected: Boolean,
     folderInfo: String?,

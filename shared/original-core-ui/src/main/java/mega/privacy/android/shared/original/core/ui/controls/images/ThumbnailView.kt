@@ -39,6 +39,7 @@ import java.io.File
  * @param contentScale [ContentScale]
  */
 @Composable
+@Deprecated("Use the version from core-ui library")
 fun ThumbnailView(
     contentDescription: String?,
     imageFile: File?,
@@ -65,6 +66,7 @@ fun ThumbnailView(
  * @param contentScale content scale
  */
 @Composable
+@Deprecated("Use the version from core-ui library")
 fun ThumbnailView(
     contentDescription: String?,
     data: Any?,
@@ -118,6 +120,7 @@ fun ThumbnailView(
  * @param contentScale content scale
  */
 @Composable
+@Deprecated("Use the version from core-ui library")
 fun ThumbnailView(
     contentDescription: String?,
     data: Any?,

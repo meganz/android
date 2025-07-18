@@ -16,7 +16,7 @@ android {
 }
 
 dependencies {
-
+    implementation(project(":domain"))
     implementation(project(":icon-pack"))
     implementation(project(":shared:resources"))
 

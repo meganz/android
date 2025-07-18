@@ -131,6 +131,7 @@ import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineGrid4ImageVe
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineImage01ImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineListSmallImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineQueueLineImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinSolidHeartImageVector
 
 public object IconPack : IconPackInterface {
     public object Medium : IconPackInterface.Medium {
@@ -496,6 +497,10 @@ public object IconPack : IconPackInterface {
 
                 override val QueueLine: ImageVector by lazy {
                         createSmallThinOutlineQueueLineImageVector() }
+            }
+
+            public object Solid : IconPackInterface.Small.Thin.Solid {
+                override val Heart: ImageVector by lazy { createSmallThinSolidHeartImageVector() }
             }
         }
     }
