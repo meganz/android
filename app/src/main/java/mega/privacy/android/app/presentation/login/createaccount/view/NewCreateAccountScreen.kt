@@ -72,7 +72,6 @@ import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.preview.CombinedThemePreviewsTablet
-import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.devicetype.DeviceType
@@ -81,7 +80,6 @@ import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.LinkColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.EMAIL_CHAR_LIMIT
@@ -124,37 +122,35 @@ internal fun NewCreateAccountRoute(
         },
     )
     val snackBarHostState = remember { SnackbarHostState() }
-    AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
-        NewCreateAccountScreen(
-            uiState = uiState,
-            snackBarHostState = snackBarHostState,
-            onFirstNameInputChanged = viewModel::onFirstNameInputChanged,
-            onLastNameInputChanged = viewModel::onLastNameInputChanged,
-            onEmailInputChanged = viewModel::onEmailInputChanged,
-            onPasswordInputChanged = viewModel::onPasswordInputChanged,
-            onConfirmPasswordInputChanged = viewModel::onConfirmPasswordInputChanged,
-            onCreateAccountClicked = viewModel::createAccount,
-            onTermsOfServiceAgreedChanged = viewModel::termsOfServiceAgreedChanged,
-            onLoginClicked = {
-                activityViewModel.setPendingFragmentToShow(LoginFragmentType.Login)
-            },
-            openLink = { url ->
-                context.launchUrl(url)
-            },
-            onResetCreateAccountStatusEvent = viewModel::resetCreateAccountStatusEvent,
-            onResetShowAgreeToTermsEvent = viewModel::resetShowAgreeToTermsEvent,
-            onCreateAccountSuccess = { credentials ->
-                activityViewModel.setTemporalCredentials(credentials)
-                activityViewModel.setIsWaitingForConfirmAccount()
-                viewModel.onCreateAccountSuccess(credentials)
-            },
-            onBackIconPressed = {
-                onBackPressedDispatcher?.onBackPressed()
-            },
-            onNetworkWarningShown = viewModel::networkWarningShown,
-            modifier = modifier.fillMaxSize()
-        )
-    }
+    NewCreateAccountScreen(
+        uiState = uiState,
+        snackBarHostState = snackBarHostState,
+        onFirstNameInputChanged = viewModel::onFirstNameInputChanged,
+        onLastNameInputChanged = viewModel::onLastNameInputChanged,
+        onEmailInputChanged = viewModel::onEmailInputChanged,
+        onPasswordInputChanged = viewModel::onPasswordInputChanged,
+        onConfirmPasswordInputChanged = viewModel::onConfirmPasswordInputChanged,
+        onCreateAccountClicked = viewModel::createAccount,
+        onTermsOfServiceAgreedChanged = viewModel::termsOfServiceAgreedChanged,
+        onLoginClicked = {
+            activityViewModel.setPendingFragmentToShow(LoginFragmentType.Login)
+        },
+        openLink = { url ->
+            context.launchUrl(url)
+        },
+        onResetCreateAccountStatusEvent = viewModel::resetCreateAccountStatusEvent,
+        onResetShowAgreeToTermsEvent = viewModel::resetShowAgreeToTermsEvent,
+        onCreateAccountSuccess = { credentials ->
+            activityViewModel.setTemporalCredentials(credentials)
+            activityViewModel.setIsWaitingForConfirmAccount()
+            viewModel.onCreateAccountSuccess(credentials)
+        },
+        onBackIconPressed = {
+            onBackPressedDispatcher?.onBackPressed()
+        },
+        onNetworkWarningShown = viewModel::networkWarningShown,
+        modifier = modifier.fillMaxSize()
+    )
 }
 
 @Composable

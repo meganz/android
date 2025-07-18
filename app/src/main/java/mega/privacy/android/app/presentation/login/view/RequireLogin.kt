@@ -145,10 +145,11 @@ fun RequireLogin(
     LaunchedEffect(state.loginException) {
         if (state.loginException is LoginWrongEmailOrPassword) {
             wrongCredentials = true
+            onLoginExceptionConsumed()
         } else if (state.loginException is LoginTooManyAttempts) {
             tooManyAttempts = true
+            onLoginExceptionConsumed()
         }
-        onLoginExceptionConsumed()
     }
 
     EventEffect(event = state.accountBlockedEvent, onConsumed = onResetAccountBlockedEvent) {

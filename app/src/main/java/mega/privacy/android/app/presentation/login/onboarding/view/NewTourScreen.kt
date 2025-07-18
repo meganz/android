@@ -21,7 +21,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -35,8 +34,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.button.TextOnlyButton
@@ -48,7 +45,6 @@ import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.onboarding.view.TourTestTags.CREATE_ACCOUNT_BUTTON
@@ -67,27 +63,22 @@ import timber.log.Timber
 internal fun NewTourRoute(
     activityViewModel: LoginViewModel,
     onBackPressed: () -> Unit,
-    viewModel: TourViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     BackHandler(onBack = onBackPressed)
 
-    AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
-        NewTourScreen(
-            modifier = Modifier
-                .fillMaxSize()
-                .semantics { testTagsAsResourceId = true },
-            onLoginClick = {
-                Timber.d("onLoginClick")
-                activityViewModel.setPendingFragmentToShow(LoginFragmentType.Login)
-            },
-            onCreateAccountClick = {
-                Timber.d("onRegisterClick")
-                activityViewModel.setPendingFragmentToShow(LoginFragmentType.CreateAccount)
-            }
-        )
-    }
+    NewTourScreen(
+        modifier = Modifier
+            .fillMaxSize()
+            .semantics { testTagsAsResourceId = true },
+        onLoginClick = {
+            Timber.d("onLoginClick")
+            activityViewModel.setPendingFragmentToShow(LoginFragmentType.Login)
+        },
+        onCreateAccountClick = {
+            Timber.d("onRegisterClick")
+            activityViewModel.setPendingFragmentToShow(LoginFragmentType.CreateAccount)
+        }
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)

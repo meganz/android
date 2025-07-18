@@ -80,7 +80,7 @@ class BackgroundRequestListener @Inject constructor(
     private val resetAccountDetailsTimeStampUseCase: ResetAccountDetailsTimeStampUseCase,
     private val broadcastSslVerificationFailedUseCase: BroadcastSslVerificationFailedUseCase,
     private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase,
-    private val setIsUnverifiedBusinessAccountUseCase: SetUnverifiedBusinessAccountUseCase
+    private val setIsUnverifiedBusinessAccountUseCase: SetUnverifiedBusinessAccountUseCase,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -222,17 +222,14 @@ class BackgroundRequestListener @Inject constructor(
         api: MegaApiJava,
     ) {
         Timber.d("Logout finished: %s(%d)", e.errorString, e.errorCode)
-        if (e.errorCode == MegaError.API_OK) {
-            Timber.d("END logout sdk request - wait chat logout")
-            MegaApplication.isLoggingOut = false
-        } else if (e.errorCode == MegaError.API_EINCOMPLETE) {
+        if (e.errorCode == MegaError.API_EINCOMPLETE) {
             if (request.paramType == MegaError.API_ESSL) {
                 Timber.w("SSL verification failed")
                 applicationScope.launch {
                     broadcastSslVerificationFailedUseCase()
                 }
             }
-        } else if (e.errorCode == MegaError.API_ESID) {
+        } else if (e.errorCode == MegaError.API_ESID || request.paramType == MegaError.API_ESID) {
             Timber.w("TYPE_LOGOUT:API_ESID")
             myAccountInfo.resetDefaults()
             applicationScope.launch {
@@ -240,9 +237,12 @@ class BackgroundRequestListener @Inject constructor(
                 runCatching { localLogoutAppUseCase() }
                     .onFailure { Timber.d(it) }
             }
-        } else if (e.errorCode == MegaError.API_EBLOCKED) {
+        } else if (e.errorCode == MegaError.API_EBLOCKED || request.paramType == MegaError.API_ESID) {
             api.localLogout()
             megaChatApi.logout()
+        } else if (e.errorCode == MegaError.API_OK) {
+            Timber.d("END logout sdk request - wait chat logout")
+            MegaApplication.isLoggingOut = false
         }
     }
 

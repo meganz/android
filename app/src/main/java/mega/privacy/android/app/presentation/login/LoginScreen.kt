@@ -21,14 +21,12 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicInputDialog
-import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.view.NewLoginView
 import mega.privacy.android.app.utils.Constants
@@ -47,7 +45,7 @@ import timber.log.Timber
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    billingViewModel: BillingViewModel
+    billingViewModel: BillingViewModel,
 ) {
     val context = LocalContext.current
     val activity = LocalActivity.current
@@ -104,98 +102,96 @@ fun LoginScreen(
         }
     }
 
-    AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
-        LaunchedEffect(Unit) {
-            Analytics.tracker.trackEvent(LoginScreenEvent)
-        }
-        NewLoginView(
-            state = uiState,
-            onEmailChanged = viewModel::onEmailChanged,
-            onPasswordChanged = viewModel::onPasswordChanged,
-            onLoginClicked = {
-                LoginActivity.isBackFromLoginPage = false
-                viewModel.onLoginClicked(false)
-                billingViewModel.loadSkus()
-                billingViewModel.loadPurchases()
+    LaunchedEffect(Unit) {
+        Analytics.tracker.trackEvent(LoginScreenEvent)
+    }
+    NewLoginView(
+        state = uiState,
+        onEmailChanged = viewModel::onEmailChanged,
+        onPasswordChanged = viewModel::onPasswordChanged,
+        onLoginClicked = {
+            LoginActivity.isBackFromLoginPage = false
+            viewModel.onLoginClicked(false)
+            billingViewModel.loadSkus()
+            billingViewModel.loadPurchases()
+        },
+        onForgotPassword = { onForgotPassword(context, uiState.accountSession?.email) },
+        onCreateAccount = {
+            viewModel.setPendingFragmentToShow(LoginFragmentType.CreateAccount)
+        },
+        onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
+        on2FAChanged = viewModel::on2FAChanged,
+        onLostAuthenticatorDevice = { onLostAuthenticationDevice(context) },
+        onBackPressed = {
+            onBackPressedDispatcher?.onBackPressed()
+        },
+        onReportIssue = {
+            openLoginIssueHelpdeskPage(context)
+        },
+        onLoginExceptionConsumed = viewModel::setLoginErrorConsumed,
+        onResetAccountBlockedEvent = viewModel::resetAccountBlockedEvent,
+        onResendVerificationEmail = viewModel::resendVerificationEmail,
+        onResetResendVerificationEmailEvent = viewModel::resetResendVerificationEmailEvent,
+        stopLogin = viewModel::stopLogin,
+    )
+
+    if (uiState.ongoingTransfersExist == true) {
+        BasicDialog(
+            title = "",
+            description = stringResource(id = R.string.login_warning_abort_transfers),
+            positiveButtonText = stringResource(id = sharedR.string.login_text),
+            onPositiveButtonClicked = {
+                viewModel.onLoginClicked(true)
+                viewModel.resetOngoingTransfers()
             },
-            onForgotPassword = { onForgotPassword(context, uiState.accountSession?.email) },
-            onCreateAccount = {
-                viewModel.setPendingFragmentToShow(LoginFragmentType.CreateAccount)
+            negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
+            onNegativeButtonClicked = {
+                viewModel.resetOngoingTransfers()
             },
-            onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
-            on2FAChanged = viewModel::on2FAChanged,
-            onLostAuthenticatorDevice = { onLostAuthenticationDevice(context) },
-            onBackPressed = {
-                onBackPressedDispatcher?.onBackPressed()
-            },
-            onReportIssue = {
-                openLoginIssueHelpdeskPage(context)
-            },
-            onLoginExceptionConsumed = viewModel::setLoginErrorConsumed,
-            onResetAccountBlockedEvent = viewModel::resetAccountBlockedEvent,
-            onResendVerificationEmail = viewModel::resendVerificationEmail,
-            onResetResendVerificationEmailEvent = viewModel::resetResendVerificationEmailEvent,
-            stopLogin = viewModel::stopLogin,
+            dismissOnClickOutside = false,
+            dismissOnBackPress = false
         )
+    }
 
-        if (uiState.ongoingTransfersExist == true) {
-            BasicDialog(
-                title = "",
-                description = stringResource(id = R.string.login_warning_abort_transfers),
-                positiveButtonText = stringResource(id = sharedR.string.login_text),
-                onPositiveButtonClicked = {
-                    viewModel.onLoginClicked(true)
-                    viewModel.resetOngoingTransfers()
-                },
-                negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
-                onNegativeButtonClicked = {
-                    viewModel.resetOngoingTransfers()
-                },
-                dismissOnClickOutside = false,
-                dismissOnBackPress = false
-            )
-        }
+    if (showIncorrectRkDialog) {
+        BasicDialog(
+            title = stringResource(id = sharedR.string.recovery_key_error_title),
+            description = stringResource(id = sharedR.string.recovery_key_error_description),
+            positiveButtonText = stringResource(id = R.string.general_ok),
+            onPositiveButtonClicked = {
+                showIncorrectRkDialog = false
+            }
+        )
+    }
 
-        if (showIncorrectRkDialog) {
-            BasicDialog(
-                title = stringResource(id = sharedR.string.recovery_key_error_title),
-                description = stringResource(id = sharedR.string.recovery_key_error_description),
-                positiveButtonText = stringResource(id = R.string.general_ok),
-                onPositiveButtonClicked = {
-                    showIncorrectRkDialog = false
-                }
-            )
-        }
-
-        val recoveryKeyLink = uiState.recoveryKeyLink
-        if (recoveryKeyLink != null) {
-            BasicInputDialog(
-                title = stringResource(id = R.string.title_dialog_insert_MK),
-                description = stringResource(id = R.string.text_dialog_insert_MK),
-                inputLabel = stringResource(id = R.string.edit_text_insert_mk),
-                inputValue = recoveryKeyInput,
-                onValueChange = {
-                    recoveryKeyInput = it
-                    if (recoveryKeyError != null) recoveryKeyError = null
-                },
-                errorText = recoveryKeyError,
-                positiveButtonText = stringResource(id = R.string.general_ok),
-                onPositiveButtonClicked = {
-                    val value = recoveryKeyInput.trim()
-                    if (value.isEmpty()) {
-                        recoveryKeyError = context.getString(R.string.invalid_string)
-                    } else {
-                        keyboardController?.hide()
-                        viewModel.checkRecoveryKey(recoveryKeyLink, value)
-                        viewModel.onRecoveryKeyConsumed()
-                    }
-                },
-                negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
-                onNegativeButtonClicked = {
+    val recoveryKeyLink = uiState.recoveryKeyLink
+    if (recoveryKeyLink != null) {
+        BasicInputDialog(
+            title = stringResource(id = R.string.title_dialog_insert_MK),
+            description = stringResource(id = R.string.text_dialog_insert_MK),
+            inputLabel = stringResource(id = R.string.edit_text_insert_mk),
+            inputValue = recoveryKeyInput,
+            onValueChange = {
+                recoveryKeyInput = it
+                if (recoveryKeyError != null) recoveryKeyError = null
+            },
+            errorText = recoveryKeyError,
+            positiveButtonText = stringResource(id = R.string.general_ok),
+            onPositiveButtonClicked = {
+                val value = recoveryKeyInput.trim()
+                if (value.isEmpty()) {
+                    recoveryKeyError = context.getString(R.string.invalid_string)
+                } else {
+                    keyboardController?.hide()
+                    viewModel.checkRecoveryKey(recoveryKeyLink, value)
                     viewModel.onRecoveryKeyConsumed()
-                },
-            )
-        }
+                }
+            },
+            negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
+            onNegativeButtonClicked = {
+                viewModel.onRecoveryKeyConsumed()
+            },
+        )
     }
 
     // Hide splash after UI is rendered, to prevent blinking

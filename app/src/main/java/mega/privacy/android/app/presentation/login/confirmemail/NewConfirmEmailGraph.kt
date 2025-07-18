@@ -9,9 +9,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.changeEmailAddress
 import mega.privacy.android.app.presentation.login.confirmemail.changeemail.navigateToChangeEmailAddress
@@ -52,32 +50,30 @@ fun NewConfirmEmailGraph(
         }
     }
 
-    AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
-        NavHost(
-            navController = navController,
-            startDestination = confirmEmailRoute
-        ) {
-            confirmEmail(
-                fullName = uiState.firstName.orEmpty(),
-                onShowPendingFragment = activityViewModel::setPendingFragmentToShow,
-                onSetTemporalEmail = activityViewModel::setTemporalEmail,
-                viewModel = viewModel,
-                onNavigateToHelpCentre = { context.launchUrl(HELP_CENTRE_HOME_URL) },
-                onNavigateToChangeEmailAddress = {
-                    navController.navigateToChangeEmailAddress(
-                        email = uiState.registeredEmail.orEmpty(),
-                        fullName = uiState.firstName.orEmpty(),
-                    )
-                }
-            )
+    NavHost(
+        navController = navController,
+        startDestination = confirmEmailRoute
+    ) {
+        confirmEmail(
+            fullName = uiState.firstName.orEmpty(),
+            onShowPendingFragment = activityViewModel::setPendingFragmentToShow,
+            onSetTemporalEmail = activityViewModel::setTemporalEmail,
+            viewModel = viewModel,
+            onNavigateToHelpCentre = { context.launchUrl(HELP_CENTRE_HOME_URL) },
+            onNavigateToChangeEmailAddress = {
+                navController.navigateToChangeEmailAddress(
+                    email = uiState.registeredEmail.orEmpty(),
+                    fullName = uiState.firstName.orEmpty(),
+                )
+            }
+        )
 
-            changeEmailAddress(
-                onChangeEmailSuccess = {
-                    viewModel.updateRegisteredEmail(it)
-                    viewModel.showSnackBar(context.getString(sharedR.string.email_confirmation_email_address_update_message))
-                    navController.popBackStack()
-                },
-            )
-        }
+        changeEmailAddress(
+            onChangeEmailSuccess = {
+                viewModel.updateRegisteredEmail(it)
+                viewModel.showSnackBar(context.getString(sharedR.string.email_confirmation_email_address_update_message))
+                navController.popBackStack()
+            },
+        )
     }
 }

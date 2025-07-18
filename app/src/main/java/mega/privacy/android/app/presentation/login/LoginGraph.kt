@@ -22,9 +22,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.flow.collectLatest
 import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.billing.BillingViewModel
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.confirmemail.confirmationEmailScreen
 import mega.privacy.android.app.presentation.login.confirmemail.openConfirmationEmailScreen
 import mega.privacy.android.app.presentation.login.createaccount.createAccountScreen
@@ -43,7 +45,7 @@ fun LoginGraph(
     viewModel: LoginViewModel = hiltViewModel(),
     billingViewModel: BillingViewModel = hiltViewModel(),
     onFinish: () -> Unit,
-    stopShowingSplashScreen: () -> Unit
+    stopShowingSplashScreen: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val navController = rememberNavController()
@@ -87,21 +89,6 @@ fun LoginGraph(
         }
     }
 
-    if (showLoggedOutDialog) {
-        BasicDialog(
-            modifier = Modifier.testTag(LOGGED_OUT_DIALOG),
-            title = stringResource(id = R.string.title_alert_logged_out),
-            description = stringResource(id = R.string.error_server_expired_session),
-            positiveButtonText = stringResource(id = R.string.general_ok),
-            onPositiveButtonClicked = {
-                showLoggedOutDialog = false
-            },
-            onDismiss = {
-                showLoggedOutDialog = false
-            }
-        )
-    }
-
     LaunchedEffect(uiState.isPendingToShowFragment) {
         val fragmentType = uiState.isPendingToShowFragment
         if (fragmentType != null) {
@@ -128,28 +115,45 @@ fun LoginGraph(
         }
     }
 
-    NavHost(
-        navController = navController,
-        startDestination = StartRoute
-    ) {
-        composable(StartRoute) {
-            // no-op, we checking start destination in the view model
+    AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
+        NavHost(
+            navController = navController,
+            startDestination = StartRoute
+        ) {
+            composable(StartRoute) {
+                // no-op, we checking start destination in the view model
+            }
+            loginScreen(
+                sharedViewModel = viewModel,
+                billingViewModel = billingViewModel,
+            )
+            createAccountScreen(
+                sharedViewModel = viewModel,
+            )
+            tourScreen(
+                sharedViewModel = viewModel,
+                onBackPressed = onFinish
+            )
+            confirmationEmailScreen(
+                sharedViewModel = viewModel,
+                onBackPressed = onFinish
+            )
         }
-        loginScreen(
-            sharedViewModel = viewModel,
-            billingViewModel = billingViewModel,
-        )
-        createAccountScreen(
-            sharedViewModel = viewModel,
-        )
-        tourScreen(
-            sharedViewModel = viewModel,
-            onBackPressed = onFinish
-        )
-        confirmationEmailScreen(
-            sharedViewModel = viewModel,
-            onBackPressed = onFinish
-        )
+
+        if (showLoggedOutDialog) {
+            BasicDialog(
+                modifier = Modifier.testTag(LOGGED_OUT_DIALOG),
+                title = stringResource(id = R.string.title_alert_logged_out),
+                description = stringResource(id = R.string.error_server_expired_session),
+                positiveButtonText = stringResource(id = R.string.general_ok),
+                onPositiveButtonClicked = {
+                    showLoggedOutDialog = false
+                },
+                onDismiss = {
+                    showLoggedOutDialog = false
+                }
+            )
+        }
     }
 }
 
