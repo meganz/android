@@ -4,7 +4,6 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -18,11 +17,9 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
-import mega.privacy.android.feature.sync.domain.usecase.solvedissue.ClearSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.ui.mapper.stalledissue.StalledIssueItemMapper
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.synclist.SyncListAction
@@ -47,8 +44,6 @@ class SyncListViewModelTest {
     private val resolveStalledIssueUseCase: ResolveStalledIssueUseCase = mock()
     private val stalledIssueItemMapper: StalledIssueItemMapper = mock()
     private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase = mock()
-    private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase = mock()
-    private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
     private val getDeviceIdUseCase: GetDeviceIdUseCase = mock()
     private val getDeviceNameUseCase: GetDeviceNameUseCase = mock()
 
@@ -84,8 +79,6 @@ class SyncListViewModelTest {
 
     @Test
     fun `test that view model initialization sets onboarding shown to true`() = runTest {
-        val monitorSyncByWiFiStateFlow = MutableStateFlow(false)
-        whenever(monitorSyncByWiFiUseCase()).thenReturn(monitorSyncByWiFiStateFlow)
         initViewModel()
 
         verify(setOnboardingShownUseCase).invoke(true)
@@ -115,8 +108,6 @@ class SyncListViewModelTest {
             emit(stalledIssues)
             awaitCancellation()
         })
-        val monitorSyncByWiFiStateFlow = MutableStateFlow(false)
-        whenever(monitorSyncByWiFiUseCase()).thenReturn(monitorSyncByWiFiStateFlow)
         val selectedResolution = StalledIssueResolutionAction(
             resolutionActionType = StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE,
             actionName = "Choose remote file",
@@ -148,8 +139,6 @@ class SyncListViewModelTest {
                 emit(solvedIssues)
                 awaitCancellation()
             })
-            val monitorSyncByWiFiStateFlow = MutableStateFlow(false)
-            whenever(monitorSyncByWiFiUseCase()).thenReturn(monitorSyncByWiFiStateFlow)
             initViewModel()
             underTest.state.test {
                 assertThat(awaitItem().shouldShowCleanSolvedIssueMenuItem).isTrue()
@@ -164,8 +153,6 @@ class SyncListViewModelTest {
             resolveStalledIssueUseCase = resolveStalledIssueUseCase,
             stalledIssueItemMapper = stalledIssueItemMapper,
             monitorSyncSolvedIssuesUseCase = monitorSyncSolvedIssuesUseCase,
-            clearSyncSolvedIssuesUseCase = clearSyncSolvedIssuesUseCase,
-            monitorSyncByWiFiUseCase = monitorSyncByWiFiUseCase,
             getDeviceIdUseCase = getDeviceIdUseCase,
             getDeviceNameUseCase = getDeviceNameUseCase,
         )

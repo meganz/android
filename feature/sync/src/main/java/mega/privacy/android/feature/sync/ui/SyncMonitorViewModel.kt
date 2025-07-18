@@ -89,6 +89,7 @@ class SyncMonitorViewModel @Inject constructor(
                     .distinctUntilChanged()
                     .catch { Timber.e("Error Monitoring SyncState $it") }
                     .collect {
+                        Timber.d("Monitoring Sync State: $it")
                         pauseResumeSyncsBasedOnBatteryAndWiFiUseCase(it)
                     }
             }

@@ -206,17 +206,13 @@ class MonitorShouldSyncUseCaseTest {
 
     @Test
     fun `test that sync is not allowed when isOnWifiNetworkUseCase throws exception`() = runTest {
-        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-        whenever(monitorBatteryInfoUseCase()).thenReturn(
-            flowOf(
-                BatteryInfo(
-                    level = 50,
-                    isCharging = false
-                )
-            )
+        setupMocks(
+            connectedToInternet = true,
+            batteryInfo = BatteryInfo(level = 50, isCharging = false),
+            wiFiOnly = true,
+            chargingOnly = true,
+            isOnWiFi = false
         )
-        whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(true))
-        whenever(monitorSyncByChargingUseCase()).thenReturn(flowOf(false))
         whenever(isOnWifiNetworkUseCase()).thenThrow(RuntimeException("Network error"))
 
         underTest().test {

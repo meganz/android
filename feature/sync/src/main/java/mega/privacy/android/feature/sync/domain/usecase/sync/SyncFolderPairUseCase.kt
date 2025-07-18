@@ -2,12 +2,9 @@ package mega.privacy.android.feature.sync.domain.usecase.sync
 
 import kotlinx.coroutines.flow.first
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
-import mega.privacy.android.domain.usecase.environment.GetBatteryInfoUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase.Companion.LOW_BATTERY_LEVEL
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import javax.inject.Inject
 
 /**
@@ -15,10 +12,8 @@ import javax.inject.Inject
  */
 internal class SyncFolderPairUseCase @Inject constructor(
     private val syncRepository: SyncRepository,
-    private val getBatteryInfoUseCase: GetBatteryInfoUseCase,
-    private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase,
-    private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
     private val pauseSyncUseCase: PauseSyncUseCase,
+    private val monitorShouldSyncUseCase: MonitorShouldSyncUseCase,
 ) {
 
     /**
@@ -45,12 +40,7 @@ internal class SyncFolderPairUseCase @Inject constructor(
 
         // Pause the new sync if required due settings, network or battery level
         folderPairHandle?.let { handle ->
-            val syncOnlyByWifi = monitorSyncByWiFiUseCase().first()
-            val userNotOnWifi = !isOnWifiNetworkUseCase()
-            val batteryInfo = getBatteryInfoUseCase()
-            val isLowBatteryLevel = batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging
-
-            if (syncOnlyByWifi && userNotOnWifi || isLowBatteryLevel) {
+            if (!monitorShouldSyncUseCase().first()) {
                 pauseSyncUseCase(handle)
             }
         }

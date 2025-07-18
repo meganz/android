@@ -7,20 +7,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
-import mega.privacy.android.feature.sync.domain.usecase.solvedissue.ClearSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.ui.mapper.stalledissue.StalledIssueItemMapper
-import mega.privacy.android.feature.sync.ui.model.SyncConnectionType
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -31,8 +27,6 @@ internal class SyncListViewModel @Inject constructor(
     private val resolveStalledIssueUseCase: ResolveStalledIssueUseCase,
     private val stalledIssueItemMapper: StalledIssueItemMapper,
     private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase,
-    private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase,
-    private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
     private val getDeviceNameUseCase: GetDeviceNameUseCase,
 ) : ViewModel() {
@@ -44,7 +38,6 @@ internal class SyncListViewModel @Inject constructor(
         observeOnboardingFlow()
         monitorStalledIssue()
         monitorSolvedIssue()
-        monitorSyncByWifiSetting()
         getDeviceName()
     }
 
@@ -74,23 +67,6 @@ internal class SyncListViewModel @Inject constructor(
                     )
                 }
             }
-        }
-    }
-
-    private fun monitorSyncByWifiSetting() {
-        viewModelScope.launch {
-            monitorSyncByWiFiUseCase()
-                .collectLatest { syncByWiFi ->
-                    _state.update { state ->
-                        state.copy(
-                            selectedSyncConnectionType = if (syncByWiFi) {
-                                SyncConnectionType.WiFiOnly
-                            } else {
-                                SyncConnectionType.WiFiOrMobileData
-                            }
-                        )
-                    }
-                }
         }
     }
 
@@ -126,16 +102,6 @@ internal class SyncListViewModel @Inject constructor(
                 _state.update { state ->
                     state.copy(snackbarMessage = null)
                 }
-            }
-        }
-    }
-
-    fun onClearSyncOptionsPressed() {
-        viewModelScope.launch {
-            runCatching {
-                clearSyncSolvedIssuesUseCase()
-            }.onFailure {
-                Timber.e(it)
             }
         }
     }
