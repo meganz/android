@@ -8,7 +8,9 @@ import javax.inject.Inject
 /**
  * The use case to check if Node file is valid
  */
-class IsValidNodeFileUseCase @Inject constructor(private val fingerprintRepository: FingerprintRepository) {
+class IsValidNodeFileUseCase @Inject constructor(
+    private val fingerprintRepository: FingerprintRepository,
+) {
 
     /**
      * check if Node file is valid
@@ -21,7 +23,7 @@ class IsValidNodeFileUseCase @Inject constructor(private val fingerprintReposito
     suspend operator fun invoke(
         node: FileNode,
         file: File,
-    ): Boolean = file.canRead() && file.length() == node.size
-// && node.fingerprint == fingerprintRepository.getFingerprint(file.absolutePath)
-// Add the check once fingerprint mismatch issue is resolved in SDK, SAO-2917
+    ): Boolean = file.canRead()
+            && file.length() == node.size
+            && node.fingerprint == fingerprintRepository.getFingerprint(file.absolutePath)
 }
