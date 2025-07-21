@@ -18,6 +18,8 @@ sealed interface AppState {
         val featureDestinations: ImmutableSet<FeatureDestination>,
         val initialMainDestination: Any,
     ) : AppState
+
+    data object FetchingNodes : AppState
 }
 
 class AppStateDataBuilder {

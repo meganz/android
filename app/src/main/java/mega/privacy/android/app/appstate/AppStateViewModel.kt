@@ -26,8 +26,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.model.AppState
 import mega.privacy.android.app.appstate.model.AppStateDataBuilder
 import mega.privacy.android.domain.entity.navigation.Flagged
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
@@ -44,6 +46,8 @@ class AppStateViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val retryConnectionsAndSignalPresenceUseCase: RetryConnectionsAndSignalPresenceUseCase,
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
+    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
 ) : ViewModel() {
 
     private val updatePresenceFlow = MutableStateFlow(false)
@@ -63,13 +67,21 @@ class AppStateViewModel @Inject constructor(
                 .log("Feature Destinations"),
             flow { emit(getStartScreenPreferenceDestinationUseCase()) }
                 .log("Start Screen Preference Destination"),
-        ) { mainItems, mainScreens, featureItems, startDestination ->
-            AppStateDataBuilder()
-                .mainNavItems(mainItems)
-                .mainNavScreens(mainScreens)
-                .featureDestinations(featureItems)
-                .initialDestination(startDestination)
-                .build()
+            monitorFetchNodesFinishUseCase()
+                .onStart { emit(rootNodeExistsUseCase()) }
+                .catch { Timber.e(it, "Error monitoring fetch nodes finish") }
+                .log("Fetch Nodes Finish"),
+        ) { mainItems, mainScreens, featureItems, startDestination, rootNodeExist ->
+            if (rootNodeExist) {
+                AppStateDataBuilder()
+                    .mainNavItems(mainItems)
+                    .mainNavScreens(mainScreens)
+                    .featureDestinations(featureItems)
+                    .initialDestination(startDestination)
+                    .build()
+            } else {
+                AppState.FetchingNodes
+            }
         }.onStart {
             trackPresence()
         }.catch {

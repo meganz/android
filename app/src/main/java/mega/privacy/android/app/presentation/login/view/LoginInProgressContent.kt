@@ -17,7 +17,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -76,18 +75,17 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 fun LoginInProgressContent(
     modifier: Modifier = Modifier,
+    isRequestStatusInProgress: Boolean,
     currentProgress: Float,
     @StringRes currentStatusText: Int,
     requestStatusProgress: Progress?,
 ) {
-    val isRequestStatusInProgress = requestStatusProgress != null
     val isInLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val scrollState = rememberScrollState()
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+        modifier = modifier
+            .fillMaxSize()
             .padding(horizontal = 20.dp)
             .verticalScroll(scrollState),
     ) {
@@ -227,6 +225,7 @@ private fun LoginInProgressScreenPreview(
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         LoginInProgressContent(
+            isRequestStatusInProgress = state.isRequestStatusInProgress,
             currentProgress = state.currentProgress,
             currentStatusText = state.currentStatusText,
             requestStatusProgress = state.requestStatusProgress,

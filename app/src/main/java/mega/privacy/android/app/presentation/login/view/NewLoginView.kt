@@ -166,7 +166,7 @@ fun NewLoginView(
         with(state) {
             when {
                 showLoginInProgress -> LoginInProgressContent(
-                    modifier = Modifier.padding(paddingValues),
+                    isRequestStatusInProgress = state.isRequestStatusInProgress,
                     currentProgress = state.currentProgress,
                     currentStatusText = state.currentStatusText,
                     requestStatusProgress = state.requestStatusProgress

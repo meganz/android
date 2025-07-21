@@ -42,9 +42,9 @@ import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 @Composable
 fun LoginGraph(
     chatRequestHandler: MegaChatRequestHandler,
+    onFinish: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel(),
     billingViewModel: BillingViewModel = hiltViewModel(),
-    onFinish: () -> Unit,
     stopShowingSplashScreen: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -103,8 +103,7 @@ fun LoginGraph(
                 LoginFragmentType.Tour -> {
                     focusManager.clearFocus()
                     navController.openTourScreen(
-                        NavOptions.Builder()
-                            .setPopUpTo(route = StartRoute, inclusive = false)
+                        NavOptions.Builder().setPopUpTo(route = StartRoute, inclusive = false)
                             .build()
                     )
                 }
@@ -117,8 +116,7 @@ fun LoginGraph(
 
     AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
         NavHost(
-            navController = navController,
-            startDestination = StartRoute
+            navController = navController, startDestination = StartRoute
         ) {
             composable(StartRoute) {
                 // no-op, we checking start destination in the view model
@@ -131,12 +129,10 @@ fun LoginGraph(
                 sharedViewModel = viewModel,
             )
             tourScreen(
-                sharedViewModel = viewModel,
-                onBackPressed = onFinish
+                sharedViewModel = viewModel, onBackPressed = onFinish
             )
             confirmationEmailScreen(
-                sharedViewModel = viewModel,
-                onBackPressed = onFinish
+                sharedViewModel = viewModel, onBackPressed = onFinish
             )
         }
 

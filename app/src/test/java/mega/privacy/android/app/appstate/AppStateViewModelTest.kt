@@ -23,8 +23,10 @@ import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.navigation.Flagged
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.navigation.GetStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -55,6 +57,13 @@ class AppStateViewModelTest {
     private val getStartScreenPreferenceDestinationUseCase =
         mock<GetStartScreenPreferenceDestinationUseCase>()
 
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock {
+        on { invoke() }.thenReturn(
+            flow { emit(true) }
+        )
+    }
+    private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
+
     @BeforeAll
     fun initialisation() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -72,7 +81,8 @@ class AppStateViewModelTest {
             getStartScreenPreferenceDestinationUseCase,
             monitorThemeModeUseCase,
             monitorConnectivityUseCase,
-            retryConnectionsAndSignalPresenceUseCase
+            retryConnectionsAndSignalPresenceUseCase,
+            rootNodeExistsUseCase
         )
     }
 
@@ -447,6 +457,8 @@ class AppStateViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase,
+            monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
+            rootNodeExistsUseCase = rootNodeExistsUseCase,
         )
     }
 

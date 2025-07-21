@@ -833,7 +833,12 @@ class LoginViewModel @Inject constructor(
             if (!isFastLogin) {
                 shouldShowUpgradeAccount()
             }
-            fetchNodes()
+            val isSingleActivityEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
+            }.getOrDefault(false)
+            if (!isSingleActivityEnabled) {
+                fetchNodes()
+            }
             sendAnalyticsEventIfFirstTimeLogin(email)
         }
 
