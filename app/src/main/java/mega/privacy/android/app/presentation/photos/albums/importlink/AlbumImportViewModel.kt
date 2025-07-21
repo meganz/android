@@ -100,6 +100,7 @@ internal class AlbumImportViewModel @Inject constructor(
 
     fun initialize() = viewModelScope.launch {
         monitorNetworkConnection()
+        handleSharedAlbumLink(link = albumLink)
         validateLink(link = albumLink)
 
         val isLogin = hasCredentialsUseCase()
@@ -191,11 +192,20 @@ internal class AlbumImportViewModel @Inject constructor(
             photos.sortedByDescending { it.modificationTime }
         }
 
+        val openedPhoto = state.value.folderSubHandle?.let { subHandle ->
+            sortedPhotos.firstOrNull { it.base64Id == subHandle }
+        }
+
         state.update {
             it.copy(
                 link = link,
                 album = album,
                 photos = sortedPhotos,
+                openFileNodeEvent = if (openedPhoto != null) {
+                    triggered(openedPhoto)
+                } else {
+                    consumed()
+                },
             )
         }
     }
@@ -527,4 +537,50 @@ internal class AlbumImportViewModel @Inject constructor(
         state.update {
             it.copy(downloadEvent = event?.let { triggered(event) } ?: consumed())
         }
+
+    /**
+     * Extract sub-handle from album link
+     * Expected URL format: https://mega.nz/collection/handle#key!subHandle123
+     *
+     * @param link The album link to process, defaults to albumLink property
+     */
+    private fun handleSharedAlbumLink(link: String? = albumLink) {
+        if (link.isNullOrBlank()) {
+            Timber.e("Album link is null or empty")
+            return
+        }
+
+        Timber.d("Processing album URL: $link")
+
+        val subHandle = link.substringAfterLast("!", "")
+            .takeIf { it.isNotBlank() }
+            ?: run {
+                Timber.e("No sub-handle found in album URL")
+                return
+            }
+
+        Timber.d("Extracted sub-handle: $subHandle")
+        state.update { it.copy(folderSubHandle = subHandle) }
+    }
+
+    /**
+     * Open file using Photo
+     * This method triggers the file opening event for the Compose view to handle
+     *
+     * @param photo The Photo object representing the file to be opened
+     */
+    fun openFile(photo: Photo) {
+        state.update {
+            it.copy(openFileNodeEvent = triggered(photo))
+        }
+    }
+
+    /**
+     * Reset and notify that openFileNodeEvent is consumed
+     */
+    fun resetOpenFileNodeEvent() {
+        state.update {
+            it.copy(openFileNodeEvent = consumed())
+        }
+    }
 }

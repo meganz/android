@@ -33,6 +33,7 @@ typealias ImageMapper = (
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards Boolean,
+    @JvmSuppressWildcards String,
 ) -> @JvmSuppressWildcards Photo.Image
 
 internal fun toImage(
@@ -50,6 +51,7 @@ internal fun toImage(
     isTakenDown: Boolean,
     isSensitive: Boolean,
     isSensitiveInherited: Boolean,
+    base64Id: String,
 ) = Photo.Image(
     id = id,
     albumPhotoId = albumPhotoId,
@@ -65,6 +67,7 @@ internal fun toImage(
     isTakenDown = isTakenDown,
     isSensitive = isSensitive,
     isSensitiveInherited = isSensitiveInherited,
+    base64Id = base64Id,
 )
 
 /**
@@ -85,6 +88,7 @@ typealias VideoMapper = (
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards Boolean,
+    @JvmSuppressWildcards String,
 ) -> @JvmSuppressWildcards Photo.Video
 
 internal fun toVideo(
@@ -102,6 +106,7 @@ internal fun toVideo(
     isTakenDown: Boolean,
     isSensitive: Boolean,
     isSensitiveInherited: Boolean,
+    base64Id: String,
 ) = Photo.Video(
     id = id,
     albumPhotoId = albumPhotoId,
@@ -117,6 +122,7 @@ internal fun toVideo(
     isTakenDown = isTakenDown,
     isSensitive = isSensitive,
     isSensitiveInherited = isSensitiveInherited,
+    base64Id = base64Id
 )
 
 class PhotoMapper @Inject constructor(
@@ -145,6 +151,7 @@ class PhotoMapper @Inject constructor(
                     node.isTakenDown,
                     node.isMarkedSensitive,
                     megaApiGateway.isSensitiveInherited(node),
+                    node.base64Handle
                 )
             }
 
@@ -164,6 +171,7 @@ class PhotoMapper @Inject constructor(
                     node.isTakenDown,
                     node.isMarkedSensitive,
                     megaApiGateway.isSensitiveInherited(node),
+                    node.base64Handle
                 )
             }
 

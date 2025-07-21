@@ -98,6 +98,8 @@ class DefaultPhotosRepositoryTest {
     }
     private val uiPreferencesGateway = mock<UIPreferencesGateway>()
 
+    private val mockBase64Id = "mockBase64Id"
+
     @Before
     fun setUp() {
         whenever(nodeRepository.monitorNodeUpdates())
@@ -348,6 +350,7 @@ class DefaultPhotosRepositoryTest {
         on { this.duration }.thenReturn(duration)
         on { this.isFile }.thenReturn(true)
         on { this.hasThumbnail() }.thenReturn(true)
+        on { base64Handle }.thenReturn(mockBase64Id)
     }
 
     private fun createImage(
@@ -365,21 +368,23 @@ class DefaultPhotosRepositoryTest {
         isTakenDown: Boolean,
         isSensitive: Boolean,
         isSensitiveInherited: Boolean,
+        base64Id: String,
     ): Photo.Image = Photo.Image(
-        id,
-        albumPhotoId,
-        parentId,
-        name,
-        isFavourite,
-        creationTime,
-        modificationTime,
-        thumbnailFilePath,
-        previewFilePath,
-        fileTypeInfo,
-        size,
-        isTakenDown,
-        isSensitive,
-        isSensitiveInherited,
+        id = id,
+        albumPhotoId = albumPhotoId,
+        parentId = parentId,
+        name = name,
+        isFavourite = isFavourite,
+        creationTime = creationTime,
+        modificationTime = modificationTime,
+        thumbnailFilePath = thumbnailFilePath,
+        previewFilePath = previewFilePath,
+        fileTypeInfo = fileTypeInfo,
+        base64Id = base64Id,
+        size = size,
+        isTakenDown = isTakenDown,
+        isSensitive = isSensitive,
+        isSensitiveInherited = isSensitiveInherited,
     )
 
     private fun createVideo(
@@ -397,21 +402,23 @@ class DefaultPhotosRepositoryTest {
         isTakenDown: Boolean,
         isSensitive: Boolean,
         isSensitiveInherited: Boolean,
+        base64Id: String,
     ): Photo.Video = Photo.Video(
-        id,
-        albumPhotoId,
-        parentId,
-        name,
-        isFavourite,
-        creationTime,
-        modificationTime,
-        thumbnailFilePath,
-        previewFilePath,
-        fileTypeInfo as VideoFileTypeInfo,
-        size,
-        isTakenDown,
-        isSensitive,
-        isSensitiveInherited,
+        id = id,
+        albumPhotoId = albumPhotoId,
+        parentId = parentId,
+        name = name,
+        isFavourite = isFavourite,
+        creationTime = creationTime,
+        modificationTime = modificationTime,
+        thumbnailFilePath = thumbnailFilePath,
+        previewFilePath = previewFilePath,
+        fileTypeInfo = fileTypeInfo as VideoFileTypeInfo,
+        base64Id = base64Id,
+        size = size,
+        isTakenDown = isTakenDown,
+        isSensitive = isSensitive,
+        isSensitiveInherited = isSensitiveInherited
     )
 
     @Test
@@ -422,11 +429,13 @@ class DefaultPhotosRepositoryTest {
                 on { handle }.thenReturn(-1L)
                 on { name }.thenReturn("image.jpg")
                 on { hasThumbnail() }.thenReturn(true)
+                on { base64Handle }.thenReturn(mockBase64Id)
             }
             val videoNode = mock<MegaNode> {
                 on { handle }.thenReturn(-2L)
                 on { name }.thenReturn("video.mp4")
                 on { hasThumbnail() }.thenReturn(true)
+                on { base64Handle }.thenReturn(mockBase64Id)
             }
             val imageFilter = mock<MegaSearchFilter>()
             val videoFilter = mock<MegaSearchFilter>()
@@ -486,11 +495,13 @@ class DefaultPhotosRepositoryTest {
                 on { handle }.thenReturn(-1L)
                 on { name }.thenReturn("image.jpg")
                 on { hasThumbnail() }.thenReturn(true)
+                on { base64Handle }.thenReturn(mockBase64Id)
             }
             val videoNode = mock<MegaNode> {
                 on { handle }.thenReturn(-2L)
                 on { name }.thenReturn("video.mp4")
                 on { hasThumbnail() }.thenReturn(true)
+                on { base64Handle }.thenReturn(mockBase64Id)
             }
             val imageFilter = mock<MegaSearchFilter>()
             val videoFilter = mock<MegaSearchFilter>()
@@ -542,11 +553,13 @@ class DefaultPhotosRepositoryTest {
                 on { handle }.thenReturn(-1L)
                 on { name }.thenReturn("image.jpg")
                 on { hasThumbnail() }.thenReturn(true)
+                on { base64Handle }.thenReturn(mockBase64Id)
             }
             val videoNode = mock<MegaNode> {
                 on { handle }.thenReturn(-2L)
                 on { name }.thenReturn("video.mp4")
                 on { hasThumbnail() }.thenReturn(true)
+                on { base64Handle }.thenReturn(mockBase64Id)
             }
             val imageFilter = mock<MegaSearchFilter>()
             val videoFilter = mock<MegaSearchFilter>()
@@ -601,11 +614,13 @@ class DefaultPhotosRepositoryTest {
                 on { handle }.thenReturn(-1L)
                 on { name }.thenReturn("image.jpg")
                 on { hasThumbnail() }.thenReturn(true)
+                on { base64Handle }.thenReturn(mockBase64Id)
             }
             val videoNode = mock<MegaNode> {
                 on { handle }.thenReturn(-2L)
                 on { name }.thenReturn("video.mp4")
                 on { hasThumbnail() }.thenReturn(true)
+                on { base64Handle }.thenReturn(mockBase64Id)
             }
             val imageFilter = mock<MegaSearchFilter>()
             val videoFilter = mock<MegaSearchFilter>()
@@ -658,11 +673,13 @@ class DefaultPhotosRepositoryTest {
             on { handle }.thenReturn(-1L)
             on { name }.thenReturn("image.jpg")
             on { hasThumbnail() }.thenReturn(true)
+            on { base64Handle }.thenReturn(mockBase64Id)
         }
         val videoNode = mock<MegaNode> {
             on { handle }.thenReturn(-2L)
             on { name }.thenReturn("video.mp4")
             on { hasThumbnail() }.thenReturn(true)
+            on { base64Handle }.thenReturn(mockBase64Id)
         }
         val imageFilter = mock<MegaSearchFilter>()
         val videoFilter = mock<MegaSearchFilter>()

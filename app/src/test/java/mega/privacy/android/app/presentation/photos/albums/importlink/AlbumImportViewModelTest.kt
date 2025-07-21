@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_LINK
-import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
@@ -38,15 +38,21 @@ import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.IsAlbumLinkValidUseCase
 import nz.mega.sdk.MegaNode
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
+@ExtendWith(TimberJUnit5Extension::class)
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AlbumImportViewModelTest {
     private lateinit var underTest: AlbumImportViewModel
 
@@ -87,7 +93,10 @@ class AlbumImportViewModelTest {
     fun setup() {
         whenever(mockMonitorConnectivityUseCase()).thenReturn(flowOf(false))
         runBlocking { whenever(mockHasCredentialsUseCaseUseCase()).thenReturn(false) }
+        initUnderTest()
+    }
 
+    private fun initUnderTest() {
         underTest = AlbumImportViewModel(
             savedStateHandle = mockSavedStateHandle,
             hasCredentialsUseCase = mockHasCredentialsUseCaseUseCase,
@@ -105,6 +114,26 @@ class AlbumImportViewModelTest {
             defaultDispatcher = StandardTestDispatcher(),
             getPublicNodeFromSerializedDataUseCase = mockGetPublicNodeFromSerializedDataUseCase,
             getPublicAlbumNodesDataUseCase = getPublicAlbumNodesDataUseCase,
+        )
+    }
+
+    @AfterEach
+    fun resetMocks() {
+        reset(
+            mockSavedStateHandle,
+            mockHasCredentialsUseCaseUseCase,
+            mockGetUserAlbums,
+            mockGetPublicAlbumUseCase,
+            mockGetPublicAlbumPhotoUseCase,
+            mockDownloadPublicAlbumPhotoThumbnailUseCase,
+            mockMonitorAccountDetailUseCase,
+            mockGetProscribedAlbumNamesUseCase,
+            mockGetStringFromStringResMapper,
+            mockImportPublicAlbumUseCase,
+            mockIsAlbumLinkValidUseCase,
+            mockMonitorConnectivityUseCase,
+            mockGetPublicNodeFromSerializedDataUseCase,
+            getPublicAlbumNodesDataUseCase,
         )
     }
 
@@ -126,7 +155,6 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that show decryption key dialog if link not contains key`() = runTest {
-        // given
         val link = "https://mega.nz/collection/handle"
 
         whenever(mockSavedStateHandle.get<String>(ALBUM_LINK))
@@ -452,6 +480,164 @@ class AlbumImportViewModelTest {
                 assertThat(awaitItem().downloadEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
             }
         }
+
+    @Test
+    fun `test that handleSharedAlbumLink handles link without sub-handle`() = runTest {
+        val album = mock<UserAlbum>()
+        val albumLink = "https://mega.nz/collection/handle#key!"
+        setupAlbumWithLink(albumLink, album, emptyList())
+
+        underTest.initialize()
+
+        underTest.stateFlow.test {
+            val state = awaitItem()
+            assertThat(state.folderSubHandle).isNull()
+        }
+    }
+
+    @Test
+    fun `test that handleSharedAlbumLink handles link with empty sub-handle`() = runTest {
+        val album = mock<UserAlbum>()
+        val albumLink = "https://mega.nz/collection/handle#key!"
+        setupAlbumWithLink(albumLink, album, emptyList())
+
+        underTest.initialize()
+
+        underTest.stateFlow.test {
+            val state = awaitItem()
+            assertThat(state.folderSubHandle).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that handleSharedAlbumLink handles null link`() = runTest {
+        whenever(mockSavedStateHandle.get<String>(ALBUM_LINK))
+            .thenReturn(null)
+
+        underTest.initialize()
+
+        underTest.stateFlow.test {
+            val state = awaitItem()
+            assertThat(state.folderSubHandle).isNull()
+        }
+    }
+
+    @Test
+    fun `test that handleSharedAlbumLink handles blank link`() = runTest {
+        whenever(mockSavedStateHandle.get<String>(ALBUM_LINK))
+            .thenReturn("")
+
+        underTest.initialize()
+
+        underTest.stateFlow.test {
+            val state = awaitItem()
+            assertThat(state.folderSubHandle).isNull()
+        }
+    }
+
+    @Test
+    fun `test that openFile triggers file opening event`() = runTest {
+        val photo = mock<Photo.Image>()
+
+        underTest.openFile(photo)
+
+        underTest.stateFlow.test {
+            val state = awaitItem()
+            assertThat(state.openFileNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            val content = (state.openFileNodeEvent as StateEventWithContentTriggered).content
+            assertThat(content).isEqualTo(photo)
+        }
+    }
+
+    @Test
+    fun `test that openFile event can be triggered multiple times`() = runTest {
+        val photo1 = mock<Photo.Image>()
+        val photo2 = mock<Photo.Image>()
+
+        underTest.stateFlow.test {
+            awaitItem()
+
+            underTest.openFile(photo1)
+            val state1 = awaitItem()
+            assertThat(state1.openFileNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            val content1 = (state1.openFileNodeEvent as StateEventWithContentTriggered).content
+            assertThat(content1).isEqualTo(photo1)
+
+            underTest.openFile(photo2)
+            val state2 = awaitItem()
+            assertThat(state2.openFileNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            val content2 = (state2.openFileNodeEvent as StateEventWithContentTriggered).content
+            assertThat(content2).isEqualTo(photo2)
+        }
+    }
+
+    @Test
+    fun `test that album with sub-handle opens specific photo on initialization`() = runTest {
+        val albumLink = "https://mega.nz/collection/handle#key!subHandle123"
+        val album = mock<UserAlbum>()
+        val photo1 = mock<Photo.Image> {
+            on { base64Id } doReturn "differentHandle"
+        }
+        val photo2 = mock<Photo.Image> {
+            on { base64Id } doReturn "subHandle123"
+        }
+        val photos = listOf(photo1, photo2)
+
+        setupAlbumWithLink(albumLink, album, photos)
+
+        initUnderTest()
+
+        underTest.stateFlow.drop(1).test {
+            val state = awaitItem()
+            assertThat(state.folderSubHandle).isEqualTo("subHandle123")
+
+            val finalState = awaitItem()
+            assertThat(finalState.openFileNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            val content = (finalState.openFileNodeEvent as StateEventWithContentTriggered).content
+            assertThat(content).isEqualTo(photo2)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that album without matching sub-handle does not open any photo`() = runTest {
+        val albumLink = "https://mega.nz/collection/handle#key!nonexistentHandle"
+        val album = mock<UserAlbum>()
+        val photo1 = mock<Photo.Image> {
+            on { base64Id } doReturn "handle1"
+        }
+        val photo2 = mock<Photo.Image> {
+            on { base64Id } doReturn "handle2"
+        }
+        val photos = listOf(photo1, photo2)
+
+        setupAlbumWithLink(albumLink, album, photos)
+
+        initUnderTest()
+
+        underTest.stateFlow.drop(1).test {
+            val state = awaitItem()
+            assertThat(state.folderSubHandle).isEqualTo("nonexistentHandle")
+
+            val finalState = awaitItem()
+            assertThat(finalState.openFileNodeEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private suspend fun setupAlbumWithLink(
+        albumLink: String,
+        album: UserAlbum,
+        photos: List<Photo>,
+    ) {
+        whenever(mockSavedStateHandle.get<String>(ALBUM_LINK)).thenReturn(albumLink)
+        whenever(mockHasCredentialsUseCaseUseCase()).thenReturn(false)
+        whenever(mockGetPublicAlbumUseCase(albumLink = AlbumLink(albumLink)))
+            .thenReturn(album to listOf())
+        whenever(mockGetPublicAlbumPhotoUseCase(albumPhotoIds = listOf()))
+            .thenReturn(photos)
+    }
 
     private suspend fun stubSelectedTypedNode(): TypedNode {
         val megaNode = stubSelectedMegaNode()

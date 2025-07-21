@@ -62,6 +62,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -202,6 +203,13 @@ internal fun AlbumImportScreen(
     if (state.isImportConstraintValid) {
         onNavigateFileExplorer()
         albumImportViewModel.clearImportConstraintValid()
+    }
+
+    EventEffect(
+        event = state.openFileNodeEvent,
+        onConsumed = albumImportViewModel::resetOpenFileNodeEvent
+    ) { photo ->
+        onPreviewPhoto(photo)
     }
 
     Scaffold(

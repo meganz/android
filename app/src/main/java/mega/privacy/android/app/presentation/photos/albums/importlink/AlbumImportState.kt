@@ -26,4 +26,6 @@ internal data class AlbumImportState(
     val showStorageExceededDialog: Boolean = false,
     val isBackToHome: Boolean = false,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
+    val folderSubHandle: String? = null,
+    val openFileNodeEvent: StateEventWithContent<Photo> = consumed(),
 )
