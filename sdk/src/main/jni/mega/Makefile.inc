@@ -83,7 +83,8 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/network_connectivity_test.cpp \
     sdk/src/udp_socket_tester.cpp \
     sdk/src/udp_socket.cpp \
-    sdk/src/localpath.cpp
+    sdk/src/localpath.cpp \
+    sdk/src/hashcash.cpp
 
 C_SOURCES = sdk/src/mega_glob.c
 
@@ -167,7 +168,8 @@ HEADERS= sdk/include/mega.h \
         sdk/include/mega/network_connectivity_test.h \
         sdk/include/mega/udp_socket_tester.h \
         sdk/include/mega/udp_socket.h \
-        sdk/include/mega/localpath.h
+        sdk/include/mega/localpath.h \
+        sdk/include/mega/hashcash.h
 
 # impl layer headers
 HEADERS += \
