@@ -69,6 +69,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.color_butto
  * @param onMenuClick action when the item menu is clicked
  */
 @OptIn(ExperimentalFoundationApi::class)
+@Deprecated("Use the version from core-ui library")
 @Composable
 fun NodeGridViewItem(
     isSelected: Boolean,
@@ -331,7 +332,7 @@ private data class NodeGridViewItemData(
 private class NodeGridViewItemDataProvider : PreviewParameterProvider<NodeGridViewItemData> {
     override val values = sequenceOf(
         NodeGridViewItemData(
-            name = "NodeGridViewItem",
+            name = "NodeGridViewItem NodeGridViewItem NodeGridViewItem.png",
             thumbnailData = null,
             duration = null,
             isTakenDown = false,

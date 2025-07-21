@@ -39,6 +39,7 @@ import java.io.File
  * @param modifier
  * @param contentScale content scale
  */
+@Deprecated("Use the version from core-ui library")
 @Composable
 fun GridThumbnailView(
     contentDescription: String?,
@@ -82,6 +83,7 @@ fun GridThumbnailView(
     )
 }
 
+@Deprecated("Use the version from core-ui library")
 @Composable
 fun GridThumbnailView(
     contentDescription: String?,

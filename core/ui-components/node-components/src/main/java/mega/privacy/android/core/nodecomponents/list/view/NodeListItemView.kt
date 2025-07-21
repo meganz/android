@@ -296,10 +296,9 @@ fun NodeListViewItem(
                 if (it) {
                     Checkbox(
                         checked = isSelected,
-                        onCheckStateChanged = {
-
-                        },
-                        enabled = true,
+                        onCheckStateChanged = { },
+                        tapTargetArea = false,
+                        clickable = false,
                         modifier = Modifier.testTag(CHECKBOX_TAG),
                     )
                 } else {
@@ -458,6 +457,26 @@ private fun GenericNodeListItemWithLongTitlePreview() {
             showFavourite = true,
             showLink = true,
             labelColor = DSTokens.colors.indicator.pink,
+            thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg",
+            onItemClicked = { }
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun GenericNodeListItemTakenDownPreview() {
+    AndroidThemeForPreviews {
+        NodeListViewItem(
+            title = "Taken down file",
+            subtitle = "8.1 MB • Feb 19, 2024",
+            icon = R.drawable.ic_folder_incoming_medium_solid,
+            onMoreClicked = { },
+            showOffline = false,
+            showVersion = false,
+            showFavourite = false,
+            showLink = false,
+            isTakenDown = true,
             thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg",
             onItemClicked = { }
         )
