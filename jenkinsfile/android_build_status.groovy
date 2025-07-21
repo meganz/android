@@ -110,10 +110,10 @@ pipeline {
                 String folder = "android-build/MR-${mrNumber}"
                 String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
 
-                // upload unit test report if unit test fail, wrapped in a collapsible details tag
+                // upload unit test reports for failed modules only, wrapped in a collapsible details tag
                 String unitTestResult = ""
                 if (!UNIT_TEST_RESULT_LINK_MAP.isEmpty()) {
-                    unitTestResult += "<details><summary><b>Unit Test Results</b></summary>"
+                    unitTestResult += "<details><summary><b>Failed Unit Test Results</b></summary>"
 
                     boolean first = true
                     for (def module in UNIT_TEST_RESULT_LINK_MAP.keySet()) {
@@ -273,19 +273,24 @@ pipeline {
                             common.downloadDependencyLibForSdk()
                         }
                         gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
-                            script {
+                            script { 
                                 util.useArtifactory() {
                                     def moduleList = common.getUnitTestModuleList()
+                                    def failedModules = []
+                                    
                                     try {
                                         sh "./gradlew --no-daemon runAllUnitTestsWithCoverage"
                                     } finally {
 
-                                        for (int i = 0; i < moduleList.size(); i++) {
-                                            String module = moduleList[i]
-                                            UNIT_TEST_RESULT_LINK_MAP.put(
-                                                    module,
-                                                    unitTestArchiveLink("${module}/build/unittest/html", "unit_test_result_${module.replace('/', '_')}.zip")
-                                            )
+                                        failedModules = detectFailedTestModules(moduleList)
+
+                                        if (!failedModules.isEmpty()) {
+                                            for (String module in failedModules) {
+                                                UNIT_TEST_RESULT_LINK_MAP.put(
+                                                        module,
+                                                        unitTestArchiveLink("${module}/build/unittest/html", "unit_test_result_${module.replace('/', '_')}.zip")
+                                                )
+                                            }
                                         }
                                     }
 
@@ -565,6 +570,36 @@ def checkFatalErrors(def lintJsonContent) {
     if (fatalCount > 0) {
         util.failPipeline("!!!!!!!! There are ${fatalCount} fatal lint errors. Build is failing.")
     }
+}
+
+/**
+ * Detects which modules have failed unit tests by checking their test result files.
+ * 
+ * @param moduleList List of all modules that were tested
+ * @return List of module names that have failed tests
+ */
+def detectFailedTestModules(List<String> moduleList) {
+    def failedModules = []
+    
+    for (String module in moduleList) {        
+        // Check if failure can be found in XML test reports under "build/unittest/junit"
+        if (fileExists("${module}/build/unittest/junit")) {
+            def testResultFiles = sh(
+                script: "grep -irE \"failures=\\\"[1-9][0-9]*\\\"\" ${module}/build/unittest/junit/* 2>/dev/null || true",
+                returnStdout: true
+            ).trim().split("\\r?\\n").findAll { it }
+
+            if (testResultFiles) {
+                failedModules.add(module)
+                println("Detected failed tests in module: ${module}")
+            }
+        } else {
+            println("No test result files found for module: ${module}")
+        }
+    }
+    
+    println("Failed modules detected: ${failedModules}")
+    return new ArrayList<>(failedModules)
 }
 
 /**
