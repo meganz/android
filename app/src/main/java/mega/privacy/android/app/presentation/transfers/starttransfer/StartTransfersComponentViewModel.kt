@@ -30,16 +30,17 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent.SlowDownloadPreviewInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -138,6 +139,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val deleteCompletedTransfersByIdUseCase: DeleteCompletedTransfersByIdUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val ratingHandler: RatingHandlerImpl,
+    private val crashReporter: CrashReporter,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -174,6 +176,12 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     if (!isCopyEvent && checkAndHandleDeviceIsNotConnected()) {
                         return@launch
                     }
+
+                    checkPossiblePerformanceIssues(
+                        DOWNLOADING_STRING,
+                        transferTriggerEvent.nodes.size
+                    )
+
                     if (transferTriggerEvent.nodes.isEmpty() && !isCopyEvent) {
                         Timber.e("Node in $transferTriggerEvent must exist")
                         _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
@@ -183,6 +191,10 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 }
 
                 is TransferTriggerEvent.StartChatUpload -> {
+                    checkPossiblePerformanceIssues(
+                        UPLOADING_CHAT_FILES_STRING,
+                        transferTriggerEvent.uris.size,
+                    )
                     startChatUploads(
                         chatId = transferTriggerEvent.chatId,
                         uris = transferTriggerEvent.uris,
@@ -194,6 +206,11 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     if (checkAndHandleDeviceIsNotConnected()) {
                         return@launch
                     }
+
+                    checkPossiblePerformanceIssues(
+                        UPLOADING_STRING,
+                        transferTriggerEvent.pathsAndNames.size
+                    )
                     startUploads(transferTriggerEvent = transferTriggerEvent)
                 }
 
@@ -201,10 +218,21 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     if (checkAndHandleDeviceIsNotConnected()) {
                         return@launch
                     }
+
+                    checkPossiblePerformanceIssues(
+                        RETRYING_STRING,
+                        transferTriggerEvent.idsAndEvents.size
+                    )
                     retryTransfers(transferTriggerEvent = transferTriggerEvent)
                 }
             }
             checkAndHandleTransfersPaused(transferTriggerEvent)
+        }
+    }
+
+    private fun checkPossiblePerformanceIssues(text: String, count: Int) {
+        if (count > POSSIBLE_PERFORMANCE_ISSUE_NUMBER) {
+            crashReporter.log(text + COUNT_STRING + count)
         }
     }
 
@@ -1153,3 +1181,10 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         private val alreadySlowNotifiedGroups = mutableListOf<Int>()
     }
 }
+
+internal const val POSSIBLE_PERFORMANCE_ISSUE_NUMBER = 10000
+internal const val DOWNLOADING_STRING = "Possible performance issue downloading."
+internal const val UPLOADING_CHAT_FILES_STRING = "Possible performance issue uploading chat files."
+internal const val UPLOADING_STRING = "Possible performance issue uploading."
+internal const val RETRYING_STRING = "Possible performance issue retrying transfers."
+internal const val COUNT_STRING = " Count: "

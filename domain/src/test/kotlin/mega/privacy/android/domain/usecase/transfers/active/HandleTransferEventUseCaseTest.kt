@@ -5,9 +5,11 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
@@ -45,6 +47,7 @@ class HandleTransferEventUseCaseTest {
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
     private val handleAvailableOfflineEventUseCase = mock<HandleAvailableOfflineEventUseCase>()
     private val broadcastStorageOverQuotaUseCase = mock<BroadcastStorageOverQuotaUseCase>()
+    private val crashReporter = mock<CrashReporter>()
 
     @BeforeAll
     fun setUp() {
@@ -54,6 +57,7 @@ class HandleTransferEventUseCaseTest {
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
             broadcastStorageOverQuotaUseCase = broadcastStorageOverQuotaUseCase,
             handleAvailableOfflineEventUseCase = handleAvailableOfflineEventUseCase,
+            crashReporter = crashReporter,
         )
     }
 
@@ -65,6 +69,7 @@ class HandleTransferEventUseCaseTest {
             broadcastTransferOverQuotaUseCase,
             broadcastStorageOverQuotaUseCase,
             handleAvailableOfflineEventUseCase,
+            crashReporter,
         )
     }
 
@@ -438,6 +443,57 @@ class HandleTransferEventUseCaseTest {
                 )
             )
         }
+
+    @ParameterizedTest(name = ". Event: {0}")
+    @MethodSource("provideTransferEventsForPerformanceIssues")
+    fun `test that checkPossiblePerformanceIssues invokes crashReporter if required`(
+        transferEvent: TransferEvent,
+    ) = runTest {
+        underTest.invoke(transferEvent)
+
+        with(transferEvent) {
+            if (this is TransferEvent.FolderTransferUpdateEvent
+                && stage == TransferStage.STAGE_TRANSFERRING_FILES
+                && fileCount > POSSIBLE_PERFORMANCE_ISSUE_NUMBER
+            ) {
+                val mainText =
+                    if (transfer.transferType == TransferType.DOWNLOAD) DOWNLOADING_FOLDER_STRING
+                    else UPLOADING_FOLDER_STRING
+
+                verify(crashReporter).log(
+                    mainText + FOLDER_COUNT_STRING + folderCount + FILE_COUNT_STRING + fileCount
+                )
+            } else {
+                verifyNoInteractions(crashReporter)
+            }
+        }
+    }
+
+    private fun provideTransferEventsForPerformanceIssues() =
+        provideTransferEvents<TransferEvent.TransferStartEvent>() +
+                provideTransferEvents<TransferEvent.TransferFinishEvent>() +
+                provideTransferEvents<TransferEvent.TransferUpdateEvent>() +
+                provideTransferEvents<TransferEvent.TransferPaused>() +
+                provideTransferEvents<TransferEvent.TransferTemporaryErrorEvent>() +
+                provideTransferEvents<TransferEvent.FolderTransferUpdateEvent> {
+                    on { stage } doReturn TransferStage.STAGE_TRANSFERRING_FILES
+                    on { fileCount } doReturn 10001
+                    on { folderCount } doReturn 45
+                } +
+                provideTransferEvents<TransferEvent.FolderTransferUpdateEvent> {
+                    on { stage } doReturn TransferStage.STAGE_TRANSFERRING_FILES
+                    on { fileCount } doReturn 9999
+                    on { folderCount } doReturn 67
+                } +
+                provideTransferEvents<TransferEvent.FolderTransferUpdateEvent> {
+                    on { stage } doReturn TransferStage.STAGE_NONE
+                } +
+                provideTransferEvents<TransferEvent.FolderTransferUpdateEvent> {
+                    on { stage } doReturn TransferStage.STAGE_SCANNING
+                } +
+                provideTransferEvents<TransferEvent.FolderTransferUpdateEvent> {
+                    on { stage } doReturn TransferStage.STAGE_CREATING_TREE
+                }
 
     private fun provideStartPauseFinishEvents() =
         provideTransferEvents<TransferEvent.TransferStartEvent>() +

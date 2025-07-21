@@ -20,7 +20,13 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
+import mega.privacy.android.app.presentation.transfers.starttransfer.COUNT_STRING
+import mega.privacy.android.app.presentation.transfers.starttransfer.DOWNLOADING_STRING
+import mega.privacy.android.app.presentation.transfers.starttransfer.POSSIBLE_PERFORMANCE_ISSUE_NUMBER
+import mega.privacy.android.app.presentation.transfers.starttransfer.RETRYING_STRING
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.UPLOADING_CHAT_FILES_STRING
+import mega.privacy.android.app.presentation.transfers.starttransfer.UPLOADING_STRING
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.ConfirmLargeDownloadInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
@@ -36,9 +42,11 @@ import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.CloudTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -169,6 +177,7 @@ class StartTransfersComponentViewModelTest {
     private val deleteCompletedTransfersByIdUseCase = mock<DeleteCompletedTransfersByIdUseCase>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
     private val ratingHandlerImpl = mock<RatingHandlerImpl>()
+    private val crashReporter = mock<CrashReporter>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -246,6 +255,7 @@ class StartTransfersComponentViewModelTest {
             deleteCompletedTransfersByIdUseCase = deleteCompletedTransfersByIdUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             ratingHandler = ratingHandlerImpl,
+            crashReporter = crashReporter,
         )
     }
 
@@ -294,7 +304,8 @@ class StartTransfersComponentViewModelTest {
             getTransferByTagUseCase,
             broadcastTransferTagToCancelUseCase,
             deleteCompletedTransfersByIdUseCase,
-            monitorStorageStateEventUseCase
+            monitorStorageStateEventUseCase,
+            crashReporter,
         )
         initialStub()
     }
@@ -1477,6 +1488,89 @@ class StartTransfersComponentViewModelTest {
             val actual = awaitItem()
             assertThat(actual.previewFileToOpen).isEqualTo(file)
             assertThat(actual.jobInProgressState).isNull()
+        }
+    }
+
+    @ParameterizedTest(name = ". Event: {0}")
+    @MethodSource("provideTransferEventsForPerformanceIssues")
+    fun `test that checkPossiblePerformanceIssues invokes crashReporter if required`(
+        transferTriggerEvent: TransferTriggerEvent,
+    ) = runTest {
+        var count = 0
+        var text = ""
+
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
+
+        underTest.startTransfer(transferTriggerEvent)
+        with(transferTriggerEvent) {
+            when (this) {
+                is TransferTriggerEvent.DownloadTriggerEvent -> {
+                    count = nodes.size
+                    text = DOWNLOADING_STRING
+                }
+
+                is TransferTriggerEvent.StartChatUpload -> {
+                    count = uris.size
+                    text = UPLOADING_CHAT_FILES_STRING
+                }
+
+                is TransferTriggerEvent.StartUpload -> {
+                    count = pathsAndNames.size
+                    text = UPLOADING_STRING
+                }
+
+                is TransferTriggerEvent.RetryTransfers -> {
+                    count = idsAndEvents.size
+                    text = RETRYING_STRING
+                }
+            }
+        }
+
+        if (count > POSSIBLE_PERFORMANCE_ISSUE_NUMBER) {
+            verify(crashReporter).log(text + COUNT_STRING + count)
+        } else {
+            verifyNoInteractions(crashReporter)
+        }
+    }
+
+    private fun provideTransferEventsForPerformanceIssues() =
+        provideStartEvents() + listOf(
+            TransferTriggerEvent.StartDownloadNode(
+                nodes = provideListOfNodes(),
+                withStartMessage = false,
+            ),
+            TransferTriggerEvent.StartChatUpload.Files(CHAT_ID, provideListOfUris()),
+            TransferTriggerEvent.StartUpload.Files(provideMapOfPathsAndNames(), parentId),
+            TransferTriggerEvent.RetryTransfers(provideMapOfIdsAndEvents()),
+        )
+
+    private fun provideListOfNodes(size: Int = POSSIBLE_PERFORMANCE_ISSUE_NUMBER + 1) =
+        buildList {
+            for (i in 0 until size) {
+                add(node)
+            }
+        }
+
+    private fun provideListOfUris(size: Int = POSSIBLE_PERFORMANCE_ISSUE_NUMBER + 1) =
+        buildList {
+            for (i in 0 until size) {
+                add(uploadUri)
+            }
+        }
+
+    private fun provideMapOfPathsAndNames(
+        size: Int = POSSIBLE_PERFORMANCE_ISSUE_NUMBER + 1,
+    ): Map<String, String?> = buildMap {
+        for (i in 0 until size) {
+            put(DESTINATION + i, null)
+        }
+    }
+
+    private fun provideMapOfIdsAndEvents(
+        size: Int = POSSIBLE_PERFORMANCE_ISSUE_NUMBER + 1,
+    ): Map<Int, CloudTransfer> = buildMap {
+        for (i in 0 until size) {
+            put(i, startUploadFilesEvent)
         }
     }
 

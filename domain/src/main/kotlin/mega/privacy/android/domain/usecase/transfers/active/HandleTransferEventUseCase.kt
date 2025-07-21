@@ -1,9 +1,12 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferStage
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
@@ -22,6 +25,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
     private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase,
     private val handleAvailableOfflineEventUseCase: HandleAvailableOfflineEventUseCase,
+    private val crashReporter: CrashReporter,
 ) : IHandleTransferEventUseCase {
 
     /**
@@ -31,6 +35,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
     override suspend operator fun invoke(vararg events: TransferEvent) {
         val transferEvents = events.asList().takeIf { it.isNotEmpty() } ?: return
 
+        checkPossiblePerformanceIssues(transferEvents)
         checkOverQuota(transferEvents)
         checkBusinessAccountExpired(transferEvents)
 
@@ -162,4 +167,29 @@ class HandleTransferEventUseCase @Inject internal constructor(
 
         return sortedMap.values.toList().takeIf { it.isNotEmpty() }
     }
+
+    private fun checkPossiblePerformanceIssues(events: List<TransferEvent>) {
+        events.filterIsInstance<TransferEvent.FolderTransferUpdateEvent>()
+            .filter {
+                it.stage == TransferStage.STAGE_TRANSFERRING_FILES
+                        && it.fileCount > POSSIBLE_PERFORMANCE_ISSUE_NUMBER
+            }
+            .forEach { folderUpdate ->
+                val mainText =
+                    if (folderUpdate.transfer.transferType == TransferType.DOWNLOAD) DOWNLOADING_FOLDER_STRING
+                    else UPLOADING_FOLDER_STRING
+
+                crashReporter.log(
+                    mainText
+                            + FOLDER_COUNT_STRING + folderUpdate.folderCount
+                            + FILE_COUNT_STRING + folderUpdate.fileCount
+                )
+            }
+    }
 }
+
+internal const val POSSIBLE_PERFORMANCE_ISSUE_NUMBER = 10000
+internal const val UPLOADING_FOLDER_STRING = "Possible performance issue uploading folder."
+internal const val DOWNLOADING_FOLDER_STRING = "Possible performance issue uploading folder."
+internal const val FOLDER_COUNT_STRING = " Folder count: "
+internal const val FILE_COUNT_STRING = ". File count: "
