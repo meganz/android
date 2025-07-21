@@ -11,10 +11,10 @@ import mega.privacy.android.app.presentation.photos.model.MediaListItem
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 
 /**
  * Media Discovery View state

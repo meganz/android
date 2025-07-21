@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.provider
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 
 /**
  * File Provider UI State

@@ -1,6 +1,5 @@
-package mega.privacy.android.app.presentation.transfers.starttransfer.model
+package mega.privacy.android.domain.entity.transfer.event
 
-import android.net.Uri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
@@ -183,11 +182,11 @@ sealed interface TransferTriggerEvent {
      * Copy uri
      *
      * @property name
-     * @property uri
+     * @property uriPath
      */
     data class CopyUri(
         val name: String,
-        val uri: Uri,
+        val uriPath: UriPath,
         override val waitNotificationPermissionResponseToStart: Boolean = false,
         override val withStartMessage: Boolean = false,
     ) : CopyTriggerEvent

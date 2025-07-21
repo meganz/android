@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+
 /**
  * Info to ask confirmation for large downloads
  * @param sizeString: the size of the download

@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.ExportListener
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
@@ -928,7 +928,7 @@ class TextEditorViewModel @Inject constructor(
                     transferEvent = triggered(
                         TransferTriggerEvent.CopyUri(
                             name = getNameOfFile(),
-                            uri = File(getFileUri().toString()).toUri()
+                            uriPath = UriPath(getFileUri().toString())
                         )
                     )
                 )

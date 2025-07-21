@@ -30,7 +30,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent.SlowDownloadPreviewInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -238,8 +238,11 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                                 Timber.e("Node in $event must exist")
                                 null
                             } else {
-                                runCatching { getOfflinePathForNodeUseCase(event.node) }
-                                    .onFailure { Timber.e(it) }
+                                runCatching {
+                                    val node = event.node
+                                    requireNotNull(node)
+                                    getOfflinePathForNodeUseCase(node)
+                                }.onFailure { Timber.e(it) }
                                     .getOrNull()
                             }
                         } else if (event is TransferTriggerEvent.RetryDownloadNode) {
@@ -476,7 +479,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         runCatching {
             saveUriToDeviceUseCase(
                 name = startDownloadNode.name,
-                source = UriPath(startDownloadNode.uri.toString()),
+                source = startDownloadNode.uriPath,
                 destination = UriPath(destination)
             )
         }.onSuccess {
@@ -509,13 +512,19 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
         viewModelScope.launch {
             startDownloadNodes(
-                nodes = listOf(event.node),
+                nodes = listOfNotNull(event.node),
                 isHighPriority = true,
                 getUri = {
                     runCatching {
                         getFilePreviewDownloadPathUseCase().also {
                             // delete the existing file if already exists, because if the preview exists and we need to download it means it's outdated
-                            runCatching { deleteCacheFilesUseCase(listOf(UriPath(it + event.node.name))) }
+                            runCatching {
+                                val node = event.node
+                                requireNotNull(node)
+                                deleteCacheFilesUseCase(listOf(UriPath(it + node.name)))
+                            }.onFailure {
+                                Timber.e(it, "Error deleting existing preview file")
+                            }
                         }
                     }
                         .onFailure { Timber.e(it) }
@@ -536,11 +545,14 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
         viewModelScope.launch {
             startDownloadNodes(
-                nodes = listOf(event.node),
-                event.isHighPriority,
+                nodes = listOfNotNull(event.node),
+                isHighPriority = event.isHighPriority,
                 getUri = {
-                    runCatching { getOfflinePathForNodeUseCase(event.node) }
-                        .onFailure { Timber.e(it) }
+                    runCatching {
+                        val node = event.node
+                        requireNotNull(node)
+                        getOfflinePathForNodeUseCase(node)
+                    }.onFailure { Timber.e(it) }
                         .getOrNull()
                 },
                 transferTriggerEvent = event,

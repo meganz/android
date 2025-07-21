@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 
 /**
  * One off events related to start transfers

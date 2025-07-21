@@ -54,9 +54,9 @@ import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.DownloadTriggerEvent
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent.StartDownloadForOffline
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartDownloadForOffline
 import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
@@ -132,6 +132,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
@@ -1273,7 +1274,7 @@ class VideoPlayerViewModel @Inject constructor(
                     val mediaItem = mediaPlayerGateway.getCurrentMediaItem()
                     val uri = mediaItem?.localConfiguration?.uri ?: return@launch
                     val nodeName = uiState.value.currentPlayingItemName ?: return@launch
-                    TransferTriggerEvent.CopyUri(nodeName, uri)
+                    TransferTriggerEvent.CopyUri(nodeName, UriPath(uri.toString()))
                 }
 
                 FROM_CHAT -> {

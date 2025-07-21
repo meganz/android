@@ -2,8 +2,8 @@ package mega.privacy.android.app.presentation.transfers.preview.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 
 /**
  * Fake preview state.

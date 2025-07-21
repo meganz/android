@@ -7,13 +7,14 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -211,14 +212,16 @@ class StartDownloadViewModelTest {
 
     @Test
     fun `test that onCopyUriClicked launches the correct event`() = runTest {
-        val uri = mock<Uri>()
+        val uri = mock<Uri> {
+            on { toString() }.thenReturn("content://example/uri")
+        }
         underTest.onCopyUriClicked("name", uri)
         underTest.state.test {
             val event = awaitItem()
             assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
             val content = (event as StateEventWithContentTriggered).content
             assertThat(content).isInstanceOf(TransferTriggerEvent.CopyUri::class.java)
-            assertThat((content as TransferTriggerEvent.CopyUri).uri).isEqualTo(uri)
+            assertThat((content as TransferTriggerEvent.CopyUri).uriPath).isEqualTo(UriPath(uri.toString()))
         }
     }
 

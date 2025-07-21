@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.model
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.net.Uri
 import android.util.Base64
@@ -44,7 +43,6 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.INVALID_LOCATION_MESSAGE_ID
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.ChatArgs
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
@@ -66,6 +64,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.MegaException
@@ -147,6 +146,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueU
 import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ChatConversationUnmuteMenuToolbarEvent
 import timber.log.Timber
 import java.io.File

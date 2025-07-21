@@ -2,8 +2,8 @@ package mega.privacy.android.app.presentation.fileexplorer.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 
 /**
  * The File Explorer UI State

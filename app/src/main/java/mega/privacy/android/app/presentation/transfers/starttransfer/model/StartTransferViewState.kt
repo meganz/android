@@ -5,6 +5,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import kotlinx.parcelize.Parcelize
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import java.io.File
 
 /**
