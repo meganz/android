@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
@@ -13,10 +14,14 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.appstate.initialisation.AuthInitialiser
+import mega.privacy.android.app.appstate.mapper.BlockedStateMapper
 import mega.privacy.android.app.appstate.model.AuthState
+import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
@@ -24,6 +29,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -38,6 +45,8 @@ class AuthStateViewModelTest {
     private lateinit var underTest: AuthStateViewModel
     private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
     private val monitorUserCredentialsUseCase = mock<MonitorUserCredentialsUseCase>()
+    private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
+
     private val authInitialiser = mock<AuthInitialiser>()
 
     @BeforeAll
@@ -56,6 +65,8 @@ class AuthStateViewModelTest {
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
             authInitialiser = authInitialiser,
+            monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
+            blockedStateMapper = BlockedStateMapper(),
         )
     }
 
@@ -79,6 +90,8 @@ class AuthStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(MutableStateFlow(null))
         }
+
+        stubNotBlockedState()
 
         underTest.state.test {
             val state = awaitItem()
@@ -138,10 +151,12 @@ class AuthStateViewModelTest {
             on { invoke() }.thenReturn(MutableStateFlow(credentials))
         }
 
+        stubNotBlockedState()
+
         underTest.state.filterIsInstance<AuthState.LoggedIn>().test {
             val state = awaitItem()
             assertThat(state.themeMode).isEqualTo(themeMode)
-            assertThat(state.credentials).isEqualTo(credentials)
+            assertThat(state.session).isEqualTo(credentials.session)
 
             // Verify post-login initializers were called with the session
             verify(authInitialiser).onPostLogin("test-session")
@@ -160,6 +175,8 @@ class AuthStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(MutableStateFlow(null))
         }
+
+        stubNotBlockedState()
 
         underTest.state.test {
             val state = awaitItem()
@@ -215,6 +232,9 @@ class AuthStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(MutableStateFlow(credentials))
             }
+
+            stubNotBlockedState()
+
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state).isInstanceOf(AuthState.RequireLogin::class.java)
@@ -241,10 +261,12 @@ class AuthStateViewModelTest {
                 on { invoke() }.thenReturn(MutableStateFlow(credentials))
             }
 
+            stubNotBlockedState()
+
             underTest.state.filterIsInstance<AuthState.LoggedIn>().test {
                 val state = awaitItem()
                 assertThat(state.themeMode).isEqualTo(themeMode)
-                assertThat(state.credentials).isEqualTo(credentials)
+                assertThat(state.session).isEqualTo(credentials.session)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -268,6 +290,8 @@ class AuthStateViewModelTest {
             on { invoke() }.thenReturn(credentialsFlow)
         }
 
+        stubNotBlockedState()
+
         underTest.state.test {
             // Initial state should be loading
             val initialState = awaitItem()
@@ -279,7 +303,7 @@ class AuthStateViewModelTest {
             // State should transition to logged in
             val loggedInState = awaitItem()
             assertThat(loggedInState).isInstanceOf(AuthState.LoggedIn::class.java)
-            assertThat((loggedInState as AuthState.LoggedIn).credentials).isEqualTo(credentials)
+            assertThat((loggedInState as AuthState.LoggedIn).session).isEqualTo(credentials.session)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -304,7 +328,7 @@ class AuthStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(credentialsFlow)
             }
-
+            stubNotBlockedState()
 
             underTest.state.test {
                 // Initial state should be logged in
@@ -352,7 +376,7 @@ class AuthStateViewModelTest {
 
             val updatedState = awaitItem()
             assertThat(updatedState.themeMode).isEqualTo(newThemeMode)
-            assertThat(updatedState.credentials).isEqualTo(credentials)
+            assertThat(updatedState.session).isEqualTo(credentials.session)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -392,6 +416,8 @@ class AuthStateViewModelTest {
             on { invoke() }.thenReturn(MutableStateFlow(credentials))
         }
 
+        stubNotBlockedState()
+
         underTest.state.test {
             val state = awaitItem()
             assertThat(state).isInstanceOf(AuthState.LoggedIn::class.java)
@@ -423,6 +449,8 @@ class AuthStateViewModelTest {
             on { invoke() }.thenReturn(credentialsFlow)
         }
 
+        stubNotBlockedState()
+
         underTest.state.test {
             // Should still emit the initial loading state even with errors
             val state = awaitItem()
@@ -435,6 +463,203 @@ class AuthStateViewModelTest {
                 expectedThemeMode
             )
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that when blocked state is not blocked and a session exists, auth state is logged in `() =
+        runTest {
+            val credentials = UserCredentials(
+                email = "test@example.com",
+                session = "test-session",
+                firstName = "John",
+                lastName = "Doe",
+                myHandle = "123456789"
+            )
+
+            val themeMode = ThemeMode.Light
+            monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+            }
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(credentials))
+            }
+            stubNotBlockedState()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(AuthState.LoggedIn::class.java)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that when blocked state is not blocked and no session exists, auth state is not logged in `() =
+        runTest {
+            val themeMode = ThemeMode.Light
+            monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+            }
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(null))
+            }
+            stubNotBlockedState()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(AuthState.RequireLogin::class.java)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @ParameterizedTest
+    @MethodSource("provideBlockedStates")
+    fun `test that all blocked states sets state to not logged in`(blockedEvent: AccountBlockedEvent) =
+        runTest {
+            val credentials = UserCredentials(
+                email = "test@example.com",
+                session = "test-session",
+                firstName = "John",
+                lastName = "Doe",
+                myHandle = "123456789"
+            )
+
+            val themeMode = ThemeMode.Light
+            monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+            }
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(credentials))
+            }
+            monitorAccountBlockedUseCase.stub {
+                on { invoke() }.thenReturn(flow {
+                    emit(blockedEvent)
+                    awaitCancellation()
+                })
+            }
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(AuthState.RequireLogin::class.java)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    private fun provideBlockedStates() =
+        AccountBlockedType.entries.filterNot { it == AccountBlockedType.NOT_BLOCKED }.map {
+            AccountBlockedEvent(
+                handle = it.ordinal.toLong(),
+                type = it,
+                text = it.name
+            )
+        }
+
+    @Test
+    fun `test that state transitions from logged in to require login when account becomes blocked`() =
+        runTest {
+            val credentials = UserCredentials(
+                email = "test@example.com",
+                session = "test-session",
+                firstName = "John",
+                lastName = "Doe",
+                myHandle = "123456789"
+            )
+
+            val themeMode = ThemeMode.Light
+            monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+            }
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(credentials))
+            }
+
+            val blockedFlow = MutableStateFlow(notBlockedEvent)
+            monitorAccountBlockedUseCase.stub {
+                on { invoke() }.thenReturn(blockedFlow)
+            }
+
+            underTest.state.test {
+                // Initial state should be logged in
+                val initialState = awaitItem()
+                assertThat(initialState).isInstanceOf(AuthState.LoggedIn::class.java)
+
+                // Emit null credentials
+                blockedFlow.emit(
+                    AccountBlockedEvent(
+                        handle = -1L,
+                        type = AccountBlockedType.VERIFICATION_EMAIL,
+                        text = ""
+                    )
+                )
+
+                // State should transition to loading
+                val loadingState = awaitItem()
+                assertThat(loadingState).isInstanceOf(AuthState.RequireLogin::class.java)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state transitions from require login to logged in when account becomes blocked`() =
+        runTest {
+            val credentials = UserCredentials(
+                email = "test@example.com",
+                session = "test-session",
+                firstName = "John",
+                lastName = "Doe",
+                myHandle = "123456789"
+            )
+
+            val themeMode = ThemeMode.Light
+            monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+            }
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(credentials))
+            }
+
+            val blockedFlow = MutableStateFlow(
+                AccountBlockedEvent(
+                    handle = -1L,
+                    type = AccountBlockedType.VERIFICATION_EMAIL,
+                    text = ""
+                )
+            )
+            monitorAccountBlockedUseCase.stub {
+                on { invoke() }.thenReturn(blockedFlow)
+            }
+
+            underTest.state.test {
+                // Initial state should be logged in
+                val initialState = awaitItem()
+                assertThat(initialState).isInstanceOf(AuthState.RequireLogin::class.java)
+
+                // Emit null credentials
+                blockedFlow.emit(
+                    notBlockedEvent
+                )
+
+                // State should transition to loading
+                val loadingState = awaitItem()
+                assertThat(loadingState).isInstanceOf(AuthState.LoggedIn::class.java)
+                assertThat((loadingState as AuthState.LoggedIn).session).isEqualTo(credentials.session)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    private val notBlockedEvent = AccountBlockedEvent(
+        handle = -1L,
+        type = AccountBlockedType.NOT_BLOCKED,
+        text = ""
+    )
+
+    private fun stubNotBlockedState() {
+        monitorAccountBlockedUseCase.stub {
+            on { invoke() }.thenReturn(flow {
+                emit(
+                    notBlockedEvent
+                )
+                awaitCancellation()
+            })
         }
     }
 

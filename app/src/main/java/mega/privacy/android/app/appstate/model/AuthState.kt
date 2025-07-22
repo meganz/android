@@ -2,7 +2,6 @@ package mega.privacy.android.app.appstate.model
 
 import androidx.compose.runtime.Stable
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.user.UserCredentials
 
 @Stable
 sealed interface AuthState {
@@ -14,10 +13,11 @@ sealed interface AuthState {
 
     data class RequireLogin(
         override val themeMode: ThemeMode,
+        val accountBlockedState: BlockedState,
     ) : AuthState
 
     data class LoggedIn(
         override val themeMode: ThemeMode,
-        val credentials: UserCredentials,
+        val session: String,
     ) : AuthState
 }

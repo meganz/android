@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -60,7 +60,7 @@ class MegaActivity : ComponentActivity() {
                     is AuthState.Loading -> {}
                     is AuthState.LoggedIn -> {
                         navController.popBackStack()
-                        navController.navigate(route = LoggedInScreens(session = currentState.credentials.session.orEmpty()))
+                        navController.navigate(route = LoggedInScreens(session = currentState.session))
                     }
 
                     is AuthState.RequireLogin -> {
