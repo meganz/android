@@ -30,7 +30,10 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
  */
 @Entity(
     tableName = TABLE_PENDING_TRANSFER,
-    indices = [Index(value = ["state", "transferUniqueId", "transferType"])]
+    indices = [
+        Index(value = ["transferUniqueId"]),
+        Index(value = ["state"]),
+        Index(value = ["transferType", "state"])]
 )
 @TypeConverters(PendingTransferNodeIdentifierConverter::class)
 data class PendingTransferEntity(

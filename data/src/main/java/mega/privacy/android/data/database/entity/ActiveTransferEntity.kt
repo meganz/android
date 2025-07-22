@@ -27,7 +27,11 @@ import mega.privacy.android.domain.entity.transfer.TransferType
  */
 @Entity(
     MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS,
-    indices = [Index(value = ["transfer_type"])]
+    indices = [
+        Index(value = ["transfer_type"]),
+        Index(value = ["uniqueId"]),
+        Index(value = ["tag"]),
+    ]
 )
 @TypeConverters(ActiveTransferAppDataConverter::class)
 internal data class ActiveTransferEntity(

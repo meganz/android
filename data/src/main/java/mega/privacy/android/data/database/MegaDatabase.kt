@@ -280,6 +280,45 @@ internal abstract class MegaDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_110_111 = object : Migration(110, 111) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Update ActiveTransferEntity indices
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS}_uniqueId " +
+                            "ON ${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS} (uniqueId)"
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS}_tag " +
+                            "ON ${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS} (tag)"
+                )
+
+                // Update CompletedTransferEntity indices - drop composite index and create separate indices
+                db.execSQL("DROP INDEX IF EXISTS index_${MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS}_transferstate_transfertimestamp")
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS}_transferstate " +
+                            "ON ${MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS} (transferstate)"
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS}_transfertimestamp " +
+                            "ON ${MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS} (transfertimestamp)"
+                )
+
+                // Update PendingTransferEntity indices - drop composite index and create separate indices
+                db.execSQL("DROP INDEX IF EXISTS index_${MegaDatabaseConstant.TABLE_PENDING_TRANSFER}_state_transferUniqueId_transferType")
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_PENDING_TRANSFER}_transferUniqueId " +
+                            "ON ${MegaDatabaseConstant.TABLE_PENDING_TRANSFER} (transferUniqueId)"
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_PENDING_TRANSFER}_state " +
+                            "ON ${MegaDatabaseConstant.TABLE_PENDING_TRANSFER} (state)"
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_PENDING_TRANSFER}_transferType_state " +
+                            "ON ${MegaDatabaseConstant.TABLE_PENDING_TRANSFER} (transferType, state)"
+                )
+            }
+        }
 
         val MIGRATIONS = arrayOf(
             MIGRATION_67_68,
@@ -292,6 +331,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
             MIGRATION_77_78,
             MIGRATION_85_86,
             MIGRATION_107_108,
+            MIGRATION_110_111,
         )
     }
 }
