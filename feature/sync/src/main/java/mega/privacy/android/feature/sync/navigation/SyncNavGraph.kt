@@ -3,7 +3,7 @@ package mega.privacy.android.feature.sync.navigation
 import android.content.Context
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager

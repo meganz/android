@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId

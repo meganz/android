@@ -67,7 +67,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.VideoFileTypeInfo

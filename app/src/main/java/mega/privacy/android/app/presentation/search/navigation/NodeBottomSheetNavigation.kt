@@ -9,7 +9,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.view.NodeOptionsBottomSheetContent
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.NodeSourceType
 
 internal const val nodeBottomSheetRoute = "search/node_bottom_sheet"

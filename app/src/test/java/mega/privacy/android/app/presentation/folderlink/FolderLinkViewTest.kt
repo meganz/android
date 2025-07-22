@@ -22,7 +22,7 @@ import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BU
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.legacy.core.ui.controls.lists.MEDIA_DISCOVERY_TAG
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.SNACKBAR_TEST_TAG

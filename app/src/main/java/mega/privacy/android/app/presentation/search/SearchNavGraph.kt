@@ -20,7 +20,7 @@ import mega.privacy.android.app.presentation.search.navigation.renameDialogNavig
 import mega.privacy.android.app.presentation.search.navigation.searchFilterBottomSheetNavigation
 import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.shareFolderDialogNavigation
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 

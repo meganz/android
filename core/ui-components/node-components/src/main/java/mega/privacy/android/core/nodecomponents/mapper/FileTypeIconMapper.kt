@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.mapper
+package mega.privacy.android.core.nodecomponents.mapper
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import java.util.TreeMap

@@ -19,7 +19,7 @@ import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
 import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView

@@ -88,7 +88,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.app.utils.wrapper.LegacyNodeWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData

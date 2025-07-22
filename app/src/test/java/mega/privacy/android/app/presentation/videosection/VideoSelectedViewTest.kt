@@ -18,7 +18,7 @@ import mega.privacy.android.app.presentation.videosection.view.videoselected.VID
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VIDEO_SELECTED_GRID_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VIDEO_SELECTED_LIST_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VideoSelectedView
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import org.junit.Rule

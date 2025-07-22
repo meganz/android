@@ -23,7 +23,7 @@ import mega.privacy.android.app.presentation.offline.optionbottomsheet.OfflineOp
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.view.OfflineOptionsContent
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation

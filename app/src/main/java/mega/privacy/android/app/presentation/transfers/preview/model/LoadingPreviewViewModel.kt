@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.transfers.preview.view.LoadingPreviewInfo
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.QuotaExceededMegaException

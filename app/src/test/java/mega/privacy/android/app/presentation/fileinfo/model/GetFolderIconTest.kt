@@ -2,11 +2,10 @@ package mega.privacy.android.app.presentation.fileinfo.model
 
 import mega.privacy.android.icon.pack.R as IconPackR
 import com.google.common.truth.Truth
-import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.domain.entity.DeviceType
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource

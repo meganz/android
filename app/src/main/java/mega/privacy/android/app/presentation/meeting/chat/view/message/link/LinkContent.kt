@@ -12,7 +12,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.navigateToChatViewGraph
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileLinkActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFolderLinkActivity
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.node.TypedFileNode

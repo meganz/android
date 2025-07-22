@@ -7,7 +7,7 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import org.junit.jupiter.api.Assertions.assertTrue

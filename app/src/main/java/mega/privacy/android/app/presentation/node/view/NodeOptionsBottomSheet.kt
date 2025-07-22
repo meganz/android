@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewMode
 import mega.privacy.android.app.presentation.view.extension.fileInfo
 import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.app.presentation.view.extension.getIcon
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeSourceType

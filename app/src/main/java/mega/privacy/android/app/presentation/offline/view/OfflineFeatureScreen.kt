@@ -31,7 +31,7 @@ import mega.privacy.android.app.presentation.offline.offlinecompose.model.Offlin
 import mega.privacy.android.app.presentation.view.NodeGridView
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.preference.ViewType

@@ -23,7 +23,7 @@ import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMap
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.FolderTreeInfo

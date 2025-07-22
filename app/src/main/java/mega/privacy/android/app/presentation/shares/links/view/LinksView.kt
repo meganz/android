@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.shares.links.model.LinksUiState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.model.rememberListGridNavigationState

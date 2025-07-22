@@ -32,7 +32,7 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSelectedState
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadingView
 import mega.privacy.android.app.presentation.view.NodeGridView
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType

@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.zipbrowser.mapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.mapper.file.FolderInfoStringMapper
 import mega.privacy.android.app.presentation.zipbrowser.model.ZipInfoUiEntity
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.zipbrowser.ZipEntryType
 import mega.privacy.android.domain.entity.zipbrowser.ZipTreeNode
 import mega.privacy.android.icon.pack.R

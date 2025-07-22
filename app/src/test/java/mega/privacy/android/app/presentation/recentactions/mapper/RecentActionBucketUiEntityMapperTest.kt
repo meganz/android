@@ -8,7 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.TimeUtils.formatBucketDate
 import mega.privacy.android.app.utils.TimeUtils.formatTime
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo

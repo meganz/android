@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.mapper
+package mega.privacy.android.core.nodecomponents.mapper
 
 import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo

@@ -3,21 +3,21 @@ package mega.privacy.android.feature.sync.ui.megapicker
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction.FolderClicked
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
-import mega.privacy.android.shared.resources.R as sharedResR
-import androidx.compose.foundation.isSystemInDarkTheme
-import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogConfirmButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDismissButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDisplayedEvent

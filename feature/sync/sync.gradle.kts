@@ -23,6 +23,7 @@ android {
 
 dependencies {
     implementation(project(":navigation"))
+    implementation(project(":core:ui-components:node-components"))
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
     lintChecks(project(":lint"))

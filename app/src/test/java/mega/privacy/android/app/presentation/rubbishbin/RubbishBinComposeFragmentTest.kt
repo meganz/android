@@ -8,7 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
 import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.Rule
 import org.junit.Test

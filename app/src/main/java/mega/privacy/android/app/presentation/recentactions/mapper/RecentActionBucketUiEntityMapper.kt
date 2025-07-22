@@ -10,7 +10,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 

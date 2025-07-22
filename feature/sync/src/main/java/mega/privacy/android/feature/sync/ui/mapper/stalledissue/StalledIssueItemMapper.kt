@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.sync.ui.mapper.stalledissue
 
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.UnTypedNode

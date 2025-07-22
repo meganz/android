@@ -40,7 +40,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownlo
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase

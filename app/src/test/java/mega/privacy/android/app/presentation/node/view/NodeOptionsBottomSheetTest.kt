@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.model.NodeBottomSheetState
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.Rule

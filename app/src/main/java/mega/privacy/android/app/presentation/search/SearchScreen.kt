@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRoute
 import mega.privacy.android.app.presentation.search.navigation.searchFilterBottomSheetRoute
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 
 /**

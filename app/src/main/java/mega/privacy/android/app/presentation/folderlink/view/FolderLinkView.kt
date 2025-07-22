@@ -71,7 +71,7 @@ import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
 import mega.privacy.android.app.presentation.view.NodesView
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.icon.pack.IconPack

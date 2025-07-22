@@ -187,6 +187,7 @@ applyTestLiteForTasks()
 dependencies {
     // Modules
     implementation(project(":core:formatter"))
+    implementation(project(":core:ui-components:node-components"))
     implementation(project(":domain"))
     implementation(project(":shared:original-core-ui"))
     implementation(project(":legacy-core-ui"))

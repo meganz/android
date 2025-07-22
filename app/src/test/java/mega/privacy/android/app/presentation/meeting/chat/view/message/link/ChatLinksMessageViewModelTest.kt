@@ -2,13 +2,8 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.link
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatGroupLinkContent
-import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatLinksMessageViewModel
-import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ContactLinkContent
-import mega.privacy.android.app.presentation.meeting.chat.view.message.link.FileLinkContent
-import mega.privacy.android.app.presentation.meeting.chat.view.message.link.FolderLinkContent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.contacts.ContactLink

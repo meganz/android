@@ -9,7 +9,7 @@ import androidx.compose.ui.res.stringResource
 import com.google.common.io.Files
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.model.OfflineOptionsUiState
 import mega.privacy.android.app.presentation.offline.view.getOfflineNodeDescription
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.icon.pack.IconPack

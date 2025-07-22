@@ -11,7 +11,7 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo

@@ -17,7 +17,7 @@ import mega.privacy.android.app.presentation.view.extension.getNodeLabel
 import mega.privacy.android.app.presentation.view.extension.getNodeTitle
 import mega.privacy.android.app.presentation.view.extension.getSharesIcon
 import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo

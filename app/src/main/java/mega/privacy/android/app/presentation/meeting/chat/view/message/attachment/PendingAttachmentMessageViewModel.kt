@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.usecase.transfers.chatuploads.MonitorPendingMessageTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.MonitorPendingMessagesCompressionProgressUseCase
