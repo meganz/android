@@ -3,10 +3,8 @@ package mega.privacy.android.rules
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest.xml
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import com.android.tools.lint.checks.infrastructure.TestMode
-import org.junit.Ignore
 import org.junit.Test
 
-@Ignore
 @Suppress("UnstableApiUsage")
 class TranslatedStringTemplateDetectorTest {
     @Test
@@ -251,7 +249,7 @@ class TranslatedStringTemplateDetectorTest {
                 ),
             )
             .issues(TranslatedStringTemplateDetector.ISSUE)
-            .skipTestModes(TestMode.CDATA)
+            .skipTestModes(TestMode.SUPPRESSIBLE)
             .run()
             .expect(
                 """
@@ -289,7 +287,7 @@ class TranslatedStringTemplateDetectorTest {
                 ),
             )
             .issues(TranslatedStringTemplateDetector.ISSUE)
-            .skipTestModes(TestMode.CDATA)
+            .skipTestModes(TestMode.SUPPRESSIBLE)
             .run()
             .expect(
                 """
@@ -327,7 +325,7 @@ class TranslatedStringTemplateDetectorTest {
                 ),
             )
             .issues(TranslatedStringTemplateDetector.ISSUE)
-            .skipTestModes(TestMode.CDATA)
+            .skipTestModes(TestMode.SUPPRESSIBLE)
             .run()
             .expect(
                 """
