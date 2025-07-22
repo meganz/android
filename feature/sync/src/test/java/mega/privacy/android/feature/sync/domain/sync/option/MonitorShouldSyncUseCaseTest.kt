@@ -8,7 +8,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByChargingUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
@@ -25,14 +24,12 @@ class MonitorShouldSyncUseCaseTest {
 
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
     private val monitorSyncByChargingUseCase: MonitorSyncByChargingUseCase = mock()
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
     private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase = mock()
 
     private val underTest = MonitorShouldSyncUseCase(
         monitorSyncByWiFiUseCase = monitorSyncByWiFiUseCase,
         monitorSyncByChargingUseCase = monitorSyncByChargingUseCase,
-        monitorConnectivityUseCase = monitorConnectivityUseCase,
         monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
         isOnWifiNetworkUseCase = isOnWifiNetworkUseCase,
     )
@@ -42,7 +39,6 @@ class MonitorShouldSyncUseCaseTest {
         reset(
             monitorSyncByWiFiUseCase,
             monitorSyncByChargingUseCase,
-            monitorConnectivityUseCase,
             monitorBatteryInfoUseCase,
             isOnWifiNetworkUseCase
         )
@@ -51,7 +47,6 @@ class MonitorShouldSyncUseCaseTest {
     @Test
     fun `test that sync is allowed when all conditions are met`() = runTest {
         setupMocks(
-            connectedToInternet = true,
             batteryInfo = BatteryInfo(level = 50, isCharging = false),
             wiFiOnly = false,
             chargingOnly = false,
@@ -66,27 +61,9 @@ class MonitorShouldSyncUseCaseTest {
     }
 
     @Test
-    fun `test that sync is not allowed when no internet connection`() = runTest {
-        setupMocks(
-            connectedToInternet = false,
-            batteryInfo = BatteryInfo(level = 50, isCharging = false),
-            wiFiOnly = false,
-            chargingOnly = false,
-            isOnWiFi = true
-        )
-
-        underTest().test {
-            val result = awaitItem()
-            assertThat(result).isFalse()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun `test that sync is not allowed when WiFi only is enabled but user is not on WiFi`() =
         runTest {
             setupMocks(
-                connectedToInternet = true,
                 batteryInfo = BatteryInfo(level = 50, isCharging = false),
                 wiFiOnly = true,
                 chargingOnly = false,
@@ -103,7 +80,6 @@ class MonitorShouldSyncUseCaseTest {
     @Test
     fun `test that sync is allowed when WiFi only is enabled and user is on WiFi`() = runTest {
         setupMocks(
-            connectedToInternet = true,
             batteryInfo = BatteryInfo(level = 50, isCharging = false),
             wiFiOnly = true,
             chargingOnly = false,
@@ -121,7 +97,6 @@ class MonitorShouldSyncUseCaseTest {
     fun `test that sync is not allowed when charging only is enabled but device is not charging`() =
         runTest {
             setupMocks(
-                connectedToInternet = true,
                 batteryInfo = BatteryInfo(level = 50, isCharging = false),
                 wiFiOnly = false,
                 chargingOnly = true,
@@ -139,7 +114,6 @@ class MonitorShouldSyncUseCaseTest {
     fun `test that sync is allowed when charging only is enabled and device is charging`() =
         runTest {
             setupMocks(
-                connectedToInternet = true,
                 batteryInfo = BatteryInfo(level = 50, isCharging = true),
                 wiFiOnly = false,
                 chargingOnly = true,
@@ -156,7 +130,6 @@ class MonitorShouldSyncUseCaseTest {
     @Test
     fun `test that sync is not allowed when battery level is low and not charging`() = runTest {
         setupMocks(
-            connectedToInternet = true,
             batteryInfo = BatteryInfo(level = 15, isCharging = false),
             wiFiOnly = false,
             chargingOnly = false,
@@ -173,7 +146,6 @@ class MonitorShouldSyncUseCaseTest {
     @Test
     fun `test that sync is allowed when battery level is low but device is charging`() = runTest {
         setupMocks(
-            connectedToInternet = true,
             batteryInfo = BatteryInfo(level = 15, isCharging = true),
             wiFiOnly = false,
             chargingOnly = false,
@@ -190,7 +162,6 @@ class MonitorShouldSyncUseCaseTest {
     @Test
     fun `test that sync is allowed when battery level is at threshold`() = runTest {
         setupMocks(
-            connectedToInternet = true,
             batteryInfo = BatteryInfo(level = 20, isCharging = false),
             wiFiOnly = false,
             chargingOnly = false,
@@ -207,7 +178,6 @@ class MonitorShouldSyncUseCaseTest {
     @Test
     fun `test that sync is not allowed when isOnWifiNetworkUseCase throws exception`() = runTest {
         setupMocks(
-            connectedToInternet = true,
             batteryInfo = BatteryInfo(level = 50, isCharging = false),
             wiFiOnly = true,
             chargingOnly = true,
@@ -225,7 +195,6 @@ class MonitorShouldSyncUseCaseTest {
     @Test
     fun `test that sync is not allowed when all restrictive conditions are enabled`() = runTest {
         setupMocks(
-            connectedToInternet = true,
             batteryInfo = BatteryInfo(level = 15, isCharging = false),
             wiFiOnly = true,
             chargingOnly = true,
@@ -242,7 +211,6 @@ class MonitorShouldSyncUseCaseTest {
     @Test
     fun `test that sync is allowed when all restrictive conditions are met`() = runTest {
         setupMocks(
-            connectedToInternet = true,
             batteryInfo = BatteryInfo(level = 50, isCharging = true),
             wiFiOnly = true,
             chargingOnly = true,
@@ -257,13 +225,11 @@ class MonitorShouldSyncUseCaseTest {
     }
 
     private fun setupMocks(
-        connectedToInternet: Boolean,
         batteryInfo: BatteryInfo,
         wiFiOnly: Boolean,
         chargingOnly: Boolean,
         isOnWiFi: Boolean,
     ) {
-        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(connectedToInternet))
         whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(batteryInfo))
         whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(wiFiOnly))
         whenever(monitorSyncByChargingUseCase()).thenReturn(flowOf(chargingOnly))

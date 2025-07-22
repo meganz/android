@@ -149,9 +149,10 @@ internal class AndroidDeviceGateway @Inject constructor(
             Intent.ACTION_BATTERY_CHANGED,
         ).map {
             val level = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-            val status: Int = it.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
+            val status: Int = it.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
             val isCharging =
-                status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS
+                status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
+            Timber.d("monitorBatteryInfo isCharging: $isCharging, level: $level")
             return@map BatteryInfo(level = level, isCharging = isCharging)
         }.catch {
             Timber.e(it, "MonitorBatteryInfo Exception")

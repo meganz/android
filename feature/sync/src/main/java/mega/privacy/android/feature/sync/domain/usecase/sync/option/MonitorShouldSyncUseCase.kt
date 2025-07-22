@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -15,7 +15,6 @@ import javax.inject.Inject
 class MonitorShouldSyncUseCase @Inject constructor(
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
     private val monitorSyncByChargingUseCase: MonitorSyncByChargingUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
     private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase,
 ) {
@@ -27,18 +26,17 @@ class MonitorShouldSyncUseCase @Inject constructor(
      * @return Flow<Boolean> indicating if sync should be allowed
      */
     operator fun invoke(): Flow<Boolean> = combine(
-        monitorConnectivityUseCase(),
         monitorBatteryInfoUseCase().distinctUntilChanged(),
         monitorSyncByWiFiUseCase().distinctUntilChanged(),
         monitorSyncByChargingUseCase().distinctUntilChanged(),
-    ) { connectedToInternet, batteryInfo, wiFiOnly, chargingOnly ->
-        val internetAvailable = connectedToInternet
+    ) { batteryInfo, wiFiOnly, chargingOnly ->
         val isUserOnWifi = runCatching { isOnWifiNetworkUseCase() }.getOrDefault(false)
         val wifiAllowed = checkWifiSettings(isUserOnWifi, wiFiOnly)
         val batteryAllowed = checkBatterySettings(batteryInfo.isCharging, chargingOnly)
         val batteryLevelAllowed = checkBatteryLevel(batteryInfo)
+        Timber.d("MonitorShouldSyncUseCase: wifiAllowed=$wifiAllowed, batteryAllowed=$batteryAllowed, batteryLevelAllowed=$batteryLevelAllowed")
 
-        internetAvailable && wifiAllowed && batteryAllowed && batteryLevelAllowed
+        wifiAllowed && batteryAllowed && batteryLevelAllowed
     }
 
     /**
