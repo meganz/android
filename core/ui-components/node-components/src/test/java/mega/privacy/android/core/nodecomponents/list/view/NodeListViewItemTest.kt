@@ -17,7 +17,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w720dp-h1280dp-xhdpi")
-class NodeListItemViewTest {
+class NodeListViewItemTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()

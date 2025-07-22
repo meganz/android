@@ -127,10 +127,13 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinSolidLink01ImageVe
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidPlayCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowDownImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowUpImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineChevronDownImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineGrid4ImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineImage01ImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineImage04ImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineListSmallImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineQueueLineImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineSquares4ImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinSolidHeartImageVector
 
 public object IconPack : IconPackInterface {
@@ -487,16 +490,25 @@ public object IconPack : IconPackInterface {
                 override val ArrowUp: ImageVector by lazy {
                         createSmallThinOutlineArrowUpImageVector() }
 
+                override val ChevronDown: ImageVector by lazy {
+                        createSmallThinOutlineChevronDownImageVector() }
+
                 override val Grid4: ImageVector by lazy { createSmallThinOutlineGrid4ImageVector() }
 
                 override val Image01: ImageVector by lazy {
                         createSmallThinOutlineImage01ImageVector() }
+
+                override val Image04: ImageVector by lazy {
+                        createSmallThinOutlineImage04ImageVector() }
 
                 override val ListSmall: ImageVector by lazy {
                         createSmallThinOutlineListSmallImageVector() }
 
                 override val QueueLine: ImageVector by lazy {
                         createSmallThinOutlineQueueLineImageVector() }
+
+                override val Squares4: ImageVector by lazy {
+                        createSmallThinOutlineSquares4ImageVector() }
             }
 
             public object Solid : IconPackInterface.Small.Thin.Solid {

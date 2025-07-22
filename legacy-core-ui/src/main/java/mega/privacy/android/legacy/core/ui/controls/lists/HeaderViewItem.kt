@@ -35,6 +35,7 @@ const val MEDIA_DISCOVERY_TAG = "header_view_item:image_media_discovery"
  * @param onSortOrderClick change sort order click
  * @param sortOrder current sort name from resource
  */
+@Deprecated("Use NodeHeaderItem from core-ui lib")
 @Composable
 fun HeaderViewItem(
     onSortOrderClick: () -> Unit,

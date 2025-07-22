@@ -324,9 +324,9 @@ fun NodeListViewItem(
 }
 
 @Composable
-private fun Circle(color: Color, modifier: Modifier = Modifier) {
+fun Circle(color: Color, modifier: Modifier = Modifier) {
     Canvas(
-        modifier = modifier.size(8.dp),
+        modifier = modifier.size(7.dp),
         onDraw = {
             drawCircle(color = color)
         },

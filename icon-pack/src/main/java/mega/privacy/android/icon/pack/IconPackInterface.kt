@@ -54,6 +54,9 @@ interface IconPackInterface {
                 val Grid4: ImageVector
                 val ListSmall: ImageVector
                 val Image01: ImageVector
+                val Squares4: ImageVector
+                val ChevronDown: ImageVector
+                val Image04: ImageVector
             }
 
             /**

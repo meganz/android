@@ -299,14 +299,9 @@ private fun Footer(
             )
         }
         if (labelColor != null) {
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .background(
-                        color = labelColor,
-                        shape = androidx.compose.foundation.shape.CircleShape
-                    )
-                    .testTag(GRID_VIEW_LABEL_TEST_TAG)
+            Circle(
+                color = labelColor,
+                modifier = Modifier.testTag(GRID_VIEW_LABEL_TEST_TAG)
             )
         }
         MegaText(
