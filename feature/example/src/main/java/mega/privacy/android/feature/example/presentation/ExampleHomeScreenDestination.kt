@@ -16,9 +16,11 @@ data object HomeScreen
 @Serializable
 data object HomeScreen2
 
-fun NavGraphBuilder.exampleHomeScreen() {
+fun NavGraphBuilder.exampleHomeScreen(
+    setNavigationVisibility: (Boolean) -> Unit,
+) {
     composable<HomeScreen> {
-        ExampleHomeScreen("1")
+        ExampleHomeScreen(content = "1", setNavigationItemVisibility = setNavigationVisibility)
     }
 }
 

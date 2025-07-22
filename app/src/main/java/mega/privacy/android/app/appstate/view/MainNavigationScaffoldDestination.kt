@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.serialization.Serializable
+import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 import kotlin.reflect.KClass
@@ -26,7 +27,7 @@ fun NavGraphBuilder.mainNavigationScaffold(
     modifier: Modifier = Modifier,
     topLevelDestinations: ImmutableSet<NavigationItem>,
     startDestination: Any,
-    builder: NavGraphBuilder.() -> Unit,
+    builder: NavGraphBuilder.(NavigationUiController) -> Unit,
 ) {
     composable<MainNavigationScaffoldDestination> {
         val navController = rememberNavController()
@@ -48,15 +49,16 @@ fun NavGraphBuilder.mainNavigationScaffold(
             isSelected = { destination ->
                 currentDestination?.isTopLevelDestinationInHierarchy(destination::class) == true
             },
-        ) {
-            NavHost(
-                modifier = modifier
-                    .fillMaxSize(),
-                navController = navController,
-                startDestination = startDestination,
-                builder = builder,
-            )
-        }
+            navContent = { navigationUiController ->
+                NavHost(
+                    modifier = modifier
+                        .fillMaxSize(),
+                    navController = navController,
+                    startDestination = startDestination,
+                    builder = { builder(navigationUiController) },
+                )
+            },
+        )
     }
 }
 

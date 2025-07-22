@@ -6,6 +6,7 @@ import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableSet
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 
 @Stable
@@ -14,7 +15,7 @@ sealed interface AppState {
 
     data class Data(
         val mainNavItems: ImmutableSet<NavigationItem>,
-        val mainNavScreens: ImmutableSet<NavGraphBuilder.(navigationHandler: NavigationHandler) -> Unit>,
+        val mainNavScreens: ImmutableSet<NavGraphBuilder.(navigationHandler: NavigationHandler, NavigationUiController) -> Unit>,
         val featureDestinations: ImmutableSet<FeatureDestination>,
         val initialMainDestination: Any,
     ) : AppState
@@ -24,7 +25,7 @@ sealed interface AppState {
 
 class AppStateDataBuilder {
     private var mainNavItemsBuilder: Set<NavigationItem>? = null
-    private val mainNavScreensBuilder: MutableSet<NavGraphBuilder.(navigationHandler: NavigationHandler) -> Unit> =
+    private val mainNavScreensBuilder: MutableSet<NavGraphBuilder.(navigationHandler: NavigationHandler, NavigationUiController) -> Unit> =
         mutableSetOf()
     private val featureDestinationsBuilder = mutableSetOf<FeatureDestination>()
     private var initialDestinationBuilder: Any? = null
@@ -33,7 +34,7 @@ class AppStateDataBuilder {
         mainNavItemsBuilder = mainNavItems
     }
 
-    fun mainNavScreens(mainNavScreens: Set<NavGraphBuilder.(navigationHandler: NavigationHandler) -> Unit>) =
+    fun mainNavScreens(mainNavScreens: Set<NavGraphBuilder.(navigationHandler: NavigationHandler, NavigationUiController) -> Unit>) =
         this.apply {
             mainNavScreensBuilder.addAll(mainNavScreens)
         }

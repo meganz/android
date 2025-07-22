@@ -10,6 +10,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import mega.privacy.android.app.appstate.model.AppState
+import mega.privacy.android.navigation.contract.NavigationUiController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,9 +38,9 @@ fun MegaApp(
             mainNavigationScaffold(
                 topLevelDestinations = appState.mainNavItems,
                 startDestination = appState.initialMainDestination,
-                builder = {
+                builder = { navigationUiController: NavigationUiController ->
                     appState.mainNavScreens.forEach {
-                        it(this, navigationHandler)
+                        it(this, navigationHandler, navigationUiController)
                     }
                 }
             )

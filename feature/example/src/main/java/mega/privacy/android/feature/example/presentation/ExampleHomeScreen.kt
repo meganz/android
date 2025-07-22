@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.example.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
@@ -28,9 +30,13 @@ import mega.privacy.android.icon.pack.IconPack
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExampleHomeScreen(content: String) {
+fun ExampleHomeScreen(
+    content: String,
+    setNavigationItemVisibility: (Boolean) -> Unit,
+) {
     Column(
-        modifier = Modifier,
+        modifier = Modifier
+            .background(Color.Blue),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -47,6 +53,18 @@ fun ExampleHomeScreen(content: String) {
                 onClick = { openBottomSheet = openBottomSheet.not() },
                 modifier = Modifier.padding(16.dp),
                 text = "Toggle bottom sheet",
+            )
+
+            MegaOutlinedButton(
+                onClick = { setNavigationItemVisibility(false) },
+                modifier = Modifier.padding(16.dp),
+                text = "Hide navigation",
+            )
+
+            MegaOutlinedButton(
+                onClick = { setNavigationItemVisibility(true) },
+                modifier = Modifier.padding(16.dp),
+                text = "Show navigation",
             )
 
             if (openBottomSheet) {
