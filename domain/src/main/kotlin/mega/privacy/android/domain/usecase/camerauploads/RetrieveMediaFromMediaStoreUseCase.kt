@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.usecase.camerauploads.mapper.CameraUploadsRecordMapper
 import javax.inject.Inject
@@ -21,6 +22,8 @@ import javax.inject.Inject
 class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
     private val cameraUploadsRepository: CameraUploadsRepository,
     private val cameraUploadsRecordMapper: CameraUploadsRecordMapper,
+    private val getPendingCameraUploadsRecordsUseCase: GetPendingCameraUploadsRecordsUseCase,
+    private val setCameraUploadsRecordUploadStatusUseCase: SetCameraUploadsRecordUploadStatusUseCase,
 ) {
 
     /**
@@ -49,13 +52,15 @@ class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
             cameraUploadsRepository.getMediaList(
                 mediaStoreFileType = it,
                 selectionQuery = selectionQuery,
-            ).map {
+            ).also { mediaList ->
+                updateNotExistRecordsStatus(mediaList = mediaList)
+            }.map { media ->
                 async {
                     semaphore.withPermit {
                         yield()
                         runCatching {
                             val exists = checkCameraUploadsRecordAlreadyExists(
-                                cameraUploadsMedia = it,
+                                cameraUploadsMedia = media,
                                 recordsToCheck =
                                     if (folderType == CameraUploadFolderType.Primary)
                                         recordsInPrimaryFolder
@@ -63,7 +68,7 @@ class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
                             )
                             if (!exists) {
                                 cameraUploadsRecordMapper(
-                                    media = it,
+                                    media = media,
                                     folderType = folderType,
                                     fileType = fileType,
                                     tempRoot = tempRoot,
@@ -89,6 +94,29 @@ class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
         return recordsToCheck.find {
             it.mediaId == cameraUploadsMedia.mediaId && it.timestamp == cameraUploadsMedia.timestamp
         } != null
+    }
+
+    private suspend fun updateNotExistRecordsStatus(
+        mediaList: List<CameraUploadsMedia>,
+    ) {
+        val pendingRecords =
+            runCatching { getPendingCameraUploadsRecordsUseCase() }.getOrElse { emptyList() }
+        if (pendingRecords.isEmpty()) return
+
+        val existingMediaIds = mediaList.mapTo(mutableSetOf()) { it.mediaId }
+
+        pendingRecords.filter { record ->
+            record.mediaId !in existingMediaIds
+        }.forEach { notExistRecord ->
+            runCatching {
+                setCameraUploadsRecordUploadStatusUseCase(
+                    mediaId = notExistRecord.mediaId,
+                    timestamp = notExistRecord.timestamp,
+                    folderType = notExistRecord.folderType,
+                    uploadStatus = CameraUploadsRecordUploadStatus.LOCAL_FILE_NOT_EXIST,
+                )
+            }
+        }
     }
 }
 
