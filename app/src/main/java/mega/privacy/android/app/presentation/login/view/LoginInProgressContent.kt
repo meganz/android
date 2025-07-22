@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -74,11 +75,11 @@ import mega.privacy.android.shared.resources.R as sharedR
  */
 @Composable
 fun LoginInProgressContent(
-    modifier: Modifier = Modifier,
     isRequestStatusInProgress: Boolean,
     currentProgress: Float,
     @StringRes currentStatusText: Int,
     requestStatusProgress: Progress?,
+    modifier: Modifier = Modifier,
 ) {
     val isInLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -172,7 +173,11 @@ fun LoginInProgressContent(
                     minLines = 2
                 )
             }
-            Spacer(modifier = Modifier.height(if (isInLandscape) 0.dp else 20.dp))
+            Spacer(
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .height(if (isInLandscape) 0.dp else 20.dp)
+            )
         }
     }
 }
