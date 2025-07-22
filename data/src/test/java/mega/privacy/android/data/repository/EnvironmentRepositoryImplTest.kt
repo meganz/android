@@ -125,7 +125,7 @@ internal class EnvironmentRepositoryImplTest {
     fun `test that charging state is correctly returned`(
         isCharging: Boolean,
     ) = runTest {
-        whenever(deviceGateway.getBatteryInfo()).thenReturn(
+        whenever(deviceGateway.getBatteryInfo(null)).thenReturn(
             BatteryInfo(100, isCharging)
         )
         whenever(deviceGateway.monitorBatteryInfo).thenReturn(
@@ -141,7 +141,7 @@ internal class EnvironmentRepositoryImplTest {
     @Test
     fun `test that battery level is correctly returned`() = runTest {
         val batteryLevel = 100
-        whenever(deviceGateway.getBatteryInfo()).thenReturn(
+        whenever(deviceGateway.getBatteryInfo(null)).thenReturn(
             BatteryInfo(batteryLevel, true)
         )
         whenever(deviceGateway.monitorBatteryInfo).thenReturn(

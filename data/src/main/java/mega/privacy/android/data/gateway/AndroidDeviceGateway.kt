@@ -2,8 +2,8 @@ package mega.privacy.android.data.gateway
 
 import android.app.ActivityManager
 import android.content.Context
-import android.content.Context.BATTERY_SERVICE
 import android.content.Intent
+import android.content.IntentFilter
 import android.icu.util.Calendar
 import android.net.ConnectivityManager
 import android.os.BatteryManager
@@ -134,10 +134,17 @@ internal class AndroidDeviceGateway @Inject constructor(
 
     override fun getCurrentMinute(): Int = LocalTime.now().minute
 
-    override fun getBatteryInfo(): BatteryInfo {
-        val batteryManager = context.getSystemService(BATTERY_SERVICE) as BatteryManager
-        val level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-        val isCharging = batteryManager.isCharging
+    override fun getBatteryInfo(intent: Intent?): BatteryInfo {
+        val intent = intent ?: context.registerReceiver(
+            null,
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        )
+        val level = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val status: Int = intent?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
+        val pluggedStatus: Int = intent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) ?: -1
+        val isCharging =
+            status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL || pluggedStatus == BatteryManager.BATTERY_PLUGGED_AC || pluggedStatus == BatteryManager.BATTERY_PLUGGED_USB || pluggedStatus == BatteryManager.BATTERY_PLUGGED_WIRELESS
+        Timber.d("monitorBatteryInfo isCharging: $isCharging, level: $level")
         return BatteryInfo(level = level, isCharging = isCharging)
     }
 
@@ -148,12 +155,7 @@ internal class AndroidDeviceGateway @Inject constructor(
             flags = ContextCompat.RECEIVER_EXPORTED,
             Intent.ACTION_BATTERY_CHANGED,
         ).map {
-            val level = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-            val status: Int = it.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
-            val isCharging =
-                status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
-            Timber.d("monitorBatteryInfo isCharging: $isCharging, level: $level")
-            return@map BatteryInfo(level = level, isCharging = isCharging)
+            return@map getBatteryInfo(it)
         }.catch {
             Timber.e(it, "MonitorBatteryInfo Exception")
         }.toSharedFlow(appScope)

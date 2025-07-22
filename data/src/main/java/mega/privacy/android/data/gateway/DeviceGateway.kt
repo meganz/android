@@ -1,5 +1,6 @@
 package mega.privacy.android.data.gateway
 
+import android.content.Intent
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.BatteryInfo
 
@@ -104,7 +105,7 @@ interface DeviceGateway {
     /**
      * Get battery info
      */
-    fun getBatteryInfo(): BatteryInfo
+    fun getBatteryInfo(intent: Intent?): BatteryInfo
 
     /**
      * Monitor battery info
