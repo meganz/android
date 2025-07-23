@@ -103,45 +103,21 @@ class CompletedTransferDaoTest {
     }
 
     @Test
-    fun test_that_insertOrUpdateAndPruneCompletedTransfers_insert_the_corresponding_items() =
+    fun test_that_insertOrUpdateCompletedTransfers_chunked_insert_the_corresponding_items() =
         runTest {
             val expected = (1..15).map {
                 createCompletedTransferEntity(
                     fileName = "2023-03-24 00.13.20_$it.jpg",
                 )
             }
-            completedTransferDao.insertOrUpdateAndPruneCompletedTransfers(
+            completedTransferDao.insertOrUpdateCompletedTransfers(
                 expected,
-                maxPerState = 100,
                 chunkSize = 10
             )
 
             assertThat(
                 completedTransferDao.getAllCompletedTransfers().first().map { it.copy(id = null) }
             ).isEqualTo(expected)
-        }
-
-    @Test
-    fun test_that_insertOrUpdateAndPruneCompletedTransfers_prunes_the_entities_after_insert() =
-        runTest {
-            val maxPerState = 10
-            val entities = (1..25).map {
-                createCompletedTransferEntity(
-                    fileName = "2023-03-24 00.13.20_$it.jpg",
-                    timeStamp = it.toLong()
-                )
-            }
-            completedTransferDao.insertOrUpdateAndPruneCompletedTransfers(
-                entities,
-                chunkSize = 5,
-                maxPerState = maxPerState,
-            )
-
-            val expected = entities.sortedByDescending { it.timestamp }.take(maxPerState)
-
-            assertThat(
-                completedTransferDao.getAllCompletedTransfers().first().map { it.copy(id = null) }
-            ).containsAtLeastElementsIn(expected)
         }
 
     @Test
@@ -274,68 +250,6 @@ class CompletedTransferDaoTest {
             assertThat(remainingState2Transfers.size).isEqualTo(expectedState2Count)
             assertThat(remainingState2Transfers.map { it.timestamp }).containsExactlyElementsIn(
                 state2Transfers.map { it.timestamp })
-        }
-
-    @Test
-    fun test_that_insertOrUpdateAndPruneCompletedTransfers_handles_different_states_correctly() =
-        runTest {
-            val maxPerState = 3
-            val state1Count = 5
-            val state2Count = 5
-
-            // Create transfers with different states
-            val state1Transfers = (1..state1Count).map {
-                createCompletedTransferEntity(
-                    fileName = "state1_file_$it.jpg",
-                    timeStamp = it.toLong(),
-                    state = 1
-                )
-            }
-            val state2Transfers = (1..state2Count).map {
-                createCompletedTransferEntity(
-                    fileName = "state2_file_$it.jpg",
-                    timeStamp = it.toLong(),
-                    state = 2
-                )
-            }
-
-            val allTransfers = state1Transfers + state2Transfers
-            val expectedTotalCount = maxPerState * 2 // maxPerState for each state
-
-            // Insert and prune transfers
-            completedTransferDao.insertOrUpdateAndPruneCompletedTransfers(
-                entities = allTransfers,
-                maxPerState = maxPerState,
-                chunkSize = 5
-            )
-
-            // Verify that each state has only the most recent transfers up to the limit
-            val remainingTransfers = completedTransferDao.getAllCompletedTransfers().first()
-            assertThat(remainingTransfers.size).isEqualTo(expectedTotalCount)
-
-            // Verify state 1 transfers: should have only the most recent ones up to the limit
-            val remainingState1Transfers = remainingTransfers.filter { it.state == 1 }
-            assertThat(remainingState1Transfers.size).isEqualTo(maxPerState)
-
-            val expectedState1Timestamps = state1Transfers
-                .sortedByDescending { it.timestamp }
-                .take(maxPerState)
-                .map { it.timestamp }
-            assertThat(remainingState1Transfers.map { it.timestamp }).containsExactlyElementsIn(
-                expectedState1Timestamps
-            )
-
-            // Verify state 2 transfers: should have only the most recent ones up to the limit
-            val remainingState2Transfers = remainingTransfers.filter { it.state == 2 }
-            assertThat(remainingState2Transfers.size).isEqualTo(maxPerState)
-
-            val expectedState2Timestamps = state2Transfers
-                .sortedByDescending { it.timestamp }
-                .take(maxPerState)
-                .map { it.timestamp }
-            assertThat(remainingState2Transfers.map { it.timestamp }).containsExactlyElementsIn(
-                expectedState2Timestamps
-            )
         }
 
     private fun createCompletedTransferEntity(

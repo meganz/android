@@ -47,6 +47,7 @@ import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
 import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfEntityMapper
 import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfModelMapper
+import mega.privacy.android.data.mapper.transfer.TransferStateIntMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferGroupEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
@@ -135,10 +136,10 @@ internal class MegaLocalRoomFacadeTest {
     private val mediaPlaybackInfoDao: MediaPlaybackInfoDao = mock()
     private val mediaPlaybackInfoEntityMapper: MediaPlaybackInfoEntityMapper = mock()
     private val mediaPlaybackInfoMapper: MediaPlaybackInfoMapper = mock()
+    private val transferStateIntMapper = mock<TransferStateIntMapper>()
 
     @BeforeAll
     fun setUp() {
-
         underTest = MegaLocalRoomFacade(
             contactDao = { contactDao },
             contactEntityMapper = contactEntityMapper,
@@ -177,7 +178,8 @@ internal class MegaLocalRoomFacadeTest {
             lastPageViewedInPdfModelMapper = lastPageViewedInPdfModelMapper,
             mediaPlaybackInfoDao = { mediaPlaybackInfoDao },
             mediaPlaybackInfoEntityMapper = mediaPlaybackInfoEntityMapper,
-            mediaPlaybackInfoMapper = mediaPlaybackInfoMapper
+            mediaPlaybackInfoMapper = mediaPlaybackInfoMapper,
+            transferStateIntMapper = transferStateIntMapper,
         )
     }
 
@@ -213,7 +215,8 @@ internal class MegaLocalRoomFacadeTest {
             activeTransferGroupEntityMapper,
             mediaPlaybackInfoDao,
             mediaPlaybackInfoMapper,
-            mediaPlaybackInfoEntityMapper
+            mediaPlaybackInfoEntityMapper,
+            transferStateIntMapper,
         )
     }
 
@@ -458,54 +461,26 @@ internal class MegaLocalRoomFacadeTest {
     @Test
     fun `test that delete entities correctly when deleteOldestCompletedTransfers is called`() =
         runTest {
-            val completedTransfers = (1..110).map { id ->
-                CompletedTransferEntity(
-                    id = id,
-                    fileName = "2023-03-24 00.13.20_1.jpg",
-                    type = 1,
-                    state = 6,
-                    size = "3.57 MB",
-                    handle = 27169983390750L,
-                    path = "Cloud drive/Camera uploads",
-                    displayPath = "display path",
-                    isOffline = false,
-                    timestamp = System.nanoTime(),
-                    error = "No error",
-                    errorCode = null,
-                    originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
-                    parentHandle = 11622336899311L,
-                    appData = "appData",
-                )
+            listOf(
+                TransferState.STATE_COMPLETED,
+                TransferState.STATE_CANCELLED,
+                TransferState.STATE_FAILED
+            ).forEach {
+                whenever(transferStateIntMapper(it)) doReturn it.ordinal
             }
-            completedTransfers.forEach { entity ->
-                whenever(completedTransferModelMapper(entity)).thenReturn(
-                    CompletedTransfer(
-                        id = entity.id,
-                        fileName = entity.fileName,
-                        type = TransferType.DOWNLOAD,
-                        state = TransferState.STATE_COMPLETED,
-                        size = entity.size,
-                        handle = entity.handle,
-                        path = entity.path,
-                        displayPath = entity.displayPath,
-                        isOffline = entity.isOffline,
-                        timestamp = entity.timestamp,
-                        error = entity.error,
-                        errorCode = entity.errorCode,
-                        originalPath = entity.originalPath,
-                        parentHandle = entity.parentHandle,
-                        appData = emptyList(),
-                    )
-                )
-            }
-            val deletedTransfers = completedTransfers.take(10)
-            whenever(completedTransferDao.getCompletedTransfersCount()) doReturn completedTransfers.size
-            whenever(completedTransferDao.getAllCompletedTransfers()) doReturn flowOf(
-                completedTransfers
-            )
+            whenever(completedTransferDao.getCompletedTransfersCount()) doReturn MAX_COMPLETED_TRANSFER_ROWS + 10
+
             underTest.deleteOldestCompletedTransfers()
-            verify(completedTransferDao).deleteCompletedTransferByIds(deletedTransfers.mapNotNull { it.id }
-                .sortedDescending(), MAX_INSERT_LIST_SIZE)
+            listOf(
+                TransferState.STATE_COMPLETED,
+                TransferState.STATE_CANCELLED,
+                TransferState.STATE_FAILED
+            ).forEach {
+                verify(completedTransferDao).deleteOldCompletedTransfersByState(
+                    it.ordinal,
+                    MAX_COMPLETED_TRANSFER_ROWS
+                )
+            }
         }
 
     @Test
@@ -656,10 +631,9 @@ internal class MegaLocalRoomFacadeTest {
 
         underTest.addCompletedTransfers(completedTransfers)
 
-        verify(completedTransferDao).insertOrUpdateAndPruneCompletedTransfers(
+        verify(completedTransferDao).insertOrUpdateCompletedTransfers(
             expected,
-            MAX_COMPLETED_TRANSFER_ROWS,
-            MAX_COMPLETED_TRANSFER_ROWS,
+            MAX_INSERT_LIST_SIZE,
         )
     }
 
@@ -695,10 +669,9 @@ internal class MegaLocalRoomFacadeTest {
             underTest.migrateLegacyCompletedTransfers()
 
             assertThat(expected).hasSize(legacyTransfers.size)
-            verify(completedTransferDao).insertOrUpdateAndPruneCompletedTransfers(
+            verify(completedTransferDao).insertOrUpdateCompletedTransfers(
                 eq(expected),
                 any(),
-                any()
             )
         }
 
@@ -720,9 +693,8 @@ internal class MegaLocalRoomFacadeTest {
             underTest.migrateLegacyCompletedTransfers()
 
             assertThat(expected).hasSize(100)
-            verify(completedTransferDao).insertOrUpdateAndPruneCompletedTransfers(
+            verify(completedTransferDao).insertOrUpdateCompletedTransfers(
                 eq(expected),
-                any(),
                 any(),
             )
         }

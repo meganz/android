@@ -32,24 +32,18 @@ internal interface CompletedTransferDao {
     suspend fun deleteOldCompletedTransfersByState(transferState: Int, limit: Int)
 
     /**
-     * Inserts or updates a list of completed transfer entities in chunks to avoid SQLite variable limits,
-     * and prunes old entries to keep only the [maxPerState] most recent transfers per state.
+     * Inserts or updates a list of completed transfer entities in chunks to avoid SQLite variable limits
      *
      * @param entities The list of completed transfer entities to insert or update.
-     * @param maxPerState The maximum number of entities of each state.
      * @param chunkSize The maximum number of entities to insert in a single chunk.
      */
     @Transaction
-    suspend fun insertOrUpdateAndPruneCompletedTransfers(
+    suspend fun insertOrUpdateCompletedTransfers(
         entities: List<CompletedTransferEntity>,
-        maxPerState: Int,
-        chunkSize: Int = maxPerState,
+        chunkSize: Int,
     ) {
         entities.chunked(chunkSize).forEach {
             insertOrUpdateCompletedTransfers(it)
-        }
-        entities.map { it.state }.distinct().forEach {
-            deleteOldCompletedTransfersByState(it, maxPerState)
         }
     }
 

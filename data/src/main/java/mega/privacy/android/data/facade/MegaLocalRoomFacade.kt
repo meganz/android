@@ -36,6 +36,7 @@ import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
 import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfEntityMapper
 import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfModelMapper
+import mega.privacy.android.data.mapper.transfer.TransferStateIntMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferGroupEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
@@ -45,8 +46,6 @@ import mega.privacy.android.data.mapper.transfer.pending.InsertPendingTransferRe
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
-import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
-import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
@@ -57,10 +56,13 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
@@ -110,6 +112,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val mediaPlaybackInfoDao: Lazy<MediaPlaybackInfoDao>,
     private val mediaPlaybackInfoEntityMapper: MediaPlaybackInfoEntityMapper,
     private val mediaPlaybackInfoMapper: MediaPlaybackInfoMapper,
+    private val transferStateIntMapper: TransferStateIntMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.get().insertOrUpdateContact(contactEntityMapper(contact))
@@ -205,9 +208,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun addCompletedTransfers(transfers: List<CompletedTransfer>) {
         transfers.map { completedTransferEntityMapper(it) }.let { mappedTransfers ->
-            completedTransferDao.get().insertOrUpdateAndPruneCompletedTransfers(
+            completedTransferDao.get().insertOrUpdateCompletedTransfers(
                 entities = mappedTransfers,
-                maxPerState = MAX_COMPLETED_TRANSFER_ROWS,
+                chunkSize = MAX_INSERT_LIST_SIZE,
             )
         }
     }
@@ -242,15 +245,16 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun deleteOldestCompletedTransfers() {
         val count = completedTransferDao.get().getCompletedTransfersCount()
         if (count > MAX_COMPLETED_TRANSFER_ROWS) {
-            val transfers = completedTransferDao.get().getAllCompletedTransfers().first()
-                .map { completedTransferModelMapper(it) }
-            val deletedTransfers =
-                transfers.sortedWith(compareByDescending { it.timestamp })
-                    .drop(MAX_COMPLETED_TRANSFER_ROWS)
-                    .mapNotNull { it.id }
-
-            if (deletedTransfers.isNotEmpty()) {
-                deleteCompletedTransferBatch(deletedTransfers)
+            listOf(
+                TransferState.STATE_COMPLETED,
+                TransferState.STATE_CANCELLED,
+                TransferState.STATE_FAILED
+            ).forEach {
+                completedTransferDao.get()
+                    .deleteOldCompletedTransfersByState(
+                        transferStateIntMapper(it),
+                        MAX_COMPLETED_TRANSFER_ROWS
+                    )
             }
         }
     }
