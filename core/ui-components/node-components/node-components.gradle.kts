@@ -32,6 +32,10 @@ dependencies {
     implementation(androidx.material3.adaptive.layout)
     implementation(androidx.material3.adaptive.navigation)
     implementation(androidx.material3.window)
+    implementation(androidx.navigation.compose)
+    implementation(lib.compose.state.events)
+    implementation(lib.kotlinx.collections.immutable)
+    implementation(lib.logging.timber)
     implementation(lib.coil3)
     implementation(lib.coil.compose)
 
