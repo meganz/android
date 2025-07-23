@@ -15,7 +15,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.extension.getNodeItemDescription
 import mega.privacy.android.core.nodecomponents.extension.getNodeItemThumbnail
 import mega.privacy.android.core.nodecomponents.extension.getSharesIcon
-import mega.privacy.android.core.nodecomponents.list.model.NodeUiItem
+import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.list.view.previewdata.FolderNodePreviewDataProvider
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo

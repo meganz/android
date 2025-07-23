@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list.model
+package mega.privacy.android.core.nodecomponents.model
 
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode

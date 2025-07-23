@@ -1,6 +1,6 @@
-package mega.privacy.android.app.presentation.time.mapper
+package mega.privacy.android.core.formatter.mapper
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 import kotlin.time.Duration
 
 /**
@@ -11,7 +11,7 @@ class DurationInSecondsTextMapper @Inject constructor() {
     /**
      * invoke
      *
-     * @param duration [Duration]
+     * @param duration [kotlin.time.Duration]
      * @return duration text
      */
     operator fun invoke(duration: Duration?): String {

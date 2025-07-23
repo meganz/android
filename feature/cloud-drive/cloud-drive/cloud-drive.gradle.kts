@@ -22,6 +22,7 @@ dependencies {
     lintChecks(project(":lint"))
 
     implementation(project(":feature:cloud-drive:cloud-drive-snowflake-components"))
+    implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":shared:resources"))
     implementation(project(":icon-pack"))

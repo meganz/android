@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.videoplayer.mapper
 
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
-import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import java.io.File
 import javax.inject.Inject

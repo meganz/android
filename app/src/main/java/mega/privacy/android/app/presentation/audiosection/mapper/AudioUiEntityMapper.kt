@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.audiosection.mapper
 
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
-import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import java.io.File
 import javax.inject.Inject

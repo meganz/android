@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.time.mapper
+package mega.privacy.android.core.formatter.mapper
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.TestInstance

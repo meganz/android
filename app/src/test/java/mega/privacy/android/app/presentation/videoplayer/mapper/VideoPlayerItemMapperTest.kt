@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.videoplayer.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
-import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.icon.pack.R
 import org.junit.jupiter.api.Assertions

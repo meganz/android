@@ -56,7 +56,7 @@ import mega.privacy.android.app.camera.state.rememberSaveableCamSelector
 import mega.privacy.android.app.camera.view.FOCUS_RING_SIZE
 import mega.privacy.android.app.camera.view.FocusRing
 import mega.privacy.android.app.camera.view.ZoomLevelButtonsGroup
-import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.camera.CameraBottomAppBar

@@ -213,3 +213,8 @@ data class VideoFileTypeInfo(
      */
     override val isSupported: Boolean = extension != "mpg" && extension != "wmv"
 }
+
+fun FileTypeInfo.toDuration(): Duration? {
+    return (this as? AudioFileTypeInfo)?.duration
+        ?: (this as? VideoFileTypeInfo)?.duration
+}

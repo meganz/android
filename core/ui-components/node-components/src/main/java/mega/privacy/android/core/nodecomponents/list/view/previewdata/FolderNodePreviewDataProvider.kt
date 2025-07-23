@@ -1,7 +1,7 @@
 package mega.privacy.android.core.nodecomponents.list.view.previewdata
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import mega.privacy.android.core.nodecomponents.list.model.NodeUiItem
+import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
