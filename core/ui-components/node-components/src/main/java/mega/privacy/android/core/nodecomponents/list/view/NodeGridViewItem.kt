@@ -1,7 +1,6 @@
 package mega.privacy.android.core.nodecomponents.list.view
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -80,7 +79,6 @@ import mega.privacy.android.icon.pack.R as IconPackR
  * @param showFavourite Whether to show a heart icon in the top-right corner (indicates favourite status)
  * @param labelColor Optional color for the label indicator in the footer area
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NodeGridViewItem(
     name: String,

@@ -1,6 +1,5 @@
-package mega.privacy.android.app.presentation.view
+package mega.privacy.android.core.nodecomponents.list.view
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
@@ -10,13 +9,14 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.view.extension.getNodeItemDescription
-import mega.privacy.android.app.presentation.view.extension.getNodeItemThumbnail
-import mega.privacy.android.app.presentation.view.extension.getNodeLabel
-import mega.privacy.android.app.presentation.view.extension.getNodeTitle
-import mega.privacy.android.app.presentation.view.extension.getSharesIcon
-import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
+import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.core.nodecomponents.extension.getNodeItemDescription
+import mega.privacy.android.core.nodecomponents.extension.getNodeItemThumbnail
+import mega.privacy.android.core.nodecomponents.extension.getSharesIcon
+import mega.privacy.android.core.nodecomponents.list.model.NodeUiItem
+import mega.privacy.android.core.nodecomponents.list.view.previewdata.FolderNodePreviewDataProvider
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -28,19 +28,11 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
-import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
-import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
-import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
-import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
-import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
-import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
- * This method will show [NodeUIItem] in vertical list using [ThumbnailRequest] to load thumbnails
+ * This method will show [NodeUiItem] in vertical list using [ThumbnailRequest] to load thumbnails
  *
- * @param nodeUIItemList list of [NodeUIItem] to show
+ * @param nodeUiItemList list of [NodeUiItem] to show
  * @param onMenuClick callback to handle menu click
  * @param onItemClicked callback to handle item click
  * @param onLongClick callback to handle long click
@@ -57,13 +49,12 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
  * @param listContentPadding the content padding of the list/lazyColumn
  * @param isContactVerificationOn whether contact verification is enabled
  */
-@Deprecated("Use the version of node-components module")
 @Composable
 fun <T : TypedNode> NodeListView(
-    nodeUIItemList: List<NodeUIItem<T>>,
-    onMenuClick: (NodeUIItem<T>) -> Unit,
-    onItemClicked: (NodeUIItem<T>) -> Unit,
-    onLongClick: (NodeUIItem<T>) -> Unit,
+    nodeUiItemList: List<NodeUiItem<T>>,
+    onMenuClick: (NodeUiItem<T>) -> Unit,
+    onItemClicked: (NodeUiItem<T>) -> Unit,
+    onLongClick: (NodeUiItem<T>) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
     sortOrder: String,
     onSortOrderClick: () -> Unit,
@@ -86,15 +77,13 @@ fun <T : TypedNode> NodeListView(
 ) {
     FastScrollLazyColumn(
         state = listState,
-        totalItems = nodeUIItemList.size,
+        totalItems = nodeUiItemList.size,
         modifier = modifier.semantics { testTagsAsResourceId = true },
         contentPadding = listContentPadding
     ) {
         if (showSortOrder || showChangeViewType) {
-            item(
-                key = "header"
-            ) {
-                HeaderViewItem(
+            item(key = "header") {
+                NodeHeaderItem(
                     modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
@@ -109,18 +98,15 @@ fun <T : TypedNode> NodeListView(
         }
 
         items(
-            count = nodeUIItemList.size,
+            count = nodeUiItemList.size,
             key = {
-                nodeUIItemList[it].uniqueKey
+                nodeUiItemList[it].uniqueKey
             }
         ) {
-            val nodeUiItem = nodeUIItemList[it]
+            val nodeUiItem = nodeUiItemList[it]
             NodeListViewItem(
-                title = nodeUiItem.node.getNodeTitle(),
-                titleOverflow = LongTextBehaviour.MiddleEllipsis,
-                subtitle = nodeUiItem.node.getNodeItemDescription(
-                    showPublicLinkCreationTime = showPublicLinkCreationTime
-                ),
+                title = nodeUiItem.node.name, // TODO: Implement title logic
+                subtitle = nodeUiItem.node.getNodeItemDescription(showPublicLinkCreationTime),
                 description = nodeUiItem.node.description?.replace("\n", " "),
                 tags = nodeUiItem.node.tags.takeIf { nodeSourceType != NodeSourceType.RUBBISH_BIN },
                 icon = nodeUiItem.node.getNodeItemThumbnail(fileTypeIconMapper = fileTypeIconMapper),
@@ -128,10 +114,10 @@ fun <T : TypedNode> NodeListView(
                 isSelected = nodeUiItem.isSelected,
                 onMoreClicked = { onMenuClick(nodeUiItem) }.takeUnless { _ -> inSelectionMode },
                 onItemClicked = { onItemClicked(nodeUiItem) },
-                onLongClick = { onLongClick(nodeUiItem) },
+                onLongClicked = { onLongClick(nodeUiItem) },
                 accessPermissionIcon = (nodeUiItem.node as? ShareFolderNode)
                     .getSharesIcon(isContactVerificationOn),
-                labelColor = nodeUiItem.node.getNodeLabel(),
+                labelColor = null, // TODO: Implement label color logic
                 highlightText = highlightText,
                 showOffline = nodeUiItem.isAvailableOffline,
                 showLink = showLinkIcon && nodeUiItem.exportedData != null,
@@ -139,6 +125,7 @@ fun <T : TypedNode> NodeListView(
                 showIsVerified = isContactVerificationOn && nodeUiItem.isIncomingShare && (nodeUiItem.node as? ShareFolderNode)?.shareData?.isContactCredentialsVerified == true,
                 showVersion = nodeUiItem.hasVersion,
                 isTakenDown = nodeUiItem.isTakenDown,
+                isInSelectionMode = inSelectionMode,
                 isSensitive = nodeSourceType != NodeSourceType.INCOMING_SHARES
                         && nodeSourceType != NodeSourceType.OUTGOING_SHARES
                         && nodeSourceType != NodeSourceType.LINKS
@@ -148,7 +135,6 @@ fun <T : TypedNode> NodeListView(
                 } ?: false,
                 isHighlighted = nodeUiItem.isHighlighted,
             )
-            MegaDivider(dividerType = DividerType.BigStartPadding)
         }
     }
 }
@@ -157,11 +143,11 @@ fun <T : TypedNode> NodeListView(
 @CombinedThemePreviews
 @Composable
 private fun NodeListViewPreview(
-    @PreviewParameter(SampleFolderNodeDataProvider::class) items: List<NodeUIItem<TypedFolderNode>>,
+    @PreviewParameter(FolderNodePreviewDataProvider::class) items: List<NodeUiItem<TypedFolderNode>>,
 ) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         NodeListView(
-            nodeUIItemList = items,
+            nodeUiItemList = items,
             onMenuClick = {},
             onItemClicked = {},
             onLongClick = {},

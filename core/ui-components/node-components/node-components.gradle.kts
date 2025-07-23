@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":icon-pack"))
     implementation(project(":shared:resources"))
+    implementation(project(":core:formatter"))
 
     //core components
     implementation(lib.mega.core.ui)

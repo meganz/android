@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.view
+package mega.privacy.android.core.nodecomponents.list.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,8 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.view.extension.getIcon
+import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
+import mega.privacy.android.core.nodecomponents.extension.getIcon
+import mega.privacy.android.core.nodecomponents.list.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -24,14 +25,11 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
-import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
-import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
-import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewItem
 
 /**
 This method will show [NodeUIItem] in Grid manner based on span and getting thumbnail using [ThumbnailRequest]
  *
- * @param nodeUIItems List of [NodeUIItem]
+ * @param nodeUiItems List of [NodeUIItem]
  * @param onMenuClick three dots click
  * @param onItemClicked on item click
  * @param onLongClick on long item click
@@ -47,13 +45,12 @@ This method will show [NodeUIItem] in Grid manner based on span and getting thum
  * @param showChangeViewType whether to show change view type button
  */
 @OptIn(ExperimentalComposeUiApi::class)
-@Deprecated("Use the version of node-components module")
 @Composable
 fun <T : TypedNode> NodeGridView(
-    nodeUIItems: List<NodeUIItem<T>>,
-    onMenuClick: (NodeUIItem<T>) -> Unit,
-    onItemClicked: (NodeUIItem<T>) -> Unit,
-    onLongClick: (NodeUIItem<T>) -> Unit,
+    nodeUiItems: List<NodeUiItem<T>>,
+    onMenuClick: (NodeUiItem<T>) -> Unit,
+    onItemClicked: (NodeUiItem<T>) -> Unit,
+    onLongClick: (NodeUiItem<T>) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
     sortOrder: String,
     onSortOrderClick: () -> Unit,
@@ -74,7 +71,7 @@ fun <T : TypedNode> NodeGridView(
     FastScrollLazyVerticalGrid(
         state = gridState,
         columns = GridCells.Fixed(spanCount),
-        totalItems = nodeUIItems.size,
+        totalItems = nodeUiItems.size,
         modifier = modifier
             .padding(horizontal = 4.dp)
             .semantics { testTagsAsResourceId = true },
@@ -89,7 +86,7 @@ fun <T : TypedNode> NodeGridView(
                     GridItemSpan(currentLineSpan = spanCount)
                 }
             ) {
-                HeaderViewItem(
+                NodeHeaderItem(
                     modifier = modifier.padding(bottom = 12.dp),
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
@@ -103,37 +100,38 @@ fun <T : TypedNode> NodeGridView(
             }
         }
         items(
-            count = nodeUIItems.size,
+            count = nodeUiItems.size,
             key = {
-                if (nodeUIItems[it].isInvisible) {
+                if (nodeUiItems[it].isInvisible) {
                     it
                 } else {
-                    nodeUIItems[it].uniqueKey
+                    nodeUiItems[it].uniqueKey
                 }
             },
         ) {
-            val node = nodeUIItems[it].node
+            val node = nodeUiItems[it].node
             NodeGridViewItem(
-                isSelected = nodeUIItems[it].isSelected,
-                name = nodeUIItems[it].node.name,
-                iconRes = nodeUIItems[it].node.getIcon(fileTypeIconMapper = fileTypeIconMapper),
-                thumbnailData = ThumbnailRequest(nodeUIItems[it].node.id, isPublicNode),
-                duration = nodeUIItems[it].fileDuration,
-                isTakenDown = nodeUIItems[it].isTakenDown,
-                onClick = { onItemClicked(nodeUIItems[it]) },
-                onLongClick = { onLongClick(nodeUIItems[it]) },
-                onMenuClick = { onMenuClick(nodeUIItems[it]) }.takeIf { !inSelectionMode },
-                isVideoNode = (nodeUIItems[it].node as? FileNode)?.type is VideoFileTypeInfo,
-                isFolderNode = nodeUIItems[it].node is TypedFolderNode,
-                isInvisible = nodeUIItems[it].isInvisible,
+                isSelected = nodeUiItems[it].isSelected,
+                name = nodeUiItems[it].node.name,
+                iconRes = nodeUiItems[it].node.getIcon(fileTypeIconMapper = fileTypeIconMapper),
+                thumbnailData = ThumbnailRequest(nodeUiItems[it].node.id, isPublicNode),
+                duration = nodeUiItems[it].fileDuration,
+                isTakenDown = nodeUiItems[it].isTakenDown,
+                onClick = { onItemClicked(nodeUiItems[it]) },
+                onLongClick = { onLongClick(nodeUiItems[it]) },
+                onMenuClick = { onMenuClick(nodeUiItems[it]) },
+                isInSelectionMode = inSelectionMode,
+                isVideoNode = (nodeUiItems[it].node as? FileNode)?.type is VideoFileTypeInfo,
+                isFolderNode = nodeUiItems[it].node is TypedFolderNode,
+                isInvisible = nodeUiItems[it].isInvisible,
                 isSensitive = nodeSourceType != NodeSourceType.INCOMING_SHARES
                         && nodeSourceType != NodeSourceType.OUTGOING_SHARES
                         && nodeSourceType != NodeSourceType.LINKS
                         && shouldApplySensitiveMode && (node.isMarkedSensitive || node.isSensitiveInherited),
-                showBlurEffect = (nodeUIItems[it].node as? FileNode)?.type?.let { fileTypeInfo ->
+                showBlurEffect = (nodeUiItems[it].node as? FileNode)?.type?.let { fileTypeInfo ->
                     fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is PdfFileTypeInfo || fileTypeInfo is AudioFileTypeInfo
                 } ?: false,
-                isHighlighted = nodeUIItems[it].isHighlighted,
+                isHighlighted = nodeUiItems[it].isHighlighted,
             )
         }
     }

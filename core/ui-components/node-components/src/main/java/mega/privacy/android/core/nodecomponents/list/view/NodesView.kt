@@ -1,11 +1,9 @@
-package mega.privacy.android.app.presentation.view
+package mega.privacy.android.core.nodecomponents.list.view
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,19 +14,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.nodecomponents.list.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 
 /**
  * NEW Nodes view to load thumbnails using [ThumbnailRequest]
  *
- * @param nodeUIItems List of [NodeUIItem]
+ * @param nodeUIItems List of [NodeUiItem]
  * @param onMenuClick three dots click
  * @param onItemClicked callback for item click
  * @param onLongClick callback for long item click
@@ -50,13 +46,12 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
  * @param listContentPadding the content padding of the list/lazyColumn
  * @param isContactVerificationOn whether contact verification is enabled
  */
-@Deprecated("Use the version of node-components module")
 @Composable
 fun <T : TypedNode> NodesView(
-    nodeUIItems: List<NodeUIItem<T>>,
-    onMenuClick: (NodeUIItem<T>) -> Unit,
-    onItemClicked: (NodeUIItem<T>) -> Unit,
-    onLongClick: (NodeUIItem<T>) -> Unit,
+    nodeUIItems: List<NodeUiItem<T>>,
+    onMenuClick: (NodeUiItem<T>) -> Unit,
+    onItemClicked: (NodeUiItem<T>) -> Unit,
+    onLongClick: (NodeUiItem<T>) -> Unit,
     sortOrder: String,
     isListView: Boolean,
     onSortOrderClick: () -> Unit,
@@ -81,7 +76,6 @@ fun <T : TypedNode> NodesView(
     onEnterMediaDiscoveryClick: () -> Unit = {},
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
-    legacyBackgroundColor: Boolean = true,
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val orientation = LocalConfiguration.current.orientation
@@ -100,12 +94,9 @@ fun <T : TypedNode> NodesView(
     }
     if (isListView) {
         NodeListView(
-            modifier = modifier
-                .conditional(legacyBackgroundColor) {
-                    background(MaterialTheme.colors.background)
-                },
+            modifier = modifier,
             listContentPadding = listContentPadding,
-            nodeUIItemList = nodeUIItems,
+            nodeUiItemList = nodeUIItems,
             onMenuClick = onMenuClick,
             onItemClicked = {
                 if (it.isTakenDown && it.node !is FolderNode) {
@@ -138,7 +129,7 @@ fun <T : TypedNode> NodesView(
         NodeGridView(
             modifier = modifier,
             listContentPadding = listContentPadding,
-            nodeUIItems = newList,
+            nodeUiItems = newList,
             onMenuClick = onMenuClick,
             onItemClicked = {
                 if (it.isTakenDown && it.node !is FolderNode) {
@@ -165,31 +156,32 @@ fun <T : TypedNode> NodesView(
         )
     }
     if (showTakenDownDialog) {
-        TakeDownDialog(
-            isFolder = false,
-            onConfirm = {
-                showTakenDownDialog = false
-            },
-            onDeny = {
-                showTakenDownDialog = false
-                onDisputeTakeDownClicked.invoke(Constants.DISPUTE_URL)
-            },
-            onLinkClick = {
-                onLinkClicked(it)
-            }
-        )
+        // TODO
+//        TakeDownDialog(
+//            isFolder = false,
+//            onConfirm = {
+//                showTakenDownDialog = false
+//            },
+//            onDeny = {
+//                showTakenDownDialog = false
+//                onDisputeTakeDownClicked.invoke(Constants.DISPUTE_URL)
+//            },
+//            onLinkClick = {
+//                onLinkClicked(it)
+//            }
+//        )
     }
 }
 
 /**
  * Remember function for [NodeGridView] to form empty items in case of folders count are not as per
  * span count
- * @param nodeUIItems list of [NodeUIItem]
+ * @param nodeUIItems list of [NodeUiItem]
  * @param spanCount span count of [NodeGridView]
  */
 @Composable
 private fun <T : TypedNode> rememberNodeListForGrid(
-    nodeUIItems: List<NodeUIItem<T>>,
+    nodeUIItems: List<NodeUiItem<T>>,
     spanCount: Int,
 ) = remember(spanCount + nodeUIItems.hashCode()) {
     val folderCount = nodeUIItems.count {
