@@ -2,57 +2,49 @@ package mega.privacy.android.app.presentation.settings.startscreen.util
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.di.settings.startscreen.getMonitorStartScreenPreference
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SharedPreferenceConstants.DO_NOT_ALERT_ABOUT_START_SCREEN
 import mega.privacy.android.app.utils.SharedPreferenceConstants.START_SCREEN_LOGIN_TIMESTAMP
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import mega.privacy.android.domain.entity.preference.StartScreen
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Class storing util methods for the start screen setting.
+ * Temporary solution until the new navigation is implemented.
  */
-object StartScreenUtil {
-
-    @JvmField
-    val CLOUD_DRIVE_BNV = StartScreen.CloudDrive.id
-
-    @JvmField
-    val PHOTOS_BNV = StartScreen.Photos.id
-
-    @JvmField
-    val HOME_BNV = StartScreen.Home.id
-
-    @JvmField
-    val CHAT_BNV = StartScreen.Chat.id
-
-    @JvmField
-    val SHARED_ITEMS_BNV = StartScreen.SharedItems.id
-
-    @JvmField
-    val NO_BNV = 5
-
-    private const val TIME_TO_SHOW_START_SCREEN_DIALOG = 604800000 //1 week in milliseconds
+@Singleton
+class StartScreenUtil @Inject constructor(
+    @ApplicationContext private val context: Context,
+    @ApplicationScope coroutineScope: CoroutineScope,
+    monitorStartScreenPreference: MonitorStartScreenPreference,
+) {
+    /**
+     * Flow that monitors the start screen preference.
+     */
+    val startScreen = monitorStartScreenPreference()
+        .stateIn(coroutineScope, started = SharingStarted.Eagerly, initialValue = StartScreen.Home)
 
     /**
      * Gets the start DrawerItem depending on the preferred start screen chosen.
      *
      * @return The start DrawerItem.
      */
-    @JvmStatic
     fun getStartDrawerItem(): DrawerItem =
-        runBlocking {
-            when (getMonitorStartScreenPreference()().map { it.id }.first()) {
-                CLOUD_DRIVE_BNV -> DrawerItem.CLOUD_DRIVE
-                PHOTOS_BNV -> DrawerItem.PHOTOS
-                CHAT_BNV -> DrawerItem.CHAT
-                SHARED_ITEMS_BNV -> DrawerItem.SHARED_ITEMS
-                else -> DrawerItem.HOMEPAGE
-            }
+        when (startScreen.value.id) {
+            CLOUD_DRIVE_BNV -> DrawerItem.CLOUD_DRIVE
+            PHOTOS_BNV -> DrawerItem.PHOTOS
+            CHAT_BNV -> DrawerItem.CHAT
+            SHARED_ITEMS_BNV -> DrawerItem.SHARED_ITEMS
+            else -> DrawerItem.HOMEPAGE
         }
 
 
@@ -61,7 +53,6 @@ object StartScreenUtil {
      *
      * @return The start bottom navigation item.
      */
-    @JvmStatic
     fun getStartBottomNavigationItem(): Int = getStartScreenId()
 
     /**
@@ -71,7 +62,6 @@ object StartScreenUtil {
      * @param drawerItem    Current drawerItem.
      * @return True if should close the app, false otherwise.
      */
-    @JvmStatic
     fun shouldCloseApp(startItem: Int, drawerItem: DrawerItem): Boolean =
         (drawerItem == DrawerItem.CLOUD_DRIVE && startItem == CLOUD_DRIVE_BNV)
                 || (drawerItem == DrawerItem.PHOTOS && startItem == PHOTOS_BNV)
@@ -86,7 +76,7 @@ object StartScreenUtil {
      * @param context   Current Context.
      * @return True if should show the dialog, false otherwise.
      */
-    fun shouldShowStartScreenDialog(context: Context): Boolean {
+    fun shouldShowStartScreenDialog(): Boolean {
         val preferences =
             context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
 
@@ -103,19 +93,14 @@ object StartScreenUtil {
                 || System.currentTimeMillis().minus(timeStamp) >= TIME_TO_SHOW_START_SCREEN_DIALOG
     }
 
-    private fun getStartScreenId() =
-        runBlocking {
-            getMonitorStartScreenPreference()()
-                .map { it.id }.first()
-        }
-
+    private fun getStartScreenId() = startScreen.value.id
 
     /**
      * Sets is not needed to alert anymore about start screen.
      *
      * @param context   Current Context.
      */
-    fun notAlertAnymoreAboutStartScreen(context: Context) {
+    fun notAlertAnymoreAboutStartScreen() {
         context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
             .edit().putBoolean(DO_NOT_ALERT_ABOUT_START_SCREEN, true).apply()
     }
@@ -125,9 +110,30 @@ object StartScreenUtil {
      *
      * @param context   Current context.
      */
-    @JvmStatic
-    fun setStartScreenTimeStamp(context: Context) {
+    fun setStartScreenTimeStamp() {
         context.getSharedPreferences(USER_INTERFACE_PREFERENCES, MODE_PRIVATE)
             .edit().putLong(START_SCREEN_LOGIN_TIMESTAMP, System.currentTimeMillis()).apply()
+    }
+
+    companion object {
+        @JvmField
+        val CLOUD_DRIVE_BNV = StartScreen.CloudDrive.id
+
+        @JvmField
+        val PHOTOS_BNV = StartScreen.Photos.id
+
+        @JvmField
+        val HOME_BNV = StartScreen.Home.id
+
+        @JvmField
+        val CHAT_BNV = StartScreen.Chat.id
+
+        @JvmField
+        val SHARED_ITEMS_BNV = StartScreen.SharedItems.id
+
+        @JvmField
+        val NO_BNV = 5
+
+        private const val TIME_TO_SHOW_START_SCREEN_DIALOG = 604800000
     }
 }

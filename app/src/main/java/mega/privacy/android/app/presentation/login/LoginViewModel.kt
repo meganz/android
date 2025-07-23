@@ -37,6 +37,7 @@ import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.login.model.RkLink
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
 import mega.privacy.android.app.utils.Constants
@@ -162,6 +163,7 @@ class LoginViewModel @Inject constructor(
     private val shouldShowUpgradeAccountUseCase: ShouldShowUpgradeAccountUseCase,
     private val ephemeralCredentialManager: EphemeralCredentialManager,
     private val resumeTransfersForNotLoggedInInstanceUseCase: ResumeTransfersForNotLoggedInInstanceUseCase,
+    private val startScreenUtil: StartScreenUtil,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -1239,6 +1241,13 @@ class LoginViewModel @Inject constructor(
      */
     fun onRecoveryKeyConsumed() {
         _state.update { it.copy(recoveryKeyLink = null) }
+    }
+
+    /**
+     * Sets the start screen timestamp in the preferences.
+     */
+    fun setStartScreenTimeStamp() {
+        startScreenUtil.setStartScreenTimeStamp()
     }
 
     companion object {

@@ -214,16 +214,13 @@ import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.StartScreenTargetPreference
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CHAT_BNV
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CLOUD_DRIVE_BNV
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.HOME_BNV
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.NO_BNV
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.PHOTOS_BNV
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.SHARED_ITEMS_BNV
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartBottomNavigationItem
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartDrawerItem
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldCloseApp
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.Companion.CHAT_BNV
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.Companion.CLOUD_DRIVE_BNV
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.Companion.HOME_BNV
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.Companion.NO_BNV
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.Companion.PHOTOS_BNV
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.Companion.SHARED_ITEMS_BNV
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeViewModel
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel
@@ -384,6 +381,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
+
+    @Inject
+    lateinit var startScreenUtil: StartScreenUtil
 
     private val searchResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -861,7 +861,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         display.getMetrics(outMetrics)
         if (checkDatabaseValues()) return
         if (firstTimeAfterInstallation) {
-            setStartScreenTimeStamp(this)
+            startScreenUtil.setStartScreenTimeStamp()
         }
         enableEdgeToEdge()
         setupView()
@@ -1828,7 +1828,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             Timber.d("Check if there any INCOMING pendingRequest contacts")
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
             if (drawerItem == null) {
-                drawerItem = getStartDrawerItem()
+                drawerItem = startScreenUtil.getStartDrawerItem()
                 if (intent != null) {
                     val upgradeAccount: Boolean =
                         intent.getBooleanExtra(IntentConstants.EXTRA_UPGRADE_ACCOUNT, false)
@@ -3579,7 +3579,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             Timber.d("DrawerItem on start offline: %s", drawerItem)
             if (drawerItem == null) {
                 Timber.w("drawerItem == null --> On start OFFLINE MODE")
-                drawerItem = getStartDrawerItem()
+                drawerItem = startScreenUtil.getStartDrawerItem()
                 disableNavigationViewMenu(bottomNavigationView.menu)
                 selectDrawerItem(drawerItem)
             } else {
@@ -4549,7 +4549,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
         }
         if (drawerItem == null) {
-            drawerItem = getStartDrawerItem()
+            drawerItem = startScreenUtil.getStartDrawerItem()
         }
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
             setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV)
@@ -4738,7 +4738,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             return true
                         }
                     } else if (drawerItem == DrawerItem.TRANSFERS) {
-                        drawerItem = getStartDrawerItem()
+                        drawerItem = startScreenUtil.getStartDrawerItem()
                         selectDrawerItem(drawerItem)
                         return true
                     } else if (drawerItem == DrawerItem.HOMEPAGE) {
@@ -5133,8 +5133,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * If not, sets the current DrawerItem as the preferred one.
      */
     private fun performOnBack() {
-        val startItem: Int = getStartBottomNavigationItem()
-        if (drawerItem?.let { shouldCloseApp(startItem, it) } == true) {
+        val startItem: Int = startScreenUtil.getStartBottomNavigationItem()
+        if (drawerItem?.let { startScreenUtil.shouldCloseApp(startItem, it) } == true) {
             handleSuperBackPressed()
         } else {
             goBackToBottomNavigationItem(startItem)

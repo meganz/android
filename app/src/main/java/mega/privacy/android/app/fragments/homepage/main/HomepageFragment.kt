@@ -41,8 +41,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.mapper.UserChatStatusIconMapper
 import mega.privacy.android.app.main.view.OngoingCallViewModel
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldShowStartScreenDialog
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.ColorUtils
@@ -88,6 +87,9 @@ class HomepageFragment : Fragment() {
 
     @Inject
     lateinit var navigator: MegaNavigator
+
+    @Inject
+    lateinit var startScreenUtil: StartScreenUtil
 
     private val viewModel: HomePageViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by activityViewModels()
@@ -230,7 +232,7 @@ class HomepageFragment : Fragment() {
         viewModel.getBanners()
 
         callManager { manager ->
-            if (manager.isInMainHomePage && shouldShowStartScreenDialog(requireContext())) {
+            if (manager.isInMainHomePage && startScreenUtil.shouldShowStartScreenDialog()) {
                 showChooseStartScreenDialog()
             }
         }
@@ -698,10 +700,10 @@ class HomepageFragment : Fragment() {
             .setView(R.layout.dialog_choose_start_screen)
             .setPositiveButton(getString(R.string.change_setting_action)) { _, _ ->
                 callManager { manager -> manager.moveToSettingsSectionStartScreen() }
-                notAlertAnymoreAboutStartScreen(requireContext())
+                startScreenUtil.notAlertAnymoreAboutStartScreen()
             }
             .setNegativeButton(getString(R.string.general_dismiss)) { _, _ ->
-                notAlertAnymoreAboutStartScreen(requireContext())
+                startScreenUtil.notAlertAnymoreAboutStartScreen()
             }
             .show().apply {
                 setCancelable(false)

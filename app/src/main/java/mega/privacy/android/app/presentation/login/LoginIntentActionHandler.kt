@@ -25,7 +25,6 @@ import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.app.providers.FileProviderActivity
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -161,7 +160,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                         if (loginUiState.isAlreadyLoggedIn) {
                             Timber.d("isAlreadyLoggedIn")
                             intent = Intent(activity, ManagerActivity::class.java)
-                            StartScreenUtil.setStartScreenTimeStamp(activity)
+                            viewModel.setStartScreenTimeStamp()
                             when (intentAction) {
                                 Constants.ACTION_EXPORT_MASTER_KEY -> {
                                     Timber.d("ACTION_EXPORT_MK")
@@ -193,9 +192,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                             if (loginUiState.hasPreferences) {
                                 if (!loginUiState.hasCUSetting) {
                                     with(activity) {
-                                        StartScreenUtil.setStartScreenTimeStamp(
-                                            this
-                                        )
+                                        viewModel.setStartScreenTimeStamp()
 
                                         Timber.d("First login")
                                         startActivity(
@@ -217,7 +214,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                 intent = Intent(activity, ManagerActivity::class.java)
                                 intent.putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
                                 initialCam = true
-                                StartScreenUtil.setStartScreenTimeStamp(activity)
+                                viewModel.setStartScreenTimeStamp()
                             }
                             if (!initialCam) {
                                 Timber.d("NOT initialCam")

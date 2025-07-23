@@ -26,6 +26,7 @@ import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandl
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.RkLink
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
@@ -162,6 +163,7 @@ internal class LoginViewModelTest {
     private val ephemeralCredentialManager = mock<EphemeralCredentialManager>()
     private val resumeTransfersForNotLoggedInInstanceUseCase =
         mock<ResumeTransfersForNotLoggedInInstanceUseCase>()
+    private val startScreenUtil = mock<StartScreenUtil>()
 
     @BeforeEach
     fun setUp() {
@@ -216,6 +218,7 @@ internal class LoginViewModelTest {
             shouldShowUpgradeAccountUseCase = shouldShowUpgradeAccountUseCase,
             ephemeralCredentialManager = ephemeralCredentialManager,
             resumeTransfersForNotLoggedInInstanceUseCase = resumeTransfersForNotLoggedInInstanceUseCase,
+            startScreenUtil = startScreenUtil
         )
     }
 
@@ -250,6 +253,7 @@ internal class LoginViewModelTest {
             shouldShowNotificationReminderUseCase,
             shouldShowUpgradeAccountUseCase,
             resumeTransfersForNotLoggedInInstanceUseCase,
+            startScreenUtil
         )
     }
 
