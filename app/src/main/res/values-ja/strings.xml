@@ -112,8 +112,6 @@
     <string name="alert_larger_file">%sがダウンロードされます。</string>
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">次回から表示しない</string>
-    <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">現在のログインプロセスをキャンセルしてもよろしいですか？</string>
     <!-- Login button -->
     <string name="login_text">ログ&#160;イン</string>
     <!-- email label -->
@@ -156,8 +154,6 @@
     <string name="first_name_text">名前</string>
     <!-- Last name of the user -->
     <string name="lastname_text">苗字</string>
-    <!-- text placed on the checkbox of acceptation of the Terms of Service -->
-    <string name="tos">私はMEGAの[A]ご利用規約[/A]に同意します</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">[B]パスワードを紛失すると、データを失う可能性がある[/B]ことを理解しています。[A]MEGAのエンドツーエンド暗号化[/A]の詳細をお読みください。</string>
     <!-- warning dialog -->
@@ -172,8 +168,6 @@
     <string name="error_passwords_dont_match">パスワードが合いません</string>
     <!-- when creating the account -->
     <string name="error_email_registered">このメールアドレスはすでにMEGAのアカウントにサインアップしています</string>
-    <!--  -->
-    <string name="create_account_creating_account">サーバーに接続：アカウントを作成</string>
     <!--  -->
     <string name="cancel_all_transfer_confirmation">転送をすべてキャンセルしますか？</string>
     <!-- Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible). -->
@@ -194,18 +188,12 @@
     <string name="location_label">%1$s (%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
     <string name="title_shared_items">共有アイテム</string>
-    <!-- The title of the trash bin in the tree of the file manager. -->
-    <string name="section_rubbish_bin">ごみ箱</string>
-    <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
-    <string name="section_contacts">連絡先</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
     <string name="section_contacts_with_notification">連絡先 [A](%1$d)[/A]</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
     <string name="sent_requests_empty">[A]送信済みの要求[/A]は[B]ありません[/B]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[A]受信済みの要求[/A]は[B]ありません[/B]</string>
-    <!-- Title for the file transfer screen (with the up & download) -->
-    <string name="section_transfers">転送</string>
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">私のアカウント</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
@@ -460,10 +448,6 @@
     <string name="cam_sync_wifi">Wi-Fiのみ</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fiまたはモバイルデータ</string>
-    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
-    <string name="cam_sync_syncing">カメラアップロードが進行中</string>
-    <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">カメラアップロードを停止しますか？</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">アップロードされるファイルを確認中</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1237,8 +1221,6 @@
     <string name="confirmation_delete_from_mega">MEGAから削除しますか？</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_contact_notifications_for_chat">チャット通知</string>
-    <!-- title of the section for achievements -->
-    <string name="achievements_title">達成</string>
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">友人を招待して報酬を獲得</string>
     <!-- title of the introduction for the achievements screen -->
@@ -1602,8 +1584,6 @@
     <string name="login_API_lock">このプロセスに予想以上時間がかかっています。お待ちください。</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit -->
     <string name="login_API_rate">要求が多すぎます。お待ちください。</string>
-    <!-- Message when previous login is being cancelled -->
-    <string name="login_in_progress">ログイン処理をキャンセルしています。お待ちください&#8230;</string>
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">エラー。ファイルが破損しているか、存在しません。</string>
     <!-- Menu option to print the recovery key from Offline section -->
@@ -2884,8 +2864,6 @@
     <string name="change_meeting_name">ミーティング名の変更</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">ミーティングリンク</string>
-    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
-    <string name="join_meeting_as_guest">ゲストとしてミーティングに参加</string>
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">ミーティングに招待されています。</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
@@ -4096,8 +4074,6 @@
     <string name="album_import_input_decryption_key_description">アルバムにアクセスするには、復号化キーを入力します。お持ちでない場合は、リンクを共有した人に連絡してください。</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">設定を記憶する</string>
-    <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title">デバイスセンター</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">毎日</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -4764,8 +4740,6 @@
     <string name="search_dropdown_chip_filter_type_date_last_year">去年</string>
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">それ以前</string>
-    <!-- String below login button next to button for reporting a login issue -->
-    <string name="general_login_label_trouble_logging_in">ログインできませんか？</string>
     <!-- Hidden nodes show items -->
     <string name="hidden_nodes_show_items">非表示項目を表示する</string>
     <!-- Hidden nodes show items description -->

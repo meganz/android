@@ -302,26 +302,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226; &#160; Chamadas e reuniões irrestritas \n&#8226; &#160; Sincronização automática das pastas no seu dispositivo móvel</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">Não há problemas solucionados</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">Você tem a chave</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">Chat criptografado</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">Crie a sua rede</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">As suas fotos na nuvem</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">Reunião MEGA</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">A segurança é a razão da nossa existência. Os seus arquivos estão protegidos por uma máquina de criptografia bem engrenada, na qual somente você pode acessá-los.</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">Chat totalmente criptografado com chamadas de voz e vídeo, mensagens de grupo e compartilhamento de dados integrado com a sua Nuvem de arquivos.</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">Adicione contatos, crie uma rede, colabore e faça chamadas de voz e vídeo sem sair do MEGA.</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">Sabemos que os Uploads da câmera são um recurso essencial para qualquer dispositivo móvel. Cadastre já uma conta.</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Videoconferência criptografada de conhecimento zero.</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]Novo recurso: Levantar a mão[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -810,8 +790,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Remover favorito</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">Não há itens marcados como favoritos</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">Confirme a sua senha</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">Configurações do scanner</string>
     <!-- Title of the camera setting screen -->
@@ -1105,7 +1083,7 @@
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
     <string name="camera_backup_permission_banner_info_description">Os uploads da câmera requerem [A]Acesso total[/A] à biblioteca de fotos do seu dispositivo</string>
     <!--Button text to request camera backup permission-->
-    <string name="camera_backup_permission_enable_button_text">Ativar Uploads da câmera</string>
+    <string name="camera_backup_permission_enable_button_text">Ativar os Uploads da câmera</string>
     <!--Permission screen skip requesting permission button text-->
     <string name="permission_screen_skip_permission_request_button_text">Agora não</string>
     <!--Notification permission screen title-->
@@ -1180,8 +1158,8 @@
     <string name="pro_plan_features_section_title">Você vai obter:</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Amplo espaço de armazenamento</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Armazene até 16&#160;TB de dados</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">Armazene até %1$s de dados</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Compartilhamento de transferência</string>
     <!-- Description for transfer sharing feature -->
@@ -1233,7 +1211,7 @@
     <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_tab_yearly">Anual</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to" formatted="false">Economize até 16% ao adquirir um plano anual</string>
+    <string name="account_upgrade_account_label_save_up_to">Economize até 16% ao adquirir um plano anual</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s de armazenamento</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
@@ -1343,15 +1321,49 @@
     <!-- Connection type option in Sync Settings Screen -->
     <string name="settings_sync_connection_type_title">Tipo de conexão</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">Uploads da câmera pausados</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">Conecte-se ao WIFI ou permita o uso de dados móveis</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">Permitir dados móveis</string>
     <!-- Alert title before download a big file for preview. -->
     <string name="alert_larger_file_preview_title">Visualização de um arquivo grande</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">Visualizar agora</string>
     <!-- Alert always allow button before download a big file for preview -->
     <string name="alert_larger_file_preview_always_allow_button">Sempre permitir visualizações</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">Esperando o Wi-Fi ou os dados móveis</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">Opções de energia</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">Sincronizar sempre</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">Sincronizar somente quando estiver carregando</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">Fazendo o upload das alterações como um novo arquivo</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">Descartar alterações?</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">Desativar os Uploads da câmera?</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">Sincronização alterada para:</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">Retomar o áudio?</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">“%1$s” será retomado a partir de %2$s.</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">Continuar</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">Reiniciar</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">Salvar no dispositivo</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">Ocultar</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">Mover</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">Copiar</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">Mover para a lixeira</string>
 </resources>

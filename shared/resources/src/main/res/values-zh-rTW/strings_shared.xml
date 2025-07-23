@@ -286,26 +286,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160; 無限制的通話和會議\n&#8226;&#160; 自動同步行動裝置上的資料夾</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">沒有已解決的問題</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">您握有鑰匙</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">加密聊天</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">建立您的網路</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">您在雲端的相片</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">MEGA會議</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">追求安全性是我們存在的原因，您的檔案安全的存放在我們運行良好的加密主機中，只有您可以存取您的檔案。</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">完全加密的語音聊天及視訊通話，群組聊天以並整合雲端硬碟的檔案共享。</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">新增聯絡人、建立網路、協作以及進行語音和視訊通話，無需離開MEGA。</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">相機上傳是任何行動裝置的基本功能，我們已經為您提供這項服務。立即註冊一個帳戶。</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">零知識加密的視訊會議</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]新功能：舉手[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -784,8 +764,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">移除收藏</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">沒有收藏</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">確認您的密碼</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">掃描設定</string>
     <!-- Title of the camera setting screen -->
@@ -1148,8 +1126,8 @@
     <string name="pro_plan_features_section_title">您將獲得：</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">大容量儲存空間</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">儲存高達16&#160;TB的資料</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">儲存高達%1$s的資料</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">傳輸流量共享</string>
     <!-- Description for transfer sharing feature -->
@@ -1309,15 +1287,49 @@
     <!-- Connection type option in Sync Settings Screen -->
     <string name="settings_sync_connection_type_title">連線類型</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">相機上傳已暫停</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">連線WiFi或允許行動數據</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">使用行動數據網路</string>
     <!-- Alert title before download a big file for preview. -->
     <string name="alert_larger_file_preview_title">預覽大檔案</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">現在預覽</string>
     <!-- Alert always allow button before download a big file for preview -->
     <string name="alert_larger_file_preview_always_allow_button">始終允許預覽</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">等待WiFi或行動網路連線中</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">電源選項</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">始終同步</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">僅在充電時同步</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">將編輯的內容作為新檔案上傳</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">捨棄更改？</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">停用相機上傳？</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">同步更改為：</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">繼續播放？</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">「%1$s」將從%2$s繼續播放。</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">恢復</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">重頭播放</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">儲存到裝置</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">隱藏</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">移動</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">複製</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">移至垃圾筒</string>
 </resources>

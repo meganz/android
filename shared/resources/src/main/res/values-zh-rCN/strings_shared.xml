@@ -286,26 +286,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN\n&#8226;&#160;无限制的通话和会议\n&#8226;&#160;自动同步移动设备上的文件夹</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">没有已解决问题</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">您持有这把密钥</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">已加密聊天</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">创建您的网络</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">您在云盘的照片</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">MEGA会议</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">安全即是我们存在的意义。您的文件会在我们的加密机器下受到安全保护，并且只有您可以访问您的文件。</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">使用您的云盘即可享有完全加密的语音与视频通话、群发信息以及文件共享整合。</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">添加联系人、创建关系网、协同合作以及进行语音和视频通话，一切尽在MEGA</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">相机上传是任何移动设备的必备功能，我们已经为您提供这项服务。立即注册一个帐户。</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">零知识加密视频会议。</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]新功能：举手[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -784,8 +764,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">移除收藏</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">无收藏</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">确认您的密码</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">扫描设置</string>
     <!-- Title of the camera setting screen -->
@@ -1148,8 +1126,8 @@
     <string name="pro_plan_features_section_title">您将获得：</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">大容量存储空间</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Store up to 16&#160;TB of data</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">Store up to %1$s of data</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">传输流量共享</string>
     <!-- Description for transfer sharing feature -->
@@ -1321,4 +1299,38 @@
     <string name="alert_larger_file_preview_confirm_button">Preview now</string>
     <!-- Alert always allow button before download a big file for preview -->
     <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">Waiting for WiFi or mobile data</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">Power options</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">Sync always</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">Uploading edits as a new file</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">放弃更改？</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">Disable Camera uploads?</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">Sync changed to:</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">继续播放？</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">“%1$s”将从%2$s开始继续播放。</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">恢复</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">重启</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">保存到设备</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">隐藏</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">移动</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">复制</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">移至回收站</string>
 </resources>

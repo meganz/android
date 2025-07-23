@@ -213,7 +213,7 @@
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
     <string name="info_total_size">Toplam boyut</string>
     <!-- Header of the Info view field for the date and time a folder was added -->
-    <string name="info_added">Eklendi</string>
+    <string name="info_added">Eklenme</string>
     <!-- String which indicates the number of files contained into a device/folder -->
     <plurals name="info_num_files">
         <item quantity="one">%1$d dosya</item>
@@ -294,26 +294,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Sınırsız arama ve toplantı \n&#8226;&#160;Mobil cihazınızdaki klasörleri otomatik olarak senkronize edin</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">Çözülmüş sorun yok</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">Anahtarlar sizde</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">Şifreli sohbet</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">Ağınızı oluşturun</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">Buluttaki fotoğraflarınız</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">MEGA toplantısı</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">Güvenlik bizim varoluş nedenimizdir; dosyalarınız, yalnızca sizin erişebileceğiniz, iyi işleyen bir şifreleme makinesinin ardında bizimle güvende.</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">Bulut Depolamanızla entegre sesli ve görüntülü aramalar, grup mesajlaşması ve dosya paylaşımı ile tamamen şifrelenmiş sohbet.</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">MEGA\’dan hiç ayrılmadan kişi ekleyin, bir ağ oluşturun, iş birliği yapın, sesli ve görüntülü aramalar yapın.</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">Kamera yüklemeleri, herhangi bir mobil cihaz için önemli bir özelliktir ve biz sizi koruyoruz. Şimdi bir hesap için kaydolun.</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Sıfır bilgi şifrelemeli görüntülü toplantı.</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]Yeni özellik: El kaldırma[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -797,8 +777,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Favorilerden kaldır</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">Favori yok</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">Şifrenizi onaylayın</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">Tarama ayarları</string>
     <!-- Title of the camera setting screen -->
@@ -916,7 +894,7 @@
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Kendime not</string>
     <!-- First message header in note to self chat -->
-    <string name="chat_note_to_self_chat_first_message_header">Kendine sakla</string>
+    <string name="chat_note_to_self_chat_first_message_header">Kendiniz için not alanı</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="one">“%1$s” albümüne 1 dosya eklendi. Yinelenen dosyalar tekrar eklenemez.</item>
@@ -1021,7 +999,7 @@
     <!--Sign Up page terms and condition content text-->
     <string name="sign_up_terms_condition_content">[A]MEGA\’nın Hizmet Şartları[/A]\’nı okudum ve kabul ediyorum.</string>
     <!--Sign Up page password hint and suggestion title-->
-    <string name="sign_up_password_hint_title_text">Şunları içermesi daha iyidir:</string>
+    <string name="sign_up_password_hint_title_text">Şunları içermesi iyidir:</string>
     <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
     <string name="sign_up_password_hint_upper_lower_case">Büyük ve küçük harfler</string>
     <!--Sign Up page password hint to suggest a password with at least one number or special character-->
@@ -1051,7 +1029,7 @@
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
     <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">Bu ada sahip bir yedek zaten mevcut. Lütfen farklı bir ad girin.</string>
     <!-- USP Carousel page 1 title-->
-    <string name="carousel_page_title_slide_1">Anahtarlar sizde</string>
+    <string name="carousel_page_title_slide_1">Kontrol sende</string>
     <!-- USP Carousel page 1 description-->
     <string name="carousel_page_description_slide_1">Kullanıcı kontrollü, sıfır bilgi şifrelemesi sayesinde siz istemediğiniz sürece hiç kimse verilerinizi göremez - biz bile!</string>
     <!-- USP Carousel page 2 title-->
@@ -1164,8 +1142,8 @@
     <string name="pro_plan_features_section_title">Elde edecekleriniz:</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Cömert depolama</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">16&#160;TB\’a kadar veri depolayın</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">%1$s’ye kadar veri depolayın</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Aktarım paylaşımı</string>
     <!-- Description for transfer sharing feature -->
@@ -1326,15 +1304,49 @@
     <!-- Connection type option in Sync Settings Screen -->
     <string name="settings_sync_connection_type_title">Bağlantı şekli</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">Kamera yüklemeleri duraklatıldı</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">WIFI\’ye bağlanın veya mobil veriye izin verin</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">Mobil veriye izin ver</string>
     <!-- Alert title before download a big file for preview. -->
     <string name="alert_larger_file_preview_title">Büyük dosyanın ön izlemesi</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">Hemen ön izle</string>
     <!-- Alert always allow button before download a big file for preview -->
     <string name="alert_larger_file_preview_always_allow_button">Ön izlemelere her zaman izin ver</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">WiFi veya mobil veri bekleniyor</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">Güç seçenekleri</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">Her zaman senkronize et</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">Yalnızca şarj olurken senkronize et</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">Düzenlemeler yeni dosya olarak yükleniyor</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">Değişiklikler iptal edilsin mi?</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">Kamera yüklemeleri kapatılsın mı?</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">Senkronizasyon şuna değiştirildi:</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">Ses çalmaya devam etsin mi?</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">“%1$s”, %2$s\’den devam edecektir.</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">Devam ettir</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">Yeniden başlat</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">Cihaza kaydet</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">Gizle</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">Taşı</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">Kopyala</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">Move to rubbish bin</string>
 </resources>

@@ -326,26 +326,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;ميغا في بي إن &#160;MEGA&#160;VPN \n&#8226;&#160;مكالمات واجتماعات غير مقيدة \n&#8226;&#160;قم بمزامنة المجلدات تلقائيًا على جهازك المحمول</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">لا توجد مشاكل تم حلها</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">انت تحتفظ بالمفاتيح</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">محادثة مشفرة</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">انشئ شبكتك</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">تطبيق الصور الخاص بك على السحابة</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">اجتماع ميغا MEGA</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">نحن موجودون لتوفير الأمان، ملفاتك بأمان أكثر معنا محمية خلف آلية تشفير متينة بحيث تكون أنت فقط القادر على الولوج الى ملفاتك.</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">محادثة مشفرة بالكامل مع مكالمات صوتية ومكالمات فيديو ومراسلات جماعية و مشاركة ملفات بشكل متكامل مع سواقتك السحابية.</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">يمكنك إضافة جهات اتصال وإنشاء شبكة والتعاون وإجراء مكالمات صوتية ومكالمات فيديو دون مغادرة ميغا MEGA مطلقًا.</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">تُعد ترفيعات الكاميرا ميزة أساسية لأي جهاز محمول ونحن هنا لنقدم لك الدعم. قم بالتسجيل للحصول على حساب الآن.</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">اجتماع فيديو مشفر بتشفير المعرفة الصفرية.</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]ميزة جديدة: رفع اليد[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -849,8 +829,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">حذف المفضلة</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">المفضلة فارغة</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">قم بتأكيد كلمة المرور الخاصة بك</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">إعدادات المسح الضوئي</string>
     <!-- Title of the camera setting screen -->
@@ -898,7 +876,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">لاحقة الملف مطلوبة</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA will fetch a temporary copy of this file so you can preview it. It won’t be saved or available outside the app. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">ستجلب ميغا MEGA نسخة مؤقتة من هذا الملف حتى تتمكن من معاينتها. لن يتم حفظها أو إتاحتها خارج التطبيق. %1$s سيتم تنزيلها.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">إكمال العملية: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -1021,7 +999,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">تأكيد البريد الإلكتروني</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]Help Centre[/A].</string>
+    <string name="email_confirmation_content">لقد أرسلنا بريدًا إلكترونيًا إلى [P]%s[/P] مع رابط. انقر فوق الرابط للتحقق من عنوان بريدك الإلكتروني وتفعيل حسابك. \n\nإذا لم تستلم البريد الإلكتروني فتحقق من مجلد الرسائل غير المرغوب فيها أو حاول مرة أخرى. لأية مشاكل أخرى، يرجى زيارة [A]مركز المساعدة[/A] الخاص بنا.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">إعادة إرسال</string>
     <!-- General change email address -->
@@ -1228,8 +1206,8 @@
     <string name="pro_plan_features_section_title">ستحصل على:</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">مساحة تخزين سخية</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">يمكن تخزين ما يصل إلى 16&#160;تيرابايت من البيانات</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">تخزين ما يصل إلى %1$s من البيانات</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">مشاركة تراسل المعطيات</string>
     <!-- Description for transfer sharing feature -->
@@ -1271,7 +1249,7 @@
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">يتم تجديد الاشتراكات تلقائيًا لفترات اشتراك متتالية من نفس المدة وبنفس سعر الفترة الأولية المختارة.\n\nيمكنك إلغاء اشتراك باقتك في أي وقت ولكن في موعد لا يتجاوز 24 ساعة قبل استحقاق دفعة الاشتراك التالية. [A]تعرف على كيفية إدارة اشتراكك في إعداداتك[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]Terms of Service[/A] and [B]Privacy Policy[/B]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]شروط الخدمة[/A] و [B]سياسة الخصوصية[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">احصل على المزيد مع باقة برو Pro</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1382,27 +1360,61 @@
     <!-- Label for rubbish bin -->
     <string name="general_section_rubbish_bin">سلة المحذوفات</string>
     <!-- Subtitle for VPN -->
-    <string name="menu_item_vpn_subtitle">High-speed VPN</string>
+    <string name="menu_item_vpn_subtitle">في بي إن VPN عالي السرعة</string>
     <!-- Subtitle for MEGA PASS -->
-    <string name="menu_item_mega_pass_subtitle">Securely store and autofill your passwords</string>
+    <string name="menu_item_mega_pass_subtitle">قم بتخزين كلمات المرور الخاصة بك وتعبئتها تلقائيًا بشكل آمن</string>
     <!-- Subtitle for transfer.it -->
-    <string name="menu_item_transfer_it_subtitle">Fast, secure file transfers</string>
+    <string name="menu_item_transfer_it_subtitle">عمليات نقل الملفات السريعة والآمنة</string>
     <!-- Label for transfer it -->
     <string name="general_section_transfer_it">Transfer.it</string>
     <!-- Label for Menu -->
     <string name="general_menu">القائمة</string>
     <!-- Connection type option in Sync Settings Screen -->
-    <string name="settings_sync_connection_type_title">Connection type</string>
+    <string name="settings_sync_connection_type_title">نوع الاتصال</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">تم إيقاف ترفيعات الكاميرا</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">الاتصال بالواي فاي WIFI أو السماح ببيانات الهاتف المحمول</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">السماح ببيانات الهاتف المحمول</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Previewing large file</string>
+    <string name="alert_larger_file_preview_title">عرض ملف كبير</string>
     <!-- Alert confirm button before download a big file for preview -->
-    <string name="alert_larger_file_preview_confirm_button">Preview now</string>
+    <string name="alert_larger_file_preview_confirm_button">قم بالعرض الآن</string>
     <!-- Alert always allow button before download a big file for preview -->
-    <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
+    <string name="alert_larger_file_preview_always_allow_button">السماح دائمًا بالعرض</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">في انتظار الواي فاي WiFi أو بيانات الهاتف المحمول</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">خيارات الطاقة</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">قم بالمزامنة دائمًا</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">قم بالمزامنة فقط عند الشحن</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">تحميل التعديلات كملف جديد</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">تجاهل التغييرات؟</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">تعطيل ترفيعات الكاميرا؟</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">تم تغيير المزامنة إلى:</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">استئناف الملف الصوتي؟</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">سيتم استئناف “%1$s” من عند %2$s.</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">متابعة</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">إعادة تشغيل</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">حفظ على الجهاز</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">إخفاء</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">نقل</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">نسخ</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">نقل إلى سلة المحذوفات</string>
 </resources>

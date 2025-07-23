@@ -286,26 +286,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;無制限の通話とミーティング \n&#8226;&#160;モバイルデバイス上のフォルダを自動的に同期</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">解決済みの問題はありません</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">あなたがキーを持っています</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">暗号化されたチャット</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">ネットワークの作成</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">クラウド内のあなたの写真</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">MEGAミーティング</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">セキュリティこそが私たちの存在理由です。あなたのファイルは、非常に効果的な暗号化マシンの裏側にあり、安全です。そこで、あなたのファイルにアクセスできるのは、あなただけです。</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">音声＆ビデオ通話、グループメッセージング、クラウドドライブとのファイル共有統合による完全に暗号化されたチャット。</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">連絡先の追加、ネットワークの作成、コラボレーション、MEGAを一切離れずに音声通話とビデオ通話を行えます。</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">カメラアップロードは、あらゆるモバイル端末にとって不可欠な機能で、あなたにもご利用いただけます。今すぐアカウントをサインアップ（登録）してください。</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">ゼロ知識暗号化によるビデオミーティングが可能です。</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]新機能：挙手[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -784,8 +764,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">お気に入りを削除</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">お気に入りがありません</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">パスワードを確認</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">スキャン設定</string>
     <!-- Title of the camera setting screen -->
@@ -1148,8 +1126,8 @@
     <string name="pro_plan_features_section_title">以下をご利用いただけます：</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">豊富なストレージ</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">最大16&#160;TBのデータを保管</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">最大%1$sのデータを保管</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">転送共有</string>
     <!-- Description for transfer sharing feature -->
@@ -1309,15 +1287,49 @@
     <!-- Connection type option in Sync Settings Screen -->
     <string name="settings_sync_connection_type_title">接続タイプ</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">カメラアップロードを一時停止しました</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">Wi-Fiに接続するか、モバイルデータを許可してください</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">モバイルデータを許可</string>
     <!-- Alert title before download a big file for preview. -->
     <string name="alert_larger_file_preview_title">大きなファイルのプレビュー</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">今すぐプレビュー</string>
     <!-- Alert always allow button before download a big file for preview -->
     <string name="alert_larger_file_preview_always_allow_button">常にプレビューを許可</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">Wi-Fiまたはモバイルデータの待機中</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">電源オプション</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">常に同期</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">充電時のみ同期</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">編集内容を新しいファイルとしてアップロード中</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">変更を破棄しますか？</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">カメラアップロードを無効にしますか？</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">同期を変更：</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">音声を再開しますか？</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">「%1$s」は%2$sから再開します。</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">再開</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">再起動</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">端末に保存</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">隠す</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">移動</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">コピー</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">ごみ箱に移す</string>
 </resources>

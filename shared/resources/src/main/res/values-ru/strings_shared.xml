@@ -310,26 +310,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Неограниченные звонки и встречи \n&#8226;&#160;Автоматическая синхронизация папок на мобильном устройстве</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">Нет решённых проблем</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">Ключи хранятся у вас</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">Зашифрованный чат</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">Создайте свою сеть</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">Ваши фотографии в облаке</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">MEGA-встреча</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">Безопасность — это то, для чего существуем. Ваши файлы в безопасности за нашей хорошо смазанной шифровальной машиной, где только вы можете получить доступ к ним.</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">Полностью зашифрованный чат с голосовыми и видеозвонками, групповой обмен сообщениями и интеграция файлов с вашим облачным диском.</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">Добавляйте контакты, создавайте сообщество, сотрудничайте и совершайте голосовые и видеозвонки, не покидая MEGA.</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">Загрузки из камеры — важная функция для любого мобильного устройства, и мы о ней позаботились. Зарегистрируйтесь сейчас.</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Зашифрованная с нулевым разглашением видеовстреча.</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]Новая функция: поднять руку[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -823,8 +803,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Удалить популярные</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">Нет избранного</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">Подтвердите пароль</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">Настройки сканирования</string>
     <!-- Title of the camera setting screen -->
@@ -1196,8 +1174,8 @@
     <string name="pro_plan_features_section_title">Вы получите:</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Выгодный объём</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Храните до 16&#160;ТБ данных</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">Храните до %1$s данных</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Совместное использование объёма передач</string>
     <!-- Description for transfer sharing feature -->
@@ -1360,15 +1338,49 @@
     <!-- Connection type option in Sync Settings Screen -->
     <string name="settings_sync_connection_type_title">Тип подключения</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">Загрузки из камеры приостановлены</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">Подключитесь к Wi-Fi или разрешите передачу мобильных данных</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">Разрешить передачу мобильных данных</string>
     <!-- Alert title before download a big file for preview. -->
     <string name="alert_larger_file_preview_title">Превью большого файла</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">Просмотреть</string>
     <!-- Alert always allow button before download a big file for preview -->
     <string name="alert_larger_file_preview_always_allow_button">Всегда разрешать превью</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">Ожидание Wi-Fi или мобильных данных</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">Настройки питания</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">Всегда синхронизировать</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">Синхронизировать только во время зарядки</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">Загрузка правок в новый файл</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">Отменить изменения?</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">Отключить Загрузки из камеры?</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">Синхронизация изменена на:</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">Продолжить аудио?</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">«%1$s» продолжится с %2$s.</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">Возобновить</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">Перезапустить</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">Сохранить на устройстве</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">Скрыть</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">Переместить</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">Копировать</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">Переместить в корзину</string>
 </resources>

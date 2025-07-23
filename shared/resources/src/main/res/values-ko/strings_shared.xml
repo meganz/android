@@ -286,26 +286,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN\n&#8226;&#160;무제한 통화와 회의\n&#8226;&#160;휴대 장치의 폴더를 자동으로 동기화</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">해결된 문제 없음</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">당신이 열쇠를 갖습니다</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">암호화된 대화</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">네트워크 생성</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">클라우드 속 당신의 사진</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">MEGA 회의</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">보안은 우리의 존재 이유이며, 당신의 파일들은 당신만이 접근 할수 있도록 우리 서버에 마치 잘 관리된 암호화 기계 뒤에 있는 것처럼 매우 안전합니다.</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">완전히 암호화된 대화와 음성과 영상 통화, 그룹 대화 그리고 클라우드 드라이브와 통합된 파일 공유.</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">MEGA를 떠날 필요 없이 연락처를 추가하고, 네트워크를 형성하고, 협업하고, 음성과 영상 통화를 하세요.</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">카메라 업로드는 어떠한 모바일 기기에서든 필요한 기능이며 우리는 이 기능이 준비되어 있습니다. 지금 가입하세요.</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">영지식 암호화 화상 회의.</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]새로운 기능: 손 들기[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -784,8 +764,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">즐겨찾기 삭제</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">즐겨찾기 없음</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">암호를 확인하세요</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">스캔 설정</string>
     <!-- Title of the camera setting screen -->
@@ -833,7 +811,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">파일 확장자가 필요합니다</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA will fetch a temporary copy of this file so you can preview it. It won’t be saved or available outside the app. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">당신이 이 파일을 미리 볼 수 있도록 MEGA가 이 파일의 임시 사본을 가져올 것입니다. 앱 외부에서 이용 가능하거나 저장되지 않을 것입니다. %1$s가 다운로드 됩니다.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">작업 완료 중: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -1148,8 +1126,8 @@
     <string name="pro_plan_features_section_title">다음을 얻게 됩니다:</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">넉넉한 저장소</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">최대 16TB의 데이터 저장</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">최대 %1$s의 데이터 저장</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">전송 공유</string>
     <!-- Description for transfer sharing feature -->
@@ -1307,17 +1285,51 @@
     <!-- Label for Menu -->
     <string name="general_menu">메뉴</string>
     <!-- Connection type option in Sync Settings Screen -->
-    <string name="settings_sync_connection_type_title">Connection type</string>
+    <string name="settings_sync_connection_type_title">연결 유형</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">카메라 업로드 일시정지됨</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">Wi-Fi에 연결하거나 모바일 데이터를 허용하세요</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">모바일 데이터 허용</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Previewing large file</string>
+    <string name="alert_larger_file_preview_title">큰 파일 미리 보기 중</string>
     <!-- Alert confirm button before download a big file for preview -->
-    <string name="alert_larger_file_preview_confirm_button">Preview now</string>
+    <string name="alert_larger_file_preview_confirm_button">지금 미리 보기</string>
     <!-- Alert always allow button before download a big file for preview -->
-    <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
+    <string name="alert_larger_file_preview_always_allow_button">항상 미리 보기 허용</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">Wi-Fi 또는 모바일 데이터를 기다리는 중</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">전원 옵션</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">항상 동기화</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">충전 중일 때만 동기화</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">편집본을 새 파일로 업로드 중</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">변경을 취소할까요?</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">카메라 업로드를 비활성화 할까요?</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">동기화가 다음으로 변경됨:</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">이어서 들을까요?</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">%1$s는/은 %2$s부터 재개됩니다</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">재개</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">재시작</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">장치에 저장</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">숨기기</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">이동</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">복사</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">휴지통으로 이동</string>
 </resources>

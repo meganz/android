@@ -310,26 +310,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226; &#160; MEGA &#160; VPN \n&#8226; &#160; Nieograniczone połączenia i spotkania \n&#8226; &#160; Automatyczna synchronizacja katalogów na urządzeniu mobilnym</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">Brak rozwiązanych problemów</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">Ty przechowujesz klucze</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">Zaszyfrowany czat</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">Stwórz swoją sieć</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">Twoje zdjęcia w chmurze</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">MEGA spotkanie</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">Bezpieczeństwo, dlatego istniejemy, twoje pliki są bezpieczne u nas za dobrze naoliwioną maszyną szyfrującą, gdzie tylko ty masz dostęp do twoich plików.</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">W pełni zaszyfrowany czat z połączeniami głosowymi i wideo, przesyłanie wiadomości grupowych i integracja udostępniania plików z dyskiem Cloud Drive.</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">Dodawaj kontakty, twórz sieć, współpracuj i wykonuj połączenia głosowe i wideo bez opuszczania MEGA.</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">Przesyłanie z aparatu jest niezbędną funkcją każdego urządzenia mobilnego, a my zapewniamy Ci ochronę. Zarejestruj się teraz, aby założyć konto.</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Zaszyfrowane spotkanie wideo o zerowej wiedzy.</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]New feature: Raise hand[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -823,8 +803,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Usuń ulubione</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">Brak ulubionych</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">Potwierdź hasło</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">Ustawienia skanowania</string>
     <!-- Title of the camera setting screen -->
@@ -1196,8 +1174,8 @@
     <string name="pro_plan_features_section_title">Otrzymasz:</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Pojemna pamięć</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Przechowuj do 16&#160;TB danych</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">Przechowuj do %1$s danych</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Współdzielenie transferu</string>
     <!-- Description for transfer sharing feature -->
@@ -1360,15 +1338,49 @@
     <!-- Connection type option in Sync Settings Screen -->
     <string name="settings_sync_connection_type_title">Typ połączenia</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">Przesyłanie z kamery wstrzymane</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">Połącz się z Wi-Fi lub zezwól na dane mobilne</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">Zezwól na dane mobilne</string>
     <!-- Alert title before download a big file for preview. -->
     <string name="alert_larger_file_preview_title">Podgląd dużego pliku</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">Zobacz teraz</string>
     <!-- Alert always allow button before download a big file for preview -->
     <string name="alert_larger_file_preview_always_allow_button">Zawsze zezwalaj na podglądy</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">Czekanie na Wi-Fi lub dane mobilne</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">Opcje zasilania</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">Zawsze synchronizuj</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">Synchronizuj tylko podczas ładowania</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">Wgrywanie edycji jako nowy plik</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">Odrzucić zmiany?</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">Wyłączyć przesyłanie z kamery?</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">Synchronizacja zmieniona na:</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">Wznowić dźwięk?</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">“%1$s” zostanie wznowione od %2$s.</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">Wznów</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">Zrestartuj</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">Zapisz na urządzeniu</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">Ukryj</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">Przenieś</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">Skopiuj</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">Przenieś do kosza</string>
 </resources>

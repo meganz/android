@@ -114,8 +114,6 @@
     <string name="alert_larger_file">%s indirilecek.</string>
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">Tekrar gösterme</string>
-    <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Mevcut giriş yapma işlemini iptal etmek istediğinizden emin misiniz?</string>
     <!-- Login button -->
     <string name="login_text">Giriş yap</string>
     <!-- email label -->
@@ -158,8 +156,6 @@
     <string name="first_name_text">Ad</string>
     <!-- Last name of the user -->
     <string name="lastname_text">Soyad</string>
-    <!-- text placed on the checkbox of acceptation of the Terms of Service -->
-    <string name="tos">MEGA\’nın [A]Hizmet Şartları[/A]\’nı kabul ediyorum</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">[B]Şifremi kaybedersem verilerimi de kaybedebileceğimi[/B] anlıyorum. [A]MEGA\’nın uçtan uca şifrelemesi[/A] hakkında daha fazlasını öğrenin.</string>
     <!-- warning dialog -->
@@ -174,8 +170,6 @@
     <string name="error_passwords_dont_match">Şifreler eşleşmiyor</string>
     <!-- when creating the account -->
     <string name="error_email_registered">Bu e-posta adresiyle zaten bir MEGA hesabı açılmış.</string>
-    <!--  -->
-    <string name="create_account_creating_account">Sunucuya bağlanılıyor: Hesap oluşturuluyor</string>
     <!--  -->
     <string name="cancel_all_transfer_confirmation">Tüm aktarımlar iptal edilsin mi?</string>
     <!-- Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible). -->
@@ -197,18 +191,12 @@
     <string name="location_label">%1$s (%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
     <string name="title_shared_items">Paylaşılan öğeler</string>
-    <!-- The title of the trash bin in the tree of the file manager. -->
-    <string name="section_rubbish_bin">Çöp kutusu</string>
-    <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
-    <string name="section_contacts">Kişiler</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
     <string name="section_contacts_with_notification">Kişiler [A](%1$d)[/A]</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
     <string name="sent_requests_empty">[A]Gönderilen istek [/A] [B]yok[/B]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[A]Alınan istek [/A] [B]yok[/B]</string>
-    <!-- Title for the file transfer screen (with the up & download) -->
-    <string name="section_transfers">Aktarımlar</string>
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Hesabım</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
@@ -236,7 +224,7 @@
     <!-- When the file/folder was last modified -->
     <string name="file_properties_info_last_modified">Son değiştirilme</string>
     <!-- Label to display the date and time when a file/folder has been added (uploaded) to MEGA. -->
-    <string name="file_properties_info_added">Eklendi</string>
+    <string name="file_properties_info_added">Eklenme</string>
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
     <string name="file_properties_shared_folder_permissions">İzinler</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
@@ -424,7 +412,7 @@
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Geçersiz şifre çözme anahtarı</string>
     <!-- upload to. Then choose an Audio file -->
-    <string name="upload_to_audio">Ses</string>
+    <string name="upload_to_audio">Sesler</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Video</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -466,10 +454,6 @@
     <string name="cam_sync_wifi">Yalnızca Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi veya mobil veri</string>
-    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
-    <string name="cam_sync_syncing">Kamera yüklemeleri senkronize ediliyor</string>
-    <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Kamera yüklemeleri durdurulsun mu?</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Yüklenecek dosyalar kontrol ediliyor</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1029,7 +1013,7 @@
     <!-- Title of the settings section to configure the autoaway of chat presence -->
     <string name="settings_autoaway_title">Otomatik uzakta</string>
     <!-- Subtitle of the settings section to configure the autoaway of chat presence -->
-    <string name="settings_autoaway_subtitle">Hareketsizlik sonrası durum</string>
+    <string name="settings_autoaway_subtitle">Hareketsizlikten sonra beni Uzakta göster</string>
     <!-- Value in the settings section of the autoaway chat presence -->
     <string name="settings_autoaway_value">%1$d dakika</string>
     <!-- Title of the settings section to configure the status persistence of chat presence -->
@@ -1265,8 +1249,6 @@
     <string name="confirmation_delete_from_mega">MEGA\’dan silinsin mi?</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_contact_notifications_for_chat">Sohbet bildirimleri</string>
-    <!-- title of the section for achievements -->
-    <string name="achievements_title">Başarılar</string>
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Arkadaşlarınızı davet edin ve ödüller kazanın</string>
     <!-- title of the introduction for the achievements screen -->
@@ -1641,8 +1623,6 @@
     <string name="login_API_lock">Bu işlem beklenenden uzun sürüyor. Lütfen bekleyin.</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit -->
     <string name="login_API_rate">Çok fazla istek denendi. Lütfen bekleyin.</string>
-    <!-- Message when previous login is being cancelled -->
-    <string name="login_in_progress">Giriş yapma işlemi iptal ediliyor. Lütfen bekleyin&#8230;</string>
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">Hata. Dosya bozuk veya mevcut değil.</string>
     <!-- Menu option to print the recovery key from Offline section -->
@@ -2292,7 +2272,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">Göz ardı et</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s bu aramayı sessize aldı</string>
+    <string name="muted_contact_micro">%s kullanıcısının mikrofonu kapalı</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">Ses kapalı</string>
     <!-- Subtitle of the call screen when the call is on hold -->
@@ -2753,7 +2733,7 @@
     <!-- Message displayed when clicking on a contact attached to the chat that is not my contact -->
     <string name="user_is_not_contact">%s, kişiler listenizde değil</string>
     <!-- Option of color theme, light mode. -->
-    <string name="theme_light">Açık</string>
+    <string name="theme_light">Aydınlık</string>
     <!-- Option of color theme, dark mode. -->
     <string name="theme_dark">Koyu</string>
     <!-- Option of color theme, follow the system setting. -->
@@ -2965,8 +2945,6 @@
     <string name="change_meeting_name">Toplantı adını değiştir</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Toplantı bağlantısı</string>
-    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
-    <string name="join_meeting_as_guest">Toplantıya misafir olarak katılın</string>
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">Bir toplantıya davetlisiniz.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
@@ -3014,7 +2992,7 @@
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Ana görünüm</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
-    <string name="offline_warning">Çıkış yapmak çevrim dışı içeriğinizi siler.</string>
+    <string name="offline_warning">Hesaptan çıkış yaptığınız zaman çevrim dışı içeriğiniz iptal olur.</string>
     <!-- Settings category which contains all preferences related to user interface. -->
     <string name="user_interface_setting">Kullanıcı arayüzü</string>
     <!-- Setting which allows to choose the start screen. -->
@@ -4296,8 +4274,6 @@
     <string name="album_import_input_decryption_key_description">Albüme erişmek için şifre çözme anahtarını girin. Elinizde yoksa bağlantıyı sizinle paylaşan kişiyle iletişime geçin.</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">Tercihleri hatırla</string>
-    <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title">Cihaz merkezi</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Her gün</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -4989,8 +4965,6 @@
     <string name="search_dropdown_chip_filter_type_date_last_year">Geçen yıl</string>
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">Daha eski</string>
-    <!-- String below login button next to button for reporting a login issue -->
-    <string name="general_login_label_trouble_logging_in">Giriş yapmada sorun mu yaşıyorsunuz?</string>
     <!-- Hidden nodes show items -->
     <string name="hidden_nodes_show_items">Gizli öğeleri göster</string>
     <!-- Hidden nodes show items description -->

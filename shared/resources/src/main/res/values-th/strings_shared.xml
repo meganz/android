@@ -286,26 +286,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;โทรและประชุมได้ไม่จำกัด\n&#8226;&#160;ซิงค์โฟลเดอร์บนอุปกรณ์มือถือของคุณโดยอัตโนมัติ</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">ปัญหาทั้งหมดได้รับการแก้ไขแล้ว</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">คุณคือผู้ถือกุญแจ</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">เข้ารหัสแชท</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">สร้างเครือข่ายของคุณ</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">รูปภาพของคุณในคลาวด์</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">การประชุม MEGA</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">ความปลอดภัยคือหัวใจสำคัญของเรา ข้อมูลของคุณจะถูกเก็บไว้อย่างปลอดภัยด้วยระบบการเข้ารหัสที่ล้ำสมัย เฉพาะคุณเท่านั้นที่จะสามารถเข้าถึงไฟล์ของคุณได้</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">แชทที่เข้ารหัสเต็มรูปแบบ รองรับการโทรด้วยเสียงและวิดีโอ ส่งข้อความแบบกลุ่ม และแชร์ไฟล์ได้อย่างราบรื่น ผ่านระบบคลาวด์ไดรฟ์ของคุณ</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">เพิ่มผู้ติดต่อ สร้างกลุ่ม ทำงานร่วมกัน และโทรทั้งแบบเสียงและวิดีโอได้ง่าย ๆ โดยไม่ต้องออกจาก MEGA เลย</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">การอัปโหลดจากกล้องเป็นฟีเจอร์สำคัญสำหรับมือถือทุกเครื่อง และเราก็มีบริการนี้ให้คุณแล้ว สมัครสมาชิกเลยตอนนี้</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">การประชุมทางวิดีโอด้วยการเข้ารหัสแบบซีโร่-นอว์เลจ</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]ฟีเจอร์ใหม่: ยกมือขึ้น[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -784,8 +764,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">ลบรายการโปรด</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">ไม่มีรายการโปรด</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">ยืนยันรหัสผ่านของคุณ</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">ตั้งค่าการสแกน</string>
     <!-- Title of the camera setting screen -->
@@ -1148,8 +1126,8 @@
     <string name="pro_plan_features_section_title">คุณจะได้รับ:</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">พื้นที่เก็บข้อมูลจุได้ไม่อั้น</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">จัดเก็บข้อมูลได้สูงสุด 16&#160;TB</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">Store up to %1$s of data</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">แชร์การถ่ายโอนของคุณให้คนอื่นได้</string>
     <!-- Description for transfer sharing feature -->
@@ -1320,4 +1298,38 @@
     <string name="alert_larger_file_preview_confirm_button">Preview now</string>
     <!-- Alert always allow button before download a big file for preview -->
     <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">Waiting for WiFi or mobile data</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">Power options</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">Sync always</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">Uploading edits as a new file</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">ยกเลิกการเปลี่ยนแปลงหรือไม่</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">Disable Camera uploads?</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">Sync changed to:</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">เล่นเสียงต่อจากก่อนหน้านี้หรือไม่</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">ไฟล์ “%1$s” จะเริ่มเล่นต่อตั้งแต่ %2$s เป็นต้นไป</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">ดำเนินการต่อ</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">เริ่มใหม่ตั้งแต่ต้น</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">บันทึกลงในอุปกรณ์</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">ซ่อน</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">ย้าย</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">คัดลอก</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">ย้ายไปถังขยะ</string>
 </resources>

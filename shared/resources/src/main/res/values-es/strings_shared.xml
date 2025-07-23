@@ -302,26 +302,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Llamadas y reuniones sin restricciones \n&#8226;&#160;Sincronización automática de carpetas en tu dispositivo móvil</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">No hay problemas resueltos</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">Tú tienes las claves</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">Chat cifrado</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">Crea tu propia red</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">Tus fotos en la nube</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">Reuniones en MEGA</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">La seguridad es la razón por la que existimos. Tus archivos están seguros con nosotros gracias a una máquina de cifrado bien engrasada que permite que solo tú puedas acceder a tus archivos.</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">Chat totalmente cifrado con llamadas y videollamadas, chat de grupo y capacidad de compartir archivos con tu Cloud Drive.</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">Añade contactos, crea tu propia red, colabora y haz llamadas y videollamadas sin salir de MEGA.</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">La función Subidas de la cámara es esencial para cualquier dispositivo móvil y nosotros la tenemos. Registra tu cuenta ahora.</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Reunión con cifrado de conocimiento cero.</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]Nueva función: Levantar la mano[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -810,8 +790,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Eliminar favorito</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">No hay favoritos</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">Confirma tu contraseña</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">Ajustes de escaneo</string>
     <!-- Title of the camera setting screen -->
@@ -1180,8 +1158,8 @@
     <string name="pro_plan_features_section_title">Obtendrás:</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Almacenamiento generoso</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Almacena hasta 16&#160;TB de datos</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">Store up to %1$s of data</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Transferencia compartida</string>
     <!-- Description for transfer sharing feature -->
@@ -1233,7 +1211,7 @@
     <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_tab_yearly">Anual</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to" formatted="false">Ahorra hasta un 16&#160;% con el cobro anual</string>
+    <string name="account_upgrade_account_label_save_up_to">Ahorra hasta un 16&#160;% con el cobro anual</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s de almacenamiento</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
@@ -1354,4 +1332,38 @@
     <string name="alert_larger_file_preview_confirm_button">Preview now</string>
     <!-- Alert always allow button before download a big file for preview -->
     <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">Waiting for WiFi or mobile data</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">Power options</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">Sync always</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">Uploading edits as a new file</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">¿Descartar los cambios?</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">Disable Camera uploads?</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">Sync changed to:</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">¿Reanudar audio?</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">“%1$s” se reanudará desde %2$s.</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">Reanudar</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">Reiniciar</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">Guardar en el dispositivo</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">Ocultar</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">Mover</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">Copiar</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">Mover a la Papelera</string>
 </resources>

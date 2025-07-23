@@ -302,26 +302,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN\n&#8226;&#160;Apeluri și întâlniri nerestricționate\n&#8226;&#160;Sincronizați automat folderele de pe dispozitivul mobil</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">Nicio problemă rezolvată</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">Tu deții cheile</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">Chat criptat</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">Creează-ți rețeaua</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">Fotografiile tale în cloud</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">Întâlnire MEGA</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">Securitatea este motivul pentru care existăm, fișierele tale sunt în siguranță în spatele unei mașini de criptare bine unsă, loc în care numai tu poți accesa fișierele.</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">Chat complet criptat cu apeluri vocale și video, mesagerie de grup și integrare pentru partajarea de fișiere din unitatea cloud.</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">Adăugați contacte, creați o rețea, colaborați și efectuați apeluri vocale și video fără a părăsi MEGA.</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">Încărcări cameră sunt o funcție esențială pentru orice dispozitiv mobil și vă asigurăm. Înscrieți-vă acum pentru un cont.</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Întâlnire video criptată cu zero cunoștințe.</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]Funcție nouă: ridicați mâna[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -810,8 +790,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Elimină de la favorite</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">Niciun favorit</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">Confirmați parola dvs.</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">Setări de scanare</string>
     <!-- Title of the camera setting screen -->
@@ -1180,8 +1158,8 @@
     <string name="pro_plan_features_section_title">Veți obține:</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Spațiu de stocare generos</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Depozitați până la 16&#160;TB de date</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">Depozitați până la %1$s de date</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Partajarea transferurilor</string>
     <!-- Description for transfer sharing feature -->
@@ -1233,7 +1211,7 @@
     <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_tab_yearly">Anual</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to" formatted="false">Economisiți până la 16&#160;% cu facturarea anuală</string>
+    <string name="account_upgrade_account_label_save_up_to">Economisiți până la 16&#160;% cu facturarea anuală</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s spațiu de stocare</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
@@ -1354,4 +1332,38 @@
     <string name="alert_larger_file_preview_confirm_button">Previzualizați acum</string>
     <!-- Alert always allow button before download a big file for preview -->
     <string name="alert_larger_file_preview_always_allow_button">Permiteți întotdeauna previzualizările</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">În așteptarea Wi-Fi sau a datelor mobile</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">Opțiuni de alimentare</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">Sincronizați întotdeauna</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">Sincronizați numai la încărcare</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">Încărcarea editărilor ca fișier nou</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">Renunțați la modificări?</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">Dezactivează Încărcări cameră?</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">Sincronizarea s-a schimbat la:</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">Reluați audio?</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">„%1$s” va fi reluat de la %2$s.</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">Reluați</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">Repornește</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">Salvați pe dispozitiv</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">Ascunde</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">Mută</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">Copiază</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">Move to rubbish bin</string>
 </resources>

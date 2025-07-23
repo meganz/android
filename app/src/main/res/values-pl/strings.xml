@@ -118,8 +118,6 @@
     <string name="alert_larger_file">%s zostanie pobrane.</string>
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">Nie pokazuj więcej</string>
-    <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">Czy na pewno chcesz anulować bieżący proces logowania?</string>
     <!-- Login button -->
     <string name="login_text">Zaloguj się</string>
     <!-- email label -->
@@ -162,8 +160,6 @@
     <string name="first_name_text">Imię</string>
     <!-- Last name of the user -->
     <string name="lastname_text">Nazwisko</string>
-    <!-- text placed on the checkbox of acceptation of the Terms of Service -->
-    <string name="tos">Akcpetuję [A]Regulamin[/A] MEGA</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Rozumiem, że [B]jeśli utracę hasło, mogę utracić dane[/B]. Przeczytaj więcej o kompleksowym szyfrowaniu [A]MEGA[/A].</string>
     <!-- warning dialog -->
@@ -178,8 +174,6 @@
     <string name="error_passwords_dont_match">Hasła do siebie nie pasują</string>
     <!-- when creating the account -->
     <string name="error_email_registered">Ten adres email zarejestrował już konto w MEGA</string>
-    <!--  -->
-    <string name="create_account_creating_account">Łączenie z serwerem: tworzenie konta</string>
     <!--  -->
     <string name="cancel_all_transfer_confirmation">Anulować wszystkie tranfsery?</string>
     <!-- Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible). -->
@@ -203,18 +197,12 @@
     <string name="location_label">%1$s (%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
     <string name="title_shared_items">Udostępnione elementy</string>
-    <!-- The title of the trash bin in the tree of the file manager. -->
-    <string name="section_rubbish_bin">Kosz</string>
-    <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
-    <string name="section_contacts">Kontakty</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
     <string name="section_contacts_with_notification">Kontakty [A](%1$d)[/A]</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
     <string name="sent_requests_empty">[B]Brak [/B][A]zgłoszeń[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[B]Brak [/B][A]zgłoszeń[/A]</string>
-    <!-- Title for the file transfer screen (with the up & download) -->
-    <string name="section_transfers">Ruch</string>
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Moje konto</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
@@ -478,10 +466,6 @@
     <string name="cam_sync_wifi">Tylko Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi lub komórkowa transmisja danych</string>
-    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
-    <string name="cam_sync_syncing">Przesyłanie z kamery w toku</string>
-    <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Czy chcesz wstrzymać Przesyłanie z kamery?</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Sprawdzanie plików do przesłania</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1321,8 +1305,6 @@
     <string name="confirmation_delete_from_mega">Usunąć z MEGA?</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_contact_notifications_for_chat">Powiadomienia Chat</string>
-    <!-- title of the section for achievements -->
-    <string name="achievements_title">Osiągnięcia</string>
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Zaproś znajomych i odbierz nagrody</string>
     <!-- title of the introduction for the achievements screen -->
@@ -1719,8 +1701,6 @@
     <string name="login_API_lock">Ten proces zajmuje więcej czasu niż standardowo. Prosimy czekać.</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit -->
     <string name="login_API_rate">Za dużo zgłoszeń. Proszę czekać.</string>
-    <!-- Message when previous login is being cancelled -->
-    <string name="login_in_progress">Anulowanie procesu logowania. Proszę czekać&#8230;</string>
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">Błąd. Plik jest uszkodzony lub nie istnieje.</string>
     <!-- Menu option to print the recovery key from Offline section -->
@@ -3127,8 +3107,6 @@
     <string name="change_meeting_name">Zmień nazwę spotkania</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Link do spotkania</string>
-    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
-    <string name="join_meeting_as_guest">Dołącz do spotkania jako gość</string>
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">Zostałeś zaproszony na spotkanie.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
@@ -4696,8 +4674,6 @@
     <string name="album_import_input_decryption_key_description">Aby uzyskać dostęp do albumu, wprowadź klucz deszyfrujący. Jeśli go nie masz, skontaktuj się z osobą, która udostępniła Ci link.</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">Zapamiętaj preferencje</string>
-    <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title">Centrum urządzeń</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Każdego dnia</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -5439,8 +5415,6 @@
     <string name="search_dropdown_chip_filter_type_date_last_year">Ostatni rok</string>
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">Starsze</string>
-    <!-- String below login button next to button for reporting a login issue -->
-    <string name="general_login_label_trouble_logging_in">Problemy z zalogowaniem?</string>
     <!-- Hidden nodes show items -->
     <string name="hidden_nodes_show_items">Pokaż ukryte elementy</string>
     <!-- Hidden nodes show items description -->

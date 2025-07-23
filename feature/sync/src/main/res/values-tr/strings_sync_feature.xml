@@ -141,7 +141,7 @@
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">Bu dosyanın çakışan kopyaları var</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
-    <string name="sync_stalled_issue_name_clash_detail">Senkronizasyonunuzun bir tarafında aynı ada sahip birden fazla öğe var ve bunların hepsi senkronizasyonunuzun diğer tarafında aynı tek öğe haline gelecek</string>
+    <string name="sync_stalled_issue_name_clash_detail">Senkronizasyonunuzun bir tarafında aynı ada sahip birden fazla öğe var ve bunların tümü senkronizasyonunuzun diğer tarafında aynı tek öğe haline gelecek</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">MEGA\’da bir taşıma veya yeniden adlandırma eylemi algılandı, ancak yerel olarak çoğaltılamadı.</string>
     <!-- Sync notification title description sync monitoring-->

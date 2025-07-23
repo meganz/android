@@ -271,7 +271,7 @@
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_body" formatted="false">Die Uploads werden pausiert, bis Sie Ihr Gerät an ein Ladegerät anschließen. Die Uploads bleiben auch dann pausiert, wenn der Ladestand weniger als 20&#160;% beträgt.</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_body">Die Uploads werden pausiert, bis Sie Ihr Gerät an ein Ladegerät anschließen. Die Uploads bleiben auch dann pausiert, wenn der Ladestand weniger als 20&#160;% beträgt.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Neue Synchronisierung hinzufügen</string>
     <!-- Text for the Sync solved issues chip -->
@@ -294,26 +294,6 @@
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Keine Anruf- und Meeting-Beschränkungen \n&#8226;&#160;Automatische Synchronisierung der Ordner auf Ihrem Mobilgerät</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">Keine gelösten Probleme</string>
-    <!-- Title of first tour screen -->
-    <string name="cloud_drive_tour_first_title">Sie sind der alleinige Inhaber Ihrer Schlüssel</string>
-    <!-- Title of second tour screen -->
-    <string name="cloud_drive_tour_second_title">Verschlüsselte Kommunikation</string>
-    <!-- Title of third tour screen -->
-    <string name="cloud_drive_tour_third_title">Kontaktnetzwerk erstellen</string>
-    <!-- Title of fourth tour screen -->
-    <string name="cloud_drive_tour_fourth_title">Ihre Fotos in der Cloud</string>
-    <!-- Title of fifth tour screen -->
-    <string name="cloud_drive_tour_fifth_title">MEGA-Meeting</string>
-    <!-- First subtitle of the tour screen -->
-    <string name="cloud_drive_tour_first_subtitle">Die Sicherheit Ihrer Daten ist unsere Existenzgrundlage. Dank Ende-zu-Ende-Verschlüsselung kontrollieren Sie alleine, wer Zugang zu ihnen erhält.</string>
-    <!-- Second subtitle of the tour screen -->
-    <string name="cloud_drive_tour_second_subtitle">Vollverschlüsselter Textchat, Audio- und Videoanrufe, Gruppengespräche und Integration mit Ihrem Cloud Drive.</string>
-    <!-- Third subtitle of the tour screen -->
-    <string name="cloud_drive_tour_third_subtitle">Fügen Sie Kontakte hinzu, tauschen Sie Dokumente aus und führen Sie Audio- und Video-Gespräche, ohne MEGA zu verlassen.</string>
-    <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">Kamera-Uploads sind bei Mobilgeräten unverzichtbar und werden von MEGA bestens unterstützt. Registrieren Sie Ihren Account jetzt!</string>
-    <!-- Fifth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fifth_subtitle">Videomeeting mit Zero-Knowledge-Verschlüsselung.</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]Neue Funktion: Hand heben[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -797,8 +777,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Lesezeichen entfernen</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">Keine Favoriten</string>
-    <!-- Message to enter confirm password -->
-    <string name="general_confirm_your_password">Bestätigen Sie Ihr Passwort</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">Scan-Einstellungen</string>
     <!-- Title of the camera setting screen -->
@@ -846,7 +824,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Eine Dateierweiterung ist erforderlich</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA will fetch a temporary copy of this file so you can preview it. It won’t be saved or available outside the app. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">MEGA ruft eine temporäre Kopie dieser Datei ab, damit Sie sie in der Vorschau betrachten können. Diese wird nicht gespeichert und ist außerhalb der App nicht verfügbar. %1$s werden heruntergeladen.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Vorgang wird abgeschlossen: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -957,7 +935,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">E-Mail-Bestätigung</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]Help Centre[/A].</string>
+    <string name="email_confirmation_content">Wir haben eine E-Mail mit einem Link an [P]%s[/P] gesendet. Tippen Sie auf den Link, um Ihre E-Mail-Adresse zu bestätigen und Ihren Account zu aktivieren. \n\nWenn Sie die E-Mail nicht erhalten haben, überprüfen Sie Ihren Spam-Ordner oder versuchen Sie es erneut. Bei anderen Problemen besuchen Sie bitte unser [A]Hilfecenter[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Erneut senden</string>
     <!-- General change email address -->
@@ -1164,8 +1142,8 @@
     <string name="pro_plan_features_section_title">Sie erhalten:</string>
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Großzügiger Speicherplatz</string>
-    <!-- Description for generous storage feature -->
-    <string name="pro_plan_feature_storage_desc">Speichern Sie bis zu 16&#160;TB an Daten</string>
+    <!-- Description for generous storage feature with placeholder -->
+    <string name="pro_plan_feature_storage_desc">Speichern Sie bis zu %1$s an Daten</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Transfervolumen teilen</string>
     <!-- Description for transfer sharing feature -->
@@ -1207,7 +1185,7 @@
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">Abonnements werden automatisch für den ursprünglich gewählten Abonnementzeitraum und zum gleichen Preis verlängert.\n\nSie können Ihr Abonnement jederzeit kündigen – spätestens 24 Stunden vor Fälligkeit Ihrer nächsten Abonnementzahlung. [A]So können Sie Ihr Abonnement in Ihren Einstellungen verwalten[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]Terms of Service[/A] and [B]Privacy Policy[/B]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]Nutzungsbedingungen[/A] und [B]Datenschutzerklärung[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">Mit einem Pro-Paket bekommen Sie mehr</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1217,7 +1195,7 @@
     <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_tab_yearly">Jährlich</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to" formatted="false">Sparen Sie bis zu 16% bei jährlicher Abrechnung</string>
+    <string name="account_upgrade_account_label_save_up_to">Sparen Sie bis zu 16% bei jährlicher Abrechnung</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s Speicherplatz</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
@@ -1314,27 +1292,61 @@
     <!-- Label for rubbish bin -->
     <string name="general_section_rubbish_bin">Papierkorb</string>
     <!-- Subtitle for VPN -->
-    <string name="menu_item_vpn_subtitle">High-speed VPN</string>
+    <string name="menu_item_vpn_subtitle">Hochgeschwindigkeits-VPN</string>
     <!-- Subtitle for MEGA PASS -->
-    <string name="menu_item_mega_pass_subtitle">Securely store and autofill your passwords</string>
+    <string name="menu_item_mega_pass_subtitle">Sicherer Passwortspeicher und automatisches Ausfüllen Ihrer Passwörter</string>
     <!-- Subtitle for transfer.it -->
-    <string name="menu_item_transfer_it_subtitle">Fast, secure file transfers</string>
+    <string name="menu_item_transfer_it_subtitle">Schnelle, sichere Dateitransfers</string>
     <!-- Label for transfer it -->
     <string name="general_section_transfer_it">Transfer.it</string>
     <!-- Label for Menu -->
     <string name="general_menu">Menü</string>
     <!-- Connection type option in Sync Settings Screen -->
-    <string name="settings_sync_connection_type_title">Connection type</string>
+    <string name="settings_sync_connection_type_title">Verbindungsart</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">Kamera-Uploads pausiert</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">Stellen Sie eine WLAN-Verbindung her oder erlauben Sie die Verwendung der mobilen Daten</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">Mobile Daten verwenden</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Previewing large file</string>
+    <string name="alert_larger_file_preview_title">Vorschau einer großen Datei</string>
     <!-- Alert confirm button before download a big file for preview -->
-    <string name="alert_larger_file_preview_confirm_button">Preview now</string>
+    <string name="alert_larger_file_preview_confirm_button">Vorschau jetzt anzeigen</string>
     <!-- Alert always allow button before download a big file for preview -->
-    <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
+    <string name="alert_larger_file_preview_always_allow_button">Vorschauen immer zulassen</string>
+    <!-- The camera uploads notification content to reminder there is no network connection-->
+    <string name="camera_uploads_notification_content_no_network_connection">Warten auf WLAN oder mobile Daten</string>
+    <!-- Settings title  for sync power options -->
+    <string name="settings_sync_power_settings_title">Energieoptionen</string>
+    <!-- Sync always label for sync power options -->
+    <string name="settings_sync_power_always_title">Immer synchronisieren</string>
+    <!-- Sync only when charging label for sync power options -->
+    <string name="settings_sync_battery_sync_only_when_charging_title">Nur beim Laden synchronisieren</string>
+    <!-- Message shown when uploading edited image as a new file -->
+    <string name="photo_editor_upload_message">Änderungen werden als neue Datei hochgeladen</string>
+    <!-- Dialog title asking user to discard changes -->
+    <string name="general_dialog_title_discard_changes">Änderungen verwerfen?</string>
+    <!-- Dialog title asking user to disable camera uploads -->
+    <string name="settings_camera_uploads_disable_warning">Kamera-Uploads deaktivieren?</string>
+    <!-- Sync settings change message prefix -->
+    <string name="settings_sync_message_prefix">Synchronisierung geändert in:</string>
+    <!--Title of playback position dialog that is displayed when audio has playback position history. -->
+    <string name="audio_playback_position_dialog_title">Audiowiedergabe fortsetzen?</string>
+    <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="audio_playback_position_dialog_message">„%1$s“ wird bei %2$s fortgesetzt.</string>
+    <!--Resume of playback position dialog for playing audio from the playback position history. -->
+    <string name="audio_playback_position_dialog_resume_button">Fortsetzen</string>
+    <!--Resume of playback position dialog for playing audio from beginning. -->
+    <string name="audio_playback_position_dialog_restart_button">Neu starten</string>
+    <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
+    <string name="general_save_to_device">Auf Gerät speichern</string>
+    <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
+    <string name="general_hide_node">Verbergen</string>
+    <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
+    <string name="general_move">Verschieben</string>
+    <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
+    <string name="general_copy">Kopieren</string>
+    <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
+    <string name="node_option_move_to_rubbish_bin">In den Papierkorb verschieben</string>
 </resources>
