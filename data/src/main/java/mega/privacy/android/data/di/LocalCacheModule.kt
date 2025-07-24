@@ -9,6 +9,7 @@ import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.cache.ExpiringCache
 import mega.privacy.android.data.cache.PermanentCache
 import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
 import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.data.qualifier.OriginalPathForNodeCache
 import mega.privacy.android.data.qualifier.OriginalPathForPendingMessageCache
@@ -88,4 +89,9 @@ internal object LocalCacheModule {
     @Provides
     @Singleton
     fun provideParentsAppDataCache(): HashMap<Int, List<RecursiveTransferAppData>> = hashMapOf()
+
+    @Provides
+    @Singleton
+    @DisplayPathFromUriCache
+    fun provideDisplayPathFromUriCache(): HashMap<String, String> = hashMapOf()
 }

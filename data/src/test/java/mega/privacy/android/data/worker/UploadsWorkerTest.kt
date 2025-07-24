@@ -105,6 +105,7 @@ class UploadsWorkerTest {
         mock<TransfersFinishNotificationSummaryBuilder>()
     private val transfersActionGroupFinishNotificationBuilder =
         mock<TransfersActionGroupFinishNotificationBuilder>()
+    private val displayPathFromUriCache = mock<HashMap<String, String>>()
 
     private val nodeId = 1L
     private val localPath = "localPath"
@@ -157,6 +158,7 @@ class UploadsWorkerTest {
             transfersActionGroupProgressNotificationBuilder = transfersActionGroupProgressNotificationBuilder,
             transfersFinishNotificationSummaryBuilder = transfersFinishNotificationSummaryBuilder,
             transfersActionGroupFinishNotificationBuilder = transfersActionGroupFinishNotificationBuilder,
+            displayPathFromUriCache = displayPathFromUriCache
         )
     }
 

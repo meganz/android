@@ -100,6 +100,7 @@ class DownloadsWorkerTest {
     private val transfersProgressNotificationSummaryBuilder =
         mock<TransfersProgressNotificationSummaryBuilder>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val displayPathFromUriCache = mock<HashMap<String, String>>()
 
     @BeforeAll
     fun setup() {
@@ -149,6 +150,7 @@ class DownloadsWorkerTest {
             transfersProgressNotificationSummaryBuilder = transfersProgressNotificationSummaryBuilder,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             loginMutex = mock(),
+            displayPathFromUriCache = displayPathFromUriCache,
         )
     }
 
@@ -176,6 +178,7 @@ class DownloadsWorkerTest {
             transfersActionGroupProgressNotificationBuilder,
             transfersProgressNotificationSummaryBuilder,
             getFeatureFlagValueUseCase,
+            displayPathFromUriCache,
         )
     }
 
@@ -332,6 +335,15 @@ class DownloadsWorkerTest {
             commonStub(transferTotals = listOf(transferTotal))
             underTest.doWork()
             verify(clearActiveTransfersIfFinishedUseCase).invoke()
+        }
+
+    @Test
+    fun `test that displayPathFromUriCache is cleared when transfers finishes`() =
+        runTest {
+            val transferTotal = mockActiveTransferTotals(true)
+            commonStub(transferTotals = listOf(transferTotal))
+            underTest.doWork()
+            verify(displayPathFromUriCache).clear()
         }
 
     @Test

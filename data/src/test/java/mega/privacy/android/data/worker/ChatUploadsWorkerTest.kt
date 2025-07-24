@@ -105,6 +105,7 @@ class ChatUploadsWorkerTest {
         mock<StartUploadingAllPendingMessagesUseCase>()
     private val monitorPendingMessagesByStateUseCase = mock<MonitorPendingMessagesByStateUseCase>()
     private val prepareAllPendingMessagesUseCase = mock<PrepareAllPendingMessagesUseCase>()
+    private val displayPathFromUriCache = mock<HashMap<String, String>>()
 
     @BeforeAll
     fun init() {
@@ -153,7 +154,8 @@ class ChatUploadsWorkerTest {
             crashReporter = crashReporter,
             foregroundSetter = setForeground,
             notificationSamplePeriod = 0L,
-            loginMutex = mock()
+            loginMutex = mock(),
+            displayPathFromUriCache = displayPathFromUriCache,
         )
     }
 

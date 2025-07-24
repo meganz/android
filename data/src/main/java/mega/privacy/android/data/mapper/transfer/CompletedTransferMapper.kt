@@ -6,6 +6,7 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.transfer.completed.API_EOVERQUOTA_FOREIGN
+import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -33,6 +34,7 @@ class CompletedTransferMapper @Inject constructor(
     private val documentFileWrapper: DocumentFileWrapper,
     private val stringWrapper: StringWrapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @DisplayPathFromUriCache private val displayPathFromUriCache: HashMap<String, String>,
 ) {
 
     /**
@@ -104,11 +106,16 @@ class CompletedTransferMapper @Inject constructor(
             TransferType.NONE -> ""
         }.removeSuffix(File.separator)
 
-    private suspend fun getDisplayPath(transfer: Transfer, isOffline: Boolean): String? =
+    private suspend fun getDisplayPath(
+        transfer: Transfer,
+        isOffline: Boolean,
+    ): String? =
         if (transfer.transferType == TransferType.DOWNLOAD && isOffline.not()) {
-            documentFileWrapper.getDocumentFile(transfer.parentPath)?.let {
-                documentFileWrapper.getAbsolutePathFromContentUri(it.uri)
-            }?.takeIf { it.isNotBlank() }
+            displayPathFromUriCache.getOrPut(transfer.parentPath) {
+                documentFileWrapper.getDocumentFile(transfer.parentPath)?.let {
+                    documentFileWrapper.getAbsolutePathFromContentUri(it.uri)
+                } ?: ""
+            }.takeIf { it.isNotBlank() }
         } else {
             null
         }

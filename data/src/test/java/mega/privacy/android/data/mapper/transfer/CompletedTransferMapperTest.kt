@@ -29,9 +29,11 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.math.BigInteger
 import java.util.stream.Stream
@@ -47,6 +49,7 @@ class CompletedTransferMapperTest {
     private val fileGateway: FileGateway = mock()
     private val stringWrapper: StringWrapper = mock()
     private val documentFileWrapper = mock<DocumentFileWrapper>()
+    private val displayPathFromUriCache = hashMapOf<String, String>()
 
     @BeforeAll
     fun setup() {
@@ -57,6 +60,7 @@ class CompletedTransferMapperTest {
             documentFileWrapper = documentFileWrapper,
             stringWrapper = stringWrapper,
             ioDispatcher = UnconfinedTestDispatcher(),
+            displayPathFromUriCache = displayPathFromUriCache
         )
     }
 
@@ -69,6 +73,7 @@ class CompletedTransferMapperTest {
             documentFileWrapper,
             stringWrapper,
         )
+        displayPathFromUriCache.clear()
     }
 
     @Test
@@ -121,7 +126,7 @@ class CompletedTransferMapperTest {
     fun `test that displayPath is mapped correctly`() {
         runTest {
             val offlinePath = "Offline"
-            val transfer = mockTransfer(transferType = TransferType.DOWNLOAD,)
+            val transfer = mockTransfer(transferType = TransferType.DOWNLOAD)
             val expected = "displayPath"
             whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
             whenever(fileGateway.getOfflineFilesRootPath()).thenReturn(offlinePath)
@@ -264,6 +269,31 @@ class CompletedTransferMapperTest {
             assertThat(actual.type).isEqualTo(transfer.transferType)
             assertThat(actual.path).isEqualTo(expected)
         }
+
+    @Test
+    fun `test that cache is used to get display path`() = runTest {
+        val offlinePath = "Offline"
+        val transfer = mockTransfer(transferType = TransferType.DOWNLOAD)
+        val expected = "displayPath"
+        whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
+        whenever(fileGateway.getOfflineFilesRootPath()).thenReturn(offlinePath)
+        val uri = mock<Uri>()
+        val documentFile = mock<DocumentFile> {
+            on { this.uri } doReturn uri
+        }
+        whenever(documentFileWrapper.getDocumentFile(transfer.parentPath))
+            .thenReturn(documentFile)
+        whenever(documentFileWrapper.getAbsolutePathFromContentUri(uri)).thenReturn(expected)
+
+
+        assertThat(underTest(transfer, null).displayPath).isEqualTo(expected)
+        clearInvocations(documentFileWrapper)
+        val transfer2 = mockTransfer(transferType = TransferType.DOWNLOAD)
+        val actual = underTest(transfer2, null)
+
+        assertThat(actual.displayPath).isEqualTo(expected)
+        verifyNoMoreInteractions(documentFileWrapper)
+    }
 
     private fun provideDownloadParams() =
         Stream.of(

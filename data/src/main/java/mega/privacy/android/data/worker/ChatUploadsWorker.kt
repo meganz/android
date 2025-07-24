@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -67,7 +68,8 @@ class ChatUploadsWorker @AssistedInject constructor(
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
-    @LoginMutex private val loginMutex: Mutex,
+    @LoginMutex loginMutex: Mutex,
+    @DisplayPathFromUriCache displayPathFromUriCache: HashMap<String, String>,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -84,6 +86,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     foregroundSetter = foregroundSetter,
     notificationSamplePeriod = notificationSamplePeriod,
     loginMutex = loginMutex,
+    displayPathFromUriCache = displayPathFromUriCache,
 ) {
     override val updateNotificationId = NOTIFICATION_CHAT_UPLOAD
 

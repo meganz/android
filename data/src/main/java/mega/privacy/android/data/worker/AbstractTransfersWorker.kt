@@ -60,6 +60,7 @@ abstract class AbstractTransfersWorker(
     protected val crashReporter: CrashReporter,
     private val foregroundSetter: ForegroundSetter?,
     private val notificationSamplePeriod: Long?,
+    private val displayPathFromUriCache: HashMap<String, String>,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -274,6 +275,7 @@ abstract class AbstractTransfersWorker(
         Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Stop work")
         notificationManager.cancel(updateNotificationId)
         clearActiveTransfersIfFinishedUseCase()
+        displayPathFromUriCache.clear()
         performWorkJob.cancel()
     }
 

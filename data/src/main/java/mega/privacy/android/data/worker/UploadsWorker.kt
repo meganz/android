@@ -21,6 +21,7 @@ import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSumm
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
+import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -59,12 +60,13 @@ class UploadsWorker @AssistedInject constructor(
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
     private val startAllPendingUploadsUseCase: StartAllPendingUploadsUseCase,
-    @LoginMutex private val loginMutex: Mutex,
+    @LoginMutex loginMutex: Mutex,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val transfersProgressNotificationSummaryBuilder: TransfersProgressNotificationSummaryBuilder,
     private val transfersActionGroupProgressNotificationBuilder: TransfersActionGroupProgressNotificationBuilder,
     private val transfersFinishNotificationSummaryBuilder: TransfersFinishNotificationSummaryBuilder,
     private val transfersActionGroupFinishNotificationBuilder: TransfersActionGroupFinishNotificationBuilder,
+    @DisplayPathFromUriCache private val displayPathFromUriCache: HashMap<String, String>,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -81,6 +83,7 @@ class UploadsWorker @AssistedInject constructor(
     foregroundSetter = foregroundSetter,
     notificationSamplePeriod = notificationSamplePeriod,
     loginMutex = loginMutex,
+    displayPathFromUriCache = displayPathFromUriCache,
 ) {
     override val finalNotificationId = NOTIFICATION_UPLOAD_FINAL
     override val updateNotificationId = UPLOAD_NOTIFICATION_ID
