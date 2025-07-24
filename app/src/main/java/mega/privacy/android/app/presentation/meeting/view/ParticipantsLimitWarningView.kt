@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.core.content.withStyledAttributes
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.nav.megaNavigator
+import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText

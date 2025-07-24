@@ -14,7 +14,7 @@ import androidx.navigation.navArgument
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.nav.megaNavigator
+import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme

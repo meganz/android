@@ -1,11 +1,10 @@
-package mega.privacy.android.app.nav
+package mega.privacy.android.navigation
 
 import android.content.Context
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.navigation.MegaNavigator
 
 /**
  * Extension function to get [MegaNavigator] from the application context.

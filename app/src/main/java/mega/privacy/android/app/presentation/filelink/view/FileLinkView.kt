@@ -36,7 +36,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.ads.AdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.nav.megaNavigator
+import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
 import mega.privacy.android.app.presentation.fileinfo.view.PreviewWithShadow
 import mega.privacy.android.app.presentation.filelink.model.FileLinkJobInProgressState
