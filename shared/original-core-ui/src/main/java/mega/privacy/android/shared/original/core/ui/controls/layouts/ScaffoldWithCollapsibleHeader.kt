@@ -50,9 +50,9 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.LocalMegaAppBarColors
 import mega.privacy.android.shared.original.core.ui.controls.appbar.LocalMegaAppBarElevation
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBarColors
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionString
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionString
+import mega.android.core.ui.model.menu.MenuActionWithoutIcon
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme

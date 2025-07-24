@@ -15,7 +15,7 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.android.core.ui.model.menu.MenuAction
 import javax.inject.Inject
 
 /**

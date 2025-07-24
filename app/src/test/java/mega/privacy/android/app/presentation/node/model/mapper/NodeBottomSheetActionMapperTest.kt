@@ -9,7 +9,7 @@ import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.Bott
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any

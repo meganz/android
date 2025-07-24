@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.pluralStringResource
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 

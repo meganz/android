@@ -43,7 +43,7 @@ import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.Unhi
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.VerifyBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.VersionsBottomSheetMenuItem
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.ViewInFolderBottomSheetMenuItem
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import javax.inject.Singleton
 
 /**

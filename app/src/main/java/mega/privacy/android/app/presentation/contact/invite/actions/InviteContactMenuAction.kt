@@ -2,8 +2,8 @@ package mega.privacy.android.app.presentation.contact.invite.actions
 
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.invite.InviteContactScreen
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithoutIcon
 
 /**
  * [InviteContactScreen] option menu actions.

@@ -2,9 +2,9 @@ package mega.privacy.android.app.mediaplayer.queue.model
 
 import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionString
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionString
+import mega.android.core.ui.model.menu.MenuActionWithoutIcon
 
 /**
  * Video player menu action

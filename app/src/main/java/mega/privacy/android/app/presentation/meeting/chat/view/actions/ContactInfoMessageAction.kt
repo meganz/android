@@ -8,7 +8,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.mobile.analytics.event.ChatConversationViewContactsActionMenuItemEvent
 
 internal class ContactInfoMessageAction(

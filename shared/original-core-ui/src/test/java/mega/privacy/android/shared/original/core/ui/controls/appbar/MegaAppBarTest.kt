@@ -13,9 +13,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.R
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionString
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionString
+import mega.android.core.ui.model.menu.MenuActionWithoutIcon
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

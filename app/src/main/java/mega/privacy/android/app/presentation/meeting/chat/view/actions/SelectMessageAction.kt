@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ManagementMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.mobile.analytics.event.ChatConversationSelectActionMenuItemEvent
 
 internal class SelectMessageAction(

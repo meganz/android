@@ -9,8 +9,8 @@ import mega.privacy.android.app.presentation.node.model.menuaction.LabelMenuActi
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.components.LabelAccessoryView
 import mega.privacy.android.app.presentation.search.navigation.changeLabelBottomSheetRoute
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission

@@ -49,8 +49,8 @@ import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.menus.MenuActions
 import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.badge

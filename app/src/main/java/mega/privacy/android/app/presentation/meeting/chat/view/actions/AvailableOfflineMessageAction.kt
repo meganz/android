@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationAvailableOfflineActionMenuItemEvent
 import timber.log.Timber

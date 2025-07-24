@@ -12,7 +12,7 @@ import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.original.core.ui.controls.layouts.CollapsibleHeaderWithTitle
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalCollapsibleHeaderTitleTransition
 import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.composeLet

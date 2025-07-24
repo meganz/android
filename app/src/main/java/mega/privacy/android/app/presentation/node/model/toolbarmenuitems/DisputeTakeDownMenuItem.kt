@@ -6,8 +6,8 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.node.model.menuaction.DisputeTakeDownMenuAction
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import javax.inject.Inject
 
 /**

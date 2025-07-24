@@ -3,8 +3,8 @@ package mega.privacy.android.feature.sync.ui.synclist
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import mega.privacy.android.core.R as appR
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 
 /**
  * Sync menu action

@@ -37,9 +37,9 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.appbar.LocalMegaAppBarColors
 import mega.privacy.android.shared.original.core.ui.controls.appbar.addClick
 import mega.privacy.android.shared.original.core.ui.controls.tooltips.Tooltip
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 
 
 /**

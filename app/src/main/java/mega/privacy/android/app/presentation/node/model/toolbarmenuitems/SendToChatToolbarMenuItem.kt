@@ -10,8 +10,8 @@ import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMen
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.chat.GetNodeToAttachUseCase
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import timber.log.Timber
 import javax.inject.Inject
 

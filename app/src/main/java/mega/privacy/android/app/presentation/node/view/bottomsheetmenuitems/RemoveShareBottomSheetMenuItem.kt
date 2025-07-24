@@ -5,8 +5,8 @@ import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.RemoveShareMenuAction
 import mega.privacy.android.app.presentation.search.navigation.searchRemoveFolderShareDialog
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper

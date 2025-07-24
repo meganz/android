@@ -39,7 +39,7 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareTo
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.android.core.ui.model.menu.MenuAction
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 

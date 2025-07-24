@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMe
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.android.core.ui.model.menu.MenuAction
 
 /**
  * Node bottom sheet action handler

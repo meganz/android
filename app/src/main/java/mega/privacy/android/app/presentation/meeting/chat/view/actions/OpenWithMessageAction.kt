@@ -17,7 +17,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.CanNotOpen
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.mobile.analytics.event.ChatConversationOpenWithActionMenuItemEvent
 import timber.log.Timber
 
