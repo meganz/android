@@ -23,7 +23,6 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.sharedViewModel
-import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
@@ -31,6 +30,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.MegaNavigatorEntryPoint
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
+import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction

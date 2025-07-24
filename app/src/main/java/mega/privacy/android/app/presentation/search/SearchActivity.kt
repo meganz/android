@@ -58,7 +58,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
-import mega.privacy.android.app.presentation.node.FileNodeContent
+import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity

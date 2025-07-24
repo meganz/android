@@ -1,6 +1,5 @@
-package mega.privacy.android.app.presentation.node
+package mega.privacy.android.domain.entity.node
 
-import mega.privacy.android.domain.entity.node.NodeContentUri
 import java.io.File
 
 /**

@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.app.presentation.node.FileNodeContent
+import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper

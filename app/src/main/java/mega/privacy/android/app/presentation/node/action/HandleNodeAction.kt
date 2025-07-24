@@ -19,7 +19,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImag
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.node.FileNodeContent
+import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
