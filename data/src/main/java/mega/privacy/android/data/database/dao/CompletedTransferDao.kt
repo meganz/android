@@ -19,6 +19,12 @@ internal interface CompletedTransferDao {
     @Query("SELECT * FROM $TABLE_COMPLETED_TRANSFERS WHERE transferstate IN(:states)")
     fun getCompletedTransfersByState(states: List<Int>): List<CompletedTransferEntity>
 
+    @Query("SELECT * FROM $TABLE_COMPLETED_TRANSFERS WHERE transferstate IN(:states) ORDER BY transfertimestamp DESC LIMIT :limit")
+    fun getCompletedTransfersByStateWithLimit(
+        states: List<Int>,
+        limit: Int,
+    ): Flow<List<CompletedTransferEntity>>
+
     @Query("SELECT * FROM $TABLE_COMPLETED_TRANSFERS WHERE id = :id")
     suspend fun getCompletedTransferById(id: Int): CompletedTransferEntity?
 

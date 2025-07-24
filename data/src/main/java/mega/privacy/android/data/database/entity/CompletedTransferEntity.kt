@@ -29,7 +29,8 @@ import mega.privacy.android.data.database.MegaDatabaseConstant
     MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS,
     indices = [
         Index(value = ["transferstate"]),
-        Index(value = ["transfertimestamp"])
+        Index(value = ["transfertimestamp"]),
+        Index(value = ["transferstate", "transfertimestamp"]),
     ]
 )
 internal data class CompletedTransferEntity(

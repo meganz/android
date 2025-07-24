@@ -201,6 +201,15 @@ internal class MegaLocalRoomFacade @Inject constructor(
                     .let { if (size != null) it.take(size) else it }
             }
 
+    override fun getCompletedTransfersByStateWithLimit(
+        limit: Int,
+        vararg transferStates: TransferState,
+    ) =
+        completedTransferDao.get().getCompletedTransfersByStateWithLimit(
+            transferStates.map(transferStateIntMapper::invoke),
+            limit
+        ).map { it.map(completedTransferModelMapper::invoke) }
+
     override suspend fun addCompletedTransfer(transfer: CompletedTransfer) {
         completedTransferDao.get()
             .insertOrUpdateCompletedTransfer(completedTransferEntityMapper(transfer))

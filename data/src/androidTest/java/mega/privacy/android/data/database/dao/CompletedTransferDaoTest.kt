@@ -252,6 +252,52 @@ class CompletedTransferDaoTest {
                 state2Transfers.map { it.timestamp })
         }
 
+    @Test
+    fun test_that_getCompletedTransfersByStateWithLimit_returns_correct_transfers_with_limit() =
+        runTest {
+            // Create transfers with different states and timestamps
+            val state1Transfers = (1..10).map {
+                createCompletedTransferEntity(
+                    fileName = "state1_file_$it.jpg",
+                    timeStamp = it.toLong(),
+                    state = 1
+                )
+            }
+            val state2Transfers = (1..8).map {
+                createCompletedTransferEntity(
+                    fileName = "state2_file_$it.jpg",
+                    timeStamp = (it + 100).toLong(), // Different timestamp range
+                    state = 2
+                )
+            }
+            val state3Transfers = (1..6).map {
+                createCompletedTransferEntity(
+                    fileName = "state3_file_$it.jpg",
+                    timeStamp = (it + 200).toLong(), // Different timestamp range
+                    state = 3
+                )
+            }
+
+            // Insert all transfers
+            completedTransferDao.insertOrUpdateCompletedTransfers(state1Transfers + state2Transfers + state3Transfers)
+
+            // Test query with multiple states and limit
+            val states = listOf(1, 2)
+            val limit = 5
+            val result =
+                completedTransferDao.getCompletedTransfersByStateWithLimit(states, limit).first()
+
+            // Verify result
+            assertThat(result.size).isEqualTo(limit)
+            assertThat(result.all { it.state in states }).isTrue()
+            val expectedTimestamps = (state1Transfers + state2Transfers)
+                .sortedByDescending { it.timestamp }
+                .take(limit)
+                .map { it.timestamp }
+            assertThat(result.map { it.timestamp }).containsExactlyElementsIn(expectedTimestamps)
+            assertThat(result.any { it.state !in states }).isFalse()
+        }
+
     private fun createCompletedTransferEntity(
         fileName: String = "2023-03-24 00.13.20_1.jpg",
         timeStamp: Long = 1684228012974L,

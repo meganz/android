@@ -430,6 +430,13 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.getCompletedTransfers(size)
             .flowOn(ioDispatcher)
 
+    override fun monitorCompletedTransfersByStateWithLimit(
+        limit: Int,
+        vararg states: TransferState
+    ): Flow<List<CompletedTransfer>> =
+        megaLocalRoomGateway.getCompletedTransfersByStateWithLimit(limit, *states)
+            .flowOn(ioDispatcher)
+
     override suspend fun addCompletedTransfers(finishEvents: List<TransferEvent.TransferFinishEvent>) {
         withContext(ioDispatcher) {
             var completedTransferState = CompletedTransferState.Completed

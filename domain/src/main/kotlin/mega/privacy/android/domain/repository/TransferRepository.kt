@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferAppData.RecursiveTransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
@@ -213,6 +214,16 @@ interface TransferRepository {
      * @param size the limit size of the list. If null, the limit does not apply
      */
     fun monitorCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
+
+    /**
+     * Monitors list of completed transfers
+     *
+     * @param limit the limit size of the list. If null, the limit does not apply
+     */
+    fun monitorCompletedTransfersByStateWithLimit(
+        limit: Int,
+        vararg states: TransferState,
+    ): Flow<List<CompletedTransfer>>
 
     /**
      * Add a list of completed transfer to local storage. Please note that completed transfers are pruned to prevent them from growing without limit.

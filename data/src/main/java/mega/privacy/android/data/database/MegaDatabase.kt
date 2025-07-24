@@ -320,6 +320,16 @@ internal abstract class MegaDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_111_112 = object : Migration(111, 112) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Add composite index for CompletedTransferEntity to optimize queries that filter by transferstate and order by transfertimestamp
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS}_transferstate_transfertimestamp " +
+                            "ON ${MegaDatabaseConstant.TABLE_COMPLETED_TRANSFERS} (transferstate, transfertimestamp)"
+                )
+            }
+        }
+
         val MIGRATIONS = arrayOf(
             MIGRATION_67_68,
             MIGRATION_68_69,
@@ -332,6 +342,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
             MIGRATION_85_86,
             MIGRATION_107_108,
             MIGRATION_110_111,
+            MIGRATION_111_112,
         )
     }
 }

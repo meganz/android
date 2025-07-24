@@ -17,7 +17,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel.Companion.MAX_COMPLETED_TRANSFER_FOR_STATE
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
@@ -28,6 +28,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -42,7 +43,7 @@ import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTra
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersByStateWithLimitUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
@@ -57,6 +58,8 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyVararg
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
@@ -80,7 +83,8 @@ class TransfersViewModelTest {
     private val pauseTransferByTagUseCase = mock<PauseTransferByTagUseCase>()
     private val pauseTransfersQueueUseCase = mock<PauseTransfersQueueUseCase>()
     private val cancelTransfersUseCase = mock<CancelTransfersUseCase>()
-    private val monitorCompletedTransfersUseCase = mock<MonitorCompletedTransfersUseCase>()
+    private val monitorCompletedTransfersByStateWithLimitUseCase =
+        mock<MonitorCompletedTransfersByStateWithLimitUseCase>()
     private val moveTransferBeforeByTagUseCase = mock<MoveTransferBeforeByTagUseCase>()
     private val moveTransferToFirstByTagUseCase = mock<MoveTransferToFirstByTagUseCase>()
     private val moveTransferToLastByTagUseCase = mock<MoveTransferToLastByTagUseCase>()
@@ -158,7 +162,7 @@ class TransfersViewModelTest {
             deleteCompletedTransfersByIdUseCase,
             cancelTransferByTagUseCase,
             cancelTransfersUseCase,
-            monitorCompletedTransfersUseCase,
+            monitorCompletedTransfersByStateWithLimitUseCase,
         )
         wheneverBlocking { monitorInProgressTransfersUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
@@ -166,7 +170,12 @@ class TransfersViewModelTest {
         )
         wheneverBlocking { monitorTransferOverQuotaUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorPausedTransfersUseCase() }.thenReturn(emptyFlow())
-        wheneverBlocking { monitorCompletedTransfersUseCase() }.thenReturn(emptyFlow())
+        wheneverBlocking {
+            monitorCompletedTransfersByStateWithLimitUseCase(
+                any(),
+                anyVararg()
+            )
+        }.thenReturn(emptyFlow())
     }
 
     private fun initTestClass() {
@@ -180,7 +189,7 @@ class TransfersViewModelTest {
             pauseTransferByTagUseCase = pauseTransferByTagUseCase,
             pauseTransfersQueueUseCase = pauseTransfersQueueUseCase,
             cancelTransfersUseCase = cancelTransfersUseCase,
-            monitorCompletedTransfersUseCase = monitorCompletedTransfersUseCase,
+            monitorCompletedTransfersByStateWithLimitUseCase = monitorCompletedTransfersByStateWithLimitUseCase,
             moveTransferBeforeByTagUseCase = moveTransferBeforeByTagUseCase,
             moveTransferToFirstByTagUseCase = moveTransferToFirstByTagUseCase,
             moveTransferToLastByTagUseCase = moveTransferToLastByTagUseCase,
@@ -418,7 +427,8 @@ class TransfersViewModelTest {
     @Test
     fun `test that MonitorCompletedTransfersUseCase updates state with completed and failed transfers`() =
         runTest {
-            val flow = MutableSharedFlow<List<CompletedTransfer>>()
+            val flowCompleted = MutableSharedFlow<List<CompletedTransfer>>()
+            val flowFailed = MutableSharedFlow<List<CompletedTransfer>>()
             val transfer1 = mock<CompletedTransfer> {
                 on { state } doReturn TransferState.STATE_COMPLETED
                 on { timestamp } doReturn 1L
@@ -435,11 +445,13 @@ class TransfersViewModelTest {
                 on { state } doReturn TransferState.STATE_CANCELLED
                 on { timestamp } doReturn 4L
             }
-            val list = listOf(transfer1, transfer4, transfer3, transfer2)
+            val listCompleted = listOf(transfer1, transfer3)
+            val listFailed = listOf(transfer2, transfer4)
             val expectedCompleted = immutableListOf(transfer3, transfer1)
             val expectedFailed = immutableListOf(transfer4, transfer2)
 
-            whenever(monitorCompletedTransfersUseCase()).thenReturn(flow)
+            stubCompletedTransfers().thenReturn(flowCompleted)
+            stubFailedTransfers().thenReturn(flowFailed)
 
             initTestClass()
 
@@ -447,11 +459,13 @@ class TransfersViewModelTest {
                 var actual = awaitItem()
                 assertThat(actual.completedTransfers).isEmpty()
                 assertThat(actual.failedTransfers).isEmpty()
-                flow.emit(list)
-                advanceUntilIdle()
+                flowCompleted.emit(listCompleted)
                 actual = awaitItem()
                 assertThat(actual.completedTransfers).isEqualTo(expectedCompleted)
+                flowFailed.emit(listFailed)
+                actual = awaitItem()
                 assertThat(actual.failedTransfers).isEqualTo(expectedFailed)
+                assertThat(actual.completedTransfers).isEqualTo(expectedCompleted)
             }
         }
 
@@ -470,7 +484,7 @@ class TransfersViewModelTest {
             val list = listOf(transfer1, transfer2)
             val expectedCompleted = immutableListOf(transfer2, transfer1)
 
-            whenever(monitorCompletedTransfersUseCase()).thenReturn(flow)
+            stubCompletedTransfers().thenReturn(flow)
 
             initTestClass()
 
@@ -501,7 +515,7 @@ class TransfersViewModelTest {
             val list = listOf(transfer1, transfer2)
             val expectedFailed = immutableListOf(transfer2, transfer1)
 
-            whenever(monitorCompletedTransfersUseCase()).thenReturn(flow)
+            stubFailedTransfers() doReturn flow
 
             initTestClass()
 
@@ -818,7 +832,7 @@ class TransfersViewModelTest {
             )
             val expected = TransferTriggerEvent.RetryTransfers(cloudTransferEvents)
 
-            whenever(monitorCompletedTransfersUseCase()) doReturn flow
+            stubFailedTransfers() doReturn flow
             whenever(getNodeByIdUseCase(NodeId(failedOfflineDownload.handle))) doReturn typedNode
             whenever(getNodeByIdUseCase(NodeId(cancelledDownload.handle))) doReturn typedNode
             whenever(retryChatUploadUseCase(chatAppData.mapNotNull { it as? TransferAppData.ChatUpload })) doReturn Unit
@@ -858,7 +872,7 @@ class TransfersViewModelTest {
             )
             val expected = TransferTriggerEvent.RetryTransfers(cloudTransferEvents)
 
-            whenever(monitorCompletedTransfersUseCase()) doReturn flow
+            stubFailedTransfers() doReturn flow
             whenever(getNodeByIdUseCase(NodeId(failedOfflineDownload.handle))) doReturn typedNode
             whenever(getNodeByIdUseCase(NodeId(cancelledDownload.handle))) doReturn typedNode
             whenever(retryChatUploadUseCase(chatAppData.mapNotNull { it as? TransferAppData.ChatUpload })) doReturn Unit
@@ -1030,7 +1044,7 @@ class TransfersViewModelTest {
                         on { it.state } doReturn TransferState.STATE_COMPLETED
                     }
                 }
-                whenever(monitorCompletedTransfersUseCase()) doReturn completedTransfers.asHotFlow()
+                stubCompletedTransfers() doReturn completedTransfers.asHotFlow()
                 initTestClass()
                 underTest.startCompletedTransfersSelection()
                 val completedTransfer = completedTransfers[3]
@@ -1051,7 +1065,7 @@ class TransfersViewModelTest {
                         on { it.state } doReturn TransferState.STATE_COMPLETED
                     }
                 }
-                whenever(monitorCompletedTransfersUseCase()) doReturn completedTransfers.asHotFlow()
+                stubCompletedTransfers() doReturn completedTransfers.asHotFlow()
                 initTestClass()
                 underTest.startCompletedTransfersSelection()
                 val ids = completedTransfers.map { it.id }
@@ -1072,7 +1086,7 @@ class TransfersViewModelTest {
                     on { it.state } doReturn TransferState.STATE_COMPLETED
                 }
             }
-            whenever(monitorCompletedTransfersUseCase()) doReturn completedTransfers.asHotFlow()
+            stubCompletedTransfers() doReturn completedTransfers.asHotFlow()
             initTestClass()
             val completedTransferSelected = completedTransfers[3]
             val id = completedTransferSelected.id ?: -1
@@ -1117,7 +1131,7 @@ class TransfersViewModelTest {
                         on { it.state } doReturn TransferState.STATE_FAILED
                     }
                 }
-                whenever(monitorCompletedTransfersUseCase()) doReturn failedTransfers.asHotFlow()
+                stubFailedTransfers() doReturn failedTransfers.asHotFlow()
                 initTestClass()
                 underTest.startFailedTransfersSelection()
                 val failedTransfer = failedTransfers[3]
@@ -1138,7 +1152,7 @@ class TransfersViewModelTest {
                         on { it.state } doReturn TransferState.STATE_FAILED
                     }
                 }
-                whenever(monitorCompletedTransfersUseCase()) doReturn failedTransfers.asHotFlow()
+                stubFailedTransfers() doReturn failedTransfers.asHotFlow()
                 initTestClass()
                 underTest.startFailedTransfersSelection()
                 val ids = failedTransfers.map { it.id }
@@ -1159,7 +1173,7 @@ class TransfersViewModelTest {
                     on { it.state } doReturn TransferState.STATE_FAILED
                 }
             }
-            whenever(monitorCompletedTransfersUseCase()) doReturn failedTransfers.asHotFlow()
+            stubFailedTransfers() doReturn failedTransfers.asHotFlow()
             initTestClass()
             val failedTransferSelected = failedTransfers[3]
             val id = failedTransferSelected.id ?: -1
@@ -1170,6 +1184,21 @@ class TransfersViewModelTest {
             verify(deleteCompletedTransfersByIdUseCase)(listOf(id))
         }
     }
+
+
+    private fun stubCompletedTransfers() = whenever(
+        monitorCompletedTransfersByStateWithLimitUseCase(
+            MAX_COMPLETED_TRANSFER_FOR_STATE,
+            TransferState.STATE_COMPLETED
+        )
+    )
+
+    private fun stubFailedTransfers() = whenever(
+        monitorCompletedTransfersByStateWithLimitUseCase(
+            MAX_COMPLETED_TRANSFER_FOR_STATE,
+            TransferState.STATE_FAILED, TransferState.STATE_CANCELLED
+        )
+    )
 
     companion object {
         private val testDispatcher = UnconfinedTestDispatcher()

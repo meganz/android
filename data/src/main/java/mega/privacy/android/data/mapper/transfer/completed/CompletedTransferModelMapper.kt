@@ -16,7 +16,7 @@ internal class CompletedTransferModelMapper @Inject constructor(
     private val transferStateMapper: TransferStateMapper,
     private val transferAppDataMapper: TransferAppDataMapper,
 ) {
-    suspend operator fun invoke(entity: CompletedTransferEntity): CompletedTransfer {
+    operator fun invoke(entity: CompletedTransferEntity): CompletedTransfer {
         val appData = entity.appData?.let { transferAppDataMapper(it) }
         return CompletedTransfer(
             id = entity.id,

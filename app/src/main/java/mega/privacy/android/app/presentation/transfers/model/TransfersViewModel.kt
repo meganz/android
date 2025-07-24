@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.matchOrderWithNewAtEnd
 import mega.privacy.android.app.extensions.moveElement
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.view.navigation.TransfersInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
@@ -28,6 +27,7 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -41,7 +41,7 @@ import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTra
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCancelledTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersByStateWithLimitUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
@@ -64,7 +64,7 @@ class TransfersViewModel @Inject constructor(
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
     private val cancelTransfersUseCase: CancelTransfersUseCase,
-    private val monitorCompletedTransfersUseCase: MonitorCompletedTransfersUseCase,
+    private val monitorCompletedTransfersByStateWithLimitUseCase: MonitorCompletedTransfersByStateWithLimitUseCase,
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase,
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase,
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
@@ -188,14 +188,27 @@ class TransfersViewModel @Inject constructor(
 
     private fun monitorCompletedTransfers() {
         viewModelScope.launch {
-            monitorCompletedTransfersUseCase().conflate().collect { completedTransfers ->
-                val (completed, failed) = completedTransfers.partition { it.state == TransferState.STATE_COMPLETED }
-
+            monitorCompletedTransfersByStateWithLimitUseCase(
+                MAX_COMPLETED_TRANSFER_FOR_STATE,
+                TransferState.STATE_COMPLETED,
+            ).conflate().collect { completed ->
                 _uiState.update { state ->
                     state.copy(
                         completedTransfers = completed
                             .sortedByDescending { it.timestamp }.toImmutableList(),
-                        failedTransfers = failed
+                    )
+                }
+            }
+        }
+        viewModelScope.launch {
+            monitorCompletedTransfersByStateWithLimitUseCase(
+                MAX_COMPLETED_TRANSFER_FOR_STATE,
+                TransferState.STATE_FAILED,
+                TransferState.STATE_CANCELLED,
+            ).conflate().collect { failedAndCancelled ->
+                _uiState.update { state ->
+                    state.copy(
+                        failedTransfers = failedAndCancelled
                             .sortedByDescending { it.timestamp }.toImmutableList(),
                     )
                 }
@@ -631,5 +644,9 @@ class TransfersViewModel @Inject constructor(
         _uiState.update {
             it.copy(selectedFailedTransfersIds = emptyList<Int>().toImmutableList())
         }
+    }
+
+    companion object {
+        internal const val MAX_COMPLETED_TRANSFER_FOR_STATE = 100
     }
 }

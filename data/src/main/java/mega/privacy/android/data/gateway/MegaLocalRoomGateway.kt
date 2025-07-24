@@ -1,7 +1,7 @@
 package mega.privacy.android.data.gateway
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_COMPLETED_TRANSFER_ROWS
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
@@ -11,10 +11,12 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
+import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
@@ -137,6 +139,17 @@ interface MegaLocalRoomGateway {
      * @param size the limit size of the list. If null, the limit does not apply and gets all.
      */
     fun getCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
+
+    /**
+     * Get completed transfers by states
+     *
+     * @param limit the limit size of the list.
+     * @param transferStates the transfer states to filter the completed transfers
+     */
+    fun getCompletedTransfersByStateWithLimit(
+        limit: Int = MAX_COMPLETED_TRANSFER_ROWS,
+        vararg transferStates: TransferState,
+    ): Flow<List<CompletedTransfer>>
 
     /**
      * Add a completed transfer
