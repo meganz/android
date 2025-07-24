@@ -1,3 +1,5 @@
+import mega.privacy.android.build.isServerBuild
+
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
@@ -48,6 +50,10 @@ tasks.register("generateIconPackVectors") {
     }
 }
 
-tasks.named("preBuild").configure {
-    dependsOn("generateIconPackVectors")
+
+// Only run icon generation locally, not in CI/CD, to don't create the icons in the pipeline so missing generated icons are detected
+if (!isServerBuild()) {
+    tasks.named("preBuild").configure {
+        dependsOn("generateIconPackVectors")
+    }
 }
