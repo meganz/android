@@ -31,7 +31,7 @@ fun MegaApp(
     }) {
         NavHost(
             navController = navController,
-            startDestination = MainNavigationScaffoldDestination::class
+            startDestination = MainNavigationScaffoldDestination,
         ) {
             val navigationHandler = NavigationHandlerImpl(navController)
 

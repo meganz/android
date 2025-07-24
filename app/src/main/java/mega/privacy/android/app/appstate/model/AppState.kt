@@ -2,6 +2,7 @@ package mega.privacy.android.app.appstate.model
 
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation3.runtime.NavKey
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableSet
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -17,7 +18,7 @@ sealed interface AppState {
         val mainNavItems: ImmutableSet<NavigationItem>,
         val mainNavScreens: ImmutableSet<NavGraphBuilder.(navigationHandler: NavigationHandler, NavigationUiController) -> Unit>,
         val featureDestinations: ImmutableSet<FeatureDestination>,
-        val initialMainDestination: Any,
+        val initialMainDestination: NavKey,
     ) : AppState
 
     data object FetchingNodes : AppState
@@ -28,7 +29,7 @@ class AppStateDataBuilder {
     private val mainNavScreensBuilder: MutableSet<NavGraphBuilder.(navigationHandler: NavigationHandler, NavigationUiController) -> Unit> =
         mutableSetOf()
     private val featureDestinationsBuilder = mutableSetOf<FeatureDestination>()
-    private var initialDestinationBuilder: Any? = null
+    private var initialDestinationBuilder: NavKey? = null
 
     fun mainNavItems(mainNavItems: Set<NavigationItem>) = this.apply {
         mainNavItemsBuilder = mainNavItems
@@ -43,7 +44,7 @@ class AppStateDataBuilder {
         featureDestinationsBuilder.addAll(featureGraphs)
     }
 
-    fun initialDestination(destination: Any) = this.apply {
+    fun initialDestination(destination: NavKey) = this.apply {
         initialDestinationBuilder = destination
     }
 

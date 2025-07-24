@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import androidx.navigation3.runtime.NavKey
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.serialization.Serializable
 import mega.privacy.android.navigation.contract.NavigationUiController
@@ -20,7 +21,7 @@ import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 import kotlin.reflect.KClass
 
 @Serializable
-object MainNavigationScaffoldDestination
+data object MainNavigationScaffoldDestination : NavKey
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun NavGraphBuilder.mainNavigationScaffold(

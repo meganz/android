@@ -2,6 +2,7 @@ package mega.privacy.android.app.appstate
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -52,7 +53,7 @@ class AppStateViewModel @Inject constructor(
 
     private val updatePresenceFlow = MutableStateFlow(false)
 
-    private val getStartScreenPreferenceDestinationUseCase: suspend () -> Any =
+    private val getStartScreenPreferenceDestinationUseCase: suspend () -> NavKey =
         { mainDestinations.first().destination } // Inject as param once we have a new use case for it
 
     val state: StateFlow<AppState> by lazy {

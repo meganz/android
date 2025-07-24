@@ -46,6 +46,8 @@ dependencies {
     implementation(platform(androidx.compose.bom))
     implementation(androidx.material3.adaptive.navigation.suite)
     implementation(lib.kotlin.serialisation)
+    implementation(androidx.navigation3.runtime)
+
 
     // test
     testImplementation(project(":core-test"))

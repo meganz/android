@@ -5,16 +5,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import mega.privacy.android.navigation.destination.ExampleLegacyResultScreen
 import mega.privacy.android.navigation.destination.Secondary
 
 @Serializable
-data object HomeScreen
+data object HomeScreen : NavKey
 
 @Serializable
-data object HomeScreen2
+data object HomeScreen2 : NavKey
 
 fun NavGraphBuilder.exampleHomeScreen(
     setNavigationVisibility: (Boolean) -> Unit,

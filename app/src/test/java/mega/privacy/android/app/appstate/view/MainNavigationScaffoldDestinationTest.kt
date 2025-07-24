@@ -10,6 +10,7 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
+import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.persistentSetOf
@@ -120,7 +121,7 @@ class MainNavigationScaffoldDestinationTest {
     }
 
     private fun testNavItem(
-        destination: Any,
+        destination: NavKey,
         testTag: String,
     ) = NavigationItem(
         destination = destination,
@@ -140,11 +141,11 @@ object TopLevelTestDestination // The destination we expect to return to
 
 // Dummy destinations for tabs within MainNavigationScaffold
 @Serializable
-object TabDestinationA
+object TabDestinationA : NavKey
 
 @Serializable
-object TabDestinationB
+object TabDestinationB : NavKey
 
 @Serializable
-object TabDestinationC
+object TabDestinationC : NavKey
 

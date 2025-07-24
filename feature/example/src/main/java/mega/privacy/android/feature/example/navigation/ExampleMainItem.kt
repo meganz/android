@@ -3,6 +3,7 @@ package mega.privacy.android.feature.example.navigation
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -19,7 +20,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 
 class ExampleMainItem : MainNavItem {
-    override val destination: Any = HomeScreen
+    override val destination: NavKey = HomeScreen
     override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController) -> Unit =
         { navigationHandler, navigationUiController -> exampleHomeScreen(setNavigationVisibility = navigationUiController::showNavigation) }
 
@@ -34,7 +35,7 @@ class ExampleMainItem : MainNavItem {
 }
 
 class OtherExampleMainItem : MainNavItem {
-    override val destination: Any = HomeScreen2
+    override val destination: NavKey = HomeScreen2
     override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController) -> Unit =
         { navigationHandler, _ ->
             otherExampleHomeScreen(

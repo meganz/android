@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.persistentListOf
@@ -77,6 +78,6 @@ class SettingsHomeViewKtTest {
     }
 
     @Parcelize
-    object TestDestination : Parcelable
+    object TestDestination : Parcelable, NavKey
 
 }

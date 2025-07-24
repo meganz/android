@@ -3,6 +3,7 @@ package mega.privacy.mobile.navigation.snowflake.model
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 
@@ -15,7 +16,7 @@ import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdenti
  */
 @Immutable
 data class NavigationItem(
-    val destination: Any,
+    val destination: NavKey,
     val icon: ImageVector,
     @StringRes val label: Int,
     val isEnabled: Boolean,

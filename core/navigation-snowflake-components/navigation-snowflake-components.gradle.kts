@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(platform(androidx.compose.bom))
     implementation(androidx.navigation.compose)
+    implementation(androidx.navigation3.runtime)
     implementation(androidx.material3.adaptive.navigation.suite)
     implementation(lib.kotlinx.collections.immutable)
     implementation(lib.logging.timber)
