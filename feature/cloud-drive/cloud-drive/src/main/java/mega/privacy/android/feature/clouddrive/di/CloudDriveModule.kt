@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.feature.clouddrive.navigation.CloudDriveFeatureDestination
-import mega.privacy.android.feature.clouddrive.navigation.CloudDriveMainNavItem
+import mega.privacy.android.feature.clouddrive.navigation.DriveSyncNavItem
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
 
@@ -21,5 +21,5 @@ class CloudDriveModule {
 
     @Provides
     @IntoSet
-    fun provideCloudDriveMainNavItem(): MainNavItem = CloudDriveMainNavItem()
+    fun provideDriveSyncNavItem(): MainNavItem = DriveSyncNavItem()
 }

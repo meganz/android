@@ -46,4 +46,15 @@ dependencies {
     implementation(platform(androidx.compose.bom))
     implementation(androidx.material3.adaptive.navigation.suite)
     implementation(lib.kotlin.serialisation)
+
+    // test
+    testImplementation(project(":core-test"))
+    testImplementation(project(":core-ui-test"))
+    testImplementation(androidx.navigation.testing)
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.ui.test)
+    testImplementation(testlib.bundles.unit.test)
+    testImplementation(testlib.bundles.junit5.api)
+    testImplementation(google.hilt.android.test)
+    testRuntimeOnly(testlib.junit.jupiter.engine)
 }

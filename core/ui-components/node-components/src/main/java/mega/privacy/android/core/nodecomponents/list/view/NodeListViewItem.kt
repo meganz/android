@@ -121,7 +121,7 @@ fun NodeListViewItem(
             ThumbnailView(
                 modifier = Modifier
                     .size(32.dp)
-                    .clip(DSTokens.shapes.medium)
+                    .clip(DSTokens.shapes.extraSmall)
                     .testTag(ICON_TAG),
                 data = thumbnailData,
                 defaultImage = icon,

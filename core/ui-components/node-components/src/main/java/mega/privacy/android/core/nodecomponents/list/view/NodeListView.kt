@@ -12,12 +12,13 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.nodecomponents.extension.getNodeItemDescription
 import mega.privacy.android.core.nodecomponents.extension.getNodeItemThumbnail
 import mega.privacy.android.core.nodecomponents.extension.getSharesIcon
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.list.view.previewdata.FolderNodePreviewDataProvider
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -84,7 +85,7 @@ fun <T : TypedNode> NodeListView(
         if (showSortOrder || showChangeViewType) {
             item(key = "header") {
                 NodeHeaderItem(
-                    modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
+                    modifier = Modifier.padding(bottom = DSTokens.spacings.s3),
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
