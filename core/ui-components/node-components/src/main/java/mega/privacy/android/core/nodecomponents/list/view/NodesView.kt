@@ -24,10 +24,10 @@ import mega.privacy.android.domain.entity.node.TypedNode
 /**
  * NEW Nodes view to load thumbnails using [ThumbnailRequest]
  *
- * @param nodeUIItems List of [NodeUiItem]
+ * @param items List of [NodeUiItem]
  * @param onMenuClick three dots click
  * @param onItemClicked callback for item click
- * @param onLongClick callback for long item click
+ * @param onLongClicked callback for long item click
  * @param sortOrder the sort order of the list
  * @param isListView whether the current view is list view
  * @param onSortOrderClick callback for sort order click
@@ -48,10 +48,10 @@ import mega.privacy.android.domain.entity.node.TypedNode
  */
 @Composable
 fun <T : TypedNode> NodesView(
-    nodeUIItems: List<NodeUiItem<T>>,
+    items: List<NodeUiItem<T>>,
     onMenuClick: (NodeUiItem<T>) -> Unit,
     onItemClicked: (NodeUiItem<T>) -> Unit,
-    onLongClick: (NodeUiItem<T>) -> Unit,
+    onLongClicked: (NodeUiItem<T>) -> Unit,
     sortOrder: String,
     isListView: Boolean,
     onSortOrderClick: () -> Unit,
@@ -80,14 +80,14 @@ fun <T : TypedNode> NodesView(
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val orientation = LocalConfiguration.current.orientation
     val span = if (orientation == Configuration.ORIENTATION_PORTRAIT) spanCount else 4
-    val highlightedIndex = remember(nodeUIItems) {
-        nodeUIItems.indexOfFirst { it.isHighlighted }
-            .takeIf { nodeUIItems.indices.contains(it) }
+    val highlightedIndex = remember(items) {
+        items.indexOfFirst { it.isHighlighted }
+            .takeIf { items.indices.contains(it) }
     }
     LaunchedEffect(highlightedIndex) {
         highlightedIndex?.let {
             listState.animateScrollToItem(
-                index = highlightedIndex.plus(2).coerceAtMost(nodeUIItems.lastIndex),
+                index = highlightedIndex.plus(2).coerceAtMost(items.lastIndex),
                 scrollOffset = -(listState.layoutInfo.viewportSize.height / 2)
             )
         }
@@ -96,7 +96,7 @@ fun <T : TypedNode> NodesView(
         NodeListView(
             modifier = modifier,
             listContentPadding = listContentPadding,
-            nodeUiItemList = nodeUIItems,
+            nodeUiItemList = items,
             onMenuClick = onMenuClick,
             onItemClicked = {
                 if (it.isTakenDown && it.node !is FolderNode) {
@@ -105,7 +105,7 @@ fun <T : TypedNode> NodesView(
                     onItemClicked(it)
                 }
             },
-            onLongClick = onLongClick,
+            onLongClick = onLongClicked,
             onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
             sortOrder = sortOrder,
             highlightText = highlightText,
@@ -125,7 +125,7 @@ fun <T : TypedNode> NodesView(
             nodeSourceType = nodeSourceType,
         )
     } else {
-        val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = span)
+        val newList = rememberNodeListForGrid(nodeUIItems = items, spanCount = span)
         NodeGridView(
             modifier = modifier,
             listContentPadding = listContentPadding,
@@ -138,7 +138,7 @@ fun <T : TypedNode> NodesView(
                     onItemClicked(it)
                 }
             },
-            onLongClick = onLongClick,
+            onLongClick = onLongClicked,
             onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
             spanCount = span,
             sortOrder = sortOrder,

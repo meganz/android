@@ -14,6 +14,7 @@ fun NavGraphBuilder.cloudDriveScreen(
     composable<CloudDriveScreen> {
         val viewModel = hiltViewModel<CloudDriveViewModel>()
         CloudDriveScreen(
+            viewModel = viewModel,
             onBack = onBack,
         )
     }
