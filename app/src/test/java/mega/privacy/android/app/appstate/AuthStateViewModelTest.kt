@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -36,6 +37,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -644,6 +646,210 @@ class AuthStateViewModelTest {
 
                 cancelAndIgnoreRemainingEvents()
             }
+        }
+
+    @Test
+    fun `test that post login initialisers are not called again if credentials are updated, but session is the same`() =
+        runTest {
+            val session = "test-session"
+            val initialCredentials = UserCredentials(
+                email = "test@example.com",
+                session = session,
+                firstName = "John",
+                lastName = "Doe",
+                myHandle = "123456789"
+            )
+
+            val updatedCredentials = UserCredentials(
+                email = "test@example.com",
+                session = session,
+                firstName = "Jane",
+                lastName = "Doe",
+                myHandle = "123456789"
+            )
+
+            val themeMode = ThemeMode.Light
+            monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+            }
+
+            val credentialsFlow = MutableStateFlow<UserCredentials?>(initialCredentials)
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() }.thenReturn(credentialsFlow)
+            }
+            stubNotBlockedState()
+
+            underTest.state.test {
+                // Initial state should be logged in
+                val initialState = awaitItem()
+                assertThat(initialState).isInstanceOf(AuthState.LoggedIn::class.java)
+
+                // Emit new credentials
+                credentialsFlow.emit(updatedCredentials)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(authInitialiser, times(1)).onPreLogin(session)
+        }
+
+    @Test
+    fun `test that post login initialisers are not called again if ui state is resubscribed`() =
+        runTest {
+            val session = "test-session"
+            val credentials = UserCredentials(
+                email = "test@example.com",
+                session = session,
+                firstName = "John",
+                lastName = "Doe",
+                myHandle = "123456789"
+            )
+
+            val themeMode = ThemeMode.Light
+            monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+            }
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(credentials))
+            }
+            stubNotBlockedState()
+            underTest.state.test { cancelAndIgnoreRemainingEvents() }
+            advanceTimeBy(6_000) // Advance time past ui state flow timeout
+            underTest.state.test { cancelAndIgnoreRemainingEvents() }
+            verify(authInitialiser, times(1)).onPreLogin(session)
+        }
+
+    @Test
+    fun `test that session is retained if ui state is resubscribed`() =
+        runTest {
+            val credentials = UserCredentials(
+                email = "test@example.com",
+                session = "test-session",
+                firstName = "John",
+                lastName = "Doe",
+                myHandle = "123456789"
+            )
+
+            val themeMode = ThemeMode.Light
+            monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+            }
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(credentials))
+            }
+            stubNotBlockedState()
+            underTest.state.test {
+                assertThat(awaitItem()).isInstanceOf(AuthState.LoggedIn::class.java)
+                cancelAndIgnoreRemainingEvents()
+            }
+            advanceTimeBy(6_000) // Advance time past ui state flow timeout
+            underTest.state.test {
+                assertThat(awaitItem()).isInstanceOf(AuthState.LoggedIn::class.java)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that new session values are retained if ui state is resubscribed`() =
+        runTest {
+            val credentials = UserCredentials(
+                email = "test@example.com",
+                session = "test-session",
+                firstName = "John",
+                lastName = "Doe",
+                myHandle = "123456789"
+            )
+
+            val themeMode = ThemeMode.Light
+            monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+            }
+            val credentialsFlow = MutableStateFlow<UserCredentials?>(credentials)
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() }.thenReturn(credentialsFlow)
+            }
+            stubNotBlockedState()
+            underTest.state.test {
+                assertThat(awaitItem()).isInstanceOf(AuthState.LoggedIn::class.java)
+                cancelAndIgnoreRemainingEvents()
+            }
+            advanceTimeBy(6_000) // Advance time past ui state flow timeout
+            credentialsFlow.emit(null)
+            underTest.state.test {
+                assertThat(awaitItem()).isInstanceOf(AuthState.RequireLogin::class.java)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that pre login initialisers are not called again if credentials are updated, but session is the same`() =
+        runTest {
+            val session = "test-session"
+            val initialCredentials = UserCredentials(
+                email = "test@example.com",
+                session = session,
+                firstName = "John",
+                lastName = "Doe",
+                myHandle = "123456789"
+            )
+
+            val updatedCredentials = UserCredentials(
+                email = "test@example.com",
+                session = session,
+                firstName = "Jane",
+                lastName = "Doe",
+                myHandle = "123456789"
+            )
+
+            val themeMode = ThemeMode.Light
+            monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+            }
+
+            val credentialsFlow = MutableStateFlow<UserCredentials?>(initialCredentials)
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() }.thenReturn(credentialsFlow)
+            }
+            stubNotBlockedState()
+
+            underTest.state.test {
+                // Initial state should be logged in
+                val initialState = awaitItem()
+                assertThat(initialState).isInstanceOf(AuthState.LoggedIn::class.java)
+
+                // Emit new credentials
+                credentialsFlow.emit(updatedCredentials)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(authInitialiser, times(1)).onPostLogin(session)
+        }
+
+    @Test
+    fun `test that pre login initialisers are not called again if ui state is resubscribed`() =
+        runTest {
+            val session = "test-session"
+            val credentials = UserCredentials(
+                email = "test@example.com",
+                session = session,
+                firstName = "John",
+                lastName = "Doe",
+                myHandle = "123456789"
+            )
+
+            val themeMode = ThemeMode.Light
+            monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+            }
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() }.thenReturn(MutableStateFlow(credentials))
+            }
+            stubNotBlockedState()
+            underTest.state.test { cancelAndIgnoreRemainingEvents() }
+            advanceTimeBy(6_000) // Advance time past ui state flow timeout
+            underTest.state.test { cancelAndIgnoreRemainingEvents() }
+            verify(authInitialiser, times(1)).onPostLogin(session)
         }
 
     private val notBlockedEvent = AccountBlockedEvent(

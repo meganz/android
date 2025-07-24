@@ -5,19 +5,21 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.app.appstate.initialisation.AuthInitialiser
 import mega.privacy.android.app.appstate.mapper.BlockedStateMapper
 import mega.privacy.android.app.appstate.model.AuthState
 import mega.privacy.android.app.appstate.model.BlockedState
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.extension.onFirst
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
@@ -45,10 +47,15 @@ class AuthStateViewModel @Inject constructor(
         authInitialiser.onAppStart()
     }
 
+    private var lastLoggedInSession: String? = null
+
     val state: StateFlow<AuthState> by lazy {
         getStateValues().onEach { state ->
             if (state is AuthState.LoggedIn) {
-                authInitialiser.onPostLogin(state.session)
+                if (lastLoggedInSession != state.session) {
+                    lastLoggedInSession = state.session
+                    authInitialiser.onPostLogin(state.session)
+                }
             }
         }.catch {
             Timber.e(it, "Error while building auth state")
@@ -80,19 +87,27 @@ class AuthStateViewModel @Inject constructor(
 
     private fun monitorBlockedState() =
         combine(
-            monitorCredentials(),
+            sessionFlow,
             monitorAccountBlockedUseCase(),
-        ) { credentials, blockedState ->
-            val session = credentials?.session
+        ) { session, blockedState ->
             val result = blockedStateMapper(blockedState, session)
             handleBlockedStateSessionUseCase(blockedState)
             result
         }
 
 
-    private fun monitorCredentials(): Flow<UserCredentials?> = monitorUserCredentialsUseCase()
-        .onFirst(
-            predicate = { true },
-            action = { authInitialiser.onPreLogin(it?.session) }
-        )
+    private val sessionFlow: Flow<String?> by lazy {
+        monitorUserCredentialsUseCase()
+            .catch { Timber.e(it, "Error monitoring user credentials") }
+            .map { it?.session }
+            .distinctUntilChanged()
+            .onFirst(
+                predicate = { true },
+                action = { authInitialiser.onPreLogin(it) }
+            ).shareIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                replay = 1,
+            )
+    }
 }
