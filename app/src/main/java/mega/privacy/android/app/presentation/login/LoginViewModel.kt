@@ -49,6 +49,7 @@ import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginException
+import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
@@ -782,6 +783,7 @@ class LoginViewModel @Inject constructor(
                     // in the new design we don't show snackbar for these errors
                     this !is LoginTooManyAttempts
                             && this !is LoginWrongEmailOrPassword
+                            && this !is LoginLoggedOutFromOtherLocation
                 }?.let { triggered(it) }
             loginState.copy(
                 isLoginInProgress = false,
