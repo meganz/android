@@ -591,6 +591,10 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                     readyToFinish(uiState)
                 }
 
+                LoginIntentState.AlreadySet -> {
+                    activity.intent.action = null
+                }
+
                 else -> {
                     /* Nothing to update */
                     Timber.d("Intent state: $this")

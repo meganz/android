@@ -5,19 +5,26 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.billing.BillingViewModel
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountBlockedEvent
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.utils.setupSplashExitAnimation
 import timber.log.Timber
 import javax.inject.Inject
@@ -33,6 +40,9 @@ class LoginActivity : BaseActivity() {
     @Inject
     lateinit var chatRequestHandler: MegaChatRequestHandler
 
+    @Inject
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
     private val disabledPasscodeCheck = object : PasscodeCheck {
         override fun disablePasscode() {
 //            no-op
@@ -47,7 +57,6 @@ class LoginActivity : BaseActivity() {
     }
 
     private val viewModel by viewModels<LoginViewModel>()
-    private val billingViewModel by viewModels<BillingViewModel>()
 
     /**
      * Flag to delay showing the splash screen.
@@ -87,13 +96,25 @@ class LoginActivity : BaseActivity() {
 
         enableEdgeToEdge()
         setContent {
-            LoginGraph(
-                chatRequestHandler = chatRequestHandler,
-                viewModel = viewModel,
-                billingViewModel = billingViewModel,
-                onFinish = ::finish,
-                stopShowingSplashScreen = ::stopShowingSplashScreen
-            )
+            val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val navController = rememberNavController()
+            AndroidTheme(isDark = themeMode.isDarkMode()) {
+                NavHost(
+                    navController = navController,
+                    startDestination = LoginGraph(
+                        startScreen = intent.getIntExtra(Constants.VISIBLE_FRAGMENT, -1)
+                            .takeIf { it != -1 }
+                    ),
+                ) {
+                    loginNavigationGraph(
+                        navController = navController,
+                        chatRequestHandler = chatRequestHandler,
+                        onFinish = ::finish,
+                        stopShowingSplashScreen = ::stopShowingSplashScreen,
+                        activityViewModel = viewModel
+                    )
+                }
+            }
         }
         splashScreen.setupSplashExitAnimation(window)
         lifecycleScope.launch {

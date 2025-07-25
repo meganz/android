@@ -1,12 +1,17 @@
 package mega.privacy.android.app.presentation.login.createaccount
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.presentation.login.LoginGraph
+import mega.privacy.android.app.presentation.login.LoginGraphContent
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.createaccount.view.NewCreateAccountRoute
 
@@ -14,13 +19,31 @@ import mega.privacy.android.app.presentation.login.createaccount.view.NewCreateA
 data object CreateAccountRoute
 
 internal fun NavGraphBuilder.createAccountScreen(
-    sharedViewModel: LoginViewModel,
+    navController: NavController,
+    chatRequestHandler: MegaChatRequestHandler,
+    onFinish: () -> Unit,
+    activityViewModel: LoginViewModel? = null,
+    stopShowingSplashScreen: () -> Unit,
 ) {
-    composable<CreateAccountRoute> {
-        NewCreateAccountRoute(
-            activityViewModel = sharedViewModel,
-            modifier = Modifier.fillMaxSize(),
-        )
+    composable<CreateAccountRoute> { backStackEntry ->
+        val sharedViewModel = activityViewModel ?: run {
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry<LoginGraph>()
+            }
+            hiltViewModel<LoginViewModel>(parentEntry)
+        }
+        LoginGraphContent(
+            navController = navController,
+            viewModel = sharedViewModel,
+            chatRequestHandler = chatRequestHandler,
+            onFinish = onFinish,
+            stopShowingSplashScreen = stopShowingSplashScreen,
+        ) {
+            NewCreateAccountRoute(
+                activityViewModel = sharedViewModel,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
     }
 }
 

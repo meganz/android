@@ -1,10 +1,10 @@
 package mega.privacy.android.app.appstate
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,7 +21,9 @@ import mega.privacy.android.app.appstate.view.LoggedInAppView
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginGraph
+import mega.privacy.android.app.presentation.login.loginNavigationGraph
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.utils.Constants
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -37,10 +39,12 @@ class MegaActivity : ComponentActivity() {
     data object LoginLoading
 
     @Serializable
-    data object LoginScreens
-
-    @Serializable
     data class LoggedInScreens(val session: String)
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        this.intent = intent
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -60,12 +64,19 @@ class MegaActivity : ComponentActivity() {
                     is AuthState.Loading -> {}
                     is AuthState.LoggedIn -> {
                         navController.popBackStack()
-                        navController.navigate(route = LoggedInScreens(session = currentState.session))
+                        navController.navigate(
+                            route = LoggedInScreens(session = currentState.session),
+                        )
                     }
 
                     is AuthState.RequireLogin -> {
                         navController.popBackStack()
-                        navController.navigate(route = LoginScreens)
+                        navController.navigate(
+                            route = LoginGraph(
+                                startScreen = intent.getIntExtra(Constants.VISIBLE_FRAGMENT, -1)
+                                    .takeIf { it != -1 }
+                            ),
+                        )
                     }
                 }
             }
@@ -73,25 +84,22 @@ class MegaActivity : ComponentActivity() {
             AndroidTheme(isDark = state.value.themeMode.isDarkMode()) {
                 NavHost(
                     navController = navController,
-                    startDestination = LoginLoading
+                    startDestination = LoginLoading,
                 ) {
 
-                    composable<LoginLoading> {
-                        // Splash screen or empty? Technically this should never be seen.
-                        Text("Loading...")
-                    }
+                    composable<LoginLoading> {}
 
-                    composable<LoginScreens> {
-                        LoginGraph(
-                            chatRequestHandler = chatRequestHandler,
-                            onFinish = {
-                                navController.popBackStack()
-                            },
-                            stopShowingSplashScreen = {
-                                keepSplashScreen = false
-                            }
-                        )
-                    }
+                    loginNavigationGraph(
+                        navController = navController,
+                        chatRequestHandler = chatRequestHandler,
+                        onFinish = {
+                            navController.popBackStack(LoginGraph, inclusive = true)
+                        },
+                        stopShowingSplashScreen = {
+                            keepSplashScreen = false
+                        },
+                    )
+
                     composable<LoggedInScreens> {
                         val appStateViewModel = hiltViewModel<AppStateViewModel>()
                         LoggedInAppView(

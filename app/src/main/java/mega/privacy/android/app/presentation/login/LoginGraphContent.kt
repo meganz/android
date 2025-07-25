@@ -16,39 +16,32 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavOptions
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.flow.collectLatest
 import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
-import mega.privacy.android.app.presentation.billing.BillingViewModel
-import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.login.confirmemail.confirmationEmailScreen
 import mega.privacy.android.app.presentation.login.confirmemail.openConfirmationEmailScreen
-import mega.privacy.android.app.presentation.login.createaccount.createAccountScreen
 import mega.privacy.android.app.presentation.login.createaccount.openCreateAccountScreen
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.onboarding.openTourScreen
-import mega.privacy.android.app.presentation.login.onboarding.tourScreen
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 
 /**
- * Login Graph Composable.
+ * Login Graph Content Composable that handles state management and navigation logic
+ * without creating its own NavHost. This can be used within other navigation graphs.
  */
 @Composable
-fun LoginGraph(
+fun LoginGraphContent(
+    navController: NavController,
     chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
-    viewModel: LoginViewModel = hiltViewModel(),
-    billingViewModel: BillingViewModel = hiltViewModel(),
     stopShowingSplashScreen: () -> Unit,
+    viewModel: LoginViewModel = hiltViewModel(),
+    content: @Composable () -> Unit = {},
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
-    val navController = rememberNavController()
     val focusManager = LocalFocusManager.current
     var showLoggedOutDialog by rememberSaveable { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -113,45 +106,21 @@ fun LoginGraph(
             viewModel.isPendingToShowFragmentConsumed()
         }
     }
-
-    AndroidTheme(isDark = uiState.themeMode.isDarkMode()) {
-        NavHost(
-            navController = navController, startDestination = StartRoute
-        ) {
-            composable(StartRoute) {
-                // no-op, we checking start destination in the view model
+    content()
+    if (showLoggedOutDialog) {
+        BasicDialog(
+            modifier = Modifier.testTag(LOGGED_OUT_DIALOG),
+            title = stringResource(id = R.string.title_alert_logged_out),
+            description = stringResource(id = R.string.error_server_expired_session),
+            positiveButtonText = stringResource(id = R.string.general_ok),
+            onPositiveButtonClicked = {
+                showLoggedOutDialog = false
+            },
+            onDismiss = {
+                showLoggedOutDialog = false
             }
-            loginScreen(
-                sharedViewModel = viewModel,
-                billingViewModel = billingViewModel,
-            )
-            createAccountScreen(
-                sharedViewModel = viewModel,
-            )
-            tourScreen(
-                sharedViewModel = viewModel, onBackPressed = onFinish
-            )
-            confirmationEmailScreen(
-                sharedViewModel = viewModel, onBackPressed = onFinish
-            )
-        }
-
-        if (showLoggedOutDialog) {
-            BasicDialog(
-                modifier = Modifier.testTag(LOGGED_OUT_DIALOG),
-                title = stringResource(id = R.string.title_alert_logged_out),
-                description = stringResource(id = R.string.error_server_expired_session),
-                positiveButtonText = stringResource(id = R.string.general_ok),
-                onPositiveButtonClicked = {
-                    showLoggedOutDialog = false
-                },
-                onDismiss = {
-                    showLoggedOutDialog = false
-                }
-            )
-        }
+        )
     }
 }
 
-private const val StartRoute = "start"
-internal const val LOGGED_OUT_DIALOG = "logged_out_dialog"
+internal const val LOGGED_OUT_DIALOG = "logged_out_dialog" 

@@ -17,10 +17,12 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.OpenPasswordLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.launchUrl
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.main.ManagerActivity
@@ -91,13 +93,9 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.navigation.DeeplinkHandler
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRequest
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -105,8 +103,7 @@ import javax.inject.Inject
  * Open link activity
  */
 @AndroidEntryPoint
-class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
-    LoadPreviewListener.OnPreviewLoadedCallback {
+class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoadedCallback {
 
     /**
      * MegaNavigator injection
@@ -596,15 +593,23 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      *
      * Navigates to [LoginActivity] if the user logged out
      */
-    private fun handleLoggedOutState() {
-        startActivity(
-            Intent(this@OpenLinkActivity, LoginActivity::class.java)
-                .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                .putExtra(EXTRA_CONFIRMATION, urlConfirmationLink)
-                .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                .setAction(ACTION_CONFIRM)
-        )
-        finish()
+    private fun handleLoggedOutState() = lifecycleScope.launch {
+        getFeatureFlagValueUseCase(AppFeatures.SingleActivity).let { isSingleActivityEnabled ->
+            Timber.d("SingleActivity feature flag is enabled: $isSingleActivityEnabled")
+            val targetActivity = if (isSingleActivityEnabled) {
+                MegaActivity::class.java
+            } else {
+                LoginActivity::class.java
+            }
+            startActivity(
+                Intent(this@OpenLinkActivity, targetActivity)
+                    .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+                    .putExtra(EXTRA_CONFIRMATION, urlConfirmationLink)
+                    .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                    .setAction(ACTION_CONFIRM)
+            )
+            finish()
+        }
     }
 
     /**
@@ -736,38 +741,6 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     /**
-     * onRequestStart
-     */
-    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestStart")
-    }
-
-    /**
-     * onRequestUpdate
-     */
-    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
-
-    /**
-     * onRequestFinish
-     */
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.d("onRequestFinish")
-        when (request.type) {
-            MegaRequest.TYPE_QUERY_SIGNUP_LINK -> {
-                Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK")
-                if (e.errorCode == MegaError.API_OK) {
-                    MegaApplication.urlConfirmationLink = request.link
-                    viewModel.logout()
-                } else {
-                    setError(getString(R.string.invalid_link))
-                }
-            }
-
-            else -> {}
-        }
-    }
-
-    /**
      * Set error message and views
      *
      * @param errorMessage error message
@@ -779,11 +752,6 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         binding.openLinkError.isVisible = true
         binding.containerAcceptButton.isVisible = true
     }
-
-    /**
-     * onRequestTemporaryError
-     */
-    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {}
 
     /**
      * onPreviewLoaded

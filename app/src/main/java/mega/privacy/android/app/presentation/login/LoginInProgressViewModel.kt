@@ -260,8 +260,6 @@ class LoginInProgressViewModel @Inject constructor(
      */
     private fun fetchNodes(isRefreshSession: Boolean = false) {
         viewModelScope.launch {
-            MegaApplication.getInstance().checkEnabledCookies()
-
             if (isRefreshSession) {
                 _state.update { it.copy(fetchNodesUpdate = cleanFetchNodesUpdate) }
             }
