@@ -6,7 +6,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveScreen
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 
 @Serializable
@@ -17,11 +16,12 @@ fun NavGraphBuilder.driveSyncScreen(
     onNavigateToFolder: (NodeId) -> Unit,
 ) {
     composable<DriveSync> {
-        // TODO: drive, sync tabs screen
-        val viewModel = hiltViewModel<CloudDriveViewModel>()
-        CloudDriveScreen(
+        val viewModel = hiltViewModel<DriveSyncViewModel>()
+        val cloudDriveViewModel = hiltViewModel<CloudDriveViewModel>()
+        DriveSyncScreen(
+            onBackPress = onBack,
             viewModel = viewModel,
-            onBack = onBack,
+            cloudDriveViewModel = cloudDriveViewModel,
             onNavigateToFolder = onNavigateToFolder,
         )
     }

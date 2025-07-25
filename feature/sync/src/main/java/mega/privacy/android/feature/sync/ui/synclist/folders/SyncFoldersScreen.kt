@@ -75,7 +75,10 @@ internal fun SyncFoldersScreen(
         LazyColumn(
             state = rememberLazyListState(),
             modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = if (syncUiItems.isEmpty()) 0.dp else BOTTOM_PADDING.dp),
+            contentPadding = PaddingValues(
+                top = 8.dp,
+                bottom = if (syncUiItems.isEmpty()) 0.dp else BOTTOM_PADDING.dp
+            ),
         ) {
             if (isLoading) {
                 item {
@@ -201,7 +204,7 @@ private fun SyncFoldersScreenLoadingState() {
             for (i in 1..4) {
                 CardItemLoadingSkeleton(
                     modifier = Modifier.padding(
-                        vertical = 12.dp,
+                        vertical = 8.dp,
                         horizontal = 16.dp
                     )
                 )
