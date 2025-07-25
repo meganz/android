@@ -14,6 +14,7 @@ data object DriveSync : NavKey
 fun NavGraphBuilder.driveSyncScreen(
     onBack: () -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
+    setNavigationVisibility: (Boolean) -> Unit,
 ) {
     composable<DriveSync> {
         val viewModel = hiltViewModel<DriveSyncViewModel>()
@@ -23,6 +24,7 @@ fun NavGraphBuilder.driveSyncScreen(
             viewModel = viewModel,
             cloudDriveViewModel = cloudDriveViewModel,
             onNavigateToFolder = onNavigateToFolder,
+            setNavigationItemVisibility = setNavigationVisibility
         )
     }
 }

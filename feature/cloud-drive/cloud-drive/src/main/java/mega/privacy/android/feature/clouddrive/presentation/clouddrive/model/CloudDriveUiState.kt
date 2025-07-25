@@ -12,7 +12,15 @@ data class CloudDriveUiState(
     val isLoading: Boolean = true,
     val currentFolderId: NodeId = NodeId(-1L),
     val items: List<NodeUiItem<TypedNode>> = emptyList(),
-    val selectedItems: Set<Long> = emptySet(),
-    val isInSelectionMode: Boolean = false,
     val navigateToFolderEvent: StateEventWithContent<NodeId> = consumed(),
-)
+) {
+    /**
+     * True if any item is selected
+     */
+    val isInSelectionMode: Boolean = items.any { it.isSelected }
+
+    /**
+     * Returns a list of selected node ids.
+     */
+    val selectedNodeIds: List<NodeId> get() = items.filter { it.isSelected }.map { it.node.id }
+}

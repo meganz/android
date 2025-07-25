@@ -2,7 +2,6 @@ package mega.privacy.android.core.nodecomponents.list.view
 
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -292,29 +291,27 @@ fun NodeListViewItem(
                         .testTag(INFO_ICON_TAG)
                 )
             }
-            AnimatedContent(targetState = isInSelectionMode, label = "node thumbnail") {
-                if (it) {
-                    Checkbox(
-                        checked = isSelected,
-                        onCheckStateChanged = { },
-                        tapTargetArea = false,
-                        clickable = false,
-                        modifier = Modifier.testTag(CHECKBOX_TAG),
+            if (isInSelectionMode) {
+                Checkbox(
+                    checked = isSelected,
+                    onCheckStateChanged = { },
+                    tapTargetArea = false,
+                    clickable = false,
+                    modifier = Modifier.testTag(CHECKBOX_TAG),
+                )
+            } else {
+                if (onMoreClicked != null) {
+                    MegaIcon(
+                        imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
+                        contentDescription = "More",
+                        tint = IconColor.Secondary,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable { onMoreClicked() }
+                            .testTag(MORE_ICON_TAG)
                     )
                 } else {
-                    if (onMoreClicked != null) {
-                        MegaIcon(
-                            imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
-                            contentDescription = "More",
-                            tint = IconColor.Secondary,
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clickable { onMoreClicked() }
-                                .testTag(MORE_ICON_TAG)
-                        )
-                    } else {
-                        Spacer(modifier = Modifier.size(24.dp))
-                    }
+                    Spacer(modifier = Modifier.size(24.dp))
                 }
             }
         },

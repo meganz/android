@@ -19,12 +19,13 @@ import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdenti
 class DriveSyncNavItem : MainNavItem {
     override val destination: NavKey = DriveSync
     override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController) -> Unit =
-        { navigationHandler, _ ->
+        { navigationHandler, navigationController ->
             driveSyncScreen(
                 onBack = navigationHandler::back,
                 onNavigateToFolder = { nodeId ->
                     navigationHandler.navigate(CloudDrive(nodeHandle = nodeId.longValue))
-                }
+                },
+                setNavigationVisibility = navigationController::showNavigation,
             )
         }
 

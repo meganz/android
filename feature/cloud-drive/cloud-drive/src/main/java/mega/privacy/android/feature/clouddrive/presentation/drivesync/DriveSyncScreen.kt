@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,6 +20,7 @@ import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.TabItems
+import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveContent
@@ -31,6 +33,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal fun DriveSyncScreen(
     onBackPress: () -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
+    setNavigationItemVisibility: (Boolean) -> Unit,
     viewModel: DriveSyncViewModel = hiltViewModel(),
     cloudDriveViewModel: CloudDriveViewModel = hiltViewModel(),
 ) {
@@ -43,10 +46,18 @@ internal fun DriveSyncScreen(
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
         topBar = {
-            MegaTopAppBar(
-                navigationType = AppBarNavigationType.None,
-                title = stringResource(sharedR.string.general_drive),
-            )
+            if (cloudDriveUiState.isInSelectionMode) {
+                NodeSelectionModeAppBar(
+                    count = cloudDriveUiState.selectedNodeIds.size,
+                    onSelectAllClicked = cloudDriveViewModel::selectAllItems,
+                    onCancelSelectionClicked = cloudDriveViewModel::deselectAllItems
+                )
+            } else {
+                MegaTopAppBar(
+                    navigationType = AppBarNavigationType.None,
+                    title = stringResource(sharedR.string.general_drive),
+                )
+            }
         }
     ) { paddingValues ->
         MegaScrollableTabRow(
@@ -54,8 +65,8 @@ internal fun DriveSyncScreen(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding()),
             beyondViewportPageCount = 1,
-            hideTabs = false,
-            pagerScrollEnabled = true,
+            hideTabs = cloudDriveUiState.isInSelectionMode,
+            pagerScrollEnabled = !cloudDriveUiState.isInSelectionMode,
             cells = {
                 addTextTabWithLazyListState(
                     tabItem = TabItems(stringResource(sharedR.string.general_section_cloud_drive)),
@@ -68,6 +79,7 @@ internal fun DriveSyncScreen(
                         uiState = cloudDriveUiState,
                         fileTypeIconMapper = cloudDriveViewModel.fileTypeIconMapper,
                         onItemClicked = cloudDriveViewModel::onItemClicked,
+                        onItemLongClicked = cloudDriveViewModel::onItemLongClicked,
                         onNavigateToFolder = onNavigateToFolder,
                         onNavigateToFolderEventConsumed = cloudDriveViewModel::onNavigateToFolderEventConsumed,
                     )
@@ -113,5 +125,9 @@ internal fun DriveSyncScreen(
                 true
             }
         )
+    }
+
+    LaunchedEffect(cloudDriveUiState.isInSelectionMode) {
+        setNavigationItemVisibility(!cloudDriveUiState.isInSelectionMode)
     }
 }

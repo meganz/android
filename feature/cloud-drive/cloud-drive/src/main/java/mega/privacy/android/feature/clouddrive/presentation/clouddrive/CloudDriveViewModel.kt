@@ -77,6 +77,10 @@ class CloudDriveViewModel @Inject constructor(
      * Handle item click - navigate to folder if it's a folder
      */
     fun onItemClicked(nodeUiItem: NodeUiItem<TypedNode>) {
+        if (uiState.value.isInSelectionMode) {
+            toggleItemSelection(nodeUiItem)
+            return
+        }
         when (nodeUiItem.node) {
             is FolderNode -> {
                 uiState.update { state ->
@@ -103,6 +107,46 @@ class CloudDriveViewModel @Inject constructor(
     }
 
     /**
+     * Handle item long click - toggle selection state
+     */
+    fun onItemLongClicked(nodeUiItem: NodeUiItem<TypedNode>) {
+        toggleItemSelection(nodeUiItem)
+    }
+
+    private fun toggleItemSelection(nodeUiItem: NodeUiItem<TypedNode>) {
+        val updatedItems = uiState.value.items.map { item ->
+            if (item.node.id == nodeUiItem.node.id) {
+                item.copy(isSelected = !item.isSelected)
+            } else {
+                item
+            }
+        }
+        uiState.update { state ->
+            state.copy(items = updatedItems)
+        }
+    }
+
+    /**
+     * Deselect all items and reset selection state
+     */
+    fun deselectAllItems() {
+        val updatedItems = uiState.value.items.map { it.copy(isSelected = false) }
+        uiState.update { state ->
+            state.copy(items = updatedItems)
+        }
+    }
+
+    /**
+     * Select all items
+     */
+    fun selectAllItems() {
+        val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
+        uiState.update { state ->
+            state.copy(items = updatedItems)
+        }
+    }
+
+    /**
      * A temporary mapper for sample screen
      */
     private suspend fun getNodeUiItems(
@@ -111,14 +155,12 @@ class CloudDriveViewModel @Inject constructor(
         highlightedNames: Set<String>? = null,
     ): List<NodeUiItem<TypedNode>> = withContext(defaultDispatcher) {
         val existingNodeList = uiState.value.items
-        val selectedHandles = uiState.value.selectedItems
         val existingHighlightedIds = existingNodeList.asSequence()
             .filter { it.isHighlighted }
             .map { it.node.id }
             .toSet()
 
         nodeList.mapIndexed { index, node ->
-            val isSelected = selectedHandles.contains(node.id.longValue)
             val fileDuration = if (node is FileNode) {
                 node.type.toDuration()?.let { durationInSecondsTextMapper(it) }
             } else null
@@ -128,7 +170,7 @@ class CloudDriveViewModel @Inject constructor(
             val hasCorrespondingIndex = existingNodeList.size > index
             NodeUiItem(
                 node = node,
-                isSelected = if (hasCorrespondingIndex) isSelected else false,
+                isSelected = if (hasCorrespondingIndex) existingNodeList[index].isSelected else false,
                 isInvisible = if (hasCorrespondingIndex) existingNodeList[index].isInvisible else false,
                 fileDuration = fileDuration,
                 isHighlighted = isHighlighted,

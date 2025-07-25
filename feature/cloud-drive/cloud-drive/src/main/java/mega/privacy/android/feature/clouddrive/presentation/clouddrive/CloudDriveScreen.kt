@@ -23,6 +23,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.nodecomponents.list.view.NodesView
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
@@ -38,16 +39,25 @@ fun CloudDriveScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     MegaScaffold(
         topBar = {
-            MegaTopAppBar(
-                title = uiState.title.text,
-                navigationType = AppBarNavigationType.Back(onBack),
-            )
+            if (uiState.isInSelectionMode) {
+                NodeSelectionModeAppBar(
+                    count = uiState.selectedNodeIds.size,
+                    onSelectAllClicked = viewModel::selectAllItems,
+                    onCancelSelectionClicked = viewModel::deselectAllItems
+                )
+            } else {
+                MegaTopAppBar(
+                    title = uiState.title.text,
+                    navigationType = AppBarNavigationType.Back(onBack),
+                )
+            }
         },
         content = { innerPadding ->
             CloudDriveContent(
                 uiState = uiState,
                 contentPadding = innerPadding,
                 onItemClicked = viewModel::onItemClicked,
+                onItemLongClicked = viewModel::onItemLongClicked,
                 fileTypeIconMapper = viewModel.fileTypeIconMapper,
                 onNavigateToFolder = onNavigateToFolder,
                 onNavigateToFolderEventConsumed = viewModel::onNavigateToFolderEventConsumed,
@@ -61,6 +71,7 @@ internal fun CloudDriveContent(
     uiState: CloudDriveUiState,
     fileTypeIconMapper: FileTypeIconMapper,
     onItemClicked: (NodeUiItem<TypedNode>) -> Unit,
+    onItemLongClicked: (NodeUiItem<TypedNode>) -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
     onNavigateToFolderEventConsumed: () -> Unit,
     modifier: Modifier = Modifier,
@@ -89,7 +100,7 @@ internal fun CloudDriveContent(
             items = uiState.items,
             onMenuClick = { },
             onItemClicked = onItemClicked,
-            onLongClicked = { },
+            onLongClicked = onItemLongClicked,
             sortOrder = "Name",
             isListView = true,
             onSortOrderClick = {},
