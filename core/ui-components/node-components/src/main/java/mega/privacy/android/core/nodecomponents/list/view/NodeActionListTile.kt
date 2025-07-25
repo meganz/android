@@ -25,6 +25,7 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.toggle.Toggle
 import mega.android.core.ui.model.TopAppBarAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -44,7 +45,7 @@ import mega.privacy.android.icon.pack.R as IconPackR
  */
 @Composable
 fun NodeActionListTile(
-    menuAction: TopAppBarAction,
+    menuAction: MenuActionWithIcon,
     modifier: Modifier = Modifier,
     isDestructive: Boolean = false,
     onActionClicked: (() -> Unit)? = null,

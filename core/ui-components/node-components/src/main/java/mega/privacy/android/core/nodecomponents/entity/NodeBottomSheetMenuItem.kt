@@ -3,7 +3,7 @@ package mega.privacy.android.core.nodecomponents.entity
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import mega.android.core.ui.model.TopAppBarAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.list.view.NodeActionListTile
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  */
 typealias BottomSheetClickHandler = @Composable (
     onDismiss: () -> Unit,
-    actionHandler: (menuAction: TopAppBarAction, node: TypedNode) -> Unit,
+    actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
     navController: NavHostController,
     coroutineScope: CoroutineScope,
 ) -> Unit
@@ -21,7 +21,7 @@ typealias BottomSheetClickHandler = @Composable (
 /**
  * Node bottom sheet menu item
  */
-interface NodeBottomSheetMenuItem<T : TopAppBarAction> {
+interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
 
     /**
      * Build compose control
@@ -64,7 +64,7 @@ interface NodeBottomSheetMenuItem<T : TopAppBarAction> {
     fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: TopAppBarAction, node: TypedNode) -> Unit,
+        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
