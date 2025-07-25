@@ -166,7 +166,7 @@ interface AppNavigator {
         context: Context,
         contentUri: NodeContentUri,
         fileNode: TypedFileNode,
-        viewType: Int,
+        viewType: Int?,
         sortOrder: SortOrder = SortOrder.ORDER_NONE,
         isFolderLink: Boolean = false,
         isMediaQueueAvailable: Boolean = true,
@@ -174,7 +174,7 @@ interface AppNavigator {
         mediaQueueTitle: String? = null,
         collectionTitle: String? = null,
         collectionId: Long? = null,
-        enableAddToAlbum: Boolean = false,
+        enableAddToAlbum: Boolean? = null,
     )
 
     /**
@@ -301,4 +301,45 @@ interface AppNavigator {
      * //stop-backup-mega-picker
      */
     fun openSelectStopBackupDestinationFromSyncsTab(context: Context)
+
+    /**
+     * Open PDF viewer activity
+     *
+     * @param context Context
+     * @param content NodeContentUri
+     * @param type the adapter type of the view
+     * @param currentFileNode TypedFileNode
+     */
+    fun openPdfActivity(
+        context: Context,
+        content: NodeContentUri,
+        type: Int?,
+        currentFileNode: TypedFileNode,
+    )
+
+    /**
+     * Open image viewer activity
+     *
+     * @param context Context
+     * @param currentFileNode TypedFileNode
+     * @param nodeSourceType the adapter type of the view
+     */
+    fun openImageViewerActivity(
+        context: Context,
+        currentFileNode: TypedFileNode,
+        nodeSourceType: Int?,
+    )
+
+    /**
+     * Open text editor activity
+     *
+     * @param context Context
+     * @param currentFileNode TypedFileNode
+     * @param nodeSourceType the adapter type of the view
+     */
+    fun openTextEditorActivity(
+        context: Context,
+        currentFileNode: TypedFileNode,
+        nodeSourceType: Int?,
+    )
 }

@@ -15,16 +15,25 @@ import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
+import mega.privacy.android.app.textEditor.TextEditorActivity
+import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountSource
@@ -72,6 +81,7 @@ import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.settings.SettingsNavigator
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -211,7 +221,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         context: Context,
         contentUri: NodeContentUri,
         fileNode: TypedFileNode,
-        viewType: Int,
+        viewType: Int?,
         sortOrder: SortOrder,
         isFolderLink: Boolean,
         isMediaQueueAvailable: Boolean,
@@ -219,14 +229,14 @@ internal class MegaNavigatorImpl @Inject constructor(
         mediaQueueTitle: String?,
         collectionTitle: String?,
         collectionId: Long?,
-        enableAddToAlbum: Boolean,
+        enableAddToAlbum: Boolean?,
     ) {
         manageMediaIntent(
             context = context,
             contentUri = contentUri,
             fileTypeInfo = fileNode.type,
             sortOrder = sortOrder,
-            viewType = viewType,
+            viewType = viewType ?: Constants.FILE_BROWSER_ADAPTER,
             name = fileNode.name,
             handle = fileNode.id.longValue,
             parentHandle = fileNode.parentId.longValue,
@@ -236,7 +246,12 @@ internal class MegaNavigatorImpl @Inject constructor(
             mediaQueueTitle = mediaQueueTitle,
             collectionTitle = collectionTitle,
             collectionId = collectionId,
-            enableAddToAlbum = enableAddToAlbum,
+            enableAddToAlbum = enableAddToAlbum ?: run {
+                viewType in listOf(
+                    Constants.FILE_BROWSER_ADAPTER,
+                    Constants.OUTGOING_SHARES_ADAPTER,
+                )
+            },
         )
     }
 
@@ -502,5 +517,105 @@ internal class MegaNavigatorImpl @Inject constructor(
             putExtra(SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, true)
             putExtra(SyncHostActivity.EXTRA_OPEN_SELECT_STOP_BACKUP_DESTINATION, true)
         })
+    }
+
+    override fun openPdfActivity(
+        context: Context,
+        content: NodeContentUri,
+        type: Int?,
+        currentFileNode: TypedFileNode,
+    ) {
+        val pdfIntent = Intent(context, PdfViewerActivity::class.java)
+        val mimeType = currentFileNode.type.mimeType
+        pdfIntent.apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
+            putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
+            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, type)
+            putExtra(Constants.INTENT_EXTRA_KEY_APP, true)
+        }
+        nodeContentUriIntentMapper(
+            intent = pdfIntent,
+            content = content,
+            mimeType = mimeType,
+        )
+        context.startActivity(pdfIntent)
+    }
+
+    override fun openImageViewerActivity(
+        context: Context,
+        currentFileNode: TypedFileNode,
+        nodeSourceType: Int?,
+    ) {
+        val currentFileNodeParentId = currentFileNode.parentId.longValue
+
+        val (imageSource, menuOptionsSource, paramKey) = when (nodeSourceType) {
+            Constants.FILE_BROWSER_ADAPTER -> Triple(
+                ImagePreviewFetcherSource.CLOUD_DRIVE,
+                ImagePreviewMenuSource.CLOUD_DRIVE,
+                CloudDriveImageNodeFetcher.PARENT_ID
+            )
+
+            Constants.RUBBISH_BIN_ADAPTER -> Triple(
+                ImagePreviewFetcherSource.RUBBISH_BIN,
+                ImagePreviewMenuSource.RUBBISH_BIN,
+                RubbishBinImageNodeFetcher.PARENT_ID
+            )
+
+            Constants.INCOMING_SHARES_ADAPTER,
+            Constants.OUTGOING_SHARES_ADAPTER,
+                -> Triple(
+                ImagePreviewFetcherSource.SHARED_ITEMS,
+                ImagePreviewMenuSource.SHARED_ITEMS,
+                SharedItemsImageNodeFetcher.PARENT_ID
+            )
+
+            Constants.LINKS_ADAPTER -> Triple(
+                ImagePreviewFetcherSource.SHARED_ITEMS,
+                ImagePreviewMenuSource.LINKS,
+                SharedItemsImageNodeFetcher.PARENT_ID
+            )
+
+            Constants.BACKUPS_ADAPTER -> Triple(
+                ImagePreviewFetcherSource.CLOUD_DRIVE,
+                ImagePreviewMenuSource.CLOUD_DRIVE,
+                CloudDriveImageNodeFetcher.PARENT_ID
+            )
+
+            else -> {
+                Timber.e("Unknown node source type: $nodeSourceType")
+                return
+            }
+        }
+
+        val intent = ImagePreviewActivity.createIntent(
+            context = context,
+            imageSource = imageSource,
+            menuOptionsSource = menuOptionsSource,
+            anchorImageNodeId = currentFileNode.id,
+            params = mapOf(paramKey to currentFileNodeParentId),
+            enableAddToAlbum = nodeSourceType in listOf(
+                Constants.FILE_BROWSER_ADAPTER,
+                Constants.OUTGOING_SHARES_ADAPTER,
+            )
+        )
+
+        context.startActivity(intent)
+    }
+
+    override fun openTextEditorActivity(
+        context: Context,
+        currentFileNode: TypedFileNode,
+        nodeSourceType: Int?,
+    ) {
+        val textFileIntent = Intent(context, TextEditorActivity::class.java)
+        textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
+            .putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
+            .putExtra(
+                Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                nodeSourceType ?: Constants.FILE_BROWSER_ADAPTER
+            )
+        context.startActivity(textFileIntent)
     }
 }

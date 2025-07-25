@@ -165,7 +165,7 @@ class RecentActionsComposeFragment : Fragment() {
                                 clickedFile = null
                                 parentFolderSharesType = null
                             },
-                            nodeActionsViewModel = nodeActionsViewModel,
+                            onDownloadEvent = nodeActionsViewModel::triggerDownloadEvent,
                             coroutineScope = coroutineScope
                         )
                     }

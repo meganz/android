@@ -2,37 +2,28 @@ package mega.privacy.android.app.presentation.node.action
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
-import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
-import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
-import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.domain.entity.node.FileNodeContent
-import mega.privacy.android.app.presentation.node.NodeActionsViewModel
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
 import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
-import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.textEditor.TextEditorViewModel
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.MegaNodeUtil.MegaNavigatorEntryPoint
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.megaNavigator
 import timber.log.Timber
 import java.io.File
 
@@ -41,7 +32,7 @@ import java.io.File
  *
  * @param typedFileNode [TypedFileNode]
  * @param nodeSourceType from where item click is performed
- * @param nodeActionsViewModel [NodeActionsViewModel]
+ * @param onDownloadEvent callback for download event
  * @param sortOrder [SortOrder]
  * @param snackBarHostState [SnackbarHostState]
  * @param onActionHandled callback after file clicked
@@ -53,103 +44,118 @@ fun HandleNodeAction(
     onActionHandled: () -> Unit,
     coroutineScope: CoroutineScope,
     nodeSourceType: Int? = null,
-    nodeActionsViewModel: NodeActionsViewModel = hiltViewModel(),
+    onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
-) = HandleNodeAction(
-    typedFileNode = typedFileNode,
-    snackBarHostStateWrapper = SnackbarHostStateWrapper(snackBarHostState),
-    onActionHandled = onActionHandled,
-    coroutineScope = coroutineScope,
-    nodeSourceType = nodeSourceType,
-    nodeActionsViewModel = nodeActionsViewModel,
-    sortOrder = sortOrder
-)
+) {
+    val snackbarHostStateWrapper = remember {
+        SnackbarHostStateWrapper(snackBarHostStateM2 = snackBarHostState)
+    }
+    HandleNodeAction(
+        typedFileNode = typedFileNode,
+        showSnackbar = { message ->
+            coroutineScope.launch {
+                snackbarHostStateWrapper.showAutoDurationSnackbar(message)
+            }
+        },
+        onActionHandled = onActionHandled,
+        coroutineScope = coroutineScope,
+        nodeSourceType = nodeSourceType,
+        onDownloadEvent = onDownloadEvent,
+        sortOrder = sortOrder
+    )
+}
 
 /**
  * Handle node action click
  *
  * @param typedFileNode [TypedFileNode]
  * @param nodeSourceType from where item click is performed
- * @param nodeActionsViewModel [NodeActionsViewModel]
  * @param sortOrder [SortOrder]
- * @param snackBarHostStateWrapper [SnackbarHostStateWrapper]
+ * @param showSnackbar callback to show snackbar messages
  * @param onActionHandled callback after file clicked
+ * @param onDownloadEvent callback for download event
  */
 @Composable
 fun HandleNodeAction(
     typedFileNode: TypedFileNode,
-    snackBarHostStateWrapper: SnackbarHostStateWrapper,
+    showSnackbar: (String) -> Unit,
     onActionHandled: () -> Unit,
     coroutineScope: CoroutineScope,
     nodeSourceType: Int? = null,
-    nodeActionsViewModel: NodeActionsViewModel = hiltViewModel(),
+    onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
 ) {
+    val nodeActionsViewModel: NodeActionHandlerViewModel = hiltViewModel()
     val context = LocalContext.current
+    val megaNavigator = remember { context.megaNavigator }
 
     LaunchedEffect(key1 = typedFileNode) {
         runCatching {
             nodeActionsViewModel.handleFileNodeClicked(typedFileNode)
         }.onSuccess { content ->
             when (content) {
-                is FileNodeContent.Pdf -> openPdfActivity(
+                is FileNodeContent.Pdf -> megaNavigator.openPdfActivity(
                     context = context,
-                    type = nodeSourceType,
                     content = content.uri,
-                    currentFileNode = typedFileNode,
-                    nodeActionsViewModel = nodeActionsViewModel
+                    type = nodeSourceType,
+                    currentFileNode = typedFileNode
                 )
 
                 is FileNodeContent.ImageForNode -> {
-                    openImageViewerActivity(
+                    megaNavigator.openImageViewerActivity(
                         context = context,
                         currentFileNode = typedFileNode,
                         nodeSourceType = nodeSourceType,
                     )
                 }
 
-                is FileNodeContent.TextContent -> openTextEditorActivity(
+                is FileNodeContent.TextContent -> megaNavigator.openTextEditorActivity(
                     context = context,
                     currentFileNode = typedFileNode,
-                    nodeSourceType = nodeSourceType ?: Constants.FILE_BROWSER_ADAPTER
+                    nodeSourceType = nodeSourceType
                 )
 
                 is FileNodeContent.AudioOrVideo -> {
                     openVideoOrAudioFile(
+                        megaNavigator = megaNavigator,
                         context = context,
                         content = content.uri,
                         fileNode = typedFileNode,
-                        snackBarHostState = snackBarHostStateWrapper,
+                        showSnackbar = showSnackbar,
                         sortOrder = sortOrder,
-                        viewType = nodeSourceType ?: Constants.FILE_BROWSER_ADAPTER,
+                        viewType = nodeSourceType,
                         coroutineScope = coroutineScope,
-                        enableAddToAlbum = nodeSourceType in listOf(
-                            Constants.FILE_BROWSER_ADAPTER,
-                            Constants.OUTGOING_SHARES_ADAPTER,
-                        )
                     )
                 }
 
                 is FileNodeContent.UrlContent -> {
                     openUrlFile(
-                        context = context, content = content, snackBarHostState = snackBarHostStateWrapper
+                        context = context,
+                        content = content,
+                        showSnackbar = showSnackbar
                     )
                 }
 
                 is FileNodeContent.Other -> {
                     content.localFile?.let {
                         openOtherFile(
+                            megaNavigator = megaNavigator,
                             file = it,
                             typedFileNode = typedFileNode,
                             isOpenWith = false,
                             fileTypeInfo = typedFileNode.type,
                             nodeActionsViewModel = nodeActionsViewModel,
-                            snackBarHostState = snackBarHostStateWrapper,
+                            showSnackbar = showSnackbar,
                             coroutineScope = coroutineScope,
                             context = context,
                         )
                     } ?: run {
-                        nodeActionsViewModel.downloadNodeForPreview(typedFileNode)
+                        onDownloadEvent(
+                            TransferTriggerEvent.StartDownloadForPreview(
+                                node = typedFileNode,
+                                isOpenWith = false
+                            )
+                        )
                     }
                 }
 
@@ -172,18 +178,24 @@ fun HandleFileAction(
     snackBarHostState: SnackbarHostStateWrapper?,
     onActionHandled: () -> Unit,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    nodeActionsViewModel: NodeActionsViewModel = hiltViewModel(),
 ) {
+    val nodeActionsViewModel: NodeActionHandlerViewModel = hiltViewModel()
     val context = LocalContext.current
+    val megaNavigator = remember { context.megaNavigator }
 
     LaunchedEffect(file) {
         openOtherFile(
+            megaNavigator = megaNavigator,
             file = file,
             typedFileNode = null,
             isOpenWith = isOpenWith,
             fileTypeInfo = nodeActionsViewModel.getTypeInfo(file),
             nodeActionsViewModel = nodeActionsViewModel,
-            snackBarHostState = snackBarHostState,
+            showSnackbar = { message ->
+                coroutineScope.launch {
+                    snackBarHostState?.showAutoDurationSnackbar(message)
+                }
+            },
             coroutineScope = coroutineScope,
             context = context,
         )
@@ -192,167 +204,68 @@ fun HandleFileAction(
     }
 }
 
-private fun openTextEditorActivity(
-    context: Context,
-    currentFileNode: TypedFileNode,
-    nodeSourceType: Int,
-) {
-    val textFileIntent = Intent(context, TextEditorActivity::class.java)
-    textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
-        .putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
-        .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, nodeSourceType)
-    context.startActivity(textFileIntent)
-}
 
-private fun openPdfActivity(
-    context: Context,
-    content: NodeContentUri,
-    type: Int?,
-    currentFileNode: TypedFileNode,
-    nodeActionsViewModel: NodeActionsViewModel,
-) {
-    val pdfIntent = Intent(context, PdfViewerActivity::class.java)
-    val mimeType = currentFileNode.type.mimeType
-    pdfIntent.apply {
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-        putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
-        putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
-        putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, type)
-        putExtra(Constants.INTENT_EXTRA_KEY_APP, true)
-    }
-    nodeActionsViewModel.applyNodeContentUri(
-        intent = pdfIntent,
-        content = content,
-        mimeType = mimeType,
-    )
-    context.startActivity(pdfIntent)
-}
-
-private fun openImageViewerActivity(
-    context: Context,
-    currentFileNode: TypedFileNode,
-    nodeSourceType: Int?,
-) {
-    val currentFileNodeParentId = currentFileNode.parentId.longValue
-
-    val (imageSource, menuOptionsSource, paramKey) = when (nodeSourceType) {
-        Constants.FILE_BROWSER_ADAPTER -> Triple(
-            ImagePreviewFetcherSource.CLOUD_DRIVE,
-            ImagePreviewMenuSource.CLOUD_DRIVE,
-            CloudDriveImageNodeFetcher.PARENT_ID
-        )
-
-        Constants.RUBBISH_BIN_ADAPTER -> Triple(
-            ImagePreviewFetcherSource.RUBBISH_BIN,
-            ImagePreviewMenuSource.RUBBISH_BIN,
-            RubbishBinImageNodeFetcher.PARENT_ID
-        )
-
-        Constants.INCOMING_SHARES_ADAPTER,
-        Constants.OUTGOING_SHARES_ADAPTER,
-            -> Triple(
-            ImagePreviewFetcherSource.SHARED_ITEMS,
-            ImagePreviewMenuSource.SHARED_ITEMS,
-            SharedItemsImageNodeFetcher.PARENT_ID
-        )
-
-        Constants.LINKS_ADAPTER -> Triple(
-            ImagePreviewFetcherSource.SHARED_ITEMS,
-            ImagePreviewMenuSource.LINKS,
-            SharedItemsImageNodeFetcher.PARENT_ID
-        )
-
-        Constants.BACKUPS_ADAPTER -> Triple(
-            ImagePreviewFetcherSource.CLOUD_DRIVE,
-            ImagePreviewMenuSource.CLOUD_DRIVE,
-            CloudDriveImageNodeFetcher.PARENT_ID
-        )
-
-        else -> {
-            Timber.e("Unknown node source type: $nodeSourceType")
-            return
-        }
-    }
-
-    val intent = ImagePreviewActivity.createIntent(
-        context = context,
-        imageSource = imageSource,
-        menuOptionsSource = menuOptionsSource,
-        anchorImageNodeId = currentFileNode.id,
-        params = mapOf(paramKey to currentFileNodeParentId),
-        enableAddToAlbum = nodeSourceType in listOf(
-            Constants.FILE_BROWSER_ADAPTER,
-            Constants.OUTGOING_SHARES_ADAPTER,
-        )
-    )
-
-    context.startActivity(intent)
-}
-
-private suspend fun openVideoOrAudioFile(
+private fun openVideoOrAudioFile(
+    megaNavigator: MegaNavigator,
     context: Context,
     fileNode: TypedFileNode,
     content: NodeContentUri,
-    snackBarHostState: SnackbarHostStateWrapper?,
+    showSnackbar: (String) -> Unit,
     sortOrder: SortOrder,
-    viewType: Int,
+    viewType: Int?,
     coroutineScope: CoroutineScope,
-    enableAddToAlbum: Boolean,
 ) {
     coroutineScope.launch {
         runCatching {
-            EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
-                .megaNavigator().openMediaPlayerActivityByFileNode(
-                    context = context,
-                    contentUri = content,
-                    fileNode = fileNode,
-                    sortOrder = sortOrder,
-                    viewType = viewType,
-                    isFolderLink = false,
-                    enableAddToAlbum = enableAddToAlbum,
-                )
+            megaNavigator.openMediaPlayerActivityByFileNode(
+                context = context,
+                contentUri = content,
+                fileNode = fileNode,
+                sortOrder = sortOrder,
+                viewType = viewType,
+                isFolderLink = false,
+            )
         }.onFailure {
-            snackBarHostState?.showAutoDurationSnackbar(context.getString(R.string.intent_not_available))
+            showSnackbar(context.getString(R.string.intent_not_available))
         }
     }
 }
 
-private suspend fun openUrlFile(
+private fun openUrlFile(
     context: Context,
     content: FileNodeContent.UrlContent,
-    snackBarHostState: SnackbarHostStateWrapper?,
+    showSnackbar: (String) -> Unit,
 ) {
     content.path?.let {
         val intent = Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(it)
+            data = it.toUri()
         }
         safeLaunchActivity(
             context = context,
             intent = intent,
-            snackBarHostState = snackBarHostState
+            showSnackbar = showSnackbar
         )
     } ?: run {
-        snackBarHostState?.showAutoDurationSnackbar(message = context.getString(R.string.general_text_error))
+        showSnackbar(context.getString(R.string.general_text_error))
     }
 }
 
-private suspend fun safeLaunchActivity(
+private fun safeLaunchActivity(
     context: Context,
     intent: Intent,
-    snackBarHostState: SnackbarHostStateWrapper?,
+    showSnackbar: (String) -> Unit,
 ) {
     runCatching {
         context.startActivity(intent)
     }.onFailure {
         Timber.e(it)
-        snackBarHostState?.showAutoDurationSnackbar(message = context.getString(R.string.intent_not_available))
+        showSnackbar(context.getString(R.string.intent_not_available))
     }
 }
 
-private suspend fun Intent.openShareIntent(
+private fun Intent.openShareIntent(
     context: Context,
-    snackBarHostState: SnackbarHostStateWrapper?,
+    showSnackbar: (String) -> Unit,
 ) {
     if (resolveActivity(context.packageManager) == null) {
         action = Intent.ACTION_SEND
@@ -360,26 +273,28 @@ private suspend fun Intent.openShareIntent(
     safeLaunchActivity(
         context = context,
         intent = this,
-        snackBarHostState = snackBarHostState
+        showSnackbar = showSnackbar
     )
 }
 
-private suspend fun openOtherFile(
+private fun openOtherFile(
+    megaNavigator: MegaNavigator,
     file: File,
     typedFileNode: TypedFileNode?,
     isOpenWith: Boolean,
     fileTypeInfo: FileTypeInfo,
-    nodeActionsViewModel: NodeActionsViewModel,
-    snackBarHostState: SnackbarHostStateWrapper?,
+    nodeActionsViewModel: NodeActionHandlerViewModel,
+    showSnackbar: (String) -> Unit,
     coroutineScope: CoroutineScope,
     context: Context,
 ) {
     if (isOpenWith.not() && fileTypeInfo is ZipFileTypeInfo) {
         openZipFile(
+            megaNavigator = megaNavigator,
             context = context,
             localFile = file,
             fileNode = typedFileNode,
-            snackBarHostState = snackBarHostState,
+            showSnackbar = showSnackbar,
             coroutineScope = coroutineScope
         )
     } else {
@@ -387,40 +302,38 @@ private suspend fun openOtherFile(
             context = context,
             localFile = file,
             mimeType = fileTypeInfo.mimeType,
-            snackBarHostState = snackBarHostState,
+            showSnackbar = showSnackbar,
             nodeActionsViewModel = nodeActionsViewModel
         )
     }
 }
 
 private fun openZipFile(
+    megaNavigator: MegaNavigator,
     context: Context,
     localFile: File,
     fileNode: TypedFileNode?,
-    snackBarHostState: SnackbarHostStateWrapper?,
+    showSnackbar: (String) -> Unit,
     coroutineScope: CoroutineScope,
 ) {
     Timber.d("The file is zip, open in-app.")
-    EntryPointAccessors.fromApplication(
-        context,
-        MegaNavigatorEntryPoint::class.java
-    ).megaNavigator().openZipBrowserActivity(
+    megaNavigator.openZipBrowserActivity(
         context = context,
         zipFilePath = localFile.absolutePath,
         nodeHandle = fileNode?.id?.longValue,
     ) {
         coroutineScope.launch {
-            snackBarHostState?.showAutoDurationSnackbar(context.getString(R.string.message_zip_format_error))
+            showSnackbar(context.getString(R.string.message_zip_format_error))
         }
     }
 }
 
-private suspend fun handleOtherFiles(
+private fun handleOtherFiles(
     context: Context,
     localFile: File,
     mimeType: String,
-    snackBarHostState: SnackbarHostStateWrapper?,
-    nodeActionsViewModel: NodeActionsViewModel,
+    showSnackbar: (String) -> Unit,
+    nodeActionsViewModel: NodeActionHandlerViewModel,
 ) {
     Intent(Intent.ACTION_VIEW).apply {
         nodeActionsViewModel.applyNodeContentUri(
@@ -433,7 +346,7 @@ private suspend fun handleOtherFiles(
             context.startActivity(this)
         }.onFailure { error ->
             Timber.e(error)
-            openShareIntent(context = context, snackBarHostState = snackBarHostState)
+            openShareIntent(context = context, showSnackbar = showSnackbar)
         }
     }
 }

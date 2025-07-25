@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,7 +46,6 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
-import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.shares.SharesActionListener
@@ -84,7 +82,6 @@ import javax.inject.Inject
 class LinksComposeFragment : Fragment() {
 
     private val viewModel: LinksViewModel by activityViewModels()
-    private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     /**
@@ -141,7 +138,6 @@ class LinksComposeFragment : Fragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDarkMode = themeMode.isDarkMode()
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
-                val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
                 val snackbarHostState = remember { SnackbarHostState() }
                 val coroutineScope = rememberCoroutineScope()
                 var currentFileNode: TypedFileNode? by remember {
@@ -218,12 +214,6 @@ class LinksComposeFragment : Fragment() {
                             )
                         },
                     )
-                    EventEffect(
-                        event = nodeActionState.downloadEvent,
-                        onConsumed = nodeActionsViewModel::markDownloadEventConsumed
-                    ) {
-                        viewModel.onDownloadFileTriggered(it)
-                    }
                 }
 
                 performItemOptionsClick(uiState.optionsItemInfo)
@@ -240,7 +230,7 @@ class LinksComposeFragment : Fragment() {
                         onActionHandled = {
                             currentFileNode = null
                         },
-                        nodeActionsViewModel = nodeActionsViewModel,
+                        onDownloadEvent = viewModel::onDownloadFileTriggered,
                         coroutineScope = coroutineScope
                     )
                 } ?: run {

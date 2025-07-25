@@ -199,7 +199,7 @@ class RubbishBinComposeFragment : Fragment() {
                         onActionHandled = {
                             clickedFile = null
                         },
-                        nodeActionsViewModel = nodeActionsViewModel,
+                        onDownloadEvent = nodeActionsViewModel::triggerDownloadEvent,
                         coroutineScope = coroutineScope
                     )
                 }

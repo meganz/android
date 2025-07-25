@@ -19,7 +19,6 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.attachmen
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.model.NodeActionState
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -36,6 +35,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -359,6 +359,17 @@ class NodeActionsViewModel @Inject constructor(
                     )
                 )
             )
+        }
+    }
+
+    /**
+     * Trigger download event
+     */
+    fun triggerDownloadEvent(
+        event: TransferTriggerEvent,
+    ) {
+        _state.update {
+            it.copy(downloadEvent = triggered(event))
         }
     }
 

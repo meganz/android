@@ -42,7 +42,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.crashlytics.ktx.crashlytics
@@ -77,7 +76,6 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
-import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
@@ -175,7 +173,6 @@ class CloudDriveSyncsFragment : Fragment() {
     @Inject
     lateinit var appNavigator: MegaNavigator
 
-    private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
     private val transfersManagementViewModel: TransfersManagementViewModel by activityViewModels()
@@ -246,7 +243,6 @@ class CloudDriveSyncsFragment : Fragment() {
                 val themeMode by monitorThemeModeUseCase()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by fileBrowserViewModel.state.collectAsStateWithLifecycle()
-                val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
                 val syncNotificationState by syncIssueNotificationViewModel.state.collectAsStateWithLifecycle()
                 val scaffoldState = rememberScaffoldState()
                 val snackbarHostState = scaffoldState.snackbarHostState
@@ -389,12 +385,6 @@ class CloudDriveSyncsFragment : Fragment() {
                                 )
                             },
                         )
-                        EventEffect(
-                            event = nodeActionState.downloadEvent,
-                            onConsumed = nodeActionsViewModel::markDownloadEventConsumed
-                        ) {
-                            fileBrowserViewModel.onDownloadFileTriggered(it)
-                        }
                     }
                 }
                 performItemOptionsClick(uiState.optionsItemInfo)
@@ -423,7 +413,7 @@ class CloudDriveSyncsFragment : Fragment() {
                         onActionHandled = {
                             clickedFile = null
                         },
-                        nodeActionsViewModel = nodeActionsViewModel,
+                        onDownloadEvent = fileBrowserViewModel::onDownloadFileTriggered,
                         coroutineScope = coroutineScope
                     )
                 }

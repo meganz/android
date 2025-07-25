@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,7 +47,6 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
-import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
@@ -133,7 +131,6 @@ class IncomingSharesComposeFragment : Fragment() {
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
     private val viewModel: IncomingSharesComposeViewModel by activityViewModels()
-    private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     /**
@@ -180,7 +177,6 @@ class IncomingSharesComposeFragment : Fragment() {
                 val themeMode by monitorThemeModeUseCase()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
-                val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
                 val snackbarHostState = remember { SnackbarHostState() }
                 val coroutineScope = rememberCoroutineScope()
                 var clickedFile: TypedFileNode? by remember {
@@ -262,12 +258,6 @@ class IncomingSharesComposeFragment : Fragment() {
                             )
                         },
                     )
-                    EventEffect(
-                        event = nodeActionState.downloadEvent,
-                        onConsumed = nodeActionsViewModel::markDownloadEventConsumed
-                    ) {
-                        viewModel.onDownloadFileTriggered(it)
-                    }
                 }
                 LaunchedEffect(uiState.isInRootLevel) {
                     if (!uiState.isInRootLevel) {
@@ -297,7 +287,7 @@ class IncomingSharesComposeFragment : Fragment() {
                         onActionHandled = {
                             clickedFile = null
                         },
-                        nodeActionsViewModel = nodeActionsViewModel,
+                        onDownloadEvent = viewModel::onDownloadFileTriggered,
                         coroutineScope = coroutineScope
                     )
                 }
