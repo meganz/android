@@ -27,7 +27,7 @@ import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
-import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
@@ -86,6 +86,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
 import java.io.File
@@ -905,7 +906,7 @@ class FolderLinkViewModel @Inject constructor(
     private suspend fun startMegaApiFolderHttpServer(intent: Intent): Intent {
         if (megaApiFolderHttpServerIsRunningUseCase() == 0) {
             megaApiFolderHttpServerStartUseCase()
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
+            intent.putExtra(ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
         }
         return intent
     }
@@ -917,7 +918,7 @@ class FolderLinkViewModel @Inject constructor(
     private suspend fun startMegaApiHttpServer(intent: Intent): Intent {
         if (httpServerIsRunning() == 0) {
             httpServerStart()
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
+            intent.putExtra(ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
         }
         return intent
     }

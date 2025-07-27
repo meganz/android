@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.ImportTypedNodesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject

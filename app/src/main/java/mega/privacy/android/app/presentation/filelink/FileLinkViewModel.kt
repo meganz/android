@@ -21,7 +21,6 @@ import mega.privacy.android.app.presentation.filelink.model.FileLinkJobInProgres
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
-import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
@@ -52,6 +51,8 @@ import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameC
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
 import java.io.File
@@ -453,7 +454,7 @@ class FileLinkViewModel @Inject constructor(
     private suspend fun startHttpServer(intent: Intent): Intent {
         if (httpServerIsRunning() == 0) {
             httpServerStart()
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
+            intent.putExtra(ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
         }
         return intent
     }

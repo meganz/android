@@ -59,6 +59,7 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartUpload
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -637,7 +638,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                         if (megaApi.httpServerIsRunning() == 0) {
                             megaApi.httpServerStart()
                             pdfIntent.putExtra(
-                                Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER,
+                                ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER,
                                 true
                             )
                         }

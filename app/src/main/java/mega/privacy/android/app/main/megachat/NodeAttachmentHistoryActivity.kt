@@ -78,6 +78,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificati
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -616,7 +617,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                                     if (megaApi.httpServerIsRunning() == 0) {
                                         megaApi.httpServerStart()
                                         pdfIntent.putExtra(
-                                            Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER,
+                                            ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER,
                                             true
                                         )
                                     } else {

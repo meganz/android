@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":icon-pack"))
     implementation(project(":shared:resources"))
     implementation(project(":core:formatter"))
+    implementation(project(":navigation"))
 
     //core components
     implementation(lib.mega.core.ui)

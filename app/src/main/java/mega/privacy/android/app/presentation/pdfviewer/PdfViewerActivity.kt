@@ -89,6 +89,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentPreviewHideNodeMenuItemEvent
@@ -1743,7 +1744,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         Timber.d("onDestroy()")
         binding.pdfView.recycle()
         val needStopHttpServer =
-            intent.getBooleanExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false)
+            intent.getBooleanExtra(ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false)
         applicationScope.launch {
             megaApi.removeTransferListener(this@PdfViewerActivity)
             megaApi.removeGlobalListener(this@PdfViewerActivity)

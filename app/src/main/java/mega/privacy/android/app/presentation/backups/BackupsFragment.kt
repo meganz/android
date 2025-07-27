@@ -68,6 +68,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -638,7 +639,7 @@ class BackupsFragment : RotatableFragment() {
             } else {
                 if (megaApi.httpServerIsRunning() == 0) {
                     megaApi.httpServerStart()
-                    pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
+                    pdfIntent.putExtra(ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
                 }
                 val url = megaApi.httpServerGetLocalLink(node)
                 pdfIntent.setDataAndType(Uri.parse(url), mimeType)

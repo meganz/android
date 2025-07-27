@@ -22,7 +22,6 @@ import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.documentsection.model.DocumentSectionUiState
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntityMapper
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
@@ -47,6 +46,7 @@ import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseC
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.navigation.ExtraConstant
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -257,7 +257,7 @@ class DocumentSectionViewModel @Inject constructor(
     ): Intent {
         if (megaApiHttpServerIsRunningUseCase() == 0) {
             megaApiHttpServerStartUseCase()
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
+            intent.putExtra(ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
         }
 
         getFileUrlByNodeHandleUseCase(handle)?.let { url ->

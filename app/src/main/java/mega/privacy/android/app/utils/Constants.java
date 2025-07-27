@@ -199,7 +199,6 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_OFFLINE_ADAPTER = "offline_adapter";
     public static final String INTENT_EXTRA_KEY_PARENT_HANDLE = "PARENT_HANDLE";
     public static final String INTENT_EXTRA_KEY_FRAGMENT_HANDLE = "fragmentHandle";
-    public static final String INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER = "NEED_STOP_HTTP_SERVER";
     public static final String INTENT_EXTRA_KEY_FIRST_LEVEL = "firstLevel";
     public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
     public static final String INTENT_EXTRA_KEY_MAX_USER = "max_user";
