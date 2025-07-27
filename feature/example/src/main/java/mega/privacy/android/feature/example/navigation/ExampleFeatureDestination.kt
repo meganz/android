@@ -12,7 +12,7 @@ class ExampleFeatureDestination : FeatureDestination {
         { navigationHandler ->
             exampleSecondaryScreen(navigationHandler::back)
             exampleLegacyScreen(navigationHandler::back)
-            exampleLegacyResultScreen(navigationHandler::returnResult)
+            exampleLegacyResultScreen(navigationHandler::returnResult, navigationHandler::back)
         }
 
 }

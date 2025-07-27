@@ -7,7 +7,10 @@ import androidx.navigation.compose.composable
 import mega.privacy.android.navigation.destination.ExampleLegacyResultScreen
 
 
-fun NavGraphBuilder.exampleLegacyResultScreen(returnResult: (String, Int?) -> Unit) {
+fun NavGraphBuilder.exampleLegacyResultScreen(
+    returnResult: (String, Int?) -> Unit,
+    removeDestination: () -> Unit,
+) {
     composable<ExampleLegacyResultScreen> {
 
         val legacyActivityLauncher = rememberLauncherForActivityResult(
@@ -18,6 +21,8 @@ fun NavGraphBuilder.exampleLegacyResultScreen(returnResult: (String, Int?) -> Un
 
         LaunchedEffect(Unit) {
             legacyActivityLauncher.launch(Unit)
+            // Immediately pop this destination from the back stack
+            removeDestination()
         }
 
     }

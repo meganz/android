@@ -13,7 +13,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -72,7 +72,7 @@ fun MainNavigationScaffold(
 
     // Order items based on preferredSlot
     val orderedItems = orderNavigationItems(items = mainNavItems, availableSlots = availableSlots)
-    var isNavigationVisible by remember { mutableStateOf(true) }
+    var isNavigationVisible by rememberSaveable { mutableStateOf(true) }
     val navUiController = NavigationUiController {
         isNavigationVisible = it
     }

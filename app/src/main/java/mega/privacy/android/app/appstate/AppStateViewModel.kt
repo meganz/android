@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -87,12 +88,13 @@ class AppStateViewModel @Inject constructor(
             trackPresence()
         }.catch {
             Timber.e(it, "Error while building app state")
-        }.onEach {
-            Timber.d("AppState emitted: $it")
-        }.asUiStateFlow(
-            scope = viewModelScope,
-            initialValue = AppState.Loading
-        )
+        }.distinctUntilChanged()
+            .onEach {
+                Timber.d("AppState emitted: $it")
+            }.asUiStateFlow(
+                scope = viewModelScope,
+                initialValue = AppState.Loading
+            )
     }
 
     private fun filteredMainNavItemsFlow(): SharedFlow<Set<@JvmSuppressWildcards MainNavItem>> =

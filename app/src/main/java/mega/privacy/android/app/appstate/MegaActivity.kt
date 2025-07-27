@@ -10,6 +10,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -63,10 +65,20 @@ class MegaActivity : ComponentActivity() {
                 when (val currentState = state.value) {
                     is AuthState.Loading -> {}
                     is AuthState.LoggedIn -> {
-                        navController.popBackStack()
-                        navController.navigate(
-                            route = LoggedInScreens(session = currentState.session),
-                        )
+                        val previousDestination = navController.previousBackStackEntry?.destination
+                        if (previousDestination?.hierarchy?.any { it.hasRoute(LoginGraph::class) } == true) {
+                            navController.popBackStack()
+                        }
+                        val currentBackStackEntry = navController.currentBackStackEntry
+                        if (currentBackStackEntry?.destination?.hierarchy?.any {
+                                it.hasRoute(
+                                    LoggedInScreens::class
+                                )
+                            } == true) {
+                            // Already logged in, no need to navigate again
+                            return@LaunchedEffect
+                        }
+                        navController.navigate(route = LoggedInScreens(session = currentState.session))
                     }
 
                     is AuthState.RequireLogin -> {

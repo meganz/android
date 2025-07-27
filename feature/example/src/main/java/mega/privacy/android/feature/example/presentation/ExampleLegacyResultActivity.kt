@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import mega.android.core.ui.components.MegaScaffold
@@ -34,7 +35,7 @@ class ExampleLegacyResultActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        val result = Random.nextInt(1, 101)
+                        val result = rememberSaveable { Random.nextInt(1, 101) }
                         MegaText(
                             text = "This is a fake legacy screen that returns a result.",
                             textColor = TextColor.Primary

@@ -59,12 +59,13 @@ class AuthStateViewModel @Inject constructor(
             }
         }.catch {
             Timber.e(it, "Error while building auth state")
-        }.onEach {
-            Timber.d("AuthState emitted: $it")
-        }.asUiStateFlow(
-            scope = viewModelScope,
-            initialValue = AuthState.Loading(ThemeMode.System)
-        )
+        }.distinctUntilChanged()
+            .onEach {
+                Timber.d("AuthState emitted: $it")
+            }.asUiStateFlow(
+                scope = viewModelScope,
+                initialValue = AuthState.Loading(ThemeMode.System)
+            )
     }
 
     private fun getStateValues(): Flow<AuthState> {
