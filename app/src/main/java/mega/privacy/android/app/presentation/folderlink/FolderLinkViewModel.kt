@@ -450,6 +450,7 @@ class FolderLinkViewModel @Inject constructor(
             runCatching { fetchFolderNodesUseCase(folderSubHandle) }
                 .onSuccess { result ->
                     val hasMediaItem = containsMediaItemUseCase(result.childrenNodes)
+                    val title = result.parentNode?.name ?: result.rootNode?.name ?: ""
                     _state.update {
                         it.copy(
                             isNodesFetched = true,
@@ -463,7 +464,7 @@ class FolderLinkViewModel @Inject constructor(
                             hasMediaItem = hasMediaItem,
                             rootNode = result.rootNode,
                             parentNode = result.parentNode,
-                            title = result.rootNode?.name ?: ""
+                            title = title
                         )
                     }
 
