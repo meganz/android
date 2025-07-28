@@ -214,17 +214,12 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_CONTACTS_SELECTED = "INTENT_EXTRA_KEY_CONTACTS_SELECTED";
     public static final String INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT = "INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT";
 
-    public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
-    public static final int RUBBISH_BIN_ADAPTER = 2002;
     public static final int OFFLINE_ADAPTER = 2004;
     public static final int FOLDER_LINK_ADAPTER = 2005;
     public static final int SEARCH_ADAPTER = 2006;
     public static final int PHOTO_SYNC_ADAPTER = 2007;
     public static final int ZIP_ADAPTER = 2008;
-    public static final int OUTGOING_SHARES_ADAPTER = 2009;
-    public static final int INCOMING_SHARES_ADAPTER = 2010;
-    public static final int BACKUPS_ADAPTER = 2011;
     public static final int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
     public static final int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
     public static final int SEARCH_BY_ADAPTER = 2018;
@@ -232,15 +227,11 @@ public class Constants {
     public static final int FROM_CHAT = 2020;
     public static final int CONTACT_SHARED_FOLDER_ADAPTER = 2021;
     public static final int RECENTS_ADAPTER = 2024;
-    public static final int LINKS_ADAPTER = 2025;
-    public static final int AUDIO_BROWSE_ADAPTER = 2028;
-    public static final int DOCUMENTS_BROWSE_ADAPTER = 2030;
     public static final int DOCUMENTS_SEARCH_ADAPTER = 2031;
     public static final int VIDEO_BROWSE_ADAPTER = 2032;
     public static final int RECENTS_BUCKET_ADAPTER = 2034;
     public static final int VERSIONS_ADAPTER = 2035;
     public static final int FROM_IMAGE_VIEWER = 2036;
-    public static final int FAVOURITES_ADAPTER = 2039;
     public static final int FROM_MEDIA_DISCOVERY = 2040;
     public static final int FROM_ALBUM_SHARING = 2041;
     public static final int VIEWER_FROM_RECETS_BUCKET = 8;

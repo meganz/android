@@ -45,6 +45,7 @@ import mega.privacy.android.app.presentation.settings.model.StorageTargetPrefere
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -193,7 +194,7 @@ class RubbishBinComposeFragment : Fragment() {
                 clickedFile?.let {
                     HandleNodeAction(
                         typedFileNode = it,
-                        nodeSourceType = Constants.RUBBISH_BIN_ADAPTER,
+                        nodeSourceType = NodeSourceTypeInt.RUBBISH_BIN_ADAPTER,
                         sortOrder = uiState.sortOrder,
                         snackBarHostState = snackbarHostState,
                         onActionHandled = {

@@ -77,6 +77,7 @@ import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
 import mega.privacy.android.navigation.MegaNavigator
@@ -236,7 +237,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             contentUri = contentUri,
             fileTypeInfo = fileNode.type,
             sortOrder = sortOrder,
-            viewType = viewType ?: Constants.FILE_BROWSER_ADAPTER,
+            viewType = viewType ?: NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
             name = fileNode.name,
             handle = fileNode.id.longValue,
             parentHandle = fileNode.parentId.longValue,
@@ -248,8 +249,8 @@ internal class MegaNavigatorImpl @Inject constructor(
             collectionId = collectionId,
             enableAddToAlbum = enableAddToAlbum ?: run {
                 viewType in listOf(
-                    Constants.FILE_BROWSER_ADAPTER,
-                    Constants.OUTGOING_SHARES_ADAPTER,
+                    NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                    NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
                 )
             },
         )
@@ -555,33 +556,33 @@ internal class MegaNavigatorImpl @Inject constructor(
         val currentFileNodeParentId = currentFileNode.parentId.longValue
 
         val (imageSource, menuOptionsSource, paramKey) = when (nodeSourceType) {
-            Constants.FILE_BROWSER_ADAPTER -> Triple(
+            NodeSourceTypeInt.FILE_BROWSER_ADAPTER -> Triple(
                 ImagePreviewFetcherSource.CLOUD_DRIVE,
                 ImagePreviewMenuSource.CLOUD_DRIVE,
                 CloudDriveImageNodeFetcher.PARENT_ID
             )
 
-            Constants.RUBBISH_BIN_ADAPTER -> Triple(
+            NodeSourceTypeInt.RUBBISH_BIN_ADAPTER -> Triple(
                 ImagePreviewFetcherSource.RUBBISH_BIN,
                 ImagePreviewMenuSource.RUBBISH_BIN,
                 RubbishBinImageNodeFetcher.PARENT_ID
             )
 
-            Constants.INCOMING_SHARES_ADAPTER,
-            Constants.OUTGOING_SHARES_ADAPTER,
+            NodeSourceTypeInt.INCOMING_SHARES_ADAPTER,
+            NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
                 -> Triple(
                 ImagePreviewFetcherSource.SHARED_ITEMS,
                 ImagePreviewMenuSource.SHARED_ITEMS,
                 SharedItemsImageNodeFetcher.PARENT_ID
             )
 
-            Constants.LINKS_ADAPTER -> Triple(
+            NodeSourceTypeInt.LINKS_ADAPTER -> Triple(
                 ImagePreviewFetcherSource.SHARED_ITEMS,
                 ImagePreviewMenuSource.LINKS,
                 SharedItemsImageNodeFetcher.PARENT_ID
             )
 
-            Constants.BACKUPS_ADAPTER -> Triple(
+            NodeSourceTypeInt.BACKUPS_ADAPTER -> Triple(
                 ImagePreviewFetcherSource.CLOUD_DRIVE,
                 ImagePreviewMenuSource.CLOUD_DRIVE,
                 CloudDriveImageNodeFetcher.PARENT_ID
@@ -600,8 +601,8 @@ internal class MegaNavigatorImpl @Inject constructor(
             anchorImageNodeId = currentFileNode.id,
             params = mapOf(paramKey to currentFileNodeParentId),
             enableAddToAlbum = nodeSourceType in listOf(
-                Constants.FILE_BROWSER_ADAPTER,
-                Constants.OUTGOING_SHARES_ADAPTER,
+                NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
             )
         )
 
@@ -618,7 +619,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             .putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
             .putExtra(
                 Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                nodeSourceType ?: Constants.FILE_BROWSER_ADAPTER
+                nodeSourceType ?: NodeSourceTypeInt.FILE_BROWSER_ADAPTER
             )
         context.startActivity(textFileIntent)
     }

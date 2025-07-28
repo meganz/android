@@ -66,6 +66,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -288,7 +289,7 @@ class OutgoingSharesComposeFragment : Fragment() {
                 clickedFile?.let {
                     HandleNodeAction(
                         typedFileNode = it,
-                        nodeSourceType = Constants.OUTGOING_SHARES_ADAPTER,
+                        nodeSourceType = NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
                         sortOrder = uiState.sortOrder,
                         snackBarHostState = snackbarHostState,
                         onActionHandled = {

@@ -1,7 +1,8 @@
 package mega.privacy.android.app.presentation.search.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -24,16 +25,16 @@ class NodeSourceTypeToViewTypeMapperTest {
     }
 
     private fun provideParam() = Stream.of(
-        Arguments.of(NodeSourceType.HOME, Constants.FILE_BROWSER_ADAPTER),
-        Arguments.of(NodeSourceType.CLOUD_DRIVE, Constants.FILE_BROWSER_ADAPTER),
-        Arguments.of(NodeSourceType.BACKUPS, Constants.BACKUPS_ADAPTER),
-        Arguments.of(NodeSourceType.LINKS, Constants.LINKS_ADAPTER),
-        Arguments.of(NodeSourceType.OUTGOING_SHARES, Constants.OUTGOING_SHARES_ADAPTER),
-        Arguments.of(NodeSourceType.INCOMING_SHARES, Constants.INCOMING_SHARES_ADAPTER),
-        Arguments.of(NodeSourceType.RUBBISH_BIN, Constants.RUBBISH_BIN_ADAPTER),
-        Arguments.of(NodeSourceType.FAVOURITES, Constants.FAVOURITES_ADAPTER),
-        Arguments.of(NodeSourceType.DOCUMENTS, Constants.DOCUMENTS_BROWSE_ADAPTER),
-        Arguments.of(NodeSourceType.AUDIO, Constants.AUDIO_BROWSE_ADAPTER),
+        Arguments.of(NodeSourceType.HOME, NodeSourceTypeInt.FILE_BROWSER_ADAPTER),
+        Arguments.of(NodeSourceType.CLOUD_DRIVE, NodeSourceTypeInt.FILE_BROWSER_ADAPTER),
+        Arguments.of(NodeSourceType.BACKUPS, NodeSourceTypeInt.BACKUPS_ADAPTER),
+        Arguments.of(NodeSourceType.LINKS, NodeSourceTypeInt.LINKS_ADAPTER),
+        Arguments.of(NodeSourceType.OUTGOING_SHARES, NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER),
+        Arguments.of(NodeSourceType.INCOMING_SHARES, NodeSourceTypeInt.INCOMING_SHARES_ADAPTER),
+        Arguments.of(NodeSourceType.RUBBISH_BIN, NodeSourceTypeInt.RUBBISH_BIN_ADAPTER),
+        Arguments.of(NodeSourceType.FAVOURITES, NodeSourceTypeInt.FAVOURITES_ADAPTER),
+        Arguments.of(NodeSourceType.DOCUMENTS, NodeSourceTypeInt.DOCUMENTS_BROWSE_ADAPTER),
+        Arguments.of(NodeSourceType.AUDIO, NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER),
         Arguments.of(NodeSourceType.OTHER, null),
     )
 }

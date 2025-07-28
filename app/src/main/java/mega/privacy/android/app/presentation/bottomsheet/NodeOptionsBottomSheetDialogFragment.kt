@@ -89,6 +89,7 @@ import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.app.utils.wrapper.LegacyNodeWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
@@ -1505,7 +1506,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (drawerItem === DrawerItem.SHARED_ITEMS && managerActivity?.tabItemShares === SharesTab.OUTGOING_TAB) {
             fileInfoIntent.putExtra(
                 Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                Constants.OUTGOING_SHARES_ADAPTER,
+                NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
             )
         }
 
@@ -1686,19 +1687,19 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private val adapterType: Int
         get() = when (mode) {
-            CLOUD_DRIVE_MODE -> Constants.FILE_BROWSER_ADAPTER
-            RUBBISH_BIN_MODE -> Constants.RUBBISH_BIN_ADAPTER
-            BACKUPS_MODE -> Constants.BACKUPS_ADAPTER
+            CLOUD_DRIVE_MODE -> NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+            RUBBISH_BIN_MODE -> NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
+            BACKUPS_MODE -> NodeSourceTypeInt.BACKUPS_ADAPTER
             SHARED_ITEMS_MODE -> when ((requireActivity() as ManagerActivity).tabItemShares) {
-                SharesTab.INCOMING_TAB -> Constants.INCOMING_SHARES_ADAPTER
-                SharesTab.OUTGOING_TAB -> Constants.OUTGOING_SHARES_ADAPTER
-                SharesTab.LINKS_TAB -> Constants.LINKS_ADAPTER
+                SharesTab.INCOMING_TAB -> NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+                SharesTab.OUTGOING_TAB -> NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
+                SharesTab.LINKS_TAB -> NodeSourceTypeInt.LINKS_ADAPTER
                 else -> Constants.INVALID_VALUE
             }
 
             SEARCH_MODE -> Constants.SEARCH_ADAPTER
             RECENTS_MODE -> Constants.RECENTS_ADAPTER
-            FAVOURITES_IN_TAB_MODE, FAVOURITES_MODE -> Constants.FAVOURITES_ADAPTER
+            FAVOURITES_IN_TAB_MODE, FAVOURITES_MODE -> NodeSourceTypeInt.FAVOURITES_ADAPTER
             else -> Constants.INVALID_VALUE
         }
 

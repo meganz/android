@@ -69,6 +69,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -284,7 +285,7 @@ class FileInfoActivity : BaseActivity() {
         Timber.d("Handle of the selected node: %s", handleNode)
         adapterType = intent.getIntExtra(
             Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-            Constants.FILE_BROWSER_ADAPTER
+            NodeSourceTypeInt.FILE_BROWSER_ADAPTER
         )
         handleNode.takeIf { it >= 0 }
     } ?: run {

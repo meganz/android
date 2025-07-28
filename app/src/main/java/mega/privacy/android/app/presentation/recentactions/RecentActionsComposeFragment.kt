@@ -42,6 +42,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartT
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.ThemeMode
@@ -157,8 +158,8 @@ class RecentActionsComposeFragment : Fragment() {
                         HandleNodeAction(
                             typedFileNode = it,
                             nodeSourceType = when (parentFolderSharesType) {
-                                RecentActionsSharesType.INCOMING_SHARES -> Constants.INCOMING_SHARES_ADAPTER
-                                else -> Constants.FILE_BROWSER_ADAPTER
+                                RecentActionsSharesType.INCOMING_SHARES -> NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+                                else -> NodeSourceTypeInt.FILE_BROWSER_ADAPTER
                             },
                             snackBarHostState = snackbarHostState,
                             onActionHandled = {

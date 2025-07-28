@@ -41,7 +41,7 @@ import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActiv
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.entity.ThemeMode

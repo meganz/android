@@ -86,6 +86,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAva
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -931,7 +932,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 importMenuItem.isVisible = false
                 saveForOfflineMenuItem.isVisible = false
                 chatRemoveMenuItem.isVisible = false
-            } else if (type == Constants.RUBBISH_BIN_ADAPTER
+            } else if (type == NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
                 || megaApi.isInRubbish(megaApi.getNodeByHandle(handle))
             ) {
                 shareMenuItem.isVisible = false
@@ -1049,7 +1050,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 importMenuItem.isVisible = false
                 saveForOfflineMenuItem.isVisible = false
                 chatRemoveMenuItem.isVisible = false
-            } else if (type == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
+            } else if (type == NodeSourceTypeInt.INCOMING_SHARES_ADAPTER || fromIncoming) {
                 propertiesMenuItem.isVisible = true
                 chatMenuItem.isVisible = true
                 copyMenuItem.isVisible = true
@@ -1138,9 +1139,9 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
      */
     private fun setDefaultOptionsToolbar(menu: Menu) {
         val isInSharedItems = type in listOf(
-            Constants.INCOMING_SHARES_ADAPTER,
-            Constants.OUTGOING_SHARES_ADAPTER,
-            Constants.LINKS_ADAPTER
+            NodeSourceTypeInt.INCOMING_SHARES_ADAPTER,
+            NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
+            NodeSourceTypeInt.LINKS_ADAPTER
         )
         val downloadMenuItem = menu.findItem(R.id.pdf_viewer_download)
         val chatMenuItem = menu.findItem(R.id.pdf_viewer_chat)
@@ -1453,10 +1454,10 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 if (type == Constants.SEARCH_ADAPTER || type == Constants.RECENTS_ADAPTER) {
                     fromIncoming = nC?.nodeComesFromIncoming(node) ?: false
                 }
-                if (type == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
+                if (type == NodeSourceTypeInt.INCOMING_SHARES_ADAPTER || fromIncoming) {
                     i.putExtra("from", Constants.FROM_INCOMING_SHARES)
                     i.putExtra(Constants.INTENT_EXTRA_KEY_FIRST_LEVEL, false)
-                } else if (type == Constants.BACKUPS_ADAPTER) {
+                } else if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
                     i.putExtra("from", Constants.FROM_BACKUPS)
                 }
             }

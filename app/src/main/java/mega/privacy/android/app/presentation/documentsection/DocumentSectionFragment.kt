@@ -47,7 +47,7 @@ import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.DOCUMENTS_BROWSE_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.DOCUMENTS_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util

@@ -67,6 +67,7 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest.Companion.fromHandle
@@ -115,7 +116,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
     private var listFragment: RecyclerView? = null
     private var dbH: DatabaseHandler? = null
     private var multipleSelect = false
-    private var type = Constants.FILE_BROWSER_ADAPTER
+    private var type = NodeSourceTypeInt.FILE_BROWSER_ADAPTER
     var adapterType = 0
 
     private var isContactVerificationOn = false
@@ -179,11 +180,11 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             var orderType = sortByViewModel?.order?.cloudSortOrder
 
             // Root of incoming shares tab, display sort options OTHERS
-            if (type == Constants.INCOMING_SHARES_ADAPTER
+            if (type == NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
                 && (context as ManagerActivity).deepBrowserTreeIncoming == 0
             ) {
                 orderType = sortByViewModel?.order?.othersSortOrder
-            } else if (type == Constants.OUTGOING_SHARES_ADAPTER
+            } else if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
                 && (context as ManagerActivity).deepBrowserTreeOutgoing == 0
             ) {
                 orderType = sortByViewModel?.order?.othersSortOrder
@@ -199,7 +200,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                 binding.sortByLayout.visibility = View.VISIBLE
             }
 
-            binding.listModeSwitch.visibility = if (type == Constants.LINKS_ADAPTER)
+            binding.listModeSwitch.visibility = if (type == NodeSourceTypeInt.LINKS_ADAPTER)
                 View.GONE
             else
                 View.VISIBLE
@@ -329,7 +330,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
 
     fun hideMultipleSelect() {
         if (selectedItems.size() <= 0) {
-            if (type == Constants.BACKUPS_ADAPTER) {
+            if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
                 (fragment as BackupsFragment).hideMultipleSelect()
             } else if (type == Constants.CONTACT_FILE_ADAPTER) {
                 (fragment as ContactFileListFragment).hideMultipleSelect()
@@ -516,7 +517,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                 megaApi = ((context as Activity).application as MegaApplication).megaApiFolder
             }
 
-            Constants.BACKUPS_ADAPTER -> {
+            NodeSourceTypeInt.BACKUPS_ADAPTER -> {
                 Timber.d("onCreate BACKUPS_ADAPTER")
                 (context as ManagerActivity).setParentHandleBackups(parentHandle)
             }
@@ -766,7 +767,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             holder.imageViewIcon?.setImageResource(
                 getFolderIcon(
                     node,
-                    if (type == Constants.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
+                    if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
                 )
             )
             holder.imageViewThumb?.visibility = View.GONE
@@ -905,7 +906,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         holder.textViewFileSize?.text = ""
 
         holder.imageFavourite?.visibility =
-            if (type != Constants.INCOMING_SHARES_ADAPTER && type != Constants.FOLDER_LINK_ADAPTER && node.isFavourite) View.VISIBLE else View.GONE
+            if (type != NodeSourceTypeInt.INCOMING_SHARES_ADAPTER && type != Constants.FOLDER_LINK_ADAPTER && node.isFavourite) View.VISIBLE else View.GONE
 
         if (type != Constants.FOLDER_LINK_ADAPTER && node.label != MegaNode.NODE_LBL_UNKNOWN) {
             val drawable = getNodeLabelDrawable(node.label, holder.itemView.resources)
@@ -918,7 +919,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         holder.publicLinkImage?.visibility = View.INVISIBLE
         holder.permissionsIcon?.visibility = View.GONE
 
-        if (node.isExported && type != Constants.LINKS_ADAPTER) {
+        if (node.isExported && type != NodeSourceTypeInt.LINKS_ADAPTER) {
             //Node has public link
             holder.publicLinkImage?.visibility = View.VISIBLE
             if (node.isExpired) {
@@ -981,7 +982,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                 position,
                 getFolderIcon(
                     node,
-                    if (type == Constants.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
+                    if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
                 )
             )
             if (isMultipleSelect) {
@@ -1010,7 +1011,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                 } else {
                     holder.permissionsIcon?.visibility = View.GONE
                 }
-            } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
+            } else if (type == NodeSourceTypeInt.INCOMING_SHARES_ADAPTER) {
                 holder.publicLinkImage?.visibility = View.INVISIBLE
 
                 if (node.isTakenDown) {
@@ -1084,7 +1085,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                 } else {
                     holder.permissionsIcon?.visibility = View.GONE
                 }
-            } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
+            } else if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) {
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize?.apply {
                     text = getOutgoingSubtitle(
@@ -1099,7 +1100,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         } else {
             Timber.d("Node is file")
             val isLinksRoot =
-                type == Constants.LINKS_ADAPTER && (context as ManagerActivity).getHandleFromLinksViewModel() == -1L
+                type == NodeSourceTypeInt.LINKS_ADAPTER && (context as ManagerActivity).getHandleFromLinksViewModel() == -1L
             holder.textViewFileSize?.text = TextUtil.getFileInfo(
                 Util.getSizeString(node.size, context),
                 TimeUtils.formatLongDateTime(if (isLinksRoot) node.publicLinkCreationTime else node.modificationTime)
@@ -1291,7 +1292,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
     }
 
     private fun fileClicked(currentPosition: Int) {
-        if (type == Constants.BACKUPS_ADAPTER) {
+        if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
             (fragment as BackupsFragment).onNodeSelected(currentPosition)
         } else if (type == Constants.CONTACT_FILE_ADAPTER) {
             (fragment as ContactFileListFragment).itemClick(currentPosition)
@@ -1307,7 +1308,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         }
 
         if (isMultipleSelect) {
-            if (type == Constants.BACKUPS_ADAPTER) {
+            if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
                 (fragment as BackupsFragment).onNodeSelected(currentPosition)
             } else if (type == Constants.CONTACT_FILE_ADAPTER) {
                 (fragment as ContactFileListFragment).itemClick(currentPosition)
@@ -1338,7 +1339,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
 
         val holder = view.tag as ViewHolderBrowser
         val currentPosition = holder.adapterPosition
-        if (type == Constants.BACKUPS_ADAPTER) {
+        if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
             (fragment as BackupsFragment).activateActionMode()
             (fragment as BackupsFragment).onNodeSelected(currentPosition)
         } else if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
