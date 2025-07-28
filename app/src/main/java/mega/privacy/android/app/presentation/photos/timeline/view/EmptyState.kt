@@ -55,9 +55,11 @@ fun EmptyState(
         }
 
         if (enableCameraUploadButtonShowing) {
-            NewEnableCameraUploadsButton(
-                onClick = onEnableCameraUploads,
-            )
+            if (timelineViewState.isCameraUploadsBannerImprovementEnabled) {
+                EnableCameraUploadsBanner(onClick = onEnableCameraUploads)
+            } else {
+                NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
+            }
         }
     } else {
         Column(
@@ -67,9 +69,11 @@ fun EmptyState(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (enableCameraUploadButtonShowing) {
-                NewEnableCameraUploadsButton(
-                    onClick = onEnableCameraUploads,
-                )
+                if (timelineViewState.isCameraUploadsBannerImprovementEnabled) {
+                    EnableCameraUploadsBanner(onClick = onEnableCameraUploads)
+                } else {
+                    NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

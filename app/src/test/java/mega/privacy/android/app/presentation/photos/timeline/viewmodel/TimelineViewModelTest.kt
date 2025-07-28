@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
@@ -66,6 +67,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
@@ -703,6 +705,23 @@ internal class TimelineViewModelTest {
 
             assertWithMessage("Loading is not complete").that(state.loadPhotosDone)
                 .isTrue()
+        }
+    }
+
+    @ParameterizedTest(name = "when CameraUploadsBannerImprovement is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isCameraUploadsBannerImprovementEnabled is updated as expected`(
+        isEnabled: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsBannerImprovement))
+            .thenReturn(isEnabled)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isCameraUploadsBannerImprovementEnabled).isEqualTo(isEnabled)
         }
     }
 

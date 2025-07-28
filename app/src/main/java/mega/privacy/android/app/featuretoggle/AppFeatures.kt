@@ -15,6 +15,12 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
  */
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
+
+    CameraUploadsBannerImprovement(
+        "Enable Camera Uploads Banner Improvement",
+        false
+    ),
+
     AudioPlaybackPosition(
         "Enable audio playback position feature",
         true

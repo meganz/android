@@ -1,5 +1,12 @@
 package mega.privacy.android.app.presentation.photos.timeline.view
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
@@ -7,12 +14,23 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.amber_400
 import mega.privacy.android.shared.original.core.ui.theme.blue_400
 import mega.privacy.android.shared.original.core.ui.theme.green_400
@@ -126,6 +144,101 @@ private fun CameraUploadsStatus(
             statusIcon()
         },
     )
+}
+
+@Composable
+fun EnableCameraUploadsBanner(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
+    CameraUploadsBanner(
+        modifier = modifier.clickable {
+            onClick()
+        },
+        statusIcon = R.drawable.ic_cu_status,
+        title = stringResource(R.string.settings_camera_upload_on),
+        description = stringResource(id = R.string.enable_cu_subtitle),
+        endIcon = {
+            MegaIcon(
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
+                contentDescription = "Camera uploads banner end icon",
+                modifier = Modifier
+                    .size(24.dp),
+                tint = IconColor.Primary,
+            )
+        }
+    )
+}
+
+@Composable
+private fun CameraUploadsBanner(
+    @DrawableRes statusIcon: Int,
+    title: String?,
+    description: Any?,
+    modifier: Modifier = Modifier,
+    endIcon: @Composable (() -> Unit)? = null,
+) {
+    Column(modifier) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(15.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = statusIcon),
+                contentDescription = "Camera uploads banner status icon",
+                modifier = Modifier
+                    .padding(end = 15.dp)
+                    .size(24.dp),
+                tint = Color.Unspecified,
+            )
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                title?.let {
+                    MegaText(
+                        modifier = Modifier.padding(bottom = 5.dp),
+                        textColor = TextColor.Primary,
+                        style = MaterialTheme.typography.subtitle1,
+                        text = title
+                    )
+                }
+
+                description?.let {
+                    when (it) {
+                        is String -> {
+                            MegaText(
+                                modifier = Modifier,
+                                textColor = TextColor.Secondary,
+                                style = MaterialTheme.typography.body2,
+                                text = it
+                            )
+                        }
+
+                        is AnnotatedString -> {
+                            MegaText(
+                                text = it,
+                                maxLines = Int.MAX_VALUE,
+                                modifier = Modifier,
+                                textColor = TextColor.Secondary,
+                                style = MaterialTheme.typography.body2,
+                            )
+                        }
+                    }
+                }
+            }
+
+            endIcon?.let {
+                Box(modifier = Modifier.padding(start = 10.dp)) {
+                    endIcon()
+                }
+            }
+        }
+        MegaDivider(
+            dividerType = DividerType.FullSize,
+            strong = true
+        )
+    }
 }
 
 @Preview

@@ -159,6 +159,8 @@ class TimelineViewModel @Inject constructor(
             }
         }
 
+        checkCameraUploadsBannerImprovementEnabled()
+
         updatePhotos(listOf())
         viewModelScope.launch {
             _state.collectLatest {
@@ -180,6 +182,18 @@ class TimelineViewModel @Inject constructor(
             getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
         }
         return result.getOrNull() ?: false
+    }
+
+    private fun checkCameraUploadsBannerImprovementEnabled() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CameraUploadsBannerImprovement)
+            }.onSuccess { isEnabled ->
+                _state.update { it.copy(isCameraUploadsBannerImprovementEnabled = isEnabled) }
+            }.onFailure { error ->
+                Timber.e(error)
+            }
+        }
     }
 
     internal fun loadPhotos() {

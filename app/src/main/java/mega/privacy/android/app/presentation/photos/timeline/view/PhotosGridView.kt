@@ -85,7 +85,7 @@ fun PhotosGridView(
         if (enableCameraUploadsBanner) 1 else 0 + if (isCameraUploadsLimitedAccess) 1 else 0
     val totalItems = potentialItems + uiPhotoList.size + 1
     var userScrollEnabled by remember { mutableStateOf(true) }
-    var coroutineScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     val onZoom = remember(coroutineScope) {
         { zoomAction: () -> Unit ->
             coroutineScope.launch {
@@ -144,7 +144,11 @@ fun PhotosGridView(
                 key = "enable-camera-uploads-banner",
                 span = { GridItemSpan(maxLineSpan) },
             ) {
-                NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
+                if (timelineViewState.isCameraUploadsBannerImprovementEnabled) {
+                    EnableCameraUploadsBanner(onClick = onEnableCameraUploads)
+                } else {
+                    NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
+                }
             }
         }
 
