@@ -1,4 +1,4 @@
-package mega.privacy.android.app.di.ui.toolbaritem.qualifier
+package mega.privacy.android.domain.qualifier.features
 
 import javax.inject.Qualifier
 

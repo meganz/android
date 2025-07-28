@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.di.ui.toolbaritem.qualifier.CloudDrive
-import mega.privacy.android.app.di.ui.toolbaritem.qualifier.IncomingShares
-import mega.privacy.android.app.di.ui.toolbaritem.qualifier.Links
-import mega.privacy.android.app.di.ui.toolbaritem.qualifier.OutgoingShares
-import mega.privacy.android.app.di.ui.toolbaritem.qualifier.RubbishBin
+import mega.privacy.android.domain.qualifier.features.CloudDrive
+import mega.privacy.android.domain.qualifier.features.IncomingShares
+import mega.privacy.android.domain.qualifier.features.Links
+import mega.privacy.android.domain.qualifier.features.OutgoingShares
+import mega.privacy.android.domain.qualifier.features.RubbishBin
 import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
