@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,11 +25,14 @@ import mega.privacy.android.core.nodecomponents.list.view.NodesView
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeAppBar
+import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 
-
+/**
+ * Cloud Drive Screen, used to display contents of a folder
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CloudDriveScreen(
@@ -37,6 +41,11 @@ fun CloudDriveScreen(
     viewModel: CloudDriveViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    BackHandler(enabled = uiState.isInSelectionMode) {
+        viewModel.deselectAllItems()
+    }
+
     MegaScaffold(
         topBar = {
             if (uiState.isInSelectionMode) {
@@ -51,6 +60,15 @@ fun CloudDriveScreen(
                     navigationType = AppBarNavigationType.Back(onBack),
                 )
             }
+        },
+        bottomBar = {
+            NodeSelectionModeBottomBar(
+                count = uiState.selectedNodeIds.size,
+                visible = uiState.isInSelectionMode,
+                onActionPressed = {
+                    // TODO
+                }
+            )
         },
         content = { innerPadding ->
             CloudDriveContent(

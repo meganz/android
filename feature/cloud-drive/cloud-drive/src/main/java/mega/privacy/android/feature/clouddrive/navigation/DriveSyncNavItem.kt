@@ -21,7 +21,6 @@ class DriveSyncNavItem : MainNavItem {
     override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController) -> Unit =
         { navigationHandler, navigationController ->
             driveSyncScreen(
-                onBack = navigationHandler::back,
                 onNavigateToFolder = { nodeId ->
                     navigationHandler.navigate(CloudDrive(nodeHandle = nodeId.longValue))
                 },

@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.drivesync
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.TabItems
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeAppBar
+import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveContent
@@ -28,10 +30,12 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriv
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.shared.resources.R as sharedR
 
+/**
+ * Drive Sync Screen, shown in the Drive bottom navigation tab.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DriveSyncScreen(
-    onBackPress: () -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
     setNavigationItemVisibility: (Boolean) -> Unit,
     viewModel: DriveSyncViewModel = hiltViewModel(),
@@ -40,6 +44,10 @@ internal fun DriveSyncScreen(
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val megaNavigator = viewModel.megaNavigator
+
+    BackHandler(enabled = cloudDriveUiState.isInSelectionMode) {
+        cloudDriveViewModel.deselectAllItems()
+    }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
@@ -58,7 +66,16 @@ internal fun DriveSyncScreen(
                     title = stringResource(sharedR.string.general_drive),
                 )
             }
-        }
+        },
+        bottomBar = {
+            NodeSelectionModeBottomBar(
+                count = cloudDriveUiState.selectedNodeIds.size,
+                visible = cloudDriveUiState.isInSelectionMode,
+                onActionPressed = {
+                    // TODO
+                }
+            )
+        },
     ) { paddingValues ->
         MegaScrollableTabRow(
             modifier = Modifier

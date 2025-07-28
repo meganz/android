@@ -12,7 +12,6 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriv
 data object DriveSync : NavKey
 
 fun NavGraphBuilder.driveSyncScreen(
-    onBack: () -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
     setNavigationVisibility: (Boolean) -> Unit,
 ) {
@@ -20,7 +19,6 @@ fun NavGraphBuilder.driveSyncScreen(
         val viewModel = hiltViewModel<DriveSyncViewModel>()
         val cloudDriveViewModel = hiltViewModel<CloudDriveViewModel>()
         DriveSyncScreen(
-            onBackPress = onBack,
             viewModel = viewModel,
             cloudDriveViewModel = cloudDriveViewModel,
             onNavigateToFolder = onNavigateToFolder,
