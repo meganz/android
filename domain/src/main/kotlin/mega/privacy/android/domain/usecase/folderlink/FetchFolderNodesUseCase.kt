@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.folderlink
 
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.repository.FolderLinkRepository
@@ -14,6 +15,7 @@ class FetchFolderNodesUseCase @Inject constructor(
     private val folderLinkRepository: FolderLinkRepository,
     private val addNodeType: AddNodeType,
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
+    private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
 ) {
 
     /**
@@ -45,10 +47,20 @@ class FetchFolderNodesUseCase @Inject constructor(
                                         )
                                     }
                                         .onSuccess {
-                                            runCatching { addNodeType(it) as TypedFolderNode }
-                                                .onSuccess {
-                                                    folderNodesResult.parentNode = it
-                                                    parentHandle = it.id.longValue
+                                            runCatching { addNodeType(it) }
+                                                .onSuccess { typedNode ->
+                                                    if (typedNode is TypedFolderNode) {
+                                                        folderNodesResult.parentNode = typedNode
+                                                        parentHandle = typedNode.id.longValue
+                                                    } else {
+                                                        runCatching {
+                                                            getFolderParentNodeUseCase(typedNode.id)
+                                                        }.onSuccess { parentNode ->
+                                                            folderNodesResult.parentNode =
+                                                                parentNode
+                                                            parentHandle = parentNode.id.longValue
+                                                        }
+                                                    }
                                                 }
                                         }
                                         .onFailure { throw FetchFolderNodesException.GenericError() }

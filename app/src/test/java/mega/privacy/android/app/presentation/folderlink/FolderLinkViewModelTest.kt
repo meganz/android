@@ -260,7 +260,9 @@ class FolderLinkViewModelTest {
         val folderLink = "abcd"
         val childNode = mock<TypedFolderNode>()
         val childrenNodes = listOf(childNode)
-        val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
+        val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+            on { this.childrenNodes }.thenReturn(childrenNodes)
+        }
         whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
         whenever(fetchFolderNodesUseCase(anyOrNull())).thenReturn(fetchFolderNodeResult)
         val folderInfo = mock<FolderInfo> {
@@ -426,17 +428,49 @@ class FolderLinkViewModelTest {
     }
 
     @Test
-    fun `test that fetch nodes returns correct result`() = runTest {
+    fun `test that title is updated correctly when parent node name and root node name are not null`() =
+        runTest {
+            val base64Handle = "1234"
+            val rootNodeName = "RootNode"
+            val parentName = "ParentNode"
+            val rootNode = mock<TypedFolderNode> {
+                on { this.name }.thenReturn(rootNodeName)
+            }
+            val parentNode = mock<TypedFolderNode> {
+                on { this.name }.thenReturn(parentName)
+            }
+            val node1 = mock<TypedFolderNode>()
+            val node2 = mock<TypedFolderNode>()
+            val childrenNodes = listOf(node1, node2)
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.rootNode }.thenReturn(rootNode)
+                on { this.parentNode }.thenReturn(parentNode)
+                on { this.childrenNodes }.thenReturn(childrenNodes)
+            }
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
+            underTest.fetchNodes(base64Handle)
+            underTest.state.test {
+                val newValue = expectMostRecentItem()
+                assertThat(newValue.title).isEqualTo(parentName)
+            }
+        }
+
+    @Test
+    fun `test that fetch nodes returns correct result when root node name is not null`() = runTest {
         val base64Handle = "1234"
         val rootNodeName = "RootNode"
-        val rootNode = mock<TypedFolderNode>()
+        val rootNode = mock<TypedFolderNode> {
+            on { this.name }.thenReturn(rootNodeName)
+        }
         val parentNode = mock<TypedFolderNode>()
         val node1 = mock<TypedFolderNode>()
         val node2 = mock<TypedFolderNode>()
         val childrenNodes = listOf(node1, node2)
-        val fetchFolderNodeResult = FetchFolderNodesResult(rootNode, parentNode, childrenNodes)
-
-        whenever(rootNode.name).thenReturn(rootNodeName)
+        val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+            on { this.rootNode }.thenReturn(rootNode)
+            on { this.parentNode }.thenReturn(parentNode)
+            on { this.childrenNodes }.thenReturn(childrenNodes)
+        }
         whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
 
         underTest.state.test {
@@ -455,7 +489,9 @@ class FolderLinkViewModelTest {
         val base64Handle = "1234"
         val childNode = mock<TypedFolderNode>()
         val childrenNodes = listOf(childNode)
-        val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
+        val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+            on { this.childrenNodes }.thenReturn(childrenNodes)
+        }
         val nodeUIItem = NodeUIItem<TypedNode>(childNode, isSelected = false, isInvisible = false)
 
         whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
@@ -473,7 +509,9 @@ class FolderLinkViewModelTest {
     fun `test that onSelectAllClicked selects all the nodes`() = runTest {
         val base64Handle = "1234"
         val childrenNodes = listOf<TypedFolderNode>(mock(), mock())
-        val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
+        val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+            on { this.childrenNodes }.thenReturn(childrenNodes)
+        }
 
         whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
 
@@ -492,7 +530,9 @@ class FolderLinkViewModelTest {
     fun `test that onClearAllClicked unselects all the nodes`() = runTest {
         val base64Handle = "1234"
         val childrenNodes = listOf<TypedFolderNode>(mock(), mock())
-        val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
+        val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+            on { this.childrenNodes }.thenReturn(childrenNodes)
+        }
 
         whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
 
@@ -524,8 +564,10 @@ class FolderLinkViewModelTest {
         val newChildNode = mock<TypedFileNode>()
         val oldChildrenNodes = listOf(oldChildNode)
         val newChildrenNodes = listOf(newChildNode)
-        val fetchFolderNodeResult =
-            FetchFolderNodesResult(mock(), oldParentNode, oldChildrenNodes)
+        val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+            on { this.parentNode }.thenReturn(oldParentNode)
+            on { this.childrenNodes }.thenReturn(oldChildrenNodes)
+        }
 
         whenever(newParentNode.name).thenReturn(newParentNodeName)
         whenever(newChildNode.id.longValue).thenReturn(newChildHandle)
@@ -596,8 +638,10 @@ class FolderLinkViewModelTest {
         val childrenNodes = listOf(childNode)
         val node =
             NodeUIItem<TypedNode>(mock<TypedFolderNode>(), isSelected = false, isInvisible = false)
-        val fetchFolderNodeResult =
-            FetchFolderNodesResult(rootNode, mock(), childrenNodes)
+        val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+            on { this.rootNode }.thenReturn(rootNode)
+            on { this.childrenNodes }.thenReturn(childrenNodes)
+        }
 
         whenever(rootNode.name).thenReturn(rootNodeName)
         whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
@@ -673,8 +717,11 @@ class FolderLinkViewModelTest {
             val node1 = mock<TypedFolderNode>()
             val node2 = mock<TypedFolderNode>()
             val childrenNodes = listOf(node1, node2)
-            val fetchFolderNodeResult = FetchFolderNodesResult(rootNode, parentNode, childrenNodes)
-
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.rootNode }.thenReturn(rootNode)
+                on { this.parentNode }.thenReturn(parentNode)
+                on { this.childrenNodes }.thenReturn(childrenNodes)
+            }
             whenever(rootNode.name).thenReturn(rootNodeName)
             whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
             whenever(checkNodesNameCollisionUseCase(any(), any())).thenReturn(mock())
@@ -710,8 +757,11 @@ class FolderLinkViewModelTest {
             val node1 = mock<TypedFolderNode>()
             val node2 = mock<TypedFolderNode>()
             val childrenNodes = listOf(node1, node2)
-            val fetchFolderNodeResult = FetchFolderNodesResult(rootNode, parentNode, childrenNodes)
-
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.rootNode }.thenReturn(rootNode)
+                on { this.parentNode }.thenReturn(parentNode)
+                on { this.childrenNodes }.thenReturn(childrenNodes)
+            }
             whenever(rootNode.name).thenReturn(rootNodeName)
             whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
             whenever(checkNodesNameCollisionUseCase(any(), any())).thenReturn(mock())
@@ -742,8 +792,11 @@ class FolderLinkViewModelTest {
                 on { id }.thenReturn(NodeId(2222L))
             }
             val childrenNodes = listOf(node1, node2)
-            val fetchFolderNodeResult = FetchFolderNodesResult(rootNode, parentNode, childrenNodes)
-
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.rootNode }.thenReturn(rootNode)
+                on { this.parentNode }.thenReturn(parentNode)
+                on { this.childrenNodes }.thenReturn(childrenNodes)
+            }
             whenever(rootNode.name).thenReturn(rootNodeName)
             whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
             whenever(checkNodesNameCollisionUseCase(any(), any())).thenReturn(mock())
@@ -824,7 +877,9 @@ class FolderLinkViewModelTest {
             val folderLink = "abcd"
             val childNode = mock<TypedFolderNode>()
             val childrenNodes = listOf(childNode)
-            val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.childrenNodes }.thenReturn(childrenNodes)
+            }
             whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
             whenever(fetchFolderNodesUseCase(anyOrNull())).thenReturn(fetchFolderNodeResult)
             val folderInfo = mock<FolderInfo> {
@@ -906,11 +961,9 @@ class FolderLinkViewModelTest {
                 )
             }
 
-            val fetchFolderNodeResult = FetchFolderNodesResult(
-                rootNode = mock(),
-                parentNode = mock(),
-                childrenNodes = listOf(imageFileNode)
-            )
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.childrenNodes }.thenReturn(listOf(imageFileNode))
+            }
 
             whenever(fetchFolderNodesUseCase(subHandle)).thenReturn(fetchFolderNodeResult)
 
@@ -938,11 +991,9 @@ class FolderLinkViewModelTest {
                 )
             }
 
-            val fetchFolderNodeResult = FetchFolderNodesResult(
-                rootNode = mock(),
-                parentNode = mock(),
-                childrenNodes = listOf(videoFileNode)
-            )
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.childrenNodes }.thenReturn(listOf(videoFileNode))
+            }
 
             whenever(fetchFolderNodesUseCase(subHandle)).thenReturn(fetchFolderNodeResult)
 
@@ -992,11 +1043,9 @@ class FolderLinkViewModelTest {
                 on { type }.thenReturn(mock<TextFileTypeInfo>())
             }
 
-            val fetchFolderNodeResult = FetchFolderNodesResult(
-                rootNode = mock(),
-                parentNode = mock(),
-                childrenNodes = listOf(textFileNode)
-            )
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.childrenNodes }.thenReturn(listOf(textFileNode))
+            }
 
             whenever(fetchFolderNodesUseCase(subHandle)).thenReturn(fetchFolderNodeResult)
 
@@ -1016,11 +1065,9 @@ class FolderLinkViewModelTest {
             val subHandle = "testSubHandle"
             val folderNode = mock<TypedFolderNode>()
 
-            val fetchFolderNodeResult = FetchFolderNodesResult(
-                rootNode = mock(),
-                parentNode = mock(),
-                childrenNodes = listOf(folderNode)
-            )
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.childrenNodes }.thenReturn(listOf(folderNode))
+            }
 
             whenever(fetchFolderNodesUseCase(subHandle)).thenReturn(fetchFolderNodeResult)
 
@@ -1036,11 +1083,9 @@ class FolderLinkViewModelTest {
 
     @Test
     fun `test that fetchNodes with null subHandle does not trigger openFileNodeEvent`() = runTest {
-        val fetchFolderNodeResult = FetchFolderNodesResult(
-            rootNode = mock(),
-            parentNode = mock(),
-            childrenNodes = listOf(mock<TypedFileNode>())
-        )
+        val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+            on { this.childrenNodes }.thenReturn(listOf(mock<TypedFileNode>()))
+        }
 
         whenever(fetchFolderNodesUseCase(null)).thenReturn(fetchFolderNodeResult)
 
@@ -1062,11 +1107,9 @@ class FolderLinkViewModelTest {
                 on { type }.thenReturn(mock<TextFileTypeInfo>())
             }
 
-            val fetchFolderNodeResult = FetchFolderNodesResult(
-                rootNode = mock(),
-                parentNode = mock(),
-                childrenNodes = listOf(nonMediaFileNode)
-            )
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.childrenNodes }.thenReturn(listOf(nonMediaFileNode))
+            }
 
             whenever(fetchFolderNodesUseCase(subHandle)).thenReturn(fetchFolderNodeResult)
 
