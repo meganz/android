@@ -300,7 +300,7 @@ interface AppNavigator {
      * Open Stop Backup Destination in SyncHost Activity
      * //stop-backup-mega-picker
      */
-    fun openSelectStopBackupDestinationFromSyncsTab(context: Context)
+    fun openSelectStopBackupDestinationFromSyncsTab(context: Context, folderName: String?)
 
     /**
      * Open PDF viewer activity

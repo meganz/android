@@ -48,6 +48,7 @@ internal fun SyncScreen(
     shouldNavigateToSyncList: Boolean,
     newFolderDetail: SyncNewFolder?,
     shouldOpenStopBackup: Boolean,
+    folderName: String?,
 ) {
     if (state.isNetworkConnected) {
         AndroidSyncFeatureNavigation(
@@ -58,6 +59,7 @@ internal fun SyncScreen(
             megaNavigator = megaNavigator,
             fileTypeIconMapper = fileTypeIconMapper,
             syncPermissionsManager = syncPermissionsManager,
+            folderName = folderName,
         )
     } else {
         SyncNoNetworkState(onBackPressed = onBackPressed)
@@ -72,11 +74,14 @@ internal fun AndroidSyncFeatureNavigation(
     megaNavigator: MegaNavigator,
     fileTypeIconMapper: FileTypeIconMapper,
     syncPermissionsManager: SyncPermissionsManager,
+    folderName: String?,
     shouldOpenStopBackup: Boolean = false,
 ) {
     val context = LocalContext.current
     val startDestination = if (shouldOpenStopBackup) {
-        StopBackupMegaPicker
+        StopBackupMegaPicker(
+            folderName
+        )
     } else {
         newFolderDetail ?: SyncList()
     }

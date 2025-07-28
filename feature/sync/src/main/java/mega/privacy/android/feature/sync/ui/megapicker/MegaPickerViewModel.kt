@@ -2,6 +2,9 @@ package mega.privacy.android.feature.sync.ui.megapicker
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -24,6 +27,7 @@ import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
@@ -31,10 +35,11 @@ import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-internal class MegaPickerViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = MegaPickerViewModel.MegaPickerViewModelFactory::class)
+internal class MegaPickerViewModel @AssistedInject constructor(
+    @Assisted val isStopBackup: Boolean = false,
+    @Assisted val folderName: String? = null,
     private val setSelectedMegaFolderUseCase: SetSelectedMegaFolderUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getTypedNodesFromFolder: GetTypedNodesFromFolderUseCase,
@@ -46,7 +51,16 @@ internal class MegaPickerViewModel @Inject constructor(
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
 ) : ViewModel() {
+
+    @AssistedFactory
+    interface MegaPickerViewModelFactory {
+        fun create(
+            isStopBackup: Boolean,
+            folderName: String? = null,
+        ): MegaPickerViewModel
+    }
 
     private val _state = MutableStateFlow(MegaPickerState())
     val state: StateFlow<MegaPickerState> = _state.asStateFlow()
@@ -92,7 +106,16 @@ internal class MegaPickerViewModel @Inject constructor(
                         disableBatteryOptimizationsPermissionShown = true
                     }
                     runCatching {
-                        tryNodeSyncUseCase(state.value.currentFolder?.id ?: NodeId(0))
+                        if (isStopBackup.not()) {
+                            tryNodeSyncUseCase(state.value.currentFolder?.id ?: NodeId(0))
+                        } else {
+                            state.value.currentFolder?.id?.let { currentFolder ->
+                                isFolderExists(currentFolder).let {
+                                    Timber.d("Folder exists: $it")
+                                    if (it) return@launch
+                                }
+                            }
+                        }
                     }.onSuccess {
                         folderSelected()
                     }.onFailure {
@@ -146,6 +169,7 @@ internal class MegaPickerViewModel @Inject constructor(
     }
 
     private fun folderSelected() {
+        Timber.d("Folder selected: ${state.value.currentFolder?.name}, id: ${state.value.currentFolder?.id}")
         when {
             allFilesPermissionShown && disableBatteryOptimizationsPermissionShown -> {
                 saveSelectedFolder()
@@ -207,6 +231,10 @@ internal class MegaPickerViewModel @Inject constructor(
                 null
             }
 
+            Timber.d("Current folder: ${currentFolder.name}, id: ${currentFolder.id}, RootFolder: ${rootFolder?.name}, id: ${rootFolder?.id}, Exclude folders: $excludeFolders")
+
+            val isSelectEnabled = isFolderExists(currentFolder.id).not()
+
             getTypedNodesFromFolder(currentFolder.id).catch {
                 Timber.d(it, "Error getting child folders of current folder ${currentFolder.name}")
             }.collectLatest { childFolders ->
@@ -223,7 +251,7 @@ internal class MegaPickerViewModel @Inject constructor(
                         } else {
                             childFolders.map { TypedNodeUiModel(it, false) }
                         },
-                        isSelectEnabled = isRootFolder(currentFolder).not(),
+                        isSelectEnabled = isSelectEnabled,
                         isLoading = false,
                     )
                 }
@@ -231,7 +259,11 @@ internal class MegaPickerViewModel @Inject constructor(
         }
     }
 
-    private fun isRootFolder(folder: Node) = rootFolder?.id == folder.id
+    private suspend fun isFolderExists(currentFolder: NodeId) =
+        folderName?.let {
+            nodeExistsInCurrentLocationUseCase(currentFolder, it)
+        } ?: true
+
 
     /**
      * Creates a new folder

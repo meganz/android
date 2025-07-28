@@ -58,7 +58,7 @@ internal fun MegaPickerRoute(
             )
         },
         isLoading = state.value.isLoading,
-        isSelectEnabled = isStopBackupMegaPicker || state.value.isSelectEnabled,
+        isSelectEnabled = state.value.isSelectEnabled,
         isStopBackupMegaPicker = isStopBackupMegaPicker,
     )
 
@@ -116,7 +116,7 @@ private fun selectCurrentFolder(
     viewModel.handleAction(
         MegaPickerAction.CurrentFolderSelected(
             allFilesAccessPermissionGranted = syncPermissionsManager.isManageExternalStoragePermissionGranted(),
-            disableBatteryOptimizationPermissionGranted = syncPermissionsManager.isDisableBatteryOptimizationGranted()
+            disableBatteryOptimizationPermissionGranted = syncPermissionsManager.isDisableBatteryOptimizationGranted(),
         )
     )
 }

@@ -28,7 +28,7 @@ import mega.privacy.android.shared.resources.R as sharedResR
 internal fun SyncFoldersRoute(
     onAddNewSyncClicked: () -> Unit,
     onAddNewBackupClicked: () -> Unit,
-    onSelectStopBackupDestinationClicked: () -> Unit,
+    onSelectStopBackupDestinationClicked: (String?) -> Unit,
     issuesInfoClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
@@ -96,6 +96,7 @@ internal fun SyncFoldersRoute(
                             viewModel.handleAction(OnRemoveFolderDialogDismissed)
                         },
                         onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
+                        folderName = syncUiItemToRemove.folderPairName,
                     )
                 }
 

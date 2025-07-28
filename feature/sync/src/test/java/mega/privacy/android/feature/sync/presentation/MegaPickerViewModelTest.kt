@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.presentation
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
@@ -58,6 +60,7 @@ internal class MegaPickerViewModelTest {
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase = mock()
     private val createFolderNodeUseCase: CreateFolderNodeUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase = mock()
 
     private val typedNodeUiModels: List<TypedNodeUiModel> = emptyList()
     private val childrenNodes: List<TypedNode> = emptyList()
@@ -77,7 +80,8 @@ internal class MegaPickerViewModelTest {
             getMediaUploadsFolderHandleUseCase,
             getMyChatsFilesFolderIdUseCase,
             createFolderNodeUseCase,
-            getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase,
+            nodeExistsInCurrentLocationUseCase
         )
     }
 
@@ -95,10 +99,13 @@ internal class MegaPickerViewModelTest {
         whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
         whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
         whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+        whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
 
         initViewModel()
         val expectedState = MegaPickerState(
-            currentFolder = rootFolder, nodes = typedNodeUiModels
+            currentFolder = rootFolder,
+            nodes = typedNodeUiModels,
+            isSelectEnabled = false
         )
 
         underTest.state.test {
@@ -132,13 +139,15 @@ internal class MegaPickerViewModelTest {
         whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(cameraUploadsFolderId.longValue)
         whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(mediaUploadsFolder)
         whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(chatFilesFolderId)
+        whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
 
         initViewModel()
         val expectedState = MegaPickerState(
             currentFolder = rootFolder,
             nodes = childrenNodesWithCUAndChat.map {
                 TypedNodeUiModel(it, true)
-            }
+            },
+            isSelectEnabled = false
         )
 
         underTest.state.test {
@@ -160,8 +169,16 @@ internal class MegaPickerViewModelTest {
             emit(childrenNodes)
             awaitCancellation()
         })
+        whenever(
+            nodeExistsInCurrentLocationUseCase(
+                nodeId = clickedFolderId,
+                name = ""
+            )
+        ).thenReturn(false)
         val expectedState = MegaPickerState(
-            currentFolder = clickedFolder, nodes = typedNodeUiModels, isSelectEnabled = true,
+            currentFolder = clickedFolder,
+            nodes = typedNodeUiModels,
+            isSelectEnabled = false,
         )
 
         underTest.handleAction(MegaPickerAction.FolderClicked(clickedFolder))
@@ -195,8 +212,11 @@ internal class MegaPickerViewModelTest {
             emit(childrenNodes)
             awaitCancellation()
         })
+        whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
         val expectedState = MegaPickerState(
-            currentFolder = parentFolder, nodes = typedNodeUiModels, isSelectEnabled = true,
+            currentFolder = parentFolder,
+            nodes = typedNodeUiModels,
+            isSelectEnabled = false,
         )
 
         initViewModel()
@@ -224,6 +244,7 @@ internal class MegaPickerViewModelTest {
             emit(childrenNodes)
             awaitCancellation()
         })
+        whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
 
         initViewModel()
 
@@ -337,6 +358,7 @@ internal class MegaPickerViewModelTest {
             whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
             whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
             whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
             initViewModel()
 
             underTest.handleAction(
@@ -352,7 +374,6 @@ internal class MegaPickerViewModelTest {
 
     @Test
     fun `test that error message event is null when viewmodel handle action is called`() = runTest {
-
         initViewModel()
 
         underTest.handleAction(
@@ -365,75 +386,150 @@ internal class MegaPickerViewModelTest {
     }
 
     @Test
-    fun `test that viewmodel disables selection for root node`() = runTest {
-        val rootFolderId = NodeId(123456L)
-        val rootFolder: FolderNode = mock {
-            on { id } doReturn rootFolderId
+    fun `test that all files access dialog is hidden when dialog shown action is called`() =
+        runTest {
+            initViewModel()
+
+            underTest.handleAction(MegaPickerAction.AllFilesAccessPermissionDialogShown)
+
+            underTest.state.test {
+                assertThat(awaitItem().showAllFilesAccessDialog).isEqualTo(false)
+            }
         }
-        whenever(getRootNodeUseCase()).thenReturn(rootFolder)
-        whenever(getTypedNodesFromFolder(rootFolderId)).thenReturn(flow {
-            emit(childrenNodes)
+
+    @Test
+    fun `test that disable battery optimizations dialog is hidden when dialog shown action is called`() =
+        runTest {
+            initViewModel()
+
+            underTest.handleAction(MegaPickerAction.DisableBatteryOptimizationsDialogShown)
+
+            underTest.state.test {
+                assertThat(awaitItem().showDisableBatteryOptimizationsDialog).isEqualTo(false)
+            }
+        }
+
+    @Test
+    fun `test that navigate next event is consumed when next screen opened action is called`() =
+        runTest {
+            initViewModel()
+
+            underTest.handleAction(MegaPickerAction.NextScreenOpened)
+
+            underTest.state.test {
+                assertThat(awaitItem().navigateNextEvent).isEqualTo(de.palm.composestateevents.consumed)
+            }
+        }
+
+    @Test
+    fun `test that navigate next event is triggered when folder is selected with all permissions`() =
+        runTest {
+            val currentFolderId = NodeId(2323L)
+            val currentFolderName = "some secret folder"
+            val currentFolder: TypedFolderNode = mock {
+                on { id } doReturn currentFolderId
+                on { name } doReturn currentFolderName
+            }
+            whenever(getRootNodeUseCase()).thenReturn(currentFolder)
+            whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
+                emit(childrenNodes)
+                awaitCancellation()
+            })
+            whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
+            whenever(tryNodeSyncUseCase(currentFolderId)).thenReturn(Unit)
+
+            initViewModel()
+
+            underTest.handleAction(
+                MegaPickerAction.CurrentFolderSelected(
+                    allFilesAccessPermissionGranted = true,
+                    disableBatteryOptimizationPermissionGranted = true
+                )
+            )
+
+            underTest.state.test {
+                assertThat(awaitItem().navigateNextEvent).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that createFolder creates new folder and fetches its children`() = runTest {
+        val parentFolderId = NodeId(123L)
+        val newFolderId = NodeId(456L)
+        val parentFolder: FolderNode = mock {
+            on { id } doReturn parentFolderId
+        }
+        val newFolder: FolderNode = mock {
+            on { id } doReturn newFolderId
+        }
+
+        whenever(createFolderNodeUseCase(name = "New Folder", parentNodeId = parentFolderId))
+            .thenReturn(newFolderId)
+        whenever(getNodeByHandleUseCase(newFolderId.longValue)).thenReturn(newFolder)
+        whenever(getTypedNodesFromFolder(newFolderId)).thenReturn(flow {
+            emit(emptyList())
             awaitCancellation()
         })
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
 
         initViewModel()
-        val expectedState = MegaPickerState(
-            currentFolder = rootFolder,
-            nodes = typedNodeUiModels,
-            isSelectEnabled = false,
-        )
 
-        underTest.state.test {
-            assertThat(awaitItem()).isEqualTo(expectedState)
-        }
+        underTest.createFolder("New Folder", parentFolder)
+
+        verify(createFolderNodeUseCase).invoke(
+            name = "New Folder",
+            parentNodeId = parentFolderId
+        )
+        verify(getNodeByHandleUseCase).invoke(newFolderId.longValue)
     }
 
     @Test
-    fun `test that viewmodel enables selection for clicked non root node`() = runTest {
-        val rootFolderId = NodeId(123456L)
-        val rootFolder: FolderNode = mock {
-            on { id } doReturn rootFolderId
-        }
-        val clickedFolderId = NodeId(2323L)
-        val clickedFolderName = "Folder"
+    fun `test that isSelectEnabled is false when folder exists in stop backup mode`() = runTest {
+        val currentFolderId = NodeId(9845748L)
+        val folderName = "ExistingFolder"
         val clickedFolder: TypedFolderNode = mock {
-            on { id } doReturn clickedFolderId
-            on { name } doReturn clickedFolderName
+            on { id } doReturn currentFolderId
         }
-        whenever(getRootNodeUseCase()).thenReturn(rootFolder)
-        whenever(getTypedNodesFromFolder(clickedFolderId)).thenReturn(flow {
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+        whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
             emit(childrenNodes)
             awaitCancellation()
         })
+        whenever(nodeExistsInCurrentLocationUseCase(currentFolderId, folderName)).thenReturn(true)
 
-        initViewModel()
-        val expectedState = MegaPickerState(
-            currentFolder = clickedFolder,
-            nodes = typedNodeUiModels,
-            isSelectEnabled = true,
-        )
+        initViewModel(isStopBackup = true, folderName = folderName)
 
         underTest.handleAction(MegaPickerAction.FolderClicked(clickedFolder))
 
         underTest.state.test {
-            assertThat(awaitItem()).isEqualTo(expectedState)
+            assertThat(awaitItem().isSelectEnabled).isEqualTo(false)
         }
     }
 
-    private fun initViewModel() {
+    private fun initViewModel(isStopBackup: Boolean = false, folderName: String? = null) {
         wheneverBlocking { getFeatureFlagValueUseCase.invoke(any()) }.thenReturn(false)
         underTest = MegaPickerViewModel(
-            setSelectedMegaFolderUseCase,
-            getRootNodeUseCase,
-            getTypedNodesFromFolder,
-            getNodeByHandleUseCase,
-            tryNodeSyncUseCase,
-            deviceFolderUINodeErrorMessageMapper,
-            getCameraUploadsFolderHandleUseCase,
-            getMediaUploadsFolderHandleUseCase,
-            getMyChatsFilesFolderIdUseCase,
-            createFolderNodeUseCase,
-            getFeatureFlagValueUseCase
+            isStopBackup = isStopBackup,
+            folderName = folderName,
+            setSelectedMegaFolderUseCase = setSelectedMegaFolderUseCase,
+            getRootNodeUseCase = getRootNodeUseCase,
+            getTypedNodesFromFolder = getTypedNodesFromFolder,
+            getNodeByHandleUseCase = getNodeByHandleUseCase,
+            tryNodeSyncUseCase = tryNodeSyncUseCase,
+            deviceFolderUINodeErrorMessageMapper = deviceFolderUINodeErrorMessageMapper,
+            getCameraUploadsFolderHandleUseCase = getCameraUploadsFolderHandleUseCase,
+            getMediaUploadsFolderHandleUseCase = getMediaUploadsFolderHandleUseCase,
+            getMyChatsFilesFolderIdUseCase = getMyChatsFilesFolderIdUseCase,
+            createFolderNodeUseCase = createFolderNodeUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase
         )
     }
 }

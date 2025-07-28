@@ -222,6 +222,63 @@ fun ConfirmationDialog(
 )
 
 /**
+ * Confirmation dialog with a title, a message body and 3 buttons.
+ * The 3 buttons have short text and are in a vertical column.
+ *
+ * @param title title
+ * @param text1 message body
+ * @param text2 additional message body
+ * @param cancelButtonText cancel button text
+ * @param buttonOption1Text option 1 button text
+ * @param buttonOption2Text option 2 button text
+ * @param onDismiss to be triggered when dialog is hidden, whether with cancel button, confirm button, back or outside press.
+ * @param onOption1 to be triggered when option 1 button is pressed
+ * @param onOption2 to be triggered when option 2 button is pressed
+ * @param onCancel  to be triggered when cancel button is clicked
+ * @param dismissOnBackPress if true, the dialog will be dismiss when the user does back action, default to true.
+ * @param dismissOnClickOutside if true, the dialog will be dismiss when the user taps outside of the dialog, default to true.
+ */
+@Composable
+fun ConfirmationDialog(
+    title: String?,
+    text1: String,
+    text2: String,
+    buttonOption1Text: String,
+    buttonOption2Text: String,
+    cancelButtonText: String,
+    onOption1: () -> Unit,
+    onOption2: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    onCancel: () -> Unit = onDismiss,
+    dismissOnClickOutside: Boolean = true,
+    dismissOnBackPress: Boolean = true,
+) = BaseMegaAlertDialog(
+    text1 = text1,
+    text2 = text2,
+    buttons = {
+        ButtonsColumn {
+            DialogEndButton(
+                modifier = Modifier.testTag(OPTION1_TAG),
+                text = buttonOption1Text,
+                onClick = onOption1,
+            )
+            DialogEndButton(
+                modifier = Modifier.testTag(OPTION2_TAG),
+                text = buttonOption2Text,
+                onClick = onOption2,
+            )
+            DialogEndButton(
+                modifier = Modifier.testTag(CANCEL_TAG),
+                text = cancelButtonText,
+                onClick = onCancel,
+            )
+        }
+    },
+    onDismiss, modifier, title, dismissOnClickOutside, dismissOnBackPress
+)
+
+/**
  * Button with end text alignment, in case it takes more than one line
  */
 @Composable
@@ -286,6 +343,25 @@ private fun ConfirmationDialog3ButtonsPreview() {
         ConfirmationDialog(
             title = "Dialog title",
             text = "This is the message body of the dialog. And this is another line in the test.",
+            buttonOption1Text = "Action 1",
+            buttonOption2Text = "Action 2 with a very long title that takes more than one line",
+            cancelButtonText = "Cancel",
+            onOption1 = {},
+            onOption2 = {},
+            onDismiss = {},
+        )
+    }
+}
+
+
+@CombinedThemePreviews
+@Composable
+private fun ConfirmationDialogTwoTextsPreview() {
+    OriginalThemeForPreviews {
+        ConfirmationDialog(
+            title = "Dialog title",
+            text1 = "This is the first message body of the dialog.",
+            text2 = "This is the second message body with additional information.",
             buttonOption1Text = "Action 1",
             buttonOption2Text = "Action 2 with a very long title that takes more than one line",
             cancelButtonText = "Cancel",

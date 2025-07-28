@@ -105,7 +105,7 @@ internal fun DriveSyncScreen(
                             )
                         },
                         onSelectStopBackupDestinationClicked = {
-                            megaNavigator.openSelectStopBackupDestinationFromSyncsTab(context)
+                            megaNavigator.openSelectStopBackupDestinationFromSyncsTab(context, it)
                         },
                         onOpenUpgradeAccountClicked = {
                             megaNavigator.openUpgradeAccount(context)

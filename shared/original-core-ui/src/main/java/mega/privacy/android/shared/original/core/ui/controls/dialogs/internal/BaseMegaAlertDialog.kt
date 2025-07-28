@@ -1,5 +1,7 @@
 package mega.privacy.android.shared.original.core.ui.controls.dialogs.internal
 
+import androidx.compose.foundation.layout.Arrangement.spacedBy
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
@@ -122,6 +124,45 @@ internal fun BaseMegaAlertDialog(
     dismissOnBackPress = dismissOnBackPress
 )
 
+@Composable
+internal fun BaseMegaAlertDialog(
+    text1: String,
+    text2: String,
+    buttons: @Composable (() -> Unit),
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    title: String? = null,
+    dismissOnClickOutside: Boolean = true,
+    dismissOnBackPress: Boolean = true,
+) = BaseMegaAlertDialog(
+    text = {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalArrangement = spacedBy(4.dp)
+        ) {
+            Text(
+                text = text1,
+                style = MaterialTheme.typography.subtitle1,
+                color = DSTokens.colors.text.primary,
+                modifier = Modifier.padding(vertical = 8.dp).testTag(CONTENT_TAG),
+            )
+            Text(
+                text = text2,
+                style = MaterialTheme.typography.subtitle1,
+                color = DSTokens.colors.text.secondary,
+                modifier = Modifier.padding(vertical = 8.dp).testTag(CONTENT_EXTRA_TAG),
+            )
+        }
+    },
+    buttons = buttons,
+    onDismiss = onDismiss,
+    modifier = modifier,
+    title = title,
+    dismissOnClickOutside = dismissOnClickOutside,
+    dismissOnBackPress = dismissOnBackPress
+)
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun BaseMegaAlertDialog(
@@ -177,5 +218,6 @@ const val CANCEL_TAG = "mega_alert_dialog:button_cancel"
 const val TITLE_TAG = "mega_alert_dialog:text_title"
 
 internal const val CONTENT_TAG = "mega_alert_dialog:text_content"
+internal const val CONTENT_EXTRA_TAG = "mega_alert_dialog:text_content_extra"
 internal const val OPTION1_TAG = "mega_alert_dialog:button_option1"
 internal const val OPTION2_TAG = "mega_alert_dialog:button_option2"

@@ -512,10 +512,14 @@ internal class MegaNavigatorImpl @Inject constructor(
         )
     }
 
-    override fun openSelectStopBackupDestinationFromSyncsTab(context: Context) {
+    override fun openSelectStopBackupDestinationFromSyncsTab(
+        context: Context,
+        folderName: String?,
+    ) {
         context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
             putExtra(SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, true)
             putExtra(SyncHostActivity.EXTRA_OPEN_SELECT_STOP_BACKUP_DESTINATION, true)
+            putExtra(SyncHostActivity.EXTRA_FOLDER_NAME, folderName)
         })
     }
 

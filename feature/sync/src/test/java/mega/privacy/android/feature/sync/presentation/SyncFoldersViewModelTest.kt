@@ -53,6 +53,8 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.RefreshSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.StopBackupOption
@@ -110,6 +112,8 @@ class SyncFoldersViewModelTest {
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val changeSyncLocalRootUseCase: ChangeSyncLocalRootUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase = mock()
+    private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase = mock()
     private lateinit var underTest: SyncFoldersViewModel
 
     private val folderPairs = listOf(
@@ -219,6 +223,8 @@ class SyncFoldersViewModelTest {
             getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase,
             monitorConnectivityUseCase,
+            monitorSelectedMegaFolderUseCase,
+            clearSelectedMegaFolderUseCase,
         )
     }
 
@@ -305,12 +311,11 @@ class SyncFoldersViewModelTest {
                     selectedFolder = null,
                 )
             )
-
-            verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
             verify(moveDeconfiguredBackupNodesUseCase).invoke(
                 deconfiguredBackupRoot = syncUiItem.megaStorageNodeId,
                 backupDestination = rootFolder.id
             )
+            verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
         }
 
     @Test
@@ -496,6 +501,8 @@ class SyncFoldersViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             changeSyncLocalRootUseCase = changeSyncLocalRootUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            monitorSelectedMegaFolderUseCase = monitorSelectedMegaFolderUseCase,
+            clearSelectedMegaFolderUseCase = clearSelectedMegaFolderUseCase
         )
     }
 }

@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
+import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerViewModel
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 
 /**
@@ -20,8 +21,12 @@ internal fun NavGraphBuilder.syncMegaPickerDestination(
     onNavigateBack: () -> Unit,
 ) {
     composable<SyncMegaPicker> {
+        val viewModel =
+            hiltViewModel<MegaPickerViewModel, MegaPickerViewModel.MegaPickerViewModelFactory> { factory ->
+                factory.create(isStopBackup = false, folderName = "")
+            }
         MegaPickerRoute(
-            hiltViewModel(),
+            viewModel = viewModel,
             syncPermissionsManager,
             folderSelected = onNavigateBack,
             backClicked = onNavigateBack,

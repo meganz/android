@@ -1,9 +1,9 @@
 package mega.privacy.android.feature.sync.ui
 
-import mega.privacy.android.shared.resources.R as sharedResR
 import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -21,12 +21,8 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_BODY_TEST_TAG
-import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_DELETE_OPTION_ROW_TEST_TAG
-import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_ROW_TEST_TAG
 import mega.privacy.android.feature.sync.ui.stopbackup.StopBackupConfirmationDialogBody
-import mega.privacy.android.feature.sync.ui.stopbackup.model.StopBackupState
 import mega.privacy.android.feature.sync.ui.synclist.folders.STOP_SYNC_CONFIRM_DIALOG_TEST_TAG
-
 import mega.privacy.android.feature.sync.ui.synclist.folders.StopSyncConfirmDialog
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersScreen
@@ -38,9 +34,9 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_SYNC_ITEM_VIEW
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CANCEL_TAG
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CONFIRM_TAG
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.TITLE_TAG
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
 import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
 import org.junit.Rule
@@ -216,21 +212,28 @@ class SyncFoldersScreenTest {
     fun `test that stop backup confirm dialog is properly displayed `() {
         composeTestRule.setContent {
             StopBackupConfirmationDialogBody(
-                state = StopBackupState(),
                 onConfirm = { _, _ -> },
                 onDismiss = {},
                 onSelectStopBackupDestinationClicked = {},
+                folderName = null
             )
         }
-        composeTestRule.onNodeWithTag(TITLE_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TITLE_TAG).assertIsDisplayed().assertHasNoClickAction()
         composeTestRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_BODY_TEST_TAG)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_ROW_TEST_TAG)
+            .assertHasNoClickAction()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_confirm_dialog_title))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_DELETE_OPTION_ROW_TEST_TAG)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_confirm_dialog_text))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(CANCEL_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(CONFIRM_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_confirm_dialog_delete_explanation))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_confirm_dialog_move_cloud_drive))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_confirm_dialog_delete_permanently))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_dialog_cancel_button))
+            .assertIsDisplayed()
     }
 
     @Test

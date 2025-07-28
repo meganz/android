@@ -42,7 +42,7 @@ class NodeExistsInCurrentLocationUseCaseTest {
             whenever(it.id).thenReturn(NodeId(123L))
         }
         whenever(nodeRepository.getNodeChildren(currentNodeMock.id, null)).thenReturn(nodeList)
-        val actual = underTest(currentNodeMock, providedName)
+        val actual = underTest(currentNodeMock.id, providedName)
         Truth.assertThat(expected).isEqualTo(actual)
     }
 

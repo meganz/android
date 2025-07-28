@@ -702,8 +702,8 @@
     <string name="general_open_button">Open</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">Add to playlist</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up this folder, you need to either move it or delete it.</string>
+    <!-- Stop Backup confirmation dialog text -->
+    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up your folder, you need to either move it or delete it.</string>
     <!-- Move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option">Move folder</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
@@ -1350,7 +1350,7 @@
     <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
     <string name="node_option_move_to_rubbish_bin">Move to Rubbish bin</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">Available Offline</string>
+    <string name="file_properties_available_offline">Available offline</string>
     <!-- Menu item to unselect all the elements of a list -->
     <string name="action_unselect_all">Clear selection</string>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
@@ -1407,4 +1407,10 @@
     <string name="title_section_versions">Versions</string>
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">View in folder</string>
+    <!-- Stop Backup confirmation dialog delete explanation -->
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">If you choose to delete it, the folder will be deleted from MEGA but it won’t be deleted from your device.</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Move to Cloud drive</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Delete permanently</string>
 </resources>

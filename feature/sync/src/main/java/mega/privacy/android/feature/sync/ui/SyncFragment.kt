@@ -79,11 +79,12 @@ class SyncFragment : Fragment() {
                         shouldOpenStopBackup = activity?.intent?.getBooleanExtra(
                             SyncHostActivity.EXTRA_OPEN_SELECT_STOP_BACKUP_DESTINATION, false
                         ) == true,
+                        folderName = activity?.intent?.getStringExtra(
+                            SyncHostActivity.EXTRA_FOLDER_NAME,
+                        ),
                     )
                 }
             }
         }
     }
 }
-
-

@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.exception.ResourceAlreadyExistsMegaException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
@@ -52,6 +53,8 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.RefreshSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase.Companion.LOW_BATTERY_LEVEL
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
@@ -97,6 +100,8 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val changeSyncLocalRootUseCase: ChangeSyncLocalRootUseCase,
+    private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase,
+    private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncFoldersUiState(emptyList()))
@@ -160,6 +165,22 @@ internal class SyncFoldersViewModel @Inject constructor(
                 _uiState.update { state ->
                     state.copy(
                         isDisableBatteryOptimizationEnabled = value
+                    )
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            monitorSelectedMegaFolderUseCase().catch {
+                Timber.e(it)
+            }.distinctUntilChanged().collect {
+                if (it != null) {
+                    Timber.d("Selected mega folder: $it")
+                    handleAction(
+                        SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(
+                            StopBackupOption.MOVE,
+                            it
+                        )
                     )
                 }
             }
@@ -347,6 +368,7 @@ internal class SyncFoldersViewModel @Inject constructor(
             }
 
             is SyncFoldersAction.RemoveFolderClicked -> {
+                Timber.d("Remove folder clicked: ${action.syncUiItem}")
                 _uiState.update { state ->
                     state.copy(
                         showConfirmRemoveSyncFolderDialog = true,
@@ -372,54 +394,63 @@ internal class SyncFoldersViewModel @Inject constructor(
 
             is SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed -> {
                 viewModelScope.launch {
+                    Timber.d("Sync Ui Item to remove: ${uiState.value.syncUiItemToRemove}")
                     uiState.value.syncUiItemToRemove?.let { syncUiItemToRemove ->
-                        runCatching {
-                            removeFolderPairUseCase(syncUiItemToRemove.id)
-                        }.onSuccess {
-                            syncUiItemToRemove.apply {
+                        syncUiItemToRemove.apply {
+                            runCatching {
                                 when (action.stopBackupOption) {
                                     StopBackupOption.MOVE -> {
-                                        action.selectedFolder?.let { selectedFolder ->
-                                            runCatching {
-                                                moveDeconfiguredBackupNodesUseCase(
-                                                    deconfiguredBackupRoot = megaStorageNodeId,
-                                                    backupDestination = selectedFolder.id,
-                                                )
-                                            }.onFailure {
-                                                Timber.e(it)
-                                            }
-                                        } ?: run {
-                                            getRootNodeUseCase()?.let { rootNode ->
-                                                runCatching {
-                                                    moveDeconfiguredBackupNodesUseCase(
-                                                        deconfiguredBackupRoot = megaStorageNodeId,
-                                                        backupDestination = rootNode.id,
-                                                    )
-                                                }.onFailure {
-                                                    Timber.e(it)
-                                                }
-                                            }
+                                        val destinationFolderId =
+                                            action.selectedFolder?.id ?: getRootNodeUseCase()?.id
+                                        destinationFolderId?.let { folderId ->
+                                            Timber.d("Moving deconfigured backup nodes to folder with id: $folderId")
+                                            moveDeconfiguredBackupNodesUseCase(
+                                                deconfiguredBackupRoot = megaStorageNodeId,
+                                                backupDestination = folderId,
+                                            )
                                         }
                                     }
 
                                     StopBackupOption.DELETE -> {
-                                        runCatching {
-                                            removeDeconfiguredBackupNodesUseCase(
-                                                deconfiguredBackupRoot = megaStorageNodeId,
-                                            )
-                                        }.onFailure {
-                                            Timber.e(it)
-                                        }
+                                        removeDeconfiguredBackupNodesUseCase(
+                                            deconfiguredBackupRoot = megaStorageNodeId,
+                                        )
                                     }
                                 }
+                                removeFolderPairUseCase(syncUiItemToRemove.id)
+                                clearSelectedMegaFolderUseCase()
+                                _uiState.update { state ->
+                                    state.copy(
+                                        snackbarMessage = sharedResR.string.sync_snackbar_message_confirm_backup_stopped,
+                                        showConfirmRemoveSyncFolderDialog = false,
+                                        syncUiItemToRemove = null
+                                    )
+                                }
+                            }.onFailure {
+                                if (it is ResourceAlreadyExistsMegaException) {
+                                    _uiState.update { state ->
+                                        state.copy(
+                                            snackbarMessage = sharedResR.string.create_new_folder_dialog_error_existing_folder,
+                                            showConfirmRemoveSyncFolderDialog = false,
+                                            syncUiItemToRemove = null
+                                        )
+                                    }
+                                } else {
+                                    removeFolderPairUseCase(syncUiItemToRemove.id)
+                                    clearSelectedMegaFolderUseCase()
+                                    _uiState.update { state ->
+                                        state.copy(
+                                            snackbarMessage = sharedResR.string.sync_snackbar_message_confirm_backup_stopped,
+                                            showConfirmRemoveSyncFolderDialog = false,
+                                            syncUiItemToRemove = null
+                                        )
+                                    }
+                                    Timber.e(it)
+                                }
                             }
-                            _uiState.update { state -> state.copy(snackbarMessage = sharedResR.string.sync_snackbar_message_confirm_backup_stopped) }
-                        }.onFailure {
-                            Timber.e(it)
                         }
                     }
                 }
-                dismissConfirmRemoveSyncFolderDialog()
             }
 
             is SyncFoldersAction.OnRemoveFolderDialogDismissed -> {

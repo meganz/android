@@ -83,8 +83,8 @@ internal fun NavGraphBuilder.syncNavGraph(
                 SyncNewFolder(syncType = type)
             )
         },
-        onNavigateToStopBackupMegaPicker = {
-            navController.navigate(StopBackupMegaPicker)
+        onNavigateToStopBackupMegaPicker = { folderName ->
+            navController.navigate(StopBackupMegaPicker(folderName))
         },
         syncFoldersViewModel = syncFoldersViewModel,
         syncStalledIssuesViewModel = syncStalledIssuesViewModel,

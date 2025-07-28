@@ -40,7 +40,11 @@ class CheckForValidNameUseCase @Inject constructor(
         return when {
             newName.isBlank() -> ValidNameType.BLANK_NAME
             regexRepository.invalidNamePattern.matcher(newName).find() -> ValidNameType.INVALID_NAME
-            nodeExistsInCurrentLocationUseCase(node, newName) -> ValidNameType.NAME_ALREADY_EXISTS
+            nodeExistsInCurrentLocationUseCase(
+                node.id,
+                newName
+            ) -> ValidNameType.NAME_ALREADY_EXISTS
+
             else -> checkForExtension(newName, node)
         }
     }

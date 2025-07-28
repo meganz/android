@@ -2123,8 +2123,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             if (managerState.uploadEvent is StateEventWithContentTriggered) {
                 startDownloadViewModel.onUploadClicked(managerState.uploadEvent.content)
             }
-            syncMonitorViewModel.startMonitoring()
         }
+        syncMonitorViewModel.startMonitoring()
         this.collectFlow(
             viewModel.monitorConnectivityEvent,
             Lifecycle.State.STARTED

@@ -337,9 +337,10 @@ class CloudDriveSyncsFragment : Fragment() {
                                                 isFromCloudDrive = true
                                             )
                                         },
-                                        onSelectStopBackupDestinationClicked = {
+                                        onSelectStopBackupDestinationClicked = { folderName ->
                                             megaNavigator.openSelectStopBackupDestinationFromSyncsTab(
-                                                activity
+                                                activity,
+                                                folderName
                                             )
                                         },
                                         onOpenUpgradeAccountClicked = {

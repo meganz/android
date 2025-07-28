@@ -80,6 +80,7 @@ class SyncHostActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_IS_FROM_CLOUD_DRIVE = "IS_FROM_CLOUD_DRIVE"
         const val EXTRA_OPEN_SELECT_STOP_BACKUP_DESTINATION = "OPEN_SELECT_STOP_BACKUP_DESTINATION"
+        const val EXTRA_FOLDER_NAME = "FOLDER_NAME"
         const val EXTRA_NEW_FOLDER_DETAIL = "EXTRA_NEW_FOLDER_DETAIL"
     }
 }

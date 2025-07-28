@@ -29,7 +29,7 @@ internal fun NavGraphBuilder.syncListDestination(
     onOpenSyncFolder: (handle: Long) -> Unit,
     onNavigateToCameraUploadSettings: () -> Unit,
     onNavigateToNewSyncFolder: (SyncType) -> Unit,
-    onNavigateToStopBackupMegaPicker: () -> Unit,
+    onNavigateToStopBackupMegaPicker: (String?) -> Unit,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
