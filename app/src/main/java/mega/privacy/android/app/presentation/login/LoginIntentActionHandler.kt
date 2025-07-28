@@ -63,7 +63,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                         return@ReadyToFinish
                     }
 
-                    Constants.ACTION_FILE_EXPLORER_UPLOAD == action && Constants.TYPE_TEXT_PLAIN == type -> {
+                    Constants.ACTION_FILE_EXPLORER_UPLOAD == intentAction && Constants.TYPE_TEXT_PLAIN == type -> {
                         Timber.d("Intent to FileExplorerActivity")
                         activity.startActivity(
                             Intent(
@@ -88,7 +88,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                         return@ReadyToFinish
                     }
 
-                    Constants.ACTION_REFRESH == action -> {
+                    Constants.ACTION_REFRESH == intentAction -> {
                         Timber.d("Intent to refresh")
                         activity.apply {
                             setResult(Activity.RESULT_OK)
