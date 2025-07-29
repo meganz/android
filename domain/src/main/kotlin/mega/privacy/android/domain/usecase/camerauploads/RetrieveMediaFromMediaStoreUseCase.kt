@@ -48,12 +48,18 @@ class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
                 .partition { it.folderType == CameraUploadFolderType.Primary }
 
         val semaphore = Semaphore(8)
-        return@coroutineScope types.flatMap {
+        return@coroutineScope types.flatMap { type ->
             cameraUploadsRepository.getMediaList(
-                mediaStoreFileType = it,
+                mediaStoreFileType = type,
                 selectionQuery = selectionQuery,
             ).also { mediaList ->
-                updateNotExistRecordsStatus(mediaList = mediaList)
+                mediaList.takeIf { list -> list.isNotEmpty() }?.let { list ->
+                    updateNotExistRecordsStatus(
+                        mediaList = list,
+                        fileType = fileType,
+                        folderType = folderType
+                    )
+                }
             }.map { media ->
                 async {
                     semaphore.withPermit {
@@ -98,10 +104,14 @@ class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
 
     private suspend fun updateNotExistRecordsStatus(
         mediaList: List<CameraUploadsMedia>,
+        fileType: CameraUploadsRecordType,
+        folderType: CameraUploadFolderType,
     ) {
-        val pendingRecords =
-            runCatching { getPendingCameraUploadsRecordsUseCase() }.getOrElse { emptyList() }
-        if (pendingRecords.isEmpty()) return
+        val pendingRecords = runCatching {
+            getPendingCameraUploadsRecordsUseCase()
+                .filter { it.folderType == folderType && it.type == fileType }
+                .takeIf { it.isNotEmpty() }
+        }.getOrNull() ?: return
 
         val existingMediaIds = mediaList.mapTo(mutableSetOf()) { it.mediaId }
 

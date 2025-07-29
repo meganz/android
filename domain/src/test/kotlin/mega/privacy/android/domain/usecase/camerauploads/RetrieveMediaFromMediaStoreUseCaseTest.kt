@@ -18,6 +18,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 /**
@@ -234,13 +235,42 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
         }
 
     @Test
+    fun `test that getPendingCameraUploadsRecordsUseCase is not invoked when media list is null`() =
+        runTest {
+            val parentPath = ""
+            val mediaStoreFileType1 = mock<MediaStoreFileType>()
+            val types = listOf(mediaStoreFileType1)
+            val folderType = CameraUploadFolderType.Primary
+            val fileType = CameraUploadsRecordType.TYPE_VIDEO
+            val tempRoot = "tempRoot"
+            val selectionQuery = "selectionQuery"
+
+            whenever(cameraUploadsRepository.getMediaSelectionQuery(parentPath))
+                .thenReturn(selectionQuery)
+            whenever(
+                cameraUploadsRepository.getMediaList(mediaStoreFileType1, selectionQuery)
+            ).thenReturn(emptyList())
+
+            val cameraUploadsRecord1 = mock<CameraUploadsRecord> {
+                on { mediaId }.thenReturn(1111L)
+                on { timestamp }.thenReturn(1234L)
+                on { this.folderType }.thenReturn(CameraUploadFolderType.Primary)
+            }
+            whenever(cameraUploadsRepository.getAllCameraUploadsRecords())
+                .thenReturn(listOf(cameraUploadsRecord1))
+
+            underTest(parentPath, types, folderType, fileType, tempRoot)
+            verifyNoInteractions(getPendingCameraUploadsRecordsUseCase)
+        }
+
+    @Test
     fun `test that setCameraUploadsRecordUploadStatusUseCase is invoked as expected when there is no existed records`() =
         runTest {
             val parentPath = ""
             val mediaStoreFileType1 = mock<MediaStoreFileType>()
             val types = listOf(mediaStoreFileType1)
-            val folderType = mock<CameraUploadFolderType>()
-            val fileType = mock<CameraUploadsRecordType>()
+            val folderType = CameraUploadFolderType.Primary
+            val fileType = CameraUploadsRecordType.TYPE_VIDEO
             val tempRoot = "tempRoot"
             val selectionQuery = "selectionQuery"
 
@@ -251,7 +281,8 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
             val noExistRecord = mock<CameraUploadsRecord> {
                 on { mediaId }.thenReturn(55555L)
                 on { timestamp }.thenReturn(1234L)
-                on { this.folderType }.thenReturn(CameraUploadFolderType.Primary)
+                on { this.folderType }.thenReturn(folderType)
+                on { this.type }.thenReturn(fileType)
             }
 
             val cameraUploadsMediaList1 = listOf(media1, mock())
@@ -279,5 +310,93 @@ class RetrieveMediaFromMediaStoreUseCaseTest {
                 folderType = noExistRecord.folderType,
                 uploadStatus = CameraUploadsRecordUploadStatus.LOCAL_FILE_NOT_EXIST
             )
+        }
+
+    @Test
+    fun `test that setCameraUploadsRecordUploadStatusUseCase is not invoked when pending records not includes correct folderType items`() =
+        runTest {
+            val parentPath = ""
+            val mediaStoreFileType1 = mock<MediaStoreFileType>()
+            val types = listOf(mediaStoreFileType1)
+            val folderType = CameraUploadFolderType.Primary
+            val fileType = CameraUploadsRecordType.TYPE_VIDEO
+            val tempRoot = "tempRoot"
+            val selectionQuery = "selectionQuery"
+
+            val media1 = mock<CameraUploadsMedia> {
+                on { mediaId }.thenReturn(1111L)
+                on { timestamp }.thenReturn(1234L)
+            }
+            val noExistRecord = mock<CameraUploadsRecord> {
+                on { mediaId }.thenReturn(55555L)
+                on { timestamp }.thenReturn(1234L)
+                on { this.folderType }.thenReturn(CameraUploadFolderType.Secondary)
+                on { this.type }.thenReturn(fileType)
+            }
+
+            val cameraUploadsMediaList1 = listOf(media1, mock())
+            whenever(cameraUploadsRepository.getMediaSelectionQuery(parentPath))
+                .thenReturn(selectionQuery)
+            whenever(
+                cameraUploadsRepository.getMediaList(mediaStoreFileType1, selectionQuery)
+            ).thenReturn(cameraUploadsMediaList1)
+
+            val cameraUploadsRecord1 = mock<CameraUploadsRecord> {
+                on { mediaId }.thenReturn(1111L)
+                on { timestamp }.thenReturn(1234L)
+                on { this.folderType }.thenReturn(CameraUploadFolderType.Primary)
+            }
+            whenever(cameraUploadsRepository.getAllCameraUploadsRecords())
+                .thenReturn(listOf(cameraUploadsRecord1))
+
+            whenever(getPendingCameraUploadsRecordsUseCase()).thenReturn(listOf(noExistRecord))
+
+            underTest(parentPath, types, folderType, fileType, tempRoot)
+
+            verifyNoInteractions(setCameraUploadsRecordUploadStatusUseCase)
+        }
+
+    @Test
+    fun `test that setCameraUploadsRecordUploadStatusUseCase is not invoked when pending records not includes correct fileType items`() =
+        runTest {
+            val parentPath = ""
+            val mediaStoreFileType1 = mock<MediaStoreFileType>()
+            val types = listOf(mediaStoreFileType1)
+            val folderType = CameraUploadFolderType.Primary
+            val fileType = CameraUploadsRecordType.TYPE_VIDEO
+            val tempRoot = "tempRoot"
+            val selectionQuery = "selectionQuery"
+
+            val media1 = mock<CameraUploadsMedia> {
+                on { mediaId }.thenReturn(1111L)
+                on { timestamp }.thenReturn(1234L)
+            }
+            val noExistRecord = mock<CameraUploadsRecord> {
+                on { mediaId }.thenReturn(55555L)
+                on { timestamp }.thenReturn(1234L)
+                on { this.folderType }.thenReturn(folderType)
+                on { this.type }.thenReturn(CameraUploadsRecordType.TYPE_PHOTO)
+            }
+
+            val cameraUploadsMediaList1 = listOf(media1, mock())
+            whenever(cameraUploadsRepository.getMediaSelectionQuery(parentPath))
+                .thenReturn(selectionQuery)
+            whenever(
+                cameraUploadsRepository.getMediaList(mediaStoreFileType1, selectionQuery)
+            ).thenReturn(cameraUploadsMediaList1)
+
+            val cameraUploadsRecord1 = mock<CameraUploadsRecord> {
+                on { mediaId }.thenReturn(1111L)
+                on { timestamp }.thenReturn(1234L)
+                on { this.folderType }.thenReturn(CameraUploadFolderType.Primary)
+            }
+            whenever(cameraUploadsRepository.getAllCameraUploadsRecords())
+                .thenReturn(listOf(cameraUploadsRecord1))
+
+            whenever(getPendingCameraUploadsRecordsUseCase()).thenReturn(listOf(noExistRecord))
+
+            underTest(parentPath, types, folderType, fileType, tempRoot)
+
+            verifyNoInteractions(setCameraUploadsRecordUploadStatusUseCase)
         }
 }
