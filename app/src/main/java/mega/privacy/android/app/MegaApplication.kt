@@ -64,6 +64,7 @@ import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
+import mega.privacy.android.domain.usecase.domainmigration.UpdateDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
@@ -216,6 +217,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     lateinit var monitorTransferEventsToStartWorkersIfNeededUseCase: MonitorTransferEventsToStartWorkersIfNeededUseCase
 
+    @Inject
+    internal lateinit var updateDomainNameUseCase: UpdateDomainNameUseCase
+
     var localIpAddress: String? = ""
 
     private val meetingListener = MeetingListener()
@@ -257,6 +261,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         initialiseAdsIfNeeded()
         applicationScope.launch {
             runCatching { updateApiServerUseCase() }
+        }
+        applicationScope.launch {
+            runCatching { updateDomainNameUseCase() }
         }
 
         myAccountInfo.resetDefaults()
