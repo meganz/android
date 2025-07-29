@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.viewbinding.ViewBinding
 import coil3.load
+import coil3.request.error
 import coil3.request.transformations
 import coil3.transform.RoundedCornersTransformation
 import mega.privacy.android.app.MimeTypeList
@@ -182,12 +183,12 @@ class FavouritesGridViewHolder(
                         } else {
                             itemGridFile.setBackgroundResource(backgroundColor)
                             itemThumbnail.load(ThumbnailRequest(info.typedNode.id)) {
-                                transformations(
+                                this.transformations(
                                     RoundedCornersTransformation(
                                         Util.dp2px(Constants.THUMB_CORNER_RADIUS_DP).toFloat()
                                     )
                                 )
-                                error(info.icon)
+                                this.error(info.icon)
                             }
 
                             if (selectionMode) {
