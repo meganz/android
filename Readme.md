@@ -217,8 +217,10 @@ fun shouldUsePrebuiltSdk(): Boolean = false
         }
     }
     ```
+### 13. Use public dependencies
+In `lib.versions.toml`, replace dependencies of Telephoto and uCrop with their publicly available versions from their official GitHub repositories.
 
-### 13. Run the project
+### 14. Run the project
 
 Open the project with Android Studio, let it build the project and hit _*Run*_.
 
