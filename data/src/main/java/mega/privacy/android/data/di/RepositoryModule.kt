@@ -19,6 +19,7 @@ import mega.privacy.android.data.repository.DefaultCancelTokenRepository
 import mega.privacy.android.data.repository.DefaultChatParticipantsRepository
 import mega.privacy.android.data.repository.DefaultClipboardRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
+import mega.privacy.android.data.repository.DefaultDomainNameMigrationRepository
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
@@ -92,6 +93,7 @@ import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ClipboardRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.DocumentSectionRepository
+import mega.privacy.android.domain.repository.DomainNameMigrationRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
@@ -373,4 +375,8 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindBannerRepository(repository: BannerRepositoryImpl): BannerRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDomainNameMigrationRepository(repository: DefaultDomainNameMigrationRepository): DomainNameMigrationRepository
 }
