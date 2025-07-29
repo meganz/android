@@ -61,7 +61,7 @@ fun PhotosGridView(
     onLongPress: (Photo) -> Unit = {},
     onEnableCameraUploads: () -> Unit = {},
     onChangeCameraUploadsPermissions: () -> Unit = {},
-    onCloseCameraUploadsLimitedAccess: () -> Unit = {},
+    onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit = {},
     onZoomIn: () -> Unit = {},
     onZoomOut: () -> Unit = {},
 ) {
@@ -132,10 +132,17 @@ fun PhotosGridView(
                 key = "camera-uploads-limited-access-banner",
                 span = { GridItemSpan(maxLineSpan) },
             ) {
-                CameraUploadsLimitedAccess(
-                    onClick = onChangeCameraUploadsPermissions,
-                    onClose = onCloseCameraUploadsLimitedAccess,
-                )
+                if (timelineViewState.isCameraUploadsBannerImprovementEnabled) {
+                    CameraUploadsNoFullAccessBanner(
+                        onClick = onChangeCameraUploadsPermissions,
+                        onClose = { onUpdateCameraUploadsLimitedAccessState(false) },
+                    )
+                } else {
+                    CameraUploadsLimitedAccess(
+                        onClick = onChangeCameraUploadsPermissions,
+                        onClose = { onUpdateCameraUploadsLimitedAccessState(false) },
+                    )
+                }
             }
         }
 

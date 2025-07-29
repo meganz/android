@@ -86,7 +86,6 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -617,7 +616,11 @@ class PhotosFragment : Fragment() {
             }
 
             R.id.action_cu_status_warning -> {
-                checkCameraUploadsPermissions(showAction = true)
+                if (timelineViewModel.state.value.isCameraUploadsBannerImprovementEnabled) {
+                    timelineViewModel.setCameraUploadsLimitedAccess(true)
+                } else {
+                    checkCameraUploadsPermissions(showAction = true)
+                }
                 true
             }
 

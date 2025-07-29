@@ -21,6 +21,10 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.IconColor
@@ -34,6 +38,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.amber_400
 import mega.privacy.android.shared.original.core.ui.theme.blue_400
 import mega.privacy.android.shared.original.core.ui.theme.green_400
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun CameraUploadsStatusSync(
@@ -143,6 +148,39 @@ private fun CameraUploadsStatus(
 
             statusIcon()
         },
+    )
+}
+
+@Composable
+fun CameraUploadsNoFullAccessBanner(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    onClose: () -> Unit = {},
+) {
+    val description = buildAnnotatedString {
+        append(stringResource(sharedR.string.camera_uploads_banner_no_full_access_message))
+        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+            append(stringResource(R.string.camera_uploads_change_permissions))
+        }
+    }
+
+    CameraUploadsBanner(
+        modifier = modifier.clickable {
+            onClick()
+        },
+        statusIcon = R.drawable.ic_cu_status_warning,
+        title = stringResource(sharedR.string.camera_uploads_banner_complete_title),
+        description = description,
+        endIcon = {
+            MegaIcon(
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
+                contentDescription = "Camera uploads banner end icon",
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { onClose() },
+                tint = IconColor.Primary,
+            )
+        }
     )
 }
 
