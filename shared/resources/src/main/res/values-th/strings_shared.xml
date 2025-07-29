@@ -690,8 +690,8 @@
     <string name="general_open_button">เปิด</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">เพิ่มลงในเพลย์ลิสต์</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_text">หากต้องการหยุดสำรองข้อมูลโฟลเดอร์นี้ คุณต้องย้ายออกหรือลบทิ้ง</string>
+    <!-- Stop Backup confirmation dialog text -->
+    <string name="sync_stop_backup_confirm_dialog_text">หากต้องการหยุดสำรองโฟลเดอร์ของคุณ คุณต้องย้ายหรือลบโฟลเดอร์นั้น</string>
     <!-- Move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option">ย้ายโฟลเดอร์</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
@@ -811,7 +811,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">จำเป็นต้องมีนามสกุลไฟล์</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA will fetch a temporary copy of this file so you can preview it. It won’t be saved or available outside the app. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">MEGA จะเรียกสำเนาไฟล์นี้แบบชั่วคราวเพื่อให้คุณดูตัวอย่างได้ ไฟล์จะไม่ถูกบันทึกหรือเข้าถึงได้จากภายนอกแอป และจะมีการดาวน์โหลด %1$s</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">กำลังดำเนินการ: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -919,7 +919,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">การยืนยันอีเมล</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]Help Centre[/A].</string>
+    <string name="email_confirmation_content">เราได้ส่งอีเมลพร้อมลิงก์ไปยังที่อยู่อีเมลของคุณ [P]%s[/P] คลิกที่ลิงก์เพื่อยืนยันที่อยู่อีเมลและเปิดใช้งานบัญชีของคุณ\n\nหากคุณไม่ได้รับอีเมล ให้ตรวจสอบโฟลเดอร์สแปมหรือลองส่งอีกครั้ง หากพบปัญหาอื่น ๆ กรุณาเยี่ยมชม[A]ศูนย์ช่วยเหลือ[/A]ของเรา</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">ส่งใหม่</string>
     <!-- General change email address -->
@@ -1127,7 +1127,7 @@
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">พื้นที่เก็บข้อมูลจุได้ไม่อั้น</string>
     <!-- Description for generous storage feature with placeholder -->
-    <string name="pro_plan_feature_storage_desc">Store up to %1$s of data</string>
+    <string name="pro_plan_feature_storage_desc">จัดเก็บข้อมูลได้สูงสุด %1$s</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">แชร์การถ่ายโอนของคุณให้คนอื่นได้</string>
     <!-- Description for transfer sharing feature -->
@@ -1169,7 +1169,7 @@
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">การสมัครใช้งานจะต่ออายุโดยอัตโนมัติทุกครั้ง โดยจะใช้ระยะเวลาและราคาเท่ากับครั้งแรกที่สมัคร\n\nคุณสามารถยกเลิกการสมัคร แผนได้ตลอดเวลา แต่ต้องทำก่อน 24 ชั่วโมงก่อนวันที่จะตัดเงินครั้งต่อไป [A]เรียนรู้วิธีจัดการการสมัครใช้งานได้ในตั้งค่าของคุณ[/A]</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]Terms of Service[/A] and [B]Privacy Policy[/B]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]เงื่อนไขการให้บริการ[/A] และ[B]นโยบายความเป็นส่วนตัว[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">รับสิทธิประโยชน์เพิ่มเติมด้วยการอัปเกรดเป็นแผน Pro</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1271,49 +1271,49 @@
     <!-- Label for transfers -->
     <string name="general_section_transfers">การถ่ายโอน</string>
     <!-- Label for offline files -->
-    <string name="general_section_offline_files">Offline files</string>
+    <string name="general_section_offline_files">ไฟล์ออฟไลน์</string>
     <!-- Label for rubbish bin -->
     <string name="general_section_rubbish_bin">ถังขยะ</string>
     <!-- Subtitle for VPN -->
-    <string name="menu_item_vpn_subtitle">High-speed VPN</string>
+    <string name="menu_item_vpn_subtitle">VPN ความเร็วสูง</string>
     <!-- Subtitle for MEGA PASS -->
-    <string name="menu_item_mega_pass_subtitle">Securely store and autofill your passwords</string>
+    <string name="menu_item_mega_pass_subtitle">จัดเก็บและกรอกรหัสผ่านของคุณอัตโนมัติอย่างปลอดภัย</string>
     <!-- Subtitle for transfer.it -->
-    <string name="menu_item_transfer_it_subtitle">Fast, secure file transfers</string>
+    <string name="menu_item_transfer_it_subtitle">ถ่ายโอนไฟล์ได้รวดเร็วและปลอดภัย</string>
     <!-- Label for transfer it -->
     <string name="general_section_transfer_it">Transfer.it</string>
     <!-- Label for Menu -->
     <string name="general_menu">เมนู</string>
     <!-- Connection type option in Sync Settings Screen -->
-    <string name="settings_sync_connection_type_title">Connection type</string>
+    <string name="settings_sync_connection_type_title">ประเภทการเชื่อมต่อ</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">การอัปโหลดจากกล้องหยุดชั่วคราว</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">เชื่อมต่อ Wi-Fi หรืออนุญาตการใช้ข้อมูลมือถือ</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">อนุญาตให้ใช้ข้อมูลมือถือ</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Previewing large file</string>
+    <string name="alert_larger_file_preview_title">กำลังดูตัวอย่างไฟล์ขนาดใหญ่</string>
     <!-- Alert confirm button before download a big file for preview -->
-    <string name="alert_larger_file_preview_confirm_button">Preview now</string>
+    <string name="alert_larger_file_preview_confirm_button">ดูตัวอย่างตอนนี้</string>
     <!-- Alert always allow button before download a big file for preview -->
-    <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
+    <string name="alert_larger_file_preview_always_allow_button">อนุญาตให้ดูตัวอย่างเสมอ</string>
     <!-- The camera uploads notification content to reminder there is no network connection-->
-    <string name="camera_uploads_notification_content_no_network_connection">Waiting for WiFi or mobile data</string>
+    <string name="camera_uploads_notification_content_no_network_connection">กำลังรอ Wi-Fi หรือข้อมูลมือถือ</string>
     <!-- Settings title  for sync power options -->
-    <string name="settings_sync_power_settings_title">Power options</string>
+    <string name="settings_sync_power_settings_title">ตัวเลือกการใช้พลังงาน</string>
     <!-- Sync always label for sync power options -->
-    <string name="settings_sync_power_always_title">Sync always</string>
+    <string name="settings_sync_power_always_title">ซิงค์ตลอดเวลา</string>
     <!-- Sync only when charging label for sync power options -->
-    <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
+    <string name="settings_sync_battery_sync_only_when_charging_title">ซิงค์เมื่อชาร์จเท่านั้น</string>
     <!-- Message shown when uploading edited image as a new file -->
-    <string name="photo_editor_upload_message">Uploading edits as a new file</string>
+    <string name="photo_editor_upload_message">กำลังอัปโหลดการแก้ไขเป็นไฟล์ใหม่</string>
     <!-- Dialog title asking user to discard changes -->
     <string name="general_dialog_title_discard_changes">ยกเลิกการเปลี่ยนแปลงหรือไม่</string>
     <!-- Dialog title asking user to disable camera uploads -->
-    <string name="settings_camera_uploads_disable_warning">Disable Camera uploads?</string>
+    <string name="settings_camera_uploads_disable_warning">ปิดใช้งานการอัปโหลดจากกล้องหรือไม่</string>
     <!-- Sync settings change message prefix -->
-    <string name="settings_sync_message_prefix">Sync changed to:</string>
+    <string name="settings_sync_message_prefix">การซิงค์ถูกเปลี่ยนเป็น:</string>
     <!--Title of playback position dialog that is displayed when audio has playback position history. -->
     <string name="audio_playback_position_dialog_title">เล่นเสียงต่อจากก่อนหน้านี้หรือไม่</string>
     <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
@@ -1331,5 +1331,73 @@
     <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
     <string name="general_copy">คัดลอก</string>
     <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
-    <string name="node_option_move_to_rubbish_bin">ย้ายไปถังขยะ</string>
+    <string name="node_option_move_to_rubbish_bin">ย้ายไปที่ถังขยะ</string>
+    <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
+    <string name="file_properties_available_offline">ออฟไลน์</string>
+    <!-- Menu item to unselect all the elements of a list -->
+    <string name="action_unselect_all">ล้างรายการที่เลือกไว้</string>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">ลบอย่างถาวร</string>
+    <!-- option to dispute taken down file or folder -->
+    <string name="dispute_takendown_file">ระงับข้อพิพาท</string>
+    <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
+    <string name="title_edit_profile_info">แก้ไข</string>
+    <!-- Context menu item. Allows user to add file/folder to favourites -->
+    <string name="file_properties_favourite">รายการโปรด</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">ข้อมูล</string>
+    <!-- Context menu item. Allows to mark file/folder with own color label -->
+    <string name="file_properties_label">ป้ายชื่อ</string>
+    <!-- Title alert before leaving a share. -->
+    <string name="alert_leave_share">ออกจากโฟลเดอร์</string>
+    <!-- Option of the sliding panel to edit the link of a node -->
+    <string name="edit_link_option">จัดการลิงก์</string>
+    <!-- Menu option to manage a shared folder. -->
+    <string name="manage_share">จัดการการแชร์</string>
+    <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
+    <string name="search_open_location">เปิดตำแหน่งที่ตั้ง</string>
+    <!-- Item menu option to reproduce audio or video in external reproductors -->
+    <string name="external_play">เปิดด้วย</string>
+    <!-- Context menu item. Allows user to delete file/folder from favourites -->
+    <string name="file_properties_unfavourite">ลบรายการโปรด</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_remove_link_menu">เอาลิงก์ออก</string>
+    <!-- Menu option to delete one or multiple selected items. -->
+    <string name="general_remove">ลบออก</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_clean_shares_menu">ลบแชร์ออก</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_rename">เปลี่ยนชื่อ</string>
+    <!-- Menu option to restore an item from the Rubbish bin -->
+    <string name="context_restore">กู้คืน</string>
+    <!-- Menu item to select all the elements of a list -->
+    <string name="action_select_all">เลือกทั้งหมด</string>
+    <!-- send cancel subscriptions dialog -->
+    <string name="context_send">ส่ง</string>
+    <!-- menu option to send a file to a chat -->
+    <string name="context_send_file_to_chat">ส่งไปยังแชท</string>
+    <!-- menu item -->
+    <string name="context_share_folder">แชร์โฟลเดอร์</string>
+    <!-- button -->
+    <string name="general_share">แชร์</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">สไลด์โชว์</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">ยกเลิกการซ่อน</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">ตรวจสอบ %s</string>
+    <!-- Title of the section Versions for files -->
+    <string name="title_section_versions">เวอร์ชัน</string>
+    <!-- Action to show any file in its location -->
+    <string name="view_in_folder_label">ดูในโฟลเดอร์</string>
+    <!-- Stop Backup confirmation dialog delete explanation -->
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">หากคุณเลือกลบ โฟลเดอร์จะถูกลบออกจาก MEGA แต่จะไม่ถูกลบออกจากอุปกรณ์ของคุณ</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">ย้ายไปยังคลาวด์ไดร์ฟ</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">ลบอย่างถาวร</string>
+    <!-- Title of the Camera Uploads complete banner in Photos -->
+    <string name="camera_uploads_banner_complete_title">การอัปโหลดกล้องเสร็จสมบูรณ์</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_uploads_banner_no_full_access_message">เพื่อให้มั่นใจว่าคุณจะไม่พลาดทุกความทรงจำ MEGA ต้องการสิทธิ์เข้าถึงแกลเลอรี่รูปภาพของคุณแบบเต็มที่</string>
 </resources>

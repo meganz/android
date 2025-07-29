@@ -726,8 +726,8 @@
     <string name="general_open_button">Otwórz</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">Dodaj do listy odtwarzania</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_text">Aby przestać tworzyć kopie zapasowe tego katalogu, należy go przenieść lub usunąć.</string>
+    <!-- Stop Backup confirmation dialog text -->
+    <string name="sync_stop_backup_confirm_dialog_text">Aby przestać tworzyć kopie zapasowe swojego katalogu, należy go przenieść lub usunąć.</string>
     <!-- Move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option">Przenieś katalog</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
@@ -1181,7 +1181,7 @@
     <!-- Description for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_desc">Osoby, z którymi udostępniasz elementy, mogą korzystać z Twojego limitu na pobieranie i strumieniowanie plików</string>
     <!-- Title for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_title">Dostęp do MEGA &#160; VPN</string>
+    <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
     <string name="pro_plan_feature_vpn_desc">Pozostań bezpieczny w sieci dzięki naszej szybkiej i prostej w użyciu sieci VPN</string>
     <!-- Title for MEGA Pass feature -->
@@ -1382,5 +1382,73 @@
     <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
     <string name="general_copy">Skopiuj</string>
     <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
-    <string name="node_option_move_to_rubbish_bin">Przenieś do kosza</string>
+    <string name="node_option_move_to_rubbish_bin">Przenieś do Kosza</string>
+    <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
+    <string name="file_properties_available_offline">Dostępne offline</string>
+    <!-- Menu item to unselect all the elements of a list -->
+    <string name="action_unselect_all">Wyczyść</string>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Usuń trwale</string>
+    <!-- option to dispute taken down file or folder -->
+    <string name="dispute_takendown_file">Roztrzyganie sporów</string>
+    <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
+    <string name="title_edit_profile_info">Edytuj</string>
+    <!-- Context menu item. Allows user to add file/folder to favourites -->
+    <string name="file_properties_favourite">Ulubione</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Info</string>
+    <!-- Context menu item. Allows to mark file/folder with own color label -->
+    <string name="file_properties_label">Etykieta</string>
+    <!-- Title alert before leaving a share. -->
+    <string name="alert_leave_share">Opuść katalog</string>
+    <!-- Option of the sliding panel to edit the link of a node -->
+    <string name="edit_link_option">Zarządzaj linkiem</string>
+    <!-- Menu option to manage a shared folder. -->
+    <string name="manage_share">Zarządzaj udziałem</string>
+    <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
+    <string name="search_open_location">Otwórz łącze</string>
+    <!-- Item menu option to reproduce audio or video in external reproductors -->
+    <string name="external_play">Otwórz z</string>
+    <!-- Context menu item. Allows user to delete file/folder from favourites -->
+    <string name="file_properties_unfavourite">Usuń ulubione</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_remove_link_menu">Usuń&#160;link</string>
+    <!-- Menu option to delete one or multiple selected items. -->
+    <string name="general_remove">Usuń</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_clean_shares_menu">Usuń udostępnienie</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_rename">Zmień nazwę</string>
+    <!-- Menu option to restore an item from the Rubbish bin -->
+    <string name="context_restore">Odzyskaj</string>
+    <!-- Menu item to select all the elements of a list -->
+    <string name="action_select_all">Zaznacz wszystkie</string>
+    <!-- send cancel subscriptions dialog -->
+    <string name="context_send">Wyślij</string>
+    <!-- menu option to send a file to a chat -->
+    <string name="context_send_file_to_chat">Wyślij do czatu</string>
+    <!-- menu item -->
+    <string name="context_share_folder">Udostępnij katalog</string>
+    <!-- button -->
+    <string name="general_share">Udostępnij</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Pokaz slajdów</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Odkryj</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Zweryfikuj %s</string>
+    <!-- Title of the section Versions for files -->
+    <string name="title_section_versions">Wersje</string>
+    <!-- Action to show any file in its location -->
+    <string name="view_in_folder_label">Wyświetl w katalogu</string>
+    <!-- Stop Backup confirmation dialog delete explanation -->
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Jeśli zdecydujesz się go usunąć, katalog zostanie usunięty z MEGA, ale nie zostanie usunięty z Twojego urządzenia.</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Przenieś do Dysku w Chmurze</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Usuń trwale</string>
+    <!-- Title of the Camera Uploads complete banner in Photos -->
+    <string name="camera_uploads_banner_complete_title">Wgrywanie plików z kamery zakończone</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_uploads_banner_no_full_access_message">Aby upewnić się, że nie przegapimy żadnych Twoich wspomnień, MEGA potrzebuje pełnego dostępu do Twojej biblioteki zdjęć.</string>
 </resources>

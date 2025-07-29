@@ -362,7 +362,7 @@
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Öğe taşındı</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Öğe Çöp kutusuna taşındı</string>
+    <string name="context_correctly_moved_to_rubbish">Öğe, Çöp kutusuna taşındı</string>
     <!-- error message -->
     <string name="context_no_moved">Hata. Taşınamadı</string>
     <!-- success message when sharing a folder -->
@@ -1166,7 +1166,7 @@
     <!-- Message when an user avatar has been changed successfully -->
     <string name="success_changing_user_avatar">Profil fotoğrafı güncellendi</string>
     <!-- Message when an error ocurred when changing an user avatar -->
-    <string name="error_changing_user_avatar_image_not_available">Hata. Seçilen görüntü mevcut değil</string>
+    <string name="error_changing_user_avatar_image_not_available">Hata. Seçilen görsel mevcut değil</string>
     <!-- Message when an error ocurred when changing an user avatar -->
     <string name="error_changing_user_avatar">Profil fotoğrafı değiştirilirken bir hata oluştu</string>
     <!-- Message when an user avatar has been deleted successfully -->
@@ -1431,7 +1431,7 @@
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Çevrim dışı için kaydedilmiş [/B][A]dosya yok[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_contacts">[B]Kişileriniz [/B][A]yok[/A]</string>
+    <string name="context_empty_contacts">[B]Kişi [/B][A]bulunamadı[/A]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]Gelen paylaşımlı klasör [/B][A]yok[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -2300,7 +2300,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">MEGA\’nın şifreli sohbeti ile kişilerinizi davet edin ve güvenli bir şekilde sohbet etmeye başlayın.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Merhaba, MEGA\’da bana katılın ve ücretsiz, güvenli bir şekilde şifrelenmiş depolama ve iletişimin keyfini çıkarın. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Merhaba, MEGA\’ya katılarak ücretsiz ve güvenli bir şekilde şifrelenmiş depolama ve iletişimin keyfini çıkart. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Sohbet bağlantısı yok.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2331,7 +2331,7 @@
     <string name="title_bucket">%1$s ve %2$d daha</string>
     <!-- Title of a media recents bucket that only contains some images -->
     <plurals name="title_media_bucket_only_images">
-        <item quantity="one">%d görsel</item>
+        <item quantity="one">%d görüntü</item>
         <item quantity="other">%d görüntü</item>
     </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
@@ -2341,7 +2341,7 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d görsel&#160;</item>
+        <item quantity="one">%1$d görüntü&#160;</item>
         <item quantity="other">%1$d görüntü&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->

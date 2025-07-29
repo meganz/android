@@ -690,8 +690,8 @@
     <string name="general_open_button">열기</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">재생목록에 추가</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_text">이 폴더의 백업을 중단하시려면, 폴더를 이동하거나 삭제해야 합니다.</string>
+    <!-- Stop Backup confirmation dialog text -->
+    <string name="sync_stop_backup_confirm_dialog_text">폴더의 백업을 중단하시려면, 폴더를 이동하거나 삭제해야 합니다.</string>
     <!-- Move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option">폴더 이동</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
@@ -1332,4 +1332,72 @@
     <string name="general_copy">복사</string>
     <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
     <string name="node_option_move_to_rubbish_bin">휴지통으로 이동</string>
+    <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
+    <string name="file_properties_available_offline">오프라인 이용 가능</string>
+    <!-- Menu item to unselect all the elements of a list -->
+    <string name="action_unselect_all">선택 해제</string>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">영구적으로 삭제</string>
+    <!-- option to dispute taken down file or folder -->
+    <string name="dispute_takendown_file">게시중단 이의제기</string>
+    <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
+    <string name="title_edit_profile_info">수정</string>
+    <!-- Context menu item. Allows user to add file/folder to favourites -->
+    <string name="file_properties_favourite">즐겨찾기</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">정보</string>
+    <!-- Context menu item. Allows to mark file/folder with own color label -->
+    <string name="file_properties_label">라벨</string>
+    <!-- Title alert before leaving a share. -->
+    <string name="alert_leave_share">폴더 나가기</string>
+    <!-- Option of the sliding panel to edit the link of a node -->
+    <string name="edit_link_option">링크 관리</string>
+    <!-- Menu option to manage a shared folder. -->
+    <string name="manage_share">공유 관리</string>
+    <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
+    <string name="search_open_location">위치 열기</string>
+    <!-- Item menu option to reproduce audio or video in external reproductors -->
+    <string name="external_play">다음으로 열기</string>
+    <!-- Context menu item. Allows user to delete file/folder from favourites -->
+    <string name="file_properties_unfavourite">즐겨찾기 삭제</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_remove_link_menu">링크 제거</string>
+    <!-- Menu option to delete one or multiple selected items. -->
+    <string name="general_remove">제거</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_clean_shares_menu">공유 제거</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_rename">이름 바꾸기</string>
+    <!-- Menu option to restore an item from the Rubbish bin -->
+    <string name="context_restore">복구</string>
+    <!-- Menu item to select all the elements of a list -->
+    <string name="action_select_all">모두 선택</string>
+    <!-- send cancel subscriptions dialog -->
+    <string name="context_send">보내기</string>
+    <!-- menu option to send a file to a chat -->
+    <string name="context_send_file_to_chat">대화</string>
+    <!-- menu item -->
+    <string name="context_share_folder">폴더 공유</string>
+    <!-- button -->
+    <string name="general_share">공유</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">슬라이드쇼</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">숨기기 취소</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">%s 님 인증</string>
+    <!-- Title of the section Versions for files -->
+    <string name="title_section_versions">버전</string>
+    <!-- Action to show any file in its location -->
+    <string name="view_in_folder_label">폴더에서 보기</string>
+    <!-- Stop Backup confirmation dialog delete explanation -->
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">삭제하기로 선택했다면, 폴더는 MEGA에서 삭제되지만 당신의 장치에서는 삭제되지 않습니다.</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">클라우드 드라이브로 이동</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">영구적으로 삭제</string>
+    <!-- Title of the Camera Uploads complete banner in Photos -->
+    <string name="camera_uploads_banner_complete_title">카메라 업로드 완료</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
 </resources>

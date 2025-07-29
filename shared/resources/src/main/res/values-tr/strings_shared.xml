@@ -702,8 +702,8 @@
     <string name="general_open_button">Aç</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">Oynatma listesine ekle</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_text">Bu klasörü yedeklemeyi durdurmak için taşımanız veya silmeniz gerekir.</string>
+    <!-- Stop Backup confirmation dialog text -->
+    <string name="sync_stop_backup_confirm_dialog_text">Klasörünüzün yedeklemesini durdurmak için onu taşımanız veya silmeniz gerekir.</string>
     <!-- Move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option">Klasörü taşı</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
@@ -1348,5 +1348,73 @@
     <!-- General copy. A menu option to copy node(s), file(s) or folder(s) on the device -->
     <string name="general_copy">Kopyala</string>
     <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
-    <string name="node_option_move_to_rubbish_bin">Move to rubbish bin</string>
+    <string name="node_option_move_to_rubbish_bin">Çöp kutusuna taşı</string>
+    <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
+    <string name="file_properties_available_offline">Çevrim dışı kullanılabilir</string>
+    <!-- Menu item to unselect all the elements of a list -->
+    <string name="action_unselect_all">Tüm seçimleri kaldır</string>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Kalıcı olarak sil</string>
+    <!-- option to dispute taken down file or folder -->
+    <string name="dispute_takendown_file">Kaldırma işlemine itiraz et</string>
+    <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
+    <string name="title_edit_profile_info">Düzenle</string>
+    <!-- Context menu item. Allows user to add file/folder to favourites -->
+    <string name="file_properties_favourite">Favori</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Bilgi</string>
+    <!-- Context menu item. Allows to mark file/folder with own color label -->
+    <string name="file_properties_label">İşaret</string>
+    <!-- Title alert before leaving a share. -->
+    <string name="alert_leave_share">Klasörden ayrıl</string>
+    <!-- Option of the sliding panel to edit the link of a node -->
+    <string name="edit_link_option">Bağlantıyı yönet</string>
+    <!-- Menu option to manage a shared folder. -->
+    <string name="manage_share">Paylaşımı yönet</string>
+    <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
+    <string name="search_open_location">Konumu aç</string>
+    <!-- Item menu option to reproduce audio or video in external reproductors -->
+    <string name="external_play">Şununla aç</string>
+    <!-- Context menu item. Allows user to delete file/folder from favourites -->
+    <string name="file_properties_unfavourite">Favoriden kaldır</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_remove_link_menu">Bağlantıyı kaldır</string>
+    <!-- Menu option to delete one or multiple selected items. -->
+    <string name="general_remove">Kaldır</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_clean_shares_menu">Paylaşımı kaldır</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_rename">Yeniden adlandır</string>
+    <!-- Menu option to restore an item from the Rubbish bin -->
+    <string name="context_restore">Kurtar</string>
+    <!-- Menu item to select all the elements of a list -->
+    <string name="action_select_all">Tümünü seç</string>
+    <!-- send cancel subscriptions dialog -->
+    <string name="context_send">Gönder</string>
+    <!-- menu option to send a file to a chat -->
+    <string name="context_send_file_to_chat">Sohbete gönder</string>
+    <!-- menu item -->
+    <string name="context_share_folder">Klasörü paylaş</string>
+    <!-- button -->
+    <string name="general_share">Paylaşım</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Slayt gösterisi</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Göster</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">%s kişisini doğrula</string>
+    <!-- Title of the section Versions for files -->
+    <string name="title_section_versions">Sürüm sayısı</string>
+    <!-- Action to show any file in its location -->
+    <string name="view_in_folder_label">Klasörde görüntüle</string>
+    <!-- Stop Backup confirmation dialog delete explanation -->
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Silmeyi seçerseniz, klasör MEGA\’dan silinir ancak cihazınızdan silinmez.</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Bulut depolamaya taşı</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Kalıcı olarak sil</string>
+    <!-- Title of the Camera Uploads complete banner in Photos -->
+    <string name="camera_uploads_banner_complete_title">Kamera yüklemeleri tamamlandı</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_uploads_banner_no_full_access_message">Tüm anılarınızı kaçırmadığımızdan emin olmak için MEGA\’nın fotoğraf arşivinize tam erişimi olması gerekiyor.</string>
 </resources>
