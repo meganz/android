@@ -690,8 +690,8 @@
     <string name="general_open_button">開啟</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">新增到播放列表</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_text">要停止備份此資料夾，您需要移動或刪除它。</string>
+    <!-- Stop Backup confirmation dialog text -->
+    <string name="sync_stop_backup_confirm_dialog_text">要停止備份您的資料夾，您需要移動或刪除它。</string>
     <!-- Move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option">移動資料夾</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
@@ -1332,4 +1332,72 @@
     <string name="general_copy">複製</string>
     <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
     <string name="node_option_move_to_rubbish_bin">移至垃圾筒</string>
+    <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
+    <string name="file_properties_available_offline">可離線存取</string>
+    <!-- Menu item to unselect all the elements of a list -->
+    <string name="action_unselect_all">清除選取</string>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">永久刪除</string>
+    <!-- option to dispute taken down file or folder -->
+    <string name="dispute_takendown_file">爭議撤除</string>
+    <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
+    <string name="title_edit_profile_info">編輯</string>
+    <!-- Context menu item. Allows user to add file/folder to favourites -->
+    <string name="file_properties_favourite">我的最愛</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">資訊</string>
+    <!-- Context menu item. Allows to mark file/folder with own color label -->
+    <string name="file_properties_label">標籤</string>
+    <!-- Title alert before leaving a share. -->
+    <string name="alert_leave_share">離開資料夾</string>
+    <!-- Option of the sliding panel to edit the link of a node -->
+    <string name="edit_link_option">管理連結</string>
+    <!-- Menu option to manage a shared folder. -->
+    <string name="manage_share">管理分享</string>
+    <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
+    <string name="search_open_location">開啟位置</string>
+    <!-- Item menu option to reproduce audio or video in external reproductors -->
+    <string name="external_play">開啟於</string>
+    <!-- Context menu item. Allows user to delete file/folder from favourites -->
+    <string name="file_properties_unfavourite">移除收藏</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_remove_link_menu">移除連結</string>
+    <!-- Menu option to delete one or multiple selected items. -->
+    <string name="general_remove">移除</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_clean_shares_menu">移除共享</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_rename">重新命名</string>
+    <!-- Menu option to restore an item from the Rubbish bin -->
+    <string name="context_restore">還原</string>
+    <!-- Menu item to select all the elements of a list -->
+    <string name="action_select_all">全選</string>
+    <!-- send cancel subscriptions dialog -->
+    <string name="context_send">送出</string>
+    <!-- menu option to send a file to a chat -->
+    <string name="context_send_file_to_chat">發送至對話</string>
+    <!-- menu item -->
+    <string name="context_share_folder">共享資料夾</string>
+    <!-- button -->
+    <string name="general_share">共享</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">幻燈片</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">取消隱藏</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">驗證%s</string>
+    <!-- Title of the section Versions for files -->
+    <string name="title_section_versions">版本</string>
+    <!-- Action to show any file in its location -->
+    <string name="view_in_folder_label">在資料夾中檢視</string>
+    <!-- Stop Backup confirmation dialog delete explanation -->
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">如果您選擇刪除它，該資料夾將從MEGA中刪除，但不會從您的裝置中刪除。</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">移到雲端硬碟</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">永久刪除</string>
+    <!-- Title of the Camera Uploads complete banner in Photos -->
+    <string name="camera_uploads_banner_complete_title">相機上傳完成</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
 </resources>

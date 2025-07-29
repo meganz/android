@@ -690,8 +690,8 @@
     <string name="general_open_button">開く</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">プレイリストに追加</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_text">このフォルダのバックアップを停止するには、それを移動するか、削除する必要があります。</string>
+    <!-- Stop Backup confirmation dialog text -->
+    <string name="sync_stop_backup_confirm_dialog_text">フォルダのバックアップを停止するには、フォルダを移動するか削除する必要があります。</string>
     <!-- Move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option">フォルダの移動</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
@@ -1332,4 +1332,72 @@
     <string name="general_copy">コピー</string>
     <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
     <string name="node_option_move_to_rubbish_bin">ごみ箱に移す</string>
+    <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
+    <string name="file_properties_available_offline">オフラインで利用可能</string>
+    <!-- Menu item to unselect all the elements of a list -->
+    <string name="action_unselect_all">選択をクリア</string>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">恒久的に削除</string>
+    <!-- option to dispute taken down file or folder -->
+    <string name="dispute_takendown_file">異議申立による削除</string>
+    <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
+    <string name="title_edit_profile_info">編集</string>
+    <!-- Context menu item. Allows user to add file/folder to favourites -->
+    <string name="file_properties_favourite">お気に入り</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">情報</string>
+    <!-- Context menu item. Allows to mark file/folder with own color label -->
+    <string name="file_properties_label">ラベル</string>
+    <!-- Title alert before leaving a share. -->
+    <string name="alert_leave_share">フォルダの共有を解除する</string>
+    <!-- Option of the sliding panel to edit the link of a node -->
+    <string name="edit_link_option">リンク管理</string>
+    <!-- Menu option to manage a shared folder. -->
+    <string name="manage_share">共有を管理</string>
+    <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
+    <string name="search_open_location">場所を開く</string>
+    <!-- Item menu option to reproduce audio or video in external reproductors -->
+    <string name="external_play">以下で開く</string>
+    <!-- Context menu item. Allows user to delete file/folder from favourites -->
+    <string name="file_properties_unfavourite">お気に入りを削除</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_remove_link_menu">リンクを削除</string>
+    <!-- Menu option to delete one or multiple selected items. -->
+    <string name="general_remove">削除</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_clean_shares_menu">共有を削除</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_rename">名前を変更</string>
+    <!-- Menu option to restore an item from the Rubbish bin -->
+    <string name="context_restore">修復する</string>
+    <!-- Menu item to select all the elements of a list -->
+    <string name="action_select_all">すべて選択</string>
+    <!-- send cancel subscriptions dialog -->
+    <string name="context_send">送信</string>
+    <!-- menu option to send a file to a chat -->
+    <string name="context_send_file_to_chat">チャットに送信</string>
+    <!-- menu item -->
+    <string name="context_share_folder">フォルダを共有</string>
+    <!-- button -->
+    <string name="general_share">共有</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">スライドショー</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">非表示を解除</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">%sさんを認証</string>
+    <!-- Title of the section Versions for files -->
+    <string name="title_section_versions">バージョン</string>
+    <!-- Action to show any file in its location -->
+    <string name="view_in_folder_label">フォルダで表示</string>
+    <!-- Stop Backup confirmation dialog delete explanation -->
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">削除を選択した場合、フォルダはMEGAから削除されますが、お使いのデバイスからは削除されません。</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">クラウドドライブに移動</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">恒久的に削除</string>
+    <!-- Title of the Camera Uploads complete banner in Photos -->
+    <string name="camera_uploads_banner_complete_title">カメラアップロードが完了しました</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_uploads_banner_no_full_access_message">思い出をすべて見逃さないようにするには、MEGAに写真ライブラリへのフルアクセスを許可してください。</string>
 </resources>

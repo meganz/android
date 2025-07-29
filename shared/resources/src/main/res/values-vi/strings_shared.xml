@@ -690,8 +690,8 @@
     <string name="general_open_button">Mở</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">Thêm vào danh&#160;sách phát</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_text">Để chấm dứt sao lưu thư mục này, bạn phải di chuyển hoặc xóa nó.</string>
+    <!-- Stop Backup confirmation dialog text -->
+    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up your folder, you need to either move it or delete it.</string>
     <!-- Move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option">Di chuyển thư mục</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
@@ -1332,4 +1332,72 @@
     <string name="general_copy">Sao chép</string>
     <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
     <string name="node_option_move_to_rubbish_bin">Chuyển vào Thùng Rác</string>
+    <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
+    <string name="file_properties_available_offline">Được lưu ngoại tuyến</string>
+    <!-- Menu item to unselect all the elements of a list -->
+    <string name="action_unselect_all">Bỏ lựa chọn</string>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Xóa vĩnh viễn</string>
+    <!-- option to dispute taken down file or folder -->
+    <string name="dispute_takendown_file">Phản&#160;đối yêu&#160;cầu gỡ bỏ</string>
+    <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
+    <string name="title_edit_profile_info">Sửa</string>
+    <!-- Context menu item. Allows user to add file/folder to favourites -->
+    <string name="file_properties_favourite">Đánh dấu ưa thích</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Thông tin</string>
+    <!-- Context menu item. Allows to mark file/folder with own color label -->
+    <string name="file_properties_label">Màu nhãn</string>
+    <!-- Title alert before leaving a share. -->
+    <string name="alert_leave_share">Rời khỏi thư mục</string>
+    <!-- Option of the sliding panel to edit the link of a node -->
+    <string name="edit_link_option">Quản lý đường liên kết</string>
+    <!-- Menu option to manage a shared folder. -->
+    <string name="manage_share">Quản lý chia sẻ</string>
+    <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
+    <string name="search_open_location">Đến vị&#160;trí chứa tệp&#160;tin</string>
+    <!-- Item menu option to reproduce audio or video in external reproductors -->
+    <string name="external_play">Mở với</string>
+    <!-- Context menu item. Allows user to delete file/folder from favourites -->
+    <string name="file_properties_unfavourite">Loại bỏ ưa thích</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_remove_link_menu">Loại bỏ đường liên&#160;kết</string>
+    <!-- Menu option to delete one or multiple selected items. -->
+    <string name="general_remove">Xóa</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_clean_shares_menu">Loại bỏ chia&#160;sẻ</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_rename">Đổi tên</string>
+    <!-- Menu option to restore an item from the Rubbish bin -->
+    <string name="context_restore">Khôi phục</string>
+    <!-- Menu item to select all the elements of a list -->
+    <string name="action_select_all">Chọn tất cả</string>
+    <!-- send cancel subscriptions dialog -->
+    <string name="context_send">Gửi</string>
+    <!-- menu option to send a file to a chat -->
+    <string name="context_send_file_to_chat">Gửi đến cuộc chat</string>
+    <!-- menu item -->
+    <string name="context_share_folder">Chia sẻ thư mục</string>
+    <!-- button -->
+    <string name="general_share">Chia&#160;sẻ</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Chạy trình chiếu</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Hiện</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Xác thực %s</string>
+    <!-- Title of the section Versions for files -->
+    <string name="title_section_versions">Các phiên bản</string>
+    <!-- Action to show any file in its location -->
+    <string name="view_in_folder_label">Xem trong thư&#160;mục chứa</string>
+    <!-- Stop Backup confirmation dialog delete explanation -->
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">If you choose to delete it, the folder will be deleted from MEGA but it won’t be deleted from your device.</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Move to Cloud drive</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Xóa vĩnh viễn</string>
+    <!-- Title of the Camera Uploads complete banner in Photos -->
+    <string name="camera_uploads_banner_complete_title">Đăng tải camêra đã hoàn tất</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
 </resources>

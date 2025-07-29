@@ -1349,10 +1349,6 @@
     <string name="general_copy">Copy</string>
     <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
     <string name="node_option_move_to_rubbish_bin">Move to Rubbish bin</string>
-    <!-- Title of the Camera Uploads complete banner in Photos -->
-    <string name="camera_uploads_banner_complete_title">Camera uploads complete</string>
-    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
     <string name="file_properties_available_offline">Available offline</string>
     <!-- Menu item to unselect all the elements of a list -->
@@ -1417,4 +1413,8 @@
     <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Move to Cloud drive</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
     <string name="sync_stop_backup_confirm_dialog_delete_permanently">Delete permanently</string>
+    <!-- Title of the Camera Uploads complete banner in Photos -->
+    <string name="camera_uploads_banner_complete_title">Camera uploads complete</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
 </resources>

@@ -714,8 +714,8 @@
     <string name="general_open_button">Abrir</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">Añadir a la lista de reproducción</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_text">Para dejar de tener un backup de esta carpeta, necesitas moverla o eliminarla.</string>
+    <!-- Stop Backup confirmation dialog text -->
+    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up your folder, you need to either move it or delete it.</string>
     <!-- Move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option">Mover carpeta</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
@@ -837,7 +837,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Se necesita la extensión del archivo</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA will fetch a temporary copy of this file so you can preview it. It won’t be saved or available outside the app. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">MEGA buscará una copia temporal de este archivo para que puedas previsualizarlo. No se guardará ni estará disponible fuera de la aplicación. Se descargarán %1$s.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Completando operación: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -951,7 +951,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Confirmación por correo</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]Help Centre[/A].</string>
+    <string name="email_confirmation_content">Hemos enviado un correo a [P]%s[/P] con un enlace. Toca en el enlace para verificar tu dirección de correo y así activar tu cuenta. \n\nSi no recibes ese correo electrónico, revisa tu carpeta de spam o prueba de nuevo. Para cualquier otro problema, visita nuestro [A]Centro de ayuda[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Reenviar</string>
     <!-- General change email address -->
@@ -1159,13 +1159,13 @@
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Almacenamiento generoso</string>
     <!-- Description for generous storage feature with placeholder -->
-    <string name="pro_plan_feature_storage_desc">Store up to %1$s of data</string>
+    <string name="pro_plan_feature_storage_desc">Almacena hasta %1$s de datos</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Transferencia compartida</string>
     <!-- Description for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_desc">Las personas con las que compartes datos pueden usar tu cuota para descargar y hacer streaming de archivos</string>
     <!-- Title for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_title">Acceso a MEGA&#160;VPN</string>
+    <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
     <string name="pro_plan_feature_vpn_desc">Mantente seguro en línea con nuestra VPN de alta velocidad, rápida y fácil de usar</string>
     <!-- Title for MEGA Pass feature -->
@@ -1201,7 +1201,7 @@
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">La suscripción se renueva automáticamente con la misma duración y precio elegidos inicialmente.\n\nPuedes cancelar tu suscripción en cualquier momento, siempre y cuando sea al menos 24 horas antes del siguiente pago. [A]Obtén información sobre cómo gestionar tu suscripción en los ajustes[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]Terms of Service[/A] and [B]Privacy Policy[/B]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]Términos de servicio[/A] y [B]Política de privacidad[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">Obtén más con un plan Pro</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1217,7 +1217,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
     <string name="choose_account_screen_transfer_quota_label">%1$s de transferencia</string>
     <!-- General month label -->
-    <string name="general_month">/month</string>
+    <string name="general_month">/mes</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s al mes</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
@@ -1285,9 +1285,9 @@
     <!-- Warning indicating that the transfer quota limit has been reached -->
     <string name="transfers_transfer_quota_banner_title">Obtén más cuota de transferencia</string>
     <!-- Warning indicating that the storage quota limit has been reached -->
-    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <string name="transfers_storage_quota_banner_title">Obtén más cuota de almacenamiento</string>
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
-    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <string name="transfers_storage_and_transfer_quota_banner_title">Obtén más espacio de almacenamiento y cuota de transferencia</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">Centro de ayuda</string>
     <!-- Warning informing the transfers queue has been paused -->
@@ -1305,49 +1305,49 @@
     <!-- Label for transfers -->
     <string name="general_section_transfers">Transferencias</string>
     <!-- Label for offline files -->
-    <string name="general_section_offline_files">Offline files</string>
+    <string name="general_section_offline_files">Archivos sin conexión</string>
     <!-- Label for rubbish bin -->
     <string name="general_section_rubbish_bin">Papelera</string>
     <!-- Subtitle for VPN -->
-    <string name="menu_item_vpn_subtitle">High-speed VPN</string>
+    <string name="menu_item_vpn_subtitle">VPN de alta velocidad</string>
     <!-- Subtitle for MEGA PASS -->
-    <string name="menu_item_mega_pass_subtitle">Securely store and autofill your passwords</string>
+    <string name="menu_item_mega_pass_subtitle">Almacena y autocompleta tus contraseñas de forma segura</string>
     <!-- Subtitle for transfer.it -->
-    <string name="menu_item_transfer_it_subtitle">Fast, secure file transfers</string>
+    <string name="menu_item_transfer_it_subtitle">Transferencias de archivos rápidas y seguras</string>
     <!-- Label for transfer it -->
     <string name="general_section_transfer_it">Transfer.it</string>
     <!-- Label for Menu -->
     <string name="general_menu">Menu</string>
     <!-- Connection type option in Sync Settings Screen -->
-    <string name="settings_sync_connection_type_title">Connection type</string>
+    <string name="settings_sync_connection_type_title">Tipo de conexión</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">Se han pausado las subidas de la cámara</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">Conéctate al WiFi o permite el uso de datos móviles</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">Permitir datos móviles</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Previewing large file</string>
+    <string name="alert_larger_file_preview_title">Previsualizar archivos grandes</string>
     <!-- Alert confirm button before download a big file for preview -->
-    <string name="alert_larger_file_preview_confirm_button">Preview now</string>
+    <string name="alert_larger_file_preview_confirm_button">Vista previa</string>
     <!-- Alert always allow button before download a big file for preview -->
-    <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
+    <string name="alert_larger_file_preview_always_allow_button">Permitir siempre vistas previas</string>
     <!-- The camera uploads notification content to reminder there is no network connection-->
-    <string name="camera_uploads_notification_content_no_network_connection">Waiting for WiFi or mobile data</string>
+    <string name="camera_uploads_notification_content_no_network_connection">Esperando WiFi o datos móviles</string>
     <!-- Settings title  for sync power options -->
-    <string name="settings_sync_power_settings_title">Power options</string>
+    <string name="settings_sync_power_settings_title">Opciones de alimentación</string>
     <!-- Sync always label for sync power options -->
-    <string name="settings_sync_power_always_title">Sync always</string>
+    <string name="settings_sync_power_always_title">Sincronizar siempre</string>
     <!-- Sync only when charging label for sync power options -->
-    <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
+    <string name="settings_sync_battery_sync_only_when_charging_title">Sincronizar solo cargando</string>
     <!-- Message shown when uploading edited image as a new file -->
-    <string name="photo_editor_upload_message">Uploading edits as a new file</string>
+    <string name="photo_editor_upload_message">Subiendo las ediciones como un nuevo archivo</string>
     <!-- Dialog title asking user to discard changes -->
     <string name="general_dialog_title_discard_changes">¿Descartar los cambios?</string>
     <!-- Dialog title asking user to disable camera uploads -->
-    <string name="settings_camera_uploads_disable_warning">Disable Camera uploads?</string>
+    <string name="settings_camera_uploads_disable_warning">¿Desactivar las subidas de la cámara?</string>
     <!-- Sync settings change message prefix -->
-    <string name="settings_sync_message_prefix">Sync changed to:</string>
+    <string name="settings_sync_message_prefix">Sincronización cambiada a:</string>
     <!--Title of playback position dialog that is displayed when audio has playback position history. -->
     <string name="audio_playback_position_dialog_title">¿Reanudar audio?</string>
     <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
@@ -1366,4 +1366,72 @@
     <string name="general_copy">Copiar</string>
     <!-- Option text to move node(s), file(s) or folder(s) to the rubbish bin -->
     <string name="node_option_move_to_rubbish_bin">Mover a la Papelera</string>
+    <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
+    <string name="file_properties_available_offline">Sin conexión</string>
+    <!-- Menu item to unselect all the elements of a list -->
+    <string name="action_unselect_all">Deseleccionar</string>
+    <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
+    <string name="rubbish_bin_bottom_menu_option_delete">Eliminar permanentemente</string>
+    <!-- option to dispute taken down file or folder -->
+    <string name="dispute_takendown_file">Disputar la retirada</string>
+    <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
+    <string name="title_edit_profile_info">Editar</string>
+    <!-- Context menu item. Allows user to add file/folder to favourites -->
+    <string name="file_properties_favourite">Favorito</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Información</string>
+    <!-- Context menu item. Allows to mark file/folder with own color label -->
+    <string name="file_properties_label">Etiqueta</string>
+    <!-- Title alert before leaving a share. -->
+    <string name="alert_leave_share">Abandonar carpeta</string>
+    <!-- Option of the sliding panel to edit the link of a node -->
+    <string name="edit_link_option">Gestionar enlace</string>
+    <!-- Menu option to manage a shared folder. -->
+    <string name="manage_share">Administrar compartido</string>
+    <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
+    <string name="search_open_location">Abrir ubicación</string>
+    <!-- Item menu option to reproduce audio or video in external reproductors -->
+    <string name="external_play">Abrir con</string>
+    <!-- Context menu item. Allows user to delete file/folder from favourites -->
+    <string name="file_properties_unfavourite">Eliminar favorito</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_remove_link_menu">Eliminar enlace</string>
+    <!-- Menu option to delete one or multiple selected items. -->
+    <string name="general_remove">Eliminar</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_clean_shares_menu">Eliminar compartición</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="context_rename">Renombrar</string>
+    <!-- Menu option to restore an item from the Rubbish bin -->
+    <string name="context_restore">Restaurar</string>
+    <!-- Menu item to select all the elements of a list -->
+    <string name="action_select_all">Seleccionar todo</string>
+    <!-- send cancel subscriptions dialog -->
+    <string name="context_send">Enviar</string>
+    <!-- menu option to send a file to a chat -->
+    <string name="context_send_file_to_chat">Enviar al chat</string>
+    <!-- menu item -->
+    <string name="context_share_folder">Compartir carpeta</string>
+    <!-- button -->
+    <string name="general_share">Compartir</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Presentación</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Mostrar</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Verificar %s</string>
+    <!-- Title of the section Versions for files -->
+    <string name="title_section_versions">Versiones</string>
+    <!-- Action to show any file in its location -->
+    <string name="view_in_folder_label">Ver en carpeta</string>
+    <!-- Stop Backup confirmation dialog delete explanation -->
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">If you choose to delete it, the folder will be deleted from MEGA but it won’t be deleted from your device.</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Move to Cloud drive</string>
+    <!-- Stop Backup confirmation dialog button option 1 text -->
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Eliminar permanentemente</string>
+    <!-- Title of the Camera Uploads complete banner in Photos -->
+    <string name="camera_uploads_banner_complete_title">Subidas de la cámara completadas</string>
+    <!-- Message of the Camera Uploads no full access warning banner in Photos -->
+    <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
 </resources>

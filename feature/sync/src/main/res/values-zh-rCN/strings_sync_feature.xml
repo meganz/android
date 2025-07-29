@@ -127,7 +127,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">本地错误导致无法访问文件夹</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">文件系统错误，无法访问文件夹。</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">目标在您的文件夹结构中的位置太深了。\n请将其移至深度小于64个文件夹的位置。</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
