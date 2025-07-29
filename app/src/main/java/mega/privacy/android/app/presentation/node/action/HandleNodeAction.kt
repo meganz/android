@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
 import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
+import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
@@ -112,7 +113,8 @@ fun HandleNodeAction(
                 is FileNodeContent.TextContent -> megaNavigator.openTextEditorActivity(
                     context = context,
                     currentFileNode = typedFileNode,
-                    nodeSourceType = nodeSourceType
+                    mode = TextEditorViewModel.VIEW_MODE,
+                    nodeSourceType = nodeSourceType,
                 )
 
                 is FileNodeContent.AudioOrVideo -> {

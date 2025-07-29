@@ -9,12 +9,17 @@ import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
+import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
+import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
+import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
@@ -612,15 +617,71 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openTextEditorActivity(
         context: Context,
         currentFileNode: TypedFileNode,
+        mode: String,
         nodeSourceType: Int?,
     ) {
         val textFileIntent = Intent(context, TextEditorActivity::class.java)
         textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
-            .putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
+            .putExtra(TextEditorViewModel.MODE, mode)
             .putExtra(
                 Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
                 nodeSourceType ?: NodeSourceTypeInt.FILE_BROWSER_ADAPTER
             )
         context.startActivity(textFileIntent)
+    }
+
+    override fun openGetLinkActivity(context: Context, handle: Long) {
+        context.startActivity(
+            Intent(context, GetLinkActivity::class.java)
+                .putExtra(Constants.HANDLE, handle)
+        )
+    }
+
+    override fun openFileInfoActivity(context: Context, handle: Long) {
+        context.startActivity(
+            Intent(context, FileInfoActivity::class.java)
+                .putExtra(Constants.HANDLE, handle)
+        )
+    }
+
+    override fun openFileContactListActivity(
+        context: Context,
+        handle: Long,
+        nodeName: String,
+    ) {
+        context.startActivity(
+            FileContactListComposeActivity.newIntent(
+                context = context,
+                nodeHandle = handle,
+                nodeName = nodeName
+            )
+        )
+    }
+
+    @Deprecated("Use the new openFileContactListActivity with nodeName parameter")
+    override fun openFileContactListActivity(
+        context: Context,
+        handle: Long,
+    ) {
+        context.startActivity(
+            FileContactListActivity.launchIntent(
+                context = context,
+                handle = handle
+            )
+        )
+    }
+
+    override fun openAuthenticityCredentialsActivity(
+        context: Context,
+        email: String,
+        isIncomingShares: Boolean,
+    ) {
+        context.startActivity(
+            AuthenticityCredentialsActivity.getIntent(
+                context = context,
+                email = email,
+                isIncomingShares = isIncomingShares
+            )
+        )
     }
 }

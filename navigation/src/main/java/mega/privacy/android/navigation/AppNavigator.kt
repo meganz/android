@@ -335,11 +335,73 @@ interface AppNavigator {
      *
      * @param context Context
      * @param currentFileNode TypedFileNode
+     * @param mode the mode of the text editor, e.g., "view", "edit"
      * @param nodeSourceType the adapter type of the view
      */
     fun openTextEditorActivity(
         context: Context,
         currentFileNode: TypedFileNode,
+        mode: String,
         nodeSourceType: Int?,
+    )
+
+    /**
+     * Open Get Link Activity
+     *
+     * @param context Context
+     * @param handle Node handle
+     */
+    fun openGetLinkActivity(
+        context: Context,
+        handle: Long,
+    )
+
+    /**
+     * Open File Info Activity
+     *
+     * @param context Context
+     * @param handle Node handle
+     */
+    fun openFileInfoActivity(
+        context: Context,
+        handle: Long,
+    )
+
+    /**
+     * Open File Contact List Activity
+     *
+     * @param context Context
+     * @param handle Node handle
+     * @param nodeName Name of the node
+     */
+    fun openFileContactListActivity(
+        context: Context,
+        handle: Long,
+        nodeName: String,
+    )
+
+    /**
+     * Open File Contact List Activity
+     *
+     * @param context Context
+     * @param handle Node handle
+     */
+    @Deprecated("Use the new openFileContactListActivity with nodeName parameter")
+    fun openFileContactListActivity(
+        context: Context,
+        handle: Long,
+    )
+
+    /**
+     * Open Authenticity Credentials Activity
+     *
+     * @param context Context
+     * @param email Email of the user
+     * @param isIncomingShares Indicates if the shares are incoming
+     */
+    fun openAuthenticityCredentialsActivity(
+        context: Context,
+        email: String,
+        isIncomingShares: Boolean,
     )
 }
