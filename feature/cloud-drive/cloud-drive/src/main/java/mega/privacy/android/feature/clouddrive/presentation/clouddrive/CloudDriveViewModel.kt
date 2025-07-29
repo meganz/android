@@ -10,6 +10,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -21,10 +22,13 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.toDuration
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
@@ -34,6 +38,8 @@ import javax.inject.Inject
 class CloudDriveViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
+    private val setViewTypeUseCase: SetViewType,
+    private val monitorViewTypeUseCase: MonitorViewType,
     val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     val fileTypeIconMapper: FileTypeIconMapper,
     savedStateHandle: SavedStateHandle,
@@ -45,6 +51,7 @@ class CloudDriveViewModel @Inject constructor(
         field = MutableStateFlow(CloudDriveUiState(currentFolderId = NodeId(args.nodeHandle)))
 
     init {
+        monitorViewType()
         loadNodes()
     }
 
@@ -143,6 +150,33 @@ class CloudDriveViewModel @Inject constructor(
         val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
         uiState.update { state ->
             state.copy(items = updatedItems)
+        }
+    }
+
+    /**
+     * This method will toggle node view type between list and grid.
+     */
+    fun onChangeViewTypeClicked() {
+        viewModelScope.launch {
+            runCatching {
+                val toggledViewType = when (uiState.value.currentViewType) {
+                    ViewType.LIST -> ViewType.GRID
+                    ViewType.GRID -> ViewType.LIST
+                }
+                setViewTypeUseCase(toggledViewType)
+            }.onFailure {
+                Timber.e(it, "Failed to change view type")
+            }
+        }
+    }
+
+    private fun monitorViewType() {
+        viewModelScope.launch {
+            monitorViewTypeUseCase()
+                .catch { Timber.e(it) }
+                .collect { viewType ->
+                    uiState.update { it.copy(currentViewType = viewType) }
+                }
         }
     }
 

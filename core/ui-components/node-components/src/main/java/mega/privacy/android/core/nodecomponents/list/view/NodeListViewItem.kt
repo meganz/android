@@ -19,8 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -31,7 +29,6 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.chip.HighlightChip
 import mega.android.core.ui.components.image.MegaIcon
-import mega.android.core.ui.components.image.ThumbnailView
 import mega.android.core.ui.components.list.GenericListItem
 import mega.android.core.ui.components.text.HighlightedText
 import mega.android.core.ui.components.util.normalize
@@ -117,23 +114,15 @@ fun NodeListViewItem(
             vertical = DSTokens.spacings.s3
         ),
         leadingElement = {
-            ThumbnailView(
+            NodeThumbnailView(
                 modifier = Modifier
                     .size(32.dp)
-                    .clip(DSTokens.shapes.extraSmall)
                     .testTag(ICON_TAG),
+                layoutType = ThumbnailLayoutType.List,
                 data = thumbnailData,
                 defaultImage = icon,
                 contentDescription = "Thumbnail",
-                onSuccess = { modifier ->
-                    if (!showBlurEffect) {
-                        modifier.size(32.dp)
-                    } else {
-                        modifier
-                            .size(32.dp)
-                            .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
-                    }
-                }
+                blurImage = showBlurEffect && isSensitive
             )
         },
         title = {

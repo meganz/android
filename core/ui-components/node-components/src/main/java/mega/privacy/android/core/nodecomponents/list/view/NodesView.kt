@@ -33,7 +33,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param sortOrder the sort order of the list
  * @param isListView whether the current view is list view
  * @param onSortOrderClick callback for sort order click
- * @param onChangeViewTypeClick callback for change view type click
+ * @param onChangeViewTypeClicked callback for change view type click
  * @param onLinkClicked callback for link click
  * @param onDisputeTakeDownClicked callback for dispute take down click
  * @param modifier
@@ -57,7 +57,7 @@ fun <T : TypedNode> NodesView(
     sortOrder: String,
     isListView: Boolean,
     onSortOrderClick: () -> Unit,
-    onChangeViewTypeClick: () -> Unit,
+    onChangeViewTypeClicked: () -> Unit,
     onLinkClicked: (String) -> Unit,
     onDisputeTakeDownClicked: (String) -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
@@ -112,7 +112,7 @@ fun <T : TypedNode> NodesView(
             sortOrder = sortOrder,
             highlightText = highlightText,
             onSortOrderClick = onSortOrderClick,
-            onChangeViewTypeClick = onChangeViewTypeClick,
+            onChangeViewTypeClick = onChangeViewTypeClicked,
             showSortOrder = showSortOrder,
             showChangeViewType = showChangeViewType,
             showLinkIcon = showLinkIcon,
@@ -145,7 +145,7 @@ fun <T : TypedNode> NodesView(
             spanCount = span,
             sortOrder = sortOrder,
             onSortOrderClick = onSortOrderClick,
-            onChangeViewTypeClick = onChangeViewTypeClick,
+            onChangeViewTypeClick = onChangeViewTypeClicked,
             showSortOrder = showSortOrder,
             showChangeViewType = showChangeViewType,
             gridState = gridState,

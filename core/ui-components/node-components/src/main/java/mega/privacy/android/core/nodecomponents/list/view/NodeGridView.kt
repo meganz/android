@@ -74,10 +74,10 @@ fun <T : TypedNode> NodeGridView(
         columns = GridCells.Fixed(spanCount),
         totalItems = nodeUiItems.size,
         modifier = modifier
-            .padding(horizontal = 4.dp)
+            .padding(horizontal = DSTokens.spacings.s3)
             .semantics { testTagsAsResourceId = true },
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(DSTokens.spacings.s3),
+        verticalArrangement = Arrangement.spacedBy(DSTokens.spacings.s3),
         contentPadding = listContentPadding
     ) {
         if (showSortOrder || showChangeViewType) {
@@ -88,7 +88,6 @@ fun <T : TypedNode> NodeGridView(
                 }
             ) {
                 NodeHeaderItem(
-                    modifier = Modifier.padding(bottom = DSTokens.spacings.s3),
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,

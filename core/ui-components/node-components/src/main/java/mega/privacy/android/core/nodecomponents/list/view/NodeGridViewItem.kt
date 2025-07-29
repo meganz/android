@@ -31,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -43,7 +42,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.checkbox.Checkbox
-import mega.android.core.ui.components.image.GridThumbnailView
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -128,9 +126,6 @@ fun NodeGridViewItem(
                         else -> DSTokens.colors.background.pageBackground
                     }
                 )
-                .conditional(!isFolderNode) {
-                    padding(DSTokens.spacings.s2)
-                }
                 .combinedClickable(
                     onClick = { onClick() },
                     onLongClick = { onLongClick() },
@@ -144,23 +139,16 @@ fun NodeGridViewItem(
                         .clip(DSTokens.shapes.extraSmall)
                         .background(DSTokens.colors.background.surface2)
                 ) {
-                    GridThumbnailView(
-                        data = thumbnailData,
-                        defaultImage = iconRes,
+                    NodeThumbnailView(
                         modifier = Modifier
-                            .fillMaxSize()
                             .align(Alignment.Center)
                             .testTag(THUMBNAIL_FILE_TEST_TAG),
+                        layoutType = ThumbnailLayoutType.Grid,
+                        data = thumbnailData,
+                        defaultImage = iconRes,
                         contentDescription = name,
                         contentScale = ContentScale.Crop,
-                        onSuccess = { modifier ->
-                            if (!showBlurEffect) {
-                                modifier
-                            } else {
-                                modifier
-                                    .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
-                            }
-                        }
+                        blurImage = showBlurEffect && isSensitive
                     )
 
                     if (isVideoNode) {
@@ -295,6 +283,8 @@ private fun Footer(
                     .size(24.dp)
                     .testTag(FOLDER_VIEW_ICON_TEST_TAG),
             )
+        } else {
+            Spacer(modifier = Modifier.width(DSTokens.spacings.s2))
         }
         if (labelColor != null) {
             Circle(

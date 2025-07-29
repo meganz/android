@@ -48,8 +48,7 @@ fun NodeHeaderItem(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = DSTokens.spacings.s3),
+            .fillMaxWidth(),
     ) {
         if (showSortOrder) {
             Row(

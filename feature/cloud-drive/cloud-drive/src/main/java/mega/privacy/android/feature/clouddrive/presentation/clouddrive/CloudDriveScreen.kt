@@ -28,6 +28,7 @@ import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeA
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 
 /**
@@ -74,9 +75,10 @@ fun CloudDriveScreen(
             CloudDriveContent(
                 uiState = uiState,
                 contentPadding = innerPadding,
+                fileTypeIconMapper = viewModel.fileTypeIconMapper,
                 onItemClicked = viewModel::onItemClicked,
                 onItemLongClicked = viewModel::onItemLongClicked,
-                fileTypeIconMapper = viewModel.fileTypeIconMapper,
+                onChangeViewTypeClicked = viewModel::onChangeViewTypeClicked,
                 onNavigateToFolder = onNavigateToFolder,
                 onNavigateToFolderEventConsumed = viewModel::onNavigateToFolderEventConsumed,
             )
@@ -90,6 +92,7 @@ internal fun CloudDriveContent(
     fileTypeIconMapper: FileTypeIconMapper,
     onItemClicked: (NodeUiItem<TypedNode>) -> Unit,
     onItemLongClicked: (NodeUiItem<TypedNode>) -> Unit,
+    onChangeViewTypeClicked: () -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
     onNavigateToFolderEventConsumed: () -> Unit,
     modifier: Modifier = Modifier,
@@ -120,9 +123,9 @@ internal fun CloudDriveContent(
             onItemClicked = onItemClicked,
             onLongClicked = onItemLongClicked,
             sortOrder = "Name",
-            isListView = true,
+            isListView = uiState.currentViewType == ViewType.LIST,
             onSortOrderClick = {},
-            onChangeViewTypeClick = {},
+            onChangeViewTypeClicked = onChangeViewTypeClicked,
             onLinkClicked = {},
             onDisputeTakeDownClicked = {},
             showMediaDiscoveryButton = false,

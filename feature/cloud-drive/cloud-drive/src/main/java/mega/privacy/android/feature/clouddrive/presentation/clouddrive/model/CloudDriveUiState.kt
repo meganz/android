@@ -6,12 +6,14 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.preference.ViewType
 
 data class CloudDriveUiState(
     val title: LocalizedText = LocalizedText.Literal(""),
     val isLoading: Boolean = true,
     val currentFolderId: NodeId = NodeId(-1L),
     val items: List<NodeUiItem<TypedNode>> = emptyList(),
+    val currentViewType: ViewType = ViewType.LIST,
     val navigateToFolderEvent: StateEventWithContent<NodeId> = consumed(),
 ) {
     /**

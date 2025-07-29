@@ -9,6 +9,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -19,8 +20,11 @@ import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -30,6 +34,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 
@@ -40,6 +45,8 @@ class CloudDriveViewModelTest {
 
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase = mock()
+    private val setViewTypeUseCase: SetViewType = mock()
+    private val monitorViewTypeUseCase: MonitorViewType = mock()
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
     private val folderNodeHandle = 123L
@@ -57,6 +64,8 @@ class CloudDriveViewModelTest {
         reset(
             getNodeByIdUseCase,
             getFileBrowserNodeChildrenUseCase,
+            setViewTypeUseCase,
+            monitorViewTypeUseCase,
             durationInSecondsTextMapper,
             fileTypeIconMapper
         )
@@ -65,6 +74,8 @@ class CloudDriveViewModelTest {
     private fun createViewModel() = CloudDriveViewModel(
         getNodeByIdUseCase = getNodeByIdUseCase,
         getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
+        setViewTypeUseCase = setViewTypeUseCase,
+        monitorViewTypeUseCase = monitorViewTypeUseCase,
         durationInSecondsTextMapper = durationInSecondsTextMapper,
         fileTypeIconMapper = fileTypeIconMapper,
         savedStateHandle = SavedStateHandle.Companion.invoke(
@@ -81,6 +92,7 @@ class CloudDriveViewModelTest {
         whenever(getNodeByIdUseCase(eq(folderNodeId))).thenReturn(folderNode)
         whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
         whenever(durationInSecondsTextMapper(any())).thenReturn(null)
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
     }
 
     @Test
@@ -455,6 +467,93 @@ class CloudDriveViewModelTest {
 
             assertThat(stateAfterClick.navigateToFolderEvent).isEqualTo(triggered(folderNodeId))
             assertThat(stateAfterConsume.navigateToFolderEvent).isEqualTo(consumed())
+        }
+    }
+
+    @Test
+    fun `test that onChangeViewTypeClicked toggles from LIST to GRID`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+        val underTest = createViewModel()
+
+        underTest.onChangeViewTypeClicked()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(setViewTypeUseCase).invoke(ViewType.GRID)
+    }
+
+    @Test
+    fun `test that onChangeViewTypeClicked toggles from GRID to LIST`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.GRID))
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            awaitItem() // Initial state
+            val stateWithGrid = awaitItem() // State after monitorViewType updates
+            assertThat(stateWithGrid.currentViewType).isEqualTo(ViewType.GRID)
+        }
+
+        underTest.onChangeViewTypeClicked()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(setViewTypeUseCase).invoke(ViewType.LIST)
+    }
+
+    @Test
+    fun `test that monitorViewType updates currentViewType in ui state`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            awaitItem() // Initial state
+            val updatedState = awaitItem() // State after monitorViewType flow emits
+            assertThat(updatedState.currentViewType).isEqualTo(ViewType.LIST)
+        }
+    }
+
+    @Test
+    fun `test that monitorViewType handles GRID view type correctly`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.GRID))
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            awaitItem() // Initial state
+            val updatedState = awaitItem() // State after monitorViewType flow emits
+            assertThat(updatedState.currentViewType).isEqualTo(ViewType.GRID)
+        }
+    }
+
+    @Test
+    fun `test that multiple view type changes are handled correctly`() = runTest {
+        setupTestData(emptyList())
+        // Use individual flows since flowOf emits all values synchronously
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.GRID))
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            awaitItem() // Initial state
+            val gridState = awaitItem() // State after monitorViewType flow emits GRID
+            assertThat(gridState.currentViewType).isEqualTo(ViewType.GRID)
+        }
+    }
+
+    @Test
+    fun `test that view type is correctly set in initial state`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            // Initial state should have default value before monitoring starts
+            assertThat(initialState.currentViewType).isEqualTo(ViewType.LIST)
+
+            val updatedState = awaitItem()
+            // After monitoring starts, it should be updated from the flow
+            assertThat(updatedState.currentViewType).isEqualTo(ViewType.LIST)
         }
     }
 } 

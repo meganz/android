@@ -97,6 +97,7 @@ internal fun DriveSyncScreen(
                         fileTypeIconMapper = cloudDriveViewModel.fileTypeIconMapper,
                         onItemClicked = cloudDriveViewModel::onItemClicked,
                         onItemLongClicked = cloudDriveViewModel::onItemLongClicked,
+                        onChangeViewTypeClicked = cloudDriveViewModel::onChangeViewTypeClicked,
                         onNavigateToFolder = onNavigateToFolder,
                         onNavigateToFolderEventConsumed = cloudDriveViewModel::onNavigateToFolderEventConsumed,
                     )

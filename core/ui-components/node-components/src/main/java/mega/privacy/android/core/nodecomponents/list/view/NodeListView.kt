@@ -85,7 +85,9 @@ fun <T : TypedNode> NodeListView(
         if (showSortOrder || showChangeViewType) {
             item(key = "header") {
                 NodeHeaderItem(
-                    modifier = Modifier.padding(bottom = DSTokens.spacings.s3),
+                    modifier = Modifier
+                        .padding(horizontal = DSTokens.spacings.s3)
+                        .padding(bottom = DSTokens.spacings.s3),
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
