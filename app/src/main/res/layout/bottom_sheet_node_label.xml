@@ -32,7 +32,6 @@
                 style="@style/Widget.Mega.RadioButton.Label"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="@string/label_red"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_red"
                 app:buttonTint="@color/salmon_400_salmon_300" />
@@ -42,7 +41,6 @@
                 style="@style/Widget.Mega.RadioButton.Label"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="@string/label_orange"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_orange"
                 app:buttonTint="@color/orange_400_orange_300" />
@@ -52,7 +50,6 @@
                 style="@style/Widget.Mega.RadioButton.Label"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="@string/label_yellow"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_yellow"
                 app:buttonTint="@color/yellow_600_yellow_300" />
@@ -62,7 +59,6 @@
                 style="@style/Widget.Mega.RadioButton.Label"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="@string/label_green"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_green"
                 app:buttonTint="@color/green_400_green_300" />
@@ -72,7 +68,6 @@
                 style="@style/Widget.Mega.RadioButton.Label"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="@string/label_blue"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_blue"
                 app:buttonTint="@color/blue_300_blue_200" />
@@ -82,7 +77,6 @@
                 style="@style/Widget.Mega.RadioButton.Label"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="@string/label_purple"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_purple"
                 app:buttonTint="@color/purple_300_purple_200" />
@@ -92,7 +86,6 @@
                 style="@style/Widget.Mega.RadioButton.Label"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="@string/label_grey"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_grey"
                 app:buttonTint="@color/grey_300" />

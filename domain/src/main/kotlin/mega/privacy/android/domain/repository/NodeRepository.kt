@@ -643,6 +643,13 @@ interface NodeRepository {
     suspend fun removeOfflineNodeByIds(ids: List<Int>)
 
     /**
+     * Get node label
+     * @param label Int
+     * @return [NodeLabel]
+     */
+    suspend fun getNodeLabel(label: Int): NodeLabel?
+
+    /**
      * Set label for node
      * @param nodeId [NodeId]
      * @param label Int

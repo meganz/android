@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.node.model.mapper.NodeLabelResourceMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeLabelResourceMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.LabelMenuAction
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.node.TypedFileNode

@@ -48,12 +48,24 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
             return;
         }
 
+        setTextResourcesForLabel();
+
         node = megaApi.getNodeByHandle(arguments.getLong(HANDLE, INVALID_HANDLE));
         showCurrentNodeLabel();
 
         binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> updateNodeLabel(checkedId));
 
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    private void setTextResourcesForLabel() {
+        binding.radioLabelRed.setText(mega.privacy.android.shared.resources.R.string.label_red);
+        binding.radioLabelOrange.setText(mega.privacy.android.shared.resources.R.string.label_orange);
+        binding.radioLabelYellow.setText(mega.privacy.android.shared.resources.R.string.label_yellow);
+        binding.radioLabelGreen.setText(mega.privacy.android.shared.resources.R.string.label_green);
+        binding.radioLabelBlue.setText(mega.privacy.android.shared.resources.R.string.label_blue);
+        binding.radioLabelPurple.setText(mega.privacy.android.shared.resources.R.string.label_purple);
+        binding.radioLabelGrey.setText(mega.privacy.android.shared.resources.R.string.label_grey);
     }
 
     private void showCurrentNodeLabel() {

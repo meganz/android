@@ -704,14 +704,6 @@
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">Add to playlist</string>
     <!-- Stop Backup confirmation dialog text -->
     <string name="sync_stop_backup_confirm_dialog_text">To stop backing up your folder, you need to either move it or delete it.</string>
-    <!-- Move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option">Move folder</string>
-    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_text">Move this folder to another location to get full access to your data.</string>
-    <!-- Delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option">Delete folder permanently</string>
-    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option_text">Folder will be deleted from MEGA. It won’t be deleted from your device.</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">Confirm</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -727,8 +719,6 @@
     <string name="general_select">Select</string>
     <!-- Name for a general label which action is "Select folder" -->
     <string name="general_select_folder">Select folder</string>
-    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Move to: [B]%1s[/B]</string>
     <!-- Message shown to user when app is connected to the MEGA server -->
     <string name="login_connected_to_server">Connected to the server</string>
     <!-- User Alert notification for scheduled recurring meeting changes -->
@@ -1418,7 +1408,27 @@
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
     <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
     <!-- Message of notice that the zip file format is error -->
-    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
-    <!-- message when trying to open a downloaded file but there isn't any app that open that file. Example: a user downloads a pdf but doesn't have any app to read a pdf -->
+    <string name="message_zip_format_error">File can’t be opened as the file format isn’t supported</string>
+    <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">There’s no suitable app to open this file on your device</string>
+    <!-- A user can mark a folder or file with red colour. -->
+    <string name="label_red">Red</string>
+    <!-- A user can mark a folder or file with orange colour. -->
+    <string name="label_orange">Orange</string>
+    <!-- A user can mark a folder or file with yellow colour. -->
+    <string name="label_yellow">Yellow</string>
+    <!-- A user can mark a folder or file with green colour. -->
+    <string name="label_green">Green</string>
+    <!-- A user can mark a folder or file with blue colour. -->
+    <string name="label_blue">Blue</string>
+    <!-- A user can mark a folder or file with purple colour. -->
+    <string name="label_purple">Purple</string>
+    <!-- A user can mark a folder or file with grey colour. -->
+    <string name="label_grey">Grey</string>
+    <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
+    <string name="error_open_file_with">An error has occurred and the file cannot be opened with this app.</string>
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
+    <string name="intent_not_available_file">You may not have any apps installed which support this file type</string>
+    <!-- Text to inform the user when an error occurs -->
+    <string name="general_text_error">An error occurred, please try again.</string>
 </resources>

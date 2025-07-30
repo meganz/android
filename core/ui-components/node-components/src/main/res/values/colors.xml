@@ -1,0 +1,16 @@
+<resources>
+    <!-- Label red -->
+    <color name="label_red">#FF5252</color>
+    <!-- Label green -->
+    <color name="label_green">#56C13E</color>
+    <!-- Label blue -->
+    <color name="label_blue">#00C0FD</color>
+    <!-- Label purple -->
+    <color name="label_purple">#B965C1</color>
+    <!-- Label orange -->
+    <color name="label_orange">#FFA500</color>
+    <!-- Label yellow -->
+    <color name="label_yellow">#FFD300</color>
+    <!-- Label Grey -->
+    <color name="label_grey">#9E9E9E</color>
+</resources>

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node.label
+package mega.privacy.android.core.nodecomponents.entity.label
 
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes

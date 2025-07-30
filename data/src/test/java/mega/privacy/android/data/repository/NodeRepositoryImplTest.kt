@@ -36,11 +36,13 @@ import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelIntMapper
+import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
@@ -137,6 +139,7 @@ internal class NodeRepositoryImplTest {
     private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
     private val stringListMapper = mock<StringListMapper>()
     private val workManagerGateway = mock<WorkManagerGateway>()
+    private val nodeLabelMapper = mock<NodeLabelMapper>()
 
     private val fileNodeMapper = FileNodeMapper(
         cacheGateway = cacheGateway,
@@ -195,6 +198,7 @@ internal class NodeRepositoryImplTest {
             megaSearchFilterMapper = megaSearchFilterMapper,
             workManagerGateway = workManagerGateway,
             stringListMapper = stringListMapper,
+            nodeLabelMapper = nodeLabelMapper,
         )
     }
 
@@ -1538,6 +1542,14 @@ internal class NodeRepositoryImplTest {
         }
         underTest.removeAllVersions()
         verify(megaApiGateway).removeVersions(any())
+    }
+
+    @Test
+    fun `test that getNodeLabel returns correct value`() = runTest {
+        val mockResult = mock<NodeLabel>()
+        whenever(nodeLabelMapper(any())).thenReturn(mockResult)
+
+        assertThat(underTest.getNodeLabel(1)).isEqualTo(mockResult)
     }
 
     private fun provideNodeId() = Stream.of(

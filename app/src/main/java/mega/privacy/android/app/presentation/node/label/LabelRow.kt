@@ -21,11 +21,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.core.nodecomponents.entity.label.Label
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun LabelRow(
@@ -70,7 +72,7 @@ private fun LabelRowPreview() {
             Label(
                 label = NodeLabel.RED,
                 labelColor = R.color.red_600_red_300,
-                labelName = R.string.label_red,
+                labelName = sharedResR.string.label_red,
                 isSelected = true
             )
         ) {}

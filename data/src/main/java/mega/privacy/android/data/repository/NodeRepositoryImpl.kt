@@ -40,6 +40,7 @@ import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelIntMapper
+import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
@@ -126,6 +127,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val cancelTokenProvider: CancelTokenProvider,
     private val workManagerGateway: WorkManagerGateway,
     private val stringListMapper: StringListMapper,
+    private val nodeLabelMapper: NodeLabelMapper,
 ) : NodeRepository {
 
     override suspend fun getNodeOutgoingShares(nodeId: NodeId) =
@@ -937,6 +939,10 @@ internal class NodeRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             megaLocalRoomGateway.removeOfflineInformationByIds(ids)
         }
+    }
+
+    override suspend fun getNodeLabel(label: Int): NodeLabel? = withContext(ioDispatcher) {
+        nodeLabelMapper(label)
     }
 
     override suspend fun setNodeLabel(nodeId: NodeId, label: NodeLabel): Unit =

@@ -22,16 +22,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.core.nodecomponents.entity.label.ChangeLabelState
+import mega.privacy.android.core.nodecomponents.entity.label.Label
+import mega.privacy.android.domain.entity.NodeLabel
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.domain.entity.NodeLabel
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun ChangeLabelBottomSheetContent(
@@ -112,26 +114,26 @@ private fun ChangeLabelBottomSheetPreview() {
         labelList = listOf(
             Label(
                 label = NodeLabel.RED,
-                labelName = R.string.label_red,
+                labelName = sharedResR.string.label_red,
                 labelColor = R.color.red_600_red_300,
                 isSelected = false
             ),
             Label(
                 label = NodeLabel.GREY,
                 labelColor = R.color.grey_300,
-                labelName = R.string.label_grey,
+                labelName = sharedResR.string.label_grey,
                 isSelected = false
             ),
             Label(
                 label = NodeLabel.PURPLE,
                 labelColor = R.color.purple_300_purple_200,
-                labelName = R.string.label_purple,
+                labelName = sharedResR.string.label_purple,
                 isSelected = true
             ),
             Label(
                 label = NodeLabel.GREEN,
                 labelColor = R.color.green_400_green_300,
-                labelName = R.string.label_green,
+                labelName = sharedResR.string.label_green,
                 isSelected = false
             )
         )

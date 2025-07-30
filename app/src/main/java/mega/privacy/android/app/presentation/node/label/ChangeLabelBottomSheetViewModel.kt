@@ -7,7 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.node.model.mapper.NodeLabelResourceMapper
+import mega.privacy.android.core.nodecomponents.entity.label.ChangeLabelState
+import mega.privacy.android.core.nodecomponents.mapper.NodeLabelResourceMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.NodeId

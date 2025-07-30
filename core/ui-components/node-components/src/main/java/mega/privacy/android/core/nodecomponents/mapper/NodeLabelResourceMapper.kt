@@ -1,8 +1,9 @@
-package mega.privacy.android.app.presentation.node.model.mapper
+package mega.privacy.android.core.nodecomponents.mapper
 
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.node.label.Label
+import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.nodecomponents.entity.label.Label
 import mega.privacy.android.domain.entity.NodeLabel
+import mega.privacy.android.shared.resources.R as sharedResR
 import javax.inject.Inject
 
 /**
@@ -20,53 +21,53 @@ class NodeLabelResourceMapper @Inject constructor() {
         when (nodeLabel) {
             NodeLabel.RED -> Label(
                 label = nodeLabel,
-                labelColor = R.color.salmon_400_salmon_300,
-                labelName = R.string.label_red,
+                labelColor = R.color.label_red,
+                labelName = sharedResR.string.label_red,
                 isSelected = nodeLabel == selectedLabel
             )
 
             NodeLabel.ORANGE -> Label(
                 label = nodeLabel,
-                labelColor = R.color.orange_400_orange_300,
-                labelName = R.string.label_orange,
+                labelColor = R.color.label_orange,
+                labelName = sharedResR.string.label_orange,
                 isSelected = nodeLabel == selectedLabel
             )
 
             NodeLabel.YELLLOW -> Label(
                 label = nodeLabel,
-                labelColor = R.color.yellow_600_yellow_300,
-                labelName = R.string.label_yellow,
+                labelColor = R.color.label_yellow,
+                labelName = sharedResR.string.label_yellow,
                 isSelected = nodeLabel == selectedLabel
             )
 
             NodeLabel.GREEN -> Label(
                 label = nodeLabel,
-                labelColor = R.color.green_400_green_300,
-                labelName = R.string.label_green,
+                labelColor = R.color.label_green,
+                labelName = sharedResR.string.label_green,
                 isSelected = nodeLabel == selectedLabel
             )
 
 
             NodeLabel.BLUE -> Label(
                 label = nodeLabel,
-                labelColor = R.color.blue_300_blue_200,
-                labelName = R.string.label_blue,
+                labelColor = R.color.label_blue,
+                labelName = sharedResR.string.label_blue,
                 isSelected = nodeLabel == selectedLabel
             )
 
 
             NodeLabel.PURPLE -> Label(
                 label = nodeLabel,
-                labelColor = R.color.purple_300_purple_200,
-                labelName = R.string.label_purple,
+                labelColor = R.color.label_purple,
+                labelName = sharedResR.string.label_purple,
                 isSelected = nodeLabel == selectedLabel
             )
 
 
             NodeLabel.GREY -> Label(
                 label = nodeLabel,
-                labelColor = R.color.grey_300,
-                labelName = R.string.label_grey,
+                labelColor = R.color.label_grey,
+                labelName = sharedResR.string.label_grey,
                 isSelected = nodeLabel == selectedLabel
             )
         }

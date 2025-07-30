@@ -48,7 +48,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
@@ -70,9 +69,11 @@ import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showSnackbar
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -85,7 +86,6 @@ import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import mega.privacy.android.shared.resources.R as sharedR
 
 @Deprecated("This class is deprecated. Use corresponding use cases instead.")
 object MegaNodeUtil {
@@ -784,13 +784,13 @@ object MegaNodeUtil {
     @JvmStatic
     fun getNodeLabelText(nodeLabel: Int, context: Context): String = context.getString(
         when (nodeLabel) {
-            MegaNode.NODE_LBL_RED -> R.string.label_red
-            MegaNode.NODE_LBL_ORANGE -> R.string.label_orange
-            MegaNode.NODE_LBL_YELLOW -> R.string.label_yellow
-            MegaNode.NODE_LBL_GREEN -> R.string.label_green
-            MegaNode.NODE_LBL_BLUE -> R.string.label_blue
-            MegaNode.NODE_LBL_PURPLE -> R.string.label_purple
-            else -> R.string.label_grey
+            MegaNode.NODE_LBL_RED -> sharedR.string.label_red
+            MegaNode.NODE_LBL_ORANGE -> sharedR.string.label_orange
+            MegaNode.NODE_LBL_YELLOW -> sharedR.string.label_yellow
+            MegaNode.NODE_LBL_GREEN -> sharedR.string.label_green
+            MegaNode.NODE_LBL_BLUE -> sharedR.string.label_blue
+            MegaNode.NODE_LBL_PURPLE -> sharedR.string.label_purple
+            else -> sharedR.string.label_grey
         }
     )
 
