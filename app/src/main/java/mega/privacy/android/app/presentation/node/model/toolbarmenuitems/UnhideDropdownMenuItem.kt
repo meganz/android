@@ -4,7 +4,7 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.node.model.menuaction.UnhideDropdownMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.UnhideMenuAction

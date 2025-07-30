@@ -1,9 +1,7 @@
-package mega.privacy.android.app.featuretoggle
+package mega.privacy.android.domain.featuretoggle
 
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.featureflag.ApiFeature
-import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
-import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 
 /**
  * Remote Api features
@@ -54,8 +52,7 @@ enum class ApiFeatures(
         "n2s",
         "Enable note to yourself",
         false
-    ),
-    ;
+    );
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =

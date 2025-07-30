@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.node.model.menuaction.HideMenuAction
 import mega.privacy.android.domain.entity.AccountType

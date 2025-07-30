@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.main.model.AddContactState
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
