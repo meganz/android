@@ -11,18 +11,29 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import org.junit.After
@@ -47,6 +58,11 @@ class CloudDriveViewModelTest {
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase = mock()
     private val setViewTypeUseCase: SetViewType = mock()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase = mock()
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
     private val folderNodeHandle = 123L
@@ -66,6 +82,11 @@ class CloudDriveViewModelTest {
             getFileBrowserNodeChildrenUseCase,
             setViewTypeUseCase,
             monitorViewTypeUseCase,
+            getFeatureFlagValueUseCase,
+            isHiddenNodesOnboardedUseCase,
+            monitorShowHiddenItemsUseCase,
+            monitorAccountDetailUseCase,
+            getBusinessStatusUseCase,
             durationInSecondsTextMapper,
             fileTypeIconMapper
         )
@@ -76,6 +97,11 @@ class CloudDriveViewModelTest {
         getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
         setViewTypeUseCase = setViewTypeUseCase,
         monitorViewTypeUseCase = monitorViewTypeUseCase,
+        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+        isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+        monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+        monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+        getBusinessStatusUseCase = getBusinessStatusUseCase,
         durationInSecondsTextMapper = durationInSecondsTextMapper,
         fileTypeIconMapper = fileTypeIconMapper,
         savedStateHandle = SavedStateHandle.Companion.invoke(
@@ -107,6 +133,9 @@ class CloudDriveViewModelTest {
             assertThat(initialState.items).isEmpty()
             assertThat(initialState.isInSelectionMode).isFalse()
             assertThat(initialState.navigateToFolderEvent).isEqualTo(consumed())
+            assertThat(initialState.showHiddenNodes).isFalse()
+            assertThat(initialState.isHiddenNodesEnabled).isFalse()
+            assertThat(initialState.isHiddenNodesOnboarded).isFalse()
         }
     }
 
@@ -554,6 +583,337 @@ class CloudDriveViewModelTest {
             val updatedState = awaitItem()
             // After monitoring starts, it should be updated from the flow
             assertThat(updatedState.currentViewType).isEqualTo(ViewType.LIST)
+        }
+    }
+
+    // Hidden Nodes Tests
+
+    @Test
+    fun `test that monitorHiddenNodes is not called when feature flag is disabled`() = runTest {
+        setupTestData(emptyList())
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+            false
+        )
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(isHiddenNodesOnboardedUseCase()).thenReturn(true)
+
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            val finalState = awaitItem()
+            assertThat(finalState.showHiddenNodes).isFalse()
+            assertThat(finalState.isHiddenNodesEnabled).isFalse()
+            assertThat(finalState.isHiddenNodesOnboarded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that monitorShowHiddenNodesSettings updates showHiddenNodes when feature flag is enabled`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                true
+            )
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+            whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val finalState = awaitItem()
+                assertThat(finalState.showHiddenNodes).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that monitorShowHiddenNodesSettings updates showHiddenNodes to false`() = runTest {
+        setupTestData(emptyList())
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val finalState = awaitItem()
+            assertThat(finalState.showHiddenNodes).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that monitorAccountDetail enables hidden nodes for paid account`() = runTest {
+        setupTestData(emptyList())
+        val accountLevelDetail = mock<AccountLevelDetail> {
+            on { accountType } doReturn AccountType.PRO_I
+        }
+        val accountDetail = mock<AccountDetail> {
+            on { levelDetail } doReturn accountLevelDetail
+        }
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+        whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
+        whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val finalState = awaitItem()
+            assertThat(finalState.isHiddenNodesEnabled).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that monitorAccountDetail disables hidden nodes for free account`() = runTest {
+        setupTestData(emptyList())
+        val accountLevelDetail = mock<AccountLevelDetail> {
+            on { accountType } doReturn AccountType.FREE
+        }
+        val accountDetail = mock<AccountDetail> {
+            on { levelDetail } doReturn accountLevelDetail
+        }
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+        whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val finalState = awaitItem()
+            assertThat(finalState.isHiddenNodesEnabled).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that monitorAccountDetail disables hidden nodes for expired business account`() =
+        runTest {
+            setupTestData(emptyList())
+            val accountLevelDetail = mock<AccountLevelDetail> {
+                on { accountType } doReturn AccountType.BUSINESS
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { levelDetail } doReturn accountLevelDetail
+            }
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                true
+            )
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
+            whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val finalState = awaitItem()
+
+                assertThat(finalState.isHiddenNodesEnabled).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that monitorAccountDetail enables hidden nodes for active business account`() =
+        runTest {
+            setupTestData(emptyList())
+            val accountLevelDetail = mock<AccountLevelDetail> {
+                on { accountType } doReturn AccountType.BUSINESS
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { levelDetail } doReturn accountLevelDetail
+            }
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                true
+            )
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
+            whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val finalState = awaitItem()
+                assertThat(finalState.isHiddenNodesEnabled).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that checkIfHiddenNodeIsOnboarded updates isHiddenNodesOnboarded to true`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                true
+            )
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+            whenever(isHiddenNodesOnboardedUseCase()).thenReturn(true)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val finalState = awaitItem()
+                assertThat(finalState.isHiddenNodesOnboarded).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that checkIfHiddenNodeIsOnboarded updates isHiddenNodesOnboarded to false`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                true
+            )
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+            whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val finalState = awaitItem()
+
+                assertThat(finalState.isHiddenNodesOnboarded).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that setHiddenNodesOnboarded updates isHiddenNodesOnboarded to true`() = runTest {
+        setupTestData(emptyList())
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            awaitItem()
+            underTest.setHiddenNodesOnboarded()
+            val updatedState = awaitItem()
+            assertThat(updatedState.isHiddenNodesOnboarded).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that monitorAccountDetail handles null account detail gracefully`() = runTest {
+        setupTestData(emptyList())
+        val accountDetail = mock<AccountDetail> {
+            on { levelDetail } doReturn null
+        }
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+        whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val finalState = awaitItem()
+            assertThat(finalState.isHiddenNodesEnabled).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that monitorAccountDetail handles null account type gracefully`() = runTest {
+        setupTestData(emptyList())
+        val accountLevelDetail = mock<AccountLevelDetail> {
+            on { accountType } doReturn null
+        }
+        val accountDetail = mock<AccountDetail> {
+            on { levelDetail } doReturn accountLevelDetail
+        }
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+        whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val finalState = awaitItem()
+            assertThat(finalState.isHiddenNodesEnabled).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that checkIfHiddenNodeIsOnboarded handles failure gracefully`() = runTest {
+        setupTestData(emptyList())
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(isHiddenNodesOnboardedUseCase()).thenThrow(RuntimeException("Test exception"))
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val finalState = awaitItem()
+            assertThat(finalState.isHiddenNodesOnboarded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that all hidden nodes properties are updated correctly when feature flag is enabled`() =
+        runTest {
+            setupTestData(emptyList())
+            val accountLevelDetail = mock<AccountLevelDetail> {
+                on { accountType } doReturn AccountType.PRO_I
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { levelDetail } doReturn accountLevelDetail
+            }
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                true
+            )
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
+            whenever(isHiddenNodesOnboardedUseCase()).thenReturn(true)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val finalState = awaitItem()
+                assertThat(finalState.showHiddenNodes).isTrue()
+                assertThat(finalState.isHiddenNodesEnabled).isTrue()
+                assertThat(finalState.isHiddenNodesOnboarded).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that hidden nodes properties remain false when feature flag is disabled`() = runTest {
+        setupTestData(emptyList())
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+            false
+        )
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(isHiddenNodesOnboardedUseCase()).thenReturn(true)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val finalState = awaitItem()
+            assertThat(finalState.showHiddenNodes).isFalse()
+            assertThat(finalState.isHiddenNodesEnabled).isFalse()
+            assertThat(finalState.isHiddenNodesOnboarded).isFalse()
         }
     }
 } 

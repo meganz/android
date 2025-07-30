@@ -142,7 +142,7 @@ internal fun CloudDriveContent(
             onEnterMediaDiscoveryClick = {},
             fileTypeIconMapper = fileTypeIconMapper,
             inSelectionMode = uiState.isInSelectionMode,
-            shouldApplySensitiveMode = false,
+            shouldApplySensitiveMode = uiState.isHiddenNodesEnabled,
         )
     }
 
