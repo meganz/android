@@ -2,8 +2,8 @@
 include(ExternalProject)
 
 # Variables
-set(SUBPROJECT_REPO "https://github.com/barteksc/PdfiumAndroid.git")
-set(SUBPROJECT_TAG "pdfium-android-1.9.0")
+set(SUBPROJECT_REPO "https://github.com/meganz/PdfiumAndroid.git")
+set(SUBPROJECT_TAG "pdfium-android-1.9.2")
 set(CUSTOM_CMAKE_SOURCE ${CMAKE_SOURCE_DIR}/pdfviewer/CMakeLists.txt)
 set(SUBPROJECT_SOURCE_DIR ${CMAKE_BINARY_DIR}/pdfium_download/src/PdfiumAndroid)
 set(BUILD_DIR ${CMAKE_BINARY_DIR}/builddir)
