@@ -465,16 +465,17 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     private fun CoroutineScope.monitorConnectivityStatus() = launch {
-        monitorConnectivityUseCase().collect {
+        monitorConnectivityUseCase().collect { connectivityState ->
             val isWifiNotSatisfied = isWifiNotSatisfiedUseCase()
             val isEnableNewNotification =
                 runCatching { getFeatureFlagValueUseCase(DataFeatures.CameraUploadsNotification) }
                     .onFailure { error ->
                         Timber.e(error)
                     }.getOrDefault(false)
-            isWifiConstraintSatisfied = it && isWifiNotSatisfied.not()
+            isWifiConstraintSatisfied = connectivityState && isWifiNotSatisfied.not()
 
             if (!isWifiConstraintSatisfied) {
+                Timber.d("Network connection requirement not met, connectivityState: $connectivityState, isWifiNotSatisfied: $isWifiNotSatisfied")
                 if (isEnableNewNotification) {
                     if (isWifiNotSatisfied) {
                         sendNoWifiConnectionStatus()
