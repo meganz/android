@@ -1417,4 +1417,8 @@
     <string name="camera_uploads_banner_complete_title">Camera uploads complete</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
     <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
+    <!-- message when trying to open a downloaded file but there isn't any app that open that file. Example: a user downloads a pdf but doesn't have any app to read a pdf -->
+    <string name="intent_not_available">There’s no suitable app to open this file on your device</string>
 </resources>

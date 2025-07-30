@@ -341,8 +341,8 @@ interface AppNavigator {
     fun openTextEditorActivity(
         context: Context,
         currentFileNode: TypedFileNode,
-        mode: String,
         nodeSourceType: Int?,
+        mode: String? = null,
     )
 
     /**

@@ -68,6 +68,8 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_ADD_TO_AL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
@@ -81,8 +83,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
-import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
 import mega.privacy.android.navigation.MegaNavigator
@@ -617,12 +617,12 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openTextEditorActivity(
         context: Context,
         currentFileNode: TypedFileNode,
-        mode: String,
         nodeSourceType: Int?,
+        mode: String?,
     ) {
         val textFileIntent = Intent(context, TextEditorActivity::class.java)
         textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
-            .putExtra(TextEditorViewModel.MODE, mode)
+            .putExtra(TextEditorViewModel.MODE, mode ?: TextEditorViewModel.VIEW_MODE)
             .putExtra(
                 Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
                 nodeSourceType ?: NodeSourceTypeInt.FILE_BROWSER_ADAPTER

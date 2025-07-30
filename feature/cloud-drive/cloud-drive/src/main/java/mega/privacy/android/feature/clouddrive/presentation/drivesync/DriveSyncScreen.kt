@@ -100,6 +100,7 @@ internal fun DriveSyncScreen(
                         onChangeViewTypeClicked = cloudDriveViewModel::onChangeViewTypeClicked,
                         onNavigateToFolder = onNavigateToFolder,
                         onNavigateToFolderEventConsumed = cloudDriveViewModel::onNavigateToFolderEventConsumed,
+                        onOpenedFileNodeHandled = cloudDriveViewModel::onOpenedFileNodeHandled,
                     )
                 }
                 addTextTabWithLazyListState(

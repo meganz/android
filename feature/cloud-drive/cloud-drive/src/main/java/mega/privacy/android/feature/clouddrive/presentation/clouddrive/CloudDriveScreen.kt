@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -18,15 +19,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LoadingView
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.list.view.NodesView
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
@@ -81,6 +86,7 @@ fun CloudDriveScreen(
                 onChangeViewTypeClicked = viewModel::onChangeViewTypeClicked,
                 onNavigateToFolder = onNavigateToFolder,
                 onNavigateToFolderEventConsumed = viewModel::onNavigateToFolderEventConsumed,
+                onOpenedFileNodeHandled = viewModel::onOpenedFileNodeHandled,
             )
         }
     )
@@ -94,12 +100,16 @@ internal fun CloudDriveContent(
     onItemLongClicked: (NodeUiItem<TypedNode>) -> Unit,
     onChangeViewTypeClicked: () -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
+    onOpenedFileNodeHandled: () -> Unit,
     onNavigateToFolderEventConsumed: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackBarHostState.current
+
     when {
         uiState.isLoading -> {
             if (uiState.currentFolderId.longValue == -1L) {
@@ -141,5 +151,19 @@ internal fun CloudDriveContent(
         onConsumed = onNavigateToFolderEventConsumed
     ) { nodeId ->
         onNavigateToFolder(nodeId)
+    }
+
+    uiState.openedFileNode?.let { openedFileNode ->
+        HandleNodeAction3(
+            typedFileNode = openedFileNode,
+            snackBarHostState = snackbarHostState,
+            coroutineScope = coroutineScope,
+            onActionHandled = { onOpenedFileNodeHandled() },
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            onDownloadEvent = {
+                //handle download event
+            },
+            sortOrder = SortOrder.ORDER_NONE
+        )
     }
 }

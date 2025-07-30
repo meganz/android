@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":shared:resources"))
     implementation(project(":core:formatter"))
     implementation(project(":navigation"))
+    implementation(project(":core:ui-components:snowflake-components"))
 
     //core components
     implementation(lib.mega.core.ui)
@@ -39,6 +40,7 @@ dependencies {
     implementation(lib.logging.timber)
     implementation(lib.coil3)
     implementation(lib.coil.compose)
+    implementation(androidx.hilt.navigation)
 
     //test
     testImplementation(project(":core-test"))

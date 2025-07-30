@@ -5,6 +5,7 @@ import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 
@@ -15,6 +16,7 @@ data class CloudDriveUiState(
     val items: List<NodeUiItem<TypedNode>> = emptyList(),
     val currentViewType: ViewType = ViewType.LIST,
     val navigateToFolderEvent: StateEventWithContent<NodeId> = consumed(),
+    val openedFileNode: TypedFileNode? = null
 ) {
     /**
      * True if any item is selected

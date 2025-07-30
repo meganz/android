@@ -21,6 +21,8 @@ import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.toDuration
@@ -89,7 +91,7 @@ class CloudDriveViewModel @Inject constructor(
             return
         }
         when (nodeUiItem.node) {
-            is FolderNode -> {
+            is TypedFolderNode -> {
                 uiState.update { state ->
                     state.copy(
                         navigateToFolderEvent = triggered(nodeUiItem.id)
@@ -97,9 +99,12 @@ class CloudDriveViewModel @Inject constructor(
                 }
             }
 
-            is FileNode -> {
-                // Handle file click - could open file or show options
-                Timber.d("File clicked: ${nodeUiItem.node.name}")
+            is TypedFileNode -> {
+                uiState.update { state ->
+                    state.copy(
+                        openedFileNode = nodeUiItem.node as TypedFileNode
+                    )
+                }
             }
         }
     }
@@ -209,6 +214,15 @@ class CloudDriveViewModel @Inject constructor(
                 fileDuration = fileDuration,
                 isHighlighted = isHighlighted,
             )
+        }
+    }
+
+    /**
+     * Handle the event when a file node is opened
+     */
+    fun onOpenedFileNodeHandled() {
+        uiState.update { state ->
+            state.copy(openedFileNode = null)
         }
     }
 }
