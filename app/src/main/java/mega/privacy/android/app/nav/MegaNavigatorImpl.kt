@@ -8,6 +8,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -683,5 +684,9 @@ internal class MegaNavigatorImpl @Inject constructor(
                 isIncomingShares = isIncomingShares
             )
         )
+    }
+
+    override fun launchUrl(context: Context?, url: String?) {
+        context?.launchUrl(url)
     }
 }

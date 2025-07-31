@@ -404,4 +404,12 @@ interface AppNavigator {
         email: String,
         isIncomingShares: Boolean,
     )
+
+    /**
+     * Launches a URL with via intent
+     *
+     * @param context The Context
+     * @param url The URL to launch
+     */
+    fun launchUrl(context: Context?, url: String?)
 }
