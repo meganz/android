@@ -11,6 +11,7 @@ import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
+import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.MenuBottomNavigationItemEvent
@@ -18,8 +19,8 @@ import mega.privacy.mobile.analytics.event.MenuBottomNavigationItemEvent
 
 class MenuNavItem : MainNavItem {
     override val destination: NavKey = MenuHomeScreen
-    override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController) -> Unit =
-        { navigationHandler, _ -> menuHomeScreen(navigationHandler::navigate) }
+    override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
+        { navigationHandler, _, _ -> menuHomeScreen(navigationHandler::navigate) }
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Menu01
     override val badge: Flow<String?>? = null
     override val label: Int = sharedR.string.general_menu

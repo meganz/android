@@ -25,6 +25,7 @@ import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeA
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveContent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
@@ -40,6 +41,7 @@ internal fun DriveSyncScreen(
     setNavigationItemVisibility: (Boolean) -> Unit,
     viewModel: DriveSyncViewModel = hiltViewModel(),
     cloudDriveViewModel: CloudDriveViewModel = hiltViewModel(),
+    onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -101,6 +103,7 @@ internal fun DriveSyncScreen(
                         onNavigateToFolder = onNavigateToFolder,
                         onNavigateToFolderEventConsumed = cloudDriveViewModel::onNavigateToFolderEventConsumed,
                         onOpenedFileNodeHandled = cloudDriveViewModel::onOpenedFileNodeHandled,
+                        onTransfer = onTransfer
                     )
                 }
                 addTextTabWithLazyListState(

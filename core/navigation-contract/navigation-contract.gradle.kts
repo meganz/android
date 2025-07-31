@@ -11,4 +11,5 @@ dependencies {
     implementation(androidx.navigation.compose)
     implementation(androidx.navigation3.runtime)
     implementation(lib.mega.analytics)
+    implementation(project(":domain"))
 }

@@ -13,18 +13,20 @@ import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
+import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 
 class DriveSyncNavItem : MainNavItem {
     override val destination: NavKey = DriveSync
-    override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController) -> Unit =
-        { navigationHandler, navigationController ->
+    override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
+        { navigationHandler, navigationController, transferHandler ->
             driveSyncScreen(
                 onNavigateToFolder = { nodeId ->
                     navigationHandler.navigate(CloudDrive(nodeHandle = nodeId.longValue))
                 },
                 setNavigationVisibility = navigationController::showNavigation,
+                onTransfer = transferHandler::setTransferEvent,
             )
         }
 

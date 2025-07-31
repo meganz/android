@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 
 @Serializable
 data class CloudDrive(
@@ -14,6 +15,7 @@ data class CloudDrive(
 
 fun NavGraphBuilder.cloudDriveScreen(
     onBack: () -> Unit,
+    onTransfer: (TransferTriggerEvent) -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
 ) {
     composable<CloudDrive> { backStackEntry ->
@@ -23,6 +25,7 @@ fun NavGraphBuilder.cloudDriveScreen(
             viewModel = viewModel,
             onBack = onBack,
             onNavigateToFolder = onNavigateToFolder,
+            onTransfer = onTransfer
         )
     }
 }

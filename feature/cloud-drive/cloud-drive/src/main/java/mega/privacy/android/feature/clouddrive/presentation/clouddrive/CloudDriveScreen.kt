@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 
 /**
@@ -44,6 +45,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 fun CloudDriveScreen(
     onBack: () -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
+    onTransfer: (TransferTriggerEvent) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -87,6 +89,7 @@ fun CloudDriveScreen(
                 onNavigateToFolder = onNavigateToFolder,
                 onNavigateToFolderEventConsumed = viewModel::onNavigateToFolderEventConsumed,
                 onOpenedFileNodeHandled = viewModel::onOpenedFileNodeHandled,
+                onTransfer = onTransfer
             )
         }
     )
@@ -101,6 +104,7 @@ internal fun CloudDriveContent(
     onChangeViewTypeClicked: () -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
     onOpenedFileNodeHandled: () -> Unit,
+    onTransfer: (TransferTriggerEvent) -> Unit,
     onNavigateToFolderEventConsumed: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
@@ -160,9 +164,7 @@ internal fun CloudDriveContent(
             coroutineScope = coroutineScope,
             onActionHandled = { onOpenedFileNodeHandled() },
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-            onDownloadEvent = {
-                //handle download event
-            },
+            onDownloadEvent = onTransfer,
             sortOrder = SortOrder.ORDER_NONE
         )
     }

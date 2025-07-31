@@ -8,7 +8,7 @@ import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdenti
 
 interface MainNavItem {
     val destination: NavKey
-    val screen: NavGraphBuilder.(navigationHandler: NavigationHandler, navigationUiController: NavigationUiController) -> Unit
+    val screen: NavGraphBuilder.(navigationHandler: NavigationHandler, navigationUiController: NavigationUiController, transferHandler: TransferHandler) -> Unit
     val icon: ImageVector
     val badge: Flow<String?>?
     val label: Int

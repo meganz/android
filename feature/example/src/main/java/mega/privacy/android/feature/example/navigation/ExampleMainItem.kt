@@ -16,13 +16,14 @@ import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
+import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 
 class ExampleMainItem : MainNavItem {
     override val destination: NavKey = HomeScreen
-    override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController) -> Unit =
-        { navigationHandler, navigationUiController -> exampleHomeScreen(setNavigationVisibility = navigationUiController::showNavigation) }
+    override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
+        { navigationHandler, navigationUiController, _ -> exampleHomeScreen(setNavigationVisibility = navigationUiController::showNavigation) }
 
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.MessageChatCircle
     override val badge: Flow<String?>? = null
@@ -36,8 +37,8 @@ class ExampleMainItem : MainNavItem {
 
 class OtherExampleMainItem : MainNavItem {
     override val destination: NavKey = HomeScreen2
-    override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController) -> Unit =
-        { navigationHandler, _ ->
+    override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
+        { navigationHandler, _, _ ->
             otherExampleHomeScreen(
                 onNavigate = navigationHandler::navigate,
                 resultFlow = navigationHandler::monitorResult
