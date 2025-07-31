@@ -18,10 +18,10 @@ import mega.privacy.android.app.appstate.initialisation.AuthInitialiser
 import mega.privacy.android.app.appstate.mapper.BlockedStateMapper
 import mega.privacy.android.app.appstate.model.AuthState
 import mega.privacy.android.app.appstate.model.BlockedState
-import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.extension.onFirst
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.shared.original.core.ui.utils.asUiStateFlow
@@ -36,13 +36,8 @@ class AuthStateViewModel @Inject constructor(
     private val authInitialiser: AuthInitialiser,
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val blockedStateMapper: BlockedStateMapper,
+    private val handleBlockedStateSessionUseCase: HandleBlockedStateSessionUseCase,
 ) : ViewModel() {
-
-    private val handleBlockedStateSessionUseCase: suspend (AccountBlockedEvent) -> Unit = {
-        //Create a use case that logs out the and cleans up resources if need be based on blocked state
-        //then inject it as a parameter
-    }
-
     init {
         authInitialiser.onAppStart()
     }

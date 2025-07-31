@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import org.junit.jupiter.api.AfterAll
@@ -48,6 +49,7 @@ class AuthStateViewModelTest {
     private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
     private val monitorUserCredentialsUseCase = mock<MonitorUserCredentialsUseCase>()
     private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
+    private val handleBlockedStateSessionUseCase = mock<HandleBlockedStateSessionUseCase>()
 
     private val authInitialiser = mock<AuthInitialiser>()
 
@@ -69,12 +71,18 @@ class AuthStateViewModelTest {
             authInitialiser = authInitialiser,
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             blockedStateMapper = BlockedStateMapper(),
+            handleBlockedStateSessionUseCase = handleBlockedStateSessionUseCase,
         )
     }
 
     @AfterEach
     fun resetMocks() {
-        reset(monitorThemeModeUseCase, monitorUserCredentialsUseCase, authInitialiser)
+        reset(
+            monitorThemeModeUseCase,
+            monitorUserCredentialsUseCase,
+            authInitialiser,
+            handleBlockedStateSessionUseCase,
+        )
     }
 
     @Test
@@ -851,6 +859,20 @@ class AuthStateViewModelTest {
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
             verify(authInitialiser, times(1)).onPostLogin(session)
         }
+
+    @Test
+    fun `test that handle blocked state is called when a blocked state is returned`() = runTest {
+        stubNotBlockedState()
+        monitorThemeModeUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(ThemeMode.Light))
+        }
+        monitorUserCredentialsUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(null))
+        }
+
+        underTest.state.test { cancelAndIgnoreRemainingEvents() }
+        verify(handleBlockedStateSessionUseCase).invoke(notBlockedEvent)
+    }
 
     private val notBlockedEvent = AccountBlockedEvent(
         handle = -1L,

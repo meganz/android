@@ -22,6 +22,7 @@ import mega.privacy.android.data.filewrapper.FileWrapper
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
@@ -121,4 +122,8 @@ class AppModule {
     @ElementsIntoSet
     fun provideFeatureDestinations(): Set<@JvmSuppressWildcards FeatureDestination> =
         emptySet<FeatureDestination>()
+
+    @Provides
+    fun provideDisableChatApiUseCase(): DisableChatApiUseCase =
+        DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
 }

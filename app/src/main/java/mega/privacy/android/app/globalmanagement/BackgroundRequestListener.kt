@@ -173,7 +173,7 @@ class BackgroundRequestListener @Inject constructor(
         Timber.d("TYPE_FETCH_NODES")
         applicationScope.launch {
             runCatching { loginMutex.unlock() }
-                .onFailure { Timber.w("Exception unlocking login mutex", it) }
+                .onFailure { Timber.w(it, "Exception unlocking login mutex") }
 
             broadcastFetchNodesFinishUseCase()
             runCatching {
@@ -260,7 +260,7 @@ class BackgroundRequestListener @Inject constructor(
         Timber.d("askForFullAccountInfo")
         applicationScope.launch {
             runCatching { getFullAccountInfoUseCase() }.onFailure {
-                Timber.w("Exception getting full account info.", it)
+                Timber.w(it, "Exception getting full account info.")
             }
         }
     }
