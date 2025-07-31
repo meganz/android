@@ -114,10 +114,11 @@ internal fun SyncFoldersRoute(
         }
     }
 
-    val message = uiState.snackbarMessage?.let { stringResource(id = it) }
     LaunchedEffect(key1 = uiState.snackbarMessage) {
-        message?.let {
-            snackBarHostState.showAutoDurationSnackbar(it)
+        uiState.snackbarMessage?.let { resId ->
+            val message =
+                uiState.snackbarMessage.let { context.getString(resId, uiState.movedFolderName) }
+            snackBarHostState.showAutoDurationSnackbar(message)
             viewModel.handleAction(SnackBarShown)
         }
     }

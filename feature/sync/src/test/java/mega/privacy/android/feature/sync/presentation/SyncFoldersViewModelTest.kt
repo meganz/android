@@ -62,6 +62,7 @@ import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
+import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -339,6 +340,13 @@ class SyncFoldersViewModelTest {
                 deconfiguredBackupRoot = syncUiItem.megaStorageNodeId,
                 backupDestination = remoteFolder.id
             )
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.snackbarMessage).isEqualTo(
+                    sharedResR.string.sync_snackbar_message_confirm_backup_moved,
+                )
+                assertThat(state.movedFolderName).isEqualTo(remoteFolder.name)
+            }
         }
 
     @Test
@@ -360,6 +368,13 @@ class SyncFoldersViewModelTest {
             verify(removeDeconfiguredBackupNodesUseCase).invoke(
                 deconfiguredBackupRoot = syncUiItem.megaStorageNodeId,
             )
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.snackbarMessage).isEqualTo(
+                    sharedResR.string.sync_snackbar_message_confirm_backup_deleted,
+                )
+                assertThat(state.movedFolderName).isEqualTo(null)
+            }
         }
 
     @Test

@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -9,9 +8,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,6 +22,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaSnackbar
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -34,12 +35,10 @@ import mega.privacy.android.feature.sync.ui.createnewfolder.model.CreateNewFolde
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
-import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 
 @Composable
@@ -69,22 +68,13 @@ internal fun MegaPickerScreen(
 
     var showCreateNewFolderDialog by rememberSaveable { mutableStateOf(false) }
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(0.dp),
+    MegaScaffold(
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,
                 title = currentFolder?.name?.takeIf { showCurrentFolderName }
-                    ?: if (isStopBackupMegaPicker) {
-                        stringResource(sharedR.string.general_select_folder)
-                    } else {
-                        stringResource(sharedR.string.general_section_cloud_drive)
-                    },
-                subtitle = if (isStopBackupMegaPicker || showCurrentFolderName) {
-                    null
-                } else {
-                    stringResource(sharedR.string.general_select_folder)
-                },
+                    ?: stringResource(sharedR.string.general_section_cloud_drive),
+                subtitle = stringResource(sharedR.string.general_select_create_folder).takeIf { isStopBackupMegaPicker },
                 windowInsets = WindowInsets(0.dp),
                 elevation = 0.dp,
                 onNavigationPressed = {
@@ -112,9 +102,7 @@ internal fun MegaPickerScreen(
             )
         },
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                MegaSnackbar(snackbarData = data, modifier = Modifier.padding(bottom = 56.dp))
-            }
+            MegaSnackbar(snackbarHostState)
         }
     )
 
@@ -171,23 +159,25 @@ private fun MegaPickerScreenContent(
             isLoading = isLoading,
         )
 
-        Box(
-            Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
-        ) {
-            RaisedDefaultMegaButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 24.dp, top = 8.dp, end = 24.dp, bottom = 8.dp),
-                textId = if (isStopBackupMegaPicker) {
-                    sharedR.string.general_select
-                } else {
-                    sharedR.string.general_select_folder
-                },
-                onClick = {
-                    currentFolderSelected()
-                },
-                enabled = isSelectEnabled,
-            )
+        if (isSelectEnabled) {
+            Box(
+                Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
+            ) {
+                RaisedDefaultMegaButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 24.dp, top = 8.dp, end = 24.dp, bottom = 8.dp),
+                    textId = if (isStopBackupMegaPicker) {
+                        sharedR.string.general_select
+                    } else {
+                        sharedR.string.general_select_folder
+                    },
+                    onClick = {
+                        currentFolderSelected()
+                    },
+                    enabled = true,
+                )
+            }
         }
     }
 

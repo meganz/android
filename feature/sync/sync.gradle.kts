@@ -61,6 +61,7 @@ dependencies {
     implementation(lib.compose.state.events)
     implementation(lib.kotlin.serialisation)
     implementation(google.guava)
+    implementation(androidx.material3)
 
     testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(testlib.bundles.ui.test)

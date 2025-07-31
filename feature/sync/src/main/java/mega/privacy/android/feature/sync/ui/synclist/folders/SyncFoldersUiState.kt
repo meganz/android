@@ -12,6 +12,7 @@ internal data class SyncFoldersUiState(
     val showConfirmRemoveSyncFolderDialog: Boolean = false,
     val isDisableBatteryOptimizationEnabled: Boolean = false,
     val syncUiItemToRemove: SyncUiItem? = null,
+    val movedFolderName: String? = null,
     @StringRes val snackbarMessage: Int? = null,
 ) {
     val isWarningBannerDisplayed =

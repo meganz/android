@@ -690,7 +690,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Check your email inbox to proceed.</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">An error occurred, please try again.</string>
+    <string name="general_text_error">An error occurred, try again</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">You must be logged in to perform this action.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->

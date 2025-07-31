@@ -402,12 +402,24 @@ internal class SyncFoldersViewModel @Inject constructor(
                                     StopBackupOption.MOVE -> {
                                         val destinationFolderId =
                                             action.selectedFolder?.id ?: getRootNodeUseCase()?.id
+                                        val destinationFolderName = action.selectedFolder?.name
+                                            ?: getRootNodeUseCase()?.name
                                         destinationFolderId?.let { folderId ->
                                             Timber.d("Moving deconfigured backup nodes to folder with id: $folderId")
                                             moveDeconfiguredBackupNodesUseCase(
                                                 deconfiguredBackupRoot = megaStorageNodeId,
                                                 backupDestination = folderId,
                                             )
+                                            removeFolderPairUseCase(syncUiItemToRemove.id)
+                                            clearSelectedMegaFolderUseCase()
+                                            _uiState.update { state ->
+                                                state.copy(
+                                                    snackbarMessage = sharedResR.string.sync_snackbar_message_confirm_backup_moved,
+                                                    showConfirmRemoveSyncFolderDialog = false,
+                                                    syncUiItemToRemove = null,
+                                                    movedFolderName = destinationFolderName ?: ""
+                                                )
+                                            }
                                         }
                                     }
 
@@ -415,16 +427,16 @@ internal class SyncFoldersViewModel @Inject constructor(
                                         removeDeconfiguredBackupNodesUseCase(
                                             deconfiguredBackupRoot = megaStorageNodeId,
                                         )
+                                        removeFolderPairUseCase(syncUiItemToRemove.id)
+                                        clearSelectedMegaFolderUseCase()
+                                        _uiState.update { state ->
+                                            state.copy(
+                                                snackbarMessage = sharedResR.string.sync_snackbar_message_confirm_backup_deleted,
+                                                showConfirmRemoveSyncFolderDialog = false,
+                                                syncUiItemToRemove = null
+                                            )
+                                        }
                                     }
-                                }
-                                removeFolderPairUseCase(syncUiItemToRemove.id)
-                                clearSelectedMegaFolderUseCase()
-                                _uiState.update { state ->
-                                    state.copy(
-                                        snackbarMessage = sharedResR.string.sync_snackbar_message_confirm_backup_stopped,
-                                        showConfirmRemoveSyncFolderDialog = false,
-                                        syncUiItemToRemove = null
-                                    )
                                 }
                             }.onFailure {
                                 if (it is ResourceAlreadyExistsMegaException) {
@@ -475,7 +487,7 @@ internal class SyncFoldersViewModel @Inject constructor(
 
             is SyncFoldersAction.SnackBarShown -> {
                 _uiState.update { state ->
-                    state.copy(snackbarMessage = null)
+                    state.copy(snackbarMessage = null, movedFolderName = null)
                 }
             }
 
