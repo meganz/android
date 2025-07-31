@@ -237,6 +237,7 @@ public class PDFView extends RelativeLayout {
 
     /** pages numbers used when calling onDrawAllListener */
     private List<Integer> onDrawPagesNums = new ArrayList<>(10);
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     /** Construct the initial view */
     public PDFView(Context context, AttributeSet set) {
@@ -281,7 +282,6 @@ public class PDFView extends RelativeLayout {
 
     private void decodeDocument(DocumentSource docSource, String password, int[] userPages, PDFView pdfView, PdfiumCore pdfiumCore) {
         decodingExecutorService = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
 
         try {
             decodingExecutorService.execute(() -> {
@@ -432,6 +432,7 @@ public class PDFView extends RelativeLayout {
 
         animationManager.stopAll();
         dragPinchManager.disable();
+        handler.removeCallbacksAndMessages(null);
 
         // Stop tasks
         if (renderingHandler != null) {
@@ -756,7 +757,7 @@ public class PDFView extends RelativeLayout {
             return;
         }
 
-        if (isAlertDialogShown(pdfViewer.getTakenDownDialog())) {
+        if (isAlertDialogShown(pdfViewer.getTakenDownDialog()) || isRecycled()) {
             return;
         }
 
