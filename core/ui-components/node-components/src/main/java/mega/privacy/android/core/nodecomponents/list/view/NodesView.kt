@@ -16,7 +16,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -60,7 +59,6 @@ fun <T : TypedNode> NodesView(
     onChangeViewTypeClicked: () -> Unit,
     onLinkClicked: (String) -> Unit,
     onDisputeTakeDownClicked: (String) -> Unit,
-    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
@@ -68,16 +66,12 @@ fun <T : TypedNode> NodesView(
     spanCount: Int = 2,
     showLinkIcon: Boolean = true,
     showChangeViewType: Boolean = true,
-    shouldApplySensitiveMode: Boolean = false,
     showSortOrder: Boolean = true,
     showMediaDiscoveryButton: Boolean = false,
-    showPublicLinkCreationTime: Boolean = false,
-    isPublicNode: Boolean = false,
     isContactVerificationOn: Boolean = false,
     inSelectionMode: Boolean = false,
     onEnterMediaDiscoveryClick: () -> Unit = {},
     listContentPadding: PaddingValues = PaddingValues(0.dp),
-    nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val orientation = LocalConfiguration.current.orientation
@@ -118,13 +112,8 @@ fun <T : TypedNode> NodesView(
             showLinkIcon = showLinkIcon,
             listState = listState,
             showMediaDiscoveryButton = showMediaDiscoveryButton,
-            isPublicNode = isPublicNode,
-            showPublicLinkCreationTime = showPublicLinkCreationTime,
-            fileTypeIconMapper = fileTypeIconMapper,
             inSelectionMode = inSelectionMode,
-            shouldApplySensitiveMode = shouldApplySensitiveMode,
             isContactVerificationOn = isContactVerificationOn,
-            nodeSourceType = nodeSourceType,
         )
     } else {
         val newList = rememberNodeListForGrid(nodeUIItems = items, spanCount = span)
@@ -150,11 +139,7 @@ fun <T : TypedNode> NodesView(
             showChangeViewType = showChangeViewType,
             gridState = gridState,
             showMediaDiscoveryButton = showMediaDiscoveryButton,
-            isPublicNode = isPublicNode,
-            fileTypeIconMapper = fileTypeIconMapper,
             inSelectionMode = inSelectionMode,
-            shouldApplySensitiveMode = shouldApplySensitiveMode,
-            nodeSourceType = nodeSourceType,
         )
     }
     if (showTakenDownDialog) {

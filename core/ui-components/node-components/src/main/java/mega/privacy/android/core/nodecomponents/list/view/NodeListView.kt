@@ -13,22 +13,11 @@ import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.nodecomponents.extension.getNodeItemDescription
-import mega.privacy.android.core.nodecomponents.extension.getNodeItemThumbnail
-import mega.privacy.android.core.nodecomponents.extension.getSharesIcon
 import mega.privacy.android.core.nodecomponents.list.view.previewdata.FolderNodePreviewDataProvider
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
-import mega.privacy.android.domain.entity.AudioFileTypeInfo
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
-import mega.privacy.android.domain.entity.PdfFileTypeInfo
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 
 /**
  * This method will show [NodeUiItem] in vertical list using [ThumbnailRequest] to load thumbnails
@@ -63,18 +52,13 @@ fun <T : TypedNode> NodeListView(
     showSortOrder: Boolean,
     listState: LazyListState,
     showMediaDiscoveryButton: Boolean,
-    shouldApplySensitiveMode: Boolean,
-    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
     highlightText: String = "",
     showLinkIcon: Boolean = true,
     showChangeViewType: Boolean = true,
-    isPublicNode: Boolean = false,
-    showPublicLinkCreationTime: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     inSelectionMode: Boolean = false,
     isContactVerificationOn: Boolean = false,
-    nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
     FastScrollLazyColumn(
         state = listState,
@@ -103,40 +87,17 @@ fun <T : TypedNode> NodeListView(
         items(
             count = nodeUiItemList.size,
             key = {
-                nodeUiItemList[it].uniqueKey
+                nodeUiItemList[it].id.longValue
             }
         ) {
             val nodeUiItem = nodeUiItemList[it]
             NodeListViewItem(
-                title = nodeUiItem.node.name, // TODO: Implement title logic
-                subtitle = nodeUiItem.node.getNodeItemDescription(showPublicLinkCreationTime),
-                description = nodeUiItem.node.description?.replace("\n", " "),
-                tags = nodeUiItem.node.tags.takeIf { nodeSourceType != NodeSourceType.RUBBISH_BIN },
-                icon = nodeUiItem.node.getNodeItemThumbnail(fileTypeIconMapper = fileTypeIconMapper),
-                thumbnailData = ThumbnailRequest(nodeUiItem.id, isPublicNode),
-                isSelected = nodeUiItem.isSelected,
+                nodeUiItem = nodeUiItem,
+                isInSelectionMode = inSelectionMode,
+                highlightText = highlightText,
                 onMoreClicked = { onMenuClick(nodeUiItem) }.takeUnless { _ -> inSelectionMode },
                 onItemClicked = { onItemClicked(nodeUiItem) },
                 onLongClicked = { onLongClick(nodeUiItem) },
-                accessPermissionIcon = (nodeUiItem.node as? ShareFolderNode)
-                    .getSharesIcon(isContactVerificationOn),
-                labelColor = null, // TODO: Implement label color logic
-                highlightText = highlightText,
-                showOffline = nodeUiItem.isAvailableOffline,
-                showLink = showLinkIcon && nodeUiItem.exportedData != null,
-                showFavourite = nodeUiItem.isFavourite && nodeUiItem.isIncomingShare.not(),
-                showIsVerified = isContactVerificationOn && nodeUiItem.isIncomingShare && (nodeUiItem.node as? ShareFolderNode)?.shareData?.isContactCredentialsVerified == true,
-                showVersion = nodeUiItem.hasVersion,
-                isTakenDown = nodeUiItem.isTakenDown,
-                isInSelectionMode = inSelectionMode,
-                isSensitive = nodeSourceType != NodeSourceType.INCOMING_SHARES
-                        && nodeSourceType != NodeSourceType.OUTGOING_SHARES
-                        && nodeSourceType != NodeSourceType.LINKS
-                        && shouldApplySensitiveMode && (nodeUiItem.isMarkedSensitive || nodeUiItem.isSensitiveInherited),
-                showBlurEffect = (nodeUiItem.node as? FileNode)?.type?.let { fileTypeInfo ->
-                    fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is PdfFileTypeInfo || fileTypeInfo is AudioFileTypeInfo
-                } ?: false,
-                isHighlighted = nodeUiItem.isHighlighted,
             )
         }
     }
@@ -161,10 +122,8 @@ private fun NodeListViewPreview(
             showSortOrder = true,
             listState = LazyListState(),
             showMediaDiscoveryButton = false,
-            shouldApplySensitiveMode = false,
             modifier = Modifier,
-            showChangeViewType = true,
-            fileTypeIconMapper = FileTypeIconMapper()
+            showChangeViewType = true
         )
     }
 }

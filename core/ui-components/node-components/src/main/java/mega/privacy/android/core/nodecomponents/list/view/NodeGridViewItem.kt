@@ -50,8 +50,55 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
+
+/**
+ * Node grid view item using NodeUiItem
+ *
+ * @param nodeUiItem The NodeUiItem containing all UI properties
+ * @param modifier Optional [Modifier] to be applied to the component
+ * @param isInSelectionMode Whether the grid is in selection mode (shows checkbox instead of more menu)
+ * @param onClick Callback invoked when the item is clicked
+ * @param onLongClick Callback invoked when the item is long-pressed
+ * @param onMenuClick Callback invoked when the more options menu is clicked
+ */
+@Composable
+fun <T : TypedNode> NodeGridViewItem(
+    nodeUiItem: NodeUiItem<T>,
+    modifier: Modifier = Modifier,
+    isInSelectionMode: Boolean = false,
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {},
+    onMenuClick: (() -> Unit) = {},
+) {
+    NodeGridViewItem(
+        name = nodeUiItem.title.text,
+        iconRes = nodeUiItem.iconRes,
+        thumbnailData = nodeUiItem.thumbnailData,
+        isTakenDown = nodeUiItem.isTakenDown,
+        modifier = modifier,
+        duration = nodeUiItem.duration,
+        isSelected = nodeUiItem.isSelected,
+        isInSelectionMode = isInSelectionMode,
+        isFolderNode = nodeUiItem.isFolderNode,
+        isVideoNode = nodeUiItem.isVideoNode,
+        onClick = onClick,
+        onLongClick = onLongClick,
+        onMenuClick = onMenuClick,
+        isInvisible = nodeUiItem.isInvisible,
+        isSensitive = nodeUiItem.isSensitive,
+        showBlurEffect = nodeUiItem.showBlurEffect,
+        isHighlighted = nodeUiItem.isHighlighted,
+        showLink = nodeUiItem.showLink,
+        showFavourite = nodeUiItem.showFavourite,
+        labelColor = nodeUiItem.labelColor?.let { Color(it) },
+    )
+}
+
+
 
 /**
  * Node grid view item component for displaying files and folders in a grid layout.

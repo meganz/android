@@ -7,10 +7,12 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.node.NodeSourceType
 
 @Serializable
 data class CloudDrive(
-    val nodeHandle: Long = -1L
+    val nodeHandle: Long = -1L,
+    val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 )
 
 fun NavGraphBuilder.cloudDriveScreen(

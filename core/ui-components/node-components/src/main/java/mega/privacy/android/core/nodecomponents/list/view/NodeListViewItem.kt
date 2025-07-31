@@ -40,8 +40,67 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
+
+/**
+ * Node list item using NodeUiItem
+ *
+ * @param nodeUiItem The NodeUiItem containing all UI properties
+ * @param modifier [Modifier] to be applied to the item
+ * @param titleColor Color for the title text
+ * @param subtitleColor Color for the subtitle text
+ * @param isInSelectionMode if true, the item is in selection mode
+ * @param onMoreClicked Callback for when the more options icon is clicked
+ * @param onInfoClicked Callback for when the info icon is clicked
+ * @param onItemClicked Callback for when the item is clicked
+ * @param onLongClicked Callback for when the item is long clicked
+ */
+@Composable
+fun <T : TypedNode> NodeListViewItem(
+    nodeUiItem: NodeUiItem<T>,
+    modifier: Modifier = Modifier,
+    titleColor: TextColor = TextColor.Primary,
+    subtitleColor: TextColor = TextColor.Secondary,
+    isInSelectionMode: Boolean = false,
+    highlightText: String = "",
+    onMoreClicked: (() -> Unit)? = null,
+    onInfoClicked: (() -> Unit)? = null,
+    onItemClicked: () -> Unit,
+    onLongClicked: (() -> Unit)? = null,
+) {
+    NodeListViewItem(
+        title = nodeUiItem.title.text,
+        subtitle = nodeUiItem.subtitle.text,
+        icon = nodeUiItem.iconRes,
+        modifier = modifier,
+        description = nodeUiItem.formattedDescription?.text,
+        tags = nodeUiItem.tags,
+        thumbnailData = nodeUiItem.thumbnailData,
+        titleColor = titleColor,
+        subtitleColor = subtitleColor,
+        accessPermissionIcon = nodeUiItem.accessPermissionIcon,
+        highlightText = highlightText,
+        showOffline = nodeUiItem.isAvailableOffline,
+        showVersion = nodeUiItem.hasVersion,
+        isSelected = nodeUiItem.isSelected,
+        isInSelectionMode = isInSelectionMode,
+        showIsVerified = nodeUiItem.showIsVerified,
+        isTakenDown = nodeUiItem.isTakenDown,
+        labelColor = nodeUiItem.labelColor?.let { Color(it) },
+        showLink = nodeUiItem.showLink,
+        showFavourite = nodeUiItem.showFavourite,
+        isSensitive = nodeUiItem.isSensitive,
+        showBlurEffect = nodeUiItem.showBlurEffect,
+        isHighlighted = nodeUiItem.isHighlighted,
+        onMoreClicked = onMoreClicked,
+        onInfoClicked = onInfoClicked,
+        onItemClicked = onItemClicked,
+        onLongClicked = onLongClicked,
+    )
+}
 
 /**
  * Node list item

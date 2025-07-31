@@ -25,7 +25,6 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.list.view.NodesView
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeBottomBar
@@ -82,7 +81,6 @@ fun CloudDriveScreen(
             CloudDriveContent(
                 uiState = uiState,
                 contentPadding = innerPadding,
-                fileTypeIconMapper = viewModel.fileTypeIconMapper,
                 onItemClicked = viewModel::onItemClicked,
                 onItemLongClicked = viewModel::onItemLongClicked,
                 onChangeViewTypeClicked = viewModel::onChangeViewTypeClicked,
@@ -98,7 +96,6 @@ fun CloudDriveScreen(
 @Composable
 internal fun CloudDriveContent(
     uiState: CloudDriveUiState,
-    fileTypeIconMapper: FileTypeIconMapper,
     onItemClicked: (NodeUiItem<TypedNode>) -> Unit,
     onItemLongClicked: (NodeUiItem<TypedNode>) -> Unit,
     onChangeViewTypeClicked: () -> Unit,
@@ -144,9 +141,7 @@ internal fun CloudDriveContent(
             onDisputeTakeDownClicked = {},
             showMediaDiscoveryButton = false,
             onEnterMediaDiscoveryClick = {},
-            fileTypeIconMapper = fileTypeIconMapper,
             inSelectionMode = uiState.isInSelectionMode,
-            shouldApplySensitiveMode = uiState.isHiddenNodesEnabled,
         )
     }
 

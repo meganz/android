@@ -18,12 +18,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -42,7 +40,6 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
-import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -57,10 +54,8 @@ class CloudDriveViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    val durationInSecondsTextMapper: DurationInSecondsTextMapper,
-    val fileTypeIconMapper: FileTypeIconMapper,
+    private val nodeUiItemMapper: NodeUiItemMapper,
     savedStateHandle: SavedStateHandle,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val args = savedStateHandle.toRoute<CloudDrive>()
@@ -148,19 +143,17 @@ class CloudDriveViewModel @Inject constructor(
         viewModelScope.launch {
             val folderId = uiState.value.currentFolderId
             runCatching {
-                getNodeByIdUseCase(folderId) to getFileBrowserNodeChildrenUseCase(folderId.longValue)
-            }.onSuccess { (currentNode, children) ->
-                val title = currentNode?.name.takeIf { currentNode is FolderNode }?.let {
-                    LocalizedText.Literal(it)
-                } ?: LocalizedText.StringRes(sharedR.string.general_section_cloud_drive)
-                val nodeUiItems = getNodeUiItems(
-                    nodeList = children,
+                getNodeByIdUseCase(folderId) to nodeUiItemMapper(
+                    nodeList = getFileBrowserNodeChildrenUseCase(folderId.longValue),
+                    nodeSourceType = args.nodeSourceType,
                 )
+            }.onSuccess { (currentNode, children) ->
+                val title = LocalizedText.Literal(currentNode?.name ?: "")
                 uiState.update { state ->
                     state.copy(
                         title = title,
                         isLoading = false,
-                        items = nodeUiItems,
+                        items = children,
                     )
                 }
             }.onFailure {
@@ -269,38 +262,6 @@ class CloudDriveViewModel @Inject constructor(
                 .collect { viewType ->
                     uiState.update { it.copy(currentViewType = viewType) }
                 }
-        }
-    }
-
-    /**
-     * A temporary mapper for sample screen
-     */
-    private suspend fun getNodeUiItems(
-        nodeList: List<TypedNode>,
-        highlightedNodeId: NodeId? = null,
-        highlightedNames: Set<String>? = null,
-    ): List<NodeUiItem<TypedNode>> = withContext(defaultDispatcher) {
-        val existingNodeList = uiState.value.items
-        val existingHighlightedIds = existingNodeList.asSequence()
-            .filter { it.isHighlighted }
-            .map { it.node.id }
-            .toSet()
-
-        nodeList.mapIndexed { index, node ->
-            val fileDuration = if (node is FileNode) {
-                node.type.toDuration()?.let { durationInSecondsTextMapper(it) }
-            } else null
-            val isHighlighted = existingHighlightedIds.contains(node.id) ||
-                    node.id == highlightedNodeId ||
-                    highlightedNames?.contains(node.name) == true
-            val hasCorrespondingIndex = existingNodeList.size > index
-            NodeUiItem(
-                node = node,
-                isSelected = if (hasCorrespondingIndex) existingNodeList[index].isSelected else false,
-                isInvisible = if (hasCorrespondingIndex) existingNodeList[index].isInvisible else false,
-                fileDuration = fileDuration,
-                isHighlighted = isHighlighted,
-            )
         }
     }
 

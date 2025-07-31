@@ -14,18 +14,9 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.nodecomponents.extension.getIcon
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
-import mega.privacy.android.domain.entity.AudioFileTypeInfo
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
-import mega.privacy.android.domain.entity.PdfFileTypeInfo
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 
 /**
 This method will show [NodeUIItem] in Grid manner based on span and getting thumbnail using [ThumbnailRequest]
@@ -59,15 +50,11 @@ fun <T : TypedNode> NodeGridView(
     showSortOrder: Boolean,
     gridState: LazyGridState,
     showMediaDiscoveryButton: Boolean,
-    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
     spanCount: Int = 2,
     showChangeViewType: Boolean = true,
-    isPublicNode: Boolean = false,
     inSelectionMode: Boolean = false,
-    shouldApplySensitiveMode: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
-    nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
     FastScrollLazyVerticalGrid(
         state = gridState,
@@ -105,33 +92,17 @@ fun <T : TypedNode> NodeGridView(
                 if (nodeUiItems[it].isInvisible) {
                     it
                 } else {
-                    nodeUiItems[it].uniqueKey
+                    nodeUiItems[it].id.longValue
                 }
             },
         ) {
             val node = nodeUiItems[it].node
             NodeGridViewItem(
-                isSelected = nodeUiItems[it].isSelected,
-                name = nodeUiItems[it].node.name,
-                iconRes = nodeUiItems[it].node.getIcon(fileTypeIconMapper = fileTypeIconMapper),
-                thumbnailData = ThumbnailRequest(nodeUiItems[it].node.id, isPublicNode),
-                duration = nodeUiItems[it].fileDuration,
-                isTakenDown = nodeUiItems[it].isTakenDown,
+                nodeUiItem = nodeUiItems[it],
+                isInSelectionMode = inSelectionMode,
                 onClick = { onItemClicked(nodeUiItems[it]) },
                 onLongClick = { onLongClick(nodeUiItems[it]) },
                 onMenuClick = { onMenuClick(nodeUiItems[it]) },
-                isInSelectionMode = inSelectionMode,
-                isVideoNode = (nodeUiItems[it].node as? FileNode)?.type is VideoFileTypeInfo,
-                isFolderNode = nodeUiItems[it].node is TypedFolderNode,
-                isInvisible = nodeUiItems[it].isInvisible,
-                isSensitive = nodeSourceType != NodeSourceType.INCOMING_SHARES
-                        && nodeSourceType != NodeSourceType.OUTGOING_SHARES
-                        && nodeSourceType != NodeSourceType.LINKS
-                        && shouldApplySensitiveMode && (node.isMarkedSensitive || node.isSensitiveInherited),
-                showBlurEffect = (nodeUiItems[it].node as? FileNode)?.type?.let { fileTypeInfo ->
-                    fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is PdfFileTypeInfo || fileTypeInfo is AudioFileTypeInfo
-                } ?: false,
-                isHighlighted = nodeUiItems[it].isHighlighted,
             )
         }
     }

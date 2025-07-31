@@ -15,14 +15,14 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -40,7 +40,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -63,15 +62,13 @@ class CloudDriveViewModelTest {
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
-    private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
-    private val fileTypeIconMapper: FileTypeIconMapper = mock()
+    private val nodeUiItemMapper: NodeUiItemMapper = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
-    private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(testDispatcher)
+        Dispatchers.setMain(StandardTestDispatcher())
     }
 
     @After
@@ -87,8 +84,7 @@ class CloudDriveViewModelTest {
             monitorShowHiddenItemsUseCase,
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase,
-            durationInSecondsTextMapper,
-            fileTypeIconMapper
+            nodeUiItemMapper
         )
     }
 
@@ -102,12 +98,10 @@ class CloudDriveViewModelTest {
         monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
         monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         getBusinessStatusUseCase = getBusinessStatusUseCase,
-        durationInSecondsTextMapper = durationInSecondsTextMapper,
-        fileTypeIconMapper = fileTypeIconMapper,
+        nodeUiItemMapper = nodeUiItemMapper,
         savedStateHandle = SavedStateHandle.Companion.invoke(
             route = CloudDrive(folderNodeHandle)
         ),
-        defaultDispatcher = testDispatcher
     )
 
     private suspend fun setupTestData(items: List<TypedNode>) {
@@ -117,7 +111,25 @@ class CloudDriveViewModelTest {
         }
         whenever(getNodeByIdUseCase(eq(folderNodeId))).thenReturn(folderNode)
         whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
-        whenever(durationInSecondsTextMapper(any())).thenReturn(null)
+
+        val nodeUiItems = items.map { node ->
+            NodeUiItem(
+                node = node,
+                isSelected = false
+            )
+        }
+        whenever(
+            nodeUiItemMapper(
+                nodeList = items,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                isPublicNodes = false,
+                showPublicLinkCreationTime = false,
+                highlightedNodeId = null,
+                highlightedNames = null,
+                shouldApplySensitiveMode = false,
+                isContactVerificationOn = false,
+            )
+        ).thenReturn(nodeUiItems)
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
     }
 
@@ -506,7 +518,7 @@ class CloudDriveViewModelTest {
         val underTest = createViewModel()
 
         underTest.onChangeViewTypeClicked()
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         verify(setViewTypeUseCase).invoke(ViewType.GRID)
     }
@@ -521,10 +533,11 @@ class CloudDriveViewModelTest {
             awaitItem() // Initial state
             val stateWithGrid = awaitItem() // State after monitorViewType updates
             assertThat(stateWithGrid.currentViewType).isEqualTo(ViewType.GRID)
+            cancelAndIgnoreRemainingEvents()
         }
 
         underTest.onChangeViewTypeClicked()
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         verify(setViewTypeUseCase).invoke(ViewType.LIST)
     }
@@ -552,6 +565,7 @@ class CloudDriveViewModelTest {
             awaitItem() // Initial state
             val updatedState = awaitItem() // State after monitorViewType flow emits
             assertThat(updatedState.currentViewType).isEqualTo(ViewType.GRID)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -566,6 +580,7 @@ class CloudDriveViewModelTest {
             awaitItem() // Initial state
             val gridState = awaitItem() // State after monitorViewType flow emits GRID
             assertThat(gridState.currentViewType).isEqualTo(ViewType.GRID)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 

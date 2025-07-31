@@ -58,7 +58,6 @@ internal fun ShareFolderNode?.getSharedNodeItemDescription(): String? {
     }
 }
 
-@Composable
 internal fun TypedNode.getNodeItemThumbnail(
     fileTypeIconMapper: FileTypeIconMapper,
     originShares: Boolean = false,
@@ -68,7 +67,6 @@ internal fun TypedNode.getNodeItemThumbnail(
     else -> R.drawable.ic_generic_medium_solid
 }
 
-@Composable
 internal fun ShareFolderNode?.getSharesIcon(
     isContactVerificationOn: Boolean,
 ): Int? =
@@ -84,7 +82,6 @@ internal fun ShareFolderNode?.getSharesIcon(
         } else null
     }
 
-@Composable
 internal fun TypedNode.getIcon(
     fileTypeIconMapper: FileTypeIconMapper,
     originShares: Boolean = false,

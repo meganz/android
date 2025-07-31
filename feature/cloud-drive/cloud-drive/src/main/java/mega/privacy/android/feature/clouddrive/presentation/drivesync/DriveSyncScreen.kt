@@ -96,7 +96,6 @@ internal fun DriveSyncScreen(
                             bottom = paddingValues.calculateBottomPadding()
                         ),
                         uiState = cloudDriveUiState,
-                        fileTypeIconMapper = cloudDriveViewModel.fileTypeIconMapper,
                         onItemClicked = cloudDriveViewModel::onItemClicked,
                         onItemLongClicked = cloudDriveViewModel::onItemLongClicked,
                         onChangeViewTypeClicked = cloudDriveViewModel::onChangeViewTypeClicked,
