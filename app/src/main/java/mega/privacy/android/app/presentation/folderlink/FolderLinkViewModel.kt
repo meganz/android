@@ -1042,9 +1042,7 @@ class FolderLinkViewModel @Inject constructor(
                 _state.value.nodesList.firstOrNull { nodeUIItem ->
                     nodeUIItem.base64Id == subHandle
                 }?.let { nodeUIItem ->
-                    if (nodeUIItem.node is FileNode &&
-                        (nodeUIItem.node.type is ImageFileTypeInfo || nodeUIItem.node.type is VideoFileTypeInfo)
-                    ) {
+                    if (nodeUIItem.node is FileNode) {
                         openFile(nodeUIItem)
                     }
                 }

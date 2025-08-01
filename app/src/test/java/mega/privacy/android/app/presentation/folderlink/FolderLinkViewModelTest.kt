@@ -19,10 +19,18 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderInfo
+import mega.privacy.android.domain.entity.GifFileTypeInfo
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
@@ -76,6 +84,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
@@ -86,6 +96,8 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -1036,30 +1048,6 @@ class FolderLinkViewModelTest {
     }
 
     @Test
-    fun `test that fetchNodes with subHandle does not trigger openFileNodeEvent for non-media files`() =
-        runTest {
-            val subHandle = "testSubHandle"
-            val textFileNode = mock<TypedFileNode> {
-                on { type }.thenReturn(mock<TextFileTypeInfo>())
-            }
-
-            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
-                on { this.childrenNodes }.thenReturn(listOf(textFileNode))
-            }
-
-            whenever(fetchFolderNodesUseCase(subHandle)).thenReturn(fetchFolderNodeResult)
-
-            underTest.state.test {
-                underTest.fetchNodes(subHandle)
-
-                val finalState = expectMostRecentItem()
-                assertThat(finalState.openFileNodeEvent).isEqualTo(consumed())
-
-                cancelAndConsumeRemainingEvents()
-            }
-        }
-
-    @Test
     fun `test that fetchNodes with subHandle does not trigger openFileNodeEvent for folders`() =
         runTest {
             val subHandle = "testSubHandle"
@@ -1099,12 +1087,21 @@ class FolderLinkViewModelTest {
         }
     }
 
-    @Test
-    fun `test that fetchNodes with subHandle does not trigger openFileNodeEvent when no media files found`() =
+    @ParameterizedTest(name = "when open a {0} type file")
+    @MethodSource("provideFileTypeInfo")
+    fun `test that fetchNodes with subHandle trigger openFileNodeEvent`(
+        fileTypeInfo: FileTypeInfo
+    ) =
         runTest {
-            val subHandle = "testSubHandle"
+            val url = "https://mega.nz/#F!KDZkRKJK!1meD4csdaj7DWjEhJoHaFw!SDQadJqY"
+            val subHandle = "SDQadJqY"
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(url)
+            }
             val nonMediaFileNode = mock<TypedFileNode> {
-                on { type }.thenReturn(mock<TextFileTypeInfo>())
+                on { type }.thenReturn(fileTypeInfo)
+                on { base64Id }.thenReturn(subHandle)
             }
 
             val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
@@ -1114,14 +1111,43 @@ class FolderLinkViewModelTest {
             whenever(fetchFolderNodesUseCase(subHandle)).thenReturn(fetchFolderNodeResult)
 
             underTest.state.test {
+                underTest.handleIntent(intent)
                 underTest.fetchNodes(subHandle)
 
                 // Get the final state after fetchNodes completes
                 val finalState = expectMostRecentItem()
-                assertThat(finalState.openFileNodeEvent).isEqualTo(consumed())
+                assertThat(finalState.openFileNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
 
                 // Consume any remaining events
                 cancelAndConsumeRemainingEvents()
             }
         }
+
+    companion object {
+        @JvmStatic
+        fun provideFileTypeInfo() = listOf(
+            Arguments.of(ZipFileTypeInfo(mimeType = "application/zip", extension = "zip")),
+            Arguments.of(mock<PdfFileTypeInfo>()),
+            Arguments.of(StaticImageFileTypeInfo(mimeType = "image/jpeg", extension = "jpg")),
+            Arguments.of(
+                AudioFileTypeInfo(
+                    mimeType = "audio",
+                    extension = "mp3",
+                    duration = 10.toDuration(DurationUnit.MINUTES)
+                )
+            ),
+            Arguments.of(
+                VideoFileTypeInfo(
+                    mimeType = "video",
+                    extension = "mp3",
+                    duration = 10.toDuration(DurationUnit.MINUTES)
+                )
+            ),
+            Arguments.of(mock<TextFileTypeInfo>()),
+            Arguments.of(mock<UrlFileTypeInfo>()),
+            Arguments.of(SvgFileTypeInfo(mimeType = "image/svg+xml", extension = "svg")),
+            Arguments.of(RawFileTypeInfo(mimeType = "image/raw", extension = "raw")),
+            Arguments.of(GifFileTypeInfo(mimeType = "image/gif", extension = "gif"))
+        )
+    }
 }
