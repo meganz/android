@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -18,6 +17,8 @@ import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIs
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_NAME
+import mega.privacy.android.feature.sync.ui.views.TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_PATH
+import mega.privacy.android.icon.pack.R as IconPackR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,6 +48,8 @@ class SyncStalledIssuesScreenTest {
                         localPaths = listOf(folderName),
                         issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
                         conflictName = "Names conflict",
+                        displayedName = "$folderName (conflict)",
+                        displayedPath = "/test/path",
                         nodeNames = listOf(folderName),
                         icon = IconPackR.drawable.ic_folder_medium_solid,
                         detailedInfo = StalledIssueDetailedInfo("", ""),
@@ -64,12 +67,13 @@ class SyncStalledIssuesScreenTest {
         composeTestRule.setContent {
             SyncStalledIssuesRoute(
                 {},
-                {},
                 viewModel = viewModel,
             )
         }
 
         composeTestRule.onNodeWithTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_NAME)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_PATH)
             .assertIsDisplayed()
     }
 
@@ -79,7 +83,6 @@ class SyncStalledIssuesScreenTest {
         whenever(viewModel.state).thenReturn(state)
         composeTestRule.setContent {
             SyncStalledIssuesRoute(
-                {},
                 {},
                 viewModel = viewModel,
             )

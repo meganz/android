@@ -8,6 +8,7 @@ internal sealed interface SyncListAction {
     data class ResolveStalledIssue(
         val uiItem: StalledIssueUiItem,
         val selectedResolution: StalledIssueResolutionAction,
+        val isApplyToAll: Boolean = false,
     ) : SyncListAction
 
     object SnackBarShown : SyncListAction

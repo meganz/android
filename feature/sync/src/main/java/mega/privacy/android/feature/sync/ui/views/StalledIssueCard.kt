@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.views
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -9,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -30,10 +30,10 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 @Composable
 internal fun StalledIssueCard(
     nodeName: String,
+    nodePath: String,
     conflictName: String,
     @DrawableRes icon: Int,
     shouldShowMoreIcon: Boolean,
-    issueDetailsClicked: () -> Unit,
     moreClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -61,30 +61,30 @@ internal fun StalledIssueCard(
                     .padding(start = 12.dp)
             ) {
                 MegaText(
-                    modifier = Modifier.testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_CONFLICT_NAME),
-                    text = conflictName,
-                    style = MaterialTheme.typography.subtitle1,
-                    textColor = TextColor.Primary
-                )
-                MegaText(
                     modifier = Modifier
                         .padding(top = 1.dp)
                         .testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_NAME),
                     text = nodeName,
-                    style = MaterialTheme.typography.subtitle2,
-                    textColor = TextColor.Secondary
+                    style = MaterialTheme.typography.bodyLarge,
+                    textColor = TextColor.Primary
+                )
+                if (nodePath.isNotEmpty()) {
+                    MegaText(
+                        modifier = Modifier
+                            .padding(top = 1.dp)
+                            .testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_PATH),
+                        text = nodePath,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textColor = TextColor.Secondary
+                    )
+                }
+                MegaText(
+                    modifier = Modifier.testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_CONFLICT_NAME),
+                    text = conflictName,
+                    style = MaterialTheme.typography.bodySmall,
+                    textColor = TextColor.Brand
                 )
             }
-            MegaIcon(
-                modifier = Modifier
-                    .padding(end = 24.dp)
-                    .size(24.dp)
-                    .clickable { issueDetailsClicked() }
-                    .testTag(TEST_TAG_STALLED_ISSUE_CARD_BUTTON_INFO),
-                painter = painterResource(R.drawable.ic_info),
-                contentDescription = "Info",
-                tint = IconColor.Primary
-            )
             MegaIcon(
                 modifier = Modifier
                     .clickable(shouldShowMoreIcon) { moreClicked() }
@@ -104,10 +104,10 @@ private fun StalledIssueCardPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         StalledIssueCard(
             nodeName = "Some folder",
+            nodePath = "Some path",
             conflictName = "Conflicting name",
             icon = IconPackR.drawable.ic_folder_medium_solid,
-            true,
-            issueDetailsClicked = {},
+            shouldShowMoreIcon = true,
             moreClicked = {},
         )
     }
@@ -115,8 +115,8 @@ private fun StalledIssueCardPreview() {
 
 internal const val TEST_TAG_STALLED_ISSUE_CARD_ICON_NODE_THUMBNAIL =
     "stalled_issue_card:icon_node_thumbnail"
-internal const val TEST_TAG_STALLED_ISSUE_CARD_BUTTON_INFO = "stalled_issue_card:button_info"
 internal const val TEST_TAG_STALLED_ISSUE_CARD_BUTTON_MORE = "stalled_issue_card:button_more"
 internal const val TEST_TAG_STALLED_ISSUE_CARD_TEXT_CONFLICT_NAME =
     "stalled_issue_card:text_conflict_name"
 internal const val TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_NAME = "stalled_issue_card:text_node_name"
+internal const val TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_PATH = "stalled_issue_card:text_node_path"

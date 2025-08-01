@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
+import android.content.Context
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -34,9 +36,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.model.SyncModalSheetContent
@@ -52,7 +56,7 @@ import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssu
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesRoute
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
-import mega.privacy.android.feature.sync.ui.views.ConflictDetailsDialog
+import mega.privacy.android.feature.sync.ui.views.ApplyToAllDialog
 import mega.privacy.android.feature.sync.ui.views.IssuesResolutionDialog
 import mega.privacy.android.feature.sync.ui.views.SyncNotificationWarningBanner
 import mega.privacy.android.feature.sync.ui.views.SyncPermissionWarningBanner
@@ -69,10 +73,8 @@ import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
-import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncMultiFABButtonPressedEvent
@@ -87,7 +89,7 @@ internal fun SyncListScreen(
     onBackupFolderClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
-    actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction) -> Unit,
+    actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction, isApplyToAll: Boolean) -> Unit,
     snackBarHostState: SnackbarHostState,
     syncPermissionsManager: SyncPermissionsManager,
     actions: List<MenuAction>,
@@ -107,6 +109,7 @@ internal fun SyncListScreen(
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     var sheetContent by remember { mutableStateOf<SyncModalSheetContent?>(null) }
+    val context = LocalContext.current
 
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
@@ -122,25 +125,44 @@ internal fun SyncListScreen(
         modalSheetState = modalSheetState,
         sheetBody = {
             when (val content = sheetContent) {
-                is SyncModalSheetContent.DetailedInfo -> {
-                    ConflictDetailsDialog(
-                        content.stalledIssueUiItem.detailedInfo.title,
-                        content.stalledIssueUiItem.detailedInfo.explanation,
-                    )
-                }
-
                 is SyncModalSheetContent.IssueResolutions -> {
                     IssuesResolutionDialog(
                         icon = content.stalledIssueUiItem.icon,
                         conflictName = content.stalledIssueUiItem.conflictName,
-                        nodeName = content.stalledIssueUiItem.nodeNames.firstOrNull()
-                            ?: content.stalledIssueUiItem.localPaths.first(),
+                        nodeName = content.stalledIssueUiItem.displayedName,
                         actions = content.stalledIssueUiItem.actions,
                         actionSelected = { action ->
-                            actionSelected(content.stalledIssueUiItem, action)
-                            coroutineScope.launch {
-                                modalSheetState.hide()
-                            }
+                            // Show ApplyToAllDialog instead of immediately resolving
+                            sheetContent = SyncModalSheetContent.ApplyToAllDialog(
+                                stalledIssueUiItem = content.stalledIssueUiItem,
+                                selectedAction = action
+                            )
+                        }
+                    )
+                }
+
+                is SyncModalSheetContent.ApplyToAllDialog -> {
+                    ApplyToAllDialog(
+                        title = "${content.selectedAction.actionName}?",
+                        description = getApplyToAllDescription(
+                            content.stalledIssueUiItem,
+                            content.selectedAction,
+                            context = context
+                        ),
+                        onApplyToCurrent = {
+                            actionSelected(
+                                content.stalledIssueUiItem,
+                                content.selectedAction,
+                                false
+                            )
+                            sheetContent = null
+                        },
+                        onApplyToAll = {
+                            actionSelected(content.stalledIssueUiItem, content.selectedAction, true)
+                            sheetContent = null
+                        },
+                        onCancel = {
+                            sheetContent = null
                         }
                     )
                 }
@@ -199,7 +221,7 @@ internal fun SyncListScreen(
                             ),
                             MultiFloatingActionButtonItem(
                                 icon = painterResource(id = iconPackR.drawable.ic_database_medium_thin_outline),
-                                label = stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title),
+                                label = stringResource(id = sharedR.string.sync_add_new_backup_toolbar_title),
                                 onClicked = {
                                     Analytics.tracker.trackEvent(AndroidBackupFABButtonPressedEvent)
                                     onBackupFolderClicked()
@@ -231,12 +253,6 @@ internal fun SyncListScreen(
                     modifier = Modifier
                         .padding(paddingValues),
                     stalledIssuesCount = stalledIssuesCount,
-                    stalledIssuesDetailsClicked = { stalledIssueItem ->
-                        sheetContent = SyncModalSheetContent.DetailedInfo(stalledIssueItem)
-                        coroutineScope.launch {
-                            modalSheetState.show()
-                        }
-                    },
                     moreClicked = { stalledIssueItem ->
                         sheetContent = SyncModalSheetContent.IssueResolutions(stalledIssueItem)
                         coroutineScope.launch {
@@ -269,7 +285,6 @@ private fun SyncListScreenContent(
     modifier: Modifier,
     snackBarHostState: SnackbarHostState,
     stalledIssuesCount: Int,
-    stalledIssuesDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
     onAddNewSyncClicked: () -> Unit,
     onAddNewBackupClicked: () -> Unit,
@@ -313,7 +328,7 @@ private fun SyncListScreenContent(
             )
             if (syncFoldersUiState.syncUiItems.isNotEmpty() && syncFoldersUiState.isLowBatteryLevel) {
                 WarningBanner(
-                    textString = stringResource(id = sharedResR.string.general_message_sync_paused_low_battery_level),
+                    textString = stringResource(id = sharedR.string.general_message_sync_paused_low_battery_level),
                     onCloseClick = null
                 )
             }
@@ -334,7 +349,6 @@ private fun SyncListScreenContent(
                 onAddNewSyncClicked = onAddNewSyncClicked,
                 onAddNewBackupClicked = onAddNewBackupClicked,
                 onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
-                stalledIssueDetailsClicked = stalledIssuesDetailsClicked,
                 onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                 onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
                 moreClicked = moreClicked,
@@ -404,7 +418,6 @@ private fun SelectedChipScreen(
     onSelectStopBackupDestinationClicked: (String?) -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
-    stalledIssueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
     issuesInfoClicked: () -> Unit,
     checkedChip: SyncChip,
@@ -433,7 +446,6 @@ private fun SelectedChipScreen(
 
         STALLED_ISSUES -> {
             SyncStalledIssuesRoute(
-                stalledIssueDetailsClicked = stalledIssueDetailsClicked,
                 moreClicked = moreClicked,
                 viewModel = syncStalledIssuesViewModel
             )
@@ -461,3 +473,48 @@ internal const val STALLED_ISSUES_CHIP_TEST_TAG = "sync_list:stalled_issues_chip
 internal const val SOLVED_ISSUES_CHIP_TEST_TAG = "sync_list:solved_issues_chip"
 
 internal const val BOTTOM_PADDING = 72
+
+/**
+ * Generates a description for the ApplyToAllDialog based on the stalled issue and selected action
+ */
+private fun getApplyToAllDescription(
+    stalledIssueUiItem: StalledIssueUiItem,
+    selectedAction: StalledIssueResolutionAction,
+    context: Context,
+): String {
+    val fileName = stalledIssueUiItem.displayedName
+
+    return when (selectedAction.resolutionActionType) {
+        StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE ->
+            context.getString(
+                sharedR.string.sync_stalled_issue_choose_local_file_explanation,
+                fileName
+            )
+
+        StalledIssueResolutionActionType.CHOOSE_REMOTE_FILE ->
+            context.getString(
+                sharedR.string.sync_stalled_issue_choose_remote_file_explanation,
+                fileName
+            )
+
+        StalledIssueResolutionActionType.CHOOSE_LATEST_MODIFIED_TIME ->
+            context.getString(
+                sharedR.string.sync_stalled_issue_choose_last_modified_file_explanation,
+            )
+
+        StalledIssueResolutionActionType.RENAME_ALL_ITEMS ->
+            context.getString(
+                sharedR.string.sync_stalled_issue_choose_rename_file_explanation,
+            )
+
+        StalledIssueResolutionActionType.MERGE_FOLDERS ->
+            context.getString(
+                sharedR.string.sync_stalled_issue_choose_merge_folder_explanation,
+            )
+
+        else ->
+            context.getString(
+                sharedR.string.sync_stalled_issue_general_explanation,
+            )
+    }
+}

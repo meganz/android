@@ -10,19 +10,14 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
-import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
-import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
-import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.ui.mapper.stalledissue.StalledIssueItemMapper
-import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
-import mega.privacy.android.feature.sync.ui.synclist.SyncListAction
 import mega.privacy.android.feature.sync.ui.synclist.SyncListViewModel
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -103,36 +98,6 @@ class SyncListViewModelTest {
     }
 
     @Test
-    fun `test that snackbar is shown when issues are resolved`() = runTest {
-        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flow {
-            emit(stalledIssues)
-            awaitCancellation()
-        })
-        val selectedResolution = StalledIssueResolutionAction(
-            resolutionActionType = StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE,
-            actionName = "Choose remote file",
-        )
-        val stalledIssueUiItem: StalledIssueUiItem = mock()
-        val stalledIssue: StalledIssue = mock()
-        whenever(stalledIssueItemMapper(stalledIssueUiItem)).thenReturn(stalledIssue)
-        initViewModel()
-
-        underTest.handleAction(
-            SyncListAction.ResolveStalledIssue(
-                stalledIssueUiItem, selectedResolution
-            )
-        )
-
-        verify(resolveStalledIssueUseCase).invoke(
-            selectedResolution, stalledIssue
-        )
-        underTest.state.test {
-            assertThat(awaitItem().snackbarMessage).isEqualTo(R.string.sync_stalled_issue_conflict_resolved)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun `test that when monitorSyncSolvedIssuesUseCase emit list then it updates shouldShowCleanSolvedIssueMenuItem to true`() =
         runTest {
             whenever(monitorSyncSolvedIssuesUseCase()).thenReturn(flow {
@@ -150,8 +115,6 @@ class SyncListViewModelTest {
         underTest = SyncListViewModel(
             setOnboardingShownUseCase = setOnboardingShownUseCase,
             monitorSyncStalledIssuesUseCase = monitorSyncStalledIssuesUseCase,
-            resolveStalledIssueUseCase = resolveStalledIssueUseCase,
-            stalledIssueItemMapper = stalledIssueItemMapper,
             monitorSyncSolvedIssuesUseCase = monitorSyncSolvedIssuesUseCase,
             getDeviceIdUseCase = getDeviceIdUseCase,
             getDeviceNameUseCase = getDeviceNameUseCase,

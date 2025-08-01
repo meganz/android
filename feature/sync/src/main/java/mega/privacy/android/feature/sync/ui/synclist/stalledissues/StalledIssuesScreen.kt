@@ -28,18 +28,16 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 @Composable
 internal fun StalledIssuesScreen(
     stalledIssues: List<StalledIssueUiItem>,
-    issueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    StalledIssuesScreenContent(stalledIssues, modifier, issueDetailsClicked, moreClicked)
+    StalledIssuesScreenContent(stalledIssues, modifier, moreClicked)
 }
 
 @Composable
 private fun StalledIssuesScreenContent(
     stalledIssues: List<StalledIssueUiItem>,
     modifier: Modifier,
-    issueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
 ) {
     LazyColumn(
@@ -61,13 +59,13 @@ private fun StalledIssuesScreenContent(
             items(count = stalledIssues.size) { itemIndex ->
                 val issue = stalledIssues[itemIndex]
                 StalledIssueCard(
-                    nodeName = issue.nodeNames.firstOrNull() ?: issue.localPaths.first(),
+                    nodeName = issue.displayedName,
                     conflictName = issue.conflictName,
                     modifier = modifier,
                     icon = issue.icon,
-                    issueDetailsClicked = { issueDetailsClicked(issue) },
                     moreClicked = { moreClicked(issue) },
-                    shouldShowMoreIcon = issue.actions.isNotEmpty()
+                    shouldShowMoreIcon = issue.actions.isNotEmpty(),
+                    nodePath = issue.displayedPath,
                 )
                 Divider(Modifier.padding(start = 72.dp))
             }
@@ -81,7 +79,6 @@ internal fun StalledIssuesScreenEmptyStatePreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         StalledIssuesScreen(
             stalledIssues = emptyList(),
-            issueDetailsClicked = {},
             moreClicked = {},
         )
     }
@@ -110,7 +107,9 @@ internal fun StalledIssuesScreenPreview() {
                     nodeNames = listOf("Node names"),
                     icon = iconPackR.drawable.ic_folder_medium_solid,
                     detailedInfo = detailedInfo,
-                    actions = listOf(stalledIssueResolutionAction)
+                    actions = listOf(stalledIssueResolutionAction),
+                    displayedName = "Folder name",
+                    displayedPath = "Folder path",
                 ),
                 StalledIssueUiItem(
                     syncId = 1L,
@@ -121,7 +120,9 @@ internal fun StalledIssuesScreenPreview() {
                     nodeNames = listOf("Node names"),
                     icon = iconPackR.drawable.ic_text_medium_solid,
                     detailedInfo = detailedInfo,
-                    actions = listOf(stalledIssueResolutionAction)
+                    actions = listOf(stalledIssueResolutionAction),
+                    displayedName = "Folder name",
+                    displayedPath = "Folder path",
                 ),
                 StalledIssueUiItem(
                     syncId = 1L,
@@ -132,7 +133,9 @@ internal fun StalledIssuesScreenPreview() {
                     nodeNames = listOf("Node names"),
                     icon = iconPackR.drawable.ic_word_medium_solid,
                     detailedInfo = detailedInfo,
-                    actions = listOf(stalledIssueResolutionAction)
+                    actions = listOf(stalledIssueResolutionAction),
+                    displayedName = "Folder name",
+                    displayedPath = "Folder path",
                 ),
                 StalledIssueUiItem(
                     syncId = 1L,
@@ -143,10 +146,11 @@ internal fun StalledIssuesScreenPreview() {
                     nodeNames = listOf("Node names"),
                     icon = iconPackR.drawable.ic_generic_medium_solid,
                     detailedInfo = detailedInfo,
-                    actions = listOf(stalledIssueResolutionAction)
+                    actions = listOf(stalledIssueResolutionAction),
+                    displayedName = "Folder name",
+                    displayedPath = "Folder path",
                 ),
             ),
-            issueDetailsClicked = {},
             moreClicked = {},
         )
     }

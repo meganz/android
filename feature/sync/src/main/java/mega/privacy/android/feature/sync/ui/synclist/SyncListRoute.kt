@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
@@ -107,6 +108,7 @@ internal fun SyncListRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val syncSettingsState by settingsSyncViewModel.uiState.collectAsStateWithLifecycle()
+    val stalledIssueState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
     val modalSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
@@ -119,7 +121,7 @@ internal fun SyncListRoute(
         onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
         onSyncFolderClicked = { onSyncFolderClicked() },
         onBackupFolderClicked = { onBackupFolderClicked() },
-        actionSelected = { item, selectedAction ->
+        actionSelected = { item, selectedAction, isApplyToAll ->
             when (selectedAction.resolutionActionType) {
                 StalledIssueResolutionActionType.RENAME_ALL_ITEMS -> {
                     Analytics.tracker.trackEvent(AndroidSyncRenameAllItemsEvent)
@@ -153,8 +155,12 @@ internal fun SyncListRoute(
 
                 }
             }
-            viewModel.handleAction(
-                SyncListAction.ResolveStalledIssue(item, selectedAction)
+            syncStalledIssuesViewModel.handleAction(
+                SyncListAction.ResolveStalledIssue(
+                    item,
+                    selectedAction,
+                    isApplyToAll = isApplyToAll
+                )
             )
         },
         snackBarHostState = snackBarHostState,
@@ -181,15 +187,17 @@ internal fun SyncListRoute(
     )
 
     val context = LocalContext.current
-    LaunchedEffect(key1 = state.snackbarMessage) {
-        state.snackbarMessage?.let { message ->
-            snackBarHostState.showAutoDurationSnackbar(
-                context.resources.getString(
-                    message
-                )
-            )
-            viewModel.handleAction(SyncListAction.SnackBarShown)
+    EventEffect(
+        stalledIssueState.snackbarMessageContent,
+        onConsumed = {
+            syncStalledIssuesViewModel.handleAction(SyncListAction.SnackBarShown)
         }
+    ) {
+        snackBarHostState.showAutoDurationSnackbar(
+            context.resources.getString(
+                it
+            )
+        )
     }
 
     LaunchedEffect(key1 = syncSettingsState.snackbarMessage) {

@@ -8,7 +8,6 @@ import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 
 @Composable
 internal fun SyncStalledIssuesRoute(
-    stalledIssueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
     viewModel: SyncStalledIssuesViewModel,
     modifier: Modifier = Modifier,
@@ -18,7 +17,6 @@ internal fun SyncStalledIssuesRoute(
 
     StalledIssuesScreen(
         stalledIssues = stalledIssues,
-        issueDetailsClicked = stalledIssueDetailsClicked,
         moreClicked = moreClicked,
         modifier = modifier
     )

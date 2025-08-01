@@ -12,6 +12,8 @@ internal data class StalledIssueUiItem(
     val issueType: StallIssueType,
     val conflictName: String,
     val nodeNames: List<String>,
+    val displayedName: String,
+    val displayedPath: String,
     @DrawableRes val icon: Int,
     val detailedInfo: StalledIssueDetailedInfo,
     val actions: List<StalledIssueResolutionAction>,

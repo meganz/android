@@ -11,12 +11,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
-import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.usecase.SetOnboardingShownUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
-import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
-import mega.privacy.android.feature.sync.ui.mapper.stalledissue.StalledIssueItemMapper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,8 +21,6 @@ import javax.inject.Inject
 internal class SyncListViewModel @Inject constructor(
     private val setOnboardingShownUseCase: SetOnboardingShownUseCase,
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
-    private val resolveStalledIssueUseCase: ResolveStalledIssueUseCase,
-    private val stalledIssueItemMapper: StalledIssueItemMapper,
     private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase,
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
     private val getDeviceNameUseCase: GetDeviceNameUseCase,
@@ -79,29 +74,6 @@ internal class SyncListViewModel @Inject constructor(
                 }
             }.onFailure {
                 Timber.e(it)
-            }
-        }
-    }
-
-    fun handleAction(action: SyncListAction) {
-        when (action) {
-            is SyncListAction.ResolveStalledIssue -> {
-                viewModelScope.launch {
-                    resolveStalledIssueUseCase(
-                        action.selectedResolution, stalledIssueItemMapper(action.uiItem)
-                    )
-                }
-                _state.update {
-                    it.copy(
-                        snackbarMessage = R.string.sync_stalled_issue_conflict_resolved
-                    )
-                }
-            }
-
-            SyncListAction.SnackBarShown -> {
-                _state.update { state ->
-                    state.copy(snackbarMessage = null)
-                }
             }
         }
     }

@@ -1,28 +1,33 @@
 package mega.privacy.android.feature.sync.ui.mapper.stalledissue
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.ui.extension.getIcon
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
+import mega.privacy.android.icon.pack.R as iconPackR
 import javax.inject.Inject
 
 internal class StalledIssueItemMapper @Inject constructor(
     private val stalledIssueResolutionActionMapper: StalledIssueResolutionActionMapper,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val stalledIssueDetailInfoMapper: StalledIssueDetailInfoMapper,
+    private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
 ) {
 
-    operator fun invoke(
+    suspend operator fun invoke(
         stalledIssueEntity: StalledIssue,
         nodes: List<UnTypedNode>,
     ): StalledIssueUiItem {
         val firstNode = nodes.firstOrNull()
         val areAllNodesFolders = nodes.all { it is FolderNode }
         val detailedInfo = stalledIssueDetailInfoMapper(stalledIssueEntity)
+        val nameAndPath = stalledIssueEntity.nodeNames.firstOrNull()?.split("/")
+            ?: stalledIssueEntity.localPaths.firstOrNull()
+                ?.let { getPathByDocumentContentUriUseCase(it)?.split("/") }
         return StalledIssueUiItem(
             syncId = stalledIssueEntity.syncId,
             nodeIds = stalledIssueEntity.nodeIds,
@@ -42,6 +47,14 @@ internal class StalledIssueItemMapper @Inject constructor(
                 stalledIssueEntity.issueType,
                 areAllNodesFolders
             ),
+            displayedName = nameAndPath?.last() ?: "",
+            displayedPath = nameAndPath?.dropLast(1)?.let {
+                if (it.size > 1) {
+                    it.joinToString(separator = "/")
+                } else {
+                    it.firstOrNull() ?: ""
+                }
+            } ?: ""
         )
     }
 

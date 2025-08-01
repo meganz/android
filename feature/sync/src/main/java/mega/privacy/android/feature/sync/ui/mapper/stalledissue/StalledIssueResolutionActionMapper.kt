@@ -12,7 +12,7 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAct
 import javax.inject.Inject
 
 internal class StalledIssueResolutionActionMapper @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) {
 
     operator fun invoke(
@@ -44,7 +44,7 @@ internal class StalledIssueResolutionActionMapper @Inject constructor(
 
             LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
             LocalAndRemotePreviouslyNotSyncedDifferUserMustChoose,
-            -> {
+                -> {
                 listOf(
                     StalledIssueResolutionAction(
                         context.getString(R.string.sync_stalled_issue_choose_local_file),

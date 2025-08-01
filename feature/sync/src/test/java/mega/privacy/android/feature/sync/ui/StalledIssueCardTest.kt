@@ -1,17 +1,17 @@
 package mega.privacy.android.feature.sync.ui
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.sync.ui.views.StalledIssueCard
-import mega.privacy.android.feature.sync.ui.views.TEST_TAG_STALLED_ISSUE_CARD_BUTTON_INFO
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_STALLED_ISSUE_CARD_BUTTON_MORE
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_STALLED_ISSUE_CARD_ICON_NODE_THUMBNAIL
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_STALLED_ISSUE_CARD_TEXT_CONFLICT_NAME
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_NAME
+import mega.privacy.android.feature.sync.ui.views.TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_PATH
+import mega.privacy.android.icon.pack.R as IconPackR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,8 +28,8 @@ internal class StalledIssueCardTest {
             StalledIssueCard(
                 nodeName = "test folder",
                 conflictName = "Name conflict",
+                nodePath = "/test/path",
                 icon = IconPackR.drawable.ic_folder_medium_solid,
-                issueDetailsClicked = {},
                 moreClicked = {},
                 shouldShowMoreIcon = true
             )
@@ -37,13 +37,13 @@ internal class StalledIssueCardTest {
 
         composeTestRule.onNodeWithTag(TEST_TAG_STALLED_ISSUE_CARD_ICON_NODE_THUMBNAIL)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_STALLED_ISSUE_CARD_BUTTON_INFO)
-            .assertIsDisplayed()
         composeTestRule.onNodeWithTag(TEST_TAG_STALLED_ISSUE_CARD_BUTTON_MORE)
             .assertIsDisplayed()
         composeTestRule.onNodeWithTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_CONFLICT_NAME)
             .assertIsDisplayed()
         composeTestRule.onNodeWithTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_NAME)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_PATH)
             .assertIsDisplayed()
     }
 }
