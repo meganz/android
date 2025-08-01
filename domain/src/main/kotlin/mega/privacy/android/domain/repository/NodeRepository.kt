@@ -647,7 +647,7 @@ interface NodeRepository {
      * @param label Int
      * @return [NodeLabel]
      */
-    suspend fun getNodeLabel(label: Int): NodeLabel?
+    fun getNodeLabel(label: Int): NodeLabel?
 
     /**
      * Set label for node

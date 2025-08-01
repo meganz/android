@@ -941,9 +941,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getNodeLabel(label: Int): NodeLabel? = withContext(ioDispatcher) {
-        nodeLabelMapper(label)
-    }
+    override fun getNodeLabel(label: Int): NodeLabel? = nodeLabelMapper(label)
 
     override suspend fun setNodeLabel(nodeId: NodeId, label: NodeLabel): Unit =
         withContext(ioDispatcher) {

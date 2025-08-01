@@ -1,14 +1,13 @@
-package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
+package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.app.presentation.node.model.menuaction.DeletePermanentlyMenuAction
-import mega.privacy.android.app.presentation.search.navigation.moveToRubbishOrDelete
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.entity.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DeletePermanentlyMenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -20,7 +19,7 @@ import javax.inject.Inject
  */
 class DeletePermanentlyBottomSheetMenuItem @Inject constructor(
     override val menuAction: DeletePermanentlyMenuAction,
-    private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
+    private val nodeHandlesToJsonMapper: NodeHandlesToJsonMapper,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -33,17 +32,22 @@ class DeletePermanentlyBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
+        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         val handles = listOf(node.id.longValue)
-        runCatching { listToStringWithDelimitersMapper(handles) }
-            .onSuccess { navController.navigate(route = "$moveToRubbishOrDelete/true/${it}") }
-            .onFailure { Timber.e(it) }
+        runCatching { nodeHandlesToJsonMapper(handles) }
+            .onSuccess { navController.navigate(route = "$moveToRubbishOrDelete/${true}/${it}") }
+            .onFailure { Timber.Forest.e(it) }
     }
 
     override val isDestructiveAction = true
     override val groupId = 9
+
+    companion object {
+        // Todo duplicate routes to the one in mega.privacy.android.app.presentation.search.navigation.MoveToRubbishOrDeleteNavigation
+        private const val moveToRubbishOrDelete = "search/moveToRubbishOrDelete/isInRubbish"
+    }
 }

@@ -37,6 +37,7 @@ dependencies {
     implementation(androidx.navigation.compose)
     implementation(lib.compose.state.events)
     implementation(lib.kotlinx.collections.immutable)
+    implementation(lib.kotlin.serialisation)
     implementation(lib.logging.timber)
     implementation(lib.coil3)
     implementation(lib.coil.compose)
