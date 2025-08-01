@@ -212,8 +212,8 @@ import mega.privacy.android.app.presentation.rubbishbin.RubbishBinComposeFragmen
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
-import mega.privacy.android.app.presentation.settings.model.StartScreenTargetPreference
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.startScreenTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.Companion.CHAT_BNV
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.Companion.CLOUD_DRIVE_BNV
@@ -1067,7 +1067,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 navigateToStorageSettings = {
                     megaNavigator.openSettings(
                         this,
-                        StorageTargetPreference
+                        storageTargetPreference
                     )
                 }
             )
@@ -4364,14 +4364,14 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * Opens the settings section and scrolls to storage category.
      */
     fun moveToSettingsSectionStorage() {
-        navigateToSettingsActivity(StorageTargetPreference)
+        navigateToSettingsActivity(storageTargetPreference)
     }
 
     /**
      * Opens the settings section and scrolls to start screen setting.
      */
     fun moveToSettingsSectionStartScreen() {
-        navigateToSettingsActivity(StartScreenTargetPreference)
+        navigateToSettingsActivity(startScreenTargetPreference)
     }
 
     override fun moveToChatSection(chatId: Long) {

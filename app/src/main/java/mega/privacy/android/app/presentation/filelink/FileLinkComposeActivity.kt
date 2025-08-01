@@ -43,7 +43,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
@@ -176,7 +176,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
                     navigateToStorageSettings = {
                         megaNavigator.openSettings(
                             this,
-                            StorageTargetPreference
+                            storageTargetPreference
                         )
                     }
                 )

@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion
 import mega.privacy.android.app.presentation.settings.camerauploads.INTENT_EXTRA_KEY_SHOW_DISABLE_CU
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.compose.SettingsHomeActivity
-import mega.privacy.android.app.presentation.settings.model.CameraUploadsTargetPreference
+import mega.privacy.android.app.presentation.settings.model.cameraUploadsTargetPreference
 import mega.privacy.android.app.presentation.transfers.notification.OpenTransfersSectionIntentMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT
@@ -213,15 +213,15 @@ class CameraUploadsNotificationManager @Inject constructor(
             )
             val subText = stringWrapper.getProgressSize(totalUploadedBytes, totalUploadBytes)
             val actionIntent = (if (getFeatureFlagValueUseCase(AppFeatures.SettingsComposeUI)) {
-                SettingsHomeActivity.getIntent(context, CameraUploadsTargetPreference).also {
+                SettingsHomeActivity.getIntent(context, cameraUploadsTargetPreference).also {
                     it.putExtra(INTENT_EXTRA_KEY_SHOW_DISABLE_CU, true)
                 }
             } else {
                 Intent(context, SettingsActivity::class.java).apply {
-                    putExtra(INITIAL_PREFERENCE, CameraUploadsTargetPreference.preferenceId)
+                    putExtra(INITIAL_PREFERENCE, cameraUploadsTargetPreference.preferenceId)
                     putExtra(
                         NAVIGATE_TO_INITIAL_PREFERENCE,
-                        CameraUploadsTargetPreference.requiresNavigation
+                        cameraUploadsTargetPreference.requiresNavigation
                     )
                     putExtra(INTENT_EXTRA_KEY_SHOW_DISABLE_CU, true)
                 }

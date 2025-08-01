@@ -54,7 +54,7 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.outgoing.ui.OutgoingSharesView
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
@@ -262,7 +262,7 @@ class OutgoingSharesComposeFragment : Fragment() {
                         navigateToStorageSettings = {
                             megaNavigator.openSettings(
                                 requireActivity(),
-                                StorageTargetPreference
+                                storageTargetPreference
                             )
                         },
                     )

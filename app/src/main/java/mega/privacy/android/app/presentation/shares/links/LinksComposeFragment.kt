@@ -47,7 +47,7 @@ import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.links.view.LinksView
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
@@ -211,7 +211,7 @@ class LinksComposeFragment : Fragment() {
                         navigateToStorageSettings = {
                             megaNavigator.openSettings(
                                 requireActivity(),
-                                StorageTargetPreference
+                                storageTargetPreference
                             )
                         },
                     )

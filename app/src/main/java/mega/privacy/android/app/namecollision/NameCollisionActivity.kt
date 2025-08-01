@@ -30,7 +30,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.namecollision.data.toDomainEntity
 import mega.privacy.android.app.namecollision.data.toUiEntity
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
@@ -168,7 +168,7 @@ class NameCollisionActivity : PasscodeActivity() {
                 navigateToStorageSettings = {
                     megaNavigator.openSettings(
                         this,
-                        StorageTargetPreference
+                        storageTargetPreference
                     )
                 }
             ) { transferEvent ->

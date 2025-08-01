@@ -49,7 +49,7 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.incoming.ui.IncomingSharesView
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
@@ -255,7 +255,7 @@ class IncomingSharesComposeFragment : Fragment() {
                         navigateToStorageSettings = {
                             megaNavigator.openSettings(
                                 requireActivity(),
-                                StorageTargetPreference
+                                storageTargetPreference
                             )
                         },
                     )

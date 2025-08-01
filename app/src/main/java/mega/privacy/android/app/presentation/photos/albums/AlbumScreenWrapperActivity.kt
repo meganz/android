@@ -33,7 +33,7 @@ import mega.privacy.android.app.presentation.photos.albums.photosselection.Album
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
@@ -216,7 +216,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                     navigateToStorageSettings = {
                         megaNavigator.openSettings(
                             this,
-                            StorageTargetPreference
+                            storageTargetPreference
                         )
                     }
                 )

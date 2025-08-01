@@ -6,8 +6,8 @@ import mega.privacy.android.navigation.settings.arguments.TargetPreference
 /**
  * Start screen
  */
-data object StartScreenTargetPreference : TargetPreference {
-    override val preferenceId = SettingsConstants.KEY_START_SCREEN
-    override val requiresNavigation = true
-    override val rootKey = "appearance"
-}
+val startScreenTargetPreference = TargetPreference (
+    preferenceId = SettingsConstants.KEY_START_SCREEN,
+    requiresNavigation = true,
+    rootKey = "appearance",
+)

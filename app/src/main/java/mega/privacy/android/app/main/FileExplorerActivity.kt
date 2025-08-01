@@ -81,7 +81,7 @@ import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScan
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.presentation.upload.UploadDestinationActivity
@@ -2709,7 +2709,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 navigateToStorageSettings = {
                     megaNavigator.openSettings(
                         this,
-                        StorageTargetPreference
+                        storageTargetPreference
                     )
                 }
             ) { startTransferEvent ->

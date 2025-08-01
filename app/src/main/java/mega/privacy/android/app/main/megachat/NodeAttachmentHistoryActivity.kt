@@ -60,7 +60,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.ChatImageNodeF
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -436,7 +436,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                     startDownloadViewModel.consumeDownloadEvent()
                 },
                 {
-                    megaNavigator.openSettings(this, StorageTargetPreference)
+                    megaNavigator.openSettings(this, storageTargetPreference)
                 },
                 { }
             )

@@ -4,10 +4,10 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
 
 /**
- * Start screen
+ * Camera uploads
  */
-data object CameraUploadsTargetPreference : TargetPreference {
-    override val preferenceId = SettingsConstants.KEY_FEATURES_CAMERA_UPLOAD
-    override val requiresNavigation = true
-    override val rootKey = "camera_uploads"
-}
+val cameraUploadsTargetPreference = TargetPreference(
+    preferenceId = SettingsConstants.KEY_FEATURES_CAMERA_UPLOAD,
+    requiresNavigation = true,
+    rootKey = "camera_uploads"
+)

@@ -17,7 +17,7 @@ import androidx.navigation.compose.NavHost
 import mega.privacy.android.app.appstate.model.AppState
 import mega.privacy.android.app.appstate.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.transfer.TransferHandlerImpl
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.megaNavigator
@@ -73,7 +73,7 @@ fun MegaApp(
         navigateToStorageSettings = {
             megaNavigator.openSettings(
                 context,
-                StorageTargetPreference
+                storageTargetPreference
             )
         }
     )

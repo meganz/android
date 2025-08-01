@@ -18,8 +18,8 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
-import mega.privacy.android.app.presentation.settings.model.QRTargetPreference
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.qrTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.ContactUtil
@@ -121,11 +121,11 @@ class QRCodeComposeActivity : PasscodeActivity() {
                     onScanCancelConsumed = viewModel::resetScanCancel,
                     onUploadEventConsumed = viewModel::onUploadEventConsumed,
                     qrCodeMapper = qrCodeMapper,
-                    navigateToQrSettings = { megaNavigator.openSettings(this, QRTargetPreference) },
+                    navigateToQrSettings = { megaNavigator.openSettings(this, qrTargetPreference) },
                     navigateToStorageSettings = {
                         megaNavigator.openSettings(
                             this,
-                            StorageTargetPreference
+                            storageTargetPreference
                         )
                     },
                 )

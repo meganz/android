@@ -68,7 +68,7 @@ import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectF
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -219,7 +219,7 @@ class ImagePreviewActivity : BaseActivity() {
                                 navigateToStorageSettings = {
                                     megaNavigator.openSettings(
                                         this,
-                                        StorageTargetPreference
+                                        storageTargetPreference
                                     )
                                 }
                             )

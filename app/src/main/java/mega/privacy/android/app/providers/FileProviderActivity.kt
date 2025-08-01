@@ -1,6 +1,5 @@
 package mega.privacy.android.app.providers
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.SearchManager
@@ -63,7 +62,7 @@ import mega.privacy.android.app.main.providers.ProviderPageAdapter
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.provider.FileProviderViewModel
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -89,6 +88,7 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.account.SetUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -485,7 +485,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
                 navigateToStorageSettings = {
                     megaNavigator.openSettings(
                         this,
-                        StorageTargetPreference
+                        storageTargetPreference
                     )
                 }
             )

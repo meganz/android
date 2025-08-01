@@ -17,7 +17,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.preview.model.LoadingPreviewViewModel
 import mega.privacy.android.app.presentation.transfers.preview.view.LoadingPreviewInfo
 import mega.privacy.android.app.presentation.transfers.preview.view.loadingPreviewScreen
@@ -89,7 +89,7 @@ class LoadingPreviewActivity : AppCompatActivity() {
                                     navigateToStorageSettings = {
                                         megaNavigator.openSettings(
                                             this@LoadingPreviewActivity,
-                                            StorageTargetPreference
+                                            storageTargetPreference
                                         )
                                     },
                                 )

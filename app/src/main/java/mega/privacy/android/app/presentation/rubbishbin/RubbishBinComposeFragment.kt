@@ -41,7 +41,7 @@ import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
@@ -176,7 +176,7 @@ class RubbishBinComposeFragment : Fragment() {
                         navigateToStorageSettings = {
                             megaNavigator.openSettings(
                                 requireActivity(),
-                                StorageTargetPreference
+                                storageTargetPreference
                             )
                         },
                     )

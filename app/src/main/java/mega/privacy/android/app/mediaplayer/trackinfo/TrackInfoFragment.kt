@@ -19,7 +19,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -94,7 +94,7 @@ class TrackInfoFragment : Fragment() {
                         navigateToStorageSettings = {
                             megaNavigator.openSettings(
                                 requireActivity(),
-                                StorageTargetPreference
+                                storageTargetPreference
                             )
                         },
                     )

@@ -44,7 +44,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsIma
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
@@ -447,7 +447,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                     navigateToStorageSettings = {
                         megaNavigator.openSettings(
                             requireActivity(),
-                            StorageTargetPreference
+                            storageTargetPreference
                         )
                     }
                 )

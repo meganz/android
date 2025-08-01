@@ -30,7 +30,7 @@ import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
 import mega.privacy.android.app.main.managerSections.LegacyTransfersFragment
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.Constants
@@ -110,7 +110,7 @@ internal class TransferPageFragment : Fragment() {
                 navigateToStorageSettings = {
                     megaNavigator.openSettings(
                         requireActivity(),
-                        StorageTargetPreference
+                        storageTargetPreference
                     )
                 }
             )

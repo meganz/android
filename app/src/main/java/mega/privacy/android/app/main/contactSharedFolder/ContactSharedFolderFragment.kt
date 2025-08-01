@@ -27,7 +27,7 @@ import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.Constants
@@ -128,7 +128,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                     navigateToStorageSettings = {
                         megaNavigator.openSettings(
                             requireActivity(),
-                            StorageTargetPreference
+                            storageTargetPreference
                         )
                     }
                 )

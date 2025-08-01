@@ -1,6 +1,5 @@
 package mega.privacy.android.app.uploadFolder
 
-import mega.privacy.android.core.R as CoreUiR
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
@@ -44,9 +43,8 @@ import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.extensions.serializable
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.uploadFolder.list.adapter.FolderContentAdapter
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
@@ -56,8 +54,10 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HAN
 import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
@@ -312,7 +312,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                 navigateToStorageSettings = {
                     megaNavigator.openSettings(
                         this,
-                        StorageTargetPreference
+                        storageTargetPreference
                     )
                 },
                 onScanningFinished = { event ->
