@@ -2,6 +2,7 @@ package mega.privacy.android.core.nodecomponents.sheet.options
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.entity.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
@@ -22,6 +24,12 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.qualifier.features.Backups
+import mega.privacy.android.domain.qualifier.features.CloudDrive
+import mega.privacy.android.domain.qualifier.features.IncomingShares
+import mega.privacy.android.domain.qualifier.features.Links
+import mega.privacy.android.domain.qualifier.features.OutgoingShares
+import mega.privacy.android.domain.qualifier.features.RubbishBin
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -55,13 +63,12 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val getContactItemFromInShareFolder: DefaultGetContactItemFromInShareFolder,
     private val getOutShareByNodeIdUseCase: GetOutShareByNodeIdUseCase,
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
-    // TODO Inject dependency from app module
-//    @CloudDrive private val cloudDriveBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
-//    @RubbishBin private val rubbishBinBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
-//    @IncomingShares private val incomingSharesBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
-//    @OutgoingShares private val outgoingSharesBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
-//    @Links private val linksBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
-//    @Backups private val backupsBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @CloudDrive private val cloudDriveBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @RubbishBin private val rubbishBinBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @IncomingShares private val incomingSharesBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @OutgoingShares private val outgoingSharesBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @Links private val linksBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @Backups private val backupsBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
 ) : ViewModel() {
 
     internal val uiState: StateFlow<NodeBottomSheetState>
@@ -202,15 +209,13 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
         uiState.update { it.copy(error = consumed()) }
     }
 
-    // TODO: Uncomment when the options are implemented
     private fun getOptionsForSourceType(nodeSourceType: NodeSourceType): Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<*>> =
-//        when (nodeSourceType) {
-//            NodeSourceType.INCOMING_SHARES -> incomingSharesBottomSheetOptions
-//            NodeSourceType.OUTGOING_SHARES -> outgoingSharesBottomSheetOptions
-//            NodeSourceType.LINKS -> linksBottomSheetOptions
-//            NodeSourceType.RUBBISH_BIN -> rubbishBinBottomSheetOptions
-//            NodeSourceType.BACKUPS -> backupsBottomSheetOptions
-//            else -> cloudDriveBottomSheetOptions
-//        }.get()
-        emptySet()
+        when (nodeSourceType) {
+            NodeSourceType.INCOMING_SHARES -> incomingSharesBottomSheetOptions
+            NodeSourceType.OUTGOING_SHARES -> outgoingSharesBottomSheetOptions
+            NodeSourceType.LINKS -> linksBottomSheetOptions
+            NodeSourceType.RUBBISH_BIN -> rubbishBinBottomSheetOptions
+            NodeSourceType.BACKUPS -> backupsBottomSheetOptions
+            else -> cloudDriveBottomSheetOptions
+        }.get()
 }

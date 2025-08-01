@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -122,22 +123,20 @@ fun NodeActionListTile(
                     )
                 }
             }
-            Box(modifier = Modifier.weight(1f)) {
-                MegaText(
-                    modifier = Modifier
-                        .testTag(MENU_ITEM_TEXT_TAG)
-                        .then(
-                            if (icon != null && addIconPadding) {
-                                Modifier.padding(start = 56.dp)
-                            } else Modifier
-                        ),
-                    text = text,
-                    textColor = if (isDestructive) TextColor.Error else TextColor.Primary,
-                    style = MaterialTheme.typography.bodyLarge,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
-            }
+
+            MegaText(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .testTag(MENU_ITEM_TEXT_TAG),
+                text = text,
+                textColor = if (isDestructive) TextColor.Error else TextColor.Primary,
+                style = MaterialTheme.typography.bodyLarge,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                textAlign = TextAlign.Start
+            )
+
             trailingItem?.invoke()
         }
 
@@ -186,7 +185,7 @@ private fun PreviewMegaMenuActionWithSwitch(
 @Composable
 private fun PreviewMegaMenuActionWithoutIcon() {
     AndroidThemeForPreviews {
-        NodeActionListTile(text = "Menu Item",)
+        NodeActionListTile(text = "Menu Item")
     }
 }
 
