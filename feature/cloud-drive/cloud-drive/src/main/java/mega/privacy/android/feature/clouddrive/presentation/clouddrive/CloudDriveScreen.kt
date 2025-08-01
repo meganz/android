@@ -130,6 +130,8 @@ internal fun CloudDriveContent(
             listState = listState,
             gridState = gridState,
             items = uiState.items,
+            isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+            showHiddenNodes = uiState.showHiddenNodes,
             onMenuClick = { },
             onItemClicked = onItemClicked,
             onLongClicked = onItemLongClicked,

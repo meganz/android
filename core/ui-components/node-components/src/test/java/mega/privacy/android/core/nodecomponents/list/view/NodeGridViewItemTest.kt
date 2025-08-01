@@ -56,7 +56,7 @@ class NodeGridViewItemTest {
                 isInSelectionMode = isInSelectionMode,
                 isFolderNode = isFolderNode,
                 isVideoNode = isVideoNode,
-                isInvisible = isInvisible,
+                isDummy = isInvisible,
                 isSensitive = isSensitive,
                 showBlurEffect = showBlurEffect,
                 isHighlighted = isHighlighted,

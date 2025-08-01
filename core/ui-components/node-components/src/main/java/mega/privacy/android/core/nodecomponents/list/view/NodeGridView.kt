@@ -89,20 +89,20 @@ fun <T : TypedNode> NodeGridView(
         items(
             count = nodeUiItems.size,
             key = {
-                if (nodeUiItems[it].isInvisible) {
+                if (nodeUiItems[it].isDummy) {
                     it
                 } else {
                     nodeUiItems[it].id.longValue
                 }
             },
         ) {
-            val node = nodeUiItems[it].node
+            val nodeUiItem = nodeUiItems[it]
             NodeGridViewItem(
                 nodeUiItem = nodeUiItems[it],
                 isInSelectionMode = inSelectionMode,
-                onClick = { onItemClicked(nodeUiItems[it]) },
-                onLongClick = { onLongClick(nodeUiItems[it]) },
-                onMenuClick = { onMenuClick(nodeUiItems[it]) },
+                onClick = { onItemClicked(nodeUiItem) },
+                onLongClick = { onLongClick(nodeUiItem) },
+                onMenuClick = { onMenuClick(nodeUiItem) },
             )
         }
     }

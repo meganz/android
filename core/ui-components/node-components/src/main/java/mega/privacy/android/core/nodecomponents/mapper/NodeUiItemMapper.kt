@@ -52,7 +52,6 @@ class NodeUiItemMapper @Inject constructor(
         showPublicLinkCreationTime: Boolean = false,
         highlightedNodeId: NodeId? = null,
         highlightedNames: Set<String>? = null,
-        shouldApplySensitiveMode: Boolean = false,
         isContactVerificationOn: Boolean = false,
     ): List<NodeUiItem<TypedNode>> = withContext(ioDispatcher) {
         nodeList.mapAsync { node ->
@@ -66,7 +65,7 @@ class NodeUiItemMapper @Inject constructor(
             NodeUiItem(
                 node = node,
                 isSelected = false,
-                isInvisible = false,
+                isDummy = false,
                 isHighlighted = isHighlighted,
                 title = LocalizedText.Literal(node.name), // TODO: Handle unverified shares
                 subtitle = nodeSubtitleMapper(
@@ -92,7 +91,7 @@ class NodeUiItemMapper @Inject constructor(
                     NodeSourceType.INCOMING_SHARES,
                     NodeSourceType.OUTGOING_SHARES,
                     NodeSourceType.LINKS,
-                ) && shouldApplySensitiveMode && (node.isMarkedSensitive || node.isSensitiveInherited),
+                ) && (node.isMarkedSensitive || node.isSensitiveInherited),
                 showBlurEffect = shouldShowBlurEffect(node),
                 isFolderNode = node is TypedFolderNode,
                 isVideoNode = node is TypedFileNode && node.type is VideoFileTypeInfo,

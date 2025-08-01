@@ -141,7 +141,7 @@ class NodeUiItemMapperTest {
         assertThat(nodeUiItem.iconRes).isEqualTo(IconPackR.drawable.ic_folder_medium_solid)
         assertThat(nodeUiItem.title).isEqualTo(LocalizedText.Literal("Test Folder"))
         assertThat(nodeUiItem.isSelected).isFalse()
-        assertThat(nodeUiItem.isInvisible).isFalse()
+        assertThat(nodeUiItem.isDummy).isFalse()
         assertThat(nodeUiItem.isHighlighted).isFalse()
         assertThat(nodeUiItem.showLink).isFalse()
         assertThat(nodeUiItem.showFavourite).isFalse()
@@ -167,7 +167,7 @@ class NodeUiItemMapperTest {
         assertThat(nodeUiItem.iconRes).isEqualTo(IconPackR.drawable.ic_text_medium_solid)
         assertThat(nodeUiItem.title).isEqualTo(LocalizedText.Literal("test_file.txt"))
         assertThat(nodeUiItem.isSelected).isFalse()
-        assertThat(nodeUiItem.isInvisible).isFalse()
+        assertThat(nodeUiItem.isDummy).isFalse()
         assertThat(nodeUiItem.isHighlighted).isFalse()
         assertThat(nodeUiItem.showLink).isFalse()
         assertThat(nodeUiItem.showFavourite).isFalse()
@@ -207,45 +207,7 @@ class NodeUiItemMapperTest {
         }
 
     @Test
-    fun `test that invoke sets isSensitive to true when shouldApplySensitiveMode is true and node is marked sensitive`() =
-        runTest {
-            val mockSensitiveNode = createMockFileNode(
-                id = 4L,
-                name = "sensitive_file.txt",
-                isMarkedSensitive = true,
-            )
-
-            val result = underTest(
-                nodeList = listOf(mockSensitiveNode),
-                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-                shouldApplySensitiveMode = true,
-            )
-
-            assertThat(result).hasSize(1)
-            assertThat(result[0].isSensitive).isTrue()
-        }
-
-    @Test
-    fun `test that invoke sets isSensitive to false when shouldApplySensitiveMode is false`() =
-        runTest {
-            val mockSensitiveNode = createMockFileNode(
-                id = 4L,
-                name = "sensitive_file.txt",
-                isMarkedSensitive = true,
-            )
-
-            val result = underTest(
-                nodeList = listOf(mockSensitiveNode),
-                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-                shouldApplySensitiveMode = false,
-            )
-
-            assertThat(result).hasSize(1)
-            assertThat(result[0].isSensitive).isFalse()
-        }
-
-    @Test
-    fun `test that invoke sets isSensitive to false when nodeSourceType is INCOMING_SHARES even if shouldApplySensitiveMode is true`() =
+    fun `test that invoke sets isSensitive to false when nodeSourceType is INCOMING_SHARES`() =
         runTest {
             val mockSensitiveNode = createMockFileNode(
                 id = 4L,
@@ -256,7 +218,6 @@ class NodeUiItemMapperTest {
             val result = underTest(
                 nodeList = listOf(mockSensitiveNode),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
-                shouldApplySensitiveMode = true,
             )
 
             assertThat(result).hasSize(1)

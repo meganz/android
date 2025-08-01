@@ -126,7 +126,6 @@ class CloudDriveViewModelTest {
                 showPublicLinkCreationTime = false,
                 highlightedNodeId = null,
                 highlightedNames = null,
-                shouldApplySensitiveMode = false,
                 isContactVerificationOn = false,
             )
         ).thenReturn(nodeUiItems)

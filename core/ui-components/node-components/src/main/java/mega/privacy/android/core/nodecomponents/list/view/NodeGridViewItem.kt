@@ -88,7 +88,7 @@ fun <T : TypedNode> NodeGridViewItem(
         onClick = onClick,
         onLongClick = onLongClick,
         onMenuClick = onMenuClick,
-        isInvisible = nodeUiItem.isInvisible,
+        isDummy = nodeUiItem.isDummy,
         isSensitive = nodeUiItem.isSensitive,
         showBlurEffect = nodeUiItem.showBlurEffect,
         isHighlighted = nodeUiItem.isHighlighted,
@@ -116,7 +116,7 @@ fun <T : TypedNode> NodeGridViewItem(
  * @param onClick Callback invoked when the item is clicked
  * @param onLongClick Callback invoked when the item is long-pressed
  * @param onMenuClick Callback invoked when the more options menu is clicked
- * @param isInvisible Whether the item should be invisible (renders as a spacer)
+ * @param isDummy Whether the item should be dummy (renders as a grid spacer)
  * @param isSensitive Whether the item contains sensitive content (reduces opacity)
  * @param showBlurEffect Whether to apply blur effect to thumbnails for sensitive content
  * @param isHighlighted Whether the item should be highlighted (different background color)
@@ -139,7 +139,7 @@ fun NodeGridViewItem(
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     onMenuClick: (() -> Unit) = {},
-    isInvisible: Boolean = false,
+    isDummy: Boolean = false,
     isSensitive: Boolean = false,
     showBlurEffect: Boolean = false,
     isHighlighted: Boolean = false,
@@ -147,7 +147,7 @@ fun NodeGridViewItem(
     showFavourite: Boolean = false,
     labelColor: Color? = null,
 ) {
-    if (isInvisible) {
+    if (isDummy) {
         Spacer(
             modifier = Modifier
                 .height(folderMinHeight)

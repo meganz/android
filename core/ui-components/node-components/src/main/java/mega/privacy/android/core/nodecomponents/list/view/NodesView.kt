@@ -18,12 +18,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
+import timber.log.Timber
 
 
 /**
- * NEW Nodes view to load thumbnails using [ThumbnailRequest]
+ * NodesView
  *
  * @param items List of [NodeUiItem]
  * @param onMenuClick three dots click
@@ -39,6 +39,8 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param listState the state of the list
  * @param gridState the state of the grid
  * @param spanCount the span count of the grid
+ * @param showHiddenNodes whether to forcefully show hidden nodes
+ * @param isHiddenNodesEnabled whether hidden nodes feature is enabled for the user
  * @param showSortOrder whether to show change sort order button
  * @param showLinkIcon whether to show public share link icon
  * @param showChangeViewType whether to show change view type button
@@ -64,6 +66,8 @@ fun <T : TypedNode> NodesView(
     gridState: LazyGridState = rememberLazyGridState(),
     highlightText: String = "",
     spanCount: Int = 2,
+    showHiddenNodes: Boolean = false,
+    isHiddenNodesEnabled: Boolean = false,
     showLinkIcon: Boolean = true,
     showChangeViewType: Boolean = true,
     showSortOrder: Boolean = true,
@@ -76,10 +80,18 @@ fun <T : TypedNode> NodesView(
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val orientation = LocalConfiguration.current.orientation
     val span = if (orientation == Configuration.ORIENTATION_PORTRAIT) spanCount else 4
-    val highlightedIndex = remember(items) {
-        items.indexOfFirst { it.isHighlighted }
-            .takeIf { items.indices.contains(it) }
+    val visibleItems = rememberNodeItems(
+        nodeUIItems = items,
+        showHiddenItems = showHiddenNodes,
+        isHiddenNodesEnabled = isHiddenNodesEnabled,
+        isListView = isListView,
+        spanCount = span
+    )
+    val highlightedIndex = remember(visibleItems) {
+        visibleItems.indexOfFirst { it.isHighlighted }
+            .takeIf { visibleItems.indices.contains(it) }
     }
+
     LaunchedEffect(highlightedIndex) {
         highlightedIndex?.let {
             listState.animateScrollToItem(
@@ -88,11 +100,12 @@ fun <T : TypedNode> NodesView(
             )
         }
     }
+
     if (isListView) {
         NodeListView(
             modifier = modifier,
             listContentPadding = listContentPadding,
-            nodeUiItemList = items,
+            nodeUiItemList = visibleItems,
             onMenuClick = onMenuClick,
             onItemClicked = {
                 if (it.isTakenDown && it.node !is FolderNode) {
@@ -116,11 +129,10 @@ fun <T : TypedNode> NodesView(
             isContactVerificationOn = isContactVerificationOn,
         )
     } else {
-        val newList = rememberNodeListForGrid(nodeUIItems = items, spanCount = span)
         NodeGridView(
             modifier = modifier,
             listContentPadding = listContentPadding,
-            nodeUiItems = newList,
+            nodeUiItems = visibleItems,
             onMenuClick = onMenuClick,
             onItemClicked = {
                 if (it.isTakenDown && it.node !is FolderNode) {
@@ -142,8 +154,9 @@ fun <T : TypedNode> NodesView(
             inSelectionMode = inSelectionMode,
         )
     }
-    if (showTakenDownDialog) {
-        // TODO
+
+// TODO
+//    if (showTakenDownDialog) {
 //        TakeDownDialog(
 //            isFolder = false,
 //            onConfirm = {
@@ -157,36 +170,57 @@ fun <T : TypedNode> NodesView(
 //                onLinkClicked(it)
 //            }
 //        )
-    }
+//   }
 }
 
+
 /**
- * Remember function for [NodeGridView] to form empty items in case of folders count are not as per
- * span count
+ * Remember function for node items to handle empty span count and to filter out sensitive nodes
  * @param nodeUIItems list of [NodeUiItem]
+ * @param showHiddenItems whether to show hidden items
+ * @param isHiddenNodesEnabled whether hidden nodes are enabled
  * @param spanCount span count of [NodeGridView]
  */
 @Composable
-private fun <T : TypedNode> rememberNodeListForGrid(
+internal fun <T : TypedNode> rememberNodeItems(
     nodeUIItems: List<NodeUiItem<T>>,
+    showHiddenItems: Boolean,
+    isHiddenNodesEnabled: Boolean,
+    isListView: Boolean,
     spanCount: Int,
-) = remember(spanCount + nodeUIItems.hashCode()) {
-    val folderCount = nodeUIItems.count {
-        it.node is FolderNode
+) = remember(spanCount, isListView, showHiddenItems, nodeUIItems.hashCode()) {
+    val filteredItems = if (showHiddenItems || !isHiddenNodesEnabled) {
+        nodeUIItems
+    } else {
+        nodeUIItems.filterNot { it.isSensitive }
     }
-    val placeholderCount =
-        (folderCount % spanCount).takeIf { it != 0 }?.let { spanCount - it } ?: 0
-    if (folderCount > 0 && placeholderCount > 0 && folderCount < nodeUIItems.size) {
-        val gridItemList = nodeUIItems.toMutableList()
-        repeat(placeholderCount) {
-            val node = nodeUIItems[folderCount - 1].copy(
-                isInvisible = true,
-            )
-            gridItemList.add(folderCount, node)
+    if (isListView) return@remember filteredItems
+
+    // Fill folder grid row with dummy items so that file grid items start from a new row
+    var folderCount = 0
+    var lastFolderIndex = -1
+    filteredItems.forEachIndexed { index, item ->
+        if (item.node is FolderNode) {
+            folderCount++
+            lastFolderIndex = index
         }
-        return@remember gridItemList
     }
-    nodeUIItems
+    val remainder = folderCount % spanCount
+    // Early return if no dummy items are needed
+    if (remainder == 0 || folderCount >= filteredItems.size)
+        return@remember filteredItems
+
+    val placeholderCount = spanCount - remainder
+    val dummyNode = filteredItems[lastFolderIndex].copy(isDummy = true)
+
+    buildList(filteredItems.size + placeholderCount) {
+        filteredItems.forEachIndexed { index, item ->
+            add(item)
+            if (index == lastFolderIndex) {
+                repeat(placeholderCount) { add(dummyNode) }
+            }
+        }
+    }
 }
 
 /**

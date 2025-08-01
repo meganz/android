@@ -3,13 +3,12 @@ package mega.privacy.android.core.nodecomponents.model
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 
 /**
  * This class is used to display list items on screen
  * @property node [Node]
  * @param isSelected Node is selected
- * @param isInvisible Node is invisible
+ * @param isDummy True if a dummy item
  * @param isHighlighted Node is highlighted because it comes from "Locate" action in notification
  * @param title Localized title for the node
  * @param subtitle Localized subtitle for the node
@@ -32,8 +31,8 @@ import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
  */
 data class NodeUiItem<T : TypedNode>(
     val node: T,
-    var isSelected: Boolean,
-    val isInvisible: Boolean = false,
+    val isSelected: Boolean,
+    val isDummy: Boolean = false,
     val isHighlighted: Boolean = false,
     val title: LocalizedText = LocalizedText.Literal(""),
     val subtitle: LocalizedText = LocalizedText.Literal(""),
