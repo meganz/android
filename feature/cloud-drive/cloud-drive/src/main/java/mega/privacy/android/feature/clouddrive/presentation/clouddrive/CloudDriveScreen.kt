@@ -34,7 +34,9 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
+import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
 
 /**
  * Cloud Drive Screen, used to display contents of a folder
@@ -65,6 +67,14 @@ fun CloudDriveScreen(
                 MegaTopAppBar(
                     title = uiState.title.text,
                     navigationType = AppBarNavigationType.Back(onBack),
+                    actions = buildList {
+                        when {
+                            uiState.items.isNotEmpty() -> add(
+                                TopAppBarActionWithClick(CloudDriveAppBarAction.Search) {
+                                    // TODO Handle search
+                                })
+                        }
+                    },
                 )
             }
         },
