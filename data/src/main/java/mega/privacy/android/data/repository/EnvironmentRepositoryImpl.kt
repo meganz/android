@@ -7,7 +7,9 @@ import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
 import mega.privacy.android.data.gateway.DeviceGateway
@@ -96,6 +98,8 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
 
     override fun monitorBatteryInfo() =
         deviceGateway.monitorBatteryInfo
+            .onStart { emit(getBatteryInfo()) }
+            .flowOn(ioDispatcher)
 
     override fun monitorDevicePowerConnectionState() =
         deviceGateway.monitorDevicePowerConnectionState.map { devicePowerConnectionStateMapper(it) }
