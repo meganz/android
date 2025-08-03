@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.settings.compose.home.model.MyAccou
 import mega.privacy.android.app.presentation.settings.compose.home.model.SettingsHomeState
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.FeatureSettingEntryPoint
 import mega.privacy.mobile.analytics.event.QASettingsItemSelectedEvent
 import mega.privacy.mobile.analytics.event.SettingsScreenEvent
 import org.junit.Rule

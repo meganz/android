@@ -16,9 +16,9 @@ import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.PutPreference
-import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
-import mega.privacy.android.navigation.settings.FeatureSettings
-import mega.privacy.android.navigation.settings.MoreSettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.FeatureSettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.FeatureSettings
+import mega.privacy.android.navigation.contract.settings.MoreSettingEntryPoint
 
 /**
  * Settings module

@@ -13,8 +13,8 @@ import mega.privacy.android.app.presentation.settings.compose.home.mapper.MyAcco
 import mega.privacy.android.app.presentation.settings.compose.home.model.SettingsHomeState
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
-import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
-import mega.privacy.android.navigation.settings.MoreSettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.FeatureSettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.MoreSettingEntryPoint
 import javax.inject.Inject
 
 /**

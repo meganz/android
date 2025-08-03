@@ -2,7 +2,7 @@ package mega.privacy.android.app.navigation
 
 import androidx.navigation.NavGraphBuilder
 import mega.privacy.android.app.presentation.settings.qaSettingsHomeDestination
-import mega.privacy.android.navigation.settings.FeatureSettings
+import mega.privacy.android.navigation.contract.settings.FeatureSettings
 
 internal class QaFeatureSettings() :
     FeatureSettings {

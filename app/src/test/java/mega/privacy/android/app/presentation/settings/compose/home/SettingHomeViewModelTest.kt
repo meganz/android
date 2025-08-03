@@ -11,8 +11,8 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
-import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
-import mega.privacy.android.navigation.settings.MoreSettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.FeatureSettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.MoreSettingEntryPoint
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

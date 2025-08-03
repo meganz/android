@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import mega.privacy.android.navigation.settings.FeatureSettings
+import mega.privacy.android.navigation.contract.settings.FeatureSettings
 import javax.inject.Inject
 
 @HiltViewModel

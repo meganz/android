@@ -1,32 +1,27 @@
-package mega.privacy.android.navigation.settings
+package mega.privacy.android.navigation.contract.settings
 
-import android.os.Parcelable
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import kotlinx.parcelize.Parcelize
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.mobile.analytics.core.event.identifier.ItemSelectedEventIdentifier
-
 
 interface SettingEntryPoint {
     val navData: NavData
     val analyticsEvent: ItemSelectedEventIdentifier
 
-    @Parcelize
     data class NavData(
         val key: String,
         val title: Int,
         val icon: Int,
         val preferredOrdinal: Int,
-        val destination: Parcelable,
-    ) : Parcelable
+        val destination: NavKey,
+    )
 }
 
 class FeatureSettingEntryPoint(
     key: String,
-    @StringRes title: Int,
-    @DrawableRes icon: Int,
+    title: Int,
+    icon: Int,
     val preferredOrdinal: Int,
-    val destination: Parcelable,
+    val destination: NavKey,
     override val analyticsEvent: ItemSelectedEventIdentifier,
 ) : SettingEntryPoint {
     override val navData = SettingEntryPoint.NavData(
@@ -40,10 +35,10 @@ class FeatureSettingEntryPoint(
 
 class MoreSettingEntryPoint(
     key: String,
-    @StringRes title: Int,
-    @DrawableRes icon: Int,
+    title: Int,
+    icon: Int,
     val preferredOrdinal: Int,
-    val destination: Parcelable,
+    val destination: NavKey,
     override val analyticsEvent: ItemSelectedEventIdentifier,
 ) : SettingEntryPoint {
     override val navData = SettingEntryPoint.NavData(

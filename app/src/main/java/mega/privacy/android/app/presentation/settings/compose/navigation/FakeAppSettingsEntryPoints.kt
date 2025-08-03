@@ -1,23 +1,22 @@
 package mega.privacy.android.app.presentation.settings.compose.navigation
 
-import android.os.Parcelable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import kotlinx.parcelize.Parcelize
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
-import mega.privacy.android.navigation.settings.FeatureSettings
-import mega.privacy.android.navigation.settings.MoreSettingEntryPoint
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.settings.FeatureSettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.FeatureSettings
+import mega.privacy.android.navigation.contract.settings.MoreSettingEntryPoint
 import mega.privacy.mobile.analytics.event.AboutSettingsItemSelectedEvent
 import mega.privacy.mobile.analytics.event.AdvancedSettingsItemSelectedEvent
 import mega.privacy.mobile.analytics.event.CameraUploadsSettingsItemSelectedEvent
@@ -100,11 +99,10 @@ internal val appMoreSettingsEntryPoints = setOf<MoreSettingEntryPoint>(
 )
 
 @Serializable
-@Parcelize
-data object FakeSetting1 : Parcelable
+data object FakeSetting1 : NavKey
 
 fun NavGraphBuilder.fakeSettings(
-    navHostController: NavHostController,
+    navigationHandler: NavigationHandler,
 ) {
     composable<FakeSetting1> { backStackEntry ->
         FakeSettingsView("Fake settings screen 1")
@@ -112,11 +110,10 @@ fun NavGraphBuilder.fakeSettings(
 }
 
 @Serializable
-@Parcelize
-data object FakeSetting2 : Parcelable
+data object FakeSetting2 : NavKey
 
 fun NavGraphBuilder.fakeSettings2(
-    navHostController: NavHostController,
+    navigationHandler: NavigationHandler,
 ) {
     composable<FakeSetting2> { backStackEntry ->
         FakeSettingsView("Fake settings screen 2")

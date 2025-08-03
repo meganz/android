@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.settings.compose.home.model
 
 import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
-import mega.privacy.android.navigation.settings.SettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.SettingEntryPoint
 
 /**
  * Settings ui state

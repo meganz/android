@@ -26,9 +26,9 @@ import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.call.MonitorCallSoundEnabledUseCase
 import mega.privacy.android.domain.usecase.call.SetCallsSoundEnabledStateUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
-import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
-import mega.privacy.android.navigation.settings.FeatureSettings
-import mega.privacy.android.navigation.settings.MoreSettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.FeatureSettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.FeatureSettings
+import mega.privacy.android.navigation.contract.settings.MoreSettingEntryPoint
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock

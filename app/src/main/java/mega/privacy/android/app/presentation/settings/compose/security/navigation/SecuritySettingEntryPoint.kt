@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.settings.compose.security.navigati
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.compose.security.home.SecuritySettings
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.settings.FeatureSettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.FeatureSettingEntryPoint
 import mega.privacy.mobile.analytics.event.SecuritySettingsItemSelectedEvent
 
 /**

@@ -56,7 +56,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.compose.container.view.SettingContainerView
 import mega.privacy.android.app.presentation.settings.compose.home.model.SettingsHomeState
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.navigation.settings.SettingEntryPoint
+import mega.privacy.android.navigation.contract.settings.SettingEntryPoint
 import mega.privacy.mobile.analytics.event.SettingsScreenEvent
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
@@ -89,7 +89,6 @@ internal fun SettingsHomeView(
     }
 
     val detailNavigator = rememberNavController()
-
 
     ListDetailPaneScaffold(
         modifier = Modifier,

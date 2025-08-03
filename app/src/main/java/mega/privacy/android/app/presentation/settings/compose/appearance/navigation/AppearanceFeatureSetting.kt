@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.settings.compose.appearance.navigation
 
 import androidx.navigation.NavGraphBuilder
-import mega.privacy.android.navigation.settings.FeatureSettings
+import mega.privacy.android.navigation.contract.settings.FeatureSettings
 
 /**
  * Appearance feature setting

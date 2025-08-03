@@ -1,18 +1,16 @@
 package mega.privacy.android.app.presentation.settings
 
-import android.os.Parcelable
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import kotlinx.parcelize.Parcelize
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.settings.view.QASettingsHomeView
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 @Serializable
-@Parcelize
-internal object QASettingsHome : Parcelable
+internal object QASettingsHome : NavKey
 
-internal fun NavGraphBuilder.qaSettingsHomeDestination(navHostController: NavHostController) {
+internal fun NavGraphBuilder.qaSettingsHomeDestination(navigationHandler: NavigationHandler) {
 
     composable<QASettingsHome> {
         QASettingsHomeView()
