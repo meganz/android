@@ -1457,4 +1457,11 @@
     <string name="sync_stalled_issue_resolved">Issue has been solved</string>
     <!-- Sync message when multiple issues resolved -->
     <string name="sync_stalled_issues_resolved">Issues have been solved</string>
+    <!-- Text of the empty playlist in Video Section -->
+    <string name="video_section_playlists_video_empty">Empty</string>
+    <!-- Text of video count of playlist in Video Section -->
+    <plurals name="video_section_playlists_video_count">
+        <item quantity="one">%1$d video</item>
+        <item quantity="other">%1$d videos</item>
+    </plurals>
 </resources>

@@ -29,6 +29,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -36,6 +38,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
@@ -261,14 +264,14 @@ internal fun VideoPlaylistInfoView(
         Text(
             modifier = Modifier.padding(vertical = 5.dp),
             text = if (numberOfVideos != 0) {
-                val numberOfVideosText = if (numberOfVideos == 1) {
-                    "1 Video"
-                } else {
-                    "$numberOfVideos Videos"
-                }
+                val numberOfVideosText = pluralStringResource(
+                    sharedR.plurals.video_section_playlists_video_count,
+                    numberOfVideos,
+                    numberOfVideos
+                )
                 "$numberOfVideosText • $totalDuration"
             } else {
-                "Empty"
+                stringResource(sharedR.string.video_section_playlists_video_empty)
             },
             maxLines = 1,
             style = MaterialTheme.typography.caption,
