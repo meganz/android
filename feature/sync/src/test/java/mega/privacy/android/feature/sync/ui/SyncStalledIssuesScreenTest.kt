@@ -43,6 +43,7 @@ class SyncStalledIssuesScreenTest {
             SyncStalledIssuesState(
                 listOf(
                     StalledIssueUiItem(
+                        id = "1_1_0",
                         syncId = 1L,
                         nodeIds = listOf(NodeId(1L)),
                         localPaths = listOf(folderName),

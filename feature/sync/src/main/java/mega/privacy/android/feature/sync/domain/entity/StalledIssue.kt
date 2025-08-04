@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 /**
  * Stalled issue entity
  *
+ * @property id Unique identifier for the stalled issue
  * @property syncId id of the sync associated with this issue
  * @property nodeIds List of node ids
  * @property localPaths List of local paths
@@ -13,6 +14,7 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property nodeNames List of node names
  */
 data class StalledIssue(
+    val id: String,
     val syncId: Long,
     val nodeIds: List<NodeId>,
     val localPaths: List<String>,

@@ -96,7 +96,8 @@ class ResolveStalledIssueUseCaseTest {
                 nodeNames = listOf("nodeName"),
                 localPaths = listOf("path/to/file"),
                 issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
-                conflictName = "conflictName"
+                conflictName = "conflictName",
+                id = "1_1_0"
             )
             val megaNodeId = 1L
 
@@ -120,7 +121,8 @@ class ResolveStalledIssueUseCaseTest {
                 nodeNames = listOf("nodeName"),
                 localPaths = listOf(localPath),
                 issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
-                conflictName = "conflictName"
+                conflictName = "conflictName",
+                id = "1_1_0"
             )
 
             underTest(stalledIssueResolutionAction, stalledIssue)
@@ -145,7 +147,8 @@ class ResolveStalledIssueUseCaseTest {
                 nodeNames = listOf("nodeName"),
                 localPaths = listOf(localPath),
                 issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
-                conflictName = "conflictName"
+                conflictName = "conflictName",
+                id = "1_1_0"
             )
             val remoteNodeModificationTimeInSeconds = 100L
             val fileModificationTimeInMilliseconds = 105000L
@@ -181,7 +184,8 @@ class ResolveStalledIssueUseCaseTest {
                 nodeNames = listOf("nodeName"),
                 localPaths = listOf(localPath),
                 issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
-                conflictName = "conflictName"
+                conflictName = "conflictName",
+                id = "1_1_0"
             )
             val remoteNodeModificationTimeInSeconds = 105L
             val fileModificationTimeInMilliseconds = 100000L
@@ -215,7 +219,8 @@ class ResolveStalledIssueUseCaseTest {
                 nodeNames = listOf("/folder12/aa.txt", "/folder12/AA.txt"),
                 localPaths = emptyList(),
                 issueType = StallIssueType.NamesWouldClashWhenSynced,
-                conflictName = "Names would clash when synced"
+                conflictName = "Names would clash when synced",
+                id = "1_1_0"
             )
 
             underTest(stalledIssueResolutionAction, stalledIssue)
@@ -236,7 +241,8 @@ class ResolveStalledIssueUseCaseTest {
                 nodeNames = listOf("/folder12/aa", "/folder12/AA"),
                 localPaths = emptyList(),
                 issueType = StallIssueType.NamesWouldClashWhenSynced,
-                conflictName = "Names would clash when synced"
+                conflictName = "Names would clash when synced",
+                id = "1_1_0"
             )
 
             underTest(stalledIssueResolutionAction, stalledIssue)
@@ -257,7 +263,8 @@ class ResolveStalledIssueUseCaseTest {
                 nodeNames = emptyList(),
                 localPaths = listOf("/folder12/aa", "/folder12/AA"),
                 issueType = StallIssueType.NamesWouldClashWhenSynced,
-                conflictName = "Names would clash when synced"
+                conflictName = "Names would clash when synced",
+                id = "1_1_0"
             )
 
             underTest(stalledIssueResolutionAction, stalledIssue)
@@ -359,7 +366,8 @@ class ResolveStalledIssueUseCaseTest {
                 nodeNames = listOf("/folder12/aa", "/folder12/AA"),
                 localPaths = emptyList(),
                 issueType = StallIssueType.NamesWouldClashWhenSynced,
-                conflictName = "Names would clash when synced"
+                conflictName = "Names would clash when synced",
+                id = "1_1_0"
             )
 
             underTest(
@@ -386,7 +394,8 @@ class ResolveStalledIssueUseCaseTest {
             nodeNames = listOf("nodeName"),
             localPaths = listOf(localPath),
             issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
-            conflictName = "conflictName"
+            conflictName = "conflictName",
+            id = "1_1_0"
         )
         val remoteNodeModificationTimeInSeconds = 105L
         val fileModificationTimeInMilliseconds = 100000L

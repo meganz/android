@@ -224,7 +224,8 @@ internal class SyncNotificationRepositoryImplTest {
                     issueType = StallIssueType.FileIssue,
                     conflictName = "someConflict",
                     localPaths = listOf("somePath"),
-                    nodeNames = listOf("someNode")
+                    nodeNames = listOf("someNode"),
+                    id = "1_1_0"
                 )
             )
             whenever(

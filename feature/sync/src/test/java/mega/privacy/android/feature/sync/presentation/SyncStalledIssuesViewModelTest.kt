@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -53,6 +54,7 @@ class SyncStalledIssuesViewModelTest {
             issueType = StallIssueType.DownloadIssue,
             conflictName = "conflicting folder",
             nodeNames = listOf("Camera"),
+            id = "1_3_0",
         )
     )
 
@@ -69,6 +71,7 @@ class SyncStalledIssuesViewModelTest {
             actions = emptyList(),
             displayedName = "Camera",
             displayedPath = "/storage/emulated/0/DCIM",
+            id = "1_3_0",
         )
     )
 
@@ -209,8 +212,6 @@ class SyncStalledIssuesViewModelTest {
                 stalledIssueUiItem, selectedResolution
             )
         )
-
-        // Then clear it
         underTest.handleAction(SyncListAction.SnackBarShown)
 
         underTest.state.test {
@@ -218,6 +219,39 @@ class SyncStalledIssuesViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that distinctUntilChanged prevents duplicate emissions when stalled issues are the same`() =
+        runTest {
+            val mutableFlow = MutableSharedFlow<List<StalledIssue>>()
+            whenever(monitorSyncStalledIssuesUseCase()).thenReturn(mutableFlow)
+
+            val node: FolderNode = mock {
+                on { name } doReturn "Camera"
+                on { isIncomingShare } doReturn true
+            }
+            whenever(stalledIssueItemMapper(stalledIssues.first(), listOf(node)))
+                .thenReturn(stalledIssuesUiItems.first())
+            whenever(getNodeByHandleUseCase(stalledIssues.first().nodeIds.first().longValue))
+                .thenReturn(node)
+
+            initViewModel()
+
+            underTest.state.test {
+                // Wait for initial empty state
+                val initialState = awaitItem()
+                assertThat(initialState.stalledIssues).isEmpty()
+                // Emit the first list
+                mutableFlow.emit(stalledIssues)
+                val firstEmission = awaitItem()
+                assertThat(firstEmission.stalledIssues).isEqualTo(stalledIssuesUiItems)
+                // Emit the same list again - should not trigger a new emission due to distinctUntilChanged
+                mutableFlow.emit(stalledIssues)
+                // Verify no additional emissions occur
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     private fun initViewModel() {
         underTest = SyncStalledIssuesViewModel(

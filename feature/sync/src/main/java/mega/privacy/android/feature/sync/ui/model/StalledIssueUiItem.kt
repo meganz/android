@@ -6,6 +6,7 @@ import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 
 internal data class StalledIssueUiItem(
+    val id: String,
     val syncId: Long,
     val nodeIds: List<NodeId>,
     val localPaths: List<String>,

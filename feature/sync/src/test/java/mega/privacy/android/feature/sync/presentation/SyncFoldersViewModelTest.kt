@@ -170,6 +170,7 @@ class SyncFoldersViewModelTest {
             issueType = StallIssueType.DownloadIssue,
             conflictName = "conflicting folder",
             nodeNames = listOf("Camera"),
+            id = "1_1_0",
         )
     )
 

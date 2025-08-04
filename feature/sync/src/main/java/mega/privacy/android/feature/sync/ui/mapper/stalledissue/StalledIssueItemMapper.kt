@@ -10,6 +10,7 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.ui.extension.getIcon
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.icon.pack.R as iconPackR
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -43,6 +44,7 @@ internal class StalledIssueItemMapper @Inject constructor(
                         UriPath(it).toUri().pathSegments.drop(3)
                     }
         return StalledIssueUiItem(
+            id = stalledIssueEntity.id,
             syncId = stalledIssueEntity.syncId,
             nodeIds = stalledIssueEntity.nodeIds,
             localPaths = stalledIssueEntity.localPaths,
@@ -69,7 +71,9 @@ internal class StalledIssueItemMapper @Inject constructor(
                     it.firstOrNull() ?: ""
                 }
             } ?: ""
-        )
+        ).also {
+            Timber.d("StalledIssueUiItem: id ${it.id} Names ${it.nodeNames} LocalPath ${it.localPaths} issueType: ${it.issueType} actions: ${it.actions}")
+        }
     }
 
     /**
@@ -86,5 +90,6 @@ internal class StalledIssueItemMapper @Inject constructor(
             issueType = stalledIssueUiItem.issueType,
             conflictName = stalledIssueUiItem.conflictName,
             nodeNames = stalledIssueUiItem.nodeNames,
+            id = stalledIssueUiItem.id
         )
 }

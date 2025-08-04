@@ -52,7 +52,8 @@ class StalledIssueItemMapperTest {
             localPaths = listOf("/storage/emulated/0/DCIM"),
             issueType = StallIssueType.DownloadIssue,
             conflictName = "conflicting folder",
-            nodeNames = listOf("Camera/subfolder")
+            nodeNames = listOf("Camera/subfolder"),
+            id = "1_3_0"
         )
         val folderNode: FolderNode = mock {
             on { name } doReturn "Camera"
@@ -86,7 +87,8 @@ class StalledIssueItemMapperTest {
             localPaths = listOf("/storage/emulated/0/Documents"),
             issueType = StallIssueType.UploadIssue,
             conflictName = "conflicting file",
-            nodeNames = listOf("document.pdf")
+            nodeNames = listOf("document.pdf"),
+            id = "1_3_0"
         )
         val fileTypeInfo = PdfFileTypeInfo
         val fileNode: FileNode = mock {
@@ -133,7 +135,8 @@ class StalledIssueItemMapperTest {
                 localPaths = listOf(uriString),
                 issueType = StallIssueType.DownloadIssue,
                 conflictName = "conflicting item",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_3_0"
             )
             val detailedInfo = StalledIssueDetailedInfo("No Node Title", "No Node Description")
             val resolutionActions = listOf<StalledIssueResolutionAction>()
@@ -158,7 +161,8 @@ class StalledIssueItemMapperTest {
             localPaths = listOf("/storage/emulated/0/image.jpg"),
             issueType = StallIssueType.UploadIssue,
             conflictName = "conflicting image",
-            nodeNames = listOf("image.jpg")
+            nodeNames = listOf("image.jpg"),
+            id = "1_3_0"
         )
         val detailedInfo = StalledIssueDetailedInfo("Image Title", "Image Description")
         val resolutionActions = listOf<StalledIssueResolutionAction>()
@@ -188,7 +192,8 @@ class StalledIssueItemMapperTest {
             detailedInfo = StalledIssueDetailedInfo("", ""),
             actions = emptyList(),
             displayedName = "Camera",
-            displayedPath = "/storage/emulated/0/DCIM"
+            displayedPath = "/storage/emulated/0/DCIM",
+            id = "1_3_0"
         )
 
         val result = underTest(stalledIssueUiItem)
@@ -209,7 +214,8 @@ class StalledIssueItemMapperTest {
             localPaths = listOf("/storage/emulated/0/Documents"),
             issueType = StallIssueType.DownloadIssue,
             conflictName = "nested conflict",
-            nodeNames = listOf("Documents/Projects/Android/file.kt")
+            nodeNames = listOf("Documents/Projects/Android/file.kt"),
+            id = "1_3_0"
         )
         val detailedInfo = StalledIssueDetailedInfo("Nested Title", "Nested Description")
         val resolutionActions = listOf<StalledIssueResolutionAction>()

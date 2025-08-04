@@ -118,7 +118,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_1_0"
             ),
             0, 0,
         ),
@@ -129,7 +130,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_2_0"
             ),
             R.string.sync_stalled_issue_file_issue,
             R.string.sync_stalled_issue_file_issue_detail,
@@ -141,7 +143,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = listOf("name1", "name2")
+                nodeNames = listOf("name1", "name2"),
+                id = "1_3_0"
             ),
             R.string.sync_stalled_issue_move_or_rename,
             R.string.sync_stalled_issues_move_or_rename_message_mega,
@@ -153,7 +156,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_4_0"
             ),
             R.string.sync_stalled_issue_move_or_rename,
             R.string.sync_stalled_issues_move_or_rename_message_local
@@ -165,7 +169,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_5_0"
             ),
             R.string.sync_stalled_issue_delete_or_move_scanning,
             R.string.sync_stalled_issue_delete_or_move_scanning_detail
@@ -177,7 +182,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_6_0"
             ),
             R.string.sync_stalled_issue_delete_or_move,
             R.string.sync_stalled_issue_delete_or_move_detail
@@ -189,7 +195,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_7_0"
             ),
             R.string.sync_stalled_issue_upload_issue,
             R.string.sync_stalled_issue_upload_issue_detail
@@ -201,7 +208,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_8_0"
             ),
             R.string.sync_stalled_issue_download_issue,
             R.string.sync_stalled_issue_download_issue_detail
@@ -213,7 +221,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_9_0"
             ),
             R.string.sync_stalled_issue_cannot_create_folder,
             R.string.sync_stalled_issue_cannot_create_folder_detail
@@ -225,7 +234,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_10_0"
             ),
             R.string.sync_stalled_issue_cannot_perform_deletion,
             R.string.sync_stalled_issue_cannot_perform_deletion_detail
@@ -237,7 +247,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_11_0"
             ),
             R.string.sync_stalled_issue_cannot_support_tree_depth,
             R.string.sync_stalled_issue_cannot_support_tree_depth_detail,
@@ -249,7 +260,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_12_0"
             ),
             R.string.sync_stalled_issue_folder_matched_against_file,
             R.string.sync_stalled_issue_folder_matched_against_file_detail,
@@ -261,7 +273,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_13_0"
             ),
             R.string.sync_stalled_issue_local_and_remote_change_last_sync,
             R.string.sync_stalled_issue_local_and_remote_change_last_sync_detail
@@ -273,7 +286,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_14_0"
             ),
             R.string.sync_stalled_issue_local_and_remote_not_synced,
             R.string.sync_stalled_issue_local_and_remote_not_synced_detail
@@ -285,7 +299,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_15_0"
             ),
             R.string.sync_stalled_issue_name_clash,
             R.string.sync_stalled_issue_name_clash_detail,
@@ -297,7 +312,8 @@ class StalledIssueDetailInfoMapperTest {
                 nodeIds = emptyList(),
                 localPaths = emptyList(),
                 conflictName = "",
-                nodeNames = emptyList()
+                nodeNames = emptyList(),
+                id = "1_16_0"
             ),
             0, 0,
         ),

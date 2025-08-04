@@ -56,7 +56,9 @@ private fun StalledIssuesScreenContent(
                 )
             }
         } else {
-            items(count = stalledIssues.size) { itemIndex ->
+            items(count = stalledIssues.size, key = {
+                stalledIssues[it].id
+            }) { itemIndex ->
                 val issue = stalledIssues[itemIndex]
                 StalledIssueCard(
                     nodeName = issue.displayedName,
@@ -110,6 +112,7 @@ internal fun StalledIssuesScreenPreview() {
                     actions = listOf(stalledIssueResolutionAction),
                     displayedName = "Folder name",
                     displayedPath = "Folder path",
+                    id = "1_1_0",
                 ),
                 StalledIssueUiItem(
                     syncId = 1L,
@@ -123,6 +126,7 @@ internal fun StalledIssuesScreenPreview() {
                     actions = listOf(stalledIssueResolutionAction),
                     displayedName = "Folder name",
                     displayedPath = "Folder path",
+                    id = "1_2_0",
                 ),
                 StalledIssueUiItem(
                     syncId = 1L,
@@ -136,6 +140,7 @@ internal fun StalledIssuesScreenPreview() {
                     actions = listOf(stalledIssueResolutionAction),
                     displayedName = "Folder name",
                     displayedPath = "Folder path",
+                    id = "1_3_0",
                 ),
                 StalledIssueUiItem(
                     syncId = 1L,
@@ -149,6 +154,7 @@ internal fun StalledIssuesScreenPreview() {
                     actions = listOf(stalledIssueResolutionAction),
                     displayedName = "Folder name",
                     displayedPath = "Folder path",
+                    id = "1_4_0",
                 ),
             ),
             moreClicked = {},
