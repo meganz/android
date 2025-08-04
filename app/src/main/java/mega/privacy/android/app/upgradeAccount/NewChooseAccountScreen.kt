@@ -82,13 +82,13 @@ import java.util.Locale
 
 @Composable
 internal fun NewChooseAccountScreen(
+    onBuyPlanClick: (AccountType, Boolean) -> Unit,
+    maybeLaterClicked: () -> Unit,
+    onFreePlanClicked: () -> Unit,
     uiState: ChooseAccountState = ChooseAccountState(),
     accountStorageUiState: AccountStorageUIState = AccountStorageUIState(),
     isNewCreationAccount: Boolean = false,
     isUpgradeAccount: Boolean = false,
-    onBuyPlanClick: (AccountType, Boolean) -> Unit,
-    maybeLaterClicked: () -> Unit,
-    onFreePlanClicked: () -> Unit,
     onBack: () -> Unit,
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
@@ -187,7 +187,7 @@ internal fun NewChooseAccountScreen(
             }
             item("get_more_with_pro_plan") {
                 MegaText(
-                    text = "Get more with Pro plan",
+                    text = stringResource(sharedR.string.choose_account_screen_get_more_with_pro_plan_title),
                     style = MaterialTheme.typography.headlineSmall,
                     textColor = TextColor.Primary,
                     modifier = Modifier
