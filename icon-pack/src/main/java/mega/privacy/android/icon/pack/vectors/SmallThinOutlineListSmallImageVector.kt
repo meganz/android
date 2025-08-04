@@ -34,115 +34,61 @@ public fun createSmallThinOutlineListSmallImageVector(): ImageVector = ImageVect
         strokeLineCap = StrokeCap.Butt,
         strokeLineJoin = StrokeJoin.Miter,
         strokeLineMiter = 4.0f,
-        pathFillType = PathFillType.NonZero,
+        pathFillType = PathFillType.EvenOdd,
     ) {
-        moveTo(4.16699f, 4.0f)
-        curveTo(4.16699f, 3.72386f, 4.39085f, 3.5f, 4.66699f, 3.5f)
-        lineTo(14.0003f, 3.5f)
-        curveTo(14.2765f, 3.5f, 14.5003f, 3.72386f, 14.5003f, 4.0f)
-        curveTo(14.5003f, 4.27614f, 14.2765f, 4.5f, 14.0003f, 4.5f)
-        lineTo(4.66699f, 4.5f)
-        curveTo(4.39085f, 4.5f, 4.16699f, 4.27614f, 4.16699f, 4.0f)
+        // Subpath 1
+        moveTo(2.63184f, 12.0f)
+        curveTo(2.63184f, 12.3451f, 2.35194f, 12.6249f, 2.00684f, 12.625f)
+        lineTo(2.0f, 12.625f)
+        curveTo(1.65482f, 12.625f, 1.375f, 12.3452f, 1.375f, 12.0f)
+        curveTo(1.375f, 11.6548f, 1.65482f, 11.375f, 2.0f, 11.375f)
+        lineTo(2.00684f, 11.375f)
+        curveTo(2.35194f, 11.3751f, 2.63184f, 11.6549f, 2.63184f, 12.0f)
         close()
-    }
-    path(
-        fill = SolidColor(Color(0xFF303233)),
-        fillAlpha = 1.0f,
-        stroke = null,
-        strokeAlpha = 1.0f,
-        strokeLineWidth = 0.0f,
-        strokeLineCap = StrokeCap.Butt,
-        strokeLineJoin = StrokeJoin.Miter,
-        strokeLineMiter = 4.0f,
-        pathFillType = PathFillType.NonZero,
-    ) {
-        moveTo(4.16699f, 8.0f)
-        curveTo(4.16699f, 7.72386f, 4.39085f, 7.5f, 4.66699f, 7.5f)
-        lineTo(14.0003f, 7.5f)
-        curveTo(14.2765f, 7.5f, 14.5003f, 7.72386f, 14.5003f, 8.0f)
-        curveTo(14.5003f, 8.27614f, 14.2765f, 8.5f, 14.0003f, 8.5f)
-        lineTo(4.66699f, 8.5f)
-        curveTo(4.39085f, 8.5f, 4.16699f, 8.27614f, 4.16699f, 8.0f)
+        // Subpath 2 (hole)
+        moveTo(14.625f, 12.0f)
+        curveTo(14.625f, 12.3452f, 14.3452f, 12.625f, 14.0f, 12.625f)
+        lineTo(4.66699f, 12.625f)
+        curveTo(4.32181f, 12.625f, 4.04199f, 12.3452f, 4.04199f, 12.0f)
+        curveTo(4.04199f, 11.6548f, 4.32181f, 11.375f, 4.66699f, 11.375f)
+        lineTo(14.0f, 11.375f)
+        curveTo(14.3452f, 11.375f, 14.625f, 11.6548f, 14.625f, 12.0f)
         close()
-    }
-    path(
-        fill = SolidColor(Color(0xFF303233)),
-        fillAlpha = 1.0f,
-        stroke = null,
-        strokeAlpha = 1.0f,
-        strokeLineWidth = 0.0f,
-        strokeLineCap = StrokeCap.Butt,
-        strokeLineJoin = StrokeJoin.Miter,
-        strokeLineMiter = 4.0f,
-        pathFillType = PathFillType.NonZero,
-    ) {
-        moveTo(4.16699f, 12.0f)
-        curveTo(4.16699f, 11.7239f, 4.39085f, 11.5f, 4.66699f, 11.5f)
-        lineTo(14.0003f, 11.5f)
-        curveTo(14.2765f, 11.5f, 14.5003f, 11.7239f, 14.5003f, 12.0f)
-        curveTo(14.5003f, 12.2761f, 14.2765f, 12.5f, 14.0003f, 12.5f)
-        lineTo(4.66699f, 12.5f)
-        curveTo(4.39085f, 12.5f, 4.16699f, 12.2761f, 4.16699f, 12.0f)
+        // Subpath 3 (hole)
+        moveTo(2.63184f, 8.0f)
+        curveTo(2.63184f, 8.34512f, 2.35194f, 8.62491f, 2.00684f, 8.625f)
+        lineTo(2.0f, 8.625f)
+        curveTo(1.65482f, 8.625f, 1.375f, 8.34518f, 1.375f, 8.0f)
+        curveTo(1.375f, 7.65482f, 1.65482f, 7.375f, 2.0f, 7.375f)
+        lineTo(2.00684f, 7.375f)
+        curveTo(2.35194f, 7.37509f, 2.63184f, 7.65488f, 2.63184f, 8.0f)
         close()
-    }
-    path(
-        fill = SolidColor(Color(0xFF303233)),
-        fillAlpha = 1.0f,
-        stroke = null,
-        strokeAlpha = 1.0f,
-        strokeLineWidth = 0.0f,
-        strokeLineCap = StrokeCap.Butt,
-        strokeLineJoin = StrokeJoin.Miter,
-        strokeLineMiter = 4.0f,
-        pathFillType = PathFillType.NonZero,
-    ) {
-        moveTo(1.5f, 4.0f)
-        curveTo(1.5f, 3.72386f, 1.72386f, 3.5f, 2.0f, 3.5f)
-        lineTo(2.00667f, 3.5f)
-        curveTo(2.28281f, 3.5f, 2.50667f, 3.72386f, 2.50667f, 4.0f)
-        curveTo(2.50667f, 4.27614f, 2.28281f, 4.5f, 2.00667f, 4.5f)
-        lineTo(2.0f, 4.5f)
-        curveTo(1.72386f, 4.5f, 1.5f, 4.27614f, 1.5f, 4.0f)
+        // Subpath 4 (hole)
+        moveTo(14.625f, 8.0f)
+        curveTo(14.625f, 8.34518f, 14.3452f, 8.625f, 14.0f, 8.625f)
+        lineTo(4.66699f, 8.625f)
+        curveTo(4.32181f, 8.625f, 4.04199f, 8.34518f, 4.04199f, 8.0f)
+        curveTo(4.04199f, 7.65482f, 4.32181f, 7.375f, 4.66699f, 7.375f)
+        lineTo(14.0f, 7.375f)
+        curveTo(14.3452f, 7.375f, 14.625f, 7.65482f, 14.625f, 8.0f)
         close()
-    }
-    path(
-        fill = SolidColor(Color(0xFF303233)),
-        fillAlpha = 1.0f,
-        stroke = null,
-        strokeAlpha = 1.0f,
-        strokeLineWidth = 0.0f,
-        strokeLineCap = StrokeCap.Butt,
-        strokeLineJoin = StrokeJoin.Miter,
-        strokeLineMiter = 4.0f,
-        pathFillType = PathFillType.NonZero,
-    ) {
-        moveTo(1.5f, 8.0f)
-        curveTo(1.5f, 7.72386f, 1.72386f, 7.5f, 2.0f, 7.5f)
-        lineTo(2.00667f, 7.5f)
-        curveTo(2.28281f, 7.5f, 2.50667f, 7.72386f, 2.50667f, 8.0f)
-        curveTo(2.50667f, 8.27614f, 2.28281f, 8.5f, 2.00667f, 8.5f)
-        lineTo(2.0f, 8.5f)
-        curveTo(1.72386f, 8.5f, 1.5f, 8.27614f, 1.5f, 8.0f)
+        // Subpath 5 (hole)
+        moveTo(2.63184f, 4.0f)
+        curveTo(2.63184f, 4.34512f, 2.35194f, 4.62491f, 2.00684f, 4.625f)
+        lineTo(2.0f, 4.625f)
+        curveTo(1.65482f, 4.625f, 1.375f, 4.34518f, 1.375f, 4.0f)
+        curveTo(1.375f, 3.65482f, 1.65482f, 3.375f, 2.0f, 3.375f)
+        lineTo(2.00684f, 3.375f)
+        curveTo(2.35194f, 3.37509f, 2.63184f, 3.65488f, 2.63184f, 4.0f)
         close()
-    }
-    path(
-        fill = SolidColor(Color(0xFF303233)),
-        fillAlpha = 1.0f,
-        stroke = null,
-        strokeAlpha = 1.0f,
-        strokeLineWidth = 0.0f,
-        strokeLineCap = StrokeCap.Butt,
-        strokeLineJoin = StrokeJoin.Miter,
-        strokeLineMiter = 4.0f,
-        pathFillType = PathFillType.NonZero,
-    ) {
-        moveTo(1.5f, 12.0f)
-        curveTo(1.5f, 11.7239f, 1.72386f, 11.5f, 2.0f, 11.5f)
-        lineTo(2.00667f, 11.5f)
-        curveTo(2.28281f, 11.5f, 2.50667f, 11.7239f, 2.50667f, 12.0f)
-        curveTo(2.50667f, 12.2761f, 2.28281f, 12.5f, 2.00667f, 12.5f)
-        lineTo(2.0f, 12.5f)
-        curveTo(1.72386f, 12.5f, 1.5f, 12.2761f, 1.5f, 12.0f)
+        // Subpath 6 (hole)
+        moveTo(14.625f, 4.0f)
+        curveTo(14.625f, 4.34518f, 14.3452f, 4.625f, 14.0f, 4.625f)
+        lineTo(4.66699f, 4.625f)
+        curveTo(4.32181f, 4.625f, 4.04199f, 4.34518f, 4.04199f, 4.0f)
+        curveTo(4.04199f, 3.65482f, 4.32181f, 3.375f, 4.66699f, 3.375f)
+        lineTo(14.0f, 3.375f)
+        curveTo(14.3452f, 3.375f, 14.625f, 3.65482f, 14.625f, 4.0f)
         close()
     }
 }.build()
