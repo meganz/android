@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
@@ -31,7 +32,6 @@ import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCa
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
-import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
@@ -121,7 +121,7 @@ internal class MegaPickerViewModel @AssistedInject constructor(
                     }.onFailure {
                         val error = (it as MegaSyncException).syncError
                         val errorMessage = deviceFolderUINodeErrorMessageMapper(error)
-                            ?: sharedResR.string.general_sync_message_unknown_error
+                            ?: deviceFolderUINodeErrorMessageMapper(SyncError.UNKNOWN_ERROR)
 
                         _state.update { state ->
                             state.copy(

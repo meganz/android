@@ -19,7 +19,7 @@ class DeviceFolderUINodeErrorMessageMapper @Inject constructor() {
      */
     operator fun invoke(errorSubState: SyncError?): Int? = when (errorSubState) {
         SyncError.NO_SYNC_ERROR -> null
-        SyncError.UNKNOWN_ERROR -> R.string.general_sync_message_unknown_error
+        SyncError.UNKNOWN_ERROR -> getUnknownErrorMessageId()
         SyncError.UNSUPPORTED_FILE_SYSTEM -> R.string.general_sync_unsupported_file_system
         SyncError.INVALID_REMOTE_TYPE -> R.string.general_sync_invalid_remote_type
         SyncError.INVALID_LOCAL_TYPE -> R.string.general_sync_invalid_local_type
@@ -70,6 +70,8 @@ class DeviceFolderUINodeErrorMessageMapper @Inject constructor() {
         SyncError.LOCAL_PATH_SYNC_COLLISION,
             -> R.string.general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder
 
-        else -> R.string.general_sync_message_unknown_error
+        else -> getUnknownErrorMessageId()
     }
+
+    private fun getUnknownErrorMessageId() = R.string.general_sync_message_unknown_error
 }

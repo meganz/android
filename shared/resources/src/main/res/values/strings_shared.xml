@@ -1466,4 +1466,6 @@
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">Move this folder to your Cloud drive to get full access to your data. It will no longer be backed up to.</string>
+    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
 </resources>

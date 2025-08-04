@@ -16,8 +16,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.cancelaccountplan.view.GenericInstructionStep
 import mega.privacy.android.app.presentation.cancelaccountplan.view.InstructionStepWithBoldText
+import mega.privacy.android.app.utils.DomainNameFacade
 import mega.privacy.android.app.utils.MEGA_URL
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -28,7 +30,6 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.resources.R
 
 /**
@@ -72,7 +73,10 @@ internal fun WebReactivationInstructionsView(
         )
 
         MegaSpannedClickableText(
-            value = stringResource(id = R.string.account_cancellation_instructions_visit_website),
+            value = stringResource(
+                id = R.string.account_cancellation_instructions_visit_website_domain_placeholder,
+                DomainNameFacade.getDomainName()
+            ),
             styles = hashMapOf(
                 SpanIndicator('A') to MegaSpanStyleWithAnnotation(
                     megaSpanStyle = MegaSpanStyle(

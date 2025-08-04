@@ -7,8 +7,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.reset
@@ -35,32 +33,21 @@ class GetDomainNameUseCaseTest {
     }
 
     @Test
-    fun `test that use case returns mega app domain when repository flag is true and is not for email`() =
+    fun `test that use case returns mega app domain when repository flag is true`() =
         runTest {
             whenever(domainNameRepository.isDomainNameMegaDotAppFromCache()) doReturn true
 
-            val actual = underTest(false)
+            val actual = underTest()
 
             assertThat(actual).isEqualTo("mega.app")
         }
 
     @Test
-    fun `test that use case returns mega io domain when repository flag is true and is for email`() =
-        runTest {
-            whenever(domainNameRepository.isDomainNameMegaDotAppFromCache()) doReturn true
-
-            val actual = underTest(true)
-
-            assertThat(actual).isEqualTo("mega.io")
-        }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that use case returns mega nz when repository flag is false`(isForEmail: Boolean) =
+    fun `test that use case returns mega nz when repository flag is false`() =
         runTest {
             whenever(domainNameRepository.isDomainNameMegaDotAppFromCache()) doReturn false
 
-            val actual = underTest(isForEmail)
+            val actual = underTest()
 
             assertThat(actual).isEqualTo("mega.nz")
         }

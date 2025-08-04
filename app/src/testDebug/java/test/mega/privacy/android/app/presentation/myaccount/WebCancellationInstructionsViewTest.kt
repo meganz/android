@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
+import mega.privacy.android.app.fromId
 import mega.privacy.android.app.presentation.cancelaccountplan.view.INSTRUCTIONS_STEP_WITH_BOLD_TEXT_TEST_TAG
 import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.WEB_CANCELLATION_INSTRUCTIONS_COMPUTER_STEP_WITH_URL_TEST_TAG
 import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.WEB_CANCELLATION_INSTRUCTIONS_MOBILE_STEP_WITH_URL_TEST_TAG
@@ -18,7 +19,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import mega.privacy.android.app.fromId
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -49,9 +49,13 @@ class WebCancellationInstructionsViewTest {
             .assertIsDisplayed()
         composeTestRule.onAllNodesWithTag(INSTRUCTIONS_STEP_WITH_BOLD_TEXT_TEST_TAG)
             .assertCountEquals(4)
-        composeTestRule.onNodeWithTag(WEB_CANCELLATION_INSTRUCTIONS_COMPUTER_STEP_WITH_URL_TEST_TAG)
+        composeTestRule.onNodeWithTag(
+            WEB_CANCELLATION_INSTRUCTIONS_COMPUTER_STEP_WITH_URL_TEST_TAG
+        )
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(WEB_CANCELLATION_INSTRUCTIONS_MOBILE_STEP_WITH_URL_TEST_TAG)
+        composeTestRule.onNodeWithTag(
+            WEB_CANCELLATION_INSTRUCTIONS_MOBILE_STEP_WITH_URL_TEST_TAG
+        )
             .assertIsDisplayed()
     }
 }

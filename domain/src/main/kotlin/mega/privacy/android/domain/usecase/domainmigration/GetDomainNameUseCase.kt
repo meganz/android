@@ -12,18 +12,22 @@ class GetDomainNameUseCase @Inject constructor(
     /**
      * Invoke
      */
-    operator fun invoke(isForEmail: Boolean) =
-        if (!domainNameRepository.isDomainNameMegaDotAppFromCache()) {
-            MEGA_NZ_DOMAIN_NAME
-        } else if (isForEmail) {
-            MEGA_IO_DOMAIN_NAME
-        } else {
+    operator fun invoke() =
+        if (domainNameRepository.isDomainNameMegaDotAppFromCache()) {
             MEGA_APP_DOMAIN_NAME
+        } else {
+            MEGA_NZ_DOMAIN_NAME
         }
 
     companion object {
-        private const val MEGA_APP_DOMAIN_NAME = "mega.app"
-        private const val MEGA_IO_DOMAIN_NAME = "mega.io"
-        private const val MEGA_NZ_DOMAIN_NAME = "mega.nz"
+        /**
+         * mega.app domain
+         */
+        const val MEGA_APP_DOMAIN_NAME = "mega.app"
+
+        /**
+         * mega.nz domain
+         */
+        const val MEGA_NZ_DOMAIN_NAME = "mega.nz"
     }
 }
