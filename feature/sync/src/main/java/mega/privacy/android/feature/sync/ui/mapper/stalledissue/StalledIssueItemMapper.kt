@@ -1,33 +1,47 @@
 package mega.privacy.android.feature.sync.ui.mapper.stalledissue
 
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
-import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.ui.extension.getIcon
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.icon.pack.R as iconPackR
 import javax.inject.Inject
 
+/**
+ * Maps [StalledIssue] domain entities to [StalledIssueUiItem] UI models and vice-versa.
+ */
 internal class StalledIssueItemMapper @Inject constructor(
     private val stalledIssueResolutionActionMapper: StalledIssueResolutionActionMapper,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val stalledIssueDetailInfoMapper: StalledIssueDetailInfoMapper,
-    private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
 ) {
 
-    suspend operator fun invoke(
+    /**
+     * Maps a [StalledIssue] entity to a [StalledIssueUiItem] UI model.
+     *
+     * @param stalledIssueEntity The [StalledIssue] entity to map.
+     * @param nodes The list of [UnTypedNode] associated with the stalled issue.
+     * @return The mapped [StalledIssueUiItem].
+     */
+    operator fun invoke(
         stalledIssueEntity: StalledIssue,
         nodes: List<UnTypedNode>,
     ): StalledIssueUiItem {
         val firstNode = nodes.firstOrNull()
         val areAllNodesFolders = nodes.all { it is FolderNode }
         val detailedInfo = stalledIssueDetailInfoMapper(stalledIssueEntity)
-        val nameAndPath = stalledIssueEntity.nodeNames.firstOrNull()?.split("/")
-            ?: stalledIssueEntity.localPaths.firstOrNull()
-                ?.let { getPathByDocumentContentUriUseCase(it)?.split("/") }
+        val nameAndPath =
+            stalledIssueEntity.nodeNames.takeIf { it.isNotEmpty() }?.firstOrNull()?.split("/")
+                ?: stalledIssueEntity.localPaths.takeIf { it.isNotEmpty() }?.firstOrNull()
+                    ?.let {
+                        // [tree, primary:Ringtones, document, primary:Ringtones, Folder 1, Folder 1, Folder 1, F01.pdf]
+                        UriPath(it).toUri().pathSegments.drop(3)
+                    }
         return StalledIssueUiItem(
             syncId = stalledIssueEntity.syncId,
             nodeIds = stalledIssueEntity.nodeIds,
@@ -58,6 +72,12 @@ internal class StalledIssueItemMapper @Inject constructor(
         )
     }
 
+    /**
+     * Maps a [StalledIssueUiItem] UI model to a [StalledIssue] domain entity.
+     *
+     * @param stalledIssueUiItem The [StalledIssueUiItem] to map.
+     * @return The mapped [StalledIssue] entity.
+     */
     operator fun invoke(stalledIssueUiItem: StalledIssueUiItem): StalledIssue =
         StalledIssue(
             syncId = stalledIssueUiItem.syncId,

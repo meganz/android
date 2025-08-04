@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.mapper
 
+import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
@@ -7,7 +8,6 @@ import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
@@ -20,6 +20,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -31,7 +32,6 @@ class StalledIssueItemMapperTest {
     private val stalledIssueResolutionActionMapper: StalledIssueResolutionActionMapper = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
     private val stalledIssueDetailInfoMapper: StalledIssueDetailInfoMapper = mock()
-    private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase = mock()
 
     private lateinit var underTest: StalledIssueItemMapper
 
@@ -41,7 +41,6 @@ class StalledIssueItemMapperTest {
             stalledIssueResolutionActionMapper = stalledIssueResolutionActionMapper,
             fileTypeIconMapper = fileTypeIconMapper,
             stalledIssueDetailInfoMapper = stalledIssueDetailInfoMapper,
-            getPathByDocumentContentUriUseCase = getPathByDocumentContentUriUseCase
         )
     }
 
@@ -113,29 +112,42 @@ class StalledIssueItemMapperTest {
 
     @Test
     fun `test that StalledIssue is mapped with no nodes and uses local path`() = runTest {
-        val stalledIssue = StalledIssue(
-            syncId = 3L,
-            nodeIds = listOf(NodeId(5L)),
-            localPaths = listOf("content://documents/path"),
-            issueType = StallIssueType.DownloadIssue,
-            conflictName = "conflicting item",
-            nodeNames = emptyList()
-        )
-        val detailedInfo = StalledIssueDetailedInfo("No Node Title", "No Node Description")
-        val resolutionActions = listOf<StalledIssueResolutionAction>()
+        mockStatic(Uri::class.java).use { uriMock ->
+            val uriString = "content://documents/path/file.txt"
+            val contentUriMock: Uri = mock {
+                on { scheme } doReturn "content"
+                on { pathSegments } doReturn listOf(
+                    "tree",
+                    "primary:path",
+                    "document",
+                    "primary:path",
+                    "file.txt"
+                )
+            }
 
-        whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
-        whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, true))
-            .thenReturn(resolutionActions)
-        whenever(getPathByDocumentContentUriUseCase("content://documents/path"))
-            .thenReturn("Documents/file.txt")
+            whenever(contentUriMock.toString()).thenReturn(uriString)
+            whenever(Uri.parse(uriString)).thenReturn(contentUriMock)
+            val stalledIssue = StalledIssue(
+                syncId = 3L,
+                nodeIds = listOf(NodeId(5L)),
+                localPaths = listOf(uriString),
+                issueType = StallIssueType.DownloadIssue,
+                conflictName = "conflicting item",
+                nodeNames = emptyList()
+            )
+            val detailedInfo = StalledIssueDetailedInfo("No Node Title", "No Node Description")
+            val resolutionActions = listOf<StalledIssueResolutionAction>()
 
-        val result = underTest(stalledIssue, emptyList())
+            whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
+            whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, true))
+                .thenReturn(resolutionActions)
 
-        assertThat(result.icon).isEqualTo(iconPackR.drawable.ic_generic_medium_solid)
-        assertThat(result.displayedName).isEqualTo("file.txt")
-        assertThat(result.displayedPath).isEqualTo("Documents")
-        verify(getPathByDocumentContentUriUseCase)("content://documents/path")
+            val result = underTest(stalledIssue, emptyList())
+
+            assertThat(result.icon).isEqualTo(iconPackR.drawable.ic_generic_medium_solid)
+            assertThat(result.displayedName).isEqualTo("file.txt")
+            assertThat(result.displayedPath).isEqualTo("primary:path")
+        }
     }
 
     @Test

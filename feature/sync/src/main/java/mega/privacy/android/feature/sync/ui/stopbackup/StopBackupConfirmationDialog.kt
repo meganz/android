@@ -44,7 +44,8 @@ internal fun StopBackupConfirmationDialogBody(
     ConfirmationDialog(
         title = stringResource(id = sharedR.string.sync_stop_backup_confirm_dialog_title),
         text1 = stringResource(sharedR.string.sync_stop_backup_confirm_dialog_text),
-        text2 = stringResource(sharedR.string.sync_stop_backup_confirm_dialog_delete_explanation),
+        text2 = stringResource(sharedR.string.sync_stop_backup_confirm_dialog_move_explanation),
+        text3 = stringResource(sharedR.string.sync_stop_backup_confirm_dialog_delete_explanation),
         buttonOption1Text = stringResource(sharedR.string.sync_stop_backup_confirm_dialog_move_cloud_drive),
         buttonOption2Text = stringResource(sharedR.string.sync_stop_backup_confirm_dialog_delete_permanently),
         cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
@@ -79,9 +80,3 @@ private fun StopBackupConfirmationDialogBodyPreview() {
 
 internal const val STOP_BACKUP_CONFIRMATION_DIALOG_BODY_TEST_TAG =
     "stop_backup_confirmation_dialog:body"
-internal const val STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_ROW_TEST_TAG =
-    "stop_backup_confirmation_dialog:move_option_row"
-internal const val STOP_BACKUP_CONFIRMATION_DIALOG_DELETE_OPTION_ROW_TEST_TAG =
-    "stop_backup_confirmation_dialog:delete_option_row"
-internal const val STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_SELECT_DESTINATION_TEST_TAG =
-    "stop_backup_confirmation_dialog:move_option_select_destination"

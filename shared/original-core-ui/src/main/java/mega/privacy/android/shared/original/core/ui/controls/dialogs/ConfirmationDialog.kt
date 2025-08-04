@@ -250,12 +250,14 @@ fun ConfirmationDialog(
     onOption2: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    text3: String? = null,
     onCancel: () -> Unit = onDismiss,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
 ) = BaseMegaAlertDialog(
     text1 = text1,
     text2 = text2,
+    text3 = text3,
     buttons = {
         ButtonsColumn {
             DialogEndButton(
@@ -275,7 +277,11 @@ fun ConfirmationDialog(
             )
         }
     },
-    onDismiss, modifier, title, dismissOnClickOutside, dismissOnBackPress
+    onDismiss = onDismiss,
+    modifier = modifier,
+    title = title,
+    dismissOnClickOutside = dismissOnClickOutside,
+    dismissOnBackPress = dismissOnBackPress
 )
 
 /**

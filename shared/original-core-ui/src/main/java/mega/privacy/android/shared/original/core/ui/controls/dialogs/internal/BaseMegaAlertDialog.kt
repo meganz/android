@@ -131,6 +131,7 @@ internal fun BaseMegaAlertDialog(
     buttons: @Composable (() -> Unit),
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    text3: String? = null,
     title: String? = null,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
@@ -144,15 +145,28 @@ internal fun BaseMegaAlertDialog(
             Text(
                 text = text1,
                 style = MaterialTheme.typography.subtitle1,
-                color = DSTokens.colors.text.primary,
-                modifier = Modifier.padding(vertical = 8.dp).testTag(CONTENT_TAG),
+                color = DSTokens.colors.text.secondary,
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .testTag(CONTENT_TAG),
             )
             Text(
                 text = text2,
                 style = MaterialTheme.typography.subtitle1,
                 color = DSTokens.colors.text.secondary,
-                modifier = Modifier.padding(vertical = 8.dp).testTag(CONTENT_EXTRA_TAG),
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .testTag(CONTENT_EXTRA_TAG),
             )
+            if (text3 != null) {
+                Text(
+                    text = text3,
+                    style = MaterialTheme.typography.subtitle1,
+                    color = DSTokens.colors.text.secondary,
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                )
+            }
         }
     },
     buttons = buttons,

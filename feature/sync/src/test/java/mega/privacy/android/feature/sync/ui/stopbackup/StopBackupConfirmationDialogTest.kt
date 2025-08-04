@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.ui.stopbackup
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -39,13 +40,15 @@ class StopBackupConfirmationDialogTest {
             .assertIsDisplayed()
         composeRule.onNodeWithText(composeRule.activity.getString(sharedR.string.sync_stop_backup_confirm_dialog_text))
             .assertIsDisplayed()
+        composeRule.onNodeWithText(composeRule.activity.getString(sharedR.string.sync_stop_backup_confirm_dialog_move_explanation))
+            .assertIsDisplayed()
         composeRule.onNodeWithText(composeRule.activity.getString(sharedR.string.sync_stop_backup_confirm_dialog_delete_explanation))
             .assertIsDisplayed()
         composeRule.onNodeWithText(composeRule.activity.getString(sharedR.string.sync_stop_backup_confirm_dialog_move_cloud_drive))
-            .assertIsDisplayed()
+            .assertIsDisplayed().assertHasClickAction()
         composeRule.onNodeWithText(composeRule.activity.getString(sharedR.string.sync_stop_backup_confirm_dialog_delete_permanently))
-            .assertIsDisplayed()
+            .assertIsDisplayed().assertHasClickAction()
         composeRule.onNodeWithText(composeRule.activity.getString(sharedR.string.general_dialog_cancel_button))
-            .assertIsDisplayed()
+            .assertIsDisplayed().assertHasClickAction()
     }
 }
