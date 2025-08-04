@@ -1,31 +1,35 @@
-package mega.privacy.android.app.presentation.movenode.mapper
+package mega.privacy.android.core.nodecomponents.mapper.message
 
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.R
-import mega.privacy.android.domain.entity.node.MoveRequestResult.GeneralMovement
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
-class MoveRequestMessageMapperTest {
+class NodeMoveRequestMessageMapperTest {
     private val mContext: Context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val generalMovementMessageMapper: MoveRequestMessageMapper =
-        MoveRequestMessageMapper(mContext)
+    private val generalMovementMessageMapper: NodeMoveRequestMessageMapper =
+        NodeMoveRequestMessageMapper(mContext)
 
     @Test(expected = RuntimeException::class)
     fun `test that getResultText should throw an exception if move request data is 0`() {
-        generalMovementMessageMapper(GeneralMovement(count = 0, errorCount = 0))
+        generalMovementMessageMapper(MoveRequestResult.GeneralMovement(count = 0, errorCount = 0))
     }
 
     @Test
     fun `test that getResultText should return correct message when there is only 1 move request and is successful `() {
-        val underTest = generalMovementMessageMapper(GeneralMovement(count = 1, errorCount = 0))
+        val underTest = generalMovementMessageMapper(
+            MoveRequestResult.GeneralMovement(
+                count = 1,
+                errorCount = 0
+            )
+        )
         val expected =
             mContext.resources.getQuantityString(R.plurals.general_move_node_snackbar_success, 1, 1)
 
@@ -36,7 +40,12 @@ class MoveRequestMessageMapperTest {
     fun `test that getResultText should return correct message when more than 1 move request and all are successful`() {
         val mockMoveCount = Random.nextInt(2, 10)
         val underTest =
-            generalMovementMessageMapper(GeneralMovement(count = mockMoveCount, errorCount = 0))
+            generalMovementMessageMapper(
+                MoveRequestResult.GeneralMovement(
+                    count = mockMoveCount,
+                    errorCount = 0
+                )
+            )
         val expected = mContext.resources.getQuantityString(
             R.plurals.general_move_node_snackbar_success,
             mockMoveCount,
@@ -49,7 +58,12 @@ class MoveRequestMessageMapperTest {
     @Test
     fun `test that when there is only 1 move request and failed should return correct message`() {
         val underTest =
-            generalMovementMessageMapper(GeneralMovement(count = 1, errorCount = 1))
+            generalMovementMessageMapper(
+                MoveRequestResult.GeneralMovement(
+                    count = 1,
+                    errorCount = 1
+                )
+            )
         val expected =
             mContext.resources.getQuantityString(R.plurals.general_move_node_snackbar_fail, 1, 1)
 
@@ -61,7 +75,7 @@ class MoveRequestMessageMapperTest {
         val mockMoveCount = Random.nextInt(2, 10)
         val underTest =
             generalMovementMessageMapper(
-                GeneralMovement(
+                MoveRequestResult.GeneralMovement(
                     count = mockMoveCount,
                     errorCount = mockMoveCount
                 )
@@ -78,7 +92,12 @@ class MoveRequestMessageMapperTest {
     @Test
     fun `test that when there are 1 move success and 1 move failed should return correct message`() {
         val underTest =
-            generalMovementMessageMapper(GeneralMovement(count = 2, errorCount = 1))
+            generalMovementMessageMapper(
+                MoveRequestResult.GeneralMovement(
+                    count = 2,
+                    errorCount = 1
+                )
+            )
         val expected = "${
             mContext.resources.getQuantityString(
                 R.plurals.general_move_node_snackbar_concat_success,
@@ -102,7 +121,7 @@ class MoveRequestMessageMapperTest {
         val mockErrorCount = mockMoveCount - 1
         val underTest =
             generalMovementMessageMapper(
-                GeneralMovement(
+                MoveRequestResult.GeneralMovement(
                     count = mockMoveCount,
                     errorCount = mockErrorCount
                 )
@@ -128,7 +147,12 @@ class MoveRequestMessageMapperTest {
     fun `test that getResultText should return correct message when there are more than 1 move success and 1 move failed`() {
         val mockMoveCount = Random.nextInt(2, 10)
         val underTest =
-            generalMovementMessageMapper(GeneralMovement(count = mockMoveCount, errorCount = 1))
+            generalMovementMessageMapper(
+                MoveRequestResult.GeneralMovement(
+                    count = mockMoveCount,
+                    errorCount = 1
+                )
+            )
         val expected = "${
             mContext.resources.getQuantityString(
                 R.plurals.general_move_node_snackbar_concat_success,
@@ -152,7 +176,7 @@ class MoveRequestMessageMapperTest {
         val mockErrorCount = mockMoveCount - 3
         val underTest =
             generalMovementMessageMapper(
-                GeneralMovement(
+                MoveRequestResult.GeneralMovement(
                     count = mockMoveCount,
                     errorCount = mockErrorCount
                 )

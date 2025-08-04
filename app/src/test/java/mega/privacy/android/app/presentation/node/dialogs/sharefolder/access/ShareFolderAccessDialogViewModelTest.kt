@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -20,13 +20,13 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ShareFolderAccessDialogViewModelTest {
     private val sharedFolderUseCase: ShareFolderUseCase = mock()
-    private val moveRequestMessageMapper: MoveRequestMessageMapper = mock()
+    private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper = mock()
     private val snackBarHandler: SnackBarHandler = mock()
     private val applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val underTest = ShareFolderAccessDialogViewModel(
         sharedFolderUseCase = sharedFolderUseCase,
-        moveRequestMessageMapper = moveRequestMessageMapper,
+        nodeMoveRequestMessageMapper = nodeMoveRequestMessageMapper,
         snackBarHandler = snackBarHandler,
         applicationScope = applicationScope
     )
@@ -53,7 +53,7 @@ class ShareFolderAccessDialogViewModelTest {
             ).thenReturn(
                 shareMovement
             )
-            whenever(moveRequestMessageMapper(shareMovement)).thenReturn("Any message")
+            whenever(nodeMoveRequestMessageMapper(shareMovement)).thenReturn("Any message")
 
             underTest.shareFolder(
                 handles = handles,
@@ -66,7 +66,7 @@ class ShareFolderAccessDialogViewModelTest {
                 contactData = contactData,
                 accessPermission = AccessPermission.READ
             )
-            verify(moveRequestMessageMapper).invoke(shareMovement)
+            verify(nodeMoveRequestMessageMapper).invoke(shareMovement)
             verify(snackBarHandler).postSnackbarMessage("Any message")
         }
 

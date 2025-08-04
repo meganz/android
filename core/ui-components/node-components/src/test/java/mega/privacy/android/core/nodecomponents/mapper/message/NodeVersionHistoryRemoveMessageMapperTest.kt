@@ -1,20 +1,20 @@
-package mega.privacy.android.app.presentation.versions.mapper
+package mega.privacy.android.core.nodecomponents.mapper.message
 
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.R
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
-class VersionHistoryRemoveMessageMapperTestToolbarMenuItem {
+class NodeVersionHistoryRemoveMessageMapperTest {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val mapper = VersionHistoryRemoveMessageMapper(context)
+    private val mapper = NodeVersionHistoryRemoveMessageMapper(context)
 
     @Test
     fun `test that message shown is as expected when version not deleted exception is thrown`() {

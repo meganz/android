@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -26,7 +26,7 @@ import org.mockito.kotlin.whenever
 class MoveToRubbishOrDeleteNodeDialogViewModelTest {
     private val deleteNodesUseCase: DeleteNodesUseCase = mock()
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase = mock()
-    private val moveRequestMessageMapper: MoveRequestMessageMapper = mock()
+    private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper = mock()
     private val snackBarHandler: SnackBarHandler = mock()
     private val applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -38,7 +38,7 @@ class MoveToRubbishOrDeleteNodeDialogViewModelTest {
         applicationScope = applicationScope,
         deleteNodesUseCase = deleteNodesUseCase,
         moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
-        moveRequestMessageMapper = moveRequestMessageMapper,
+        nodeMoveRequestMessageMapper = nodeMoveRequestMessageMapper,
         snackBarHandler = snackBarHandler
     )
 
@@ -48,7 +48,7 @@ class MoveToRubbishOrDeleteNodeDialogViewModelTest {
             val moveToRubbishNode = MoveRequestResult.RubbishMovement(2, 1, handles[0])
 
             whenever(moveNodesToRubbishUseCase(handles)).thenReturn(moveToRubbishNode)
-            whenever(moveRequestMessageMapper(moveToRubbishNode)).thenReturn("Some value")
+            whenever(nodeMoveRequestMessageMapper(moveToRubbishNode)).thenReturn("Some value")
 
             underTest.moveNodesToRubbishBin(handles)
 
@@ -65,7 +65,7 @@ class MoveToRubbishOrDeleteNodeDialogViewModelTest {
             val deleteNode = MoveRequestResult.DeleteMovement(2, 1, handles)
 
             whenever(deleteNodesUseCase(nodeHandles)).thenReturn(deleteNode)
-            whenever(moveRequestMessageMapper(deleteNode)).thenReturn("Some value")
+            whenever(nodeMoveRequestMessageMapper(deleteNode)).thenReturn("Some value")
 
             underTest.deleteNodes(handles)
 
@@ -78,7 +78,7 @@ class MoveToRubbishOrDeleteNodeDialogViewModelTest {
         reset(
             deleteNodesUseCase,
             moveNodesToRubbishUseCase,
-            moveRequestMessageMapper,
+            nodeMoveRequestMessageMapper,
             snackBarHandler,
         )
     }

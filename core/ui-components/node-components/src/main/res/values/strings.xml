@@ -1,9 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingQuantity,MissingTranslation">
     <string name="upload_files">Upload files</string>
     <string name="upload_folder">Upload folder</string>
     <string name="menu_scan_document">Scan document</string>
     <string name="menu_new_folder">New folder</string>
     <string name="action_create_txt">New text file</string>
     <string name="menu_take_picture">Capture</string>
+
+    <!--Temporary and will be moved later to strings-shared-->
+    <string name="files_send_to_chat_error">Files send to chat error</string>
+    <plurals name="files_send_to_chat_success">
+        <item quantity="one">%d file sent to chat successfully</item>
+        <item quantity="other">%d files sent to chat successfully</item>
+    </plurals>
+    <plurals name="hidden_nodes_result_message">
+        <item quantity="one">%d hidden node found</item>
+        <item quantity="other">%d hidden nodes found</item>
+    </plurals>
+    <string name="version_history_deleted_erroneously">Version history deleted erroneously</string>
+    <plurals name="versions_deleted_succesfully">
+        <item quantity="one">%d version deleted successfully</item>
+        <item quantity="other">%d versions deleted successfully</item>
+    </plurals>
+    <plurals name="versions_not_deleted">
+        <item quantity="one">%d version not deleted</item>
+        <item quantity="other">%d versions not deleted</item>
+    </plurals>
+    <string name="general_text_error">General text error</string>
+    <string name="version_history_deleted">Version history deleted</string>
+    <string name="context_correctly_moved_to_rubbish">Context correctly moved to rubbish</string>
+    <string name="context_no_moved">Context no moved</string>
+    <string name="file_removed_offline">File removed offline</string>
+
+    <!-- MoveRequestMessageMapper plural resources -->
+    <plurals name="general_move_node_snackbar_fail">
+        <item quantity="one">%d item failed to move</item>
+        <item quantity="other">%d items failed to move</item>
+    </plurals>
+    <plurals name="general_move_node_snackbar_success">
+        <item quantity="one">%d item moved successfully</item>
+        <item quantity="other">%d items moved successfully</item>
+    </plurals>
+    <plurals name="general_move_node_snackbar_concat_success">
+        <item quantity="one">%d item moved successfully</item>
+        <item quantity="other">%d items moved successfully</item>
+    </plurals>
+    <plurals name="general_move_node_snackbar_concat_fail">
+        <item quantity="one">%d item failed to move</item>
+        <item quantity="other">%d items failed to move</item>
+    </plurals>
+    <plurals name="number_correctly_moved_to_rubbish">
+        <item quantity="one">%d item moved to rubbish</item>
+        <item quantity="other">%d items moved to rubbish</item>
+    </plurals>
+    <plurals name="number_incorrectly_moved_to_rubbish">
+        <item quantity="one">%d item failed to move to rubbish</item>
+        <item quantity="other">%d items failed to move to rubbish</item>
+    </plurals>
+    <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
+        <item quantity="one">%d item moved to rubbish, 1 item failed</item>
+        <item quantity="other">%d items moved to rubbish, 1 item failed</item>
+    </plurals>
+    <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 item moved to rubbish, %d items failed</item>
+        <item quantity="other">1 item moved to rubbish, %d items failed</item>
+    </plurals>
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="one">%d item removed from rubbish</item>
+        <item quantity="other">%d items removed from rubbish</item>
+    </plurals>
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="one">%d item failed to remove from rubbish</item>
+        <item quantity="other">%d items failed to remove from rubbish</item>
+    </plurals>
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="one">%d item removed from rubbish</item>
+        <item quantity="other">%d items removed from rubbish</item>
+    </plurals>
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="one">%d item failed to remove from rubbish</item>
+        <item quantity="other">%d items failed to remove from rubbish</item>
+    </plurals>
+    <plurals name="general_copy_snackbar_fail">
+        <item quantity="one">%d item failed to copy</item>
+        <item quantity="other">%d items failed to copy</item>
+    </plurals>
+    <plurals name="general_copy_snackbar_success">
+        <item quantity="one">%d item copied successfully</item>
+        <item quantity="other">%d items copied successfully</item>
+    </plurals>
+    <plurals name="general_copy_snackbar_concat_success">
+        <item quantity="one">%d item copied successfully</item>
+        <item quantity="other">%d items copied successfully</item>
+    </plurals>
+    <plurals name="general_copy_snackbar_concat_fail">
+        <item quantity="one">%d item failed to copy</item>
+        <item quantity="other">%d items failed to copy</item>
+    </plurals>
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
+        <item quantity="one">%d folder failed to share</item>
+        <item quantity="other">%d folders failed to share</item>
+    </plurals>
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
+        <item quantity="one">%d folder shared successfully</item>
+        <item quantity="other">%d folders shared successfully</item>
+    </plurals>
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
+        <item quantity="one">%d folder failed to share</item>
+        <item quantity="other">%d folders failed to share</item>
+    </plurals>
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="one">%d item failed to restore from rubbish</item>
+        <item quantity="other">%d items failed to restore from rubbish</item>
+    </plurals>
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="one">%d item restored from rubbish</item>
+        <item quantity="other">%d items restored from rubbish</item>
+    </plurals>
 </resources>

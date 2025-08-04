@@ -34,7 +34,7 @@ import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -102,7 +102,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper,
     private val checkUri: CheckFileUriUseCase,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
-    private val moveRequestMessageMapper: MoveRequestMessageMapper,
+    private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
@@ -841,7 +841,7 @@ class ImagePreviewViewModel @Inject constructor(
             runCatching {
                 moveNodesToRubbishUseCase(listOf(nodeId.longValue))
             }.onSuccess { data ->
-                setResultMessage(moveRequestMessageMapper(data))
+                setResultMessage(nodeMoveRequestMessageMapper(data))
             }.onFailure {
                 Timber.e(it)
                 setCopyMoveException(it)

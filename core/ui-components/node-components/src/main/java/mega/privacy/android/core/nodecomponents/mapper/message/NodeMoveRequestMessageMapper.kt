@@ -1,8 +1,8 @@
-package mega.privacy.android.app.presentation.movenode.mapper
+package mega.privacy.android.core.nodecomponents.mapper.message
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.R
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import javax.inject.Inject
 
@@ -10,7 +10,7 @@ import javax.inject.Inject
  * Mapper implementation for General Movement Message node action
  * @param context as Application Context provided by dependency graph
  */
-class MoveRequestMessageMapper @Inject constructor(
+class NodeMoveRequestMessageMapper @Inject constructor(
     @ApplicationContext val context: Context,
 ) {
     /**

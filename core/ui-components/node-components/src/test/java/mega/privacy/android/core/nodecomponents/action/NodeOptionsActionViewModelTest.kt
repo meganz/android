@@ -1,7 +1,6 @@
-package mega.privacy.android.app.presentation.node
+package mega.privacy.android.core.nodecomponents.action
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
@@ -11,12 +10,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
-import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -40,6 +39,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
+import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -54,8 +54,6 @@ import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
-import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
-import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -77,8 +75,8 @@ import kotlin.time.Duration
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class NodeActionsViewModelTest {
-    private lateinit var viewModel: NodeActionsViewModel
+class NodeOptionsActionViewModelTest {
+    private lateinit var viewModel: NodeOptionsActionViewModel
 
     private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
     private val moveNodesUseCase = mock<MoveNodesUseCase>()
@@ -86,14 +84,15 @@ class NodeActionsViewModelTest {
     private val setCopyLatestTargetPathUseCase = mock<SetCopyLatestTargetPathUseCase>()
     private val setMoveLatestTargetPathUseCase = mock<SetMoveLatestTargetPathUseCase>()
     private val deleteNodeVersionsUseCase = mock<DeleteNodeVersionsUseCase>()
-    private val nodeMoveRequestMessageMapper = mock<NodeMoveRequestMessageMapper>()
+    private val moveRequestMessageMapper = mock<NodeMoveRequestMessageMapper>()
     private val nodeVersionHistoryRemoveMessageMapper =
         mock<NodeVersionHistoryRemoveMessageMapper>()
-    private val snackBarHandler = mock<SnackBarHandler>()
+
+    // private val snackBarHandler = mock<SnackBarHandler>()
     private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase = mock()
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
     private val nodeSendToChatMessageMapper: NodeSendToChatMessageMapper = mock()
-    private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper = mock()
+    private val nodeHandlesToJsonMapper: NodeHandlesToJsonMapper = mock()
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase = mock()
@@ -106,23 +105,23 @@ class NodeActionsViewModelTest {
     }
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
-    private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
+    private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
 
     private fun initViewModel() {
-        viewModel = NodeActionsViewModel(
+        viewModel = NodeOptionsActionViewModel(
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
-            nodeMoveRequestMessageMapper = nodeMoveRequestMessageMapper,
+            moveRequestMessageMapper = moveRequestMessageMapper,
             versionHistoryRemoveMessageMapper = nodeVersionHistoryRemoveMessageMapper,
-            snackBarHandler = snackBarHandler,
+            // snackBarHandler = snackBarHandler,
             checkBackupNodeTypeUseCase = checkBackupNodeTypeUseCase,
             attachMultipleNodesUseCase = attachMultipleNodesUseCase,
-            chatRequestMessageMapper = nodeSendToChatMessageMapper,
-            listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
+            nodeSendToChatMessageMapper = nodeSendToChatMessageMapper,
+            nodeHandlesToJsonMapper = nodeHandlesToJsonMapper,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
@@ -132,7 +131,7 @@ class NodeActionsViewModelTest {
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
-            fileTypeInfoMapper = fileTypeInfoMapper
+            getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase
         )
     }
 
@@ -143,15 +142,15 @@ class NodeActionsViewModelTest {
             initViewModel()
             viewModel.moveNodes(emptyMap())
             verify(moveNodesUseCase).invoke(emptyMap())
-            viewModel.state.test {
-                val state = awaitItem()
-                Truth.assertThat(state.showForeignNodeDialog)
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.showForeignNodeDialog)
                     .isInstanceOf(StateEvent.Triggered::class.java)
             }
         }
 
     @Test
-    fun `test that node name collision results are updated properly in state`() = runTest {
+    fun `test that node name collision results are updated properly in uiState`() = runTest {
         whenever(
             checkNodesNameCollisionUseCase(
                 nodes = listOf(element = 1).associate { Pair(1, sampleNode.id.longValue) },
@@ -170,16 +169,16 @@ class NodeActionsViewModelTest {
             targetNode = sampleNode.id.longValue,
             type = NodeNameCollisionType.MOVE
         )
-        viewModel.state.test {
-            val stateOne = awaitItem()
-            Truth.assertThat(stateOne.nodeNameCollisionsResult).isInstanceOf(
+        viewModel.uiState.test {
+            val uiStateOne = awaitItem()
+            assertThat(uiStateOne.nodeNameCollisionsResult).isInstanceOf(
                 StateEventWithContentTriggered::class.java
             )
         }
         viewModel.markHandleNodeNameCollisionResult()
-        viewModel.state.test {
-            val stateTwo = awaitItem()
-            Truth.assertThat(stateTwo.nodeNameCollisionsResult).isInstanceOf(
+        viewModel.uiState.test {
+            val uiStateTwo = awaitItem()
+            assertThat(uiStateTwo.nodeNameCollisionsResult).isInstanceOf(
                 StateEventWithContentConsumed::class.java
             )
         }
@@ -203,7 +202,7 @@ class NodeActionsViewModelTest {
             viewModel.deleteVersionHistory(sampleNode.id.longValue)
             verify(deleteNodeVersionsUseCase).invoke(sampleNode.id)
             verify(nodeVersionHistoryRemoveMessageMapper).invoke(anyOrNull())
-            verify(snackBarHandler).postSnackbarMessage("")
+            //verify(snackBarHandler).postSnackbarMessage("")
         }
 
     @Test
@@ -213,9 +212,9 @@ class NodeActionsViewModelTest {
             initViewModel()
             viewModel.copyNodes(emptyMap())
             verify(copyNodesUseCase).invoke(emptyMap())
-            viewModel.state.test {
-                val state = awaitItem()
-                Truth.assertThat(state.showForeignNodeDialog)
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.showForeignNodeDialog)
                     .isInstanceOf(StateEvent.Triggered::class.java)
             }
         }
@@ -237,10 +236,10 @@ class NodeActionsViewModelTest {
                 listOf("sample@mega.co.nz", "test@mega.co.nz"),
                 listOf(1234L, 346L)
             )
-            viewModel.state.test {
-                val state = awaitItem()
-                Truth.assertThat(state.contactsData)
-                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.contactsData)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
             }
         }
 
@@ -274,7 +273,7 @@ class NodeActionsViewModelTest {
                 listOf(1234L)
             )
             verify(nodeSendToChatMessageMapper).invoke(request)
-            verify(snackBarHandler).postSnackbarMessage("Some value")
+            //verify(snackBarHandler).postSnackbarMessage("Some value")
         }
 
     @ParameterizedTest(name = "File type is {0}")
@@ -317,7 +316,7 @@ class NodeActionsViewModelTest {
                     verify(getNodePreviewFileUseCase).invoke(node)
                 }
             }
-            Truth.assertThat(actual).isInstanceOf(expected::class.java)
+            assertThat(actual).isInstanceOf(expected::class.java)
         }
 
     @Test
@@ -334,7 +333,7 @@ class NodeActionsViewModelTest {
         whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
         initViewModel()
         val result = viewModel.isOnboarding()
-        Truth.assertThat(result).isTrue()
+        assertThat(result).isTrue()
     }
 
     @Test
@@ -351,7 +350,7 @@ class NodeActionsViewModelTest {
         whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
         initViewModel()
         val result = viewModel.isOnboarding()
-        Truth.assertThat(result).isFalse()
+        assertThat(result).isFalse()
     }
 
     @Test
@@ -365,7 +364,7 @@ class NodeActionsViewModelTest {
         whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
         initViewModel()
         val result = viewModel.isOnboarding()
-        Truth.assertThat(result).isFalse()
+        assertThat(result).isFalse()
     }
 
     @Test
@@ -376,7 +375,7 @@ class NodeActionsViewModelTest {
         whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
         initViewModel()
         val result = viewModel.isOnboarding()
-        Truth.assertThat(result).isFalse()
+        assertThat(result).isFalse()
     }
 
     private fun provideNodeType() = Stream.of(
@@ -459,9 +458,8 @@ class NodeActionsViewModelTest {
     fun `test getTypeInfo returns the type from the mapper`() = runTest {
         val file = File("/folder/foo.txt")
         val expected = mock<RawFileTypeInfo>()
-        whenever(fileTypeInfoMapper(file.name)) doReturn expected
+        whenever(getFileTypeInfoByNameUseCase(file.name)) doReturn expected
         val actual = viewModel.getTypeInfo(file)
         assertThat(actual).isEqualTo(expected)
     }
-}
-
+} 

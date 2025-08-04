@@ -79,7 +79,7 @@ import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
@@ -148,7 +148,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Move request message mapper
      */
     @Inject
-    lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
+    lateinit var nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper
 
     /**
      * Navigator
@@ -987,7 +987,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             val data = moveRequestResult.getOrThrow()
             showSnackbar(
                 Constants.SNACKBAR_TYPE,
-                moveRequestMessageMapper(data),
+                nodeMoveRequestMessageMapper(data),
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
         } else {

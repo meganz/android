@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.app.activities.contract.HiddenNodeOnboardingActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
@@ -25,7 +26,6 @@ import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMe
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.android.core.ui.model.menu.MenuAction
 
 /**
  * Node bottom sheet action handler

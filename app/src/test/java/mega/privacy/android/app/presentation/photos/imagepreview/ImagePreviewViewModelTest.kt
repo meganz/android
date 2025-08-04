@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNo
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
@@ -105,7 +105,7 @@ class ImagePreviewViewModelTest {
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper = mock()
     private val checkUri: CheckFileUriUseCase = mock()
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase = mock()
-    private val moveRequestMessageMapper: MoveRequestMessageMapper = mock()
+    private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase = mock()
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase =
@@ -146,7 +146,7 @@ class ImagePreviewViewModelTest {
         removePublicLinkResultMapper,
         checkUri,
         moveNodesToRubbishUseCase,
-        moveRequestMessageMapper,
+        nodeMoveRequestMessageMapper,
         getFeatureFlagValueUseCase,
         getPublicChildNodeFromIdUseCase,
         getPublicNodeFromSerializedDataUseCase,
@@ -184,7 +184,7 @@ class ImagePreviewViewModelTest {
             removePublicLinkResultMapper = removePublicLinkResultMapper,
             checkUri = checkUri,
             moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
-            moveRequestMessageMapper = moveRequestMessageMapper,
+            nodeMoveRequestMessageMapper = nodeMoveRequestMessageMapper,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPublicChildNodeFromIdUseCase = getPublicChildNodeFromIdUseCase,
             getPublicNodeFromSerializedDataUseCase = getPublicNodeFromSerializedDataUseCase,

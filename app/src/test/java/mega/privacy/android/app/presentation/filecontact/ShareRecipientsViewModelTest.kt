@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactInfo
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -41,7 +41,7 @@ class ShareRecipientsViewModelTest {
 
     private val monitorShareRecipientsUseCase = mock<MonitorShareRecipientsUseCase>()
     private val shareFolderUseCase = mock<ShareFolderUseCase>()
-    private val shareFolderRequestMapper = mock<MoveRequestMessageMapper>()
+    private val shareFolderRequestMapper = mock<NodeMoveRequestMessageMapper>()
     private val getAllowedSharingPermissionsUseCase = mock<GetAllowedSharingPermissionsUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
 
@@ -71,7 +71,7 @@ class ShareRecipientsViewModelTest {
             monitorShareRecipientsUseCase = monitorShareRecipientsUseCase,
             shareFolderUseCase = shareFolderUseCase,
             removeShareResultMapper = shareResultMapper,
-            moveRequestMessageMapper = shareFolderRequestMapper,
+            nodeMoveRequestMessageMapper = shareFolderRequestMapper,
             getAllowedSharingPermissionsUseCase = getAllowedSharingPermissionsUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
         )

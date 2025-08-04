@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node
+package mega.privacy.android.core.nodecomponents.action
 
 import android.content.Intent
 import androidx.lifecycle.ViewModel
@@ -12,15 +12,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
-import mega.privacy.android.app.presentation.node.model.NodeActionState
-import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.nodecomponents.entity.NodeActionState
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
-import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -41,6 +40,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
+import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -55,7 +55,6 @@ import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
-import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -70,31 +69,32 @@ import javax.inject.Inject
  * @property setCopyLatestTargetPathUseCase
  * @property deleteNodeVersionsUseCase
  * @property snackBarHandler
- * @property nodeMoveRequestMessageMapper
+ * @property moveRequestMessageMapper
  * @property versionHistoryRemoveMessageMapper
  * @property checkBackupNodeTypeUseCase
  * @property attachMultipleNodesUseCase
- * @property chatRequestMessageMapper
- * @property listToStringWithDelimitersMapper
+ * @property nodeSendToChatMessageMapper
+ * @property nodeHandlesToJsonMapper
  * @property getNodeContentUriUseCase
  * @property nodeContentUriIntentMapper
  * @property applicationScope
  */
 @HiltViewModel
-class NodeActionsViewModel @Inject constructor(
+class NodeOptionsActionViewModel @Inject constructor(
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val moveNodesUseCase: MoveNodesUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
-    private val snackBarHandler: SnackBarHandler,
-    private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper,
+    // Todo handle snackbar
+    //private val snackBarHandler: SnackBarHandler,
+    private val moveRequestMessageMapper: NodeMoveRequestMessageMapper,
     private val versionHistoryRemoveMessageMapper: NodeVersionHistoryRemoveMessageMapper,
     private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase,
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase,
-    private val chatRequestMessageMapper: NodeSendToChatMessageMapper,
-    private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
+    private val nodeSendToChatMessageMapper: NodeSendToChatMessageMapper,
+    private val nodeHandlesToJsonMapper: NodeHandlesToJsonMapper,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
@@ -103,16 +103,12 @@ class NodeActionsViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
-    private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(NodeActionState())
-
-    /**
-     * public UI State
-     */
-    val state: StateFlow<NodeActionState> = _state
+    internal val uiState: StateFlow<NodeActionState>
+        field = MutableStateFlow(NodeActionState())
 
     /**
      * Check move nodes name collision
@@ -132,7 +128,7 @@ class NodeActionsViewModel @Inject constructor(
                     type
                 )
             }.onSuccess { result ->
-                _state.update { it.copy(nodeNameCollisionsResult = triggered(result)) }
+                uiState.update { it.copy(nodeNameCollisionsResult = triggered(result)) }
             }.onFailure {
                 Timber.e(it)
             }
@@ -150,7 +146,8 @@ class NodeActionsViewModel @Inject constructor(
                 moveNodesUseCase(nodes)
             }.onSuccess {
                 setMoveTargetPath(nodes.values.first())
-                snackBarHandler.postSnackbarMessage(nodeMoveRequestMessageMapper(it))
+                // Todo handle snackbar
+                // snackBarHandler.postSnackbarMessage(moveRequestMessageMapper(it))
             }.onFailure {
                 manageCopyMoveError(it)
                 Timber.e(it)
@@ -169,7 +166,8 @@ class NodeActionsViewModel @Inject constructor(
                 copyNodesUseCase(nodes)
             }.onSuccess {
                 setCopyTargetPath(nodes.values.first())
-                snackBarHandler.postSnackbarMessage(nodeMoveRequestMessageMapper(it))
+                // Todo handle snackbar
+                // snackBarHandler.postSnackbarMessage(moveRequestMessageMapper(it))
             }.onFailure {
                 manageCopyMoveError(it)
                 Timber.e(it)
@@ -178,12 +176,12 @@ class NodeActionsViewModel @Inject constructor(
     }
 
     private fun manageCopyMoveError(error: Throwable?) = when (error) {
-        is ForeignNodeException -> _state.update { it.copy(showForeignNodeDialog = triggered) }
-        is QuotaExceededMegaException -> _state.update {
+        is ForeignNodeException -> uiState.update { it.copy(showForeignNodeDialog = triggered) }
+        is QuotaExceededMegaException -> uiState.update {
             it.copy(showQuotaDialog = triggered(true))
         }
 
-        is NotEnoughQuotaMegaException -> _state.update {
+        is NotEnoughQuotaMegaException -> uiState.update {
             it.copy(showQuotaDialog = triggered(false))
         }
 
@@ -214,7 +212,7 @@ class NodeActionsViewModel @Inject constructor(
      * Mark handle node name collision result
      */
     fun markHandleNodeNameCollisionResult() {
-        _state.update { it.copy(nodeNameCollisionsResult = consumed()) }
+        uiState.update { it.copy(nodeNameCollisionsResult = consumed()) }
     }
 
     /**
@@ -225,7 +223,8 @@ class NodeActionsViewModel @Inject constructor(
             deleteNodeVersionsUseCase(NodeId(it))
         }
         versionHistoryRemoveMessageMapper(result.exceptionOrNull()).let {
-            snackBarHandler.postSnackbarMessage(it)
+            // Todo handle snackbar
+            // snackBarHandler.postSnackbarMessage(it)
         }
     }
 
@@ -233,14 +232,14 @@ class NodeActionsViewModel @Inject constructor(
      * Mark foreign node dialog shown
      */
     fun markForeignNodeDialogShown() {
-        _state.update { it.copy(showForeignNodeDialog = consumed) }
+        uiState.update { it.copy(showForeignNodeDialog = consumed) }
     }
 
     /**
      * Mark quota dialog shown
      */
     fun markQuotaDialogShown() {
-        _state.update { it.copy(showQuotaDialog = consumed()) }
+        uiState.update { it.copy(showQuotaDialog = consumed()) }
     }
 
     /**
@@ -248,7 +247,7 @@ class NodeActionsViewModel @Inject constructor(
      */
     fun contactSelectedForShareFolder(contactsData: List<String>, nodeHandle: List<Long>) {
         viewModelScope.launch {
-            val isFromBackups = state.value.selectedNodes.find {
+            val isFromBackups = uiState.value.selectedNodes.find {
                 runCatching {
                     checkBackupNodeTypeUseCase(it) != BackupNodeType.NonBackupNode
                 }.getOrElse {
@@ -257,9 +256,9 @@ class NodeActionsViewModel @Inject constructor(
                 }
             }
             runCatching {
-                listToStringWithDelimitersMapper(nodeHandle)
+                nodeHandlesToJsonMapper(nodeHandle)
             }.onSuccess { handles ->
-                _state.update {
+                uiState.update {
                     it.copy(
                         contactsData = triggered(
                             Triple(
@@ -306,9 +305,10 @@ class NodeActionsViewModel @Inject constructor(
                         nodeIds = nodeIds,
                         chatIds = allChatIds
                     )
-                val message = chatRequestMessageMapper(attachNodeRequest)
+                val message = nodeSendToChatMessageMapper(attachNodeRequest)
                 message?.let {
-                    snackBarHandler.postSnackbarMessage(it)
+                    // Todo handle snackbar
+                    // snackBarHandler.postSnackbarMessage(it)
                 }
             }
         }
@@ -318,21 +318,21 @@ class NodeActionsViewModel @Inject constructor(
      * Contact selected for folder share
      */
     fun markShareFolderAccessDialogShown() {
-        _state.update {
+        uiState.update {
             it.copy(contactsData = consumed())
         }
     }
 
     /**
      * Download node
-     * Triggers TransferTriggerEvent.StartDownloadNode with parameter [TypedNode]
+     * Triggers TransferTriggerEvent.StartDownloadNode with parameter [mega.privacy.android.domain.entity.node.TypedNode]
      *
      * @param withStartMessage  Whether show start message or not.
      *                          It should be true only if the widget is not visible.
      */
     fun downloadNode(withStartMessage: Boolean) {
-        state.value.selectedNodes.let { nodes ->
-            _state.update {
+        uiState.value.selectedNodes.let { nodes ->
+            uiState.update {
                 it.copy(
                     downloadEvent = triggered(
                         TransferTriggerEvent.StartDownloadNode(
@@ -347,10 +347,10 @@ class NodeActionsViewModel @Inject constructor(
 
     /**
      * Download node for preview
-     * Triggers TransferTriggerEvent.StartDownloadForPreview with parameter [TypedFileNode]
+     * Triggers TransferTriggerEvent.StartDownloadForPreview with parameter [mega.privacy.android.domain.entity.node.TypedFileNode]
      */
     fun downloadNodeForPreview(fileNode: TypedFileNode) {
-        _state.update {
+        uiState.update {
             it.copy(
                 downloadEvent = triggered(
                     TransferTriggerEvent.StartDownloadForPreview(
@@ -368,21 +368,21 @@ class NodeActionsViewModel @Inject constructor(
     fun triggerDownloadEvent(
         event: TransferTriggerEvent,
     ) {
-        _state.update {
+        uiState.update {
             it.copy(downloadEvent = triggered(event))
         }
     }
 
     /**
      * Download node for offline
-     * Triggers TransferTriggerEvent.StartDownloadNode with parameter [TypedNode]
+     * Triggers TransferTriggerEvent.StartDownloadNode with parameter [mega.privacy.android.domain.entity.node.TypedNode]
      *
      * @param withStartMessage  Whether show start message or not.
      *                          It should be true only if the widget is not visible.
      */
     fun downloadNodeForOffline(withStartMessage: Boolean) {
-        state.value.selectedNodes.firstOrNull().let { node ->
-            _state.update {
+        uiState.value.selectedNodes.firstOrNull().let { node ->
+            uiState.update {
                 it.copy(
                     downloadEvent = triggered(
                         TransferTriggerEvent.StartDownloadForOffline(
@@ -397,11 +397,11 @@ class NodeActionsViewModel @Inject constructor(
 
     /**
      * Download node for preview
-     * Triggers TransferTriggerEvent.StartDownloadNode with parameter [TypedNode]
+     * Triggers TransferTriggerEvent.StartDownloadNode with parameter [mega.privacy.android.domain.entity.node.TypedNode]
      */
     fun downloadNodeForPreview(isOpenWith: Boolean) {
-        state.value.selectedNodes.firstOrNull()?.let { node ->
-            _state.update {
+        uiState.value.selectedNodes.firstOrNull()?.let { node ->
+            uiState.update {
                 it.copy(
                     downloadEvent = triggered(
                         TransferTriggerEvent.StartDownloadForPreview(
@@ -418,7 +418,7 @@ class NodeActionsViewModel @Inject constructor(
      * Mark download event consumed
      */
     fun markDownloadEventConsumed() {
-        _state.update {
+        uiState.update {
             it.copy(downloadEvent = consumed())
         }
     }
@@ -428,7 +428,7 @@ class NodeActionsViewModel @Inject constructor(
      * @param selectedNodes
      */
     fun updateSelectedNodes(selectedNodes: List<TypedNode>) {
-        _state.update {
+        uiState.update {
             it.copy(selectedNodes = selectedNodes)
         }
     }
@@ -437,7 +437,7 @@ class NodeActionsViewModel @Inject constructor(
      * Update select All
      */
     fun selectAllClicked() {
-        _state.update {
+        uiState.update {
             it.copy(selectAll = triggered)
         }
     }
@@ -446,7 +446,7 @@ class NodeActionsViewModel @Inject constructor(
      * Consume select All
      */
     fun selectAllConsumed() {
-        _state.update {
+        uiState.update {
             it.copy(selectAll = consumed)
         }
     }
@@ -455,7 +455,7 @@ class NodeActionsViewModel @Inject constructor(
      * Update clear All
      */
     fun clearAllClicked() {
-        _state.update {
+        uiState.update {
             it.copy(clearAll = triggered)
         }
     }
@@ -464,7 +464,7 @@ class NodeActionsViewModel @Inject constructor(
      * Consume clear All
      */
     fun clearAllConsumed() {
-        _state.update {
+        uiState.update {
             it.copy(clearAll = consumed)
         }
     }
@@ -473,7 +473,7 @@ class NodeActionsViewModel @Inject constructor(
      * Consumes the event of showing info.
      */
     fun onInfoToShowEventConsumed() {
-        _state.update { state -> state.copy(infoToShowEvent = consumed()) }
+        uiState.update { state -> state.copy(infoToShowEvent = consumed()) }
     }
 
     /**
@@ -488,7 +488,7 @@ class NodeActionsViewModel @Inject constructor(
 
         fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForNode
 
-        fileNode.type is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
+        fileNode.type is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.Companion.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
 
         fileNode.type is VideoFileTypeInfo || fileNode.type is AudioFileTypeInfo -> {
             FileNodeContent.AudioOrVideo(
@@ -531,7 +531,7 @@ class NodeActionsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 if (isOnboarded) {
-                    val selectedNodes = _state.value.selectedNodes
+                    val selectedNodes = uiState.value.selectedNodes
 
                     selectedNodes.forEach {
                         updateNodeSensitiveUseCase(
@@ -539,12 +539,12 @@ class NodeActionsViewModel @Inject constructor(
                             isSensitive = true,
                         )
                     }
-                    _state.update { state ->
+                    uiState.update { state ->
                         state.copy(
                             infoToShowEvent = triggered(
-                                InfoToShow.QuantityString(
-                                    stringId = R.plurals.hidden_nodes_result_message,
-                                    count = selectedNodes.size,
+                                LocalizedText.PluralsRes(
+                                    resId = R.plurals.hidden_nodes_result_message,
+                                    quantity = selectedNodes.size,
                                 )
                             )
                         )
@@ -557,9 +557,9 @@ class NodeActionsViewModel @Inject constructor(
     suspend fun isOnboarding(): Boolean {
         val accountType =
             monitorAccountDetailUseCase().first().levelDetail?.accountType
-        val isPaid = accountType?.isPaid ?: false
+        val isPaid = accountType?.isPaid == true
         val businessStatus =
-            if (isPaid && accountType?.isBusinessAccount == true) {
+            if (isPaid && accountType.isBusinessAccount == true) {
                 getBusinessStatusUseCase()
             } else null
         val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
@@ -569,5 +569,5 @@ class NodeActionsViewModel @Inject constructor(
     /**
      * return the file type of the given file
      */
-    fun getTypeInfo(file: File) = fileTypeInfoMapper(file.name)
+    fun getTypeInfo(file: File) = getFileTypeInfoByNameUseCase(file.name)
 }

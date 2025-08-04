@@ -57,7 +57,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
@@ -79,6 +78,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
@@ -156,7 +156,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
      * Move request message mapper
      */
     @Inject
-    lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
+    lateinit var nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper
 
     /**
      * File type icon mapper

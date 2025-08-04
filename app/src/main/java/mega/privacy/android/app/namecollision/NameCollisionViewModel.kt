@@ -24,7 +24,7 @@ import mega.privacy.android.app.namecollision.model.NameCollisionUiState
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -72,7 +72,7 @@ class NameCollisionViewModel @Inject constructor(
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
-    private val moveRequestMessageMapper: MoveRequestMessageMapper,
+    private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper,
     private val getNodeByFingerprintAndParentNodeUseCase: GetNodeByFingerprintAndParentNodeUseCase,
     private val moveCollidedNodeUseCase: MoveCollidedNodeUseCase,
     private val moveCollidedNodesUseCase: MoveCollidedNodesUseCase,
@@ -645,7 +645,7 @@ class NameCollisionViewModel @Inject constructor(
         if (moveToHandle != -1L)
             setMoveLatestPath(moveToHandle)
         actionResult.value = NameCollisionActionResult(
-            message = moveRequestMessageMapper(movementResult),
+            message = nodeMoveRequestMessageMapper(movementResult),
             shouldFinish = pendingCollisions.isEmpty()
         )
     }

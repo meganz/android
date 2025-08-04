@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactInfo
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.ResultCount
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -37,7 +37,7 @@ internal class ShareRecipientsViewModel @Inject constructor(
     private val monitorShareRecipientsUseCase: MonitorShareRecipientsUseCase,
     private val shareFolderUseCase: ShareFolderUseCase,
     private val removeShareResultMapper: RemoveShareResultMapper,
-    private val moveRequestMessageMapper: MoveRequestMessageMapper,
+    private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper,
     private val getAllowedSharingPermissionsUseCase: GetAllowedSharingPermissionsUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
 ) : ViewModel() {
@@ -173,7 +173,7 @@ internal class ShareRecipientsViewModel @Inject constructor(
                 state.updateToData {
                     it.copy(
                         sharingCompletedEvent = StateEventWithContentTriggered<String>(
-                            moveRequestMessageMapper(result)
+                            nodeMoveRequestMessageMapper(result)
                         ),
                         sharingInProgress = false,
                     )

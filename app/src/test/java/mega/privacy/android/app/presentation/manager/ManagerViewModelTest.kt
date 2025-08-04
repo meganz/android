@@ -36,7 +36,7 @@ import mega.privacy.android.app.presentation.documentscanner.model.DocumentScann
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
-import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
 import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -356,7 +356,7 @@ class ManagerViewModelTest {
     private val monitorChatListItemUpdates = MutableSharedFlow<ChatListItem>()
 
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase = mock()
-    private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper = mock()
+    private val nodeVersionHistoryRemoveMessageMapper: NodeVersionHistoryRemoveMessageMapper = mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
     private val legacyState = mock<LegacyPsaGlobalState>()
     private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
@@ -447,7 +447,7 @@ class ManagerViewModelTest {
             createFolderNodeUseCase = createFolderNodeUseCase,
             monitorChatListItemUpdates = { monitorChatListItemUpdates },
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
-            versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper,
+            nodeVersionHistoryRemoveMessageMapper = nodeVersionHistoryRemoveMessageMapper,
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
@@ -507,7 +507,7 @@ class ManagerViewModelTest {
             createFolderNodeUseCase,
             deleteNodeVersionsUseCase,
             getNoteToSelfChatUseCase,
-            versionHistoryRemoveMessageMapper,
+            nodeVersionHistoryRemoveMessageMapper,
             legacyState
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
@@ -1646,7 +1646,7 @@ class ManagerViewModelTest {
         whenever(deleteNodeVersionsUseCase.invoke(NodeId(nodeHandle))).thenReturn(Unit)
         underTest.deleteVersionHistory(nodeHandle)
         verify(deleteNodeVersionsUseCase).invoke(NodeId(nodeHandle))
-        verify(versionHistoryRemoveMessageMapper).invoke(anyOrNull())
+        verify(nodeVersionHistoryRemoveMessageMapper).invoke(anyOrNull())
     }
 
     @Test

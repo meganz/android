@@ -33,7 +33,7 @@ import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
-import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
 import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
@@ -275,7 +275,7 @@ class ManagerViewModel @Inject constructor(
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
-    private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper,
+    private val nodeVersionHistoryRemoveMessageMapper: NodeVersionHistoryRemoveMessageMapper,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val legacyState: LegacyPsaGlobalState,
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
@@ -1491,7 +1491,7 @@ class ManagerViewModel @Inject constructor(
         val result = runCatching {
             deleteNodeVersionsUseCase(NodeId(it))
         }
-        return versionHistoryRemoveMessageMapper(result.exceptionOrNull())
+        return nodeVersionHistoryRemoveMessageMapper(result.exceptionOrNull())
     }
 
     /**

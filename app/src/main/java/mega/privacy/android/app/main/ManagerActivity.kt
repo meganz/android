@@ -195,7 +195,7 @@ import mega.privacy.android.app.presentation.meeting.view.dialog.CallRecordingCo
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.NodeSourceTypeMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
@@ -435,7 +435,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
 
     @Inject
-    lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
+    lateinit var nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper
 
     @Inject
     lateinit var monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase
@@ -2250,7 +2250,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
             showSnackbar(
                 SNACKBAR_TYPE,
-                moveRequestMessageMapper(data),
+                nodeMoveRequestMessageMapper(data),
                 MEGACHAT_INVALID_HANDLE
             )
         } else {

@@ -54,7 +54,7 @@ import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocument
 import mega.privacy.android.app.presentation.documentscanner.dialogs.DocumentScanningErrorDialog
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.uploadFolderManually
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -138,7 +138,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     @Inject
-    lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
+    lateinit var nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper
     private val viewModel: ContactFileListViewModel by viewModels()
     private val startDownloadViewModel: StartDownloadViewModel by viewModels()
     private lateinit var fragmentContainer: FrameLayout
@@ -548,7 +548,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             }
             showSnackbar(
                 SNACKBAR_TYPE,
-                moveRequestMessageMapper(data),
+                nodeMoveRequestMessageMapper(data),
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
         } else {

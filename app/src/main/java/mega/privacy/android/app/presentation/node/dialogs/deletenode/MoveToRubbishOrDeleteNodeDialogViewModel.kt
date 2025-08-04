@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -18,7 +18,7 @@ import javax.inject.Inject
  * @property applicationScope [CoroutineScope]
  * @property deleteNodesUseCase [DeleteNodesUseCase]
  * @property moveNodesToRubbishUseCase [MoveNodesToRubbishUseCase]
- * @property moveRequestMessageMapper [MoveRequestMessageMapper]
+ * @property nodeMoveRequestMessageMapper [NodeMoveRequestMessageMapper]
  * @property snackBarHandler [SnackBarHandler]
  */
 @HiltViewModel
@@ -26,7 +26,7 @@ class MoveToRubbishOrDeleteNodeDialogViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val deleteNodesUseCase: DeleteNodesUseCase,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
-    private val moveRequestMessageMapper: MoveRequestMessageMapper,
+    private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper,
     private val snackBarHandler: SnackBarHandler
 ) : ViewModel() {
 
@@ -46,7 +46,7 @@ class MoveToRubbishOrDeleteNodeDialogViewModel @Inject constructor(
                 Timber.e(it)
             }
             result.getOrNull()?.let { res ->
-                val message = moveRequestMessageMapper(res)
+                val message = nodeMoveRequestMessageMapper(res)
                 snackBarHandler.postSnackbarMessage(message)
             }
         }
@@ -68,7 +68,7 @@ class MoveToRubbishOrDeleteNodeDialogViewModel @Inject constructor(
                 Timber.e(it)
             }
             result.getOrNull()?.let { res ->
-                val message = moveRequestMessageMapper(res)
+                val message = nodeMoveRequestMessageMapper(res)
                 snackBarHandler.postSnackbarMessage(message)
             }
         }

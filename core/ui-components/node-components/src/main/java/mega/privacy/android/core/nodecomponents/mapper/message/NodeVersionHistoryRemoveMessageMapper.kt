@@ -1,8 +1,8 @@
-package mega.privacy.android.app.presentation.versions.mapper
+package mega.privacy.android.core.nodecomponents.mapper.message
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.R
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import javax.inject.Inject
 
@@ -11,7 +11,7 @@ import javax.inject.Inject
  *
  * @param context as Application Context provided by dependency graph
  */
-class VersionHistoryRemoveMessageMapper @Inject constructor(
+class NodeVersionHistoryRemoveMessageMapper @Inject constructor(
     @ApplicationContext val context: Context,
 ) {
     /**
@@ -42,6 +42,5 @@ class VersionHistoryRemoveMessageMapper @Inject constructor(
         is Throwable -> context.getString(R.string.general_text_error)
 
         else -> context.getString(R.string.version_history_deleted)
-
     }
 }

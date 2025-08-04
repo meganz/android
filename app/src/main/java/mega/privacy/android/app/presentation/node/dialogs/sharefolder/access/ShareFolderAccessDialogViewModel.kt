@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -16,14 +16,14 @@ import javax.inject.Inject
  * View model for share folder access dialog
  * @property applicationScope [CoroutineScope]
  * @property sharedFolderUseCase [ShareFolderUseCase]
- * @property moveRequestMessageMapper [MoveRequestMessageMapper]
+ * @property nodeMoveRequestMessageMapper [NodeMoveRequestMessageMapper]
  * @property snackBarHandler [SnackBarHandler]
  */
 @HiltViewModel
 class ShareFolderAccessDialogViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val sharedFolderUseCase: ShareFolderUseCase,
-    private val moveRequestMessageMapper: MoveRequestMessageMapper,
+    private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper,
     private val snackBarHandler: SnackBarHandler,
 ) : ViewModel() {
 
@@ -47,7 +47,7 @@ class ShareFolderAccessDialogViewModel @Inject constructor(
                 contactData = contactData,
                 accessPermission = accessPermission
             )
-            val message = moveRequestMessageMapper(result)
+            val message = nodeMoveRequestMessageMapper(result)
             snackBarHandler.postSnackbarMessage(message)
         }
     }
