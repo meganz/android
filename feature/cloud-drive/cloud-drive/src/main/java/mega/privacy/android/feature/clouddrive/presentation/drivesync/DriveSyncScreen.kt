@@ -140,6 +140,8 @@ internal fun DriveSyncScreen(
                         onChangeViewTypeClicked = cloudDriveViewModel::onChangeViewTypeClicked,
                         onNavigateToFolder = onNavigateToFolder,
                         onNavigateToFolderEventConsumed = cloudDriveViewModel::onNavigateToFolderEventConsumed,
+                        onNavigateBack = { }, // Ignore back navigation in this tab
+                        onNavigateBackEventConsumed = cloudDriveViewModel::onNavigateBackEventConsumed,
                         onOpenedFileNodeHandled = cloudDriveViewModel::onOpenedFileNodeHandled,
                         onTransfer = onTransfer
                     )

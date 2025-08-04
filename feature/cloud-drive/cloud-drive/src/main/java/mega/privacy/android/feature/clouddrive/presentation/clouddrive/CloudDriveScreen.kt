@@ -112,6 +112,8 @@ fun CloudDriveScreen(
                 onChangeViewTypeClicked = viewModel::onChangeViewTypeClicked,
                 onNavigateToFolder = onNavigateToFolder,
                 onNavigateToFolderEventConsumed = viewModel::onNavigateToFolderEventConsumed,
+                onNavigateBack = onBack,
+                onNavigateBackEventConsumed = viewModel::onNavigateBackEventConsumed,
                 onOpenedFileNodeHandled = viewModel::onOpenedFileNodeHandled,
                 onTransfer = onTransfer
             )
@@ -152,9 +154,11 @@ internal fun CloudDriveContent(
     onItemLongClicked: (NodeUiItem<TypedNode>) -> Unit,
     onChangeViewTypeClicked: () -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
+    onNavigateBack: () -> Unit,
     onOpenedFileNodeHandled: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onNavigateToFolderEventConsumed: () -> Unit,
+    onNavigateBackEventConsumed: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
@@ -204,6 +208,13 @@ internal fun CloudDriveContent(
         onConsumed = onNavigateToFolderEventConsumed
     ) { nodeId ->
         onNavigateToFolder(nodeId)
+    }
+
+    EventEffect(
+        event = uiState.navigateBack,
+        onConsumed = onNavigateBackEventConsumed
+    ) {
+        onNavigateBack()
     }
 
     uiState.openedFileNode?.let { openedFileNode ->

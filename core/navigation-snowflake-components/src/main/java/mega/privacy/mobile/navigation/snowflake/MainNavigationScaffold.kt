@@ -130,7 +130,6 @@ private fun MegaNavigationSuite(
                     )
                 }
             }
-            .padding(top = 16.dp)
     ) {
         orderedItems.forEach { navItem ->
             item(

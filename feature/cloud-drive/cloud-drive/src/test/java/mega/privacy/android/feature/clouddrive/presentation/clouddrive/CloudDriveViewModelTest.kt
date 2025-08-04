@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -33,6 +34,7 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -62,6 +64,7 @@ class CloudDriveViewModelTest {
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
+    private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase = mock()
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
@@ -84,6 +87,7 @@ class CloudDriveViewModelTest {
             monitorShowHiddenItemsUseCase,
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase,
+            monitorNodeUpdatesByIdUseCase,
             nodeUiItemMapper
         )
     }
@@ -98,6 +102,7 @@ class CloudDriveViewModelTest {
         monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
         monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         getBusinessStatusUseCase = getBusinessStatusUseCase,
+        monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
         nodeUiItemMapper = nodeUiItemMapper,
         savedStateHandle = SavedStateHandle.Companion.invoke(
             route = CloudDrive(folderNodeHandle)
@@ -130,6 +135,7 @@ class CloudDriveViewModelTest {
             )
         ).thenReturn(nodeUiItems)
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+        whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf())
     }
 
     @Test
@@ -144,9 +150,139 @@ class CloudDriveViewModelTest {
             assertThat(initialState.items).isEmpty()
             assertThat(initialState.isInSelectionMode).isFalse()
             assertThat(initialState.navigateToFolderEvent).isEqualTo(consumed())
+            assertThat(initialState.navigateBack).isEqualTo(consumed)
             assertThat(initialState.showHiddenNodes).isFalse()
             assertThat(initialState.isHiddenNodesEnabled).isFalse()
             assertThat(initialState.isHiddenNodesOnboarded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that monitorNodeUpdates triggers navigateBack when NodeChanges_Remove is received`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf(NodeChanges.Remove))
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val updatedState = awaitItem() // State after monitorNodeUpdates processes Remove
+                assertThat(updatedState.navigateBack).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that monitorNodeUpdates triggers loadNodes when NodeChanges_Attributes is received`() =
+        runTest {
+            val node1 = mock<TypedNode> {
+                on { id } doReturn NodeId(1L)
+                on { name } doReturn "Test Node 1"
+            }
+            val node2 = mock<TypedNode> {
+                on { id } doReturn NodeId(2L)
+                on { name } doReturn "Test Node 2"
+            }
+
+            setupTestData(listOf(node1, node2))
+            whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf(NodeChanges.Attributes))
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val updatedState = awaitItem()
+                assertThat(updatedState.isLoading).isFalse()
+                assertThat(updatedState.items).hasSize(2)
+            }
+        }
+
+    @Test
+    fun `test that monitorNodeUpdates handles multiple NodeChanges correctly`() = runTest {
+        setupTestData(emptyList())
+        val nodeChangesFlow = flowOf(NodeChanges.Attributes, NodeChanges.Remove)
+        whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(nodeChangesFlow)
+
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            awaitItem() // Initial state
+            awaitItem() // State after initial loadNodes
+            // Due to collectLatest, only the last Remove will be processed
+            val finalState = awaitItem() // State after Remove triggers navigateBack
+            assertThat(finalState.navigateBack).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that monitorNodeUpdates handles rapid NodeChanges with conflate`() = runTest {
+        setupTestData(emptyList())
+        val nodeChangesFlow = flowOf(
+            NodeChanges.Attributes,
+            NodeChanges.Attributes,
+            NodeChanges.Attributes,
+            NodeChanges.Remove
+        )
+        whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(nodeChangesFlow)
+
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            awaitItem() // Initial state
+            awaitItem() // State after initial loadNodes
+            // Due to collectLatest, only the last Remove will be processed
+            val finalState = awaitItem() // State after Remove triggers navigateBack
+            assertThat(finalState.navigateBack).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that monitorNodeUpdates does not trigger navigateBack for Attributes`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf(NodeChanges.Attributes))
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val updatedState = awaitItem() // State after monitorNodeUpdates processes Attributes
+            assertThat(updatedState.navigateBack).isEqualTo(consumed)
+        }
+    }
+
+
+    @Test
+    fun `test that monitorNodeUpdates does not trigger loadNodes for Remove`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf(NodeChanges.Remove))
+
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            awaitItem() // Initial state
+            awaitItem() // State after initial loadNodes
+            val updatedState = awaitItem() // State after monitorNodeUpdates processes Remove
+            assertThat(updatedState.navigateBack).isEqualTo(triggered)
+            // Should not trigger additional loadNodes calls
+        }
+    }
+
+    @Test
+    fun `test that onNavigateBackEventConsumed consumes the navigate back event`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf(NodeChanges.Remove))
+
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            awaitItem() // Initial state
+            awaitItem() // State after initial loadNodes
+            val stateAfterRemove = awaitItem() // State after Remove triggers navigateBack
+            assertThat(stateAfterRemove.navigateBack).isEqualTo(triggered)
+
+            underTest.onNavigateBackEventConsumed()
+            val stateAfterConsume = awaitItem() // State after consuming the event
+            assertThat(stateAfterConsume.navigateBack).isEqualTo(consumed)
         }
     }
 

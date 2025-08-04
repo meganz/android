@@ -13,7 +13,7 @@ internal fun MainNavigationIcon(
     icon: ImageVector, label: String, modifier: Modifier = Modifier,
 ) {
     Icon(
-        modifier = modifier.size(32.dp),
+        modifier = modifier.size(24.dp),
         painter = rememberVectorPainter(icon),
         contentDescription = label
     )
