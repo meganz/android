@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_KE
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_SENSITIVES
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_VAL_SHOW_HIDDEN_NODES
 import mega.privacy.android.domain.entity.preference.StartScreen
+import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -636,6 +637,19 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun isRubbishBinAutopurgeEnabled(): Boolean = withContext(ioDispatcher) {
         megaApiGateway.serverSideRubbishBinAutopurgeEnabled()
     }
+
+    override suspend fun setStartScreenPreferenceDestination(startScreenDestinationPreference: StartScreenDestinationPreference) {
+        withContext(ioDispatcher) {
+            uiPreferencesGateway.setSerialisedStartScreenPreferenceDestination(
+                startScreenDestinationPreference.serialisedDestination
+            )
+        }
+    }
+
+    override fun monitorStartScreenPreferenceDestination() =
+        uiPreferencesGateway.monitorSerialisedStartScreenPreferenceDestination()
+            .map { it?.let { StartScreenDestinationPreference(it) } }
+            .flowOn(ioDispatcher)
 
     companion object {
         private const val DAYS_USER_FREE = 30

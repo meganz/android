@@ -27,8 +27,8 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
-import mega.privacy.android.domain.usecase.navigation.GetStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.PreferredSlot
@@ -54,13 +54,12 @@ class AppStateViewModelTest {
     private val retryConnectionsAndSignalPresenceUseCase =
         mock<RetryConnectionsAndSignalPresenceUseCase>()
 
-    private val getStartScreenPreferenceDestinationUseCase =
-        mock<GetStartScreenPreferenceDestinationUseCase>()
+    private val monitorStartScreenPreferenceDestinationUseCase =
+        mock<MonitorStartScreenPreferenceDestinationUseCase>()
 
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock {
         on { invoke() }.thenReturn(
-            flow { emit(true) }
-        )
+            flow { emit(true) })
     }
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
 
@@ -78,7 +77,7 @@ class AppStateViewModelTest {
     fun setUp() {
         reset(
             getFeatureFlagValueUseCase,
-            getStartScreenPreferenceDestinationUseCase,
+            monitorStartScreenPreferenceDestinationUseCase,
             monitorThemeModeUseCase,
             monitorConnectivityUseCase,
             retryConnectionsAndSignalPresenceUseCase,
@@ -114,14 +113,11 @@ class AppStateViewModelTest {
         val featureDestinations = emptySet<@JvmSuppressWildcards FeatureDestination>()
         initUnderTest(expected, featureDestinations)
 
-        underTest.state
-            .filterIsInstance<AppState.Data>()
-            .test {
-                assertThat(awaitItem().mainNavItems.map { it.label }).containsExactlyElementsIn(
-                    expected.map { it.label }
-                )
-                cancelAndIgnoreRemainingEvents()
-            }
+        underTest.state.filterIsInstance<AppState.Data>().test {
+            assertThat(awaitItem().mainNavItems.map { it.label }).containsExactlyElementsIn(
+                expected.map { it.label })
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -142,8 +138,7 @@ class AppStateViewModelTest {
         getFeatureFlagValueUseCase.stub {
             onBlocking { invoke(disabledFeature) }.thenReturn(false)
         }
-        val notExpected =
-            mock<Flagged>(extraInterfaces = arrayOf(MainNavItem::class))
+        val notExpected = mock<Flagged>(extraInterfaces = arrayOf(MainNavItem::class))
         notExpected.stub {
             on { feature }.thenReturn(disabledFeature)
             with(this as KStubbing<MainNavItem>) {
@@ -160,12 +155,10 @@ class AppStateViewModelTest {
         val featureDestinations = emptySet<@JvmSuppressWildcards FeatureDestination>()
         initUnderTest(mainDestinations, featureDestinations)
 
-        underTest.state
-            .filterIsInstance<AppState.Data>()
-            .test {
-                assertThat(awaitItem().mainNavItems.map { it.label }).containsExactly(expected.label)
-                cancelAndIgnoreRemainingEvents()
-            }
+        underTest.state.filterIsInstance<AppState.Data>().test {
+            assertThat(awaitItem().mainNavItems.map { it.label }).containsExactly(expected.label)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -186,8 +179,7 @@ class AppStateViewModelTest {
         getFeatureFlagValueUseCase.stub {
             onBlocking { invoke(enabledFeature) }.thenReturn(true)
         }
-        val alsoExpected =
-            mock<Flagged>(extraInterfaces = arrayOf(MainNavItem::class))
+        val alsoExpected = mock<Flagged>(extraInterfaces = arrayOf(MainNavItem::class))
         alsoExpected.stub {
             on { feature }.thenReturn(enabledFeature)
             with(this as KStubbing<MainNavItem>) {
@@ -203,15 +195,12 @@ class AppStateViewModelTest {
         val mainDestinations = setOf(expected, alsoExpected as MainNavItem)
         val featureDestinations = emptySet<@JvmSuppressWildcards FeatureDestination>()
         initUnderTest(mainDestinations, featureDestinations)
-        underTest.state
-            .filterIsInstance<AppState.Data>()
-            .test {
-                assertThat(awaitItem().mainNavItems.map { it.label }).containsExactly(
-                    expected.label,
-                    alsoExpected.label
-                )
-                cancelAndIgnoreRemainingEvents()
-            }
+        underTest.state.filterIsInstance<AppState.Data>().test {
+            assertThat(awaitItem().mainNavItems.map { it.label }).containsExactly(
+                expected.label, alsoExpected.label
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -225,12 +214,10 @@ class AppStateViewModelTest {
         val mainDestinations = stubDefaultMainNavigationItems()
         initUnderTest(mainDestinations, expected)
 
-        underTest.state
-            .filterIsInstance<AppState.Data>()
-            .test {
-                assertThat(awaitItem().featureDestinations).isEqualTo(expected)
-                cancelAndIgnoreRemainingEvents()
-            }
+        underTest.state.filterIsInstance<AppState.Data>().test {
+            assertThat(awaitItem().featureDestinations).isEqualTo(expected)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -244,8 +231,7 @@ class AppStateViewModelTest {
             getFeatureFlagValueUseCase.stub {
                 onBlocking { invoke(disabledFeature) }.thenReturn(false)
             }
-            val notExpected =
-                mock<Flagged>(extraInterfaces = arrayOf(FeatureDestination::class))
+            val notExpected = mock<Flagged>(extraInterfaces = arrayOf(FeatureDestination::class))
             notExpected.stub {
                 on { feature }.thenReturn(disabledFeature)
             }
@@ -253,12 +239,10 @@ class AppStateViewModelTest {
             val featureDestinations = setOf(expected, notExpected as FeatureDestination)
             initUnderTest(mainDestinations, featureDestinations)
 
-            underTest.state
-                .filterIsInstance<AppState.Data>()
-                .test {
-                    assertThat(awaitItem().featureDestinations).containsExactly(expected)
-                    cancelAndIgnoreRemainingEvents()
-                }
+            underTest.state.filterIsInstance<AppState.Data>().test {
+                assertThat(awaitItem().featureDestinations).containsExactly(expected)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
@@ -271,20 +255,17 @@ class AppStateViewModelTest {
         getFeatureFlagValueUseCase.stub {
             onBlocking { invoke(enabledFeature) }.thenReturn(true)
         }
-        val alsoExpected =
-            mock<Flagged>(extraInterfaces = arrayOf(FeatureDestination::class))
+        val alsoExpected = mock<Flagged>(extraInterfaces = arrayOf(FeatureDestination::class))
         alsoExpected.stub {
             on { feature }.thenReturn(enabledFeature)
         }
         val mainDestinations = stubDefaultMainNavigationItems()
         val featureDestinations = setOf(expected, alsoExpected as FeatureDestination)
         initUnderTest(mainDestinations, featureDestinations)
-        underTest.state
-            .filterIsInstance<AppState.Data>()
-            .test {
-                assertThat(awaitItem().featureDestinations).containsExactly(expected, alsoExpected)
-                cancelAndIgnoreRemainingEvents()
-            }
+        underTest.state.filterIsInstance<AppState.Data>().test {
+            assertThat(awaitItem().featureDestinations).containsExactly(expected, alsoExpected)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -305,12 +286,10 @@ class AppStateViewModelTest {
 
         initUnderTest(expected, emptySet())
 
-        underTest.state
-            .filterIsInstance<AppState.Data>()
-            .test {
-                assertThat(awaitItem().mainNavItems.all { it.isEnabled }).isTrue()
-                cancelAndIgnoreRemainingEvents()
-            }
+        underTest.state.filterIsInstance<AppState.Data>().test {
+            assertThat(awaitItem().mainNavItems.all { it.isEnabled }).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -332,12 +311,10 @@ class AppStateViewModelTest {
 
             initUnderTest(expected, emptySet())
 
-            underTest.state
-                .filterIsInstance<AppState.Data>()
-                .test {
-                    assertThat(awaitItem().mainNavItems.all { it.isEnabled }).isFalse()
-                    cancelAndIgnoreRemainingEvents()
-                }
+            underTest.state.filterIsInstance<AppState.Data>().test {
+                assertThat(awaitItem().mainNavItems.all { it.isEnabled }).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
@@ -358,18 +335,15 @@ class AppStateViewModelTest {
             on { invoke() }.thenReturn(
                 flow {
                     throw Exception("Connectivity error")
-                }
-            )
+                })
         }
 
         initUnderTest(expected, emptySet())
 
-        underTest.state
-            .filterIsInstance<AppState.Data>()
-            .test {
-                assertThat(awaitItem().mainNavItems.all { it.isEnabled }).isTrue()
-                cancelAndIgnoreRemainingEvents()
-            }
+        underTest.state.filterIsInstance<AppState.Data>().test {
+            assertThat(awaitItem().mainNavItems.all { it.isEnabled }).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -387,12 +361,10 @@ class AppStateViewModelTest {
             initUnderTest(mainDestinations, emptySet())
 
             // Wait for initial state to be emitted
-            underTest.state
-                .filterIsInstance<AppState.Data>()
-                .test {
-                    awaitItem()
-                    cancelAndIgnoreRemainingEvents()
-                }
+            underTest.state.filterIsInstance<AppState.Data>().test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
 
             // Call signalPresence
             underTest.signalPresence()
@@ -420,12 +392,10 @@ class AppStateViewModelTest {
         initUnderTest(mainDestinations, emptySet())
 
         // Wait for initial state to be emitted
-        underTest.state
-            .filterIsInstance<AppState.Data>()
-            .test {
-                awaitItem()
-                cancelAndIgnoreRemainingEvents()
-            }
+        underTest.state.filterIsInstance<AppState.Data>().test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
 
         // Call signalPresence multiple times rapidly
         underTest.signalPresence()
@@ -463,14 +433,8 @@ class AppStateViewModelTest {
     }
 
     private fun stubDefaultStartScreenPreference() {
-        getStartScreenPreferenceDestinationUseCase.stub {
-            on { invoke() }.thenReturn(
-                flow {
-                    emit(String::class)
-                    awaitCancellation()
-                }
-            )
-        }
+//  no-op
+//        To be replaced once VM is updated with new implementation
     }
 
     private fun stubDefaultThemeMode() {
@@ -479,8 +443,7 @@ class AppStateViewModelTest {
                 flow {
                     emit(ThemeMode.System)
                     awaitCancellation()
-                }
-            )
+                })
         }
     }
 
@@ -499,8 +462,7 @@ class AppStateViewModelTest {
                 flow {
                     emit(connected)
                     awaitCancellation()
-                }
-            )
+                })
         }
     }
 }

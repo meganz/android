@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.preference.StartScreen
+import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import java.io.File
 
 /**
@@ -527,4 +528,19 @@ interface SettingsRepository {
      * is rubbish bin auto purge enabled
      */
     suspend fun isRubbishBinAutopurgeEnabled(): Boolean
+
+    /**
+     * set start screen preference destination
+     *
+     * @param startScreenDestinationPreference
+     */
+    suspend fun setStartScreenPreferenceDestination(
+        startScreenDestinationPreference: StartScreenDestinationPreference,
+    )
+
+    /**
+     * Monitor start screen preference destination
+     *
+     */
+    fun monitorStartScreenPreferenceDestination(): Flow<StartScreenDestinationPreference?>
 }

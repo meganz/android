@@ -152,4 +152,19 @@ interface UIPreferencesGateway {
      * @return notification permission shown timestamp
      */
     fun monitorNotificationPermissionShownTimestamp(): Flow<Long?>
+
+
+    /**
+     * Set serialised start screen preference destination
+     *
+     * @param destination serialised string representing the start screen preference destination
+     */
+    suspend fun setSerialisedStartScreenPreferenceDestination(destination: String)
+
+    /**
+     * Monitor serialised start screen preference destination
+     *
+     * @return serialised string representing the start screen preference destination
+     */
+    fun monitorSerialisedStartScreenPreferenceDestination(): Flow<String?>
 }

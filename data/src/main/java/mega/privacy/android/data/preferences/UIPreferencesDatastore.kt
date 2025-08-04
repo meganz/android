@@ -32,6 +32,8 @@ private const val ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP =
 private const val ADS_CLOSING_TIMESTAMP = "ADS_CLOSING_TIMESTAMP"
 private const val GEO_TAGGING = "GEO_TAGGING"
 private const val NOTIFICATION_SHOWN_TIMESTAMP = "NOTIFICATION_SHOWN_TIMESTAMP"
+private const val SERIALISED_START_SCREEN_PREFERENCE_DESTINATION =
+    "SERIALISED_START_SCREEN_PREFERENCE_DESTINATION"
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = USER_INTERFACE_PREFERENCES,
     corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
@@ -155,9 +157,9 @@ internal class UIPreferencesDatastore @Inject constructor(
     override fun monitorGeoTaggingStatus(): Flow<Boolean?> =
         context.uiPreferenceDataStore.monitor(booleanPreferencesKey(GEO_TAGGING))
 
-    override suspend fun enableGeoTagging(value: Boolean) {
+    override suspend fun enableGeoTagging(enabled: Boolean) {
         context.uiPreferenceDataStore.edit {
-            it[booleanPreferencesKey(GEO_TAGGING)] = value
+            it[booleanPreferencesKey(GEO_TAGGING)] = enabled
         }
     }
 
@@ -169,4 +171,16 @@ internal class UIPreferencesDatastore @Inject constructor(
 
     override fun monitorNotificationPermissionShownTimestamp(): Flow<Long?> =
         context.uiPreferenceDataStore.monitor(longPreferencesKey(NOTIFICATION_SHOWN_TIMESTAMP))
+
+    override suspend fun setSerialisedStartScreenPreferenceDestination(destination: String) {
+        context.uiPreferenceDataStore.edit { preferences ->
+            preferences[stringPreferencesKey(SERIALISED_START_SCREEN_PREFERENCE_DESTINATION)] =
+                destination
+        }
+    }
+
+    override fun monitorSerialisedStartScreenPreferenceDestination() =
+        context.uiPreferenceDataStore.monitor(
+            stringPreferencesKey(SERIALISED_START_SCREEN_PREFERENCE_DESTINATION)
+        )
 }

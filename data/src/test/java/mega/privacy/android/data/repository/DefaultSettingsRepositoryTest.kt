@@ -20,6 +20,7 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiJava
@@ -451,10 +452,10 @@ internal class DefaultSettingsRepositoryTest {
     @Test
     fun `test that value passed to set auto accept is passed on to the gateway`() = runTest {
         val expected = true
-        val megaError = mock<MegaError>{
+        val megaError = mock<MegaError> {
             on { errorCode }.thenReturn(MegaError.API_OK)
         }
-        val request = mock<MegaRequest>{
+        val request = mock<MegaRequest> {
             on { flag }.thenReturn(expected)
             on { type }.thenReturn(MegaRequest.TYPE_SET_ATTR_USER)
             on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION)
@@ -471,4 +472,33 @@ internal class DefaultSettingsRepositoryTest {
         underTest.setContactLinksOption(expected)
         verify(megaApiGateway).setContactLinksOption(eq(expected), any())
     }
+
+
+    @Test
+    fun `test that set start preference destination calls the gateway with the correct value`() =
+        runTest {
+            val expected = "test"
+            underTest.setStartScreenPreferenceDestination(
+                StartScreenDestinationPreference(
+                    expected
+                )
+            )
+
+            verify(uiPreferencesGateway).setSerialisedStartScreenPreferenceDestination(expected)
+        }
+
+    @Test
+    fun `test that monitorStartScreenPreferenceDestination returns the correct value from the gateway`() =
+        runTest {
+            val serialisedDestination = "test"
+            val expected = StartScreenDestinationPreference(serialisedDestination)
+            whenever(uiPreferencesGateway.monitorSerialisedStartScreenPreferenceDestination()).thenReturn(
+                flowOf(serialisedDestination)
+            )
+
+            underTest.monitorStartScreenPreferenceDestination().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+                awaitComplete()
+            }
+        }
 }
