@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import timber.log.Timber
 import javax.inject.Inject
@@ -69,6 +70,23 @@ class CloudDriveViewModel @Inject constructor(
             loadNodes()
         }
         monitorNodeUpdates()
+    }
+
+    /**
+     * Process CloudDriveAction and call relevant methods
+     */
+    fun processAction(action: CloudDriveAction) {
+        when (action) {
+            is CloudDriveAction.ItemClicked -> onItemClicked(action.nodeUiItem)
+            is CloudDriveAction.ItemLongClicked -> onItemLongClicked(action.nodeUiItem)
+            is CloudDriveAction.ChangeViewTypeClicked -> onChangeViewTypeClicked()
+            is CloudDriveAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
+            is CloudDriveAction.SelectAllItems -> selectAllItems()
+            is CloudDriveAction.DeselectAllItems -> deselectAllItems()
+            is CloudDriveAction.SetHiddenNodesOnboarded -> setHiddenNodesOnboarded()
+            is CloudDriveAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
+            is CloudDriveAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
+        }
     }
 
     private fun monitorNodeUpdates() {
@@ -149,7 +167,7 @@ class CloudDriveViewModel @Inject constructor(
     /**
      * Mark hidden nodes onboarding has shown
      */
-    fun setHiddenNodesOnboarded() {
+    private fun setHiddenNodesOnboarded() {
         uiState.update {
             it.copy(isHiddenNodesOnboarded = true)
         }
@@ -180,7 +198,7 @@ class CloudDriveViewModel @Inject constructor(
     /**
      * Handle item click - navigate to folder if it's a folder
      */
-    fun onItemClicked(nodeUiItem: NodeUiItem<TypedNode>) {
+    private fun onItemClicked(nodeUiItem: NodeUiItem<TypedNode>) {
         if (uiState.value.isInSelectionMode) {
             toggleItemSelection(nodeUiItem)
             return
@@ -207,7 +225,7 @@ class CloudDriveViewModel @Inject constructor(
     /**
      * Consume navigation event
      */
-    fun onNavigateToFolderEventConsumed() {
+    private fun onNavigateToFolderEventConsumed() {
         uiState.update { state ->
             state.copy(navigateToFolderEvent = consumed())
         }
@@ -216,7 +234,7 @@ class CloudDriveViewModel @Inject constructor(
     /**
      * Consume navigate back event
      */
-    fun onNavigateBackEventConsumed() {
+    private fun onNavigateBackEventConsumed() {
         uiState.update { state ->
             state.copy(navigateBack = consumed)
         }
@@ -225,7 +243,7 @@ class CloudDriveViewModel @Inject constructor(
     /**
      * Handle item long click - toggle selection state
      */
-    fun onItemLongClicked(nodeUiItem: NodeUiItem<TypedNode>) {
+    private fun onItemLongClicked(nodeUiItem: NodeUiItem<TypedNode>) {
         toggleItemSelection(nodeUiItem)
     }
 
@@ -245,7 +263,7 @@ class CloudDriveViewModel @Inject constructor(
     /**
      * Deselect all items and reset selection state
      */
-    fun deselectAllItems() {
+    private fun deselectAllItems() {
         val updatedItems = uiState.value.items.map { it.copy(isSelected = false) }
         uiState.update { state ->
             state.copy(items = updatedItems)
@@ -255,7 +273,7 @@ class CloudDriveViewModel @Inject constructor(
     /**
      * Select all items
      */
-    fun selectAllItems() {
+    private fun selectAllItems() {
         val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
         uiState.update { state ->
             state.copy(items = updatedItems)
@@ -265,7 +283,7 @@ class CloudDriveViewModel @Inject constructor(
     /**
      * This method will toggle node view type between list and grid.
      */
-    fun onChangeViewTypeClicked() {
+    private fun onChangeViewTypeClicked() {
         viewModelScope.launch {
             runCatching {
                 val toggledViewType = when (uiState.value.currentViewType) {
@@ -292,7 +310,7 @@ class CloudDriveViewModel @Inject constructor(
     /**
      * Handle the event when a file node is opened
      */
-    fun onOpenedFileNodeHandled() {
+    private fun onOpenedFileNodeHandled() {
         uiState.update { state ->
             state.copy(openedFileNode = null)
         }

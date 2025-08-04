@@ -37,6 +37,8 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveContent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
@@ -60,7 +62,7 @@ internal fun DriveSyncScreen(
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
 
     BackHandler(enabled = cloudDriveUiState.isInSelectionMode) {
-        cloudDriveViewModel.deselectAllItems()
+        cloudDriveViewModel.processAction(DeselectAllItems)
     }
 
     var selectedTabIndex by rememberSaveable {
@@ -75,8 +77,8 @@ internal fun DriveSyncScreen(
             if (cloudDriveUiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
                     count = cloudDriveUiState.selectedNodeIds.size,
-                    onSelectAllClicked = cloudDriveViewModel::selectAllItems,
-                    onCancelSelectionClicked = cloudDriveViewModel::deselectAllItems
+                    onSelectAllClicked = { cloudDriveViewModel.processAction(SelectAllItems) },
+                    onCancelSelectionClicked = { cloudDriveViewModel.processAction(DeselectAllItems) }
                 )
             } else {
                 MegaTopAppBar(
@@ -135,14 +137,9 @@ internal fun DriveSyncScreen(
                             bottom = paddingValues.calculateBottomPadding()
                         ),
                         uiState = cloudDriveUiState,
-                        onItemClicked = cloudDriveViewModel::onItemClicked,
-                        onItemLongClicked = cloudDriveViewModel::onItemLongClicked,
-                        onChangeViewTypeClicked = cloudDriveViewModel::onChangeViewTypeClicked,
+                        onAction = cloudDriveViewModel::processAction,
                         onNavigateToFolder = onNavigateToFolder,
-                        onNavigateToFolderEventConsumed = cloudDriveViewModel::onNavigateToFolderEventConsumed,
                         onNavigateBack = { }, // Ignore back navigation in this tab
-                        onNavigateBackEventConsumed = cloudDriveViewModel::onNavigateBackEventConsumed,
-                        onOpenedFileNodeHandled = cloudDriveViewModel::onOpenedFileNodeHandled,
                         onTransfer = onTransfer
                     )
                 }

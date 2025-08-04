@@ -30,17 +30,24 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.list.view.NodesView
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ChangeViewTypeClicked
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ItemClicked
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ItemLongClicked
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.NavigateBackEventConsumed
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.NavigateToFolderEventConsumed
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.OpenedFileNodeHandled
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
@@ -60,7 +67,7 @@ fun CloudDriveScreen(
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
 
     BackHandler(enabled = uiState.isInSelectionMode) {
-        viewModel.deselectAllItems()
+        viewModel.processAction(DeselectAllItems)
     }
 
     MegaScaffold(
@@ -68,8 +75,8 @@ fun CloudDriveScreen(
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
                     count = uiState.selectedNodeIds.size,
-                    onSelectAllClicked = viewModel::selectAllItems,
-                    onCancelSelectionClicked = viewModel::deselectAllItems
+                    onSelectAllClicked = { viewModel.processAction(SelectAllItems) },
+                    onCancelSelectionClicked = { viewModel.processAction(DeselectAllItems) }
                 )
             } else {
                 MegaTopAppBar(
@@ -107,14 +114,9 @@ fun CloudDriveScreen(
             CloudDriveContent(
                 uiState = uiState,
                 contentPadding = innerPadding,
-                onItemClicked = viewModel::onItemClicked,
-                onItemLongClicked = viewModel::onItemLongClicked,
-                onChangeViewTypeClicked = viewModel::onChangeViewTypeClicked,
+                onAction = viewModel::processAction,
                 onNavigateToFolder = onNavigateToFolder,
-                onNavigateToFolderEventConsumed = viewModel::onNavigateToFolderEventConsumed,
                 onNavigateBack = onBack,
-                onNavigateBackEventConsumed = viewModel::onNavigateBackEventConsumed,
-                onOpenedFileNodeHandled = viewModel::onOpenedFileNodeHandled,
                 onTransfer = onTransfer
             )
         }
@@ -150,15 +152,10 @@ fun CloudDriveScreen(
 @Composable
 internal fun CloudDriveContent(
     uiState: CloudDriveUiState,
-    onItemClicked: (NodeUiItem<TypedNode>) -> Unit,
-    onItemLongClicked: (NodeUiItem<TypedNode>) -> Unit,
-    onChangeViewTypeClicked: () -> Unit,
+    onAction: (CloudDriveAction) -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
     onNavigateBack: () -> Unit,
-    onOpenedFileNodeHandled: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    onNavigateToFolderEventConsumed: () -> Unit,
-    onNavigateBackEventConsumed: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
@@ -189,12 +186,12 @@ internal fun CloudDriveContent(
             isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
             showHiddenNodes = uiState.showHiddenNodes,
             onMenuClick = { },
-            onItemClicked = onItemClicked,
-            onLongClicked = onItemLongClicked,
+            onItemClicked = { onAction(ItemClicked(it)) },
+            onLongClicked = { onAction(ItemLongClicked(it)) },
             sortOrder = "Name",
             isListView = uiState.currentViewType == ViewType.LIST,
             onSortOrderClick = {},
-            onChangeViewTypeClicked = onChangeViewTypeClicked,
+            onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
             onLinkClicked = {},
             onDisputeTakeDownClicked = {},
             showMediaDiscoveryButton = false,
@@ -205,14 +202,14 @@ internal fun CloudDriveContent(
 
     EventEffect(
         event = uiState.navigateToFolderEvent,
-        onConsumed = onNavigateToFolderEventConsumed
+        onConsumed = { onAction(NavigateToFolderEventConsumed) }
     ) { nodeId ->
         onNavigateToFolder(nodeId)
     }
 
     EventEffect(
         event = uiState.navigateBack,
-        onConsumed = onNavigateBackEventConsumed
+        onConsumed = { onAction(NavigateBackEventConsumed) }
     ) {
         onNavigateBack()
     }
@@ -222,7 +219,7 @@ internal fun CloudDriveContent(
             typedFileNode = openedFileNode,
             snackBarHostState = snackbarHostState,
             coroutineScope = coroutineScope,
-            onActionHandled = { onOpenedFileNodeHandled() },
+            onActionHandled = { onAction(OpenedFileNodeHandled) },
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
             onDownloadEvent = onTransfer,
             sortOrder = SortOrder.ORDER_NONE
