@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="upload_files">Upload files</string>
+    <string name="upload_folder">Upload folder</string>
+    <string name="menu_scan_document">Scan document</string>
+    <string name="menu_new_folder">New folder</string>
+    <string name="action_create_txt">New text file</string>
+    <string name="menu_take_picture">Capture</string>
+</resources>

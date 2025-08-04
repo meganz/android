@@ -11,9 +11,13 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -21,6 +25,7 @@ import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LoadingView
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
@@ -28,6 +33,7 @@ import mega.privacy.android.core.nodecomponents.list.view.NodesView
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -36,6 +42,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
 
 /**
@@ -50,6 +57,7 @@ fun CloudDriveScreen(
     viewModel: CloudDriveViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
 
     BackHandler(enabled = uiState.isInSelectionMode) {
         viewModel.deselectAllItems()
@@ -87,6 +95,14 @@ fun CloudDriveScreen(
                 }
             )
         },
+        floatingActionButton = {
+            if (!uiState.isInSelectionMode && !uiState.items.isEmpty()) {
+                MegaFab(
+                    onClick = { showUploadOptionsBottomSheet = true },
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus)
+                )
+            }
+        },
         content = { innerPadding ->
             CloudDriveContent(
                 uiState = uiState,
@@ -101,6 +117,32 @@ fun CloudDriveScreen(
             )
         }
     )
+
+    if (showUploadOptionsBottomSheet) {
+        UploadOptionsBottomSheet(
+            onUploadFilesClicked = {
+                // TODO: Handle upload files
+            },
+            onUploadFolderClicked = {
+                // TODO: Handle upload folder
+            },
+            onScanDocumentClicked = {
+                // TODO: Handle scan document
+            },
+            onCaptureClicked = {
+                // TODO: Handle capture
+            },
+            onNewFolderClicked = {
+                // TODO: Handle new folder
+            },
+            onNewTextFileClicked = {
+                // TODO: Handle new text file
+            },
+            onDismissSheet = {
+                showUploadOptionsBottomSheet = false
+            }
+        )
+    }
 }
 
 @Composable

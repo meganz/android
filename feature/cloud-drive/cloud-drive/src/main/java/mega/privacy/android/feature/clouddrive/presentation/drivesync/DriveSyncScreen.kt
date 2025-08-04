@@ -9,9 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -20,12 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.TabItems
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -33,6 +38,7 @@ import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveContent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -51,6 +57,7 @@ internal fun DriveSyncScreen(
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val megaNavigator = viewModel.megaNavigator
+    var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
 
     BackHandler(enabled = cloudDriveUiState.isInSelectionMode) {
         cloudDriveViewModel.deselectAllItems()
@@ -101,6 +108,14 @@ internal fun DriveSyncScreen(
                     // TODO
                 }
             )
+        },
+        floatingActionButton = {
+            if (selectedTabIndex == 0 && !cloudDriveUiState.isInSelectionMode && !cloudDriveUiState.items.isEmpty()) {
+                MegaFab(
+                    onClick = { showUploadOptionsBottomSheet = true },
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus)
+                )
+            }
         },
     ) { paddingValues ->
         MegaScrollableTabRow(
@@ -175,5 +190,31 @@ internal fun DriveSyncScreen(
 
     LaunchedEffect(cloudDriveUiState.isInSelectionMode) {
         setNavigationItemVisibility(!cloudDriveUiState.isInSelectionMode)
+    }
+
+    if (showUploadOptionsBottomSheet) {
+        UploadOptionsBottomSheet(
+            onUploadFilesClicked = {
+                // TODO: Handle upload files
+            },
+            onUploadFolderClicked = {
+                // TODO: Handle upload folder
+            },
+            onScanDocumentClicked = {
+                // TODO: Handle scan document
+            },
+            onCaptureClicked = {
+                // TODO: Handle capture
+            },
+            onNewFolderClicked = {
+                // TODO: Handle new folder
+            },
+            onNewTextFileClicked = {
+                // TODO: Handle new text file
+            },
+            onDismissSheet = {
+                showUploadOptionsBottomSheet = false
+            }
+        )
     }
 }

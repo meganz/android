@@ -95,6 +95,7 @@ interface IconPackInterface {
              * medium_thin_outline
              */
             interface Outline {
+                val Plus: ImageVector
                 val PlaySquare: ImageVector
                 val Rocket: ImageVector
                 val User: ImageVector
