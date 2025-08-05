@@ -5,7 +5,6 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -39,12 +38,49 @@ data class CloudDriveUiState(
     val isHiddenNodesOnboarded: Boolean = false,
 ) {
     /**
+     * Count of visible items based on hidden nodes settings
+     */
+    val visibleItemsCount: Int
+
+    /**
+     * Count of visible selected items
+     */
+    val selectedItemsCount: Int
+
+    init {
+        // Count visible and selected items based on hidden nodes settings with single loop
+        if (showHiddenNodes || !isHiddenNodesEnabled) {
+            visibleItemsCount = items.size
+            selectedItemsCount = items.count { it.isSelected }
+        } else {
+            var visible = 0
+            var selected = 0
+            items.forEach { item ->
+                if (!item.isSensitive) {
+                    visible++
+                    if (item.isSelected) {
+                        selected++
+                    }
+                }
+            }
+            visibleItemsCount = visible
+            selectedItemsCount = selected
+        }
+    }
+
+    /**
      * True if any item is selected
      */
-    val isInSelectionMode: Boolean = items.any { it.isSelected }
+    val isInSelectionMode = selectedItemsCount > 0
+
+    /**
+     * True if there are no visible items and not loading
+     */
+    val isEmpty = visibleItemsCount == 0 && !isLoading
 
     /**
      * Returns a list of selected node ids.
      */
-    val selectedNodeIds: List<NodeId> get() = items.filter { it.isSelected }.map { it.node.id }
+    val selectedNodeIds: List<NodeId>
+        get() = items.mapNotNull { if (it.isSelected) it.node.id else null }
 }

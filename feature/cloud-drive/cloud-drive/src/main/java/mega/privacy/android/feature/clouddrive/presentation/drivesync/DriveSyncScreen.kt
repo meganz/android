@@ -35,10 +35,10 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveContent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
@@ -76,7 +76,7 @@ internal fun DriveSyncScreen(
         topBar = {
             if (cloudDriveUiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
-                    count = cloudDriveUiState.selectedNodeIds.size,
+                    count = cloudDriveUiState.selectedItemsCount,
                     onSelectAllClicked = { cloudDriveViewModel.processAction(SelectAllItems) },
                     onCancelSelectionClicked = { cloudDriveViewModel.processAction(DeselectAllItems) }
                 )
@@ -104,7 +104,7 @@ internal fun DriveSyncScreen(
         },
         bottomBar = {
             NodeSelectionModeBottomBar(
-                count = cloudDriveUiState.selectedNodeIds.size,
+                count = cloudDriveUiState.selectedItemsCount,
                 visible = cloudDriveUiState.isInSelectionMode,
                 onActionPressed = {
                     // TODO
@@ -140,7 +140,10 @@ internal fun DriveSyncScreen(
                         onAction = cloudDriveViewModel::processAction,
                         onNavigateToFolder = onNavigateToFolder,
                         onNavigateBack = { }, // Ignore back navigation in this tab
-                        onTransfer = onTransfer
+                        onTransfer = onTransfer,
+                        onAddFilesClick = {
+                            showUploadOptionsBottomSheet = true
+                        }
                     )
                 }
                 addTextTabWithLazyListState(
