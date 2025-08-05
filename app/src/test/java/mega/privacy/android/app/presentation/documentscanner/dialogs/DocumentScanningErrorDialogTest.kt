@@ -7,7 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.onNodeWithText
-import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

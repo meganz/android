@@ -27,9 +27,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.app.objects.GifData
-import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
@@ -40,7 +40,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.ForwardMessagesToChatsResult
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
-import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension

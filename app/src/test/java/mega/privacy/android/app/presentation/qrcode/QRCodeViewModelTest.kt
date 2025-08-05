@@ -16,11 +16,11 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
-import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
+import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder

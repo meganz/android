@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.call.CallCompositionChanges

@@ -8,9 +8,9 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
-import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
+import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent

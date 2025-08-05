@@ -1,7 +1,6 @@
-package mega.privacy.android.app.middlelayer.scanner
+package mega.privacy.android.core.nodecomponents.scanner
 
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
-import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
 
 /**
  * Interface for all Scanning related functionalities

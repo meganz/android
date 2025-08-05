@@ -18,15 +18,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
-import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
 import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.app.service.scanner.BarcodeScannerModuleIsNotInstalled
+import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
@@ -38,6 +35,7 @@ import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
@@ -55,6 +53,8 @@ import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
+import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File

@@ -17,8 +17,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
+import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
+import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScannerModuleIsNotInstalled
+import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.UnexpectedErrorInDocumentScanner
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
 import javax.inject.Inject
@@ -118,25 +122,3 @@ class ScannerHandlerImpl @Inject constructor(
         }
     }
 }
-
-/**
- * An exception that should be thrown whenever the [GmsBarcodeScanning] module has not been installed.
- */
-class BarcodeScannerModuleIsNotInstalled : Exception()
-
-/**
- * An Exception that should be thrown whenever the [GmsDocumentScanning] module has not been installed
- */
-class DocumentScannerModuleIsNotInstalled : Exception()
-
-/**
- * An Exception that should be thrown when attempting to run the ML Document Scanner with less than
- * 1.7 GB Device total RAM
- */
-class InsufficientRAMToLaunchDocumentScanner : Exception()
-
-/**
- * An Exception that should be thrown when an unexpected error was found trying to install the
- * ML Document Kit Scanner
- */
-class UnexpectedErrorInDocumentScanner : Exception()

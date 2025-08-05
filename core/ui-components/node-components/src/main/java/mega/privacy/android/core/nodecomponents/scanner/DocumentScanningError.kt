@@ -1,7 +1,7 @@
-package mega.privacy.android.app.presentation.documentscanner.model
+package mega.privacy.android.core.nodecomponents.scanner
 
-import mega.privacy.android.shared.resources.R as SharedR
 import androidx.annotation.StringRes
+import mega.privacy.android.shared.resources.R
 
 /**
  * An enumeration of different Error Types that can occur when using the ML Document Kit scanner, to
@@ -15,10 +15,10 @@ enum class DocumentScanningError(
     /**
      * The Device has insufficient memory (less than 1.7 GB total RAM)
      */
-    InsufficientRAM(SharedR.string.document_scanning_error_type_insufficient_ram),
+    InsufficientRAM(R.string.document_scanning_error_type_insufficient_ram),
 
     /**
      * A different type of Error occurred
      */
-    GenericError(SharedR.string.document_scanning_error_type_generic_error),
+    GenericError(R.string.document_scanning_error_type_generic_error),
 }

@@ -25,12 +25,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.main.megachat.MapsActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.GifData
-import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.manager.model.ManagerState
@@ -43,9 +40,11 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.INVALID_LOCATION_MESSAGE_ID
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.ChatArgs
-import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
+import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
@@ -70,6 +69,7 @@ import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.CreateChatException
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase

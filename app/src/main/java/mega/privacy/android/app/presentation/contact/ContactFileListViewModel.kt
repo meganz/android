@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType

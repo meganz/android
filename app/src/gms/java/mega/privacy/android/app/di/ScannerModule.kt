@@ -4,7 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.app.service.scanner.ScannerHandlerImpl
 
 /**

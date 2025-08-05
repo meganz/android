@@ -31,13 +31,13 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
-import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
