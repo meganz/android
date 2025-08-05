@@ -81,6 +81,7 @@ import mega.privacy.android.app.utils.Constants.REVERT_CHANGE_PASSWORD_LINK_REGE
 import mega.privacy.android.app.utils.Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.Constants.WEB_SESSION_LINK_REGEXS
+import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.LinksUtil.requiresTransferSession
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.matchRegexs
@@ -414,7 +415,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 }
             }
             // Reset password - two options: logged IN or OUT
-            matchRegexs(url, RESET_PASSWORD_LINK_REGEXS) -> {
+            matchRegexs(url, RESET_PASSWORD_LINK_REGEXS) && url != RECOVERY_URL -> {
                 Timber.d("Reset pass url")
                 viewModel.queryResetPasswordLink(url.orEmpty())
             }
