@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.link
 
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import java.net.URLDecoder
 import javax.inject.Inject
 
@@ -7,7 +8,9 @@ import javax.inject.Inject
  * Decode link use case
  *
  */
-class DecodeLinkUseCase @Inject constructor() {
+class DecodeLinkUseCase @Inject constructor(
+    private val getDomainNameUseCase: GetDomainNameUseCase
+) {
     /**
      * Invoke the use case
      *
@@ -24,7 +27,7 @@ class DecodeLinkUseCase @Inject constructor() {
         url = url.replace(' ', '+')
 
         if (url.startsWith("mega://")) {
-            url = url.replaceFirst("mega://", "https://mega.nz/")
+            url = url.replaceFirst("mega://", "https://${getDomainNameUseCase()}/")
         } else if (url.startsWith("mega.")) {
             url = url.replaceFirst("mega.", "https://mega.")
         }
@@ -34,7 +37,11 @@ class DecodeLinkUseCase @Inject constructor() {
         }
 
         if (url.startsWith("https://www.mega.nz")) {
-            url = url.replaceFirst("https://www.mega.nz", "https://mega.nz")
+            url = url.replaceFirst("https://www.mega.nz", "https://${getDomainNameUseCase()}")
+        }
+
+        if (url.startsWith("https://www.mega.app")) {
+            url = url.replaceFirst("https://www.mega.app", "https://${getDomainNameUseCase()}")
         }
 
         if (url.endsWith("/")) {

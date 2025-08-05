@@ -32,7 +32,10 @@ class DeleteQRCodeUseCase @Inject constructor(
 
     private suspend fun getHandleByContactLink(contactLink: String): Long {
         val contactLinkPrefix = "https://mega.nz/C!"
-        val base64Handle = contactLink.substring(contactLinkPrefix.length)
+        val contactLinkDotAppPrefix = "https://mega.app/C!"
+        val base64Handle = contactLink
+            .removePrefix(contactLinkPrefix)
+            .removePrefix(contactLinkDotAppPrefix)
         return nodeRepository.convertBase64ToHandle(base64Handle)
     }
 }

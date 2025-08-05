@@ -5,10 +5,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.settings.cookie.CookieDialog
 import mega.privacy.android.domain.entity.settings.cookie.CookieDialogType
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -21,14 +24,14 @@ internal class GetCookieDialogUseCaseTest {
     private lateinit var underTest: GetCookieDialogUseCase
     private val shouldShowGenericCookieDialogUseCase = mock<ShouldShowGenericCookieDialogUseCase>()
     private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
-
-    private val url = "https://mega.nz/cookie"
+    private val getDomainNameUseCase = mock<GetDomainNameUseCase>()
 
     @BeforeEach
     fun setUp() {
         underTest = GetCookieDialogUseCase(
             shouldShowGenericCookieDialogUseCase = shouldShowGenericCookieDialogUseCase,
             getCookieSettingsUseCase = getCookieSettingsUseCase,
+            getDomainNameUseCase = getDomainNameUseCase,
         )
     }
 
@@ -37,23 +40,28 @@ internal class GetCookieDialogUseCaseTest {
         reset(
             shouldShowGenericCookieDialogUseCase,
             getCookieSettingsUseCase,
+            getDomainNameUseCase,
         )
     }
 
-    @Test
-    fun `test that GenericCookieDialog type is returned when shouldShowGenericCookieDialogUseCase returns true`() =
-        runTest {
-            whenever(getCookieSettingsUseCase()).thenReturn(emptySet())
-            whenever(shouldShowGenericCookieDialogUseCase(any())).thenReturn(true)
+    @ParameterizedTest
+    @MethodSource("domainProvider")
+    fun `test that GenericCookieDialog type is returned when shouldShowGenericCookieDialogUseCase returns true`(
+        domain: String,
+    ) = runTest {
+        val url = "https://$domain/cookie"
+        whenever(getCookieSettingsUseCase()).thenReturn(emptySet())
+        whenever(shouldShowGenericCookieDialogUseCase(any())).thenReturn(true)
+        whenever(getDomainNameUseCase()).thenReturn(domain)
 
-            val result = underTest()
-            val expected = CookieDialog(
-                CookieDialogType.GenericCookieDialog,
-                url
-            )
+        val result = underTest()
+        val expected = CookieDialog(
+            CookieDialogType.GenericCookieDialog,
+            url
+        )
 
-            assertThat(result).isEqualTo(expected)
-        }
+        assertThat(result).isEqualTo(expected)
+    }
 
     @Test
     fun `test that None type is returned when shouldShowGenericCookieDialogUseCase return false`() =
@@ -67,4 +75,6 @@ internal class GetCookieDialogUseCaseTest {
             )
             assertThat(result).isEqualTo(expected)
         }
+
+    private fun domainProvider() = listOf("mega.nz", "mega.app")
 }
