@@ -3,6 +3,7 @@ package mega.privacy.android.app.menu.navigation
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.destination.ExampleLegacyScreen
+import mega.privacy.android.navigation.destination.LegacySettings
 import mega.privacy.android.navigation.destination.Secondary
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -62,7 +63,7 @@ object RubbishBinItem : NavDrawerItem.Account(
 )
 
 object SettingsItem : NavDrawerItem.Account(
-    destination = Unit,
+    destination = LegacySettings(null),
     icon = IconPack.Medium.Thin.Outline.GearSix,
     title = sharedR.string.general_settings
 )
