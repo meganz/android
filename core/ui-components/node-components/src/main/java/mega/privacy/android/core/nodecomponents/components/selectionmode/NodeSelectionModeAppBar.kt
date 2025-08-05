@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.selectionmode
+package mega.privacy.android.core.nodecomponents.components.selectionmode
 
 import androidx.compose.runtime.Composable
 import mega.android.core.ui.components.toolbar.AppBarNavigationType

@@ -2,7 +2,7 @@ package mega.privacy.android.core.nodecomponents.mapper
 
 import com.google.common.truth.Truth
 import mega.privacy.android.core.nodecomponents.R
-import mega.privacy.android.core.nodecomponents.entity.label.Label
+import mega.privacy.android.core.nodecomponents.model.label.Label
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.TestInstance

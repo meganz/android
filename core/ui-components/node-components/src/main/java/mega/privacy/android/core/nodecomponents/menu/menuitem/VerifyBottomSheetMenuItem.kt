@@ -3,11 +3,11 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.entity.BottomSheetClickHandler
-import mega.privacy.android.core.nodecomponents.entity.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.list.view.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
-import mega.privacy.android.core.nodecomponents.util.isOutShare
+import mega.privacy.android.core.nodecomponents.extension.isOutShare
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedNode

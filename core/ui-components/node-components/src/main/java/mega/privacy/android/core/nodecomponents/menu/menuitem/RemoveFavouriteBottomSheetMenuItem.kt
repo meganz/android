@@ -6,7 +6,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.entity.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveFavouriteMenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission

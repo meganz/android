@@ -5,7 +5,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import mega.privacy.android.core.nodecomponents.entity.NodeActionModeMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedNode

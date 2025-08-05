@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.selectionmode
+package mega.privacy.android.core.nodecomponents.components.selectionmode
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition

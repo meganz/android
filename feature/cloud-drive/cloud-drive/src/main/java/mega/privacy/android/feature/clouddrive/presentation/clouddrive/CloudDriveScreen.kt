@@ -13,8 +13,8 @@ import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
-import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeAppBar
-import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent

@@ -14,11 +14,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.entity.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
-import mega.privacy.android.core.nodecomponents.util.isOutShare
+import mega.privacy.android.core.nodecomponents.extension.isOutShare
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode

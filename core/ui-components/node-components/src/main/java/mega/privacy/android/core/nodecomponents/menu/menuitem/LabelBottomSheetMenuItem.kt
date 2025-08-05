@@ -5,8 +5,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.entity.BottomSheetClickHandler
-import mega.privacy.android.core.nodecomponents.entity.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.list.view.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.mapper.NodeLabelResourceMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.LabelMenuAction

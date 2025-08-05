@@ -1,7 +1,6 @@
 package mega.privacy.android.core.nodecomponents.list.view
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.toggle.Toggle
-import mega.android.core.ui.model.TopAppBarAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews

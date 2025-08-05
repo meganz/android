@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import timber.log.Timber
 
 
 /**

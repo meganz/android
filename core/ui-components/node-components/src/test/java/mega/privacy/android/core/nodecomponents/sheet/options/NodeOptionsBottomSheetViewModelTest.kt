@@ -4,13 +4,9 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.entity.NodeActionModeMenuItem
-import mega.privacy.android.core.nodecomponents.entity.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
-import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
-import mega.privacy.android.core.nodecomponents.util.isOutShare
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.contacts.ContactData

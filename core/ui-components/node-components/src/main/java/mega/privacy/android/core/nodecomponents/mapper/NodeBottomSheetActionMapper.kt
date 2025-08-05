@@ -1,7 +1,7 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
-import mega.privacy.android.core.nodecomponents.entity.NodeActionModeMenuItem
-import mega.privacy.android.core.nodecomponents.entity.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject

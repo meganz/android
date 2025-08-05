@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.entity.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.AvailableOfflineBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.CopyBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.DeletePermanentlyBottomSheetMenuItem

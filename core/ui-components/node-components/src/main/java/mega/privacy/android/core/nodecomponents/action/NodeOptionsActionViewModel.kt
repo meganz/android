@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.R
-import mega.privacy.android.core.nodecomponents.entity.NodeActionState
+import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper

@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.entity
+package mega.privacy.android.core.nodecomponents.model
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController

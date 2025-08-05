@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 
 /**

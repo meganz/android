@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.util
+package mega.privacy.android.core.nodecomponents.extension
 
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node

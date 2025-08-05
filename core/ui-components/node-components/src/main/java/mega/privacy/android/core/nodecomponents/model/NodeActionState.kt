@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.entity
+package mega.privacy.android.core.nodecomponents.model
 
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent

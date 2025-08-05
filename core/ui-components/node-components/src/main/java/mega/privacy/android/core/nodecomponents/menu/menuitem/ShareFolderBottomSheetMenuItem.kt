@@ -7,10 +7,10 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.entity.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareFolderMenuAction
-import mega.privacy.android.core.nodecomponents.util.isOutShare
+import mega.privacy.android.core.nodecomponents.extension.isOutShare
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType

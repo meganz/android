@@ -15,7 +15,6 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.nodecomponents.list.view.previewdata.FolderNodePreviewDataProvider
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 

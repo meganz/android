@@ -4,9 +4,9 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.entity.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageShareFolderMenuAction
-import mega.privacy.android.core.nodecomponents.util.isOutShare
+import mega.privacy.android.core.nodecomponents.extension.isOutShare
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
