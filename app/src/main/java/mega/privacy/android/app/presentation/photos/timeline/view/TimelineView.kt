@@ -2,8 +2,13 @@ package mega.privacy.android.app.presentation.photos.timeline.view
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -53,6 +58,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewS
 import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.isScrolledToEnd
+import mega.privacy.android.app.presentation.photos.view.isScrolledToTop
 import mega.privacy.android.app.presentation.photos.view.isScrollingDown
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.shared.original.core.ui.theme.accent_050
@@ -98,6 +104,7 @@ fun TimelineView(
     }
     val isScrollingDown by lazyGridState.isScrollingDown()
     val isScrolledToEnd by lazyGridState.isScrolledToEnd()
+    val isScrolledToTop by lazyGridState.isScrolledToTop()
     val scaffoldState = rememberScaffoldState()
     val isLight = MaterialTheme.colors.isLight
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -257,6 +264,7 @@ fun TimelineView(
                             isBarVisible = isBarVisible,
                             isScrollingDown = isScrollingDown,
                             isScrolledToEnd = isScrolledToEnd,
+                            isScrolledToTop = isScrolledToTop,
                             photosGridView = photosGridView,
                             photoDownload = photoDownload,
                             onCardClick = onCardClick,
@@ -281,6 +289,7 @@ private fun HandlePhotosGridView(
     isBarVisible: Boolean,
     isScrollingDown: Boolean,
     isScrolledToEnd: Boolean,
+    isScrolledToTop: Boolean,
     photosGridView: @Composable () -> Unit,
     photoDownload: PhotoDownload,
     onCardClick: (DateCard) -> Unit,
@@ -288,6 +297,7 @@ private fun HandlePhotosGridView(
     onChangeCameraUploadsPermissions: () -> Unit,
     onCloseCameraUploadsLimitedAccess: () -> Unit,
 ) {
+    val isBannerShown = (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
     LaunchedEffect(
         timelineViewState.scrollStartIndex,
         timelineViewState.scrollStartOffset,
@@ -305,52 +315,60 @@ private fun HandlePhotosGridView(
         }
     }
     // Load Photos
-    Box {
-        when (timelineViewState.selectedTimeBarTab) {
-            TimeBarTab.All -> {
-                Column {
-                    photosGridView()
-                }
-            }
-
-            else -> {
-                val dateCards = when (timelineViewState.selectedTimeBarTab) {
-                    TimeBarTab.Years -> timelineViewState.yearsCardPhotos
-                    TimeBarTab.Months -> timelineViewState.monthsCardPhotos
-                    TimeBarTab.Days -> timelineViewState.daysCardPhotos
-                    else -> timelineViewState.daysCardPhotos
-                }
-                CardListView(
-                    state = lazyGridState,
-                    dateCards = dateCards,
-                    shouldApplySensitiveMode = timelineViewState.hiddenNodeEnabled
-                            && timelineViewState.accountType?.isPaid == true
-                            && !timelineViewState.isBusinessAccountExpired,
-                    photoDownload = photoDownload,
-                    onCardClick = onCardClick,
-                    cardListViewHeaderView = {
-                        if (timelineViewState.isCameraUploadsLimitedAccess) {
-                            CameraUploadsLimitedAccess(
-                                onClick = onChangeCameraUploadsPermissions,
-                                onClose = onCloseCameraUploadsLimitedAccess,
-                            )
-                        }
-                    }
-                )
+    Column {
+        if (timelineViewState.isCameraUploadsBannerImprovementEnabled) {
+            SlideBanner(visible = isBannerShown) {
+                CameraUploadsBanner(timelineViewState)
             }
         }
 
-        if (timelineViewState.selectedPhotoCount == 0) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomEnd,
-            ) {
-                TimeSwitchBar(
-                    timeBarTabs = timelineViewState.timeBarTabs,
-                    onTimeBarTabSelected = onTimeBarTabSelected,
-                    selectedTimeBarTab = timelineViewState.selectedTimeBarTab,
+        Box {
+            when (timelineViewState.selectedTimeBarTab) {
+                TimeBarTab.All -> {
+                    Column {
+                        photosGridView()
+                    }
+                }
+
+                else -> {
+                    val dateCards = when (timelineViewState.selectedTimeBarTab) {
+                        TimeBarTab.Years -> timelineViewState.yearsCardPhotos
+                        TimeBarTab.Months -> timelineViewState.monthsCardPhotos
+                        TimeBarTab.Days -> timelineViewState.daysCardPhotos
+                        else -> timelineViewState.daysCardPhotos
+                    }
+                    CardListView(
+                        state = lazyGridState,
+                        dateCards = dateCards,
+                        shouldApplySensitiveMode = timelineViewState.hiddenNodeEnabled
+                                && timelineViewState.accountType?.isPaid == true
+                                && !timelineViewState.isBusinessAccountExpired,
+                        photoDownload = photoDownload,
+                        onCardClick = onCardClick,
+                        cardListViewHeaderView = {
+                            if (timelineViewState.isCameraUploadsLimitedAccess) {
+                                CameraUploadsLimitedAccess(
+                                    onClick = onChangeCameraUploadsPermissions,
+                                    onClose = onCloseCameraUploadsLimitedAccess,
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+
+            if (timelineViewState.selectedPhotoCount == 0) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.BottomEnd,
                 ) {
-                    isBarVisible || (!isScrollingDown && !isScrolledToEnd)
+                    TimeSwitchBar(
+                        timeBarTabs = timelineViewState.timeBarTabs,
+                        onTimeBarTabSelected = onTimeBarTabSelected,
+                        selectedTimeBarTab = timelineViewState.selectedTimeBarTab,
+                    ) {
+                        isBarVisible || (!isScrollingDown && !isScrolledToEnd)
+                    }
                 }
             }
         }
@@ -473,4 +491,40 @@ fun CameraUploadsLimitedAccess(
             }
         },
     )
+}
+
+@Composable
+private fun CameraUploadsBanner(
+    timelineViewState: TimelineViewState,
+) {
+    when (timelineViewState.cameraUploadsStatus) {
+        CameraUploadsStatus.None -> CameraUploadsCheckingUploadsBanner()
+        CameraUploadsStatus.Uploading -> CameraUploadsPendingCountBanner(timelineViewState.pending)
+        else -> {}
+    }
+}
+
+@Composable
+private fun SlideBanner(
+    visible: Boolean,
+    content: @Composable () -> Unit,
+) {
+    val duration = 300
+    AnimatedVisibility(
+        visible = visible,
+        enter = slideInVertically(
+            animationSpec = tween(duration),
+            initialOffsetY = { -it }
+        ) + fadeIn(
+            animationSpec = tween(duration)
+        ),
+        exit = slideOutVertically(
+            animationSpec = tween(duration),
+            targetOffsetY = { -it }
+        ) + fadeOut(
+            animationSpec = tween(duration)
+        )
+    ) {
+        content()
+    }
 }

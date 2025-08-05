@@ -209,6 +209,43 @@ fun EnableCameraUploadsBanner(
 }
 
 @Composable
+fun CameraUploadsCheckingUploadsBanner(
+    modifier: Modifier = Modifier,
+) {
+    CameraUploadsBanner(
+        modifier = modifier,
+        statusIcon = R.drawable.ic_cu_status_sync,
+        title = stringResource(sharedR.string.camera_uploads_banner_checking_uploads_text),
+        description = null
+    )
+}
+
+@Composable
+fun CameraUploadsPendingCountBanner(
+    count: Int,
+    modifier: Modifier = Modifier,
+) {
+    CameraUploadsBanner(
+        modifier = modifier,
+        statusIcon = R.drawable.ic_cu_status_uploading,
+        title = stringResource(
+            sharedR.string.camera_uploads_banner_uploading_pending_count_text,
+            count
+        ),
+        description = null,
+        endIcon = {
+            MegaIcon(
+                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
+                contentDescription = "Camera uploads banner end icon",
+                modifier = Modifier
+                    .size(24.dp),
+                tint = IconColor.Primary,
+            )
+        }
+    )
+}
+
+@Composable
 private fun CameraUploadsBanner(
     @DrawableRes statusIcon: Int,
     title: String?,
@@ -218,7 +255,9 @@ private fun CameraUploadsBanner(
 ) {
     Column(modifier) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(15.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(

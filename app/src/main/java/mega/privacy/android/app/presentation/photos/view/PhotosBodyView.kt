@@ -21,7 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -173,8 +173,8 @@ fun PagerView(
 
 @Composable
 internal fun LazyGridState.isScrollingDown(): State<Boolean> {
-    var nextIndex by remember(this) { mutableStateOf(firstVisibleItemIndex) }
-    var nextScrollOffset by remember(this) { mutableStateOf(firstVisibleItemScrollOffset) }
+    var nextIndex by remember(this) { mutableIntStateOf(firstVisibleItemIndex) }
+    var nextScrollOffset by remember(this) { mutableIntStateOf(firstVisibleItemScrollOffset) }
     return remember(this) {
         derivedStateOf {
             if (nextIndex != firstVisibleItemIndex) {
@@ -193,5 +193,12 @@ internal fun LazyGridState.isScrollingDown(): State<Boolean> {
 fun LazyGridState.isScrolledToEnd() = remember(this) {
     derivedStateOf {
         layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
+    }
+}
+
+@Composable
+fun LazyGridState.isScrolledToTop() = remember(this) {
+    derivedStateOf {
+        firstVisibleItemIndex == 0 && firstVisibleItemScrollOffset == 0
     }
 }
