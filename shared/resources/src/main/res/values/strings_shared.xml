@@ -1472,4 +1472,14 @@
     <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
     <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <!--  when Rename all items action is selected , title of the apply to all dialog  -->
+    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <!-- when Merge folders action is selected , title of the apply to all dialog  -->
+    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <!-- when Choose the local file action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
 </resources>

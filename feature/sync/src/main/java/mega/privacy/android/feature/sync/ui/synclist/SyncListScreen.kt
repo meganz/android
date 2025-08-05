@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
-import android.content.Context
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,7 +39,6 @@ import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
-import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.feature.sync.ui.model.SyncModalSheetContent
@@ -123,6 +121,7 @@ internal fun SyncListScreen(
 
     BottomSheet(
         modalSheetState = modalSheetState,
+        expandedRoundedCorners = true,
         sheetBody = {
             when (val content = sheetContent) {
                 is SyncModalSheetContent.IssueResolutions -> {
@@ -143,12 +142,8 @@ internal fun SyncListScreen(
 
                 is SyncModalSheetContent.ApplyToAllDialog -> {
                     ApplyToAllDialog(
-                        title = "${content.selectedAction.actionName}?",
-                        description = getApplyToAllDescription(
-                            content.stalledIssueUiItem,
-                            content.selectedAction,
-                            context = context
-                        ),
+                        fileName = content.stalledIssueUiItem.displayedName,
+                        selectedAction = content.selectedAction,
                         onApplyToCurrent = {
                             actionSelected(
                                 content.stalledIssueUiItem,
@@ -473,48 +468,3 @@ internal const val STALLED_ISSUES_CHIP_TEST_TAG = "sync_list:stalled_issues_chip
 internal const val SOLVED_ISSUES_CHIP_TEST_TAG = "sync_list:solved_issues_chip"
 
 internal const val BOTTOM_PADDING = 72
-
-/**
- * Generates a description for the ApplyToAllDialog based on the stalled issue and selected action
- */
-private fun getApplyToAllDescription(
-    stalledIssueUiItem: StalledIssueUiItem,
-    selectedAction: StalledIssueResolutionAction,
-    context: Context,
-): String {
-    val fileName = stalledIssueUiItem.displayedName
-
-    return when (selectedAction.resolutionActionType) {
-        StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE ->
-            context.getString(
-                sharedR.string.sync_stalled_issue_choose_local_file_explanation,
-                fileName
-            )
-
-        StalledIssueResolutionActionType.CHOOSE_REMOTE_FILE ->
-            context.getString(
-                sharedR.string.sync_stalled_issue_choose_remote_file_explanation,
-                fileName
-            )
-
-        StalledIssueResolutionActionType.CHOOSE_LATEST_MODIFIED_TIME ->
-            context.getString(
-                sharedR.string.sync_stalled_issue_choose_last_modified_file_explanation,
-            )
-
-        StalledIssueResolutionActionType.RENAME_ALL_ITEMS ->
-            context.getString(
-                sharedR.string.sync_stalled_issue_choose_rename_file_explanation,
-            )
-
-        StalledIssueResolutionActionType.MERGE_FOLDERS ->
-            context.getString(
-                sharedR.string.sync_stalled_issue_choose_merge_folder_explanation,
-            )
-
-        else ->
-            context.getString(
-                sharedR.string.sync_stalled_issue_general_explanation,
-            )
-    }
-}
