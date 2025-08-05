@@ -2,7 +2,7 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -50,9 +50,11 @@ class SessionTransferURLListener(private val context: Context) : MegaRequestList
         if (request.type == MegaRequest.TYPE_GET_SESSION_TRANSFER_URL) {
             if (e.errorCode == MegaError.API_OK) {
                 request.link?.let { requestLink ->
-                    Uri.parse(requestLink)?.let { uri ->
+                    requestLink.takeUnless { it.isEmpty() }?.toUri()?.let { uri ->
                         (context as? OpenLinkActivity)?.launchUrl(requestLink)
                             ?: context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+
+                        (context as? OpenLinkActivity)?.finish()
                     } ?: run {
                         Timber.e("Error MegaRequest.TYPE_GET_SESSION_TRANSFER_URL: link cannot be parsed")
                     }
