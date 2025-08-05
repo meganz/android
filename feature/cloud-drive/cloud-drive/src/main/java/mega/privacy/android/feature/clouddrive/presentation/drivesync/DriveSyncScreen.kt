@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -23,11 +22,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.TabItems
+import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
@@ -40,7 +39,6 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
-import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -112,12 +110,12 @@ internal fun DriveSyncScreen(
             )
         },
         floatingActionButton = {
-            if (selectedTabIndex == 0 && !cloudDriveUiState.isInSelectionMode && !cloudDriveUiState.items.isEmpty()) {
-                MegaFab(
-                    onClick = { showUploadOptionsBottomSheet = true },
-                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus)
-                )
-            }
+            val showFab =
+                selectedTabIndex == 0 && !cloudDriveUiState.isInSelectionMode && cloudDriveUiState.visibleItemsCount > 0
+            AddContentFab(
+                visible = showFab,
+                onClick = { showUploadOptionsBottomSheet = true }
+            )
         },
     ) { paddingValues ->
         MegaScrollableTabRow(

@@ -7,13 +7,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
@@ -23,7 +22,6 @@ import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
-import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
 
 /**
@@ -77,12 +75,10 @@ fun CloudDriveScreen(
             )
         },
         floatingActionButton = {
-            if (!uiState.isInSelectionMode && !uiState.items.isEmpty()) {
-                MegaFab(
-                    onClick = { showUploadOptionsBottomSheet = true },
-                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus)
-                )
-            }
+            AddContentFab(
+                visible = !uiState.isInSelectionMode && uiState.visibleItemsCount > 0,
+                onClick = { showUploadOptionsBottomSheet = true }
+            )
         },
         content = { innerPadding ->
             CloudDriveContent(
