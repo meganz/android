@@ -82,6 +82,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.feature.sync.navigation.SyncNewFolder
@@ -104,6 +105,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val settingsNavigator: SettingsNavigatorImpl,
+    private val getDomainNameUseCase: GetDomainNameUseCase,
 ) : MegaNavigator,
     AppNavigatorImpl, SettingsNavigator by settingsNavigator {
 
@@ -507,7 +509,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             Intent(context, ManagerActivity::class.java)
                 .setAction(ACTION_OPEN_SYNC_MEGA_FOLDER)
                 .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                .setData("https://mega.nz/opensync#${handle}".toUri())
+                .setData("https://${getDomainNameUseCase()}/opensync#${handle}".toUri())
         )
     }
 

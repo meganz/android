@@ -25,6 +25,7 @@ import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.settings.cookie.CookieType.ANALYTICS
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -33,6 +34,9 @@ class CookieSettingsFragment : SettingsBaseFragment(),
 
     @Inject
     lateinit var googleAdsManager: GoogleAdsManager
+
+    @Inject
+    lateinit var getDomainNameUseCase: GetDomainNameUseCase
 
     private val viewModel by viewModels<CookieSettingsViewModel>()
 
@@ -87,10 +91,10 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         analyticsCookiesPreference?.onPreferenceChangeListener = this
         policiesPreference?.apply {
             setButton1(getString(R.string.settings_about_cookie_policy)) {
-                context.launchUrl(COOKIE_URL)
+                context.launchUrl(cookieUrl())
             }
             setButton2(getString(R.string.settings_about_privacy_policy)) {
-                context.launchUrl(PRIVACY_URL)
+                context.launchUrl(privacyUrl())
             }
         }
         adsPersonalization?.onPreferenceClickListener = this
@@ -145,8 +149,6 @@ class CookieSettingsFragment : SettingsBaseFragment(),
         return true
     }
 
-    companion object {
-        private const val COOKIE_URL = "https://mega.nz/cookie"
-        private const val PRIVACY_URL = "https://mega.nz/privacy"
-    }
+    private fun cookieUrl() = "https://${getDomainNameUseCase()}/cookie"
+    private fun privacyUrl() = "https://${getDomainNameUseCase()}/privacy"
 }

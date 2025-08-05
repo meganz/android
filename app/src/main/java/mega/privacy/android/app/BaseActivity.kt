@@ -105,6 +105,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
@@ -181,6 +182,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     @Inject
     lateinit var monitorChatSignalPresenceUseCase: MonitorChatSignalPresenceUseCase
+
+    @Inject
+    lateinit var getDomainNameUseCase: GetDomainNameUseCase
 
     /**
      * Psa handler
@@ -443,7 +447,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
             openBrowserButton.setOnClickListener {
                 dismiss()
-                val uriUrl = Uri.parse("https://mega.nz/")
+                val uriUrl = Uri.parse("https://${getDomainNameUseCase()}/")
                 val launchBrowser = Intent(Intent.ACTION_VIEW, uriUrl)
                 startActivity(launchBrowser)
             }
