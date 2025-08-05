@@ -69,6 +69,7 @@ import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.exception.account.QueryCancelLinkException
 import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkException
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatError
@@ -143,6 +144,7 @@ class DefaultAccountRepositoryTest {
     private val cookieSettingsIntMapper = mock<CookieSettingsIntMapper>()
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
     private val uiPreferencesGateway = mock<UIPreferencesGateway>()
+    private val getDomainNameUseCase = mock<GetDomainNameUseCase>()
     private val userUpdateMapper =
         mock<UserUpdateMapper> {
             on { invoke(any()) } doReturn UserUpdate(
@@ -218,7 +220,8 @@ class DefaultAccountRepositoryTest {
             credentialsPreferencesGateway,
             storageStateMapper,
             uiPreferencesGateway,
-            userLoginPreferenceGateway
+            userLoginPreferenceGateway,
+            getDomainNameUseCase,
         )
     }
 
@@ -264,7 +267,8 @@ class DefaultAccountRepositoryTest {
             storageStateMapper = storageStateMapper,
             uiPreferencesGateway = uiPreferencesGateway,
             excludeFileNames = excludeFileNames,
-            userLoginPreferenceGateway = userLoginPreferenceGateway
+            userLoginPreferenceGateway = userLoginPreferenceGateway,
+            getDomainNameUseCase = getDomainNameUseCase,
         )
 
     }
@@ -800,8 +804,10 @@ class DefaultAccountRepositoryTest {
         underTest.deleteContactLink(handle)
     }
 
-    @Test
-    fun `test that createContactLink returns success`() = runTest {
+    @ParameterizedTest
+    @MethodSource("domainProvider")
+    fun `test that createContactLink returns success`(domain: String) = runTest {
+        whenever(getDomainNameUseCase()) doReturn domain
         val expectedHandle = 100L
         val base64Value = "mycontactlink"
         val renew = true
@@ -827,8 +833,10 @@ class DefaultAccountRepositoryTest {
 
         whenever(megaApiGateway.handleToBase64(expectedHandle)).thenReturn(base64Value)
 
-        assertThat(underTest.createContactLink(renew)).isEqualTo("https://mega.nz/C!$base64Value")
+        assertThat(underTest.createContactLink(renew)).isEqualTo("https://$domain/C!$base64Value")
     }
+
+    private fun domainProvider() = listOf("mega.nz", "mega.app")
 
     @Test
     fun `test that createContactLink throws exception when MegaApi returns failure`() = runTest {

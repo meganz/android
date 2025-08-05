@@ -91,6 +91,7 @@ import mega.privacy.android.domain.exception.account.QueryCancelLinkException
 import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
@@ -180,6 +181,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val userLoginPreferenceGateway: UserLoginPreferenceGateway,
     @ExcludeFileName val excludeFileNames: Set<String>,
+    private val getDomainNameUseCase: GetDomainNameUseCase,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -456,7 +458,7 @@ internal class DefaultAccountRepository @Inject constructor(
                 onRequestFinish = { request, error ->
                     if (error.errorCode == MegaError.API_OK) {
                         val value = megaApiGateway.handleToBase64(request.nodeHandle)
-                        continuation.resumeWith(Result.success("https://mega.nz/C!$value"))
+                        continuation.resumeWith(Result.success("https://${getDomainNameUseCase()}/C!$value"))
                     } else {
                         if (renew) {
                             continuation.resumeWith(
