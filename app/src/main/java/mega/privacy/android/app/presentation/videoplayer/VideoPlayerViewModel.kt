@@ -1065,10 +1065,18 @@ class VideoPlayerViewModel @Inject constructor(
         updateCurrentPlayingHandle(handle.toLong(), isUpdateName)
         saveVideoWatchedTime()
         if (isUpdateName) {
-            val nodeName = uiState.value.items.find {
-                it.nodeHandle == handle.toLong()
-            }?.nodeName ?: ""
-            updateMetadata(Metadata(null, null, null, nodeName))
+            val items = uiState.value.items
+            val playingIndex = items.indexOfFirst { it.nodeHandle == handle.toLong() }
+            if (playingIndex == -1) return
+            val nodeName = items[playingIndex].nodeName
+            //After the video transition, clear the subtitle info
+            clearSubtitleInfo(playingIndex)
+            uiState.update {
+                it.copy(
+                    currentPlayingItemName = nodeName,
+                    metadata = Metadata(null, null, null, nodeName)
+                )
+            }
         }
     }
 
@@ -1461,8 +1469,8 @@ class VideoPlayerViewModel @Inject constructor(
                 it.firstNodeCollisionOrNull?.let { item ->
                     collision.value = item
                 }
-                it.moveRequestResult?.let {
-                    if (it.isSuccess) {
+                it.moveRequestResult?.let { result ->
+                    if (result.isSuccess) {
                         snackbarMessage.value = R.string.context_correctly_moved
                     } else {
                         snackbarMessage.value = R.string.context_no_moved
@@ -2046,8 +2054,17 @@ class VideoPlayerViewModel @Inject constructor(
 
     private fun addSubtitleAndUpdatePlaybackSources(url: String) {
         mediaPlayerGateway.addSubtitle(url)
-        uiState.value.mediaPlaySources?.let {
-            mediaPlayerGateway.buildPlaySources(it)
+        updatePlaySourcesAfterSubtitleChange(uiState.value.currentPlayingIndex ?: 0)
+    }
+
+    private fun updatePlaySourcesAfterSubtitleChange(currentPlayingIndex: Int) {
+        uiState.value.mediaPlaySources?.let { sources ->
+            val newSources = MediaPlaySources(
+                mediaItems = sources.mediaItems,
+                newIndexForCurrentItem = currentPlayingIndex,
+                nameToDisplay = null
+            )
+            mediaPlayerGateway.buildPlaySources(newSources)
         }
     }
 
@@ -2095,6 +2112,19 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     internal fun isShowSubtitleIcon() = currentLaunchSources != OFFLINE_ADAPTER
+
+    internal fun clearSubtitleInfo(currentPlayingIndex: Int) {
+        if (uiState.value.addedSubtitleInfo != null) {
+            uiState.update {
+                it.copy(
+                    matchedSubtitleInfo = null,
+                    addedSubtitleInfo = null,
+                    subtitleSelectedStatus = SubtitleSelectedStatus.Off
+                )
+            }
+            updatePlaySourcesAfterSubtitleChange(currentPlayingIndex)
+        }
+    }
 
     companion object {
         private const val MEDIA_PLAYER_STATE_ENDED = 4

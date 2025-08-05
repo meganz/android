@@ -1289,7 +1289,7 @@ class VideoPlayerViewModelTest {
             underTest.uiState.test {
                 awaitItem().let {
                     assertThat(it.currentPlayingIndex).isEqualTo(
-                        testItems.indexOfFirst { it.nodeHandle == testHandle }
+                        testItems.indexOfFirst { item -> item.nodeHandle == testHandle }
                     )
                     assertThat(it.currentPlayingHandle).isEqualTo(testHandle)
                     assertThat(it.items[1].type).isEqualTo(MediaQueueItemType.Playing)
@@ -1398,7 +1398,7 @@ class VideoPlayerViewModelTest {
                 on { isBusinessAccount }.thenReturn(true)
             }
             whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
-            val testActions = listOf<VideoPlayerMenuAction>(
+            val testActions = listOf(
                 VideoPlayerDownloadAction,
                 VideoPlayerFileInfoAction,
             )
@@ -1442,7 +1442,7 @@ class VideoPlayerViewModelTest {
                 initVideoPlayerItem(2L, ""),
                 initVideoPlayerItem(testHandle, testHandle.toString()),
             )
-            val testActions = listOf<VideoPlayerMenuAction>(
+            val testActions = listOf(
                 VideoPlayerDownloadAction,
                 VideoPlayerFileInfoAction,
             )
@@ -2192,12 +2192,26 @@ class VideoPlayerViewModelTest {
     }
 
     @Test
+    fun `test that subtitle status is cleared correctly after onMediaItemTransition is invoked`() =
+        runTest {
+            initViewModel()
+            underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem, mock())
+            underTest.clearSubtitleInfo(0)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.matchedSubtitleInfo).isNull()
+                assertThat(actual.addedSubtitleInfo).isNull()
+                assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
+            }
+        }
+
+    @Test
     fun `test that state is updated correctly after checkPlaybackPositionBeforePlayback is invoked`() =
         runTest {
             val playbackInfo = mock<PlaybackInformation> {
                 on { currentPosition }.thenReturn(100)
             }
-            val map = mapOf<Long, PlaybackInformation>(testHandle to playbackInfo)
+            val map = mapOf(testHandle to playbackInfo)
             whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(map))
             initViewModel()
             underTest.initVideoPlayerData(null)

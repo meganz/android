@@ -48,6 +48,7 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.icon.pack.R
 import timber.log.Timber
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 /**
  * The implementation of MediaPlayerGateway
@@ -430,8 +431,9 @@ class MediaPlayerFacade @Inject constructor(
         player?.let { player ->
             val videoUri: Uri? = player.currentMediaItem?.localConfiguration?.uri
             val mediaId = player.currentMediaItem?.mediaId
-            val uri = Uri.parse(subtitleFileUrl)
-            if (videoUri != null && mediaId != null && uri != null) {
+            Timber.d("SubtitleTesting, videoUri: $videoUri, mediaId: $mediaId, subtitleFileUrl: $subtitleFileUrl")
+            val uri = subtitleFileUrl.toUri()
+            if (videoUri != null && mediaId != null) {
                 val subtitle = MediaItem.SubtitleConfiguration.Builder(uri)
                     .setMimeType(MimeTypes.APPLICATION_SUBRIP)
                     .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
