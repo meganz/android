@@ -49,6 +49,7 @@ internal fun SyncScreen(
     newFolderDetail: SyncNewFolder?,
     shouldOpenStopBackup: Boolean,
     folderName: String?,
+    megaDomainName: String,
 ) {
     if (state.isNetworkConnected) {
         AndroidSyncFeatureNavigation(
@@ -60,6 +61,7 @@ internal fun SyncScreen(
             fileTypeIconMapper = fileTypeIconMapper,
             syncPermissionsManager = syncPermissionsManager,
             folderName = folderName,
+            megaDomainName = megaDomainName,
         )
     } else {
         SyncNoNetworkState(onBackPressed = onBackPressed)
@@ -75,6 +77,7 @@ internal fun AndroidSyncFeatureNavigation(
     fileTypeIconMapper: FileTypeIconMapper,
     syncPermissionsManager: SyncPermissionsManager,
     folderName: String?,
+    megaDomainName: String,
     shouldOpenStopBackup: Boolean = false,
 ) {
     val context = LocalContext.current
@@ -124,7 +127,8 @@ internal fun AndroidSyncFeatureNavigation(
             syncStalledIssuesViewModel = syncStalledIssuesViewModel,
             syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
             syncIssueNotificationViewModel = syncIssueNotificationViewModel,
-            settingsSyncViewModel = settingsSyncViewModel
+            settingsSyncViewModel = settingsSyncViewModel,
+            megaDomainName = megaDomainName,
         )
     }
 }

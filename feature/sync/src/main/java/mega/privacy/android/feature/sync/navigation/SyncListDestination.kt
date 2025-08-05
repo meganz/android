@@ -35,11 +35,12 @@ internal fun NavGraphBuilder.syncListDestination(
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
     syncIssueNotificationViewModel: SyncIssueNotificationViewModel,
     settingsSyncViewModel: SettingsSyncViewModel,
+    megaDomainName: String,
 ) {
     composable<SyncList>(
         deepLinks = listOf(
             navDeepLink<SyncList>(
-                basePath = "https://mega.nz/${getSyncRoute()}/SyncList",
+                basePath = "https://$megaDomainName/${getSyncRoute()}/SyncList",
             ) {
                 action = Intent.ACTION_VIEW
             }),

@@ -2,8 +2,11 @@ package mega.privacy.android.feature.sync.navigation
 
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SyncDeeplinkProcessorTest {
 
     private lateinit var syncDeeplinkProcessor: SyncDeeplinkProcessor
@@ -13,14 +16,17 @@ class SyncDeeplinkProcessorTest {
         syncDeeplinkProcessor = SyncDeeplinkProcessor()
     }
 
-    @Test
-    fun `test that the sync deep link processor matches sync URLs`() = runTest {
-        val urls = listOf(
-            "https://mega.nz/${getSyncRoute()}",
-            "https://mega.nz/${getSyncListRoute()}",
-        )
-        urls.forEach { url ->
-            assert(syncDeeplinkProcessor.matches(url))
-        }
+    @ParameterizedTest
+    @MethodSource("urlsProvider")
+    fun `test that the sync deep link processor matches sync URLs`(url: String) = runTest {
+        assert(syncDeeplinkProcessor.matches(url))
     }
+
+    private fun urlsProvider() =
+        listOf("mega.nz", "mega.app").flatMap { domain ->
+            listOf(
+                "https://$domain/${getSyncRoute()}",
+                "https://$domain/${getSyncListRoute()}",
+            )
+        }
 }

@@ -38,6 +38,7 @@ internal fun NavGraphBuilder.syncNavGraph(
     syncPermissionsManager: SyncPermissionsManager,
     openUpgradeAccountPage: () -> Unit,
     shouldNavigateToSyncList: Boolean = true,
+    megaDomainName: String,
     context: Context,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
@@ -55,6 +56,7 @@ internal fun NavGraphBuilder.syncNavGraph(
         popToSyncListView = {
             navController.navFromNewFolderRouteToListRoute()
         },
+        megaDomainName = megaDomainName,
     )
     syncMegaPickerDestination(
         syncPermissionsManager = syncPermissionsManager,
@@ -90,7 +92,8 @@ internal fun NavGraphBuilder.syncNavGraph(
         syncStalledIssuesViewModel = syncStalledIssuesViewModel,
         syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
         syncIssueNotificationViewModel = syncIssueNotificationViewModel,
-        settingsSyncViewModel = settingsSyncViewModel
+        settingsSyncViewModel = settingsSyncViewModel,
+        megaDomainName = megaDomainName,
     )
 }
 

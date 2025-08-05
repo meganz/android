@@ -13,18 +13,21 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncChip
 import mega.privacy.android.icon.pack.R
 import javax.inject.Inject
 import androidx.core.net.toUri
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 
 /**
  * Mapper class to map a [SyncNotificationMessage] to a [Notification]
  */
-class SyncNotificationMapper @Inject constructor() {
+class SyncNotificationMapper @Inject constructor(
+    private val getDomainNameUseCase: GetDomainNameUseCase,
+) {
 
     operator fun invoke(
         context: Context,
         syncNotificationMessage: SyncNotificationMessage,
     ): Notification {
         val androidSyncIntent = Intent(
-            Intent.ACTION_VIEW, "https://mega.nz/${
+            Intent.ACTION_VIEW, "https://${getDomainNameUseCase()}/${
                 getSyncListRoute(
                     selectedChip = when (syncNotificationMessage.syncNotificationType) {
                         SyncNotificationType.STALLED_ISSUE -> SyncChip.STALLED_ISSUES

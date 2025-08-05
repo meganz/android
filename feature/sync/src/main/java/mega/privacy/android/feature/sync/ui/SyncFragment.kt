@@ -14,6 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.views.SyncScreen
 import mega.privacy.android.navigation.MegaNavigator
@@ -50,6 +51,12 @@ class SyncFragment : Fragment() {
     @Inject
     lateinit var syncPermissionsManager: SyncPermissionsManager
 
+    /**
+     * Get [GetDomainNameUseCase]
+     */
+    @Inject
+    lateinit var getDomainNameUseCase: GetDomainNameUseCase
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -82,6 +89,7 @@ class SyncFragment : Fragment() {
                         folderName = activity?.intent?.getStringExtra(
                             SyncHostActivity.EXTRA_FOLDER_NAME,
                         ),
+                        megaDomainName = getDomainNameUseCase()
                     )
                 }
             }

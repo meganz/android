@@ -41,11 +41,12 @@ internal fun NavGraphBuilder.syncNewFolderDestination(
     shouldNavigateToSyncList: Boolean,
     openUpgradeAccountPage: () -> Unit,
     popToSyncListView: () -> Unit,
+    megaDomainName: String,
 ) {
     composable<SyncNewFolder>(
         deepLinks = listOf(
             navDeepLink<SyncNewFolder>(
-                basePath = "https://mega.nz/${getSyncRoute()}/SyncNewFolder",
+                basePath = "https://$megaDomainName/${getSyncRoute()}/SyncNewFolder",
             ) {
                 action = Intent.ACTION_VIEW
             }),
