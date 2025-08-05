@@ -129,7 +129,7 @@ private fun RichLinkContentViewPreview() {
             RichLinkContentView(
                 contentTitle = "Title",
                 contentDescription = "Description",
-                host = "mega.nz",
+                host = "mega.app",
                 image = painterResource(R.drawable.ic_select_folder),
                 icon = painterResource(R.drawable.ic_select_folder),
             )
