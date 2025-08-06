@@ -751,15 +751,7 @@
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">إضافة إلى قائمة التشغيل</string>
     <!-- Stop Backup confirmation dialog text -->
-    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up your folder, you need to either move it or delete it.</string>
-    <!-- Move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option">انقل المجلد</string>
-    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_text">انقل هذا المجلد إلى موقع آخر للوصول الكامل إلى بياناتك.</string>
-    <!-- Delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option">احذف المجلد بشكل نهائي</string>
-    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option_text">سيتم حذف المجلد من ميغا MEGA. لن يتم حذفه من جهازك.</string>
+    <string name="sync_stop_backup_confirm_dialog_text">لإيقاف النسخ الاحتياطي لهذا المجلد، تحتاج إما إلى نقله أو حذفه</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">تأكيد</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -779,8 +771,6 @@
     <string name="general_select">تحديد</string>
     <!-- Name for a general label which action is "Select folder" -->
     <string name="general_select_folder">حدد المجلد</string>
-    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">انتقل إلى: [B]%1s[/B]</string>
     <!-- Message shown to user when app is connected to the MEGA server -->
     <string name="login_connected_to_server">متصل بالسيرفر</string>
     <!-- User Alert notification for scheduled recurring meeting changes -->
@@ -1476,13 +1466,92 @@
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">عرض في المجلد</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
-    <string name="sync_stop_backup_confirm_dialog_delete_explanation">If you choose to delete it, the folder will be deleted from MEGA but it won’t be deleted from your device.</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">أو احذف المجلد من ميغا MEGA. لن يتم حذفها من جهازك. لا يمكن التراجع عن هذا الإجراء.</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Move to Cloud drive</string>
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">نقل المجلد إلى السواقة السحابية</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_delete_permanently">حذف بشكل دائم</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">حذف المجلد من ميغا MEGA</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
     <string name="camera_uploads_banner_complete_title">تحميلات الكاميرا تمت بنجاح</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
+    <string name="camera_uploads_banner_no_full_access_message">لضمان عدم تفويت جميع ذكرياتك، تحتاج ميغا MEGA إلى الوصول الكامل إلى مكتبة الصور الخاصة بك.</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">لا يمكن فتح الملف لأن تنسيق الملف غير مدعوم</string>
+    <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
+    <string name="intent_not_available">لا يوجد تطبيق مناسب لفتح هذا الملف على جهازك</string>
+    <!-- A user can mark a folder or file with red colour. -->
+    <string name="label_red">أحمر</string>
+    <!-- A user can mark a folder or file with orange colour. -->
+    <string name="label_orange">برتقالي</string>
+    <!-- A user can mark a folder or file with yellow colour. -->
+    <string name="label_yellow">أصفر</string>
+    <!-- A user can mark a folder or file with green colour. -->
+    <string name="label_green">أخضر</string>
+    <!-- A user can mark a folder or file with blue colour. -->
+    <string name="label_blue">أزرق</string>
+    <!-- A user can mark a folder or file with purple colour. -->
+    <string name="label_purple">بنفسجي</string>
+    <!-- A user can mark a folder or file with grey colour. -->
+    <string name="label_grey">رصاصي</string>
+    <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
+    <string name="error_open_file_with">حدث خطأ ولا يمكن فتح الملف باستخدام هذا التطبيق.</string>
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
+    <string name="intent_not_available_file">قد لا يكون لديك أي تطبيقات مثبتة تدعم هذا النوع من الملفات</string>
+    <!-- Text to inform the user when an error occurs -->
+    <string name="general_text_error">خطأ حصل. الرجاء المحاولة مرة أخرى.</string>
+    <!-- Name for a general label which action is "Select or create new folder" -->
+    <string name="general_select_create_folder">حدد أو قم بإنشاء مجلدًا جديدًا</string>
+    <!-- Snackbar message when backup is moved to a cloud drive folder -->
+    <string name="sync_snackbar_message_confirm_backup_moved">تم إيقاف النسخ الاحتياطي. تم نقل المجلد إلى %1$s</string>
+    <!-- Name for a general label which action is "Select or create new folder" -->
+    <string name="sync_snackbar_message_confirm_backup_deleted">تم إيقاف النسخ الاحتياطي. تم حذف المجلد من ميغا MEGA.</string>
+    <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_local_file_explanation">سيتم استبدال الملف الموجود على ميغا MEGA بـ [A]%1$s.[/A] سيتم نقل الإصدار الحالي إلى مجلد SyncDebris في سلة المحذوفات.</string>
+    <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_remote_file_explanation">سيتم نقل الملف المحلي [A]%1$s[/A] إلى المجلد .debris</string>
+    <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_rename_file_explanation">ستتم إضافة لاحقة مثل (1) إلى الملفات التي تحمل الاسم نفسه ولكن بمحتوى مختلف</string>
+    <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">سيتم دمج جميع المجلدات. ستتم إضافة لاحقة مثل (1) للملفات التي تحتوي على نفس المحتوى ولكن المختلف.</string>
+    <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <!-- Dialog choose option -->
+    <string name="general_dialog_choose_button">اختر</string>
+    <!-- Text label of Apply to all -->
+    <string name="sync_apply_to_all_checkbox">قم بالتطبيق على الكل</string>
+    <!-- Sync message when a single issue resolved -->
+    <string name="sync_stalled_issue_resolved">تم حل المشكلة</string>
+    <!-- Sync message when multiple issues resolved -->
+    <string name="sync_stalled_issues_resolved">تم حل المشكلات</string>
+    <!-- Text of the empty playlist in Video Section -->
+    <string name="video_section_playlists_video_empty">إفراغ</string>
+    <!-- Text of video count of playlist in Video Section -->
+    <plurals name="video_section_playlists_video_count">
+        <item quantity="zero">%1$d مقطع فيديو</item>
+        <item quantity="one">%1$d مقطع فيديو</item>
+        <item quantity="two">%1$d مقطعي فيديو</item>
+        <item quantity="few">%1$d مقاطع فيديو</item>
+        <item quantity="many">%1$d مقطع فيديو</item>
+        <item quantity="other">%1$d فيديوهات</item>
+    </plurals>
+    <!-- Stop Backup confirmation dialog Move explanation -->
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">انقل هذا المجلد إلى السواقة السحابية الخاصة بك للوصول الكامل إلى بياناتك. لن يتم نسخها احتياطيًا بعد الآن.</string>
+    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <!-- Text of the Camera Uploads checking uploads banner in Photos -->
+    <string name="camera_uploads_banner_checking_uploads_text">جاري التحقق من الترفيعات...</string>
+    <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
+    <string name="camera_uploads_banner_uploading_pending_count_text">الترفيع: %d عنصر متبقي</string>
+    <!--  when Rename all items action is selected , title of the apply to all dialog  -->
+    <string name="sync_resolve_rename_all_items_title">إعادة تسمية جميع العناصر؟</string>
+    <!-- when Merge folders action is selected , title of the apply to all dialog  -->
+    <string name="sync_stalled_issue_merge_folders_title">دمج المجلدات وإعادة تسمية الملفات؟</string>
+    <!-- when Choose the local file action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_local_file_title">اختر الملف المحلي؟</string>
+    <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_remote_file_title">اختر الملف المخزن في ميغا MEGA؟</string>
+    <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">اختر آخر ملف تم تعديله؟</string>
 </resources>

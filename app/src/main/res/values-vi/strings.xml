@@ -683,7 +683,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Kiểm&#160;tra hộp&#160;thư email của bạn để tiếp&#160;tục.</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">Phát sinh lỗi, xin thử lại sau.</string>
+    <string name="general_text_error">Đã xảy ra lỗi, thử lại</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Cần phải đăng nhập vào tài khoản để thực hiện hoạt động này.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->

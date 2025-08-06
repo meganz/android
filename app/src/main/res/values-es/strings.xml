@@ -697,7 +697,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Ve a la bandeja de entrada de tu correo electrónico para continuar.</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">Se ha producido un error, por favor inténtalo de nuevo.</string>
+    <string name="general_text_error">Se ha producido un error, inténtalo de nuevo</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Debes haber iniciado sesión para realizar esta operación.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->

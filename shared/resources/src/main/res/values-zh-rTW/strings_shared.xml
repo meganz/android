@@ -691,15 +691,7 @@
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">新增到播放列表</string>
     <!-- Stop Backup confirmation dialog text -->
-    <string name="sync_stop_backup_confirm_dialog_text">要停止備份您的資料夾，您需要移動或刪除它。</string>
-    <!-- Move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option">移動資料夾</string>
-    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_text">將此資料夾移到另一個位置以獲得對您的資料的完全存取權限。</string>
-    <!-- Delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option">永久刪除資料夾</string>
-    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option_text">資料夾將從MEGA中刪除。它不會從您的裝置中刪除。</string>
+    <string name="sync_stop_backup_confirm_dialog_text">要停止備份此資料夾，您需要移動或刪除它</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">確認</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -714,8 +706,6 @@
     <string name="general_select">選擇</string>
     <!-- Name for a general label which action is "Select folder" -->
     <string name="general_select_folder">選擇資料夾</string>
-    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">移至：[B]%1s[/B]</string>
     <!-- Message shown to user when app is connected to the MEGA server -->
     <string name="login_connected_to_server">已連線到伺服器</string>
     <!-- User Alert notification for scheduled recurring meeting changes -->
@@ -1017,7 +1007,7 @@
     <!-- USP Carousel page 1 description-->
     <string name="carousel_page_description_slide_1">使用者控制的零知識加密意味著沒有人可以看到您的資料，除非您想讓他們看到，否則連我們也無法看到您的資料。</string>
     <!-- USP Carousel page 2 title-->
-    <string name="carousel_page_title_slide_2">時時刻刻保持安全</string>
+    <string name="carousel_page_title_slide_2">保護著每一刻</string>
     <!-- USP Carousel page 2 description-->
     <string name="carousel_page_description_slide_2">透過自動相機上傳到MEGA雲端和充足的儲存空間，您永遠不會失去寶貴的回憶</string>
     <!-- USP Carousel page 3 title-->
@@ -1391,13 +1381,87 @@
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">在資料夾中檢視</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
-    <string name="sync_stop_backup_confirm_dialog_delete_explanation">如果您選擇刪除它，該資料夾將從MEGA中刪除，但不會從您的裝置中刪除。</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">或從MEGA中刪除該資料夾。它不會從您的裝置中刪除。此操作無法撤銷。</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">移到雲端硬碟</string>
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">將資料夾移動到雲端硬碟</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_delete_permanently">永久刪除</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">從MEGA中刪除資料夾</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
     <string name="camera_uploads_banner_complete_title">相機上傳完成</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
+    <string name="camera_uploads_banner_no_full_access_message">為了確保我們不會遺失您的所有回憶，MEGA需要您相簿的完全存取權限。</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">由於不支援該檔案格式，因此無法開啟檔案</string>
+    <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
+    <string name="intent_not_available">您的裝置上沒有合適的應用程式來開啟此檔案</string>
+    <!-- A user can mark a folder or file with red colour. -->
+    <string name="label_red">玫紅</string>
+    <!-- A user can mark a folder or file with orange colour. -->
+    <string name="label_orange">橘橙</string>
+    <!-- A user can mark a folder or file with yellow colour. -->
+    <string name="label_yellow">金黃</string>
+    <!-- A user can mark a folder or file with green colour. -->
+    <string name="label_green">草綠</string>
+    <!-- A user can mark a folder or file with blue colour. -->
+    <string name="label_blue">天藍</string>
+    <!-- A user can mark a folder or file with purple colour. -->
+    <string name="label_purple">蘭紫</string>
+    <!-- A user can mark a folder or file with grey colour. -->
+    <string name="label_grey">銀灰</string>
+    <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
+    <string name="error_open_file_with">發生錯誤，無法使用此應用程式開啟檔案。</string>
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
+    <string name="intent_not_available_file">您可能未安裝任何支援此檔案類型的應用程式</string>
+    <!-- Text to inform the user when an error occurs -->
+    <string name="general_text_error">發生錯誤，請再試一次。</string>
+    <!-- Name for a general label which action is "Select or create new folder" -->
+    <string name="general_select_create_folder">選擇或建立新資料夾</string>
+    <!-- Snackbar message when backup is moved to a cloud drive folder -->
+    <string name="sync_snackbar_message_confirm_backup_moved">備份已停止。資料夾已移到%1$s</string>
+    <!-- Name for a general label which action is "Select or create new folder" -->
+    <string name="sync_snackbar_message_confirm_backup_deleted">備份已停止。資料夾已從MEGA中刪除。</string>
+    <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_local_file_explanation">MEGA上的檔案將被替換為[A]%1$s。[/A]現有版本將被移到垃圾筒中的同步碎片資料夾。</string>
+    <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_remote_file_explanation">本機檔案[A]%1$s[/A]將被移到.debris資料夾</string>
+    <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_rename_file_explanation">名稱相同但內容不同的檔案會加上類似（1）的後綴</string>
+    <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">所有資料夾都將合併。名稱相同但內容不同的檔案將會加上類似（1）的後綴。</string>
+    <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <!-- Dialog choose option -->
+    <string name="general_dialog_choose_button">選擇</string>
+    <!-- Text label of Apply to all -->
+    <string name="sync_apply_to_all_checkbox">套用至全部</string>
+    <!-- Sync message when a single issue resolved -->
+    <string name="sync_stalled_issue_resolved">問題已解決</string>
+    <!-- Sync message when multiple issues resolved -->
+    <string name="sync_stalled_issues_resolved">問題已解決</string>
+    <!-- Text of the empty playlist in Video Section -->
+    <string name="video_section_playlists_video_empty">清空</string>
+    <!-- Text of video count of playlist in Video Section -->
+    <plurals name="video_section_playlists_video_count">
+        <item quantity="other">%1$d個影片</item>
+    </plurals>
+    <!-- Stop Backup confirmation dialog Move explanation -->
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">將此資料夾移到您的雲端硬碟即可獲得資料的完全存取權限。它將不再進行備份。</string>
+    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <!-- Text of the Camera Uploads checking uploads banner in Photos -->
+    <string name="camera_uploads_banner_checking_uploads_text">正在檢查上傳⋯</string>
+    <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
+    <string name="camera_uploads_banner_uploading_pending_count_text">正在上傳：剩餘%d個項目</string>
+    <!--  when Rename all items action is selected , title of the apply to all dialog  -->
+    <string name="sync_resolve_rename_all_items_title">重新命名所有項目？</string>
+    <!-- when Merge folders action is selected , title of the apply to all dialog  -->
+    <string name="sync_stalled_issue_merge_folders_title">合併資料夾並重新命名檔案？</string>
+    <!-- when Choose the local file action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_local_file_title">選擇本地檔案？</string>
+    <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_remote_file_title">選擇儲存在MEGA中的檔案？</string>
+    <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">選擇上次修改的檔案？</string>
 </resources>

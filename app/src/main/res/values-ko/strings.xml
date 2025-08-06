@@ -683,7 +683,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">진행하려면 이메일 수신함을 확인하세요</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">오류가 발생했습니다, 다시 시도하세요.</string>
+    <string name="general_text_error">오류가 발생했습니다, 다시 시도하세요</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">이 행동을 하려면 로그인 해야합니다.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->

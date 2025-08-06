@@ -683,7 +683,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">檢查您的電子郵件收件匣以繼續。</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">發生錯誤，請再試一次。</string>
+    <string name="general_text_error">發生錯誤，請重試</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">您必須登入才能執行此操作。</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->

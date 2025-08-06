@@ -691,15 +691,7 @@
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">プレイリストに追加</string>
     <!-- Stop Backup confirmation dialog text -->
-    <string name="sync_stop_backup_confirm_dialog_text">フォルダのバックアップを停止するには、フォルダを移動するか削除する必要があります。</string>
-    <!-- Move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option">フォルダの移動</string>
-    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_text">このフォルダを別の場所に移動すると、お持ちのデータに完全にアクセスできるようになります。</string>
-    <!-- Delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option">フォルダを恒久的に削除</string>
-    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option_text">MEGAからフォルダが削除されます。お使いのデバイスからは削除されません。</string>
+    <string name="sync_stop_backup_confirm_dialog_text">このフォルダのバックアップを停止するには、移動するか削除する必要があります</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">確認</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -714,8 +706,6 @@
     <string name="general_select">選択</string>
     <!-- Name for a general label which action is "Select folder" -->
     <string name="general_select_folder">フォルダを選択</string>
-    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">[B]%1s[/B]に移動</string>
     <!-- Message shown to user when app is connected to the MEGA server -->
     <string name="login_connected_to_server">サーバーに接続されています</string>
     <!-- User Alert notification for scheduled recurring meeting changes -->
@@ -1391,13 +1381,87 @@
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">フォルダで表示</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
-    <string name="sync_stop_backup_confirm_dialog_delete_explanation">削除を選択した場合、フォルダはMEGAから削除されますが、お使いのデバイスからは削除されません。</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">または、MEGAからフォルダを削除してください。お使いのデバイスからは削除されません。この操作は元に戻せません。</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">クラウドドライブに移動</string>
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">フォルダをクラウドドライブに移動</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_delete_permanently">恒久的に削除</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">MEGAからフォルダを削除</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
     <string name="camera_uploads_banner_complete_title">カメラアップロードが完了しました</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
     <string name="camera_uploads_banner_no_full_access_message">思い出をすべて見逃さないようにするには、MEGAに写真ライブラリへのフルアクセスを許可してください。</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">ファイル形式がサポートされていないため、ファイルを開くことができません</string>
+    <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
+    <string name="intent_not_available">お使いのデバイスには、このファイルを開くのに適したアプリがありません</string>
+    <!-- A user can mark a folder or file with red colour. -->
+    <string name="label_red">赤</string>
+    <!-- A user can mark a folder or file with orange colour. -->
+    <string name="label_orange">オレンジ色の</string>
+    <!-- A user can mark a folder or file with yellow colour. -->
+    <string name="label_yellow">黄色</string>
+    <!-- A user can mark a folder or file with green colour. -->
+    <string name="label_green">緑の</string>
+    <!-- A user can mark a folder or file with blue colour. -->
+    <string name="label_blue">青</string>
+    <!-- A user can mark a folder or file with purple colour. -->
+    <string name="label_purple">紫</string>
+    <!-- A user can mark a folder or file with grey colour. -->
+    <string name="label_grey">グレーの</string>
+    <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
+    <string name="error_open_file_with">エラーが発生したため、このアプリではファイルを開くことができません。</string>
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
+    <string name="intent_not_available_file">このファイルタイプをサポートするアプリがインストールされていない可能性があります</string>
+    <!-- Text to inform the user when an error occurs -->
+    <string name="general_text_error">エラーが発生しました。もう一度やり直してください。</string>
+    <!-- Name for a general label which action is "Select or create new folder" -->
+    <string name="general_select_create_folder">新しいフォルダを選択または作成</string>
+    <!-- Snackbar message when backup is moved to a cloud drive folder -->
+    <string name="sync_snackbar_message_confirm_backup_moved">バックアップが停止しました。フォルダは%1$sに移動されました</string>
+    <!-- Name for a general label which action is "Select or create new folder" -->
+    <string name="sync_snackbar_message_confirm_backup_deleted">バックアップが停止しました。MEGAからフォルダが削除されました。</string>
+    <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_local_file_explanation">MEGA上のファイルは[A]%1$s.[/A]に置き換えられます。既存のバージョンはごみ箱内のSyncDebrisフォルダに移動されます。</string>
+    <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_remote_file_explanation">ローカルファイル[A]%1$s[/A]は.debrisフォルダに移動されます</string>
+    <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_rename_file_explanation">同じ名前で内容が異なるファイルには、(1)のような接尾辞が追加されます。</string>
+    <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">すべてのフォルダが結合されます。同じ内容で異なるファイルには、(1)のような接尾辞が追加されます。</string>
+    <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <!-- Dialog choose option -->
+    <string name="general_dialog_choose_button">選ぶ</string>
+    <!-- Text label of Apply to all -->
+    <string name="sync_apply_to_all_checkbox">すべてに適用</string>
+    <!-- Sync message when a single issue resolved -->
+    <string name="sync_stalled_issue_resolved">問題は解決しました</string>
+    <!-- Sync message when multiple issues resolved -->
+    <string name="sync_stalled_issues_resolved">問題は解決しました</string>
+    <!-- Text of the empty playlist in Video Section -->
+    <string name="video_section_playlists_video_empty">空にする</string>
+    <!-- Text of video count of playlist in Video Section -->
+    <plurals name="video_section_playlists_video_count">
+        <item quantity="other">%1$d個の動画</item>
+    </plurals>
+    <!-- Stop Backup confirmation dialog Move explanation -->
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">データへのフルアクセスを取得するには、このフォルダをクラウドドライブに移動してください。今後はバックアップされなくなります。</string>
+    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <!-- Text of the Camera Uploads checking uploads banner in Photos -->
+    <string name="camera_uploads_banner_checking_uploads_text">アップロードを確認中&#8230;</string>
+    <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
+    <string name="camera_uploads_banner_uploading_pending_count_text">アップロード中：残り%d件</string>
+    <!--  when Rename all items action is selected , title of the apply to all dialog  -->
+    <string name="sync_resolve_rename_all_items_title">すべての項目の名前を変更しますか？</string>
+    <!-- when Merge folders action is selected , title of the apply to all dialog  -->
+    <string name="sync_stalled_issue_merge_folders_title">フォルダを結合してファイルの名前を変更しますか？</string>
+    <!-- when Choose the local file action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_local_file_title">ローカルファイルを選択しますか？</string>
+    <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_remote_file_title">MEGAに保管されているファイルを選択しますか？</string>
+    <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">最後に変更されたファイルを選択しますか？</string>
 </resources>

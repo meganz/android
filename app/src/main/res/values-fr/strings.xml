@@ -697,7 +697,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Vérifiez votre boîte de réception des courriels afin de poursuivre.</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">Une erreur est survenue, veuillez réessayer.</string>
+    <string name="general_text_error">Une erreur s\’est produite, veuillez réessayer</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Vous devez être connecté pour effectuer cette action.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->

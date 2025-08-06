@@ -697,7 +697,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Verificați căsuța dvs. de e-mail pentru a continua.</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">A apărut o eroare, încercați din nou.</string>
+    <string name="general_text_error">A apărut o eroare, încercați din nou</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Trebuie să fii autentificat(ă) pentru a efectua această acțiune.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->

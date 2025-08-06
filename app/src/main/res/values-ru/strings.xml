@@ -704,7 +704,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Проверьте свою электронную почту, чтобы продолжить.</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">Произошла ошибка, попробуйте снова.</string>
+    <string name="general_text_error">Произошла ошибка, попробуйте ещё раз</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Вы должны войти в систему для этого действия.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->

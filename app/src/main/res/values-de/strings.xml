@@ -690,7 +690,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Prüfen Sie Ihren E-Mail-Posteingang, um fortzufahren.</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">Ein Fehler ist aufgetreten, bitte versuchen Sie es erneut.</string>
+    <string name="general_text_error">Ein Fehler ist aufgetreten, bitte erneut versuchen</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Sie müssen sich erst einloggen.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->

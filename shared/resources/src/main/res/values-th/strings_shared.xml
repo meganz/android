@@ -691,15 +691,7 @@
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">เพิ่มลงในเพลย์ลิสต์</string>
     <!-- Stop Backup confirmation dialog text -->
-    <string name="sync_stop_backup_confirm_dialog_text">หากต้องการหยุดสำรองโฟลเดอร์ของคุณ คุณต้องย้ายหรือลบโฟลเดอร์นั้น</string>
-    <!-- Move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option">ย้ายโฟลเดอร์</string>
-    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_text">ย้ายโฟลเดอร์นี้ไปยังตำแหน่งที่ตั้งอื่นเพื่อเข้าถึงข้อมูลของคุณได้อย่างเต็มที่</string>
-    <!-- Delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option">ลบโฟลเดอร์อย่างถาวร</string>
-    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option_text">โฟลเดอร์จะถูกลบออกจาก MEGA แต่จะไม่ถูกลบออกจากอุปกรณ์ของคุณ</string>
+    <string name="sync_stop_backup_confirm_dialog_text">หากต้องการหยุดสำรองข้อมูลโฟลเดอร์นี้ คุณต้องย้ายออกหรือลบทิ้ง</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">ยืนยัน</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -714,8 +706,6 @@
     <string name="general_select">เลือก</string>
     <!-- Name for a general label which action is "Select folder" -->
     <string name="general_select_folder">เลือกโฟลเดอร์</string>
-    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">ย้ายไปที่: [B]%1s[/B]</string>
     <!-- Message shown to user when app is connected to the MEGA server -->
     <string name="login_connected_to_server">เชื่อมต่อกับเซิร์ฟเวอร์สำเร็จ</string>
     <!-- User Alert notification for scheduled recurring meeting changes -->
@@ -1391,13 +1381,87 @@
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">ดูในโฟลเดอร์</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
-    <string name="sync_stop_backup_confirm_dialog_delete_explanation">หากคุณเลือกลบ โฟลเดอร์จะถูกลบออกจาก MEGA แต่จะไม่ถูกลบออกจากอุปกรณ์ของคุณ</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">หรือลบโฟลเดอร์ออกจาก MEGA โฟลเดอร์นั้นจะไม่ถูกลบออกจากอุปกรณ์ของคุณ การดำเนินการนี้ไม่สามารถยกเลิกได้</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">ย้ายไปยังคลาวด์ไดร์ฟ</string>
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">ย้ายโฟลเดอร์ไปยังคลาวด์ไดร์ฟ</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_delete_permanently">ลบอย่างถาวร</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">ลบโฟลเดอร์ออกจาก MEGA</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
     <string name="camera_uploads_banner_complete_title">การอัปโหลดกล้องเสร็จสมบูรณ์</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
     <string name="camera_uploads_banner_no_full_access_message">เพื่อให้มั่นใจว่าคุณจะไม่พลาดทุกความทรงจำ MEGA ต้องการสิทธิ์เข้าถึงแกลเลอรี่รูปภาพของคุณแบบเต็มที่</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">ไม่สามารถเปิดไฟล์ได้ เนื่องจากรูปแบบไฟล์ไม่รองรับ</string>
+    <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
+    <string name="intent_not_available">ไม่พบแอปที่เหมาะสมสำหรับเปิดไฟล์นี้บนอุปกรณ์ของคุณ</string>
+    <!-- A user can mark a folder or file with red colour. -->
+    <string name="label_red">แดง</string>
+    <!-- A user can mark a folder or file with orange colour. -->
+    <string name="label_orange">ส้ม</string>
+    <!-- A user can mark a folder or file with yellow colour. -->
+    <string name="label_yellow">เหลือง</string>
+    <!-- A user can mark a folder or file with green colour. -->
+    <string name="label_green">เขียว</string>
+    <!-- A user can mark a folder or file with blue colour. -->
+    <string name="label_blue">น้ำเงิน</string>
+    <!-- A user can mark a folder or file with purple colour. -->
+    <string name="label_purple">ม่วง</string>
+    <!-- A user can mark a folder or file with grey colour. -->
+    <string name="label_grey">เทา</string>
+    <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
+    <string name="error_open_file_with">พบข้อผิดพลาดบางประการ ไม่สามารถเปิดไฟล์ด้วยแอปนี้ได้</string>
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
+    <string name="intent_not_available_file">คุณอาจไม่ได้ติดตั้งแอปใด ๆ ที่สนับสนุนไฟล์ประเภทนี้</string>
+    <!-- Text to inform the user when an error occurs -->
+    <string name="general_text_error">เกิดข้อผิดพลาด กรุณาลองอีกครั้ง</string>
+    <!-- Name for a general label which action is "Select or create new folder" -->
+    <string name="general_select_create_folder">เลือกหรือสร้างโฟลเดอร์ใหม่</string>
+    <!-- Snackbar message when backup is moved to a cloud drive folder -->
+    <string name="sync_snackbar_message_confirm_backup_moved">Backup stopped. Folder was moved to %1$s</string>
+    <!-- Name for a general label which action is "Select or create new folder" -->
+    <string name="sync_snackbar_message_confirm_backup_deleted">Backup stopped. Folder deleted from MEGA.</string>
+    <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
+    <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder</string>
+    <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
+    <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged. Files with the same but different content will have a suffix like(1) added.</string>
+    <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <!-- Dialog choose option -->
+    <string name="general_dialog_choose_button">เลือก</string>
+    <!-- Text label of Apply to all -->
+    <string name="sync_apply_to_all_checkbox">นำไปใช้ทั้งหมด</string>
+    <!-- Sync message when a single issue resolved -->
+    <string name="sync_stalled_issue_resolved">Issue has been solved</string>
+    <!-- Sync message when multiple issues resolved -->
+    <string name="sync_stalled_issues_resolved">Issues have been solved</string>
+    <!-- Text of the empty playlist in Video Section -->
+    <string name="video_section_playlists_video_empty">ว่างเปล่า</string>
+    <!-- Text of video count of playlist in Video Section -->
+    <plurals name="video_section_playlists_video_count">
+        <item quantity="other">%1$d วิดีโอ</item>
+    </plurals>
+    <!-- Stop Backup confirmation dialog Move explanation -->
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">ย้ายโฟลเดอร์นี้ไปยังคลาวด์ไดร์ฟของคุณ เพื่อให้คุณเข้าถึงข้อมูลได้แบบเต็มที่ และจะไม่มีการสำรองข้อมูลอีกต่อไป</string>
+    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <!-- Text of the Camera Uploads checking uploads banner in Photos -->
+    <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
+    <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
+    <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <!--  when Rename all items action is selected , title of the apply to all dialog  -->
+    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <!-- when Merge folders action is selected , title of the apply to all dialog  -->
+    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <!-- when Choose the local file action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
 </resources>

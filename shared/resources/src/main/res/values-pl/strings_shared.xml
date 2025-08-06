@@ -727,15 +727,7 @@
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">Dodaj do listy odtwarzania</string>
     <!-- Stop Backup confirmation dialog text -->
-    <string name="sync_stop_backup_confirm_dialog_text">Aby przestać tworzyć kopie zapasowe swojego katalogu, należy go przenieść lub usunąć.</string>
-    <!-- Move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option">Przenieś katalog</string>
-    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_text">Przenieś ten katalog do innej lokalizacji, aby uzyskać pełny dostęp do danych.</string>
-    <!-- Delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option">Usuń katalog na stałe</string>
-    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option_text">Katalog zostanie usunięty z MEGA. Nie zostanie usunięty z urządzenia.</string>
+    <string name="sync_stop_backup_confirm_dialog_text">Aby przestać tworzyć kopie zapasowe tego katalogu, należy go przenieść lub usunąć.</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">Potwierdź</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -753,8 +745,6 @@
     <string name="general_select">Wybierz</string>
     <!-- Name for a general label which action is "Select folder" -->
     <string name="general_select_folder">Wybierz katalog</string>
-    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Przenieś do: [B]%1s[/B]</string>
     <!-- Message shown to user when app is connected to the MEGA server -->
     <string name="login_connected_to_server">Połączony z serwerem</string>
     <!-- User Alert notification for scheduled recurring meeting changes -->
@@ -1442,13 +1432,90 @@
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">Wyświetl w katalogu</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
-    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Jeśli zdecydujesz się go usunąć, katalog zostanie usunięty z MEGA, ale nie zostanie usunięty z Twojego urządzenia.</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Usuń katalog z MEGA. Nie zostanie on usunięty z Twojego urządzenia. Tej akcji nie można cofnąć.</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Przenieś do Dysku w Chmurze</string>
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Przenieś katalog do Dysku w chmurze</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Usuń trwale</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Usuń katalog z MEGA</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
     <string name="camera_uploads_banner_complete_title">Wgrywanie plików z kamery zakończone</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
     <string name="camera_uploads_banner_no_full_access_message">Aby upewnić się, że nie przegapimy żadnych Twoich wspomnień, MEGA potrzebuje pełnego dostępu do Twojej biblioteki zdjęć.</string>
+    <!-- Message of notice that the zip file format is error -->
+    <string name="message_zip_format_error">Plik nie może zostać otwarty, ponieważ format pliku nie jest obsługiwany</string>
+    <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
+    <string name="intent_not_available">Nie ma odpowiedniej aplikacji do otwarcia tego pliku na urządzeniu</string>
+    <!-- A user can mark a folder or file with red colour. -->
+    <string name="label_red">Czerwony</string>
+    <!-- A user can mark a folder or file with orange colour. -->
+    <string name="label_orange">Pomarańczowy</string>
+    <!-- A user can mark a folder or file with yellow colour. -->
+    <string name="label_yellow">Żółty</string>
+    <!-- A user can mark a folder or file with green colour. -->
+    <string name="label_green">Zielony</string>
+    <!-- A user can mark a folder or file with blue colour. -->
+    <string name="label_blue">Niebieski</string>
+    <!-- A user can mark a folder or file with purple colour. -->
+    <string name="label_purple">Purpurowy</string>
+    <!-- A user can mark a folder or file with grey colour. -->
+    <string name="label_grey">Szary</string>
+    <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
+    <string name="error_open_file_with">Wystąpił błąd i plik nie może zostać otwarty za pomocą tej aplikacji.</string>
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
+    <string name="intent_not_available_file">Być może nie masz zainstalowanych żadnych aplikacji obsługujących ten typ pliku</string>
+    <!-- Text to inform the user when an error occurs -->
+    <string name="general_text_error">Wystąpił błąd, spróbuj ponownie.</string>
+    <!-- Name for a general label which action is "Select or create new folder" -->
+    <string name="general_select_create_folder">Wybierz lub utwórz nowy katalog</string>
+    <!-- Snackbar message when backup is moved to a cloud drive folder -->
+    <string name="sync_snackbar_message_confirm_backup_moved">Kopia zapasowa zatrzymana. Katalog został przeniesiony do %1$s</string>
+    <!-- Name for a general label which action is "Select or create new folder" -->
+    <string name="sync_snackbar_message_confirm_backup_deleted">Kopia zapasowa zatrzymana. Katalog usunięty z MEGA.</string>
+    <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_local_file_explanation">Plik na MEGA zostanie zastąpiony przez [A]%1$s.[/A] Istniejąca wersja zostanie przeniesiona do katalogu SyncDebris w Twoim Koszu.</string>
+    <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_remote_file_explanation">Lokalny plik [A]%1$s[/A] zostanie przeniesiony do katalogu .debris</string>
+    <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_rename_file_explanation">Pliki o tej samej nazwie, ale różnej zawartości, będą miały dodany sufiks, taki jak (1)</string>
+    <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">Wszystkie katalogi zostaną połączone. Pliki o tej samej nazwie, ale różnej zawartości, będą miały dodany sufiks, np. (1).</string>
+    <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <!-- Dialog choose option -->
+    <string name="general_dialog_choose_button">Wybierz</string>
+    <!-- Text label of Apply to all -->
+    <string name="sync_apply_to_all_checkbox">Zastosuj do wszystkich</string>
+    <!-- Sync message when a single issue resolved -->
+    <string name="sync_stalled_issue_resolved">Problem został rozwiązany</string>
+    <!-- Sync message when multiple issues resolved -->
+    <string name="sync_stalled_issues_resolved">Problemy zostały rozwiązane</string>
+    <!-- Text of the empty playlist in Video Section -->
+    <string name="video_section_playlists_video_empty">Usuń</string>
+    <!-- Text of video count of playlist in Video Section -->
+    <plurals name="video_section_playlists_video_count">
+        <item quantity="one">%1$d film</item>
+        <item quantity="few">%1$d filmy</item>
+        <item quantity="many">%1$d filmy</item>
+        <item quantity="other">%1$d filmy</item>
+    </plurals>
+    <!-- Stop Backup confirmation dialog Move explanation -->
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">Przenieś ten katalog na swój Dysk w chmurze, aby uzyskać pełny dostęp do swoich danych. Nie będzie już tworzonej kopii zapasowej.</string>
+    <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <!-- Text of the Camera Uploads checking uploads banner in Photos -->
+    <string name="camera_uploads_banner_checking_uploads_text">Sprawdzam wgraj&#8230;</string>
+    <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
+    <string name="camera_uploads_banner_uploading_pending_count_text">Wgrywanie: pozostało %d elementów</string>
+    <!--  when Rename all items action is selected , title of the apply to all dialog  -->
+    <string name="sync_resolve_rename_all_items_title">Zmień nazwę wszystkich elementów?</string>
+    <!-- when Merge folders action is selected , title of the apply to all dialog  -->
+    <string name="sync_stalled_issue_merge_folders_title">Scalić katalogi i zmienić nazwy plików?</string>
+    <!-- when Choose the local file action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_local_file_title">Wybierz plik lokalny?</string>
+    <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_remote_file_title">Wybierz plik przechowywany w MEGA?</string>
+    <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">Wybierz ostatnio zmodyfikowany plik?</string>
 </resources>

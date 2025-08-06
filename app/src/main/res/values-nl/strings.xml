@@ -690,7 +690,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Controleer uw e-mailinbox om verder te gaan.</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">Er is een fout opgetreden, probeer nogmaals.</string>
+    <string name="general_text_error">Er is een fout opgetreden, probeer het opnieuw</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">U moet ingelogd zijn om deze actie uit te voeren.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
