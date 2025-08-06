@@ -44,8 +44,6 @@
     <string name="sync_stalled_issue_choose_remote_file">MEGA\’da depolanan dosyayı seç</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Son değiştirilen dosyayı seç</string>
-    <!-- Sync message when conflict resolved -->
-    <string name="sync_stalled_issue_conflict_resolved">Çakışma çözüldü</string>
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">Devam et</string>
     <!-- Sync dialog not now button -->
