@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.photos.timeline.view
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -270,11 +271,17 @@ private fun CameraUploadsBanner(
             )
 
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                verticalArrangement =
+                    if (title != null && description != null) {
+                        Arrangement.spacedBy(5.dp)
+                    } else {
+                        Arrangement.Top
+                    }
             ) {
                 title?.let {
                     MegaText(
-                        modifier = Modifier.padding(bottom = 5.dp),
+                        modifier = Modifier,
                         textColor = TextColor.Primary,
                         style = MaterialTheme.typography.subtitle1,
                         text = title

@@ -498,7 +498,7 @@ private fun CameraUploadsBanner(
     timelineViewState: TimelineViewState,
 ) {
     when (timelineViewState.cameraUploadsStatus) {
-        CameraUploadsStatus.None -> CameraUploadsCheckingUploadsBanner()
+        CameraUploadsStatus.Sync -> CameraUploadsCheckingUploadsBanner()
         CameraUploadsStatus.Uploading -> CameraUploadsPendingCountBanner(timelineViewState.pending)
         else -> {}
     }
