@@ -19,6 +19,7 @@ class ClearPasscodeDataLogoutTask @Inject constructor(
      */
     override suspend fun onLogoutSuccess() {
         disablePasscodeUseCase()
+        passcodeRepository.setLocked(false)
         passcodeRepository.setFailedAttempts(0)
     }
 }
