@@ -11,6 +11,7 @@ import mega.privacy.android.feature.sync.ui.views.ApplyToAllDialog
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_TEXT
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_DESCRIPTION
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -87,7 +88,8 @@ class ApplyToAllDialogTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Choose").assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_dialog_choose_button))
+            .assertIsDisplayed()
     }
 
     @Test
@@ -102,7 +104,8 @@ class ApplyToAllDialogTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(mega.privacy.android.core.R.string.general_cancel))
+            .assertIsDisplayed()
     }
 
     @Test
@@ -121,7 +124,8 @@ class ApplyToAllDialogTest {
         }
 
         // Click the choose button without checking the checkbox
-        composeTestRule.onNodeWithText("Choose").performClick()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_dialog_choose_button))
+            .performClick()
 
         assert(applyToCurrentCalled) { "onApplyToCurrent should be called when checkbox is unchecked" }
         assert(!applyToAllCalled) { "onApplyToAll should not be called when checkbox is unchecked" }
@@ -146,7 +150,8 @@ class ApplyToAllDialogTest {
         composeTestRule.onNodeWithTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX).performClick()
 
         // Then click the choose button
-        composeTestRule.onNodeWithText("Choose").performClick()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_dialog_choose_button))
+            .performClick()
 
         assert(!applyToCurrentCalled) { "onApplyToCurrent should not be called when checkbox is checked" }
         assert(applyToAllCalled) { "onApplyToAll should be called when checkbox is checked" }
@@ -166,7 +171,8 @@ class ApplyToAllDialogTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Cancel").performClick()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(mega.privacy.android.core.R.string.general_cancel))
+            .performClick()
 
         assert(cancelCalled) { "onCancel should be called when cancel button is clicked" }
     }
