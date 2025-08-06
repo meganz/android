@@ -715,7 +715,7 @@
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">Añadir a la lista de reproducción</string>
     <!-- Stop Backup confirmation dialog text -->
-    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up this folder, you need to either move it or delete it</string>
+    <string name="sync_stop_backup_confirm_dialog_text">Para detener el backup de esta carpeta, tendrás que moverla o eliminarla</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">Confirmar</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -1417,9 +1417,9 @@
     <!-- Stop Backup confirmation dialog delete explanation -->
     <string name="sync_stop_backup_confirm_dialog_delete_explanation">Or delete the folder from MEGA. It won’t be deleted from your device. This action can’t be undone.</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Move folder to Cloud drive</string>
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Mover la carpeta a la Nube</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Delete folder from MEGA</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Eliminar carpeta de MEGA</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
     <string name="camera_uploads_banner_complete_title">Subidas de la cámara completadas</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
@@ -1483,7 +1483,7 @@
         <item quantity="other">%1$d&#160;vídeos</item>
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
-    <string name="sync_stop_backup_confirm_dialog_move_explanation">Move this folder to your Cloud drive to get full access to your data. It will no longer be backed up to.</string>
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">Mueve esta carpeta a la Nube para tener acceso completo a tus datos. Ya dejará de tener backups.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
     <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->

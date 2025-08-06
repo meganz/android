@@ -1349,7 +1349,7 @@
     <!-- Label to include info of the user email in the feedback form -->
     <string name="user_account_feedback">Kullanıcı hesabı</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
-    <string name="save_to_mega">\nBulut depolamama kaydet</string>
+    <string name="save_to_mega">Bulut depolamama \nkaydet</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">Sohbet zaten mevcut</string>
     <!-- Info label about the connectivity state of the chat -->

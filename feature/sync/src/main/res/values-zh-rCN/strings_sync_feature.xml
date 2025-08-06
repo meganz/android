@@ -40,8 +40,6 @@
     <string name="sync_stalled_issue_choose_remote_file">选择存储在MEGA中的文件</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">选择上次修改的文件</string>
-    <!-- Sync message when conflict resolved -->
-    <string name="sync_stalled_issue_conflict_resolved">冲突已解决</string>
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">继续</string>
     <!-- Sync dialog not now button -->

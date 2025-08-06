@@ -60,8 +60,6 @@
     <string name="sync_stalled_issue_choose_remote_file">اختر الملف المخزن في ميغا MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">اختر آخر ملف تم تعديله</string>
-    <!-- Sync message when conflict resolved -->
-    <string name="sync_stalled_issue_conflict_resolved">تم حل المشكلة</string>
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">تابع</string>
     <!-- Sync dialog not now button -->

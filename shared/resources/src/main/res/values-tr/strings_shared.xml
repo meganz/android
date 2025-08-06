@@ -1469,13 +1469,13 @@
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
     <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
+    <string name="camera_uploads_banner_checking_uploads_text">Yüklemeler kontrol ediliyor...</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
     <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
-    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <string name="sync_resolve_rename_all_items_title">Tüm öğeler yeniden adlandırılsın mı?</string>
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
-    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <string name="sync_stalled_issue_merge_folders_title">Klasörler birleştirilerek yeniden adlandırılsın mı?</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->

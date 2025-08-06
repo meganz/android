@@ -40,8 +40,6 @@
     <string name="sync_stalled_issue_choose_remote_file">Chọn tệp&#160;tin được lưu&#160;trữ trên MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Chọn tệp&#160;tin được sửa&#160;đổi lần cuối&#160;cùng</string>
-    <!-- Sync message when conflict resolved -->
-    <string name="sync_stalled_issue_conflict_resolved">Mâu&#160;thuẫn được giải&#160;quyết</string>
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">Tiếp tục</string>
     <!-- Sync dialog not now button -->

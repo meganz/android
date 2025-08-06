@@ -48,8 +48,6 @@
     <string name="sync_stalled_issue_choose_remote_file">Elegir el archivo almacenado en MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Elegir el último archivo modificado</string>
-    <!-- Sync message when conflict resolved -->
-    <string name="sync_stalled_issue_conflict_resolved">Conflicto resuelto</string>
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">Continuar</string>
     <!-- Sync dialog not now button -->
