@@ -2,7 +2,6 @@ package mega.privacy.android.core.nodecomponents.list.view
 
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -19,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +38,9 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
@@ -89,7 +89,7 @@ fun <T : TypedNode> NodeListViewItem(
         isInSelectionMode = isInSelectionMode,
         showIsVerified = nodeUiItem.showIsVerified,
         isTakenDown = nodeUiItem.isTakenDown,
-        labelColor = nodeUiItem.labelColor?.let { Color(it) },
+        label = nodeUiItem.nodeLabel,
         showLink = nodeUiItem.showLink,
         showFavourite = nodeUiItem.showFavourite,
         isSensitive = nodeUiItem.isSensitive,
@@ -122,7 +122,7 @@ fun <T : TypedNode> NodeListViewItem(
  * @param isInSelectionMode if true, the item is in selection mode
  * @param showIsVerified if true, shows a verified icon
  * @param isTakenDown if true, shows a taken down icon
- * @param labelColor Optional color for a label circle next to the title
+ * @param label Optional node label type to show circle next to the title
  * @param showLink if true, shows a link icon
  * @param showFavourite if true, shows a favourite icon
  * @param isSensitive if true, the item is considered sensitive and will be displayed with reduced opacity
@@ -151,7 +151,7 @@ fun NodeListViewItem(
     isInSelectionMode: Boolean = false,
     showIsVerified: Boolean = false,
     isTakenDown: Boolean = false,
-    labelColor: Color? = null,
+    label: NodeLabel? = null,
     showLink: Boolean = false,
     showFavourite: Boolean = false,
     isSensitive: Boolean = false,
@@ -190,10 +190,11 @@ fun NodeListViewItem(
                 horizontalArrangement = Arrangement.spacedBy(DSTokens.spacings.s2),
                 modifier = Modifier.padding(bottom = DSTokens.spacings.s1)
             ) {
-                if (labelColor != null) {
-                    Circle(
-                        color = labelColor,
-                        modifier = Modifier.testTag(LABEL_TAG)
+                if (label != null) {
+                    NodeLabelCircle(
+                        label = label,
+                        modifier = Modifier
+                            .testTag(LABEL_TAG),
                     )
                 }
                 if (highlightText.isNotBlank()) {
@@ -368,15 +369,6 @@ fun NodeListViewItem(
     )
 }
 
-@Composable
-fun Circle(color: Color, modifier: Modifier = Modifier) {
-    Canvas(
-        modifier = modifier.size(7.dp),
-        onDraw = {
-            drawCircle(color = color)
-        },
-    )
-}
 
 /**
  * Tags row with highlight
@@ -501,7 +493,7 @@ private fun GenericNodeListItemWithLongTitlePreview() {
             showVersion = true,
             showFavourite = true,
             showLink = true,
-            labelColor = DSTokens.colors.indicator.pink,
+            label = NodeLabel.BLUE,
             thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg",
             onItemClicked = { }
         )
@@ -544,7 +536,7 @@ private fun NodeListItemWithAllFeaturesPreview() {
             showFavourite = true,
             showLink = true,
             showIsVerified = true,
-            labelColor = DSTokens.colors.indicator.blue,
+            label = NodeLabel.YELLLOW,
             thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg",
             onMoreClicked = { },
             onInfoClicked = { },

@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.icon.pack.R as IconPackR
 import org.junit.Rule
 import org.junit.Test
@@ -35,7 +36,7 @@ class NodeListViewItemTest {
         showLink: Boolean = false,
         isTakenDown: Boolean = false,
         showIsVerified: Boolean = false,
-        labelColor: androidx.compose.ui.graphics.Color? = null,
+        label: NodeLabel? = null,
         accessPermissionIcon: Int? = null,
         onMoreClicked: (() -> Unit)? = null,
         onInfoClicked: (() -> Unit)? = null,
@@ -58,7 +59,7 @@ class NodeListViewItemTest {
                 showLink = showLink,
                 isTakenDown = isTakenDown,
                 showIsVerified = showIsVerified,
-                labelColor = labelColor,
+                label = label,
                 accessPermissionIcon = accessPermissionIcon,
                 onMoreClicked = onMoreClicked,
                 onInfoClicked = onInfoClicked,
@@ -288,14 +289,14 @@ class NodeListViewItemTest {
 
     @Test
     fun `test that label is displayed when labelColor is provided`() {
-        setContent(labelColor = androidx.compose.ui.graphics.Color.Blue)
+        setContent(label = NodeLabel.BLUE)
 
         composeTestRule.onNodeWithTag(LABEL_TAG, useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
     fun `test that label is not displayed when labelColor is null`() {
-        setContent(labelColor = null)
+        setContent(label = null)
 
         composeTestRule.onNodeWithTag(LABEL_TAG).assertDoesNotExist()
     }
@@ -352,7 +353,7 @@ class NodeListViewItemTest {
             showLink = true,
             isTakenDown = true,
             showIsVerified = true,
-            labelColor = androidx.compose.ui.graphics.Color.Blue,
+            label = NodeLabel.BLUE,
             accessPermissionIcon = IconPackR.drawable.ic_sync_01_medium_thin_outline,
             onMoreClicked = {},
             onInfoClicked = {}
@@ -504,7 +505,7 @@ class NodeListViewItemTest {
             showVersion = true,
             isTakenDown = true,
             showIsVerified = true,
-            labelColor = androidx.compose.ui.graphics.Color.Blue,
+            label = NodeLabel.BLUE,
             accessPermissionIcon = IconPackR.drawable.ic_sync_01_medium_thin_outline
         )
 

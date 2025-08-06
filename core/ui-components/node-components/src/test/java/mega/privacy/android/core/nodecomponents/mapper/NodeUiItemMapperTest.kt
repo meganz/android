@@ -8,11 +8,13 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FolderType
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.usecase.node.GetNodeLabelUseCase
 import mega.privacy.android.icon.pack.R as IconPackR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,10 +29,9 @@ import org.mockito.kotlin.whenever
 class NodeUiItemMapperTest {
 
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
-
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
-
     private val nodeSubtitleMapper: NodeSubtitleMapper = mock()
+    private val getNodeLabelUseCase: GetNodeLabelUseCase = mock()
 
     private lateinit var underTest: NodeUiItemMapper
 
@@ -48,6 +49,7 @@ class NodeUiItemMapperTest {
             fileTypeIconMapper = fileTypeIconMapper,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             nodeSubtitleMapper = nodeSubtitleMapper,
+            getNodeLabelUseCase = getNodeLabelUseCase,
             ioDispatcher = StandardTestDispatcher()
         )
     }
@@ -100,12 +102,13 @@ class NodeUiItemMapperTest {
         description: String? = null,
         tags: List<String> = emptyList(),
         size: Long = 1024L,
+        label: Int = 0
     ): TypedFileNode = mock {
         whenever(it.id).thenReturn(NodeId(id))
         whenever(it.name).thenReturn(name)
         whenever(it.parentId).thenReturn(NodeId(1L))
         whenever(it.base64Id).thenReturn("test_base64_id")
-        whenever(it.label).thenReturn(0)
+        whenever(it.label).thenReturn(label)
         whenever(it.isFavourite).thenReturn(isFavourite)
         whenever(it.isMarkedSensitive).thenReturn(isMarkedSensitive)
         whenever(it.isSensitiveInherited).thenReturn(isSensitiveInherited)
@@ -368,5 +371,25 @@ class NodeUiItemMapperTest {
         assertThat(result).hasSize(2)
         assertThat(result[0].isFolderNode).isTrue()
         assertThat(result[1].isFolderNode).isFalse()
+    }
+
+
+    @Test
+    fun `test that invoke set node label correctly`() = runTest {
+        val labelId = 123
+        val nodeLabel = NodeLabel.BLUE
+        whenever(getNodeLabelUseCase(labelId)).thenReturn(nodeLabel)
+        val mockFileNode = createMockFileNode(
+            label = labelId
+        )
+
+        val result = underTest(
+            nodeList = listOf(mockFileNode),
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        )
+
+        assertThat(result).hasSize(1)
+        val nodeUiItem = result[0]
+        assertThat(nodeUiItem.nodeLabel).isEqualTo(nodeLabel)
     }
 } 

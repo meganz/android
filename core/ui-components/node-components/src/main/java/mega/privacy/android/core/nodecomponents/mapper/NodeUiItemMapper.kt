@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.toDuration
 import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.node.GetNodeLabelUseCase
 import javax.inject.Inject
 
 /**
@@ -32,6 +33,7 @@ class NodeUiItemMapper @Inject constructor(
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val nodeSubtitleMapper: NodeSubtitleMapper,
+    private val getNodeLabelUseCase: GetNodeLabelUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -84,7 +86,7 @@ class NodeUiItemMapper @Inject constructor(
                     .getSharesIcon(isContactVerificationOn),
                 showIsVerified = isContactVerificationOn && node.isIncomingShare
                         && (node as? ShareFolderNode)?.shareData?.isContactCredentialsVerified == true,
-                labelColor = null, // TODO: Implement label color logic
+                nodeLabel = getNodeLabelUseCase(node.label),
                 showLink = node.exportedData != null,
                 showFavourite = node.isFavourite && node.isIncomingShare.not(),
                 isSensitive = nodeSourceType !in setOf(

@@ -1,6 +1,5 @@
 package mega.privacy.android.core.nodecomponents.list.view
 
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertAny
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -11,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.icon.pack.R as IconPackR
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +40,7 @@ class NodeGridViewItemTest {
         isHighlighted: Boolean = false,
         showLink: Boolean = false,
         showFavourite: Boolean = false,
-        labelColor: androidx.compose.ui.graphics.Color? = null,
+        label: NodeLabel? = null,
         onClick: () -> Unit = {},
         onLongClick: () -> Unit = {},
         onMenuClick: () -> Unit = {},
@@ -62,7 +62,7 @@ class NodeGridViewItemTest {
                 isHighlighted = isHighlighted,
                 showLink = showLink,
                 showFavourite = showFavourite,
-                labelColor = labelColor,
+                label = label,
                 onClick = onClick,
                 onLongClick = onLongClick,
                 onMenuClick = onMenuClick,
@@ -173,7 +173,7 @@ class NodeGridViewItemTest {
 
     @Test
     fun `test that label is displayed when labelColor is provided`() {
-        setContent(labelColor = androidx.compose.ui.graphics.Color.Green)
+        setContent(label = NodeLabel.RED)
 
         composeTestRule.onNodeWithTag(GRID_VIEW_LABEL_TEST_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
@@ -181,7 +181,7 @@ class NodeGridViewItemTest {
 
     @Test
     fun `test that label is not displayed when labelColor is null`() {
-        setContent(labelColor = null)
+        setContent(label = null)
 
         composeTestRule.onNodeWithTag(GRID_VIEW_LABEL_TEST_TAG).assertDoesNotExist()
     }
@@ -432,7 +432,7 @@ class NodeGridViewItemTest {
             isTakenDown = true,
             isVideoNode = true,
             duration = "12:34",
-            labelColor = Color.Green,
+            label = NodeLabel.RED,
             isFolderNode = false
         )
 

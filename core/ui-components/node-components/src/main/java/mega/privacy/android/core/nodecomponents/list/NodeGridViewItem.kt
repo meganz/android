@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -50,7 +49,9 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
@@ -94,10 +95,9 @@ fun <T : TypedNode> NodeGridViewItem(
         isHighlighted = nodeUiItem.isHighlighted,
         showLink = nodeUiItem.showLink,
         showFavourite = nodeUiItem.showFavourite,
-        labelColor = nodeUiItem.labelColor?.let { Color(it) },
+        label = nodeUiItem.nodeLabel,
     )
 }
-
 
 
 /**
@@ -122,7 +122,7 @@ fun <T : TypedNode> NodeGridViewItem(
  * @param isHighlighted Whether the item should be highlighted (different background color)
  * @param showLink Whether to show a link icon in the top-right corner (indicates shared link)
  * @param showFavourite Whether to show a heart icon in the top-right corner (indicates favourite status)
- * @param labelColor Optional color for the label indicator in the footer area
+ * @param label Optional label indicator in the footer area
  */
 @Composable
 fun NodeGridViewItem(
@@ -145,7 +145,7 @@ fun NodeGridViewItem(
     isHighlighted: Boolean = false,
     showLink: Boolean = false,
     showFavourite: Boolean = false,
-    labelColor: Color? = null,
+    label: NodeLabel? = null,
 ) {
     if (isDummy) {
         Spacer(
@@ -280,7 +280,7 @@ fun NodeGridViewItem(
                 onMenuClick = onMenuClick,
                 isSelected = isSelected,
                 isInSelectionMode = isInSelectionMode,
-                labelColor = labelColor,
+                label = label,
             )
         }
     }
@@ -306,9 +306,9 @@ private fun Footer(
     isSensitive: Boolean,
     onMenuClick: (() -> Unit),
     isSelected: Boolean,
-    isInSelectionMode: Boolean = false,
     modifier: Modifier = Modifier,
-    labelColor: Color? = null,
+    isInSelectionMode: Boolean = false,
+    label: NodeLabel? = null,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -333,10 +333,11 @@ private fun Footer(
         } else {
             Spacer(modifier = Modifier.width(DSTokens.spacings.s2))
         }
-        if (labelColor != null) {
-            Circle(
-                color = labelColor,
-                modifier = Modifier.testTag(GRID_VIEW_LABEL_TEST_TAG)
+        if (label != null) {
+            NodeLabelCircle(
+                label = label,
+                modifier = Modifier
+                    .testTag(GRID_VIEW_LABEL_TEST_TAG),
             )
         }
         MegaText(
@@ -419,7 +420,7 @@ private fun NodeGridViewItemPreview(
                         isVideoNode = data.isVideoNode,
                         showLink = data.showLink,
                         showFavourite = data.showFavourite,
-                        labelColor = data.labelColor,
+                        label = data.label,
                     )
                 }
             }
@@ -437,7 +438,7 @@ private data class NodeGridViewItemData(
     val isVideoNode: Boolean = false,
     val showLink: Boolean = false,
     val showFavourite: Boolean = false,
-    val labelColor: Color? = null,
+    val label: NodeLabel? = null,
 )
 
 private class NodeGridViewItemDataProvider : PreviewParameterProvider<NodeGridViewItemData> {
@@ -449,7 +450,7 @@ private class NodeGridViewItemDataProvider : PreviewParameterProvider<NodeGridVi
             isTakenDown = false,
             iconRes = IconPackR.drawable.ic_folder_backup_medium_solid,
             isFolderNode = true,
-            labelColor = Color.Green
+            label = NodeLabel.GREEN
         ),
         NodeGridViewItemData(
             name = "Longest name I could thing of example of three lines.png",
@@ -458,7 +459,7 @@ private class NodeGridViewItemDataProvider : PreviewParameterProvider<NodeGridVi
             isTakenDown = false,
             iconRes = IconPackR.drawable.ic_folder_backup_medium_solid,
             isFolderNode = true,
-            labelColor = Color.Green
+            label = NodeLabel.GREEN
         ),
         NodeGridViewItemData(
             name = "Getting started with MEGA.pdf",
@@ -502,7 +503,7 @@ private class NodeGridViewItemDataProvider : PreviewParameterProvider<NodeGridVi
             isFolderNode = false,
             showLink = true,
             showFavourite = true,
-            labelColor = Color.Green
+            label = NodeLabel.BLUE
         )
     )
 }
