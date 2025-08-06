@@ -158,6 +158,7 @@ internal class StalledIssuesMapperTest {
 
         whenever(stalledIssueSDKObject.reasonDebugString()).thenReturn("Multiple files conflict")
         whenever(stalledIssueSDKObject.reason()).thenReturn(MegaSyncStall.SyncStallReason.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose)
+        whenever(stalledIssueSDKObject.hash).thenReturn(789012L)
 
         val stalledIssuesSDKList = listOf(stalledIssueSDKObject)
 
@@ -172,6 +173,7 @@ internal class StalledIssuesMapperTest {
         Truth.assertThat(result.localPaths)
             .containsExactly("/test/path/file1.txt", "/test/path/file2.txt")
         Truth.assertThat(result.nodeNames).containsExactly("file1.txt", "file2.txt")
+        Truth.assertThat(result.id).isEqualTo("789012") // Add assertion for id
     }
 
     private fun createTestSyncs(
@@ -195,6 +197,7 @@ internal class StalledIssuesMapperTest {
         localPath: String = "/test/path/test_file.txt",
         debugString: String = "Test debug string",
         reason: MegaSyncStall.SyncStallReason = MegaSyncStall.SyncStallReason.LocalAndRemoteChangedSinceLastSyncedState_userMustChoose,
+        hash: Long = 123456L, // Add hash parameter
     ): MegaSyncStall {
         val mock = mock<MegaSyncStall>()
         whenever(mock.pathCount(true)).thenReturn(1)
@@ -204,6 +207,7 @@ internal class StalledIssuesMapperTest {
         whenever(mock.path(false, 0)).thenReturn(localPath)
         whenever(mock.reasonDebugString()).thenReturn(debugString)
         whenever(mock.reason()).thenReturn(reason)
+        whenever(mock.hash).thenReturn(hash)
         return mock
     }
 }

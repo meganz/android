@@ -43,10 +43,7 @@ internal class StalledIssuesMapper @Inject constructor(
                     issueType = stalledIssueTypeMapper(stalledIssueSdkObject.reason()),
                     conflictName = stalledIssueSdkObject.reasonDebugString(),
                     nodeNames = nodes.map { it.nodeName },
-                    id = generateStalledIssueId(
-                        nodeIds = nodes.map { it.nodeId },
-                        localPaths = localPaths
-                    )
+                    id = stalledIssueSdkObject.hash.toString()
                 ).also {
                     Timber.d("Mapped stalled issue: $it and reason: ${stalledIssueSdkObject.reason()}")
                 }
@@ -111,23 +108,6 @@ internal class StalledIssuesMapper @Inject constructor(
         return (0 until nodesCount).map { index ->
             stalledIssueSdkObject.path(false, index)
         }
-    }
-
-    private fun generateStalledIssueId(
-        nodeIds: List<NodeId>,
-        localPaths: List<String>
-    ): String {
-        val nodeHash = nodeIds.sortedBy { it.longValue }
-            .joinToString("") { it.longValue.toString() }
-            .hashCode()
-            .toString(16)
-
-        val pathHash = localPaths.sorted()
-            .joinToString("")
-            .hashCode()
-            .toString(16)
-
-        return "stalled_${nodeHash}_${pathHash}"
     }
 
     private data class NodeInfo(
