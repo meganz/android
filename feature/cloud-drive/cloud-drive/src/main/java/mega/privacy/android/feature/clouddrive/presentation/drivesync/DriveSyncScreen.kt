@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveScanDocumentHandler
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
@@ -192,6 +193,8 @@ internal fun DriveSyncScreen(
         setNavigationItemVisibility(!cloudDriveUiState.isInSelectionMode)
     }
 
+
+
     if (showUploadOptionsBottomSheet) {
         UploadOptionsBottomSheet(
             onUploadFilesClicked = {
@@ -201,7 +204,7 @@ internal fun DriveSyncScreen(
                 // TODO: Handle upload folder
             },
             onScanDocumentClicked = {
-                // TODO: Handle scan document
+                cloudDriveViewModel.prepareDocumentScanner()
             },
             onCaptureClicked = {
                 // TODO: Handle capture
@@ -217,4 +220,10 @@ internal fun DriveSyncScreen(
             }
         )
     }
+
+    // Handle scan document functionality
+    CloudDriveScanDocumentHandler(
+        cloudDriveUiState = cloudDriveUiState,
+        cloudDriveViewModel = cloudDriveViewModel,
+    )
 }

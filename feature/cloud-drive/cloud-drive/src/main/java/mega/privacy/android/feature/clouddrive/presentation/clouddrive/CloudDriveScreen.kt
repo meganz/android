@@ -104,7 +104,7 @@ fun CloudDriveScreen(
                 // TODO: Handle upload folder
             },
             onScanDocumentClicked = {
-                // TODO: Handle scan document
+                viewModel.prepareDocumentScanner()
             },
             onCaptureClicked = {
                 // TODO: Handle capture
@@ -120,4 +120,9 @@ fun CloudDriveScreen(
             }
         )
     }
+
+    CloudDriveScanDocumentHandler(
+        cloudDriveUiState = uiState,
+        cloudDriveViewModel = viewModel,
+    )
 }

@@ -412,4 +412,21 @@ interface AppNavigator {
      * @param url The URL to launch
      */
     fun launchUrl(context: Context?, url: String?)
+
+    /**
+     * Open SaveScannedDocumentsActivity
+     *
+     * @param context The context
+     * @param originatedFromChat Whether the scan originated from chat
+     * @param cloudDriveParentHandle The parent handle in cloud drive
+     * @param scanPdfUri The PDF URI from scan result
+     * @param scanSoloImageUri The solo image URI from scan result
+     */
+    fun openSaveScannedDocumentsActivity(
+        context: Context,
+        originatedFromChat: Boolean = false,
+        cloudDriveParentHandle: Long,
+        scanPdfUri: Uri,
+        scanSoloImageUri: Uri?,
+    )
 }

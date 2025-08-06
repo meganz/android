@@ -17,6 +17,9 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
+import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
@@ -67,6 +70,7 @@ class CloudDriveViewModelTest {
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase = mock()
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
+    private val scannerHandler: ScannerHandler = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
 
@@ -89,7 +93,8 @@ class CloudDriveViewModelTest {
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase,
             monitorNodeUpdatesByIdUseCase,
-            nodeUiItemMapper
+            nodeUiItemMapper,
+            scannerHandler
         )
     }
 
@@ -105,6 +110,7 @@ class CloudDriveViewModelTest {
         getBusinessStatusUseCase = getBusinessStatusUseCase,
         monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
         nodeUiItemMapper = nodeUiItemMapper,
+        scannerHandler = scannerHandler,
         savedStateHandle = SavedStateHandle.Companion.invoke(
             route = CloudDrive(folderNodeHandle)
         ),
@@ -1084,6 +1090,208 @@ class CloudDriveViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.openedFileNode).isNull()
+        }
+    }
+
+    // Document Scanner Tests
+
+    @Test
+    fun `test that prepareDocumentScanner updates state with gmsDocumentScanner on success`() =
+        runTest {
+            setupTestData(emptyList())
+            val gmsDocumentScanner =
+                mock<com.google.mlkit.vision.documentscanner.GmsDocumentScanner>()
+            whenever(scannerHandler.prepareDocumentScanner()).thenReturn(gmsDocumentScanner)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.prepareDocumentScanner()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.gmsDocumentScanner).isEqualTo(gmsDocumentScanner)
+                assertThat(state.documentScanningError).isNull()
+            }
+        }
+
+    @Test
+    fun `test that prepareDocumentScanner updates state with InsufficientRAM error on failure`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(scannerHandler.prepareDocumentScanner()).thenAnswer {
+                throw InsufficientRAMToLaunchDocumentScanner()
+            }
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.prepareDocumentScanner()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.gmsDocumentScanner).isNull()
+                assertThat(state.documentScanningError).isEqualTo(DocumentScanningError.InsufficientRAM)
+            }
+        }
+
+    @Test
+    fun `test that prepareDocumentScanner updates state with GenericError on other failure`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(scannerHandler.prepareDocumentScanner()).thenThrow(RuntimeException("Test exception"))
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.prepareDocumentScanner()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.gmsDocumentScanner).isNull()
+                assertThat(state.documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+            }
+        }
+
+    @Test
+    fun `test that onDocumentScannerFailedToOpen updates state with GenericError`() = runTest {
+        setupTestData(emptyList())
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.onDocumentScannerFailedToOpen()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+        }
+    }
+
+    @Test
+    fun `test that onGmsDocumentScannerConsumed resets gmsDocumentScanner to null`() = runTest {
+        setupTestData(emptyList())
+        val gmsDocumentScanner = mock<com.google.mlkit.vision.documentscanner.GmsDocumentScanner>()
+        whenever(scannerHandler.prepareDocumentScanner()).thenReturn(gmsDocumentScanner)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.prepareDocumentScanner()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.gmsDocumentScanner).isEqualTo(gmsDocumentScanner)
+
+            underTest.onGmsDocumentScannerConsumed()
+            val updatedState = awaitItem()
+            assertThat(updatedState.gmsDocumentScanner).isNull()
+        }
+    }
+
+    @Test
+    fun `test that onDocumentScanningErrorConsumed resets documentScanningError to null`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(scannerHandler.prepareDocumentScanner()).thenAnswer {
+                throw InsufficientRAMToLaunchDocumentScanner()
+            }
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.prepareDocumentScanner()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.documentScanningError).isEqualTo(DocumentScanningError.InsufficientRAM)
+
+                underTest.onDocumentScanningErrorConsumed()
+                val updatedState = awaitItem()
+                assertThat(updatedState.documentScanningError).isNull()
+            }
+        }
+
+    @Test
+    fun `test that initial state has null gmsDocumentScanner and documentScanningError`() =
+        runTest {
+            setupTestData(emptyList())
+            val underTest = createViewModel()
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.gmsDocumentScanner).isNull()
+                assertThat(initialState.documentScanningError).isNull()
+            }
+        }
+
+    @Test
+    fun `test that prepareDocumentScanner handles multiple calls correctly`() = runTest {
+        setupTestData(emptyList())
+        val gmsDocumentScanner1 = mock<com.google.mlkit.vision.documentscanner.GmsDocumentScanner>()
+        val gmsDocumentScanner2 = mock<com.google.mlkit.vision.documentscanner.GmsDocumentScanner>()
+        whenever(scannerHandler.prepareDocumentScanner())
+            .thenReturn(gmsDocumentScanner1)
+            .thenReturn(gmsDocumentScanner2)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.prepareDocumentScanner()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state1 = awaitItem()
+            assertThat(state1.gmsDocumentScanner).isEqualTo(gmsDocumentScanner1)
+
+            underTest.onGmsDocumentScannerConsumed()
+            awaitItem()
+
+            underTest.prepareDocumentScanner()
+            advanceUntilIdle()
+
+            val state2 = awaitItem()
+            assertThat(state2.gmsDocumentScanner).isEqualTo(gmsDocumentScanner2)
+        }
+    }
+
+    @Test
+    fun `test that prepareDocumentScanner handles error recovery correctly`() = runTest {
+        setupTestData(emptyList())
+        val gmsDocumentScanner = mock<com.google.mlkit.vision.documentscanner.GmsDocumentScanner>()
+        var callCount = 0
+        whenever(scannerHandler.prepareDocumentScanner()).thenAnswer {
+            callCount++
+            if (callCount == 1) {
+                throw InsufficientRAMToLaunchDocumentScanner()
+            } else {
+                gmsDocumentScanner
+            }
+        }
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.prepareDocumentScanner()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val errorState = awaitItem()
+            assertThat(errorState.documentScanningError).isEqualTo(DocumentScanningError.InsufficientRAM)
+
+            underTest.onDocumentScanningErrorConsumed()
+            awaitItem()
+
+            underTest.prepareDocumentScanner()
+            advanceUntilIdle()
+
+            val successState = awaitItem()
+            assertThat(successState.gmsDocumentScanner).isEqualTo(gmsDocumentScanner)
+            assertThat(successState.documentScanningError).isNull()
         }
     }
 } 

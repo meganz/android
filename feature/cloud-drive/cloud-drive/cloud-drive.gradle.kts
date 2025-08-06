@@ -49,7 +49,7 @@ dependencies {
     implementation(androidx.material3.adaptive.navigation.suite)
     implementation(lib.kotlin.serialisation)
     implementation(androidx.navigation3.runtime)
-
+    implementation(google.services.mlkit.document.scanner)
 
     // test
     testImplementation(project(":core-test"))

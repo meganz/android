@@ -50,9 +50,9 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
      * onCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        enableEdgeToEdge()
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val systemUiController = rememberSystemUiController()

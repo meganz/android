@@ -19,6 +19,9 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
+import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -55,6 +58,7 @@ class CloudDriveViewModel @Inject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
+    private val scannerHandler: ScannerHandler,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -314,5 +318,49 @@ class CloudDriveViewModel @Inject constructor(
         uiState.update { state ->
             state.copy(openedFileNode = null)
         }
+    }
+
+    /**
+     * Prepares the ML Kit Document Scanner from Google Play Services
+     */
+    fun prepareDocumentScanner() {
+        viewModelScope.launch {
+            runCatching {
+                scannerHandler.prepareDocumentScanner()
+            }.onSuccess { gmsDocumentScanner ->
+                uiState.update { it.copy(gmsDocumentScanner = gmsDocumentScanner) }
+            }.onFailure { exception ->
+                uiState.update {
+                    it.copy(
+                        documentScanningError = if (exception is InsufficientRAMToLaunchDocumentScanner) {
+                            DocumentScanningError.InsufficientRAM
+                        } else {
+                            DocumentScanningError.GenericError
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * When the system fails to open the ML Kit Document Scanner, display a generic error message
+     */
+    fun onDocumentScannerFailedToOpen() {
+        uiState.update { it.copy(documentScanningError = DocumentScanningError.GenericError) }
+    }
+
+    /**
+     * Resets the value of [CloudDriveUiState.gmsDocumentScanner]
+     */
+    fun onGmsDocumentScannerConsumed() {
+        uiState.update { it.copy(gmsDocumentScanner = null) }
+    }
+
+    /**
+     * Resets the value of [CloudDriveUiState.documentScanningError]
+     */
+    fun onDocumentScanningErrorConsumed() {
+        uiState.update { it.copy(documentScanningError = null) }
     }
 }

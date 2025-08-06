@@ -49,6 +49,7 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CreateChatListener
@@ -1937,10 +1938,19 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * @param numberUploads Number of uploads.
      * @param message       Message to show.
      */
-    private fun backToCloud(handle: Long, numberUploads: Int, message: String?) {
+    private fun backToCloud(
+        handle: Long,
+        numberUploads: Int,
+        message: String?,
+    ) = lifecycleScope.launch {
         Timber.d("handle: %s", handle)
+        val isSingleActivity = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
+        if (isSingleActivity) {
+            finish()
+            return@launch
+        }
 
-        val startIntent = Intent(this, ManagerActivity::class.java).apply {
+        val startIntent = Intent(this@FileExplorerActivity, ManagerActivity::class.java).apply {
             if (isFromUploadDestinationActivity) {
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

@@ -1,10 +1,12 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive.model
 
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -36,6 +38,8 @@ data class CloudDriveUiState(
     val showHiddenNodes: Boolean = false,
     val isHiddenNodesEnabled: Boolean = false,
     val isHiddenNodesOnboarded: Boolean = false,
+    val gmsDocumentScanner: GmsDocumentScanner? = null,
+    val documentScanningError: DocumentScanningError? = null,
 ) {
     /**
      * Count of visible items based on hidden nodes settings

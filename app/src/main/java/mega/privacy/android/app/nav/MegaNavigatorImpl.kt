@@ -38,6 +38,7 @@ import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -690,5 +691,21 @@ internal class MegaNavigatorImpl @Inject constructor(
 
     override fun launchUrl(context: Context?, url: String?) {
         context?.launchUrl(url)
+    }
+
+    override fun openSaveScannedDocumentsActivity(
+        context: Context,
+        originatedFromChat: Boolean,
+        cloudDriveParentHandle: Long,
+        scanPdfUri: Uri,
+        scanSoloImageUri: Uri?,
+    ) {
+        val intent = Intent(context, SaveScannedDocumentsActivity::class.java).apply {
+            putExtra(SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT, originatedFromChat)
+            putExtra(SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE, cloudDriveParentHandle)
+            putExtra(SaveScannedDocumentsActivity.EXTRA_SCAN_PDF_URI, scanPdfUri)
+            putExtra(SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI, scanSoloImageUri)
+        }
+        context.startActivity(intent)
     }
 }
