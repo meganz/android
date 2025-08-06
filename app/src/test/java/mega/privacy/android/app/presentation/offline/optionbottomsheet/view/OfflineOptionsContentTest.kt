@@ -10,6 +10,7 @@ import mega.privacy.android.app.presentation.offline.optionbottomsheet.model.Off
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,15 +24,21 @@ class RecentActionsEmptyViewTest {
     @Test
     fun `test that node view is shown`() {
         composeRule.setContent {
+            val nodeInfo = OtherOfflineNodeInformation(
+                id = 1,
+                handle = "1",
+                parentId = 0,
+                path = "/path",
+                name = "Title",
+                isFolder = false,
+                lastModifiedTime = 1000L
+            )
+
             val uiState = OfflineOptionsUiState(
                 nodeId = NodeId(1),
                 offlineFileInformation = OfflineFileInformation(
-                    name = "Title",
-                    isFolder = false,
-                    thumbnail = null,
-                    handle = "1",
-                    path = "/path",
-                    lastModifiedTime = 1000L,
+                    nodeInfo = nodeInfo,
+                    thumbnail = null
                 ),
                 isOnline = true,
                 isLoading = false
@@ -57,16 +64,22 @@ class RecentActionsEmptyViewTest {
     @Test
     fun `test that open with action is not shown when node is not a folder`() {
         composeRule.setContent {
+            val nodeInfo = OtherOfflineNodeInformation(
+                id = 1,
+                handle = "1",
+                parentId = 0,
+                path = "/path",
+                name = "Title",
+                isFolder = true,
+                lastModifiedTime = 1000L
+            )
+
             val uiState = OfflineOptionsUiState(
                 nodeId = NodeId(1),
                 isOnline = true,
                 offlineFileInformation = OfflineFileInformation(
-                    name = "Title",
-                    isFolder = true,
-                    thumbnail = null,
-                    handle = "1",
-                    path = "/path",
-                    lastModifiedTime = 1000L,
+                    nodeInfo = nodeInfo,
+                    thumbnail = null
                 ),
                 isLoading = false
             )
@@ -87,15 +100,21 @@ class RecentActionsEmptyViewTest {
     @Test
     fun `test that share action is not shown when node is a folder but device is not online`() {
         composeRule.setContent {
+            val nodeInfo = OtherOfflineNodeInformation(
+                id = 1,
+                handle = "1",
+                parentId = 0,
+                path = "/path",
+                name = "Title",
+                isFolder = true,
+                lastModifiedTime = 1000L
+            )
+
             val uiState = OfflineOptionsUiState(
                 nodeId = NodeId(1),
                 offlineFileInformation = OfflineFileInformation(
-                    name = "Title",
-                    isFolder = true,
-                    thumbnail = null,
-                    handle = "1",
-                    path = "/path",
-                    lastModifiedTime = 1000L,
+                    nodeInfo = nodeInfo,
+                    thumbnail = null
                 ),
                 isLoading = false
             )

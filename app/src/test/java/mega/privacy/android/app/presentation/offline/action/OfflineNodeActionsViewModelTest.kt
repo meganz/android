@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.offline.action.model.OfflineNodeActionUiEntity
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -23,11 +24,11 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
-import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -90,11 +91,19 @@ class OfflineNodeActionsViewModelTest {
     fun `test that handleShareOfflineNodes emits shareFilesEvent when all nodes are files`() =
         runTest {
             val file = mock<File>()
+            val nodeInfo = mock<OtherOfflineNodeInformation>()
             val offlineFileInformation: OfflineFileInformation = mock {
+                on { this.nodeInfo } doReturn nodeInfo
                 on { id } doReturn 123
                 on { isFolder } doReturn false
+                on { handle } doReturn "123"
+                on { path } doReturn "path"
+                on { name } doReturn "name"
+                on { isFolder } doReturn false
+                on { lastModifiedTime } doReturn null
+                on { parentId } doReturn -1
             }
-            whenever(getOfflineFilesUseCase(listOf(offlineFileInformation))).thenReturn(
+            whenever(getOfflineFilesUseCase(listOf(nodeInfo))).thenReturn(
                 mapOf(123 to file)
             )
 
@@ -171,18 +180,20 @@ class OfflineNodeActionsViewModelTest {
         type: FileTypeInfo,
         expected: OfflineNodeActionUiEntity,
     ) = runTest {
-        val nodeInfo = mock<OfflineFileInformation>().stub {
+        val nodeInfo = mock<OtherOfflineNodeInformation>()
+        val nodeFileInfo = mock<OfflineFileInformation>().stub {
+            on { this.nodeInfo } doReturn nodeInfo
+            on { this.fileTypeInfo } doReturn type
             on { handle } doReturn "123"
+            on { parentId } doReturn -1
             on { path } doReturn "path"
-            on { name } doReturn "name"
-            on { fileTypeInfo } doReturn type
         }
 
         val file = File("path")
         val content = NodeContentUri.LocalContentUri(file)
         whenever(getOfflineFileUseCase(nodeInfo)).thenReturn(file)
 
-        underTest.handleOpenOfflineFile(nodeInfo)
+        underTest.handleOpenOfflineFile(nodeFileInfo)
 
         when (type) {
             is UrlFileTypeInfo -> {
@@ -206,11 +217,17 @@ class OfflineNodeActionsViewModelTest {
     @Test
     fun `test that text file is considered as other file type when size is too large`() =
         runTest {
-            val nodeInfo = mock<OfflineFileInformation>().stub {
+            val nodeInfo = mock<OtherOfflineNodeInformation>()
+
+            val nodeFileInfo = mock<OfflineFileInformation>().stub {
+                on { this.nodeInfo } doReturn nodeInfo
+                on { fileTypeInfo } doReturn TextFileTypeInfo("text/plain", "txt")
                 on { handle } doReturn "123"
                 on { path } doReturn "path"
                 on { name } doReturn "name"
-                on { fileTypeInfo } doReturn TextFileTypeInfo("text/plain", "txt")
+                on { isFolder } doReturn false
+                on { lastModifiedTime } doReturn null
+                on { parentId } doReturn -1
             }
 
             val file = mock<File> {
@@ -218,7 +235,7 @@ class OfflineNodeActionsViewModelTest {
             }
             whenever(getOfflineFileUseCase(nodeInfo)).thenReturn(file)
 
-            underTest.handleOpenOfflineFile(nodeInfo)
+            underTest.handleOpenOfflineFile(nodeFileInfo)
 
             underTest.uiState.test {
                 val res = awaitItem()
@@ -232,16 +249,21 @@ class OfflineNodeActionsViewModelTest {
     @Test
     fun `test that URL file type is handled when handleOpenOfflineFile is invoked`() =
         runTest {
-            val nodeInfo = mock<OfflineFileInformation>().stub {
+            val nodeInfo = mock<OtherOfflineNodeInformation>()
+            val nodeFileInfo = mock<OfflineFileInformation>().stub {
+                on { this.nodeInfo } doReturn nodeInfo
+                on { fileTypeInfo } doReturn UrlFileTypeInfo
                 on { handle } doReturn "123"
                 on { path } doReturn "path"
                 on { name } doReturn "name"
-                on { fileTypeInfo } doReturn UrlFileTypeInfo
+                on { isFolder } doReturn false
+                on { lastModifiedTime } doReturn null
+                on { parentId } doReturn -1
             }
             val file = mock<File>()
             whenever(getOfflineFileUseCase(nodeInfo)).thenReturn(file)
 
-            underTest.handleOpenOfflineFile(nodeInfo)
+            underTest.handleOpenOfflineFile(nodeFileInfo)
 
             verify(getPathFromNodeContentUseCase).invoke(NodeContentUri.LocalContentUri(file))
             underTest.uiState.test {

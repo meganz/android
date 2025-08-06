@@ -14,6 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.offline.action.model.OfflineNodeActionUiEntity
 import mega.privacy.android.app.presentation.offline.action.model.OfflineNodeActionsUiState
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -29,7 +30,6 @@ import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
-import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -88,9 +88,9 @@ class OfflineNodeActionsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun shareFiles(nodes: List<OfflineFileInformation>) {
+    private suspend fun shareFiles(infoList: List<OfflineFileInformation>) {
         runCatching {
-            getOfflineFilesUseCase(nodes).map { it.value }
+            getOfflineFilesUseCase(infoList.map { it.nodeInfo }).map { it.value }
         }.onSuccess { files ->
             _uiState.update {
                 it.copy(shareFilesEvent = triggered(files))
@@ -144,7 +144,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
     fun handleOpenOfflineFile(info: OfflineFileInformation) {
         viewModelScope.launch {
             runCatching {
-                val localFile = getOfflineFileUseCase(info)
+                val localFile = getOfflineFileUseCase(info.nodeInfo)
                 val fileType = info.fileTypeInfo
                 val nodeId = NodeId(info.handle.toLong())
                 when {
@@ -207,7 +207,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
     fun handleOpenWithIntent(info: OfflineFileInformation) {
         viewModelScope.launch {
             runCatching {
-                val localFile = getOfflineFileUseCase(info)
+                val localFile = getOfflineFileUseCase(info.nodeInfo)
                 when (info.fileTypeInfo) {
                     is UrlFileTypeInfo -> {
                         val path = getPathFromNodeContentUseCase(

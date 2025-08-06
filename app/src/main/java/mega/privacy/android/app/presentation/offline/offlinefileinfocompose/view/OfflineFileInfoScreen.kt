@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view
 
-import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -26,15 +24,17 @@ import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_TOP_APPBAR
 import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
+import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import java.time.Instant
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Compose screen for offline file info
@@ -135,42 +135,54 @@ internal class OfflineFileInfoViewStatePreviewsProvider :
     companion object {
         val uiStateFile = OfflineFileInfoUiState(
             offlineFileInformation = OfflineFileInformation(
-                name = "Notes.txt",
+                nodeInfo = OtherOfflineNodeInformation(
+                    id = 1,
+                    parentId = 0,
+                    handle = "1234",
+                    name = "Notes.txt",
+                    isFolder = false,
+                    lastModifiedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
+                    path = ""
+                ),
                 folderInfo = null,
-                isFolder = false,
-                lastModifiedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
                 totalSize = 100L,
-                thumbnail = null,
-                handle = "1234",
-                path = ""
+                thumbnail = null
             ),
             isLoading = false
         )
 
         val uiImageStateFile = OfflineFileInfoUiState(
             offlineFileInformation = OfflineFileInformation(
-                name = "Photo.jpg",
+                nodeInfo = OtherOfflineNodeInformation(
+                    id = 1,
+                    parentId = 0,
+                    handle = "1234",
+                    name = "Photo.jpg",
+                    isFolder = false,
+                    lastModifiedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
+                    path = ""
+                ),
                 folderInfo = null,
-                isFolder = false,
-                lastModifiedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
                 totalSize = 14500L,
                 thumbnail = "/path",
-                handle = "1234",
-                path = ""
             ),
             isLoading = false
         )
 
         val uiStateFolder = OfflineFileInfoUiState(
             offlineFileInformation = OfflineFileInformation(
-                name = "Favorite",
+                nodeInfo = OtherOfflineNodeInformation(
+                    id = 1,
+                    parentId = 0,
+                    handle = "1234",
+                    name = "Favorite",
+                    isFolder = true,
+                    lastModifiedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
+                    path = ""
+                ),
                 folderInfo = OfflineFolderInfo(1, 4),
-                isFolder = true,
-                lastModifiedTime = Instant.now().epochSecond - 10.seconds.inWholeSeconds,
                 totalSize = 5500L,
                 thumbnail = null,
-                handle = "1234",
-                path = ""
             ),
             isLoading = false
         )

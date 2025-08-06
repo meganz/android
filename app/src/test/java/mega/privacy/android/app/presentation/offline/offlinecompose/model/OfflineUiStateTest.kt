@@ -3,38 +3,52 @@ package mega.privacy.android.app.presentation.offline.offlinecompose.model
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
+import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import org.junit.jupiter.api.Test
 
 class OfflineUiStateTest {
     @Test
     fun `test that selectedOfflineNodes returns the correct nodes`() {
+        val nodeInfo1 = OtherOfflineNodeInformation(
+            id = 11,
+            handle = "123",
+            parentId = 678,
+            path = "path",
+            name = "test",
+            isFolder = false,
+            lastModifiedTime = 123L
+        )
+
         val offlineNodeUIItem =
             OfflineNodeUIItem(
                 OfflineFileInformation(
+                    nodeInfo = nodeInfo1,
                     totalSize = 1L,
                     folderInfo = OfflineFolderInfo(1, 1),
                     fileTypeInfo = null,
-                    thumbnail = "test",
-                    id = 11,
-                    handle = "123",
-                    parentId = 678,
-                    path = "path",
-                    lastModifiedTime = 123L,
+                    thumbnail = "test"
                 ),
                 isSelected = true
             )
+
+        val nodeInfo2 = OtherOfflineNodeInformation(
+            id = 12,
+            handle = "345",
+            parentId = 124,
+            path = "path2",
+            name = "test2",
+            isFolder = false,
+            lastModifiedTime = 123L
+        )
+
         val offlineNodeUIItem2 =
             OfflineNodeUIItem(
                 OfflineFileInformation(
+                    nodeInfo = nodeInfo2,
                     totalSize = 1L,
                     folderInfo = OfflineFolderInfo(1, 1),
                     fileTypeInfo = null,
-                    thumbnail = "test",
-                    id = 12,
-                    handle = "345",
-                    parentId = 124,
-                    path = "path2",
-                    lastModifiedTime = 123L,
+                    thumbnail = "test"
                 ),
                 isSelected = false
             )

@@ -12,6 +12,7 @@ import mega.privacy.android.app.presentation.offline.view.getOfflineNodeDescript
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
@@ -22,6 +23,8 @@ import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSh
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import java.time.Instant
+import kotlin.time.Duration.Companion.days
 
 
 @Composable
@@ -123,12 +126,16 @@ private fun OfflineOptionsContentPreview() {
                 nodeId = NodeId(1),
                 isOnline = true,
                 offlineFileInformation = OfflineFileInformation(
-                    name = "Title",
-                    isFolder = false,
+                    nodeInfo = OtherOfflineNodeInformation(
+                        id = 1,
+                        parentId = 0,
+                        handle = "1234",
+                        name = "Title.txt",
+                        isFolder = false,
+                        lastModifiedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
+                        path = ""
+                    ),
                     thumbnail = null,
-                    handle = "123",
-                    path = "",
-                    lastModifiedTime = System.currentTimeMillis()
                 ),
                 isLoading = false
             ),
@@ -151,12 +158,16 @@ private fun OfflineOptionsContentFolderPreview() {
                 nodeId = NodeId(1),
                 isOnline = false,
                 offlineFileInformation = OfflineFileInformation(
-                    name = "Title",
-                    isFolder = true,
+                    nodeInfo = OtherOfflineNodeInformation(
+                        id = 1,
+                        parentId = 0,
+                        handle = "1234",
+                        name = "My Folder",
+                        isFolder = true,
+                        lastModifiedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
+                        path = ""
+                    ),
                     thumbnail = null,
-                    handle = "123",
-                    path = "",
-                    lastModifiedTime = System.currentTimeMillis()
                 ),
                 isLoading = false
             ),

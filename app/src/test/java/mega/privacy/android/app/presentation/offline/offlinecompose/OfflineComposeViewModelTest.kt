@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -15,6 +14,7 @@ import mega.privacy.android.app.presentation.offline.offlinecompose.model.Offlin
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -144,16 +144,20 @@ class OfflineComposeViewModelTest {
         val list = listOf(offlineList1, offlineList2)
         whenever(getOfflineNodesByParentIdUseCase(parentId)).thenReturn(list)
 
+        val nodeInfo = OtherOfflineNodeInformation(
+            id = parentId,
+            parentId = 0,
+            name = "Sample",
+            isFolder = true,
+            handle = "1234",
+            lastModifiedTime = 100000L,
+            path = ""
+        )
+
         underTest.onItemClicked(
             offlineNodeUIItem = OfflineNodeUIItem(
                 offlineNode = OfflineFileInformation(
-                    id = parentId,
-                    parentId = 0,
-                    name = "Sample",
-                    isFolder = true,
-                    handle = "1234",
-                    lastModifiedTime = 100000L,
-                    path = ""
+                    nodeInfo = nodeInfo
                 ),
                 isSelected = false
             ),
@@ -164,15 +168,19 @@ class OfflineComposeViewModelTest {
 
     @Test
     fun `test that navigation even is sent when folder is clicked from homepage`() = runTest {
+        val nodeInfo = OtherOfflineNodeInformation(
+            id = 1,
+            parentId = 0,
+            name = "Sample",
+            isFolder = true,
+            handle = "1234",
+            lastModifiedTime = 100000L,
+            path = ""
+        )
+
         val item = OfflineNodeUIItem(
             offlineNode = OfflineFileInformation(
-                id = 1,
-                parentId = 0,
-                name = "Sample",
-                isFolder = true,
-                handle = "1234",
-                lastModifiedTime = 100000L,
-                path = "",
+                nodeInfo = nodeInfo,
                 absolutePath = ""
             ),
             isSelected = false
@@ -208,16 +216,21 @@ class OfflineComposeViewModelTest {
 
         val list = listOf(offlineList1, offlineList2)
         whenever(getOfflineNodesByParentIdUseCase(any(), anyOrNull())).thenReturn(list)
+
+        val nodeInfo = OtherOfflineNodeInformation(
+            id = parentId,
+            parentId = 0,
+            name = "Sample",
+            isFolder = true,
+            handle = "1234",
+            lastModifiedTime = 100000L,
+            path = ""
+        )
+
         underTest.onItemClicked(
             offlineNodeUIItem = OfflineNodeUIItem(
                 offlineNode = OfflineFileInformation(
-                    id = parentId,
-                    parentId = 0,
-                    name = "Sample",
-                    isFolder = true,
-                    handle = "1234",
-                    lastModifiedTime = 100000L,
-                    path = ""
+                    nodeInfo = nodeInfo
                 ),
                 isSelected = false
             ),
@@ -246,16 +259,21 @@ class OfflineComposeViewModelTest {
 
             val list = listOf(offlineList1, offlineList2)
             whenever(getOfflineNodesByParentIdUseCase(parentId)).thenReturn(list)
+
+            val nodeInfo = OtherOfflineNodeInformation(
+                id = parentId,
+                parentId = 0,
+                name = "Sample",
+                isFolder = true,
+                handle = "1234",
+                lastModifiedTime = 100000L,
+                path = ""
+            )
+
             underTest.onItemClicked(
                 offlineNodeUIItem = OfflineNodeUIItem(
                     offlineNode = OfflineFileInformation(
-                        id = parentId,
-                        parentId = 0,
-                        name = "Sample",
-                        isFolder = true,
-                        handle = "1234",
-                        lastModifiedTime = 100000L,
-                        path = ""
+                        nodeInfo = nodeInfo
                     ),
                     isSelected = false
                 ),
@@ -283,16 +301,21 @@ class OfflineComposeViewModelTest {
 
             val list = listOf(offlineList1, offlineList2)
             whenever(getOfflineNodesByParentIdUseCase(parentId)).thenReturn(list)
+
+            val nodeInfo = OtherOfflineNodeInformation(
+                id = parentId,
+                parentId = 0,
+                name = "Sample",
+                isFolder = true,
+                handle = "1234",
+                lastModifiedTime = 100000L,
+                path = ""
+            )
+
             underTest.onItemClicked(
                 offlineNodeUIItem = OfflineNodeUIItem(
                     offlineNode = OfflineFileInformation(
-                        id = parentId,
-                        parentId = 0,
-                        name = "Sample",
-                        isFolder = true,
-                        handle = "1234",
-                        lastModifiedTime = 100000L,
-                        path = ""
+                        nodeInfo = nodeInfo
                     ),
                     isSelected = false
                 ),
@@ -319,28 +342,41 @@ class OfflineComposeViewModelTest {
 
         val list = listOf(offlineList1, offlineList2)
         whenever(getOfflineNodesByParentIdUseCase(parentId)).thenReturn(list)
+
+        val nodeInfo = OtherOfflineNodeInformation(
+            id = parentId,
+            parentId = 0,
+            name = "Sample",
+            isFolder = true,
+            handle = "1234",
+            lastModifiedTime = 100000L,
+            path = ""
+        )
+
         underTest.onItemClicked(
             offlineNodeUIItem = OfflineNodeUIItem(
                 offlineNode = OfflineFileInformation(
-                    id = parentId,
-                    parentId = 0,
-                    name = "Sample",
-                    isFolder = true,
-                    handle = "1234",
-                    lastModifiedTime = 100000L,
-                    path = ""
+                    nodeInfo = nodeInfo
                 ),
                 isSelected = false
             ),
             rootFolderOnly = false
         )
+
+        val longClickNodeInfo = OtherOfflineNodeInformation(
+            id = 1,
+            parentId = 0,
+            name = "Sample",
+            isFolder = false,
+            handle = "1234",
+            lastModifiedTime = 100000L,
+            path = ""
+        )
+
         underTest.onLongItemClicked(
             offlineNodeUIItem = OfflineNodeUIItem(
                 offlineNode = OfflineFileInformation(
-                    id = 1,
-                    handle = "1234",
-                    lastModifiedTime = 100000L,
-                    path = ""
+                    nodeInfo = longClickNodeInfo
                 ),
             )
         )

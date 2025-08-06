@@ -6,31 +6,21 @@ import java.util.concurrent.TimeUnit
 /**
  * OfflineFileInformation
  *
- * @property id id of node in database
- * @property handle handle of node
- * @property parentId id of parent in database
- * @property name node's name
- * @property totalSize Size of the node, for folder it will be the total size of its content
- * @property isFolder true if the node is a folder, false if it's a file
- * @property folderInfo number of files in a folder
- * @property fileTypeInfo file type information
- * @property addedTime creation time of the node
- * @property thumbnail thumbnail of the node
- * @property absolutePath of the local file
+ * @property nodeInfo [OfflineNodeInformation] containing the file information
+ * @property totalSize Total size of the file
+ * @property folderInfo [OfflineFolderInfo] containing the folder information if the file is inside a folder
+ * @property fileTypeInfo [FileTypeInfo] containing the file type information
+ * @property thumbnail Path to the thumbnail of the file, if available
+ * @property absolutePath Absolute path of the file in the offline storage
+ * @property addedTime Time when the file was added, in milliseconds
  */
 data class OfflineFileInformation(
+    val nodeInfo: OfflineNodeInformation,
     val totalSize: Long = 0L,
     val folderInfo: OfflineFolderInfo? = null,
     val fileTypeInfo: FileTypeInfo? = null,
     val thumbnail: String? = null,
     val absolutePath: String = "",
-    override val id: Int = 0,
-    override val handle: String,
-    override val parentId: Int = -1,
-    override val name: String = "",
-    override val isFolder: Boolean = false,
-    override val path: String,
-    override val lastModifiedTime: Long?,
-) : OfflineNodeInformation {
+) : OfflineNodeInformation by nodeInfo {
     val addedTime = lastModifiedTime?.let { TimeUnit.MICROSECONDS.toMillis(it) }
 }

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.offline.view
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,7 +33,9 @@ import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
+import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
@@ -42,6 +43,8 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewI
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import java.time.Instant
+import kotlin.time.Duration.Companion.days
 
 /**
  * Scaffold for the Offline Flow Screen
@@ -259,31 +262,45 @@ private fun OfflineFeatureScreenPreview() {
                 offlineNodes = listOf(
                     OfflineNodeUIItem(
                         offlineNode = OfflineFileInformation(
-                            name = "Some file.txt",
+                            nodeInfo = OtherOfflineNodeInformation(
+                                id = 1,
+                                parentId = 0,
+                                handle = "1234",
+                                name = "Some file.txt",
+                                isFolder = false,
+                                lastModifiedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
+                                path = ""
+                            ),
                             totalSize = 1234,
-                            lastModifiedTime = System.currentTimeMillis(),
-                            handle = "1234",
-                            path = ""
                         )
                     ),
                     OfflineNodeUIItem(
                         offlineNode = OfflineFileInformation(
-                            name = "Some file.txt",
+                            nodeInfo = OtherOfflineNodeInformation(
+                                id = 1,
+                                parentId = 0,
+                                handle = "1234",
+                                name = "Title.txt",
+                                isFolder = false,
+                                lastModifiedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
+                                path = ""
+                            ),
                             totalSize = 3456,
-                            lastModifiedTime = System.currentTimeMillis(),
-                            handle = "1234",
-                            path = ""
                         )
                     ),
                     OfflineNodeUIItem(
                         offlineNode = OfflineFileInformation(
-                            name = "Some Folder",
+                            nodeInfo = OtherOfflineNodeInformation(
+                                id = 1,
+                                parentId = 0,
+                                handle = "1234",
+                                name = "Some Folder",
+                                isFolder = true,
+                                lastModifiedTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
+                                path = ""
+                            ),
                             totalSize = 1234,
-                            lastModifiedTime = System.currentTimeMillis(),
-                            isFolder = true,
                             folderInfo = OfflineFolderInfo(numFiles = 2, numFolders = 3),
-                            handle = "1234",
-                            path = ""
                         )
                     ),
                 )

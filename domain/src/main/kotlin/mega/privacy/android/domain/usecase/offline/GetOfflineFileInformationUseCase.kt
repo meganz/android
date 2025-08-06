@@ -46,16 +46,10 @@ class GetOfflineFileInformationUseCase @Inject constructor(
         )
 
         return OfflineFileInformation(
-            id = offlineNodeInformation.id,
-            handle = offlineNodeInformation.handle,
-            parentId = offlineNodeInformation.parentId,
-            name = offlineNodeInformation.name,
+            nodeInfo = offlineNodeInformation,
             totalSize = totalSize,
-            isFolder = offlineNodeInformation.isFolder,
             folderInfo = folderInfo,
             thumbnail = thumbnail,
-            path = offlineNodeInformation.path,
-            lastModifiedTime = offlineNodeInformation.lastModifiedTime,
             fileTypeInfo = fileTypeInfo,
             absolutePath = offlineFile.absolutePath
         )
