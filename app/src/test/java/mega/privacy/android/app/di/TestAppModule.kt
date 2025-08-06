@@ -12,6 +12,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
+import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
@@ -45,6 +46,9 @@ object TestAppModule {
 
     @Provides
     fun provideAppNavigator(): MegaNavigator = mock()
+
+    @Provides
+    fun provideMegaActivityResultContract(): MegaActivityResultContract = mock()
 
     @Provides
     fun provideLegacyDatabaseMigration(): LegacyDatabaseMigration = mock()

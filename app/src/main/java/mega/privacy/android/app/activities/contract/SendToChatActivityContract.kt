@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity
-import mega.privacy.android.app.main.model.SendToChatResult
+import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.app.utils.Constants
 
 /**

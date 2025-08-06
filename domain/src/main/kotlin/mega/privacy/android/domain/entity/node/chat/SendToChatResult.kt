@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.model
+package mega.privacy.android.domain.entity.node.chat
 
 /**
  * Send to chat result

@@ -46,7 +46,7 @@ import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
-import mega.privacy.android.app.main.model.SendToChatResult
+import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_DISABLED
 import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_ENABLED

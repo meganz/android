@@ -17,12 +17,14 @@ import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.LegacyDatabaseMigrationImpl
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.nav.MegaNavigatorImpl
+import mega.privacy.android.app.presentation.node.MegaActivityResultContractImpl
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.filewrapper.FileWrapper
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
+import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
@@ -108,6 +110,12 @@ class AppModule {
     @Singleton
     @Provides
     internal fun provideAppNavigator(navigator: MegaNavigatorImpl): MegaNavigator = navigator
+
+    @Singleton
+    @Provides
+    internal fun provideMegaActivityResultContract(
+        impl: MegaActivityResultContractImpl,
+    ): MegaActivityResultContract = impl
 
     @Singleton
     @Provides
