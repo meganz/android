@@ -21,9 +21,9 @@ import mega.privacy.android.app.presentation.filelink.model.FileLinkJobInProgres
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
-import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
@@ -51,7 +51,6 @@ import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameC
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
-import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
@@ -556,23 +555,8 @@ class FileLinkViewModel @Inject constructor(
                 context.startActivity(this)
             }.onFailure { error ->
                 Timber.e(error)
-                openShareIntent(context, showSnackBar)
+                showSnackBar(R.string.intent_not_available)
             }
-        }
-    }
-
-    private fun Intent.openShareIntent(
-        context: Context,
-        showSnackBar: (Int) -> Unit,
-    ) {
-        if (resolveActivity(context.packageManager) == null) {
-            action = Intent.ACTION_SEND
-        }
-        runCatching {
-            context.startActivity(this)
-        }.onFailure {
-            Timber.e(it)
-            showSnackBar(R.string.intent_not_available)
         }
     }
 

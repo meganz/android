@@ -472,20 +472,8 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 startActivity(this)
             }.onFailure { error ->
                 Timber.e(error)
-                openShareIntent()
+                snackbarHostState.showAutoDurationSnackbar(getString(R.string.intent_not_available))
             }
-        }
-    }
-
-    private suspend fun Intent.openShareIntent() {
-        if (resolveActivity(packageManager) == null) {
-            action = Intent.ACTION_SEND
-        }
-        runCatching {
-            startActivity(this)
-        }.onFailure { error ->
-            Timber.e(error)
-            snackbarHostState.showAutoDurationSnackbar(getString(R.string.intent_not_available))
         }
     }
 

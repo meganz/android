@@ -189,20 +189,6 @@ private fun safeLaunchActivity(
     }
 }
 
-private fun Intent.openShareIntent(
-    context: Context,
-    showSnackbar: (String) -> Unit,
-) {
-    if (resolveActivity(context.packageManager) == null) {
-        action = Intent.ACTION_SEND
-    }
-    safeLaunchActivity(
-        context = context,
-        intent = this,
-        showSnackbar = showSnackbar
-    )
-}
-
 fun openOtherFile(
     megaNavigator: MegaNavigator,
     file: File,
@@ -267,7 +253,7 @@ private fun handleOtherFiles(
             context.startActivity(this)
         }.onFailure { error ->
             Timber.e(error)
-            openShareIntent(context = context, showSnackbar = showSnackbar)
+            showSnackbar(context.getString(sharedR.string.intent_not_available))
         }
     }
 }

@@ -27,14 +27,11 @@ import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
-import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
-import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
@@ -845,20 +842,8 @@ class FolderLinkViewModel @Inject constructor(
                 context.startActivity(this)
             }.onFailure { error ->
                 Timber.e(error)
-                openShareIntent(context = context)
+                showSnackbar(R.string.intent_not_available)
             }
-        }
-    }
-
-    private fun Intent.openShareIntent(context: Context) {
-        if (resolveActivity(context.packageManager) == null) {
-            action = Intent.ACTION_SEND
-        }
-        runCatching {
-            context.startActivity(this)
-        }.onFailure {
-            Timber.e(it)
-            showSnackbar(R.string.intent_not_available)
         }
     }
 
