@@ -33,9 +33,7 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
-import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -71,6 +69,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
@@ -1248,7 +1247,7 @@ object MegaNodeUtil {
      */
     @JvmStatic
     fun manageTextFileIntent(context: Context, node: MegaNode, adapterType: Int) {
-        manageTextFileIntent(context, node, adapterType, null, VIEW_MODE)
+        manageTextFileIntent(context, node, adapterType, null, TextEditorMode.View.value)
     }
 
     /**
@@ -1260,7 +1259,7 @@ object MegaNodeUtil {
      */
     @JvmStatic
     fun manageEditTextFileIntent(context: Context, node: MegaNode, adapterType: Int) {
-        manageTextFileIntent(context, node, adapterType, null, EDIT_MODE)
+        manageTextFileIntent(context, node, adapterType, null, TextEditorMode.Edit.value)
     }
 
     /**
@@ -1278,7 +1277,7 @@ object MegaNodeUtil {
         adapterType: Int,
         urlFileLink: String?,
     ) {
-        manageTextFileIntent(context, node, adapterType, urlFileLink, VIEW_MODE)
+        manageTextFileIntent(context, node, adapterType, urlFileLink, TextEditorMode.Edit.value)
     }
 
     /**

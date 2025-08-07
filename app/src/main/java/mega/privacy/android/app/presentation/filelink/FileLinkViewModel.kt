@@ -434,7 +434,6 @@ class FileLinkViewModel @Inject constructor(
             intent.apply {
                 putExtra(Constants.URL_FILE_LINK, url)
                 putExtra(Constants.EXTRA_SERIALIZE_STRING, serializedData)
-                putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
                 putExtra(
                     Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
                     Constants.FILE_LINK_ADAPTER

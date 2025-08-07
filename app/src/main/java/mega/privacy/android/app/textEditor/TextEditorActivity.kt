@@ -59,7 +59,6 @@ import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachme
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CONVERTED_FILE_NAME
-import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.ANIMATION_DURATION
@@ -99,6 +98,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.MegaNavigator
@@ -873,7 +873,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             showLoadingView()
         }
 
-        if (mode == VIEW_MODE) {
+        if (mode == TextEditorMode.View.value) {
             supportActionBar?.title = null
             binding.nameText.isVisible = true
 

@@ -11,8 +11,10 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import java.io.File
 
 /**
@@ -334,15 +336,15 @@ interface AppNavigator {
      * Open text editor activity
      *
      * @param context Context
-     * @param currentFileNode TypedFileNode
+     * @param currentNodeId the NodeId of the current node
      * @param mode the mode of the text editor, e.g., "view", "edit"
      * @param nodeSourceType the adapter type of the view
      */
     fun openTextEditorActivity(
         context: Context,
-        currentFileNode: TypedFileNode,
+        currentNodeId: NodeId,
         nodeSourceType: Int?,
-        mode: String? = null,
+        mode: TextEditorMode,
     )
 
     /**

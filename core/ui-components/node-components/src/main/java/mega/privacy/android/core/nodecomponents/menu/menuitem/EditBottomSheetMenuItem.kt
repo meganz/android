@@ -2,23 +2,23 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.menu.menuaction.EditMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission.FULL
 import mega.privacy.android.domain.entity.shares.AccessPermission.OWNER
 import mega.privacy.android.domain.entity.shares.AccessPermission.READWRITE
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import java.io.File
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Edit bottom sheet menu action
@@ -28,7 +28,7 @@ import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 class EditBottomSheetMenuItem @Inject constructor(
     override val menuAction: EditMenuAction,
     private val megaNavigator: MegaNavigator,
-    private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase
+    private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
 
     override suspend fun shouldDisplay(
@@ -57,12 +57,11 @@ class EditBottomSheetMenuItem @Inject constructor(
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
-        // Todo variable `mode` and `nodeSourceType` are hardcoded, consider making them configurable
         megaNavigator.openTextEditorActivity(
             context = navController.context,
-            currentFileNode = node as TypedFileNode,
-            mode = "EDIT_MODE",
-            nodeSourceType = 2006,
+            currentNodeId = node.id,
+            mode = TextEditorMode.Edit,
+            nodeSourceType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
         )
         onDismiss()
     }

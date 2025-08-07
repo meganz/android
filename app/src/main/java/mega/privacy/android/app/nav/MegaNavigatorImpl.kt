@@ -17,6 +17,7 @@ import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
+import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -37,7 +38,6 @@ import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -78,8 +78,10 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
@@ -613,13 +615,13 @@ internal class MegaNavigatorImpl @Inject constructor(
 
     override fun openTextEditorActivity(
         context: Context,
-        currentFileNode: TypedFileNode,
+        currentNodeId: NodeId,
         nodeSourceType: Int?,
-        mode: String?,
+        mode: TextEditorMode,
     ) {
         val textFileIntent = Intent(context, TextEditorActivity::class.java)
-        textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
-            .putExtra(TextEditorViewModel.MODE, mode ?: TextEditorViewModel.VIEW_MODE)
+        textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentNodeId.longValue)
+            .putExtra(TextEditorViewModel.MODE, mode.value)
             .putExtra(
                 Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
                 nodeSourceType ?: NodeSourceTypeInt.FILE_BROWSER_ADAPTER

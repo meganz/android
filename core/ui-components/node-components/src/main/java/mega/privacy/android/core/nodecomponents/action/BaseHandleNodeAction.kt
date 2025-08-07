@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.megaNavigator
@@ -70,8 +71,9 @@ fun BaseHandleNodeAction(
 
                 is FileNodeContent.TextContent -> megaNavigator.openTextEditorActivity(
                     context = context,
-                    currentFileNode = typedFileNode,
-                    nodeSourceType = nodeSourceType
+                    currentNodeId = typedFileNode.id,
+                    nodeSourceType = nodeSourceType,
+                    mode = TextEditorMode.View
                 )
 
                 is FileNodeContent.AudioOrVideo -> {

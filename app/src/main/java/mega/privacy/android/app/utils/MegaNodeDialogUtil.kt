@@ -32,7 +32,6 @@ import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CREATE_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
@@ -51,6 +50,7 @@ import mega.privacy.android.app.utils.Util.isOffline
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboardDelayed
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaError
@@ -446,7 +446,7 @@ object MegaNodeDialogUtil {
 
                     TYPE_NEW_TXT_FILE -> {
                         val textFileEditor = Intent(context, TextEditorActivity::class.java)
-                            .putExtra(MODE, CREATE_MODE)
+                            .putExtra(MODE, TextEditorMode.Create.value)
                             .putExtra(INTENT_EXTRA_KEY_FILE_NAME, typedString)
                             .putExtra(INTENT_EXTRA_KEY_HANDLE, node?.handle)
                             .putExtra(FROM_HOME_PAGE, fromHome)

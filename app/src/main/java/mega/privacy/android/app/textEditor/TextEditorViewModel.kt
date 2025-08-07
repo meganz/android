@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.ExportListener
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
@@ -48,7 +47,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.MESSAGE_ID
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
@@ -62,6 +60,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.qualifier.MegaApi
@@ -73,7 +72,9 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.monitoring.CrashReporter
@@ -155,9 +156,6 @@ class TextEditorViewModel @Inject constructor(
 
     companion object {
         const val MODE = "MODE"
-        const val CREATE_MODE = "CREATE_MODE"
-        const val VIEW_MODE = "VIEW_MODE"
-        const val EDIT_MODE = "EDIT_MODE"
         const val SHOW_LINE_NUMBERS = "SHOW_LINE_NUMBERS"
 
         private val BLOCKQUOTE_STYLE = """
@@ -282,18 +280,18 @@ class TextEditorViewModel @Inject constructor(
 
     fun getMode(): LiveData<String> = mode
 
-    fun isViewMode(): Boolean = mode.value == VIEW_MODE
+    fun isViewMode(): Boolean = mode.value == TextEditorMode.View.value
 
-    internal fun isEditMode(): Boolean = mode.value == EDIT_MODE
+    internal fun isEditMode(): Boolean = mode.value == TextEditorMode.Edit.value
 
-    fun isCreateMode(): Boolean = mode.value == CREATE_MODE
+    fun isCreateMode(): Boolean = mode.value == TextEditorMode.Create.value
 
     internal fun setViewMode() {
-        mode.value = VIEW_MODE
+        mode.value = TextEditorMode.View.value
     }
 
     fun setEditMode() {
-        mode.value = EDIT_MODE
+        mode.value = TextEditorMode.Edit.value
     }
 
     fun getCurrentText(): String? = pagination.value?.getCurrentPageText()
@@ -428,7 +426,7 @@ class TextEditorViewModel @Inject constructor(
         textEditorData.value?.api =
             if (adapterType == FOLDER_LINK_ADAPTER) megaApiFolder else megaApi
 
-        mode.value = intent.getStringExtra(MODE) ?: VIEW_MODE
+        mode.value = intent.getStringExtra(MODE) ?: TextEditorMode.View.value
 
         if (isViewMode() || isEditMode()) {
             needsReadContent = true
@@ -662,9 +660,9 @@ class TextEditorViewModel @Inject constructor(
             return
         }
 
-        val parentHandle = if (mode.value == CREATE_MODE && getNode() == null) {
+        val parentHandle = if (mode.value == TextEditorMode.Create.value && getNode() == null) {
             megaApi.rootNode?.handle
-        } else if (mode.value == CREATE_MODE) {
+        } else if (mode.value == TextEditorMode.Create.value) {
             getNode()?.handle
         } else {
             getNode()?.parentHandle
@@ -675,7 +673,7 @@ class TextEditorViewModel @Inject constructor(
             return
         }
 
-        if (mode.value == EDIT_MODE) {
+        if (mode.value == TextEditorMode.Edit.value) {
             uploadFile(fromHome, tempFile, parentHandle)
             return
         }
@@ -826,7 +824,7 @@ class TextEditorViewModel @Inject constructor(
                     }
                 }
             }.onFailure {
-                Timber.e("Error not copied", it)
+                Timber.e(it)
                 if (it is NodeDoesNotExistsException) {
                     snackBarMessage.value = R.string.general_error
                 } else {
@@ -860,7 +858,7 @@ class TextEditorViewModel @Inject constructor(
                     }
                 }
             }.onFailure {
-                Timber.e("Error not copied", it)
+                Timber.e(it)
                 if (it is NodeDoesNotExistsException) {
                     snackBarMessage.value = R.string.general_error
                 } else {

@@ -44,14 +44,12 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.textEditor.TextEditorViewModel
-import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.DOCUMENTS_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.DOCUMENTS_BROWSE_ADAPTER
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
@@ -198,7 +196,6 @@ class DocumentSectionFragment : Fragment() {
                             INTENT_EXTRA_KEY_ADAPTER_TYPE,
                             DOCUMENTS_BROWSE_ADAPTER
                         )
-                        putExtra(TextEditorViewModel.MODE, VIEW_MODE)
                     }.let {
                         activity.startActivity(it)
                     }

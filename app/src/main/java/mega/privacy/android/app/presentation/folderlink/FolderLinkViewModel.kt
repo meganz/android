@@ -788,7 +788,6 @@ class FolderLinkViewModel @Inject constructor(
     fun updateTextEditorIntent(intent: Intent, fileNode: FileNode) {
         intent.apply {
             putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
-            putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
             putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FOLDER_LINK_ADAPTER)
         }
         _state.update { it.copy(openFile = triggered(intent)) }
