@@ -13,7 +13,6 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
@@ -332,15 +331,9 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(intent)
     }
 
-    private suspend fun getIntent(context: Context, fileTypeInfo: FileTypeInfo) = when {
+    private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo) = when {
         fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
-            Intent(
-                context,
-                if (getFeatureFlagValueUseCase(AppFeatures.NewVideoPlayer))
-                    VideoPlayerComposeActivity::class.java
-                else
-                    LegacyVideoPlayerActivity::class.java
-            )
+            Intent(context, VideoPlayerComposeActivity::class.java)
 
         fileTypeInfo.isSupported && fileTypeInfo is AudioFileTypeInfo ->
             Intent(context, AudioPlayerActivity::class.java)

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.mediaplayer
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -61,7 +60,6 @@ internal class SelectSubtitleFileViewModelTest {
         underTest = SelectSubtitleFileViewModel(
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
             subtitleFileInfoItemMapper = subtitleFileInfoItemMapper,
-            savedStateHandle = SavedStateHandle(),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
