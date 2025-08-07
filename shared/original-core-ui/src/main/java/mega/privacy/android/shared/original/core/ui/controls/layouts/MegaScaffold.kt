@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.rememberScrollState
@@ -258,8 +257,7 @@ private fun BarContent(
                     .background(color = DSTokens.colors.background.blur)
                     .clickable(indication = null,
                         interactionSource = remember { MutableInteractionSource() },
-                        onClick = { blurContent.invoke() })
-                    .systemBarsPadding(),
+                        onClick = { blurContent.invoke() }),
             ) { }
         }
     }

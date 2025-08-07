@@ -154,6 +154,7 @@ internal fun DriveSyncScreen(
                     tabItem = TabItems(stringResource(sharedR.string.general_syncs)),
                 ) { _, _, modifier ->
                     SyncListRoute(
+                        applyRevampStyles = true,
                         isInCloudDrive = true,
                         syncPermissionsManager = viewModel.syncPermissionsManager,
                         onSyncFolderClicked = {

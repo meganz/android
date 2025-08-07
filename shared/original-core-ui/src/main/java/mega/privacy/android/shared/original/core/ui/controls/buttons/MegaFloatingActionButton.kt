@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.FloatingActionButtonDefaults
 import androidx.compose.material.Icon
@@ -56,6 +57,7 @@ internal fun MegaFloatingActionButton(
     modifier: Modifier = Modifier,
     style: FloatingActionButtonStyle = FloatingActionButtonStyle.Big,
     enabled: Boolean = true,
+    shape: RoundedCornerShape = CircleShape,
     backgroundColor: Color = DSTokens.colors.button.primary,
     iconTintColor: Color = DSTokens.colors.icon.inverse,
     backgroundColorDisabled: Color = DSTokens.colors.button.disabled,
@@ -66,7 +68,7 @@ internal fun MegaFloatingActionButton(
         onClick = { if (enabled) onClick() },
         modifier = modifier.size(style.size),
         backgroundColor = if (enabled) backgroundColor else backgroundColorDisabled,
-        shape = CircleShape,
+        shape = shape,
         elevation = if (style.elevation && enabled) {
             FloatingActionButtonDefaults.elevation()
         } else {

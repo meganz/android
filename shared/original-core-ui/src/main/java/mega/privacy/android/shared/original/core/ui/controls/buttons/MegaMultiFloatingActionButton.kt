@@ -7,6 +7,8 @@ import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +19,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -67,6 +71,7 @@ fun MegaMultiFloatingActionButton(
     icon: Painter = painterResource(id = R.drawable.ic_plus),
     enabled: Boolean = true,
     showLabels: Boolean = true,
+    isCircular: Boolean = true,
     mainButtonCollapsedStyle: FloatingActionButtonStyle = FloatingActionButtonStyle.Big,
     mainButtonExpandedStyle: FloatingActionButtonStyle = FloatingActionButtonStyle.Medium,
     multiFabState: MutableState<MultiFloatingActionButtonState> = rememberMultiFloatingActionButtonState(),
@@ -104,17 +109,26 @@ fun MegaMultiFloatingActionButton(
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.Bottom,
     ) {
-        items.forEach { item ->
-            AnimatedVisibility(visible = isExpanded) {
-                MultiFloatingActionButtonItem(
-                    item = item,
-                    showLabel = showLabels,
-                )
+        AnimatedVisibility(
+            visible = isExpanded,
+            enter = fadeIn() + slideInVertically(
+                initialOffsetY = { fullHeight -> fullHeight }, // starts from bottom
+            ),
+        ) {
+            Column(
+                modifier = Modifier.padding(bottom = 16.dp),
+                horizontalAlignment = Alignment.End,
+            ) {
+                items.forEach { item ->
+                    MultiFloatingActionButtonItem(
+                        item = item,
+                        showLabel = showLabels,
+                    )
+                }
             }
         }
         Box(
             modifier = modifier
-                .padding(top = 16.dp)
                 .size(max(mainButtonCollapsedStyle.size, mainButtonExpandedStyle.size)),
             contentAlignment = Alignment.Center
         ) {
@@ -123,7 +137,8 @@ fun MegaMultiFloatingActionButton(
                 modifier = Modifier.testTag(tag = MULTI_FAB_MAIN_FAB_TEST_TAG),
                 style = if (isExpanded) mainButtonExpandedStyle else mainButtonCollapsedStyle,
                 enabled = enabled,
-                backgroundColor = if (isExpanded) DSTokens.colors.button.secondary else DSTokens.colors.button.primary
+                shape = if (isCircular) CircleShape else RoundedCornerShape(16.dp),
+                backgroundColor = if (isExpanded) DSTokens.colors.background.pageBackground else DSTokens.colors.button.primary
             ) {
                 Icon(
                     painter = icon,
@@ -144,7 +159,7 @@ private fun MultiFloatingActionButtonItem(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(top = 16.dp, end = 4.dp)
+            .padding(top = 16.dp, end = 6.dp)
             .clickable { if (item.enabled) item.onClicked() }
             .testTag("${MULTI_FAB_OPTION_ROW_TEST_TAG}_${item.label}"),
     ) {
@@ -155,7 +170,10 @@ private fun MultiFloatingActionButtonItem(
                     .defaultMinSize(minHeight = 26.dp, minWidth = 20.dp)
                     .padding(end = 16.dp)
                     .testTag("${MULTI_FAB_OPTION_LABEL_TEST_TAG}_${item.label}"),
-                colors = ButtonDefaults.buttonColors(),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = DSTokens.colors.background.pageBackground,
+                    contentColor = DSTokens.colors.text.primary,
+                ),
                 enabled = item.enabled,
                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
             ) {

@@ -26,7 +26,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -102,12 +101,12 @@ internal fun SyncListScreen(
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
+    applyRevampStyles: Boolean = false,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     var sheetContent by remember { mutableStateOf<SyncModalSheetContent?>(null) }
-    val context = LocalContext.current
 
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
@@ -234,7 +233,8 @@ internal fun SyncListScreen(
                             }
                             onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
                             multiFabState.value = state
-                        }
+                        },
+                        isCircular = !applyRevampStyles,
                     )
                 }
             },
