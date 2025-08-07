@@ -9,7 +9,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SetSyncFrequencyUseCaseTest {
+internal class SetSyncFrequencyUseCaseTest {
 
     private val syncPreferencesRepository: SyncPreferencesRepository = mock()
     private val underTest: SetSyncFrequencyUseCase =

@@ -7,7 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncDeeplinkProcessorTest {
+internal class SyncDeeplinkProcessorTest {
 
     private lateinit var syncDeeplinkProcessor: SyncDeeplinkProcessor
 

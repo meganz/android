@@ -25,7 +25,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
+internal class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
 
     private lateinit var underTest: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 

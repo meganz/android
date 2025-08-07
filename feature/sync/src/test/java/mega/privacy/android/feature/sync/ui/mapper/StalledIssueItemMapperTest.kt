@@ -27,7 +27,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class StalledIssueItemMapperTest {
+internal class StalledIssueItemMapperTest {
 
     private val stalledIssueResolutionActionMapper: StalledIssueResolutionActionMapper = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()

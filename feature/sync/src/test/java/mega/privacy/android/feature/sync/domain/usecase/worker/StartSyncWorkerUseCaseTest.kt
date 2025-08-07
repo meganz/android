@@ -15,7 +15,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class StartSyncWorkerUseCaseTest {
+internal class StartSyncWorkerUseCaseTest {
 
     private val syncRepository: SyncRepository = mock()
     private val getSyncFrequencyUseCase: GetSyncFrequencyUseCase = mock()

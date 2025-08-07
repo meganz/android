@@ -18,7 +18,7 @@ import org.robolectric.annotation.Config
 
 @Config(qualifiers = "fr-rFr-w1080dp-h1920dp")
 @RunWith(AndroidJUnit4::class)
-class SyncPermissionWarningBannerTest {
+internal class SyncPermissionWarningBannerTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()

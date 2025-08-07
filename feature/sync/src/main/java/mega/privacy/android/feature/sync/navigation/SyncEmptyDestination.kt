@@ -12,7 +12,7 @@ import mega.privacy.mobile.analytics.event.AndroidSyncGetStartedButtonEvent
  * Route to the onboarding screen
  */
 @Serializable
-data object SyncEmptyRoute
+internal data object SyncEmptyRoute
 
 internal fun NavGraphBuilder.syncEmptyDestination(
     onNavigateToNewFolder: () -> Unit,

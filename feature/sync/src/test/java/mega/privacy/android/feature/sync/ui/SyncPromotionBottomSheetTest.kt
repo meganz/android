@@ -32,7 +32,7 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class SyncPromotionBottomSheetTest {
+internal class SyncPromotionBottomSheetTest {
 
     private lateinit var context: Context
     private lateinit var modalSheetState: ModalBottomSheetState

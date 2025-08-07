@@ -12,7 +12,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ClearSyncDebrisUseCaseTest {
+internal class ClearSyncDebrisUseCaseTest {
     private lateinit var underTest: ClearSyncDebrisUseCase
 
     private val syncDebrisRepository = mock<SyncDebrisRepository>()

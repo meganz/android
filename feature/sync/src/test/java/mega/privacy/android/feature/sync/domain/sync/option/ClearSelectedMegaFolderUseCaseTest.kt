@@ -8,7 +8,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ClearSelectedMegaFolderUseCaseTest {
+internal class ClearSelectedMegaFolderUseCaseTest {
 
     private val repository: SyncNewFolderParamsRepository = mock()
     private val underTest = ClearSelectedMegaFolderUseCase(repository)

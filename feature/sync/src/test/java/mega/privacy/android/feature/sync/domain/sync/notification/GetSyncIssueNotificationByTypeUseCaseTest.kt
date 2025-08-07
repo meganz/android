@@ -13,7 +13,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetSyncIssueNotificationByTypeUseCaseTest {
+internal class GetSyncIssueNotificationByTypeUseCaseTest {
 
     private lateinit var underTest: GetSyncIssueNotificationByTypeUseCase
     private val syncNotificationRepository: SyncNotificationRepository = mock()

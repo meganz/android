@@ -27,7 +27,7 @@ import org.mockito.kotlin.whenever
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncSolvedIssuesViewModelTest {
+internal class SyncSolvedIssuesViewModelTest {
 
     private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase = mock()
     private val solvedIssueItemMapper: SolvedIssueItemMapper = mock()

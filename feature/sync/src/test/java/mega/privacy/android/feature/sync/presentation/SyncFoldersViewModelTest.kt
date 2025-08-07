@@ -76,7 +76,7 @@ import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncFoldersViewModelTest {
+internal class SyncFoldersViewModelTest {
 
     private val syncUiItemMapper: SyncUiItemMapper = mock()
     private val removeFolderPairUseCase: RemoveFolderPairUseCase = mock()

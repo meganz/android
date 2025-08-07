@@ -21,7 +21,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetSyncDebrisSizeInBytesUseCaseTest {
+internal class GetSyncDebrisSizeInBytesUseCaseTest {
 
     private lateinit var underTest: GetSyncDebrisSizeInBytesUseCase
 

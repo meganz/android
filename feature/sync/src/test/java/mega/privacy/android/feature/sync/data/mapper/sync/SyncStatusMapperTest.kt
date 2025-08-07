@@ -20,7 +20,7 @@ import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncStatusMapperTest {
+internal class SyncStatusMapperTest {
 
     private val underTest = SyncStatusMapper()
 

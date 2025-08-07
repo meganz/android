@@ -19,12 +19,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacyTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
 
 @Composable
 internal fun SyncEmptyScreen(getStartedClicked: () -> Unit) {
@@ -32,8 +32,8 @@ internal fun SyncEmptyScreen(getStartedClicked: () -> Unit) {
 
     Scaffold(topBar = {
         LegacyTopAppBar(modifier = Modifier.testTag(
-            TAG_SYNC_EMPTY_SCREEN_TOOLBAR
-        ),
+                TAG_SYNC_EMPTY_SCREEN_TOOLBAR
+            ),
             title = stringResource(R.string.sync_toolbar_title),
             subtitle = null,
             elevation = false,

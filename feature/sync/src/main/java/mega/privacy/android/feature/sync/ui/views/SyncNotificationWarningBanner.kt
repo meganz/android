@@ -18,7 +18,7 @@ import mega.privacy.android.shared.resources.R as sharedResR
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun SyncNotificationWarningBanner(
+internal fun SyncNotificationWarningBanner(
     state: SyncMonitorState,
     onDismissNotification: () -> Unit,
     modifier: Modifier = Modifier,

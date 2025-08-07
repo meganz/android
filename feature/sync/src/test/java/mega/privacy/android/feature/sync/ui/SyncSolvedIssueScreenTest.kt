@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -14,6 +13,7 @@ import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssu
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesState
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
+import mega.privacy.android.icon.pack.R as IconPackR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +23,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "fr-rFr-w1080dp-h1920dp")
-class SyncSolvedIssueScreenTest {
+internal class SyncSolvedIssueScreenTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()

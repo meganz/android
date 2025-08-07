@@ -21,7 +21,7 @@ import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIs
  * Route to the Sync list
  */
 @Serializable
-data class SyncList(val selectedChip: SyncChip = SyncChip.SYNC_FOLDERS)
+internal data class SyncList(val selectedChip: SyncChip = SyncChip.SYNC_FOLDERS)
 
 internal fun NavGraphBuilder.syncListDestination(
     syncPermissionsManager: SyncPermissionsManager,

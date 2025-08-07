@@ -12,7 +12,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class SyncSolvedIssuesRepositoryImplTest {
+internal class SyncSolvedIssuesRepositoryImplTest {
     private val syncSolvedIssuesGateway: SyncSolvedIssuesGateway = mock()
     private val solvedIssueToSolvedIssueEntityMapper: SolvedIssueToSolvedIssueEntityMapper = mock()
     private val solvedIssueEntityToSolvedIssueMapper: SolvedIssueEntityToSolvedIssueMapper = mock()

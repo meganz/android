@@ -33,7 +33,7 @@ import org.mockito.kotlin.wheneverBlocking
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MonitorSyncsUseCaseTest {
+internal class MonitorSyncsUseCaseTest {
 
     private val syncRepository: SyncRepository = mock()
     private val changeSyncLocalRootUseCase: ChangeSyncLocalRootUseCase = mock()

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-class RenameFilesWithTheSameNameUseCaseTest {
+internal class RenameFilesWithTheSameNameUseCaseTest {
 
     private val fileSystemRepository = mock<FileSystemRepository>()
 

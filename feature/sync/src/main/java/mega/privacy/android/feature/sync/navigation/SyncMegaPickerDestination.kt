@@ -13,7 +13,7 @@ import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
  * Route to the MEGA folder picker screen
  */
 @Serializable
-data object SyncMegaPicker
+internal data object SyncMegaPicker
 
 internal fun NavGraphBuilder.syncMegaPickerDestination(
     syncPermissionsManager: SyncPermissionsManager,

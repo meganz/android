@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.sync.data.mapper.sync
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mega.privacy.android.data.database.entity.SyncShownNotificationEntity
 import mega.privacy.android.feature.sync.data.mapper.notification.GenericErrorToNotificationMessageMapper
@@ -19,7 +18,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
+internal class SyncShownNotificationEntityToSyncNotificationMessageMapperTest {
 
     private val genericErrorToNotificationMessageMapper: GenericErrorToNotificationMessageMapper =
         mock()

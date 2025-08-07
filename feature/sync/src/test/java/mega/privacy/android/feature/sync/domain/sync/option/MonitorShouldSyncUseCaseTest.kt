@@ -20,7 +20,7 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MonitorShouldSyncUseCaseTest {
+internal class MonitorShouldSyncUseCaseTest {
 
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
     private val monitorSyncByChargingUseCase: MonitorSyncByChargingUseCase = mock()

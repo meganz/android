@@ -25,7 +25,7 @@ import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncDebrisRepositoryImplTest {
+internal class SyncDebrisRepositoryImplTest {
 
     private lateinit var underTest: SyncDebrisRepositoryImpl
     private val fileGateway: FileGateway = mock()

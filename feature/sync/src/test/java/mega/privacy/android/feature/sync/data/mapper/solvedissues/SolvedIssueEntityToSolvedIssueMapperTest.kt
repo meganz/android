@@ -11,7 +11,7 @@ import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class SolvedIssueEntityToSolvedIssueMapperTest {
+internal class SolvedIssueEntityToSolvedIssueMapperTest {
     private val gson = Gson()
     private val listToStringWithDelimitersMapper = ListToStringWithDelimitersMapper(gson)
 

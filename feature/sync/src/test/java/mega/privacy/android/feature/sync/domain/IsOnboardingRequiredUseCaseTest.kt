@@ -18,7 +18,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class IsOnboardingRequiredUseCaseTest {
+internal class IsOnboardingRequiredUseCaseTest {
 
     private val syncPreferencesRepository: SyncPreferencesRepository = mock()
     private val syncRepository: SyncRepository = mock()

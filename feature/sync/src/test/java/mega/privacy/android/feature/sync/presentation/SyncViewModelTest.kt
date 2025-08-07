@@ -19,7 +19,7 @@ import org.mockito.kotlin.whenever
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncViewModelTest {
+internal class SyncViewModelTest {
 
     private val isOnboardingRequiredUseCase: IsOnboardingRequiredUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()

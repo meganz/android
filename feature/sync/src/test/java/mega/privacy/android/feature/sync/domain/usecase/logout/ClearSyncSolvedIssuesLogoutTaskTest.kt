@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
 
-class ClearSyncSolvedIssuesLogoutTaskTest {
+internal class ClearSyncSolvedIssuesLogoutTaskTest {
     private lateinit var underTest: ClearSyncSolvedIssuesLogoutTask
 
     private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase = mock()

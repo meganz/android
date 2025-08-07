@@ -15,7 +15,7 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ChangeSyncLocalRootUseCaseTest {
+internal class ChangeSyncLocalRootUseCaseTest {
 
     private lateinit var underTest: ChangeSyncLocalRootUseCase
     private val syncRepository = mock<SyncRepository>()

@@ -9,7 +9,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ClearSolvedIssuesBySyncIdUseCaseTest {
+internal class ClearSolvedIssuesBySyncIdUseCaseTest {
 
     private val syncSolvedIssuesRepository: SyncSolvedIssuesRepository = mock()
     private val underTest = ClearSolvedIssuesBySyncIdUseCase(syncSolvedIssuesRepository)

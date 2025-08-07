@@ -13,7 +13,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncPromotionPreferencesRepositoryImplTest {
+internal class SyncPromotionPreferencesRepositoryImplTest {
 
     private lateinit var underTest: SyncPromotionPreferencesRepositoryImpl
     private val syncPromotionDataStore = mock<SyncPromotionDataStore>()

@@ -10,7 +10,7 @@ import de.palm.composestateevents.consumed
  * @property errorMessage The Error Message displayed when an issue with renaming and creating the Backup occurs
  * @property successEvent Notifies that the Backup has been successfully renamed and created
  */
-data class RenameAndCreateBackupState(
+internal data class RenameAndCreateBackupState(
     @StringRes val errorMessage: Int? = null,
     val successEvent: StateEvent = consumed,
 )

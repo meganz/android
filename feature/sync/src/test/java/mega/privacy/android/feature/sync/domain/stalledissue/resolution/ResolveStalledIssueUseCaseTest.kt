@@ -37,7 +37,7 @@ import kotlin.time.Instant
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @OptIn(ExperimentalTime::class)
-class ResolveStalledIssueUseCaseTest {
+internal class ResolveStalledIssueUseCaseTest {
 
     private val deleteDocumentFileByContentUriUseCase: DeleteDocumentFileBySyncContentUriUseCase =
         mock()

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-class RenameNodeWithTheSameNameUseCaseTest {
+internal class RenameNodeWithTheSameNameUseCaseTest {
 
     private val addCounterToNodeNameUseCase: AddCounterToNodeNameUseCase = mock()
     private val underTest: RenameNodeWithTheSameNameUseCase =

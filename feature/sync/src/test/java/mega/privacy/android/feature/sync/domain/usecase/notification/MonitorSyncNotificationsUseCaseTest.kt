@@ -24,7 +24,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MonitorSyncNotificationsUseCaseTest {
+internal class MonitorSyncNotificationsUseCaseTest {
 
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()

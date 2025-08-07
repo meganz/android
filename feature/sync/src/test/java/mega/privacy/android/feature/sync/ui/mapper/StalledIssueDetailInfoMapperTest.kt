@@ -16,7 +16,7 @@ import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class StalledIssueDetailInfoMapperTest {
+internal class StalledIssueDetailInfoMapperTest {
     private val context: Context = mock()
     private val underTest = StalledIssueDetailInfoMapper(context)
 

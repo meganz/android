@@ -37,7 +37,7 @@ import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncStalledIssuesViewModelTest {
+internal class SyncStalledIssuesViewModelTest {
 
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
     private val stalledIssueItemMapper: StalledIssueItemMapper = mock()

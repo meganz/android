@@ -13,7 +13,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class MegaPickerRouteTest {
+internal class MegaPickerRouteTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()

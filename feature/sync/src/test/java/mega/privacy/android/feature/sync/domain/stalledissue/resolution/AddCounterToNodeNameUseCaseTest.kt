@@ -15,7 +15,7 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AddCounterToNodeNameUseCaseTest {
+internal class AddCounterToNodeNameUseCaseTest {
 
     private val renameNodeUseCase: RenameNodeUseCase = mock()
 

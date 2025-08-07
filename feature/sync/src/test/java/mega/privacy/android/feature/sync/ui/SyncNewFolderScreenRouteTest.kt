@@ -37,7 +37,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "fr-rFr-w1080dp-h1920dp")
-class SyncNewFolderScreenRouteTest {
+internal class SyncNewFolderScreenRouteTest {
 
     private val composeTestRule = createAndroidComposeRule<ComponentActivity>()
     private val analyticsTestRule = AnalyticsTestRule()

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncByWifiToNetworkTypeMapperTest {
+internal class SyncByWifiToNetworkTypeMapperTest {
 
     private val underTest = SyncByWifiToNetworkTypeMapper()
 

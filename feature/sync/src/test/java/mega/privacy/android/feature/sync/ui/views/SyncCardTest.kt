@@ -5,16 +5,16 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
-import mega.privacy.android.feature.sync.R
 import mega.privacy.android.shared.resources.R as sharedR
-import androidx.compose.ui.test.performClick
-import com.google.common.truth.Truth.assertThat
 import mega.privacy.mobile.analytics.event.SyncCardIssuesInfoButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardOpenDeviceFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncCardOpenMegaFolderButtonPressedEvent
@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w720dp-h1980dp-xhdpi")
-class SyncCardTest {
+internal class SyncCardTest {
 
     private val composeTestRule = createAndroidComposeRule<ComponentActivity>()
     private val analyticsRule = AnalyticsTestRule()

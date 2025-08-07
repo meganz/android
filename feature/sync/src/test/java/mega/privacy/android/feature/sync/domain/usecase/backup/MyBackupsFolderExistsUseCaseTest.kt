@@ -12,7 +12,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MyBackupsFolderExistsUseCaseTest {
+internal class MyBackupsFolderExistsUseCaseTest {
     private lateinit var underTest: MyBackupsFolderExistsUseCase
     private val backupRepository = mock<BackupRepository>()
 

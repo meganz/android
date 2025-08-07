@@ -2,14 +2,14 @@ package mega.privacy.android.feature.sync.ui.createnewfolder
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
-import mega.privacy.android.shared.resources.R as sharedR
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.node.ValidNameType
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,7 +27,7 @@ import org.mockito.kotlin.whenever
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExperimentalCoroutinesApi
-class CreateNewFolderViewModelTest {
+internal class CreateNewFolderViewModelTest {
 
     private lateinit var underTest: CreateNewFolderViewModel
 

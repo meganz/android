@@ -14,7 +14,7 @@ import org.mockito.Mockito.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SetUserPausedSyncUseCaseTest {
+internal class SetUserPausedSyncUseCaseTest {
 
     private lateinit var underTest: SetUserPausedSyncUseCase
     private val syncPreferencesRepository = mock<SyncPreferencesRepository>()

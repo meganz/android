@@ -21,7 +21,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
-class SyncWorkManagerGatewayImplTest {
+internal class SyncWorkManagerGatewayImplTest {
 
     private lateinit var underTest: SyncWorkManagerGatewayImpl
 

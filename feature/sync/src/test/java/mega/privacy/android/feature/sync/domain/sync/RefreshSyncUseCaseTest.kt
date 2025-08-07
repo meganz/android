@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
 
-class RefreshSyncUseCaseTest {
+internal class RefreshSyncUseCaseTest {
     private val syncRepository: SyncRepository = mock()
     private val underTest = RefreshSyncUseCase(syncRepository)
 

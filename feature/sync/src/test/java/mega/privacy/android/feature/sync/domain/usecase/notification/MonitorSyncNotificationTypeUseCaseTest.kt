@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class MonitorSyncNotificationTypeUseCaseTest {
+internal class MonitorSyncNotificationTypeUseCaseTest {
 
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()

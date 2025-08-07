@@ -9,7 +9,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class StopSyncWorkerUseCaseTest {
+internal class StopSyncWorkerUseCaseTest {
     private val syncRepository: SyncRepository = mock()
     private val underTest = StopSyncWorkerUseCase(syncRepository)
 

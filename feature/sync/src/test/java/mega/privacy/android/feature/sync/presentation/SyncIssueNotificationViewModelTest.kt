@@ -21,7 +21,7 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncIssueNotificationViewModelTest {
+internal class SyncIssueNotificationViewModelTest {
 
     private val monitorSyncNotificationTypeUseCase: MonitorSyncNotificationTypeUseCase = mock()
     private val getSyncIssueNotificationByTypeUseCase: GetSyncIssueNotificationByTypeUseCase =

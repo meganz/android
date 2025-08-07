@@ -15,7 +15,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetSyncNotificationTypeUseCaseTest {
+internal class GetSyncNotificationTypeUseCaseTest {
 
     private lateinit var underTest: GetSyncNotificationTypeUseCase
 

@@ -23,7 +23,7 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncFolderPairUseCaseTest {
+internal class SyncFolderPairUseCaseTest {
 
     private val syncRepository: SyncRepository = mock()
     private val pauseSyncUseCase: PauseSyncUseCase = mock()

@@ -49,7 +49,7 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class SyncListRouteTest {
+internal class SyncListRouteTest {
 
     private val composeTestRule = createAndroidComposeRule<ComponentActivity>()
     private val analyticsRule = AnalyticsTestRule()

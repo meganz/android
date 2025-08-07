@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ListToStringWithDelimitersMapperTest {
+internal class ListToStringWithDelimitersMapperTest {
 
     private val gson = Gson()
     private val underTest = ListToStringWithDelimitersMapper(gson)

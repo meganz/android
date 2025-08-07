@@ -40,7 +40,7 @@ import timber.log.Timber
  * when the app is closed.
  */
 @HiltWorker
-class SyncWorker @AssistedInject constructor(
+internal class SyncWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
     private val monitorSyncsUseCase: MonitorSyncsUseCase,

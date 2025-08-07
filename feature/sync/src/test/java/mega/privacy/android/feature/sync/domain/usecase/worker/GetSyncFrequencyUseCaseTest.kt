@@ -10,7 +10,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetSyncFrequencyUseCaseTest {
+internal class GetSyncFrequencyUseCaseTest {
 
     private val syncPreferencesRepository: SyncPreferencesRepository = mock()
     private val underTest: GetSyncFrequencyUseCase =

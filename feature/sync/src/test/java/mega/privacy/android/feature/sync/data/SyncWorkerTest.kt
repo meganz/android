@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-class SyncWorkerTest {
+internal class SyncWorkerTest {
 
     private lateinit var underTest: SyncWorker
 

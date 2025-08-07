@@ -11,7 +11,7 @@ import org.mockito.Mockito.verify
 import org.mockito.kotlin.reset
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncSolvedIssuesGatewayImplTest {
+internal class SyncSolvedIssuesGatewayImplTest {
 
     private val syncSolvedIssuesDao: SyncSolvedIssuesDao = mock()
     private val underTest = SyncSolvedIssuesGatewayImpl { syncSolvedIssuesDao }

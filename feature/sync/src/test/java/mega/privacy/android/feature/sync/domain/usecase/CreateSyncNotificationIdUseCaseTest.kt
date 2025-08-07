@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class CreateSyncNotificationIdUseCaseTest {
+internal class CreateSyncNotificationIdUseCaseTest {
     private lateinit var underTest: CreateSyncNotificationIdUseCase
 
     @BeforeAll

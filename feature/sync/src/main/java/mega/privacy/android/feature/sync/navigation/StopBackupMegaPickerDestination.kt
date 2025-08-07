@@ -14,7 +14,7 @@ import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
  * Route to the Stop Backup MEGA folder picker screen
  */
 @Serializable
-data class StopBackupMegaPicker(val folderName: String?)
+internal data class StopBackupMegaPicker(val folderName: String?)
 
 internal fun NavGraphBuilder.stopBackupMegaPickerDestination(
     syncPermissionsManager: SyncPermissionsManager,

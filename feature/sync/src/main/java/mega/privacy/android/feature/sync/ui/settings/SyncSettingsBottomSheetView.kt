@@ -38,10 +38,10 @@ import mega.privacy.mobile.analytics.event.AndroidSyncClearResolvedIssuesEvent
 
 @Composable
 fun SyncSettingsBottomSheetView(
-    modalSheetState: ModalBottomSheetState =
-        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
     sheetElevation: Dp,
     shouldShowBottomSheet: Boolean,
+    modalSheetState: ModalBottomSheetState =
+        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
     onOptionSelected: () -> Unit = { }, // Callback for when an option is selected, if needed
 ) {
     SyncSettingsBottomSheetContent(
@@ -54,10 +54,10 @@ fun SyncSettingsBottomSheetView(
 
 @Composable
 internal fun SyncSettingsBottomSheetContent(
-    viewModel: SettingsSyncViewModel = hiltViewModel(),
     modalSheetState: ModalBottomSheetState,
-    sheetElevation: Dp = ModalBottomSheetDefaults.Elevation,
     shouldShowBottomSheet: Boolean,
+    viewModel: SettingsSyncViewModel = hiltViewModel(),
+    sheetElevation: Dp = ModalBottomSheetDefaults.Elevation,
     onOptionSelected: () -> Unit = { }, // Callback for when an option is selected, if needed
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

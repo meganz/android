@@ -14,7 +14,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
-class ShouldShowSyncPromotionUseCaseTest {
+internal class ShouldShowSyncPromotionUseCaseTest {
 
     private val syncPromotionPreferencesRepository: SyncPromotionPreferencesRepository = mock()
     private val syncRepository: SyncRepository = mock()

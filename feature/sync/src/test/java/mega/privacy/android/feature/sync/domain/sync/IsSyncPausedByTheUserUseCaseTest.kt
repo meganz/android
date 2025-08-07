@@ -15,7 +15,7 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class IsSyncPausedByTheUserUseCaseTest {
+internal class IsSyncPausedByTheUserUseCaseTest {
 
     private lateinit var underTest: IsSyncPausedByTheUserUseCase
     private val syncPreferencesRepository = mock<SyncPreferencesRepository>()

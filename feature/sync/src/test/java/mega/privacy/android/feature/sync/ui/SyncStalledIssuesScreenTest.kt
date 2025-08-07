@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "fr-rFr-w1080dp-h1920dp")
-class SyncStalledIssuesScreenTest {
+internal class SyncStalledIssuesScreenTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()

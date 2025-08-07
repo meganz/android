@@ -15,7 +15,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncNotificationGatewayImplTest {
+internal class SyncNotificationGatewayImplTest {
 
     private val syncShownNotificationDao: SyncShownNotificationDao = mock()
     private val underTest = SyncNotificationGatewayImpl { syncShownNotificationDao }

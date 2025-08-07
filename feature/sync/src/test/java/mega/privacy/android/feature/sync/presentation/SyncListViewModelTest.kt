@@ -31,7 +31,7 @@ import org.mockito.kotlin.whenever
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncListViewModelTest {
+internal class SyncListViewModelTest {
 
     private lateinit var underTest: SyncListViewModel
     private val setOnboardingShownUseCase: SetOnboardingShownUseCase = mock()

@@ -12,7 +12,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MonitorSyncByChargingUseCaseTest {
+internal class MonitorSyncByChargingUseCaseTest {
 
     private val syncPreferencesRepository: SyncPreferencesRepository = mock()
     private val underTest = MonitorSyncByChargingUseCase(syncPreferencesRepository)

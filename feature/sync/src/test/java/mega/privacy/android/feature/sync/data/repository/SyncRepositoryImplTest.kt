@@ -47,7 +47,7 @@ import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncRepositoryImplTest {
+internal class SyncRepositoryImplTest {
 
     private lateinit var underTest: SyncRepositoryImpl
     private val syncGateway: SyncGateway = mock()

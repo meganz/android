@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
 import mega.privacy.android.feature.sync.ui.views.ApplyToAllDialog
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_TEXT
@@ -19,7 +20,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "fr-rFr-w1080dp-h1920dp")
-class ApplyToAllDialogTest {
+internal class ApplyToAllDialogTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
@@ -127,8 +128,8 @@ class ApplyToAllDialogTest {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_dialog_choose_button))
             .performClick()
 
-        assert(applyToCurrentCalled) { "onApplyToCurrent should be called when checkbox is unchecked" }
-        assert(!applyToAllCalled) { "onApplyToAll should not be called when checkbox is unchecked" }
+        Truth.assertThat(applyToCurrentCalled).isTrue()
+        Truth.assertThat(applyToAllCalled).isFalse()
     }
 
     @Test
@@ -153,8 +154,9 @@ class ApplyToAllDialogTest {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_dialog_choose_button))
             .performClick()
 
-        assert(!applyToCurrentCalled) { "onApplyToCurrent should not be called when checkbox is checked" }
-        assert(applyToAllCalled) { "onApplyToAll should be called when checkbox is checked" }
+        Truth.assertThat(applyToCurrentCalled)
+            .isFalse()
+        Truth.assertThat(applyToAllCalled).isTrue()
     }
 
     @Test
@@ -174,6 +176,6 @@ class ApplyToAllDialogTest {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(mega.privacy.android.core.R.string.general_cancel))
             .performClick()
 
-        assert(cancelCalled) { "onCancel should be called when cancel button is clicked" }
+        Truth.assertThat(cancelCalled).isTrue()
     }
 } 

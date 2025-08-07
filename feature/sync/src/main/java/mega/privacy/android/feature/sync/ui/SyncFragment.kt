@@ -25,7 +25,7 @@ import javax.inject.Inject
  * Screen for syncing local folder with MEGA
  */
 @AndroidEntryPoint
-class SyncFragment : Fragment() {
+internal class SyncFragment : Fragment() {
 
     /**
      * Allows navigation to specific features in the monolith :app

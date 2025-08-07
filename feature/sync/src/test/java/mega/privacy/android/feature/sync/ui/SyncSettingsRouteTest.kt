@@ -21,7 +21,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w720dp-h1980dp-xhdpi")
-class SyncSettingsRouteTest {
+internal class SyncSettingsRouteTest {
 
     private val composeTestRule = createAndroidComposeRule<ComponentActivity>()
     private val analyticsRule = AnalyticsTestRule()
