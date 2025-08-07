@@ -30,7 +30,7 @@ fun NavGraphBuilder.legacySettingsScreen(removeDestination: () -> Unit) {
 }
 
 class SettingFeatureDestination : FeatureDestination {
-    override val navigationGraph: NavGraphBuilder.(NavigationHandler, transferHandler: TransferHandler) -> Unit =
+    override val navigationGraph: NavGraphBuilder.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, _ ->
             legacySettingsScreen(navigationHandler::back)
         }

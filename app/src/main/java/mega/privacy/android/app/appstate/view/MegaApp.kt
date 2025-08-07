@@ -22,7 +22,6 @@ import mega.privacy.android.app.appstate.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.transfer.TransferHandlerImpl
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.megaNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,13 +57,8 @@ fun MegaApp(
                 startDestination = MainNavigationScaffoldDestination,
             ) {
                 mainNavigationScaffold(
-                    topLevelDestinations = appState.mainNavItems,
-                    startDestination = appState.initialMainDestination,
-                    builder = { navigationUiController: NavigationUiController ->
-                        appState.mainNavScreens.forEach {
-                            it(this, navigationHandler, navigationUiController, transferHandler)
-                        }
-                    }
+                    transferHandler = transferHandler,
+                    navigationHandler = navigationHandler,
                 )
                 appState.featureDestinations
                     .forEach {

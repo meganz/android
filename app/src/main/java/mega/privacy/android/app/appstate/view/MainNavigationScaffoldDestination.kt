@@ -1,8 +1,20 @@
 package mega.privacy.android.app.appstate.view
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -13,11 +25,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import androidx.navigation3.runtime.NavKey
-import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.serialization.Serializable
-import mega.privacy.android.navigation.contract.NavigationUiController
+import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.NavigationItemStateViewModel
+import mega.privacy.android.app.appstate.model.MainNavState
+import mega.privacy.android.app.presentation.login.view.MEGA_LOGO_TEST_TAG
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
-import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 import kotlin.reflect.KClass
 
 @Serializable
@@ -26,40 +41,67 @@ data object MainNavigationScaffoldDestination : NavKey
 @OptIn(ExperimentalMaterial3Api::class)
 fun NavGraphBuilder.mainNavigationScaffold(
     modifier: Modifier = Modifier,
-    topLevelDestinations: ImmutableSet<NavigationItem>,
-    startDestination: Any,
-    builder: NavGraphBuilder.(NavigationUiController) -> Unit,
+    transferHandler: TransferHandler,
+    navigationHandler: NavigationHandler,
 ) {
     composable<MainNavigationScaffoldDestination> {
         val navController = rememberNavController()
+
+        val viewModel = hiltViewModel<NavigationItemStateViewModel>()
+        val state by viewModel.state.collectAsStateWithLifecycle()
+
         val currentDestination = navController.currentBackStackEntryAsState().value?.destination
-        MainNavigationScaffold(
-            mainNavItems = topLevelDestinations,
-            onDestinationClick = { destination ->
-                navController.navigate(destination, navOptions {
-                    popUpTo(navController.graph.id) {
-                        inclusive = true
-                        saveState = true
-                    }
+        when (val currentState = state) {
 
-                    launchSingleTop = true
+            MainNavState.Loading -> {
+                Box(modifier = modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_splash_logo),
+                        contentDescription = stringResource(id = R.string.login_to_mega),
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(288.dp)
+                            .testTag(MEGA_LOGO_TEST_TAG),
+                        contentScale = ContentScale.FillBounds
+                    )
+                }
+            }
 
-                    restoreState = true
-                })
-            },
-            isSelected = { destination ->
-                currentDestination?.isTopLevelDestinationInHierarchy(destination::class) == true
-            },
-            navContent = { navigationUiController ->
-                NavHost(
-                    modifier = modifier
-                        .fillMaxSize(),
-                    navController = navController,
-                    startDestination = startDestination,
-                    builder = { builder(navigationUiController) },
+            is MainNavState.Data -> {
+                MainNavigationScaffold(
+                    mainNavItems = currentState.mainNavItems,
+                    onDestinationClick = { destination ->
+                        navController.navigate(destination, navOptions {
+                            popUpTo(navController.graph.id) {
+                                inclusive = true
+                                saveState = true
+                            }
+
+                            launchSingleTop = true
+
+                            restoreState = true
+                        })
+                    },
+                    isSelected = { destination ->
+                        currentDestination?.isTopLevelDestinationInHierarchy(destination::class) == true
+                    },
+                    navContent = { navigationUiController ->
+                        NavHost(
+                            modifier = modifier
+                                .fillMaxSize(),
+                            navController = navController,
+                            startDestination = currentState.initialDestination,
+                            builder = {
+                                currentState.mainNavScreens.forEach {
+                                    it(navigationHandler, navigationUiController, transferHandler)
+                                }
+                            },
+                        )
+                    },
                 )
-            },
-        )
+            }
+        }
+
     }
 }
 

@@ -67,7 +67,7 @@ class MegaActivity : ComponentActivity() {
                     is AuthState.LoggedIn -> {
                         val previousDestination = navController.previousBackStackEntry?.destination
                         if (previousDestination?.hierarchy?.any { it.hasRoute(LoginGraph::class) } == true) {
-                            navController.popBackStack()
+                            navController.popBackStack(LoginLoading, true)
                         }
                         val currentBackStackEntry = navController.currentBackStackEntry
                         if (currentBackStackEntry?.destination?.hierarchy?.any {
@@ -78,11 +78,15 @@ class MegaActivity : ComponentActivity() {
                             // Already logged in, no need to navigate again
                             return@LaunchedEffect
                         }
-                        navController.navigate(route = LoggedInScreens(session = currentState.session))
+                        navController.navigate(route = LoggedInScreens(session = currentState.session)) {
+                            popUpTo(LoginLoading) {
+                                inclusive = true
+                            }
+                        }
                     }
 
                     is AuthState.RequireLogin -> {
-                        navController.popBackStack()
+                        navController.popBackStack(LoginLoading, true)
                         navController.navigate(
                             route = LoginGraph(
                                 startScreen = intent.getIntExtra(Constants.VISIBLE_FRAGMENT, -1)
