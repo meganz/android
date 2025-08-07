@@ -41,6 +41,7 @@ internal class TransferMapperTest {
         val expected = Transfer(
             uniqueId = megaTransfer.uniqueId,
             transferType = TransferType.DOWNLOAD,
+            startTime = megaTransfer.startTime,
             transferredBytes = megaTransfer.transferredBytes,
             totalBytes = megaTransfer.totalBytes,
             localPath = megaTransfer.path.orEmpty(),
@@ -108,6 +109,7 @@ internal class TransferMapperTest {
     private fun mockMegaTransfer(folderTransferTag: Int = 11) =
         mock<MegaTransfer> {
             on { type }.thenReturn(MegaTransfer.TYPE_DOWNLOAD)
+            on { startTime }.thenReturn(21345678L)
             on { transferredBytes }.thenReturn(Random.nextLong())
             on { totalBytes }.thenReturn(Random.nextLong())
             on { path }.thenReturn("path")

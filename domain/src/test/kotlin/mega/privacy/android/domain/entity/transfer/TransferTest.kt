@@ -83,6 +83,7 @@ class TransferTest {
     private fun createEmptyTransfer() = Transfer(
         uniqueId = 0L,
         transferType = TransferType.NONE,
+        startTime = 0L,
         transferredBytes = 0L,
         totalBytes = 0L,
         localPath = "",

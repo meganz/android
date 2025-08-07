@@ -30,6 +30,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.UPLOADING_S
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.ConfirmLargeDownloadInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent.SlowDownloadPreviewInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -87,6 +89,7 @@ import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownlo
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingUploadsForFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.MonitorPendingTransfersUntilResolvedUseCase
 import mega.privacy.android.domain.usecase.transfers.previews.BroadcastTransferTagToCancelUseCase
+import mega.privacy.android.domain.usecase.transfers.previews.GetPreviewDownloadUseCase
 import mega.privacy.android.domain.usecase.transfers.previews.MonitorTransferTagToCancelUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerAndWaitUntilIsStartedUseCase
@@ -106,6 +109,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -176,6 +180,7 @@ class StartTransfersComponentViewModelTest {
     private val broadcastTransferTagToCancelUseCase = mock<BroadcastTransferTagToCancelUseCase>()
     private val deleteCompletedTransfersByIdUseCase = mock<DeleteCompletedTransfersByIdUseCase>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
+    private val getPreviewDownloadUseCase = mock<GetPreviewDownloadUseCase>()
     private val ratingHandlerImpl = mock<RatingHandlerImpl>()
     private val crashReporter = mock<CrashReporter>()
 
@@ -254,6 +259,7 @@ class StartTransfersComponentViewModelTest {
             broadcastTransferTagToCancelUseCase = broadcastTransferTagToCancelUseCase,
             deleteCompletedTransfersByIdUseCase = deleteCompletedTransfersByIdUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            getPreviewDownloadUseCase = getPreviewDownloadUseCase,
             ratingHandler = ratingHandlerImpl,
             crashReporter = crashReporter,
         )
@@ -339,9 +345,12 @@ class StartTransfersComponentViewModelTest {
         if (startEvent is TransferTriggerEvent.StartDownloadForOffline) {
             whenever(getOfflinePathForNodeUseCase(any())).thenReturn(DESTINATION)
         } else if (startEvent is TransferTriggerEvent.StartDownloadForPreview) {
+            whenever(getPreviewDownloadUseCase(node)).thenReturn(null)
             whenever(getFilePreviewDownloadPathUseCase()).thenReturn(DESTINATION)
         }
+
         underTest.startTransfer(startEvent)
+
         verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase).invoke()
     }
 
@@ -349,9 +358,13 @@ class StartTransfersComponentViewModelTest {
     fun `test that preview file is deleted before starting to download it`() = runTest {
         commonStub()
         val previewCachePath = "/cache/preview"
-        whenever(getFilePreviewDownloadPathUseCase()) doReturn previewCachePath
         val startEvent = TransferTriggerEvent.StartDownloadForPreview(node, false)
+
+        whenever(getPreviewDownloadUseCase(node)).thenReturn(null)
+        whenever(getFilePreviewDownloadPathUseCase()) doReturn previewCachePath
+
         underTest.startTransfer(startEvent)
+
         verify(deleteCacheFilesUseCase).invoke(listOf(UriPath(previewCachePath + node.name)))
     }
 
@@ -1330,6 +1343,45 @@ class StartTransfersComponentViewModelTest {
             startDownloadEvent.appData,
         )
     }
+
+    @Test
+    fun `test that insertPendingDownloadsForNodesUseCase is not invoked but state is updated with event when a preview download already exists`() =
+        runTest {
+            val startEvent = TransferTriggerEvent.StartDownloadForPreview(node, false)
+            val startTime = 0L
+            val currentTime = 10000L
+            val uniqueId = 123L
+            val previewDownload = mock<Transfer> {
+                on { this.startTime } doReturn startTime
+                on { this.uniqueId } doReturn uniqueId
+                on { localPath } doReturn DESTINATION
+            }
+
+            commonStub()
+            whenever(getFilePreviewDownloadPathUseCase()).thenReturn(DESTINATION)
+            whenever(getPreviewDownloadUseCase(node)).thenReturn(null, previewDownload)
+            whenever(getCurrentTimeInMillisUseCase()).thenReturn(currentTime)
+
+            underTest.startTransfer(startEvent)
+
+            verify(insertPendingDownloadsForNodesUseCase)(
+                startEvent.nodes,
+                UriPath(DESTINATION),
+                startEvent.isHighPriority,
+                startEvent.appData,
+            )
+
+            underTest.startTransfer(startEvent)
+
+            assertCurrentEventIsEqualTo(
+                SlowDownloadPreviewInProgress(
+                    transferUniqueId = previewDownload.uniqueId,
+                    transferPath = previewDownload.localPath
+                )
+            )
+
+            verifyNoMoreInteractions(insertPendingDownloadsForNodesUseCase)
+        }
 
     @Nested
     inner class TriggerEventWithoutPermission {

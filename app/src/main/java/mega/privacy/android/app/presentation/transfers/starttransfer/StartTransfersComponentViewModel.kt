@@ -81,12 +81,14 @@ import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownlo
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingUploadsForFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.MonitorPendingTransfersUntilResolvedUseCase
 import mega.privacy.android.domain.usecase.transfers.previews.BroadcastTransferTagToCancelUseCase
+import mega.privacy.android.domain.usecase.transfers.previews.GetPreviewDownloadUseCase
 import mega.privacy.android.domain.usecase.transfers.previews.MonitorTransferTagToCancelUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerAndWaitUntilIsStartedUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -138,6 +140,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val broadcastTransferTagToCancelUseCase: BroadcastTransferTagToCancelUseCase,
     private val deleteCompletedTransfersByIdUseCase: DeleteCompletedTransfersByIdUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val getPreviewDownloadUseCase: GetPreviewDownloadUseCase,
     private val ratingHandler: RatingHandlerImpl,
     private val crashReporter: CrashReporter,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -535,31 +538,43 @@ internal class StartTransfersComponentViewModel @Inject constructor(
      * @param event the [TransferTriggerEvent.StartDownloadForPreview] event that starts this download
      */
     private fun startDownloadNodeForPreview(event: TransferTriggerEvent.StartDownloadForPreview) {
-        if (event.node == null) {
-            return
-        }
-        viewModelScope.launch {
-            startDownloadNodes(
-                nodes = listOfNotNull(event.node),
-                isHighPriority = true,
-                getUri = {
-                    runCatching {
-                        getFilePreviewDownloadPathUseCase().also {
-                            // delete the existing file if already exists, because if the preview exists and we need to download it means it's outdated
+        event.node?.let { node ->
+            viewModelScope.launch {
+                val previewDownload = getPreviewDownloadUseCase(node)
+
+                if (previewDownload == null) {
+                    startDownloadNodes(
+                        nodes = listOfNotNull(node),
+                        isHighPriority = true,
+                        getUri = {
                             runCatching {
-                                val node = event.node
-                                requireNotNull(node)
-                                deleteCacheFilesUseCase(listOf(UriPath(it + node.name)))
-                            }.onFailure {
-                                Timber.e(it, "Error deleting existing preview file")
+                                getFilePreviewDownloadPathUseCase().also {
+                                    // delete the existing file if already exists, because if the preview exists and we need to download it means it's outdated
+                                    deleteCacheFilesUseCase(listOf(UriPath(it + node.name)))
+                                }
                             }
-                        }
+                                .onFailure { Timber.e(it) }
+                                .getOrNull()
+                        },
+                        transferTriggerEvent = event
+                    )
+                } else {
+                    //Convert start time to milliseconds as the value is in deciseconds
+                    val startTime = previewDownload.startTime * 100
+                    val duration = (getCurrentTimeInMillisUseCase() - startTime).milliseconds
+
+                    if (duration > 1.5.seconds) {
+                        _uiState.updateEventAndClearProgress(
+                            SlowDownloadPreviewInProgress(
+                                transferUniqueId = previewDownload.uniqueId,
+                                transferPath = previewDownload.localPath
+                            )
+                        )
+                    } else {
+                        Timber.d("Preview download already started, no need to start again")
                     }
-                        .onFailure { Timber.e(it) }
-                        .getOrNull()
-                },
-                transferTriggerEvent = event
-            )
+                }
+            }
         }
     }
 

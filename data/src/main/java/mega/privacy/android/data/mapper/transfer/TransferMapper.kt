@@ -23,6 +23,7 @@ internal class TransferMapper @Inject constructor(
         return Transfer(
             uniqueId = transfer.uniqueId,
             transferType = transferTypeMapper(transfer.type, appData),
+            startTime = transfer.startTime,
             transferredBytes = transfer.transferredBytes,
             totalBytes = transfer.totalBytes,
             localPath = transfer.path.orEmpty(),

@@ -8,6 +8,7 @@ import java.math.BigInteger
  *
  * @property uniqueId The unique identifier of the transfer.
  * @property transferType [TransferType]
+ * @property startTime The starting time of the request (in deciseconds).
  * @property transferredBytes Transferred bytes during this transfer.
  * @property totalBytes Total bytes to be transferred to complete the transfer.
  * @property localPath Local path related to this transfer.
@@ -47,6 +48,7 @@ import java.math.BigInteger
 data class Transfer(
     override val uniqueId: Long,
     override val transferType: TransferType,
+    val startTime: Long,
     val transferredBytes: Long,
     override val totalBytes: Long,
     override val localPath: String,
