@@ -7,7 +7,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,7 +25,7 @@ class StartScreenOptionViewTest {
         val expected = "Home"
         composeRule.setContent {
             StartScreenOptionView(
-                icon = iconPackR.drawable.ic_mega_medium_thin_outline,
+                icon = IconPack.Medium.Thin.Outline.Mega,
                 text = expected,
                 isSelected = false,
                 onClick = {}
@@ -37,7 +37,7 @@ class StartScreenOptionViewTest {
 
     @Test
     fun `test that icon is displayed`() {
-        val expectedResId = iconPackR.drawable.ic_mega_medium_thin_outline
+        val expectedResId = IconPack.Medium.Thin.Outline.Mega
         composeRule.setContent {
             StartScreenOptionView(
                 icon = expectedResId,
@@ -55,14 +55,17 @@ class StartScreenOptionViewTest {
     fun `test that checkmark is displayed if selected`() {
         composeRule.setContent {
             StartScreenOptionView(
-                icon = iconPackR.drawable.ic_mega_medium_thin_outline,
+                icon = IconPack.Medium.Thin.Outline.Mega,
                 text = "expected",
                 isSelected = true,
                 onClick = {}
             )
         }
 
-        composeRule.onNodeWithTag(iconPackR.drawable.ic_check_medium_thin_outline.toString(), useUnmergedTree = true)
+        composeRule.onNodeWithTag(
+            IconPack.Medium.Thin.Outline.Mega.toString(),
+            useUnmergedTree = true
+        )
             .assertIsDisplayed()
     }
 
@@ -70,14 +73,15 @@ class StartScreenOptionViewTest {
     fun `test that checkmark is not displayed if not selected`() {
         composeRule.setContent {
             StartScreenOptionView(
-                icon = iconPackR.drawable.ic_mega_medium_thin_outline,
+                icon = IconPack.Medium.Thin.Outline.Mega,
                 text = "expected",
                 isSelected = false,
                 onClick = {}
             )
         }
 
-        composeRule.onNodeWithTag(iconPackR.drawable.ic_check_medium_thin_outline.toString()).assertDoesNotExist()
+        composeRule.onNodeWithTag(IconPack.Medium.Thin.Outline.Mega.toString())
+            .assertDoesNotExist()
     }
 
     @Test
@@ -85,7 +89,7 @@ class StartScreenOptionViewTest {
         val onClick = mock<() -> Unit>()
         composeRule.setContent {
             StartScreenOptionView(
-                icon = iconPackR.drawable.ic_mega_medium_thin_outline,
+                icon = IconPack.Medium.Thin.Outline.Mega,
                 text = "expected",
                 isSelected = false,
                 onClick = onClick

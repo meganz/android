@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.compose.home.model.MyAccountSettingsState
@@ -78,6 +79,7 @@ class SettingsHomeViewKtTest {
     }
 
     @Parcelize
+    @Serializable
     object TestDestination : Parcelable, NavKey
 
 }

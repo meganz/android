@@ -1,13 +1,14 @@
-package mega.privacy.android.app.presentation.settings.startscreen.model
+package mega.privacy.android.app.presentation.settings.startscreen.mapper
 
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenOption
 import mega.privacy.android.domain.entity.preference.StartScreen
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.IconPack
 
 /**
- * Map [StartScreen] to [StartScreenOption]
+ * Map [mega.privacy.android.domain.entity.preference.StartScreen] to [mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenOption]
  */
-typealias StartScreenOptionMapper = (@JvmSuppressWildcards StartScreen) -> @JvmSuppressWildcards StartScreenOption?
+typealias StartScreenOptionMapper = (@JvmSuppressWildcards StartScreen) -> @JvmSuppressWildcards StartScreenOption<StartScreen>?
 
 /**
  * Map [StartScreen] to [StartScreenOption]
@@ -19,7 +20,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
         StartScreenOption(
             startScreen = screen,
             title = R.string.section_cloud_drive,
-            icon = iconPackR.drawable.ic_folder_medium_thin_outline,
+            icon = IconPack.Medium.Thin.Outline.Folder,
         )
     }
 
@@ -27,7 +28,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
         StartScreenOption(
             startScreen = screen,
             title = R.string.settings_start_screen_photos_option,
-            icon = iconPackR.drawable.ic_camera_medium_thin_outline,
+            icon = IconPack.Medium.Thin.Outline.Camera,
         )
     }
 
@@ -35,7 +36,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
         StartScreenOption(
             startScreen = screen,
             title = R.string.home_section,
-            icon = iconPackR.drawable.ic_mega_medium_thin_outline,
+            icon = IconPack.Medium.Thin.Outline.Mega,
         )
     }
 
@@ -43,7 +44,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
         StartScreenOption(
             startScreen = screen,
             title = R.string.section_chat,
-            icon = iconPackR.drawable.ic_message_chat_circle_medium_thin_outline,
+            icon = IconPack.Medium.Thin.Outline.MessageChatCircle,
         )
     }
 
@@ -51,7 +52,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
         StartScreenOption(
             startScreen = screen,
             title = R.string.title_shared_items,
-            icon = iconPackR.drawable.ic_folder_users_medium_thin_outline,
+            icon = IconPack.Medium.Thin.Outline.FolderUsers,
         )
     }
 }

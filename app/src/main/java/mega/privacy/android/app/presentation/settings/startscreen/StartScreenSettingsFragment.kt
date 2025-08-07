@@ -16,11 +16,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenOption
 import mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenSettingsState
 import mega.privacy.android.app.presentation.settings.startscreen.view.StartScreenOptionView
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
 /**
@@ -47,22 +48,44 @@ class StartScreenSettingsFragment : Fragment() {
                 .collectAsState(initial = ThemeMode.System)
             val uiState by viewModel.state.collectAsState()
             OriginalTheme(isDark = themeMode.isDarkMode()) {
-                StartScreenSettingsView(uiState)
+                when (val state = uiState) {
+                    is StartScreenSettingsState.Loading -> {}
+                    is StartScreenSettingsState.Data -> {
+                        StartScreenSettingsView(
+                            options = state.options,
+                            selectedOption = state.selectedScreen,
+                            onOptionSelected = viewModel::navDestinationClicked
+                        )
+                    }
+
+                    is StartScreenSettingsState.LegacyData -> {
+                        StartScreenSettingsView(
+                            options = state.options,
+                            selectedOption = state.selectedScreen,
+                            onOptionSelected = viewModel::newScreenClicked
+                        )
+                    }
+                }
             }
         }
     }
 
     @Composable
-    private fun StartScreenSettingsView(uiState: StartScreenSettingsState) {
+    private fun <T> StartScreenSettingsView(
+        options: List<StartScreenOption<T>>,
+        selectedOption: T?,
+        onOptionSelected: (T) -> Unit,
+    ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top
         ) {
-            uiState.options.forEach {
-                StartScreenOptionView(icon = it.icon,
+            options.forEach {
+                StartScreenOptionView(
+                    icon = it.icon,
                     text = stringResource(id = it.title),
-                    isSelected = it.startScreen == uiState.selectedScreen,
-                    onClick = { viewModel.newScreenClicked(it.startScreen) })
+                    isSelected = it.startScreen == selectedOption,
+                    onClick = { onOptionSelected(it.startScreen) })
             }
         }
     }

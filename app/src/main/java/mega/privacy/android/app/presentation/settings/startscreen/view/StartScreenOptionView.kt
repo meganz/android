@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.settings.startscreen.view
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -20,9 +19,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -50,7 +49,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
  */
 @Composable
 fun StartScreenOptionView(
-    @DrawableRes icon: Int,
+    icon: ImageVector,
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -75,7 +74,7 @@ fun StartScreenOptionView(
             horizontalArrangement = Arrangement.Start,
         ) {
             MegaIcon(
-                painter = painterResource(id = icon),
+                painter = rememberVectorPainter(icon),
                 contentDescription = null,
                 modifier = Modifier
                     .padding(start = 18.dp)
@@ -119,7 +118,7 @@ fun StartScreenOptionViewPreview(
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.background(MaterialTheme.colors.surface)) {
             StartScreenOptionView(
-                iconPackR.drawable.ic_mega_medium_thin_outline,
+                IconPack.Medium.Thin.Outline.Mega,
                 "Home",
                 isSelected = selected,
                 onClick = { selected = !selected },

@@ -1,8 +1,7 @@
 package mega.privacy.android.app.presentation.settings.startscreen.model
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import mega.privacy.android.domain.entity.preference.StartScreen
+import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
  * Start screen option
@@ -11,8 +10,8 @@ import mega.privacy.android.domain.entity.preference.StartScreen
  * @property title
  * @property icon
  */
-data class StartScreenOption(
-    val startScreen: StartScreen,
+data class StartScreenOption<T>(
+    val startScreen: T,
     @StringRes val title: Int,
-    @DrawableRes val icon: Int,
+    val icon: ImageVector,
 )

@@ -8,8 +8,8 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenOptionMapper
-import mega.privacy.android.app.presentation.settings.startscreen.model.mapStartScreenOption
+import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenOptionMapper
+import mega.privacy.android.app.presentation.settings.startscreen.mapper.mapStartScreenOption
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.DefaultMonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
