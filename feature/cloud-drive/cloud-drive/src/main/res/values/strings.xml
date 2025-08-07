@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <!-- success message when creating a folder -->
+    <string name="context_folder_created">Folder created</string>
+    <!-- error message when creating a folder -->
+    <string name="context_folder_no_created">Error. Folder not created</string>
+</resources>

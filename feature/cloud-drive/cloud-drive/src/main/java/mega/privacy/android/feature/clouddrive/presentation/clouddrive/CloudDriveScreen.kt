@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +14,6 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
@@ -27,11 +25,11 @@ import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithCli
 /**
  * Cloud Drive Screen, used to display contents of a folder
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CloudDriveScreen(
     onBack: () -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
+    onCreatedNewFolder: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),
 ) {
@@ -83,43 +81,18 @@ fun CloudDriveScreen(
         content = { innerPadding ->
             CloudDriveContent(
                 uiState = uiState,
+                showUploadOptionsBottomSheet = showUploadOptionsBottomSheet,
+                onDismissUploadOptionsBottomSheet = { showUploadOptionsBottomSheet = false },
                 contentPadding = innerPadding,
                 onAction = viewModel::processAction,
                 onNavigateToFolder = onNavigateToFolder,
                 onNavigateBack = onBack,
                 onTransfer = onTransfer,
-                onAddFilesClick = {
-                    showUploadOptionsBottomSheet = true
-                }
+                onAddFilesClick = { showUploadOptionsBottomSheet = true },
+                onCreatedNewFolder = onCreatedNewFolder,
             )
         }
     )
-
-    if (showUploadOptionsBottomSheet) {
-        UploadOptionsBottomSheet(
-            onUploadFilesClicked = {
-                // TODO: Handle upload files
-            },
-            onUploadFolderClicked = {
-                // TODO: Handle upload folder
-            },
-            onScanDocumentClicked = {
-                viewModel.prepareDocumentScanner()
-            },
-            onCaptureClicked = {
-                // TODO: Handle capture
-            },
-            onNewFolderClicked = {
-                // TODO: Handle new folder
-            },
-            onNewTextFileClicked = {
-                // TODO: Handle new text file
-            },
-            onDismissSheet = {
-                showUploadOptionsBottomSheet = false
-            }
-        )
-    }
 
     CloudDriveScanDocumentHandler(
         cloudDriveUiState = uiState,

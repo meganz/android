@@ -14,6 +14,7 @@ data object DriveSync : NavKey
 
 fun NavGraphBuilder.driveSyncScreen(
     onNavigateToFolder: (NodeId) -> Unit,
+    onCreatedNewFolder: (NodeId) -> Unit,
     setNavigationVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
@@ -24,6 +25,7 @@ fun NavGraphBuilder.driveSyncScreen(
             viewModel = viewModel,
             cloudDriveViewModel = cloudDriveViewModel,
             onNavigateToFolder = onNavigateToFolder,
+            onCreatedNewFolder = onCreatedNewFolder,
             setNavigationItemVisibility = setNavigationVisibility,
             onTransfer = onTransfer,
         )

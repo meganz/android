@@ -29,7 +29,6 @@ import mega.android.core.ui.model.TabItems
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -50,6 +49,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 internal fun DriveSyncScreen(
     onNavigateToFolder: (NodeId) -> Unit,
+    onCreatedNewFolder: (NodeId) -> Unit,
     setNavigationItemVisibility: (Boolean) -> Unit,
     viewModel: DriveSyncViewModel = hiltViewModel(),
     cloudDriveViewModel: CloudDriveViewModel = hiltViewModel(),
@@ -142,7 +142,12 @@ internal fun DriveSyncScreen(
                         onTransfer = onTransfer,
                         onAddFilesClick = {
                             showUploadOptionsBottomSheet = true
-                        }
+                        },
+                        onCreatedNewFolder = onCreatedNewFolder,
+                        showUploadOptionsBottomSheet = showUploadOptionsBottomSheet,
+                        onDismissUploadOptionsBottomSheet = {
+                            showUploadOptionsBottomSheet = false
+                        },
                     )
                 }
                 addTextTabWithLazyListState(
@@ -191,34 +196,6 @@ internal fun DriveSyncScreen(
 
     LaunchedEffect(cloudDriveUiState.isInSelectionMode) {
         setNavigationItemVisibility(!cloudDriveUiState.isInSelectionMode)
-    }
-
-
-
-    if (showUploadOptionsBottomSheet) {
-        UploadOptionsBottomSheet(
-            onUploadFilesClicked = {
-                // TODO: Handle upload files
-            },
-            onUploadFolderClicked = {
-                // TODO: Handle upload folder
-            },
-            onScanDocumentClicked = {
-                cloudDriveViewModel.prepareDocumentScanner()
-            },
-            onCaptureClicked = {
-                // TODO: Handle capture
-            },
-            onNewFolderClicked = {
-                // TODO: Handle new folder
-            },
-            onNewTextFileClicked = {
-                // TODO: Handle new text file
-            },
-            onDismissSheet = {
-                showUploadOptionsBottomSheet = false
-            }
-        )
     }
 
     // Handle scan document functionality

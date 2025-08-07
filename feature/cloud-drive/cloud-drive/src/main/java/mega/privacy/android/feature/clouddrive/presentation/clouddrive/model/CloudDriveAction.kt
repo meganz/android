@@ -52,4 +52,9 @@ sealed interface CloudDriveAction {
      * Navigate back event consumed action
      */
     data object NavigateBackEventConsumed : CloudDriveAction
+
+    /**
+     * Start document scanning action
+     */
+    data object StartDocumentScanning : CloudDriveAction
 }

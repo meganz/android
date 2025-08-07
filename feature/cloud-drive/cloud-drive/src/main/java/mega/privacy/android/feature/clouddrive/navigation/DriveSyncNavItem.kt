@@ -25,6 +25,14 @@ class DriveSyncNavItem : MainNavItem {
                 onNavigateToFolder = { nodeId ->
                     navigationHandler.navigate(CloudDrive(nodeHandle = nodeId.longValue))
                 },
+                onCreatedNewFolder = { nodeId ->
+                    navigationHandler.navigate(
+                        CloudDrive(
+                            nodeHandle = nodeId.longValue,
+                            isNewFolder = true
+                        )
+                    )
+                },
                 setNavigationVisibility = navigationController::showNavigation,
                 onTransfer = transferHandler::setTransferEvent,
             )

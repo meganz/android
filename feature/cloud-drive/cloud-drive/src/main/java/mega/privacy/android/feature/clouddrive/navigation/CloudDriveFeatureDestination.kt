@@ -15,6 +15,9 @@ class CloudDriveFeatureDestination : FeatureDestination {
                 onTransfer = transferHandler::setTransferEvent,
                 onNavigateToFolder = { nodeId ->
                     navigationHandler.navigate(CloudDrive(nodeHandle = nodeId.longValue))
+                },
+                onCreatedNewFolder = { nodeId ->
+                    navigationHandler.navigate(CloudDrive(nodeHandle = nodeId.longValue, isNewFolder = true))
                 }
             )
         }

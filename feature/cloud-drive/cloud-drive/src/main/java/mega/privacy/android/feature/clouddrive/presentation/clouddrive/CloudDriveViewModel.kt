@@ -90,6 +90,7 @@ class CloudDriveViewModel @Inject constructor(
             is CloudDriveAction.SetHiddenNodesOnboarded -> setHiddenNodesOnboarded()
             is CloudDriveAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
             is CloudDriveAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
+            is CloudDriveAction.StartDocumentScanning -> prepareDocumentScanner()
         }
     }
 

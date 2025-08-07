@@ -7,6 +7,13 @@
     <string name="action_create_txt">New text file</string>
     <string name="menu_take_picture">Capture</string>
 
+    <!-- New folder dialog strings -->
+    <string name="context_new_folder_name">Folder name</string>
+    <string name="general_create">Create</string>
+    <string name="invalid_string">Incorrect</string>
+    <string name="invalid_characters_defined">The following characters are not allowed: %1$s</string>
+    <string name="same_item_name_warning">There is already an item with the same name</string>
+
     <!--Temporary and will be moved later to strings-shared-->
     <string name="files_send_to_chat_error">Files send to chat error</string>
     <plurals name="files_send_to_chat_success">
