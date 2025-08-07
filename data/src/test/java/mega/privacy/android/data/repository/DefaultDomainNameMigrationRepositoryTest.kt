@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
-import mega.privacy.android.data.repository.DefaultDomainNameMigrationRepository.Companion.DOMAIN_NAME_MEGA_APP_KEY
+import mega.privacy.android.data.repository.DomainNameMigrationRepositoryImpl.Companion.DOMAIN_NAME_MEGA_APP_KEY
 import mega.privacy.android.domain.repository.DomainNameMigrationRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +30,7 @@ class DefaultDomainNameMigrationRepositoryTest {
 
     @BeforeAll
     fun setup() {
-        underTest = DefaultDomainNameMigrationRepository(appPreferencesGateway)
+        underTest = DomainNameMigrationRepositoryImpl(appPreferencesGateway)
     }
 
     @BeforeEach

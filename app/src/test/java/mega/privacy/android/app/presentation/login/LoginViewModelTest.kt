@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.test.AnalyticsTestExtension
@@ -31,6 +33,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.MegaException
@@ -49,6 +52,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.domainmigration.UpdateDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -72,6 +76,7 @@ import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
+import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.ResumeTransfersForNotLoggedInInstanceUseCase
@@ -103,6 +108,7 @@ internal class LoginViewModelTest {
 
     private lateinit var underTest: LoginViewModel
 
+    private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
@@ -163,6 +169,9 @@ internal class LoginViewModelTest {
     private val ephemeralCredentialManager = mock<EphemeralCredentialManager>()
     private val resumeTransfersForNotLoggedInInstanceUseCase =
         mock<ResumeTransfersForNotLoggedInInstanceUseCase>()
+    private val updateDomainNameUseCase = mock<UpdateDomainNameUseCase>()
+    private val updateCrashAndPerformanceReportersUseCase =
+        mock<UpdateCrashAndPerformanceReportersUseCase>()
     private val startScreenUtil = mock<StartScreenUtil>()
 
     @BeforeEach
@@ -171,6 +180,7 @@ internal class LoginViewModelTest {
             stubCommon()
         }
         underTest = LoginViewModel(
+            applicationScope = applicationScope,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
@@ -218,6 +228,8 @@ internal class LoginViewModelTest {
             shouldShowUpgradeAccountUseCase = shouldShowUpgradeAccountUseCase,
             ephemeralCredentialManager = ephemeralCredentialManager,
             resumeTransfersForNotLoggedInInstanceUseCase = resumeTransfersForNotLoggedInInstanceUseCase,
+            updateDomainNameUseCase = updateDomainNameUseCase,
+            updateCrashAndPerformanceReportersUseCase = updateCrashAndPerformanceReportersUseCase,
             startScreenUtil = startScreenUtil
         )
     }
@@ -253,7 +265,9 @@ internal class LoginViewModelTest {
             shouldShowNotificationReminderUseCase,
             shouldShowUpgradeAccountUseCase,
             resumeTransfersForNotLoggedInInstanceUseCase,
-            startScreenUtil
+            startScreenUtil,
+            updateCrashAndPerformanceReportersUseCase,
+            updateDomainNameUseCase,
         )
     }
 
@@ -721,6 +735,27 @@ internal class LoginViewModelTest {
 
         assertFalse(result)
         verifyNoInteractions(loginUseCase)
+    }
+
+    @Test
+    fun `test that updateCrashAndPerformanceReportersUseCase is invoked when fetchNodes is`() =
+        runTest {
+            underTest.fetchNodes()
+            advanceUntilIdle()
+
+            verify(updateCrashAndPerformanceReportersUseCase).invoke()
+        }
+
+    @Test
+    fun `test that updateDomainNameUseCase is invoked when fetchNodes finishes`() = runTest {
+        val update = FetchNodesUpdate(progress = Progress(1.0f))
+
+        whenever(fetchNodesUseCase()) doReturn flowOf(update)
+
+        underTest.fetchNodes()
+        advanceUntilIdle()
+
+        verify(updateDomainNameUseCase).invoke()
     }
 
     companion object {

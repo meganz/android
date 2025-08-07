@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.domainmigration
 
-import mega.privacy.android.domain.featuretoggle.DomainFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.repository.DomainNameMigrationRepository
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
@@ -18,7 +18,7 @@ class UpdateDomainNameUseCase @Inject constructor(
     suspend operator fun invoke() {
         domainNameRepository.isDomainNameMegaDotApp() //update the cached value in case feature flag fails
         domainNameRepository.setDomainNameMegaDotApp(
-            getFeatureFlagValueUseCase(DomainFeatures.MegaDotAppDomain)
+            getFeatureFlagValueUseCase(ApiFeatures.MegaDotAppDomain)
         )
     }
 }

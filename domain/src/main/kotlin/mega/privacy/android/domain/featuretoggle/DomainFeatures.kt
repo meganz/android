@@ -7,13 +7,6 @@ enum class DomainFeatures(
     private val defaultValue: Boolean,
 ) : Feature {
 
-    /**
-     * Use mega.app domain instead of mega.nz domain
-     */
-    MegaDotAppDomain(
-        "Use mega.app domain instead of mega.nz domain",
-        false,
-    )
     ;
 
     companion object : FeatureFlagValueProvider {

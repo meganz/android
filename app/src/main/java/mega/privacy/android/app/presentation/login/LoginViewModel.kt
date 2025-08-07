@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,6 +59,7 @@ import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -74,6 +76,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.domainmigration.UpdateDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -98,6 +101,7 @@ import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
+import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.ResumeTransfersForNotLoggedInInstanceUseCase
@@ -116,6 +120,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
+    @ApplicationScope private val applicationScope: CoroutineScope,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
@@ -163,6 +168,8 @@ class LoginViewModel @Inject constructor(
     private val shouldShowUpgradeAccountUseCase: ShouldShowUpgradeAccountUseCase,
     private val ephemeralCredentialManager: EphemeralCredentialManager,
     private val resumeTransfersForNotLoggedInInstanceUseCase: ResumeTransfersForNotLoggedInInstanceUseCase,
+    private val updateDomainNameUseCase: UpdateDomainNameUseCase,
+    private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
     private val startScreenUtil: StartScreenUtil,
 ) : ViewModel() {
 
@@ -897,7 +904,7 @@ class LoginViewModel @Inject constructor(
                 getAccountCredentialsUseCase()?.updateCredentials() ?: return@launch
             }
 
-            MegaApplication.getInstance().checkEnabledCookies()
+            checkEnabledCookies()
 
             if (isRefreshSession) {
                 _state.update { it.copy(fetchNodesUpdate = cleanFetchNodesUpdate) }
@@ -905,6 +912,16 @@ class LoginViewModel @Inject constructor(
 
             Timber.d("fetch nodes started")
             performFetchNodes()
+        }
+    }
+
+    private fun checkEnabledCookies() {
+        applicationScope.launch {
+            runCatching {
+                updateCrashAndPerformanceReportersUseCase()
+            }.onFailure {
+                Timber.e("Failed to get cookie settings: $it")
+            }
         }
     }
 
@@ -922,6 +939,7 @@ class LoginViewModel @Inject constructor(
                             )
                         }
                         startWorkers()
+                        updateFlags()
                     } else {
                         Timber.d("fetch nodes update")
                         _state.update { it.copy(fetchNodesUpdate = update) }
@@ -970,6 +988,13 @@ class LoginViewModel @Inject constructor(
             }.onFailure { error ->
                 Timber.e(error, "Task failed")
             }
+        }
+    }
+
+    private fun updateFlags() {
+        applicationScope.launch {
+            runCatching { updateDomainNameUseCase() }
+                .onFailure { Timber.e(it, "UpdateDomainNameUseCase failed") }
         }
     }
 

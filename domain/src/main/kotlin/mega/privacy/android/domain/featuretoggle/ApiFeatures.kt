@@ -52,6 +52,15 @@ enum class ApiFeatures(
         "n2s",
         "Enable note to yourself",
         false
+    ),
+
+    /**
+     * Migration to mega app domain.
+     */
+    MegaDotAppDomain(
+        "site",
+        "Enable migration to mega app domain",
+        false
     );
 
     companion object : FeatureFlagValueProvider {

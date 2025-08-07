@@ -19,7 +19,6 @@ import mega.privacy.android.data.repository.DefaultCancelTokenRepository
 import mega.privacy.android.data.repository.DefaultChatParticipantsRepository
 import mega.privacy.android.data.repository.DefaultClipboardRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
-import mega.privacy.android.data.repository.DefaultDomainNameMigrationRepository
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
@@ -39,6 +38,7 @@ import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.DefaultVerificationRepository
 import mega.privacy.android.data.repository.DocumentSectionRepositoryImpl
+import mega.privacy.android.data.repository.DomainNameMigrationRepositoryImpl
 import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
 import mega.privacy.android.data.repository.FileLinkRepositoryImpl
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
@@ -378,5 +378,5 @@ internal abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindDomainNameMigrationRepository(repository: DefaultDomainNameMigrationRepository): DomainNameMigrationRepository
+    abstract fun bindDomainNameMigrationRepository(repository: DomainNameMigrationRepositoryImpl): DomainNameMigrationRepository
 }
