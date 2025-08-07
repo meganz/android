@@ -7,10 +7,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.components.toggle.Toggle
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.list.view.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOfflineMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
@@ -65,7 +66,7 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {

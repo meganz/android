@@ -18,6 +18,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Unhide bottom sheet menu item
@@ -55,7 +56,7 @@ class UnhideBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {

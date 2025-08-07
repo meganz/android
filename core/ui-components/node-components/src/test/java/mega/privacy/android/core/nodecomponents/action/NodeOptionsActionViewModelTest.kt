@@ -16,6 +16,9 @@ import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMe
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.android.core.ui.model.menu.MenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -57,6 +60,7 @@ import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCas
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -107,6 +111,12 @@ class NodeOptionsActionViewModelTest {
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
 
+    // Mock action handlers for testing
+    private val mockSingleNodeActionHandler = mock<SingleNodeAction>()
+    private val mockMultiNodeActionHandler = mock<MultiNodeAction>()
+    private val singleNodeActionHandlers = setOf(mockSingleNodeActionHandler)
+    private val multipleNodesActionHandlers = setOf(mockMultiNodeActionHandler)
+
     private fun initViewModel() {
         viewModel = NodeOptionsActionViewModel(
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
@@ -131,7 +141,9 @@ class NodeOptionsActionViewModelTest {
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
-            getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase
+            getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
+            singleNodeActionHandlers = singleNodeActionHandlers,
+            multipleNodesActionHandlers = multipleNodesActionHandlers,
         )
     }
 
@@ -461,5 +473,238 @@ class NodeOptionsActionViewModelTest {
         whenever(getFileTypeInfoByNameUseCase(file.name)) doReturn expected
         val actual = viewModel.getTypeInfo(file)
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test handleSingleNodeAction executes block when handler is found`() = runTest {
+        initViewModel()
+        val mockAction = mock<VersionsMenuAction>()
+        var blockExecuted = false
+        var capturedHandler: SingleNodeAction? = null
+
+        whenever(mockSingleNodeActionHandler.canHandle(mockAction)).thenReturn(true)
+
+        viewModel.handleSingleNodeAction(mockAction) { handler ->
+            blockExecuted = true
+            capturedHandler = handler
+        }
+
+        assertThat(blockExecuted).isTrue()
+        assertThat(capturedHandler).isEqualTo(mockSingleNodeActionHandler)
+    }
+
+    @Test
+    fun `test handleSingleNodeAction throws exception when no handler found`() = runTest {
+        val mockAction = mock<VersionsMenuAction>()
+
+        whenever(mockSingleNodeActionHandler.canHandle(mockAction)).thenReturn(false)
+
+        initViewModel()
+
+        assertThrows<IllegalArgumentException> {
+            viewModel.handleSingleNodeAction(mockAction) { }
+        }
+    }
+
+    @Test
+    fun `test handleMultipleNodesAction executes block when handler is found`() = runTest {
+        val mockAction = mock<MoveMenuAction>()
+        var blockExecuted = false
+        var capturedHandler: MultiNodeAction? = null
+
+        // Mock the handler to return true for canHandle
+        whenever(mockMultiNodeActionHandler.canHandle(mockAction)).thenReturn(true)
+
+        initViewModel()
+
+        viewModel.handleMultipleNodesAction(mockAction) { handler ->
+            blockExecuted = true
+            capturedHandler = handler
+        }
+
+        assertThat(blockExecuted).isTrue()
+        assertThat(capturedHandler).isEqualTo(mockMultiNodeActionHandler)
+    }
+
+    @Test
+    fun `test handleMultipleNodesAction throws exception when no handler found`() = runTest {
+        initViewModel()
+        val mockAction = mock<MoveMenuAction>()
+
+        whenever(mockMultiNodeActionHandler.canHandle(mockAction)).thenReturn(false)
+
+        assertThrows<IllegalArgumentException> {
+            viewModel.handleMultipleNodesAction(mockAction) { }
+        }
+    }
+
+    @Test
+    fun `test handleSingleNodeAction with multiple handlers finds correct handler`() = runTest {
+        // Create additional mock handlers
+        val mockHandler1 = mock<SingleNodeAction>()
+        val mockHandler2 = mock<SingleNodeAction>()
+        val mockHandler3 = mock<SingleNodeAction>()
+
+        val multipleHandlers = setOf(mockHandler1, mockHandler2, mockHandler3)
+        val viewModelWithMultipleHandlers = NodeOptionsActionViewModel(
+            checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            moveNodesUseCase = moveNodesUseCase,
+            copyNodesUseCase = copyNodesUseCase,
+            setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
+            setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
+            deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
+            moveRequestMessageMapper = moveRequestMessageMapper,
+            versionHistoryRemoveMessageMapper = nodeVersionHistoryRemoveMessageMapper,
+            checkBackupNodeTypeUseCase = checkBackupNodeTypeUseCase,
+            attachMultipleNodesUseCase = attachMultipleNodesUseCase,
+            nodeSendToChatMessageMapper = nodeSendToChatMessageMapper,
+            nodeHandlesToJsonMapper = nodeHandlesToJsonMapper,
+            getNodeContentUriUseCase = getNodeContentUriUseCase,
+            nodeContentUriIntentMapper = nodeContentUriIntentMapper,
+            getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
+            getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            applicationScope = applicationScope,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            get1On1ChatIdUseCase = get1On1ChatIdUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
+            getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
+            singleNodeActionHandlers = multipleHandlers,
+            multipleNodesActionHandlers = multipleNodesActionHandlers,
+        )
+
+        val mockAction = mock<VersionsMenuAction>()
+        var capturedHandler: SingleNodeAction? = null
+
+        // Mock handlers 1 and 3 to return false, handler 2 to return true
+        whenever(mockHandler1.canHandle(mockAction)).thenReturn(false)
+        whenever(mockHandler2.canHandle(mockAction)).thenReturn(true)
+        whenever(mockHandler3.canHandle(mockAction)).thenReturn(false)
+
+        viewModelWithMultipleHandlers.handleSingleNodeAction(mockAction) { handler ->
+            capturedHandler = handler
+        }
+
+        assertThat(capturedHandler).isEqualTo(mockHandler2)
+    }
+
+    @Test
+    fun `test handleMultipleNodesAction with multiple handlers finds correct handler`() = runTest {
+        // Create additional mock handlers
+        val mockHandler1 = mock<MultiNodeAction>()
+        val mockHandler2 = mock<MultiNodeAction>()
+        val mockHandler3 = mock<MultiNodeAction>()
+
+        val multipleHandlers = setOf(mockHandler1, mockHandler2, mockHandler3)
+        val viewModelWithMultipleHandlers = NodeOptionsActionViewModel(
+            checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            moveNodesUseCase = moveNodesUseCase,
+            copyNodesUseCase = copyNodesUseCase,
+            setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
+            setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
+            deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
+            moveRequestMessageMapper = moveRequestMessageMapper,
+            versionHistoryRemoveMessageMapper = nodeVersionHistoryRemoveMessageMapper,
+            checkBackupNodeTypeUseCase = checkBackupNodeTypeUseCase,
+            attachMultipleNodesUseCase = attachMultipleNodesUseCase,
+            nodeSendToChatMessageMapper = nodeSendToChatMessageMapper,
+            nodeHandlesToJsonMapper = nodeHandlesToJsonMapper,
+            getNodeContentUriUseCase = getNodeContentUriUseCase,
+            nodeContentUriIntentMapper = nodeContentUriIntentMapper,
+            getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
+            getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            applicationScope = applicationScope,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            get1On1ChatIdUseCase = get1On1ChatIdUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
+            getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
+            singleNodeActionHandlers = singleNodeActionHandlers,
+            multipleNodesActionHandlers = multipleHandlers,
+        )
+
+        val mockAction = mock<MoveMenuAction>()
+        var capturedHandler: MultiNodeAction? = null
+
+        // Mock handlers 1 and 3 to return false, handler 2 to return true
+        whenever(mockHandler1.canHandle(mockAction)).thenReturn(false)
+        whenever(mockHandler2.canHandle(mockAction)).thenReturn(true)
+        whenever(mockHandler3.canHandle(mockAction)).thenReturn(false)
+
+        viewModelWithMultipleHandlers.handleMultipleNodesAction(mockAction) { handler ->
+            capturedHandler = handler
+        }
+
+        assertThat(capturedHandler).isEqualTo(mockHandler2)
+    }
+
+    @Test
+    fun `test handleSingleNodeAction with empty handlers set throws exception`() = runTest {
+        val viewModelWithEmptyHandlers = NodeOptionsActionViewModel(
+            checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            moveNodesUseCase = moveNodesUseCase,
+            copyNodesUseCase = copyNodesUseCase,
+            setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
+            setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
+            deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
+            moveRequestMessageMapper = moveRequestMessageMapper,
+            versionHistoryRemoveMessageMapper = nodeVersionHistoryRemoveMessageMapper,
+            checkBackupNodeTypeUseCase = checkBackupNodeTypeUseCase,
+            attachMultipleNodesUseCase = attachMultipleNodesUseCase,
+            nodeSendToChatMessageMapper = nodeSendToChatMessageMapper,
+            nodeHandlesToJsonMapper = nodeHandlesToJsonMapper,
+            getNodeContentUriUseCase = getNodeContentUriUseCase,
+            nodeContentUriIntentMapper = nodeContentUriIntentMapper,
+            getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
+            getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            applicationScope = applicationScope,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            get1On1ChatIdUseCase = get1On1ChatIdUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
+            getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
+            singleNodeActionHandlers = emptySet(),
+            multipleNodesActionHandlers = multipleNodesActionHandlers,
+        )
+
+        val mockAction = mock<VersionsMenuAction>()
+
+        assertThrows<IllegalArgumentException> {
+            viewModelWithEmptyHandlers.handleSingleNodeAction(mockAction) { }
+        }
+    }
+
+    @Test
+    fun `test handleMultipleNodesAction with empty handlers set throws exception`() = runTest {
+        val viewModelWithEmptyHandlers = NodeOptionsActionViewModel(
+            checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            moveNodesUseCase = moveNodesUseCase,
+            copyNodesUseCase = copyNodesUseCase,
+            setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
+            setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
+            deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
+            moveRequestMessageMapper = moveRequestMessageMapper,
+            versionHistoryRemoveMessageMapper = nodeVersionHistoryRemoveMessageMapper,
+            checkBackupNodeTypeUseCase = checkBackupNodeTypeUseCase,
+            attachMultipleNodesUseCase = attachMultipleNodesUseCase,
+            nodeSendToChatMessageMapper = nodeSendToChatMessageMapper,
+            nodeHandlesToJsonMapper = nodeHandlesToJsonMapper,
+            getNodeContentUriUseCase = getNodeContentUriUseCase,
+            nodeContentUriIntentMapper = nodeContentUriIntentMapper,
+            getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
+            getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            applicationScope = applicationScope,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            get1On1ChatIdUseCase = get1On1ChatIdUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
+            getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
+            singleNodeActionHandlers = singleNodeActionHandlers,
+            multipleNodesActionHandlers = emptySet(),
+        )
+
+        assertThrows<IllegalArgumentException> {
+            viewModelWithEmptyHandlers.handleMultipleNodesAction(mock<MoveMenuAction>()) { }
+        }
     }
 } 

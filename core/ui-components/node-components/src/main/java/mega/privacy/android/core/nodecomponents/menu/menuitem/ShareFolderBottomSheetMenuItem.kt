@@ -6,6 +6,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
@@ -19,6 +20,7 @@ import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCas
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Share folder bottom sheet menu item
@@ -47,7 +49,7 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {

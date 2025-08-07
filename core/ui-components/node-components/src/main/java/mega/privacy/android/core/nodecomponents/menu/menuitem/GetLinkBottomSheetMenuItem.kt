@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Get link bottom sheet menu action
@@ -33,7 +34,7 @@ class GetLinkBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {

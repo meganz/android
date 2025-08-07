@@ -10,6 +10,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuaction.OpenWithMenuAction
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNod
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Open with bottom sheet menu item
@@ -63,7 +65,7 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {

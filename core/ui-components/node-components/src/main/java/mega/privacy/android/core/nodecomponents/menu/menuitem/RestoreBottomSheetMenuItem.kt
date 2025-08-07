@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Restore bottom sheet menu item
@@ -43,7 +44,7 @@ class RestoreBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {

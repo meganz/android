@@ -2,6 +2,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
+import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Verify bottom sheet menu item
@@ -76,7 +78,7 @@ class VerifyBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {

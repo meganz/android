@@ -9,6 +9,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.LeaveShareMenuAc
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Leave share bottom sheet menu item
@@ -32,7 +33,7 @@ class LeaveShareBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {

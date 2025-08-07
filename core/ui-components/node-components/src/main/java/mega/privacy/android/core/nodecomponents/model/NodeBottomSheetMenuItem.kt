@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.list.view.NodeActionListTile
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 
@@ -13,7 +14,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  */
 typealias BottomSheetClickHandler = @Composable (
     onDismiss: () -> Unit,
-    actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+    actionHandler: NodeActionHandler,
     navController: NavHostController,
     coroutineScope: CoroutineScope,
 ) -> Unit
@@ -64,7 +65,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
     fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {

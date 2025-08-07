@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Hide bottom sheet menu item
@@ -113,7 +115,7 @@ class HideBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {

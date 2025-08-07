@@ -10,6 +10,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
@@ -23,6 +24,7 @@ import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Share bottom sheet menu item
@@ -51,7 +53,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {

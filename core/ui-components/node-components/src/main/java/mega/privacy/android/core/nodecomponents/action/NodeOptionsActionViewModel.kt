@@ -13,13 +13,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
+import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.R
-import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
+import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -98,6 +99,8 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
+    private val singleNodeActionHandlers: Set<@JvmSuppressWildcards SingleNodeAction>,
+    private val multipleNodesActionHandlers: Set<@JvmSuppressWildcards MultiNodeAction>,
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
@@ -570,4 +573,42 @@ class NodeOptionsActionViewModel @Inject constructor(
      * return the file type of the given file
      */
     fun getTypeInfo(file: File) = getFileTypeInfoByNameUseCase(file.name)
+
+    /**
+     * Handle a single node action using injected action handlers.
+     *
+     * @param action The menu action to handle
+     * @param block Lambda to execute with the handler if found
+     * @throws IllegalArgumentException if the action is not supported
+     */
+    fun handleSingleNodeAction(
+        action: MenuAction,
+        block: (SingleNodeAction) -> Unit,
+    ) {
+        val handler = singleNodeActionHandlers.find { it.canHandle(action) }
+        if (handler != null) {
+            block(handler)
+        } else {
+            throw IllegalArgumentException("Action $action does not have a handler.")
+        }
+    }
+
+    /**
+     * Handle a multiple nodes action using injected action handlers.
+     *
+     * @param action The menu action to handle
+     * @param block Lambda to execute with the handler if found
+     * @throws IllegalArgumentException if the action is not supported or nodes list is empty
+     */
+    fun handleMultipleNodesAction(
+        action: MenuAction,
+        block: (MultiNodeAction) -> Unit,
+    ) {
+        val handler = multipleNodesActionHandlers.find { it.canHandle(action) }
+        if (handler != null) {
+            block(handler)
+        } else {
+            throw IllegalArgumentException("Action $action does not have a handler.")
+        }
+    }
 }

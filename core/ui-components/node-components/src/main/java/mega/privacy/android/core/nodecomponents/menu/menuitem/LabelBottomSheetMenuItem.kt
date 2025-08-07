@@ -4,6 +4,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
+import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.GetNodeLabelUseCase
 import java.io.File
 import javax.inject.Inject
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 internal const val changeLabelBottomSheetRoute =
     "search/node_bottom_sheet/change_label_bottom_sheet"
@@ -78,7 +80,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {

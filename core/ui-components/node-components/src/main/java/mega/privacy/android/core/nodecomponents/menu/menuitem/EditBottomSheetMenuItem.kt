@@ -2,6 +2,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
+import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuaction.EditMenuAction
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import java.io.File
 import javax.inject.Inject
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Edit bottom sheet menu action
@@ -51,7 +53,7 @@ class EditBottomSheetMenuItem @Inject constructor(
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
-        actionHandler: (menuAction: MenuActionWithIcon, node: TypedNode) -> Unit,
+        actionHandler: NodeActionHandler,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
