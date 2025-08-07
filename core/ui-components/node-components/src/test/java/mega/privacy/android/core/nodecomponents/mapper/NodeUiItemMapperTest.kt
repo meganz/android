@@ -11,11 +11,14 @@ import mega.privacy.android.core.nodecomponents.model.NodeSubtitleText
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.NodeLabel
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.GetNodeLabelUseCase
 import mega.privacy.android.icon.pack.R as IconPackR
 import org.junit.jupiter.api.BeforeEach
@@ -75,6 +78,7 @@ class NodeUiItemMapperTest {
         isMarkedSensitive: Boolean = false,
         isSensitiveInherited: Boolean = false,
         isIncomingShare: Boolean = false,
+        isNodeKeyDecrypted: Boolean = true,
         description: String? = null,
         tags: List<String> = emptyList(),
         childFolderCount: Int = 2,
@@ -90,7 +94,7 @@ class NodeUiItemMapperTest {
         whenever(it.isSensitiveInherited).thenReturn(isSensitiveInherited)
         whenever(it.isTakenDown).thenReturn(false)
         whenever(it.isIncomingShare).thenReturn(isIncomingShare)
-        whenever(it.isNodeKeyDecrypted).thenReturn(true)
+        whenever(it.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
         whenever(it.creationTime).thenReturn(1234567890L)
         whenever(it.isAvailableOffline).thenReturn(false)
         whenever(it.versionCount).thenReturn(0)
@@ -135,6 +139,59 @@ class NodeUiItemMapperTest {
         whenever(it.hasPreview).thenReturn(false)
         whenever(it.type).thenReturn(TextFileTypeInfo("text/plain", "txt"))
     }
+
+    private fun createMockShareFolderNode(
+        id: Long = 3L,
+        name: String = "Shared Folder",
+        isIncomingShare: Boolean = true,
+        isNodeKeyDecrypted: Boolean = false,
+        shareData: ShareData? = null,
+    ): ShareFolderNode = mock {
+        whenever(it.node).thenReturn(mock<TypedFolderNode>())
+        whenever(it.shareData).thenReturn(shareData)
+        // Set up all TypedFolderNode properties directly
+        whenever(it.id).thenReturn(NodeId(id))
+        whenever(it.name).thenReturn(name)
+        whenever(it.parentId).thenReturn(NodeId(0L))
+        whenever(it.base64Id).thenReturn("test_base64_id")
+        whenever(it.label).thenReturn(0)
+        whenever(it.isFavourite).thenReturn(false)
+        whenever(it.isMarkedSensitive).thenReturn(false)
+        whenever(it.isSensitiveInherited).thenReturn(false)
+        whenever(it.isTakenDown).thenReturn(false)
+        whenever(it.isIncomingShare).thenReturn(isIncomingShare)
+        whenever(it.isNodeKeyDecrypted).thenReturn(isNodeKeyDecrypted)
+        whenever(it.creationTime).thenReturn(1234567890L)
+        whenever(it.isAvailableOffline).thenReturn(false)
+        whenever(it.versionCount).thenReturn(0)
+        whenever(it.description).thenReturn(null)
+        whenever(it.tags).thenReturn(emptyList())
+        whenever(it.childFolderCount).thenReturn(2)
+        whenever(it.childFileCount).thenReturn(3)
+        whenever(it.type).thenReturn(FolderType.Default)
+    }
+
+    private fun createMockShareData(
+        user: String? = "test@example.com",
+        userFullName: String? = "Test User",
+        nodeHandle: Long = 123L,
+        access: AccessPermission = AccessPermission.READ,
+        timeStamp: Long = 1234567890L,
+        isPending: Boolean = false,
+        isVerified: Boolean = false,
+        isContactCredentialsVerified: Boolean = false,
+        count: Int = 0,
+    ): ShareData = ShareData(
+        user = user,
+        userFullName = userFullName,
+        nodeHandle = nodeHandle,
+        access = access,
+        timeStamp = timeStamp,
+        isPending = isPending,
+        isVerified = isVerified,
+        isContactCredentialsVerified = isContactCredentialsVerified,
+        count = count
+    )
 
     @Test
     fun `test that invoke returns correct NodeUiItem when mapping folder node`() = runTest {
@@ -382,7 +439,6 @@ class NodeUiItemMapperTest {
         assertThat(result[1].isFolderNode).isFalse()
     }
 
-
     @Test
     fun `test that invoke set node label correctly`() = runTest {
         val labelId = 123
@@ -401,4 +457,154 @@ class NodeUiItemMapperTest {
         val nodeUiItem = result[0]
         assertThat(nodeUiItem.nodeLabel).isEqualTo(nodeLabel)
     }
+
+    @Test
+    fun `test that invoke returns StringRes title for unverified incoming share with undecrypted node key`() =
+        runTest {
+            val unverifiedShareData = createMockShareData(
+                isVerified = false,
+                count = 0 // This makes isUnverifiedDistinctNode = true
+            )
+            val mockShareFolderNode = createMockShareFolderNode(
+                name = "Unverified Folder",
+                isIncomingShare = true,
+                isNodeKeyDecrypted = false,
+                shareData = unverifiedShareData
+            )
+
+            val result = underTest(
+                nodeList = listOf(mockShareFolderNode),
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+            )
+
+            assertThat(result).hasSize(1)
+            assertThat(result[0].title).isEqualTo(
+                LocalizedText.StringRes(R.string.shared_items_verify_credentials_undecrypted_folder)
+            )
+        }
+
+    @Test
+    fun `test that invoke returns Literal title for unverified incoming share with decrypted node key`() =
+        runTest {
+            val unverifiedShareData = createMockShareData(
+                isVerified = false,
+                count = 0 // This makes isUnverifiedDistinctNode = true
+            )
+            val mockShareFolderNode = createMockShareFolderNode(
+                name = "Unverified Folder",
+                isIncomingShare = true,
+                isNodeKeyDecrypted = true, // Node key is decrypted
+                shareData = unverifiedShareData
+            )
+
+            val result = underTest(
+                nodeList = listOf(mockShareFolderNode),
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+            )
+
+            assertThat(result).hasSize(1)
+            assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Unverified Folder"))
+        }
+
+    @Test
+    fun `test that invoke returns Literal title for verified incoming share`() = runTest {
+        val verifiedShareData = createMockShareData(
+            isVerified = true,
+            count = 1
+        )
+        val mockShareFolderNode = createMockShareFolderNode(
+            name = "Verified Folder",
+            isIncomingShare = true,
+            isNodeKeyDecrypted = false,
+            shareData = verifiedShareData
+        )
+
+        val result = underTest(
+            nodeList = listOf(mockShareFolderNode),
+            nodeSourceType = NodeSourceType.INCOMING_SHARES,
+        )
+
+        assertThat(result).hasSize(1)
+        assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Verified Folder"))
+    }
+
+    @Test
+    fun `test that invoke returns Literal title for unverified outgoing share`() = runTest {
+        val unverifiedShareData = createMockShareData(
+            isVerified = false,
+            count = 0 // This makes isUnverifiedDistinctNode = true
+        )
+        val mockShareFolderNode = createMockShareFolderNode(
+            name = "Unverified Outgoing Folder",
+            isIncomingShare = false, // Outgoing share
+            isNodeKeyDecrypted = false,
+            shareData = unverifiedShareData
+        )
+
+        val result = underTest(
+            nodeList = listOf(mockShareFolderNode),
+            nodeSourceType = NodeSourceType.OUTGOING_SHARES,
+        )
+
+        assertThat(result).hasSize(1)
+        assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Unverified Outgoing Folder"))
+    }
+
+    @Test
+    fun `test that invoke returns Literal title for regular folder node`() = runTest {
+        val mockFolderNode = createMockFolderNode(
+            name = "Regular Folder",
+            isIncomingShare = false
+        )
+
+        val result = underTest(
+            nodeList = listOf(mockFolderNode),
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        )
+
+        assertThat(result).hasSize(1)
+        assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Regular Folder"))
+    }
+
+    @Test
+    fun `test that invoke returns Literal title for share folder node without share data`() =
+        runTest {
+            val mockShareFolderNode = createMockShareFolderNode(
+                name = "Share Folder Without Data",
+                isIncomingShare = true,
+                isNodeKeyDecrypted = false,
+                shareData = null // No share data
+            )
+
+            val result = underTest(
+                nodeList = listOf(mockShareFolderNode),
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+            )
+
+            assertThat(result).hasSize(1)
+            assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Share Folder Without Data"))
+        }
+
+    @Test
+    fun `test that invoke returns Literal title for unverified share with count greater than 0`() =
+        runTest {
+            val unverifiedShareData = createMockShareData(
+                isVerified = false,
+                count = 1 // This makes isUnverifiedDistinctNode = false
+            )
+            val mockShareFolderNode = createMockShareFolderNode(
+                name = "Unverified Share With Count",
+                isIncomingShare = true,
+                isNodeKeyDecrypted = false,
+                shareData = unverifiedShareData
+            )
+
+            val result = underTest(
+                nodeList = listOf(mockShareFolderNode),
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+            )
+
+            assertThat(result).hasSize(1)
+            assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Unverified Share With Count"))
+        }
 } 

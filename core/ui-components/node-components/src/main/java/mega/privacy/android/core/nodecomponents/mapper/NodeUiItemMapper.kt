@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.extension.getNodeItemThumbnail
 import mega.privacy.android.core.nodecomponents.extension.getSharesIcon
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
@@ -69,7 +70,7 @@ class NodeUiItemMapper @Inject constructor(
                 isSelected = false,
                 isDummy = false,
                 isHighlighted = isHighlighted,
-                title = LocalizedText.Literal(node.name), // TODO: Handle unverified shares
+                title = getNodeTitle(node),
                 subtitle = nodeSubtitleMapper(
                     node = node,
                     showPublicLinkCreationTime = showPublicLinkCreationTime
@@ -99,6 +100,16 @@ class NodeUiItemMapper @Inject constructor(
                 isVideoNode = node is TypedFileNode && node.type is VideoFileTypeInfo,
                 duration = duration,
             )
+        }
+    }
+
+    private fun getNodeTitle(node: TypedNode): LocalizedText {
+        val isUnverifiedShare =
+            (node as? ShareFolderNode)?.shareData?.isUnverifiedDistinctNode == true
+        return if (node.isIncomingShare && isUnverifiedShare && node.isNodeKeyDecrypted.not()) {
+            LocalizedText.StringRes(R.string.shared_items_verify_credentials_undecrypted_folder)
+        } else {
+            LocalizedText.Literal(node.name)
         }
     }
 

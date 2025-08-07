@@ -125,7 +125,7 @@
         <item quantity="other">%d items restored from rubbish</item>
     </plurals>
 
-    <!-- Node subtitle resources -->
+    <!-- Start of node list item resources -->
     <string name="file_browser_empty_folder">Empty folder</string>
     <string name="file_subtitle_format">%1$s · %2$s</string>
     <!-- Number of files with parameter -->
@@ -133,31 +133,26 @@
         <item quantity="one">%d file</item>
         <item quantity="other">%d files</item>
     </plurals>
-
     <!-- Number of folders with parameter -->
     <plurals name="num_folders_with_parameter">
         <item quantity="one">%d folder</item>
         <item quantity="other">%d folders</item>
     </plurals>
-
     <!-- Number of folders and files (first part) -->
     <plurals name="num_folders_num_files">
         <item quantity="one">%d folder, </item>
         <item quantity="other">%d folders, </item>
     </plurals>
-
     <!-- Number of folders and files (second part) -->
     <plurals name="num_folders_num_files_2">
         <item quantity="one">%d file</item>
         <item quantity="other">%d files</item>
     </plurals>
-
     <!-- General number shared with -->
     <plurals name="general_num_shared_with">
         <item quantity="one">Shared with %d person</item>
         <item quantity="other">Shared with %d people</item>
     </plurals>
-
     <string name="label_file_size_byte" />
     <string name="label_file_size_kilo_byte" />
     <string name="label_file_size_mega_byte" />
@@ -165,4 +160,7 @@
     <string name="label_file_size_tera_byte" />
     <string name="label_file_size_peta_byte" />
     <string name="label_file_size_exa_byte" />
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <!-- End of node list item resources -->
 </resources>
