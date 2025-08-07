@@ -40,6 +40,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.core.nodecomponents.model.text
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.icon.pack.IconPack
@@ -73,7 +74,7 @@ fun <T : TypedNode> NodeListViewItem(
 ) {
     NodeListViewItem(
         title = nodeUiItem.title.text,
-        subtitle = nodeUiItem.subtitle.text,
+        subtitle = nodeUiItem.subtitle.text(),
         icon = nodeUiItem.iconRes,
         modifier = modifier,
         description = nodeUiItem.formattedDescription?.text,

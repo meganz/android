@@ -12,7 +12,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param isDummy True if a dummy item
  * @param isHighlighted Node is highlighted because it comes from "Locate" action in notification
  * @param title Localized title for the node
- * @param subtitle Localized subtitle for the node
+ * @param subtitle NodeSubtitleText for the node that can be resolved to localized string in Composable
  * @param description Optional localized description for the node
  * @param tags Optional list of tags for the node
  * @param iconRes Drawable resource ID for the node icon
@@ -36,7 +36,7 @@ data class NodeUiItem<T : TypedNode>(
     val isDummy: Boolean = false,
     val isHighlighted: Boolean = false,
     val title: LocalizedText = LocalizedText.Literal(""),
-    val subtitle: LocalizedText = LocalizedText.Literal(""),
+    val subtitle: NodeSubtitleText = NodeSubtitleText.Empty,
     val formattedDescription: LocalizedText? = null,
     val iconRes: Int = 0,
     val thumbnailData: Any? = null,

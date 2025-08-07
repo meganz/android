@@ -6,6 +6,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.nodecomponents.model.NodeSubtitleText
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.NodeLabel
@@ -43,7 +45,14 @@ class NodeUiItemMapperTest {
                 any(),
                 any()
             )
-        ).thenReturn(LocalizedText.Literal("1 KB · Jan 1, 2024"))
+        ).thenReturn(
+            NodeSubtitleText.FileSubtitle(
+                fileSizeResId = R.string.label_file_size_kilo_byte,
+                fileSizeValue = 1.0,
+                modificationTime = 1234567890L,
+                showPublicLinkCreationTime = false
+            )
+        )
         setupDefaultFileTypeIconMocks()
         underTest = NodeUiItemMapper(
             fileTypeIconMapper = fileTypeIconMapper,
@@ -102,7 +111,7 @@ class NodeUiItemMapperTest {
         description: String? = null,
         tags: List<String> = emptyList(),
         size: Long = 1024L,
-        label: Int = 0
+        label: Int = 0,
     ): TypedFileNode = mock {
         whenever(it.id).thenReturn(NodeId(id))
         whenever(it.name).thenReturn(name)

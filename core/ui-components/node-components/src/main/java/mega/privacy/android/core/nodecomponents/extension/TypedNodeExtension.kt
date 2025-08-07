@@ -1,16 +1,9 @@
 package mega.privacy.android.core.nodecomponents.extension
 
 import androidx.annotation.DrawableRes
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.intl.Locale
-import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.DeviceType
 import mega.privacy.android.domain.entity.FolderType
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -18,45 +11,6 @@ import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.icon.pack.R as IconPackR
-
-
-// A temporary file to hold copies of legacy method. It will be refactored to mapper during viewmodel implementation.
-@Composable
-internal fun TypedNode.getNodeItemDescription(showPublicLinkCreationTime: Boolean) = with(this) {
-    (this as? ShareFolderNode).getSharedNodeItemDescription() ?: when (this) {
-        is FileNode -> formatFileSize(size, LocalContext.current)
-            .plus(" · ")
-            .plus(
-                formatModifiedDate(
-                    java.util.Locale(
-                        Locale.current.language, Locale.current.region
-                    ),
-                    if (showPublicLinkCreationTime) exportedData?.publicLinkCreationTime
-                        ?: modificationTime
-                    else modificationTime
-                )
-            )
-
-        is FolderNode -> "TODO" // TODO
-        else -> ""
-    }
-}
-
-@Composable
-internal fun ShareFolderNode?.getSharedNodeItemDescription(): String? {
-    return this?.shareData?.let { shareData ->
-        when (val count = shareData.count) {
-            0 -> if (!shareData.isVerified) shareData.user else null
-            1 -> if (shareData.isVerified) shareData.userFullName else null
-            else -> "Shared with $count" // TODO
-//            else -> pluralStringResource(
-//                id = sharedR.plurals.general_num_shared_with,
-//                count = count,
-//                count
-//            )
-        }
-    }
-}
 
 internal fun TypedNode.getNodeItemThumbnail(
     fileTypeIconMapper: FileTypeIconMapper,

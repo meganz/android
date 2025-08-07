@@ -1,49 +1,60 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.core.formatter.formatModifiedDate
+import mega.privacy.android.core.nodecomponents.model.NodeSubtitleText
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import javax.inject.Inject
 
-// TODO: Use string res and remove usage of context
 /**
- * Mapper for creating node subtitles
+ * Mapper to create NodeSubtitleText from TypedNode
  */
 class NodeSubtitleMapper @Inject constructor(
-    @ApplicationContext private val context: Context,
+    private val fileSizeMapper: FileSizeMapper,
 ) {
 
     /**
-     * Get subtitle for a node
+     * Invoke
      * @param node The node to get subtitle for
      * @param showPublicLinkCreationTime Whether to show public link creation time
-     * @return LocalizedText subtitle
+     * @return NodeSubtitleText subtitle
      */
-    operator fun invoke(node: TypedNode, showPublicLinkCreationTime: Boolean): LocalizedText {
-        return LocalizedText.Literal(
-            value = when (node) {
-                is TypedFileNode -> formatFileSize(node.size, context)
-                    .plus(" · ")
-                    .plus(
-                        formatModifiedDate(
-                            java.util.Locale.getDefault(),
-                            if (showPublicLinkCreationTime) node.exportedData?.publicLinkCreationTime
-                                ?: node.modificationTime
-                            else node.modificationTime
-                        )
-                    )
+    operator fun invoke(
+        node: TypedNode,
+        showPublicLinkCreationTime: Boolean,
+    ): NodeSubtitleText {
+        return when (node) {
+            is TypedFileNode -> {
+                val (fileSizeResId, fileSizeValue) = fileSizeMapper(node.size)
+                NodeSubtitleText.FileSubtitle(
+                    fileSizeResId = fileSizeResId,
+                    fileSizeValue = fileSizeValue,
+                    modificationTime = node.modificationTime,
+                    showPublicLinkCreationTime = showPublicLinkCreationTime,
+                    publicLinkCreationTime = node.exportedData?.publicLinkCreationTime
+                )
+            }
 
-                is TypedFolderNode -> {
-                    "${node.childFolderCount} folder, ${node.childFileCount} file"
+            is TypedFolderNode -> {
+                // Check if it's a shared folder first
+                (node as? ShareFolderNode)?.shareData?.let { shareData ->
+                    return NodeSubtitleText.SharedSubtitle(
+                        shareCount = shareData.count,
+                        user = shareData.user,
+                        userFullName = shareData.userFullName,
+                        isVerified = shareData.isVerified
+                    )
                 }
 
-                else -> ""
+                // Regular folder
+                NodeSubtitleText.FolderSubtitle(
+                    childFolderCount = node.childFolderCount,
+                    childFileCount = node.childFileCount
+                )
             }
-        )
+
+            else -> NodeSubtitleText.Empty
+        }
     }
 } 
