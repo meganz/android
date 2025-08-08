@@ -19,7 +19,7 @@ class NodeLabelIntMapper @Inject constructor() {
             NodeLabel.GREEN -> MegaNode.NODE_LBL_GREEN
             NodeLabel.PURPLE -> MegaNode.NODE_LBL_PURPLE
             NodeLabel.BLUE -> MegaNode.NODE_LBL_BLUE
-            NodeLabel.YELLLOW -> MegaNode.NODE_LBL_YELLOW
+            NodeLabel.YELLOW -> MegaNode.NODE_LBL_YELLOW
             NodeLabel.ORANGE -> MegaNode.NODE_LBL_ORANGE
             NodeLabel.GREY -> MegaNode.NODE_LBL_GREY
         }

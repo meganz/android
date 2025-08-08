@@ -32,6 +32,7 @@ class ChatNodeEntityListMapper @Inject constructor() {
                     base64Id = it.base64Id,
                     restoreId = it.restoreId,
                     label = it.label,
+                    nodeLabel = it.nodeLabel,
                     isFavourite = it.isFavourite,
                     isMarkedSensitive = it.isMarkedSensitive,
                     isSensitiveInherited = it.isSensitiveInherited,

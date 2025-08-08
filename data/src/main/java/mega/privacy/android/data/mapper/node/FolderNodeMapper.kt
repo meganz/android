@@ -3,6 +3,7 @@ package mega.privacy.android.data.mapper.node
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.StringListMapper
+import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -25,6 +26,7 @@ internal class FolderNodeMapper @Inject constructor(
     private val megaApiFolderGateway: MegaApiFolderGateway,
     private val fetChildrenMapper: FetchChildrenMapper,
     private val stringListMapper: StringListMapper,
+    private val nodeLabelMapper: NodeLabelMapper
 ) {
     /**
      * Invoke
@@ -42,6 +44,7 @@ internal class FolderNodeMapper @Inject constructor(
         id = NodeId(megaNode.handle),
         name = megaNode.name,
         label = megaNode.label,
+        nodeLabel = nodeLabelMapper(megaNode.label),
         parentId = NodeId(megaNode.parentHandle),
         base64Id = megaNode.base64Handle,
         restoreId = NodeId(megaNode.restoreHandle).takeIf {

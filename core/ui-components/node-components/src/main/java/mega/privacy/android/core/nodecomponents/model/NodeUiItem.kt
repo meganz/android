@@ -1,7 +1,6 @@
 package mega.privacy.android.core.nodecomponents.model
 
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -20,7 +19,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param accessPermissionIcon Optional icon resource ID for access permission
  * @param showIsVerified if true, shows a verified icon
  * @param isTakenDown if true, shows a taken down icon
- * @param nodeLabel Optional node label circle next to the title
  * @param showLink if true, shows a link icon
  * @param showFavourite if true, shows a favourite icon
  * @param isSensitive if true, the item is considered sensitive and will be displayed with reduced opacity
@@ -42,7 +40,6 @@ data class NodeUiItem<T : TypedNode>(
     val thumbnailData: Any? = null,
     val accessPermissionIcon: Int? = null,
     val showIsVerified: Boolean = false,
-    val nodeLabel: NodeLabel? = null,
     val showLink: Boolean = false,
     val showFavourite: Boolean = false,
     val isSensitive: Boolean = false,

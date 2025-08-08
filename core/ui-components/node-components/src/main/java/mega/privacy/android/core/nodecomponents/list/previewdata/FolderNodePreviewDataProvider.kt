@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.list.view.previewdata
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.FolderType
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -30,6 +31,7 @@ internal class FolderNodePreviewDataProvider :
             override val base64Id = "1L"
             override val restoreId: NodeId? = null
             override val label = 1
+            override val nodeLabel = NodeLabel.BLUE
             override val isFavourite = false
             override val isMarkedSensitive = false
             override val isSensitiveInherited: Boolean = false
@@ -64,6 +66,7 @@ internal class FolderNodePreviewDataProvider :
             override val base64Id = "1L"
             override val restoreId: NodeId? = null
             override val label = 1
+            override val nodeLabel = NodeLabel.BLUE
             override val isFavourite = true
             override val isMarkedSensitive = false
             override val isSensitiveInherited: Boolean = false
@@ -98,6 +101,7 @@ internal class FolderNodePreviewDataProvider :
             override val base64Id = "1L"
             override val restoreId: NodeId? = null
             override val label = 1
+            override val nodeLabel = NodeLabel.BLUE
             override val isFavourite = false
             override val isMarkedSensitive = false
             override val isSensitiveInherited: Boolean = false

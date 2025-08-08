@@ -5,13 +5,13 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import mega.privacy.android.data.database.converter.ChatNodeEntityConverters
 import mega.privacy.android.data.database.converter.StringListConverter
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -45,7 +45,9 @@ data class ChatNodeEntity(
     override val parentId: NodeId,
     override val base64Id: String,
     override val restoreId: NodeId?,
+    @Deprecated("Use nodeLabel instead")
     override val label: Int,
+    override val nodeLabel: NodeLabel?,
     override val isFavourite: Boolean,
     override val isMarkedSensitive: Boolean,
     @ColumnInfo(name = "isSensitiveInherited", defaultValue = "0")
@@ -78,6 +80,7 @@ data class ChatNodeEntity(
         base64Id: String,
         restoreId: NodeId?,
         label: Int,
+        nodeLabel: NodeLabel?,
         isFavourite: Boolean,
         isMarkedSensitive: Boolean,
         isSensitiveInherited: Boolean,
@@ -109,6 +112,7 @@ data class ChatNodeEntity(
         base64Id = base64Id,
         restoreId = restoreId,
         label = label,
+        nodeLabel = nodeLabel,
         isFavourite = isFavourite,
         isMarkedSensitive = isMarkedSensitive,
         isSensitiveInherited = isSensitiveInherited,

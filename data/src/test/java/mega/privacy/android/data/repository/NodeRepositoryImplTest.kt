@@ -147,6 +147,7 @@ internal class NodeRepositoryImplTest {
         fileTypeInfoMapper = fileTypeInfoMapper,
         offlineAvailabilityMapper = offlineAvailabilityMapper,
         stringListMapper = stringListMapper,
+        nodeLabelMapper = nodeLabelMapper,
     )
 
     private val nodeMapper: NodeMapper = NodeMapper(
@@ -156,6 +157,7 @@ internal class NodeRepositoryImplTest {
             megaApiFolderGateway = megaApiFolderGateway,
             fetChildrenMapper = fetchChildrenMapper,
             stringListMapper = stringListMapper,
+            nodeLabelMapper = nodeLabelMapper,
         )
     )
 

@@ -990,7 +990,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         buildList {
             add(NodeLabel.RED)
             add(NodeLabel.ORANGE)
-            add(NodeLabel.YELLLOW)
+            add(NodeLabel.YELLOW)
             add(NodeLabel.GREEN)
             add(NodeLabel.BLUE)
             add(NodeLabel.PURPLE)

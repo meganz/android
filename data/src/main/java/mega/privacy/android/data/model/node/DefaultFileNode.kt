@@ -1,6 +1,7 @@
 package mega.privacy.android.data.model.node
 
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -12,7 +13,9 @@ internal data class DefaultFileNode(
     override val base64Id: String,
     override val restoreId: NodeId?,
     override val size: Long,
+    @Deprecated("Use nodeLabel instead")
     override val label: Int,
+    override val nodeLabel: NodeLabel?,
     override val creationTime: Long,
     override val modificationTime: Long,
     override val type: FileTypeInfo,

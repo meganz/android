@@ -3,6 +3,7 @@ package mega.privacy.android.data.mapper.node
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.StringListMapper
+import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -20,6 +21,7 @@ internal class ImageNodeMapper @Inject constructor(
     private val previewFromServerMapper: PreviewFromServerMapper,
     private val fullImageFromServerMapper: FullImageFromServerMapper,
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper,
+    private val nodeLabelMapper: NodeLabelMapper,
     private val stringListMapper: StringListMapper,
     private val megaApiGateway: MegaApiGateway,
 ) {
@@ -39,6 +41,7 @@ internal class ImageNodeMapper @Inject constructor(
             override val name = megaNode.name
             override val size = megaNode.size
             override val label = megaNode.label
+            override val nodeLabel = nodeLabelMapper(megaNode.label)
             override val parentId = NodeId(megaNode.parentHandle)
             override val base64Id = megaNode.base64Handle
             override val restoreId = NodeId(megaNode.restoreHandle).takeIf {

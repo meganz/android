@@ -537,7 +537,7 @@ private fun NodeListItemWithAllFeaturesPreview() {
             showFavourite = true,
             showLink = true,
             showIsVerified = true,
-            label = NodeLabel.YELLLOW,
+            label = NodeLabel.YELLOW,
             thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg",
             onMoreClicked = { },
             onInfoClicked = { },

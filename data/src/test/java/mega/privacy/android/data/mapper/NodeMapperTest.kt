@@ -10,6 +10,7 @@ import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
+import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.Offline
@@ -67,6 +68,7 @@ class NodeMapperTest {
     private val stringListMapper: StringListMapper = mock()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val fetChildrenMapper: FetchChildrenMapper = mock()
+    private val nodeLabelMapper: NodeLabelMapper = mock()
 
     @BeforeEach
     internal fun setUp() {
@@ -84,12 +86,14 @@ class NodeMapperTest {
                 fileTypeInfoMapper = fileTypeInfoMapper,
                 offlineAvailabilityMapper = offlineAvailabilityMapper,
                 stringListMapper = stringListMapper,
+                nodeLabelMapper = nodeLabelMapper,
             ),
             folderNodeMapper = FolderNodeMapper(
                 megaApiGateway = megaApiGateway,
                 megaApiFolderGateway = megaApiFolderGateway,
                 fetChildrenMapper = fetChildrenMapper,
                 stringListMapper = stringListMapper,
+                nodeLabelMapper = nodeLabelMapper,
             )
         )
     }

@@ -7,6 +7,7 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.StringListMapper
+import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.node.ExportedData
@@ -33,6 +34,7 @@ internal class FileNodeMapper @Inject constructor(
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper,
     private val stringListMapper: StringListMapper,
+    private val nodeLabelMapper: NodeLabelMapper,
 ) {
     /**
      * Invoke
@@ -50,6 +52,7 @@ internal class FileNodeMapper @Inject constructor(
         name = megaNode.name,
         size = megaNode.size,
         label = megaNode.label,
+        nodeLabel = nodeLabelMapper(megaNode.label),
         parentId = NodeId(megaNode.parentHandle),
         base64Id = megaNode.base64Handle,
         restoreId = NodeId(megaNode.restoreHandle).takeIf {

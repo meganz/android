@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.ui.megapicker
 
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderType
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
@@ -28,6 +29,7 @@ internal class SampleNodeDataProvider {
             override val base64Id = "1L"
             override val restoreId: NodeId? = null
             override val label = 1
+            override val nodeLabel = NodeLabel.BLUE
             override val isFavourite = false
             override val isMarkedSensitive = false
             override val isSensitiveInherited: Boolean = false
@@ -59,6 +61,7 @@ internal class SampleNodeDataProvider {
             override val base64Id = "1L"
             override val restoreId: NodeId? = null
             override val label = 1
+            override val nodeLabel = NodeLabel.BLUE
             override val isFavourite = true
             override val isMarkedSensitive = false
             override val isSensitiveInherited: Boolean = false
@@ -90,6 +93,7 @@ internal class SampleNodeDataProvider {
             override val base64Id = "1L"
             override val restoreId: NodeId? = null
             override val label = 1
+            override val nodeLabel = NodeLabel.BLUE
             override val isFavourite = false
             override val isMarkedSensitive = false
             override val isSensitiveInherited: Boolean = false
@@ -112,6 +116,7 @@ internal class SampleNodeDataProvider {
             override val base64Id = "14L"
             override val restoreId: NodeId? = null
             override val label = 1
+            override val nodeLabel = NodeLabel.BLUE
             override val isFavourite = false
             override val isMarkedSensitive = false
             override val isSensitiveInherited: Boolean = false

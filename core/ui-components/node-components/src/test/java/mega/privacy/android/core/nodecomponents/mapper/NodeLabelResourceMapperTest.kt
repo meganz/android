@@ -56,9 +56,9 @@ class NodeLabelResourceMapperTest {
             )
         ),
         Arguments.of(
-            NodeLabel.YELLLOW, null,
+            NodeLabel.YELLOW, null,
             Label(
-                label = NodeLabel.YELLLOW,
+                label = NodeLabel.YELLOW,
                 labelColor = R.color.label_yellow,
                 labelName = sharedR.string.label_yellow,
                 isSelected = false

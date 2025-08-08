@@ -36,6 +36,7 @@ class OfflineFileInformationToImageNodeMapper @Inject constructor() {
             override val name = offlineFileInformation.name
             override val size = offlineFileInformation.totalSize
             override val label = -1
+            override val nodeLabel = null
             override val parentId = NodeId(-1L)
             override val base64Id = ""
             override val restoreId = null

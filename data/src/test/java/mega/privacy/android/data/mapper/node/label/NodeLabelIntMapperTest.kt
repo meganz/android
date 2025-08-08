@@ -27,7 +27,7 @@ class NodeLabelIntMapperTest {
     private fun provideParams() = Stream.of(
         Arguments.of(NodeLabel.RED, MegaNode.NODE_LBL_RED),
         Arguments.of(NodeLabel.ORANGE, MegaNode.NODE_LBL_ORANGE),
-        Arguments.of(NodeLabel.YELLLOW, MegaNode.NODE_LBL_YELLOW),
+        Arguments.of(NodeLabel.YELLOW, MegaNode.NODE_LBL_YELLOW),
         Arguments.of(NodeLabel.BLUE, MegaNode.NODE_LBL_BLUE),
         Arguments.of(NodeLabel.PURPLE, MegaNode.NODE_LBL_PURPLE),
         Arguments.of(NodeLabel.GREEN, MegaNode.NODE_LBL_GREEN),

@@ -21,6 +21,7 @@ internal class ImageNodeFileMapper @Inject constructor(
         override val name = file.name
         override val size = file.length()
         override val label = -1
+        override val nodeLabel = null
         override val parentId = NodeId(-1)
         override val base64Id = ""
         override val restoreId = NodeId(-1)

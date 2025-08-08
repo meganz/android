@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.node
 
 import kotlinx.serialization.Polymorphic
+import mega.privacy.android.domain.entity.NodeLabel
 
 
 /**
@@ -37,7 +38,13 @@ interface Node {
     /**
      * Label
      */
+    @Deprecated("Use nodeLabel instead")
     val label: Int
+
+    /**
+     * Node label
+     */
+    val nodeLabel: NodeLabel?
 
     /**
      * Is favourite

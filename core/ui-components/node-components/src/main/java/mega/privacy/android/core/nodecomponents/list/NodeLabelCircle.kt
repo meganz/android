@@ -26,7 +26,7 @@ fun NodeLabelCircle(
     val color = when (label) {
         NodeLabel.RED -> R.color.label_red
         NodeLabel.ORANGE -> R.color.label_orange
-        NodeLabel.YELLLOW -> R.color.label_yellow
+        NodeLabel.YELLOW -> R.color.label_yellow
         NodeLabel.GREEN -> R.color.label_green
         NodeLabel.BLUE -> R.color.label_blue
         NodeLabel.PURPLE -> R.color.label_purple

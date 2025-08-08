@@ -10,7 +10,6 @@ import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.model.NodeSubtitleText
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FolderType
-import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
@@ -19,7 +18,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.node.GetNodeLabelUseCase
 import mega.privacy.android.icon.pack.R as IconPackR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,7 +34,6 @@ class NodeUiItemMapperTest {
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
     private val nodeSubtitleMapper: NodeSubtitleMapper = mock()
-    private val getNodeLabelUseCase: GetNodeLabelUseCase = mock()
 
     private lateinit var underTest: NodeUiItemMapper
 
@@ -61,7 +58,6 @@ class NodeUiItemMapperTest {
             fileTypeIconMapper = fileTypeIconMapper,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             nodeSubtitleMapper = nodeSubtitleMapper,
-            getNodeLabelUseCase = getNodeLabelUseCase,
             ioDispatcher = StandardTestDispatcher()
         )
     }
@@ -437,25 +433,6 @@ class NodeUiItemMapperTest {
         assertThat(result).hasSize(2)
         assertThat(result[0].isFolderNode).isTrue()
         assertThat(result[1].isFolderNode).isFalse()
-    }
-
-    @Test
-    fun `test that invoke set node label correctly`() = runTest {
-        val labelId = 123
-        val nodeLabel = NodeLabel.BLUE
-        whenever(getNodeLabelUseCase(labelId)).thenReturn(nodeLabel)
-        val mockFileNode = createMockFileNode(
-            label = labelId
-        )
-
-        val result = underTest(
-            nodeList = listOf(mockFileNode),
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-        )
-
-        assertThat(result).hasSize(1)
-        val nodeUiItem = result[0]
-        assertThat(nodeUiItem.nodeLabel).isEqualTo(nodeLabel)
     }
 
     @Test

@@ -45,7 +45,7 @@ class ChangeLabelBottomSheetViewModelTest {
                 listOf(
                     NodeLabel.RED,
                     NodeLabel.ORANGE,
-                    NodeLabel.YELLLOW,
+                    NodeLabel.YELLOW,
                     NodeLabel.GREEN,
                     NodeLabel.BLUE,
                     NodeLabel.PURPLE,

@@ -33,7 +33,7 @@ class NodeLabelResourceMapper @Inject constructor() {
                 isSelected = nodeLabel == selectedLabel
             )
 
-            NodeLabel.YELLLOW -> Label(
+            NodeLabel.YELLOW -> Label(
                 label = nodeLabel,
                 labelColor = R.color.label_yellow,
                 labelName = sharedResR.string.label_yellow,

@@ -1,5 +1,6 @@
 package mega.privacy.android.data.model.node
 
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -12,7 +13,9 @@ internal data class DefaultFolderNode(
     override val parentId: NodeId,
     override val base64Id: String,
     override val restoreId: NodeId?,
+    @Deprecated("Use nodeLabel instead")
     override val label: Int,
+    override val nodeLabel: NodeLabel?,
     override val childFolderCount: Int,
     override val childFileCount: Int,
     override val isFavourite: Boolean,

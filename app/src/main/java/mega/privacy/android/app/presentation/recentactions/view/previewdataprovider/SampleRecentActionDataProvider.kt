@@ -1,15 +1,16 @@
 package mega.privacy.android.app.presentation.recentactions.view.previewdataprovider
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionBucketUiEntity
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.icon.pack.R as IconPackR
 
 internal class SampleRecentActionDataProvider :
     PreviewParameterProvider<List<RecentActionBucketUiEntity>> {
@@ -26,6 +27,7 @@ internal class SampleRecentActionDataProvider :
             override val base64Id = "1L"
             override val restoreId = null
             override val label = 1
+            override val nodeLabel = null
             override val isFavourite = false
             override val isMarkedSensitive = false
             override val isSensitiveInherited = false

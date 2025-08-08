@@ -17,7 +17,7 @@ enum class NodeLabel {
     /**
      * Label color Yellow
      */
-    YELLLOW,
+    YELLOW,
 
     /**
      * Label color Green

@@ -16,7 +16,7 @@ class NodeLabelMapper @Inject constructor() {
     operator fun invoke(label: Int): NodeLabel? = when (label) {
         MegaNode.NODE_LBL_RED -> NodeLabel.RED
         MegaNode.NODE_LBL_ORANGE -> NodeLabel.ORANGE
-        MegaNode.NODE_LBL_YELLOW -> NodeLabel.YELLLOW
+        MegaNode.NODE_LBL_YELLOW -> NodeLabel.YELLOW
         MegaNode.NODE_LBL_GREEN -> NodeLabel.GREEN
         MegaNode.NODE_LBL_PURPLE -> NodeLabel.PURPLE
         MegaNode.NODE_LBL_BLUE -> NodeLabel.BLUE
