@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.sync.ui.views.ApplyToAllDialog
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX
+import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_ROW
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_TEXT
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_APPLY_TO_ALL_DIALOG_DESCRIPTION
 import mega.privacy.android.shared.resources.R as sharedR
@@ -175,5 +176,46 @@ class ApplyToAllDialogTest {
             .performClick()
 
         assert(cancelCalled) { "onCancel should be called when cancel button is clicked" }
+    }
+
+    @Test
+    fun `test that shouldShowApplyToAllOption set to false makes checkbox invisible`() {
+        composeTestRule.setContent {
+            ApplyToAllDialog(
+                title = "Choose the local file?",
+                description = "The local file will be moved to the .rubbish folder.",
+                onApplyToCurrent = {},
+                onApplyToAll = {},
+                onCancel = {},
+                shouldShowApplyToAllOption = false,
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_TEXT)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_ROW)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test onDismiss callback is triggered correctly`() {
+        var dismissCalled = false
+
+        composeTestRule.setContent {
+            ApplyToAllDialog(
+                title = "Choose the local file?",
+                description = "The local file will be moved to the .rubbish folder.",
+                onApplyToCurrent = {},
+                onApplyToAll = {},
+                onCancel = { dismissCalled = true },
+            )
+        }
+        // Click the cancel button to trigger the dismiss callback
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(mega.privacy.android.core.R.string.general_cancel))
+            .performClick()
+
+        Truth.assertThat(dismissCalled).isTrue()
     }
 } 

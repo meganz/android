@@ -234,7 +234,7 @@ class SyncFoldersViewModelTest {
     fun `test that viewmodel fetches all folder pairs upon initialization`() = runTest {
         whenever(isStorageOverQuotaUseCase()).thenReturn(false)
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-        val expectedState = SyncFoldersUiState(syncUiItems)
+        val expectedState = SyncFoldersUiState(syncUiItems, stalledIssueCount = stalledIssues.size)
 
         initViewModel()
 
@@ -249,6 +249,7 @@ class SyncFoldersViewModelTest {
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val expectedState = SyncFoldersUiState(
             syncUiItems.map { if (it == syncUiItems.first()) it.copy(expanded = true) else it },
+            stalledIssueCount = stalledIssues.size
         )
 
         initViewModel()
@@ -270,6 +271,7 @@ class SyncFoldersViewModelTest {
                 syncUiItems = syncUiItems,
                 showConfirmRemoveSyncFolderDialog = true,
                 syncUiItemToRemove = syncUiItem,
+                stalledIssueCount = stalledIssues.size
             )
         initViewModel()
         underTest.handleAction(
@@ -387,6 +389,7 @@ class SyncFoldersViewModelTest {
                     syncUiItems = syncUiItems,
                     showConfirmRemoveSyncFolderDialog = false,
                     syncUiItemToRemove = null,
+                    stalledIssueCount = stalledIssues.size
                 )
             initViewModel()
             underTest.handleAction(
@@ -426,6 +429,7 @@ class SyncFoldersViewModelTest {
             whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
             val expectedState = SyncFoldersUiState(
                 syncUiItems.map { if (it == syncUiItems.first()) it.copy(hasStalledIssues = true) else it },
+                stalledIssueCount = stalledIssues.size
             )
 
             initViewModel()

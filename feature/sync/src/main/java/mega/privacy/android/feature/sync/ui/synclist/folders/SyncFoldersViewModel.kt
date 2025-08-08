@@ -255,6 +255,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                             syncUiItems = syncsList,
                             isRefreshing = false,
                             isLoading = false,
+                            stalledIssueCount = stalledIssues.size
                         )
                     }
                 }

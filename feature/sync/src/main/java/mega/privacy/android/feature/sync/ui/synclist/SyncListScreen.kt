@@ -158,7 +158,8 @@ internal fun SyncListScreen(
                         },
                         onCancel = {
                             sheetContent = null
-                        }
+                        },
+                        shouldShowApplyToAllOption = syncFoldersState.stalledIssueCount > 1,
                     )
                 }
 
