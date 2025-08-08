@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list.view
+package mega.privacy.android.core.nodecomponents.list
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4

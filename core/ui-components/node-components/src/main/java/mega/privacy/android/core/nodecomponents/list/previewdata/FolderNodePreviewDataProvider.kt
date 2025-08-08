@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list.view.previewdata
+package mega.privacy.android.core.nodecomponents.list.previewdata
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem

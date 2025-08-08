@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list.view
+package mega.privacy.android.core.nodecomponents.list
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row

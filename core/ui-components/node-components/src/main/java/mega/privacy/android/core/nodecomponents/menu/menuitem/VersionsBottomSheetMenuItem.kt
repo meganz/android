@@ -5,7 +5,7 @@ import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
-import mega.privacy.android.core.nodecomponents.list.view.NodeActionListTile
+import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode

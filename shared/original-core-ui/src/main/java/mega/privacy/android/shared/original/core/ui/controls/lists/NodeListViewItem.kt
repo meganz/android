@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -36,6 +37,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.chip.HighlightChip
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.TITLE_TAG
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.shared.original.core.ui.controls.text.HighlightedText
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
@@ -131,24 +133,26 @@ fun NodeListViewItem(
                         contentDescription = "Selected",
                     )
                 } else {
-                    ThumbnailView(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .testTag(ICON_TAG),
-                        data = thumbnailData,
-                        defaultImage = icon,
-                        contentDescription = "Thumbnail",
-                        onSuccess = { modifier ->
-                            if (!showBlurEffect) {
-                                modifier.size(48.dp)
-                            } else {
-                                modifier
-                                    .size(48.dp)
-                                    .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
+                    key(labelColor) {
+                        ThumbnailView(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .testTag(ICON_TAG),
+                            data = thumbnailData,
+                            defaultImage = icon,
+                            contentDescription = "Thumbnail",
+                            onSuccess = { modifier ->
+                                if (!showBlurEffect) {
+                                    modifier.size(48.dp)
+                                } else {
+                                    modifier
+                                        .size(48.dp)
+                                        .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         },

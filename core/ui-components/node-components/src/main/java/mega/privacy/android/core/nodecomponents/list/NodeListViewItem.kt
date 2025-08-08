@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list.view
+package mega.privacy.android.core.nodecomponents.list
 
 
 import androidx.annotation.DrawableRes
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +39,6 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.model.text
 import mega.privacy.android.domain.entity.NodeLabel
@@ -174,16 +174,18 @@ fun NodeListViewItem(
             vertical = DSTokens.spacings.s3
         ),
         leadingElement = {
-            NodeThumbnailView(
-                modifier = Modifier
-                    .size(32.dp)
-                    .testTag(ICON_TAG),
-                layoutType = ThumbnailLayoutType.List,
-                data = thumbnailData,
-                defaultImage = icon,
-                contentDescription = "Thumbnail",
-                blurImage = showBlurEffect && isSensitive
-            )
+            key(label) {
+                NodeThumbnailView(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .testTag(ICON_TAG),
+                    layoutType = ThumbnailLayoutType.List,
+                    data = thumbnailData,
+                    defaultImage = icon,
+                    contentDescription = "Thumbnail",
+                    blurImage = showBlurEffect && isSensitive
+                )
+            }
         },
         title = {
             Row(

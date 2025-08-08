@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list.view
+package mega.privacy.android.core.nodecomponents.list
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
