@@ -4,11 +4,11 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.ui.model.SolvedIssueUiItem
-import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesRoute
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesState
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
@@ -56,8 +56,8 @@ internal class SyncSolvedIssueScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithTag(SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY)
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(folderName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(resolutionExplanation).assertIsDisplayed()
     }
 
     @Test
@@ -84,8 +84,8 @@ internal class SyncSolvedIssueScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithTag(SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY)
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(folderName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(resolutionExplanation).assertIsDisplayed()
     }
 
     @Test
@@ -98,8 +98,6 @@ internal class SyncSolvedIssueScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithTag(SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY)
-            .assertDoesNotExist()
         composeTestRule.onNodeWithTag(TAG_SYNC_LIST_SCREEN_NO_ITEMS)
             .assertIsDisplayed()
     }
