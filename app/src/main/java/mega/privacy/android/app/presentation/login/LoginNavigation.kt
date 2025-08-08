@@ -6,6 +6,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.billing.BillingViewModel
@@ -41,6 +42,12 @@ internal fun NavGraphBuilder.loginScreen(
     }
 }
 
-internal fun NavController.openLoginScreen(navOptions: NavOptions? = null) {
-    navigate(LoginScreen, navOptions)
+internal fun NavController.openLoginScreen(
+    options: NavOptions? = navOptions {
+        popUpTo(0) {
+            inclusive = true
+        }
+    },
+) {
+    navigate(LoginScreen, options)
 }
