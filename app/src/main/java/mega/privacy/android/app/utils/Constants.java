@@ -307,8 +307,6 @@ public class Constants {
     public static final String AUTHORITY_STRING_FILE_PROVIDER = APPLICATION_ID + ".providers.fileprovider";
     public static final String TYPE_TEXT_PLAIN = "text/plain";
 
-    public static final int TAKE_PICTURE_OPTION = 0;
-
     public static int TYPE_LEFT = -1;
     public static int TYPE_JOIN = 1;
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";

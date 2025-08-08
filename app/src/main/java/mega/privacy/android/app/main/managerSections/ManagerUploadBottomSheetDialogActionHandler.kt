@@ -12,21 +12,16 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import dagger.hilt.android.scopes.ActivityScoped
-import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.camera.CameraArg
 import mega.privacy.android.app.camera.InAppCameraLauncher
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
-import mega.privacy.android.app.main.CameraPermissionManager
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.NavigationDrawerManager
@@ -47,10 +42,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogSta
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog
-import mega.privacy.android.app.utils.Util.checkTakePicture
-import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
 import timber.log.Timber
 import javax.inject.Inject
@@ -61,8 +53,6 @@ import javax.inject.Inject
 @ActivityScoped
 internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
     activity: Activity,
-    private val permissionUtilWrapper: PermissionUtilWrapper,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : DefaultLifecycleObserver,
     UploadFilesActionListener,
     UploadFolderActionListener,
@@ -72,7 +62,6 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
 
     private val managerActivity = activity as ManagerActivity
     private val parentNodeManager = activity as ParentNodeManager
-    private val cameraPermissionManager = activity as CameraPermissionManager
     private val navigationDrawerManager = activity as NavigationDrawerManager
     private val actionNodeCallback = activity as ActionNodeCallback
 
@@ -243,43 +232,12 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
         }
 
     override fun takePictureAndUpload() {
-        managerActivity.lifecycleScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.CameraActivityInCloudDrive)
-            }.onSuccess { enabled ->
-                if (enabled) {
-                    cameraPermissionLauncher.launch(
-                        arrayOf(
-                            PermissionUtils.getCameraPermission(),
-                            PermissionUtils.getRecordAudioPermission()
-                        )
-                    )
-                } else {
-                    startLegacyCameraIntent()
-                }
-            }
-        }
-    }
-
-    private fun startLegacyCameraIntent() {
-        if (!permissionUtilWrapper.hasPermissions(Manifest.permission.CAMERA)) {
-            cameraPermissionManager.setTypesCameraPermission(Constants.TAKE_PICTURE_OPTION)
-            ActivityCompat.requestPermissions(
-                managerActivity,
-                arrayOf(Manifest.permission.CAMERA),
-                Constants.REQUEST_CAMERA
+        cameraPermissionLauncher.launch(
+            arrayOf(
+                PermissionUtils.getCameraPermission(),
+                PermissionUtils.getRecordAudioPermission()
             )
-            return
-        }
-        if (!permissionUtilWrapper.hasPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            ActivityCompat.requestPermissions(
-                managerActivity,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                Constants.REQUEST_WRITE_STORAGE
-            )
-            return
-        }
-        checkTakePicture(managerActivity, Constants.TAKE_PHOTO_CODE)
+        )
     }
 
     /**

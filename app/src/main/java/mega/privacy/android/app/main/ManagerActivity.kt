@@ -637,62 +637,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            Constants.REQUEST_CAMERA -> {
-                if (typesCameraPermission == Constants.TAKE_PICTURE_OPTION) {
-                    Timber.d("TAKE_PICTURE_OPTION")
-                    if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                            requestPermission(
-                                this,
-                                Constants.REQUEST_WRITE_STORAGE,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                            )
-                        } else {
-                            Util.checkTakePicture(this, Constants.TAKE_PHOTO_CODE)
-                            typesCameraPermission = Constants.INVALID_TYPE_PERMISSIONS
-                        }
-                    }
-                }
-            }
-
             Constants.REQUEST_READ_WRITE_STORAGE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     showUploadPanel()
-                }
-            }
-
-            Constants.REQUEST_WRITE_STORAGE -> {
-                if (viewModel.state().isFirstLogin) {
-                    Timber.d("The first time")
-                    if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        if (typesCameraPermission == Constants.TAKE_PICTURE_OPTION) {
-                            Timber.d("TAKE_PICTURE_OPTION")
-                            if (!hasPermissions(this, Manifest.permission.CAMERA)) {
-                                requestPermission(
-                                    this,
-                                    Constants.REQUEST_CAMERA,
-                                    Manifest.permission.CAMERA
-                                )
-                            } else {
-                                Util.checkTakePicture(this, Constants.TAKE_PHOTO_CODE)
-                                typesCameraPermission = Constants.INVALID_TYPE_PERMISSIONS
-                            }
-                        }
-                    }
-                } else {
-                    if (typesCameraPermission == Constants.TAKE_PICTURE_OPTION) {
-                        Timber.d("TAKE_PICTURE_OPTION")
-                        if (!hasPermissions(this, Manifest.permission.CAMERA)) {
-                            requestPermission(
-                                this,
-                                Constants.REQUEST_CAMERA,
-                                Manifest.permission.CAMERA
-                            )
-                        } else {
-                            Util.checkTakePicture(this, Constants.TAKE_PHOTO_CODE)
-                            typesCameraPermission = Constants.INVALID_TYPE_PERMISSIONS
-                        }
-                    }
                 }
             }
 
@@ -6243,23 +6190,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             requestCode == Constants.REQUEST_WRITE_STORAGE || requestCode == Constants.REQUEST_READ_WRITE_STORAGE -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     when (requestCode) {
-                        Constants.REQUEST_WRITE_STORAGE -> {
-                            // Take picture scenarios
-                            if (typesCameraPermission == Constants.TAKE_PICTURE_OPTION) {
-                                if (!hasPermissions(this, Manifest.permission.CAMERA)) {
-                                    requestPermission(
-                                        this,
-                                        Constants.REQUEST_CAMERA,
-                                        Manifest.permission.CAMERA
-                                    )
-                                } else {
-                                    Util.checkTakePicture(this, Constants.TAKE_PHOTO_CODE)
-                                    typesCameraPermission = Constants.INVALID_TYPE_PERMISSIONS
-                                }
-                                return
-                            }
-                        }
-
                         Constants.REQUEST_READ_WRITE_STORAGE ->                         // Upload scenario
                             Handler(Looper.getMainLooper()).post { showUploadPanel() }
                     }

@@ -31,11 +31,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
         true,
     ),
 
-    CameraActivityInCloudDrive(
-        "Enable Camera Activity in Cloud Drive to capture photos and videos",
-        true,
-    ),
-
     /**
      * Single activity
      */
