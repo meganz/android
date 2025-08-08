@@ -3,13 +3,10 @@ package mega.privacy.android.feature.sync.ui.synclist.solvedissues
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R as CoreUiR
@@ -49,12 +46,8 @@ internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
                         body = solvedIssue.resolutionExplanation,
                         nodeIcon = solvedIssue.icon,
                         bodyIcon = CoreUiR.drawable.ic_check_circle,
-                        bodyIconColor = StatusColor.Success.getStatusIconColor()
-                    )
-                    Divider(
-                        Modifier
-                            .padding(start = 72.dp)
-                            .testTag(SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY)
+                        bodyColor = StatusColor.Success.getStatusIconColor(),
+                        bodyIconColor = StatusColor.Success.getStatusIconColor(),
                     )
                 }
             }
@@ -121,6 +114,3 @@ internal fun SyncSolvedIssuesScreenPreview() {
         )
     }
 }
-
-internal const val SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY =
-    "solve_issues_menu_action_node_header_with_body"
