@@ -16,12 +16,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.filelink.model.FileLinkJobInProgressState
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.nodecomponents.extension.getIcon
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.StorageState
@@ -137,8 +137,7 @@ class FileLinkViewModel @Inject constructor(
     fun getPublicNode(link: String, decryptionIntroduced: Boolean = false) = viewModelScope.launch {
         runCatching { getPublicNodeUseCase(link) }
             .onSuccess { node ->
-                val iconResource = getNodeIcon(
-                    typedNode = node,
+                val iconResource = node.getIcon(
                     originShares = false,
                     fileTypeIconMapper = fileTypeIconMapper
                 )

@@ -12,11 +12,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.getNodeItemDescription
-import mega.privacy.android.app.presentation.view.extension.getNodeItemThumbnail
 import mega.privacy.android.app.presentation.view.extension.getNodeLabel
 import mega.privacy.android.app.presentation.view.extension.getNodeTitle
-import mega.privacy.android.app.presentation.view.extension.getSharesIcon
 import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
+import mega.privacy.android.core.nodecomponents.extension.getIcon
+import mega.privacy.android.core.nodecomponents.extension.getSharesIcon
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -123,7 +123,7 @@ fun <T : TypedNode> NodeListView(
                 ),
                 description = nodeUiItem.node.description?.replace("\n", " "),
                 tags = nodeUiItem.node.tags.takeIf { nodeSourceType != NodeSourceType.RUBBISH_BIN },
-                icon = nodeUiItem.node.getNodeItemThumbnail(fileTypeIconMapper = fileTypeIconMapper),
+                icon = nodeUiItem.node.getIcon(fileTypeIconMapper = fileTypeIconMapper),
                 thumbnailData = ThumbnailRequest(nodeUiItem.id, isPublicNode),
                 isSelected = nodeUiItem.isSelected,
                 onMoreClicked = { onMenuClick(nodeUiItem) }.takeUnless { _ -> inSelectionMode },

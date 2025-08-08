@@ -28,10 +28,10 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
-import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
+import mega.privacy.android.core.nodecomponents.extension.getIcon
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
@@ -831,8 +831,7 @@ class FileInfoViewModel @Inject constructor(
             uiState.copyWithTypedNode(
                 typedNode = typedNode,
             ).copy(
-                iconResource = getNodeIcon(
-                    typedNode = typedNode,
+                iconResource = typedNode.getIcon(
                     originShares = _uiState.value.origin.fromShares,
                     fileTypeIconMapper = fileTypeIconMapper
                 ),
@@ -874,8 +873,7 @@ class FileInfoViewModel @Inject constructor(
             it.copyWithTypedNode(
                 typedNode = typedNode
             ).copy(
-                iconResource = getNodeIcon(
-                    typedNode = typedNode,
+                iconResource = typedNode.getIcon(
                     originShares = _uiState.value.origin.fromShares,
                     fileTypeIconMapper = fileTypeIconMapper
                 ),

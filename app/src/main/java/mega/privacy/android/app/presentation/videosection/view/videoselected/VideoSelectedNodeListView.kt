@@ -14,8 +14,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.getNodeItemDescription
-import mega.privacy.android.app.presentation.view.extension.getNodeItemThumbnail
 import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
+import mega.privacy.android.core.nodecomponents.extension.getIcon
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -65,7 +65,7 @@ internal fun <T : TypedNode> VideoSelectedNodeListView(
                 title = item.name,
                 subtitle = item.node.getNodeItemDescription(showPublicLinkCreationTime = false),
                 isSelected = nodeUIItemList[it].isSelected,
-                icon = item.node.getNodeItemThumbnail(fileTypeIconMapper = fileTypeIconMapper),
+                icon = item.node.getIcon(fileTypeIconMapper = fileTypeIconMapper),
                 thumbnailData = ThumbnailRequest(item.node.id),
                 onItemClicked = { onItemClicked(nodeUIItemList[it]) },
                 isSensitive = shouldApplySensitiveMode && (item.isMarkedSensitive || item.isSensitiveInherited),

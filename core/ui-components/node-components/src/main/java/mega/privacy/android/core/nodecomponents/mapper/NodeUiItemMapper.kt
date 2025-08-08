@@ -5,7 +5,7 @@ import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.nodecomponents.R
-import mega.privacy.android.core.nodecomponents.extension.getNodeItemThumbnail
+import mega.privacy.android.core.nodecomponents.extension.getIcon
 import mega.privacy.android.core.nodecomponents.extension.getSharesIcon
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -78,7 +78,7 @@ class NodeUiItemMapper @Inject constructor(
                 formattedDescription = node.description?.replace("\n", " ")
                     ?.let { LocalizedText.Literal(it) },
                 tags = node.tags.takeIf { nodeSourceType != NodeSourceType.RUBBISH_BIN },
-                iconRes = node.getNodeItemThumbnail(fileTypeIconMapper), // TODO: Create separate mapper
+                iconRes = node.getIcon(fileTypeIconMapper),
                 thumbnailData = ThumbnailRequest(
                     id = node.id,
                     isPublicNode = isPublicNodes

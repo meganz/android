@@ -60,7 +60,6 @@ import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
-import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
@@ -88,6 +87,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.app.utils.wrapper.LegacyNodeWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
+import mega.privacy.android.core.nodecomponents.extension.getIcon
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.AccountType
@@ -945,8 +945,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (nodeDeviceCenterInformation != null) {
             setImageResource(nodeDeviceCenterInformation.icon)
         } else {
-            val iconResource = getNodeIcon(
-                typedNode = typedNode,
+            val iconResource = typedNode.getIcon(
                 originShares = drawerItem == DrawerItem.SHARED_ITEMS,
                 fileTypeIconMapper = FileTypeIconMapper(),
             )

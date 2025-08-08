@@ -10,14 +10,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
-import mega.privacy.android.domain.entity.shares.AccessPermission
 import nz.mega.sdk.MegaNode
 
 @Composable
@@ -55,32 +51,6 @@ internal fun ShareFolderNode?.getSharedNodeItemDescription(): String? {
         }
     }
 }
-
-@Composable
-internal fun TypedNode.getNodeItemThumbnail(
-    fileTypeIconMapper: FileTypeIconMapper,
-    originShares: Boolean = false,
-) = when (this) {
-    is TypedFolderNode -> this.getIcon(fileTypeIconMapper, originShares)
-    is TypedFileNode -> fileTypeIconMapper(this.type.extension)
-    else -> mega.privacy.android.icon.pack.R.drawable.ic_generic_medium_solid
-}
-
-@Composable
-internal fun ShareFolderNode?.getSharesIcon(
-    isContactVerificationOn: Boolean,
-): Int? =
-    this?.shareData?.let { shareData ->
-        if (isContactVerificationOn && shareData.isUnverifiedDistinctNode) {
-            mega.privacy.android.core.R.drawable.ic_alert_triangle
-        } else if (this.node.isIncomingShare) {
-            when (shareData.access) {
-                AccessPermission.FULL -> mega.privacy.android.icon.pack.R.drawable.ic_star_medium_thin_outline
-                AccessPermission.READWRITE -> mega.privacy.android.icon.pack.R.drawable.ic_edit_medium_thin_outline
-                else -> mega.android.core.ui.R.drawable.ic_eye_medium_thin_outline
-            }
-        } else null
-    }
 
 @Composable
 internal fun TypedNode.getNodeTitle(): String = with(this) {
