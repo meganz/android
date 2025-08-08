@@ -55,6 +55,7 @@ internal fun ApplyToAllDialog(
     onApplyToAll: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
+    shouldShowApplyToAllOption: Boolean = true,
 ) {
     val context = LocalContext.current
     val title = getApplyToAllTitle(selectedAction, context)
@@ -67,6 +68,7 @@ internal fun ApplyToAllDialog(
         onApplyToAll = onApplyToAll,
         onCancel = onCancel,
         modifier = modifier,
+        shouldShowApplyToAllOption = shouldShowApplyToAllOption
     )
 }
 
@@ -90,6 +92,7 @@ internal fun ApplyToAllDialog(
     onApplyToAll: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
+    shouldShowApplyToAllOption: Boolean = true,
 ) {
     var isApplyToAllChecked by rememberSaveable { mutableStateOf(false) }
 
@@ -116,31 +119,33 @@ internal fun ApplyToAllDialog(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Apply to all checkbox
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_ROW),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    MegaCheckbox(
+                if (shouldShowApplyToAllOption) {
+                    Row(
                         modifier = Modifier
-                            .size(32.dp)
-                            .testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX),
-                        checked = isApplyToAllChecked,
-                        onCheckedChange = { isApplyToAllChecked = it },
-                        rounded = false
-                    )
+                            .fillMaxWidth()
+                            .testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_ROW),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        MegaCheckbox(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX),
+                            checked = isApplyToAllChecked,
+                            onCheckedChange = { isApplyToAllChecked = it },
+                            rounded = false
+                        )
 
-                    Spacer(modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.size(12.dp))
 
-                    MegaText(
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_TEXT),
-                        text = stringResource(sharedR.string.sync_apply_to_all_checkbox),
-                        textColor = TextColor.Primary,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
+                        MegaText(
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag(TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_TEXT),
+                            text = stringResource(sharedR.string.sync_apply_to_all_checkbox),
+                            textColor = TextColor.Primary,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 }
             }
         },

@@ -14,6 +14,7 @@ internal data class SyncFoldersUiState(
     val syncUiItemToRemove: SyncUiItem? = null,
     val movedFolderName: String? = null,
     @StringRes val snackbarMessage: Int? = null,
+    val stalledIssueCount: Int = 0,
 ) {
     val isWarningBannerDisplayed =
         (syncUiItems.isNotEmpty() && isLowBatteryLevel) || isStorageOverQuota
