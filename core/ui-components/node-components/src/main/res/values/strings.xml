@@ -14,6 +14,11 @@
     <string name="invalid_characters_defined">The following characters are not allowed: %1$s</string>
     <string name="same_item_name_warning">There is already an item with the same name</string>
 
+    <!-- New text file dialog strings -->
+    <string name="dialog_title_new_text_file">New text file</string>
+    <string name="context_new_file_name">File name</string>
+    <string name="same_file_name_warning">There is already a file with the same name</string>
+
     <!--Temporary and will be moved later to strings-shared-->
     <string name="files_send_to_chat_error">Files send to chat error</string>
     <plurals name="files_send_to_chat_success">

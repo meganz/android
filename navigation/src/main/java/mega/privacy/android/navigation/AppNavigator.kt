@@ -339,12 +339,14 @@ interface AppNavigator {
      * @param currentNodeId the NodeId of the current node
      * @param mode the mode of the text editor, e.g., "view", "edit"
      * @param nodeSourceType the adapter type of the view
+     * @param fileName the name of the file to be created
      */
     fun openTextEditorActivity(
         context: Context,
         currentNodeId: NodeId,
         nodeSourceType: Int?,
         mode: TextEditorMode,
+        fileName: String? = null,
     )
 
     /**

@@ -618,9 +618,11 @@ internal class MegaNavigatorImpl @Inject constructor(
         currentNodeId: NodeId,
         nodeSourceType: Int?,
         mode: TextEditorMode,
+        fileName: String?,
     ) {
         val textFileIntent = Intent(context, TextEditorActivity::class.java)
         textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentNodeId.longValue)
+            .putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileName)
             .putExtra(TextEditorViewModel.MODE, mode.value)
             .putExtra(
                 Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,

@@ -5,6 +5,7 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Extension function to get [MegaNavigator] from the application context.
@@ -14,12 +15,7 @@ import dagger.hilt.components.SingletonComponent
  * @return [MegaNavigator] instance.
  */
 val Context.megaNavigator: MegaNavigator
-    get() {
-        return EntryPointAccessors.fromApplication(
-            this.applicationContext,
-            MegaNavigatorEntryPoint::class.java
-        ).megaNavigator
-    }
+    get() = MegaNavigatorProvider.get(this)
 
 /**
  * This interface is needed to inject [MegaNavigator] into classes that are not Hilt components.
@@ -30,4 +26,20 @@ val Context.megaNavigator: MegaNavigator
 @InstallIn(SingletonComponent::class)
 interface MegaNavigatorEntryPoint {
     val megaNavigator: MegaNavigator
+}
+
+internal object MegaNavigatorProvider {
+    private val navigatorRef = AtomicReference<MegaNavigator?>(null)
+
+    fun get(context: Context): MegaNavigator {
+        return navigatorRef.get() ?: run {
+            val newNavigator = EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                MegaNavigatorEntryPoint::class.java
+            ).megaNavigator
+
+            navigatorRef.set(newNavigator)
+            newNavigator
+        }
+    }
 }

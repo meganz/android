@@ -24,6 +24,7 @@ import mega.android.core.ui.components.LoadingView
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.list.view.NodesView
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
@@ -32,7 +33,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ChangeViewTypeClicked
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ItemClicked
@@ -41,6 +41,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.NavigateToFolderEventConsumed
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.OpenedFileNodeHandled
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
+import mega.privacy.android.feature.clouddrive.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,6 +61,7 @@ internal fun CloudDriveContent(
     gridState: LazyGridState = rememberLazyGridState(),
 ) {
     var showNewFolderDialog by remember { mutableStateOf(false) }
+    var showNewTextFileDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val snackbarHostState = LocalSnackBarHostState.current
@@ -150,7 +152,7 @@ internal fun CloudDriveContent(
                 showNewFolderDialog = true
             },
             onNewTextFileClicked = {
-                // TODO: Handle new text file
+                showNewTextFileDialog = true
             },
             onDismissSheet = onDismissUploadOptionsBottomSheet
         )
@@ -171,6 +173,15 @@ internal fun CloudDriveContent(
             },
             onDismiss = {
                 showNewFolderDialog = false
+            }
+        )
+    }
+
+    if (showNewTextFileDialog) {
+        NewTextFileNodeDialog(
+            parentNode = uiState.currentFolderId,
+            onDismiss = {
+                showNewTextFileDialog = false
             }
         )
     }
