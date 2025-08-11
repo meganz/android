@@ -332,7 +332,7 @@ fun PreviewAuthenticityCredentialsView(
                     "A08B",
                     "A09B",
                     "A10B",
-                ), email = "abc@mega.nz", name = "User name"
+                ), email = "abc@mega.app", name = "User name"
             ),
             myAccountCredentials = AccountCredentials.MyAccountCredentials(
                 credentials = listOf(

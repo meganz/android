@@ -155,7 +155,7 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that show decryption key dialog if link not contains key`() = runTest {
-        val link = "https://mega.nz/collection/handle"
+        val link = "https://mega.app/collection/handle"
 
         whenever(mockSavedStateHandle.get<String>(ALBUM_LINK))
             .thenReturn(link)
@@ -176,7 +176,7 @@ class AlbumImportViewModelTest {
     @Test
     fun `test that get public album works properly`() = runTest {
         // given
-        val link = "https://mega.nz/collection/handle#key"
+        val link = "https://mega.app/collection/handle#key"
         val album = mock<UserAlbum>()
 
         whenever(mockSavedStateHandle.get<String>(ALBUM_LINK))
@@ -484,7 +484,7 @@ class AlbumImportViewModelTest {
     @Test
     fun `test that handleSharedAlbumLink handles link without sub-handle`() = runTest {
         val album = mock<UserAlbum>()
-        val albumLink = "https://mega.nz/collection/handle#key!"
+        val albumLink = "https://mega.app/collection/handle#key!"
         setupAlbumWithLink(albumLink, album, emptyList())
 
         underTest.initialize()
@@ -498,7 +498,7 @@ class AlbumImportViewModelTest {
     @Test
     fun `test that handleSharedAlbumLink handles link with empty sub-handle`() = runTest {
         val album = mock<UserAlbum>()
-        val albumLink = "https://mega.nz/collection/handle#key!"
+        val albumLink = "https://mega.app/collection/handle#key!"
         setupAlbumWithLink(albumLink, album, emptyList())
 
         underTest.initialize()
@@ -574,7 +574,7 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that album with sub-handle opens specific photo on initialization`() = runTest {
-        val albumLink = "https://mega.nz/collection/handle#key!subHandle123"
+        val albumLink = "https://mega.app/collection/handle#key!subHandle123"
         val album = mock<UserAlbum>()
         val photo1 = mock<Photo.Image> {
             on { base64Id } doReturn "differentHandle"
@@ -602,7 +602,7 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that album without matching sub-handle does not open any photo`() = runTest {
-        val albumLink = "https://mega.nz/collection/handle#key!nonexistentHandle"
+        val albumLink = "https://mega.app/collection/handle#key!nonexistentHandle"
         val album = mock<UserAlbum>()
         val photo1 = mock<Photo.Image> {
             on { base64Id } doReturn "handle1"

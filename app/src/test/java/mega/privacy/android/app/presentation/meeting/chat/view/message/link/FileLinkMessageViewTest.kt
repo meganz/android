@@ -7,7 +7,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.app.presentation.meeting.chat.view.message.link.FileLinkMessageView
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,12 +21,12 @@ class FileLinkMessageViewTest {
         initComposeRuleContent(
             fileName = "File name",
             fileSize = 1024,
-            link = "https://mega.nz/file/1234567890#1234567890",
+            link = "https://mega.app/file/1234567890#1234567890",
         )
         composeTestRule.onNodeWithText("File name").assertExists()
         composeTestRule.onNodeWithText(FileSizeStringMapper(composeTestRule.activity)(1024))
             .assertExists()
-        composeTestRule.onNodeWithText("mega.nz").assertExists()
+        composeTestRule.onNodeWithText("mega.app").assertExists()
     }
 
     private fun initComposeRuleContent(

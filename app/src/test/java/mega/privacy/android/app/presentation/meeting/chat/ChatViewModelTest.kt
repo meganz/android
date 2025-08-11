@@ -25,11 +25,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.app.objects.GifData
-import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
@@ -40,9 +37,11 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.ForwardMessagesToChatsResult
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
-import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
+import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -75,6 +74,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.CreateChatException
 import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -2163,7 +2163,7 @@ internal class ChatViewModelTest {
 
     @Test
     fun `test that join chat successfully when open by chat link`() = runTest {
-        val chatLink = "https://mega.nz/chat/123456789"
+        val chatLink = "https://mega.app/chat/123456789"
         val action = "action"
         val chat = mock<ChatRoom> { on { this.chatId } doReturn chatId }
         whenever(openChatLinkUseCase(chatLink, chatId, false)).thenReturn(chatId)
@@ -2179,7 +2179,7 @@ internal class ChatViewModelTest {
 
     @Test
     fun `test that join chat failed with general exception when open by chat link`() = runTest {
-        val chatLink = "https://mega.nz/chat/123456789"
+        val chatLink = "https://mega.app/chat/123456789"
         val action = "action"
         whenever(openChatLinkUseCase(chatLink, null, false)).thenThrow(RuntimeException())
         initTestClass(
@@ -2196,7 +2196,7 @@ internal class ChatViewModelTest {
     @Test
     fun `test that join chat failed with resource not found exception when open by chat link`() =
         runTest {
-            val chatLink = "https://mega.nz/chat/123456789"
+            val chatLink = "https://mega.app/chat/123456789"
             val action = "action"
             whenever(openChatLinkUseCase(chatLink, chatId, false)).thenThrow(
                 ResourceDoesNotExistChatException()

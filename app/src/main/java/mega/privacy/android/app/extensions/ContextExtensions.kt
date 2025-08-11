@@ -8,6 +8,7 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.annotation.NonNull
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -70,7 +71,7 @@ fun Context?.launchUrl(url: String?) {
         return
     }
 
-    val uri = runCatching { Uri.parse(url) }.getOrElse {
+    val uri = runCatching { url.toUri() }.getOrElse {
         Timber.e(it, "Failed to parse URL")
         return
     }
@@ -85,7 +86,9 @@ fun Context?.launchUrl(url: String?) {
             "mega.co.nz",
             "www.mega.co.nz",
             "mega.nz",
-            "www.mega.nz"
+            "www.mega.nz",
+            "mega.app",
+            "www.mega.app",
         )
         if (deeplinkHosts.contains(uri.host) || uri.scheme == "mega") {
             throw IllegalArgumentException("URL is a deeplink")

@@ -32,7 +32,7 @@ class FolderLinkMessageViewTest {
                     numVersions = 0,
                     versionsSize = 0L,
                 ),
-                link = "https://mega.nz/folder/1234567890#1234567890",
+                link = "https://mega.app/folder/1234567890#1234567890",
             )
         )
         composeTestRule.onNodeWithText(folderName).assertExists()
@@ -54,7 +54,7 @@ class FolderLinkMessageViewTest {
                     numVersions = 0,
                     versionsSize = 0L,
                 ),
-                link = "https://mega.nz/folder/1234567890#1234567890",
+                link = "https://mega.app/folder/1234567890#1234567890",
             )
         )
         val text = TextUtil.getFolderInfo(numFolders, numFiles, composeTestRule.activity) +
@@ -64,7 +64,7 @@ class FolderLinkMessageViewTest {
 
     @Test
     fun `test that authority shows correctly`() {
-        val link = "https://mega.nz/folder/1234567890#1234567890"
+        val link = "https://mega.app/folder/1234567890#1234567890"
         initComposeRuleContent(
             content = FolderLinkContent(
                 folderInfo = FolderInfo(

@@ -504,7 +504,7 @@ class SettingsViewModelTest {
 
     private fun provideCookiePolicyLinkParameters(): Stream<Arguments> {
         return Stream.of(
-            Arguments.of(true, "https://mega.nz/testcookie", "https://mega.nz/testcookie"),
+            Arguments.of(true, "https://mega.app/testcookie", "https://mega.app/testcookie"),
             Arguments.of(true, null, null),
             Arguments.of(false, null, COOKIES_URI)
         )

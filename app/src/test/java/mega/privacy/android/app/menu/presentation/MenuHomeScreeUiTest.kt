@@ -59,7 +59,7 @@ class MenuHomeScreeUiTest {
             icon = Icons.Default.Settings,
             title = android.R.string.ok,
             subTitle = android.R.string.cancel,
-            link = "https://mega.nz",
+            link = "https://mega.app",
             appPackage = null
         )
     )

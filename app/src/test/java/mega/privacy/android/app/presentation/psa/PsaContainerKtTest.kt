@@ -87,7 +87,7 @@ class PsaContainerKtTest {
             PsaStateView(
                 state = PsaState.WebPsa(
                     id = 0,
-                    url = "https://www.mega.nz"
+                    url = "https://www.mega.app"
                 ),
                 markAsSeen = {},
                 navigateToPsaPage = {},

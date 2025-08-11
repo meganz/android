@@ -60,7 +60,7 @@ private fun FolderLinkMessageViewPreview(
         ChatBubble(isMe = isMe, subContent = {
             FolderLinkMessageView(
                 linkContent = FolderLinkContent(
-                    link = "https://mega.nz/folder/1234567890",
+                    link = "https://mega.app/folder/1234567890",
                     folderInfo = FolderInfo(
                         id = NodeId(1234567890L),
                         folderName = "Folder name",
@@ -75,7 +75,7 @@ private fun FolderLinkMessageViewPreview(
         }) {
             Text(
                 modifier = Modifier.padding(12.dp),
-                text = "https://mega.nz/chat/1234567890#1234567890"
+                text = "https://mega.app/chat/1234567890#1234567890"
             )
         }
     }

@@ -202,7 +202,7 @@ internal class PsaStatePreviewParameterProvider : PreviewParameterProvider<PsaSt
     override val values: Sequence<PsaState> = sequenceOf(
         PsaState.WebPsa(
             id = 1,
-            url = "https://www.mega.nz/psa",
+            url = "https://www.mega.app/psa",
         ),
         PsaState.StandardPsa(
             id = 2,
@@ -210,7 +210,7 @@ internal class PsaStatePreviewParameterProvider : PreviewParameterProvider<PsaSt
             text = "This is a standard PSA",
             imageUrl = null,
             positiveText = "Positive",
-            positiveLink = "https://www.mega.nz/psa",
+            positiveLink = "https://www.mega.app/psa",
         ),
         PsaState.InfoPsa(
             id = 3,

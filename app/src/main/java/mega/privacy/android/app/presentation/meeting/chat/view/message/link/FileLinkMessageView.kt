@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message.link
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import android.net.Uri
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
@@ -14,10 +13,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ChatBubble
-import mega.privacy.android.shared.original.core.ui.controls.chat.messages.RichLinkContentView
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.IconType
+import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ChatBubble
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.RichLinkContentView
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -90,12 +90,12 @@ private fun FolderLinkMessageViewPreview(
                 fileIcon = painterResource(IconPackR.drawable.ic_3d_thumbnail_outline),
                 fileName = "File name",
                 fileSize = 1234567890L,
-                link = "https://mega.nz/file/1234567890"
+                link = "https://mega.app/file/1234567890"
             )
         }) {
             Text(
                 modifier = Modifier.padding(12.dp),
-                text = "https://mega.nz/chat/1234567890#1234567890"
+                text = "https://mega.app/chat/1234567890#1234567890"
             )
         }
     }

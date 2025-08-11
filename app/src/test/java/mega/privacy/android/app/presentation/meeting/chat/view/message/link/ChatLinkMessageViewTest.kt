@@ -6,8 +6,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatGroupLinkContent
-import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatLinkMessageView
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +21,7 @@ class ChatLinkMessageViewTest {
             linkContent = ChatGroupLinkContent(
                 numberOfParticipants = 10,
                 name = "Group name",
-                link = "https://mega.nz/chat/1234567890#1234567890",
+                link = "https://mega.app/chat/1234567890#1234567890",
             )
         )
         composeTestRule.onNodeWithText("Group name").assertExists()
@@ -33,7 +31,7 @@ class ChatLinkMessageViewTest {
                 10
             )
         ).assertExists()
-        composeTestRule.onNodeWithText(Uri.parse("https://mega.nz/chat/1234567890#1234567890").authority.orEmpty())
+        composeTestRule.onNodeWithText(Uri.parse("https://mega.app/chat/1234567890#1234567890").authority.orEmpty())
             .assertExists()
     }
 
@@ -43,12 +41,12 @@ class ChatLinkMessageViewTest {
             linkContent = ChatGroupLinkContent(
                 numberOfParticipants = 0,
                 name = "",
-                link = "https://mega.nz/chat/1234567890#1234567890",
+                link = "https://mega.app/chat/1234567890#1234567890",
             )
         )
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.invalid_chat_link))
             .assertExists()
-        composeTestRule.onNodeWithText(Uri.parse("https://mega.nz/chat/1234567890#1234567890").authority.orEmpty())
+        composeTestRule.onNodeWithText(Uri.parse("https://mega.app/chat/1234567890#1234567890").authority.orEmpty())
             .assertExists()
     }
 

@@ -126,7 +126,7 @@ class MenuViewModelTest {
                 icon = Icons.Default.Settings,
                 title = android.R.string.cancel,
                 subTitle = android.R.string.copy,
-                link = "https://mega.nz",
+                link = "https://mega.app",
                 appPackage = null
             )
 

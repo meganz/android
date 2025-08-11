@@ -61,13 +61,13 @@ private fun ChatLinkMessageViewPreview(
                 linkContent = ChatGroupLinkContent(
                     numberOfParticipants = 10,
                     name = "Group name",
-                    link = "https://mega.nz/chat/1234567890#1234567890",
+                    link = "https://mega.app/chat/1234567890#1234567890",
                 )
             )
         }) {
             Text(
                 modifier = Modifier.padding(12.dp),
-                text = "https://mega.nz/chat/1234567890#1234567890"
+                text = "https://mega.app/chat/1234567890#1234567890"
             )
         }
     }
@@ -82,13 +82,13 @@ private fun ChatInvalidLinkMessageViewPreview(
         ChatBubble(isMe = isMe, subContent = {
             ChatLinkMessageView(
                 linkContent = ChatGroupLinkContent(
-                    link = "https://mega.nz/chat/1234567890#1234567890",
+                    link = "https://mega.app/chat/1234567890#1234567890",
                 )
             )
         }) {
             Text(
                 modifier = Modifier.padding(12.dp),
-                text = "https://mega.nz/chat/1234567890#1234567890"
+                text = "https://mega.app/chat/1234567890#1234567890"
             )
         }
     }

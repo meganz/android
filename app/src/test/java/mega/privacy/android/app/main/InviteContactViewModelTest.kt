@@ -63,7 +63,7 @@ class InviteContactViewModelTest {
     private val validateEmailInputForInvitationUseCase: ValidateEmailInputForInvitationUseCase =
         mock()
     private val defaultQuery = "defaultQuery"
-    private val defaultContactLink = "https://mega.nz/C!wf8jTYRB"
+    private val defaultContactLink = "https://mega.app/C!wf8jTYRB"
     private val email = "email@email.com"
 
     private lateinit var savedStateHandle: SavedStateHandle

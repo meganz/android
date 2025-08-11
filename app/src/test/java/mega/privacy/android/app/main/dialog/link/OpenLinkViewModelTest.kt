@@ -82,7 +82,7 @@ internal class OpenLinkViewModelTest {
 
     @Test
     fun `test that uiState update correctly when call onLinkChanged`() = runTest {
-        val link = "https://mega.nz/C!86YkxIDC"
+        val link = "https://mega.app/C!86YkxIDC"
         underTest.onLinkChanged(link)
         verify(savedStateHandle)[OpenLinkViewModel.CURRENT_INPUT_LINK] = link
         underTest.state.test {
@@ -95,7 +95,7 @@ internal class OpenLinkViewModelTest {
 
     @Test
     fun `test that inputLink returns correctly when call inputLink`() {
-        val link = "https://mega.nz/C!86YkxIDC"
+        val link = "https://mega.app/C!86YkxIDC"
         whenever(savedStateHandle.get<String>(OpenLinkViewModel.CURRENT_INPUT_LINK)).thenReturn(link)
         Truth.assertThat(underTest.inputLink).isEqualTo(link)
     }
@@ -112,7 +112,7 @@ internal class OpenLinkViewModelTest {
 
     @Test
     fun `test that linkType update correctly when link is not chat link`() = runTest {
-        val link = "https://mega.nz/C!86YkxIDC"
+        val link = "https://mega.app/C!86YkxIDC"
         whenever(savedStateHandle.get<Boolean>(OpenLinkDialogFragment.IS_JOIN_MEETING))
             .thenReturn(false)
         whenever(savedStateHandle.get<Boolean>(OpenLinkDialogFragment.IS_CHAT_SCREEN))
@@ -128,7 +128,7 @@ internal class OpenLinkViewModelTest {
 
     @Test
     fun `test that openContactLinkHandle update correctly when link is not chat link`() = runTest {
-        val link = "https://mega.nz/C!86YkxIDC"
+        val link = "https://mega.app/C!86YkxIDC"
         whenever(getHandleFromContactLinkUseCase(link)).thenReturn(1L)
         underTest.openContactLink(link)
         underTest.state.test {
@@ -139,7 +139,7 @@ internal class OpenLinkViewModelTest {
 
     @Test
     fun `test that checkLinkResult update correctly when open link to join meeting`() = runTest {
-        val link = "https://mega.nz/C!86YkxIDC"
+        val link = "https://mega.app/C!86YkxIDC"
         val chatLinkContent = mock<ChatLinkContent.ChatLink>()
         whenever(savedStateHandle.get<Boolean>(OpenLinkDialogFragment.IS_JOIN_MEETING))
             .thenReturn(true)
@@ -157,7 +157,7 @@ internal class OpenLinkViewModelTest {
 
     @Test
     fun `test that checkLinkResult update correctly when open link from chat`() = runTest {
-        val link = "https://mega.nz/C!86YkxIDC"
+        val link = "https://mega.app/C!86YkxIDC"
         val chatLinkContent = mock<ChatLinkContent.ChatLink>()
         whenever(savedStateHandle.get<Boolean>(OpenLinkDialogFragment.IS_JOIN_MEETING))
             .thenReturn(false)

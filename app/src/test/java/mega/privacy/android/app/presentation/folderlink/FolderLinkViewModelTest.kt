@@ -16,8 +16,8 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -600,7 +600,7 @@ class FolderLinkViewModelTest {
 
     @Test
     fun `test that handleIntent returns correct url and folderSubHandle`() = runTest {
-        val url = "https://mega.nz/#F!KDZkRKJK!1meD4csdaj7DWjEhJoHaFw!SDQadJqY"
+        val url = "https://mega.app/#F!KDZkRKJK!1meD4csdaj7DWjEhJoHaFw!SDQadJqY"
         val folderSubHandle = "SDQadJqY"
         val intent = mock<Intent>()
         whenever(intent.action).thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
@@ -1093,7 +1093,7 @@ class FolderLinkViewModelTest {
         fileTypeInfo: FileTypeInfo
     ) =
         runTest {
-            val url = "https://mega.nz/#F!KDZkRKJK!1meD4csdaj7DWjEhJoHaFw!SDQadJqY"
+            val url = "https://mega.app/#F!KDZkRKJK!1meD4csdaj7DWjEhJoHaFw!SDQadJqY"
             val subHandle = "SDQadJqY"
             val intent = mock<Intent> {
                 on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
