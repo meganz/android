@@ -338,7 +338,7 @@ internal class NodeRepositoryImplTest {
 
     @Test
     fun `test when getInShare called with valid email node list is returned`() = runTest {
-        val testEmail = "test@mega.nz"
+        val testEmail = "test@mega.io"
         val user = mock<MegaUser> {
             on { email }.thenReturn(testEmail)
         }

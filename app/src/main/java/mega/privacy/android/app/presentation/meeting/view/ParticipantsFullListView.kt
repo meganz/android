@@ -645,7 +645,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name1@mega.nz",
+        email = "name1@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 111,
@@ -664,7 +664,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name2@mega.nz",
+        email = "name2@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 222
@@ -677,7 +677,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name3@mega.nz",
+        email = "name3@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 333,
@@ -695,7 +695,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name4@mega.nz",
+        email = "name4@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Moderator,
         defaultAvatarColor = 444
@@ -709,7 +709,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name5@mega.nz",
+        email = "name5@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 555,
@@ -728,7 +728,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name6@mega.nz",
+        email = "name6@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 666
@@ -742,7 +742,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name7@mega.nz",
+        email = "name7@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 777
@@ -756,7 +756,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name8@mega.nz",
+        email = "name8@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 888
@@ -769,7 +769,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name9@mega.nz",
+        email = "name9@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 999
@@ -782,7 +782,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name10@mega.nz",
+        email = "name10@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 101010
@@ -796,7 +796,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name11@mega.nz",
+        email = "name11@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 111111
@@ -810,7 +810,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name12@mega.nz",
+        email = "name12@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 121212
@@ -824,7 +824,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name13@mega.nz",
+        email = "name13@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 131313
@@ -838,7 +838,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name14@mega.nz",
+        email = "name14@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 141414
@@ -851,7 +851,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name15@mega.nz",
+        email = "name15@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 151515
@@ -864,7 +864,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name16@mega.nz",
+        email = "name16@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 16
@@ -878,7 +878,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name17@mega.nz",
+        email = "name17@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 171717
@@ -892,7 +892,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name18@mega.nz",
+        email = "name18@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 181818
@@ -906,7 +906,7 @@ private fun getParticipants(): List<ChatParticipant> {
             avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name19@mega.nz",
+        email = "name19@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Standard,
         defaultAvatarColor = 191919

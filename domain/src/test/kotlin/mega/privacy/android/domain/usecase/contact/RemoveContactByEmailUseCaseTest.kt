@@ -8,9 +8,9 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -36,7 +36,7 @@ class RemoveContactByEmailUseCaseTest {
     private val chatCall: ChatCall = mock {
         on { callId }.thenReturn(1234567)
     }
-    private val testEmail = "test@mega.nz"
+    private val testEmail = "test@mega.io"
     private val underTest = RemoveContactByEmailUseCase(
         nodeRepository,
         hangChatCallUseCase,

@@ -13,9 +13,9 @@ import org.mockito.kotlin.whenever
 class GetContactFromEmailUseCaseTest {
     private val contactsRepository = mock<ContactsRepository>()
     private val underTest = GetContactFromEmailUseCase(contactsRepository)
-    private val testEmail = "test@mega.nz"
+    private val testEmail = "test@mega.io"
     private val contactItem = mock<ContactItem> {
-        on { email }.thenReturn("test@mega.nz")
+        on { email }.thenReturn("test@mega.io")
         on { handle }.thenReturn(12345)
     }
 

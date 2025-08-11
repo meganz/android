@@ -14,9 +14,7 @@ import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
-import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -47,7 +45,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import kotlin.Long
 
 @ExtendWith(InstantExecutorExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -62,7 +59,7 @@ class StartConversationViewModelTest {
     )
     private val testContact = ContactItem(
         handle = 123L,
-        email = "email@mega.nz",
+        email = "email@mega.io",
         contactData = emptyContactData,
         defaultAvatarColor = "0asf80",
         visibility = UserVisibility.Visible,
@@ -80,7 +77,7 @@ class StartConversationViewModelTest {
 
     private fun getContact(handle: Long) = ContactItem(
         handle = handle,
-        email = "email$handle@mega.nz",
+        email = "email$handle@mega.io",
         contactData = emptyContactData,
         defaultAvatarColor = "0asf80",
         visibility = UserVisibility.Visible,

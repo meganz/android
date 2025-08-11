@@ -93,5 +93,5 @@ internal class DefaultSupportRepository @Inject constructor(
             )
         }
 
-    override suspend fun getSupportEmail() = "support@mega.nz"
+    override suspend fun getSupportEmail() = "support@mega.io"
 }

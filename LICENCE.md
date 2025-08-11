@@ -101,7 +101,7 @@ Section 5 -- General
    judgment in New Zealand or another country.
 
 2. Questions and comments regarding this licence are welcomed and
-   should be addressed to [support@mega.nz].
+   should be addressed to [support@mega.io].
 
 
 Last updated 20 January 2016.

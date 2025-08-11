@@ -306,8 +306,8 @@ public class Constants {
 
     public static int TYPE_LEFT = -1;
     public static int TYPE_JOIN = 1;
-    public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
-    public static final String MAIL_SUPPORT = "support@mega.nz";
+    public static final String MAIL_ANDROID = "androidfeedback@mega.io";
+    public static final String MAIL_SUPPORT = "support@mega.io";
 
     //link for introduction end to end encryption
     public static final String URL_E2EE = "https://mega.io/security";

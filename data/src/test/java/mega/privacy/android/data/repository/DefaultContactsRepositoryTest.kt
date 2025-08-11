@@ -107,7 +107,7 @@ class DefaultContactsRepositoryTest {
     private val context: Context = mock()
     private val contactGateway: ContactGateway = mock()
 
-    private val userEmail = "test@mega.nz"
+    private val userEmail = "test@mega.io"
     private val userHandle = -123456L
     private val user = mock<MegaUser> { on { email }.thenReturn(userEmail) }
     private val testName = "Test User Name"

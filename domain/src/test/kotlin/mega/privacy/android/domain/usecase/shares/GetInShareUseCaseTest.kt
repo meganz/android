@@ -13,7 +13,7 @@ import org.mockito.kotlin.whenever
 class GetInShareUseCaseTest {
     private val nodeRepository = mock<NodeRepository>()
     private val underTest = GetInSharesUseCase(nodeRepository)
-    private val testEmail = "test@mega.nz"
+    private val testEmail = "test@mega.io"
 
     @Test
     fun `test that get in shares list of nodes when success`() = runTest {

@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 internal val contactItemForPreviews get() = contactItemForPreviews(-1)
 internal fun contactItemForPreviews(id: Int) = ContactItem(
     handle = id.toLong(),
-    email = "email$id@mega.nz",
+    email = "email$id@mega.io",
     contactData = ContactData(
         fullName = "Full name $id",
         alias = "Alias $id",

@@ -890,7 +890,7 @@ class DefaultAccountRepositoryTest {
     fun `test that MegaLocalStorageGateway is invoked for saving credentials and clearing ephemeral while saving credentials`() =
         runTest {
             val credentials =
-                userCredentialsMapper("test@mega.nz", "AFasdffW456sdfg", null, null, "1536456")
+                userCredentialsMapper("test@mega.io", "AFasdffW456sdfg", null, null, "1536456")
             mockGetUserDataSuccess()
             underTest.saveAccountCredentials()
             verify(credentialsPreferencesGateway).save(credentials)
@@ -915,7 +915,7 @@ class DefaultAccountRepositoryTest {
 
     @Test
     fun `test that account session is returned while saving credentials`() = runTest {
-        val email = "test@mega.nz"
+        val email = "test@mega.io"
         val session = "AFasdffW456sdfg"
         val handle = 1536456L
         mockGetUserDataSuccess()

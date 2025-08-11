@@ -148,7 +148,7 @@ class ParticipantInCallItemTest {
             fullName = "Name5", alias = null, avatarUri = null,
             userVisibility = UserVisibility.Unknown,
         ),
-        email = "name2@mega.nz",
+        email = "name2@mega.io",
         isMe = false,
         privilege = ChatRoomPermission.Moderator,
         defaultAvatarColor = -30327,

@@ -10,7 +10,7 @@ class ContactCredentialsMapperTest {
 
     private lateinit var underTest: ContactCredentialsMapper
 
-    private val email = "test@mega.nz"
+    private val email = "test@mega.io"
     private val name = "test"
 
     @Before
