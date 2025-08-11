@@ -125,7 +125,7 @@ private fun RowScope.DefaultActions(
         onClick = shareFolder,
     ) {
         MegaIcon(
-            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Folder),
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.FolderUsers),
             contentDescription = stringResource(R.string.context_share_folder),
             tint = IconColor.Primary,
         )

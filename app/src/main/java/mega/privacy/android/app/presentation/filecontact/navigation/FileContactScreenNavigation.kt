@@ -5,6 +5,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.filecontact.ShareRecipientsViewModel
 import mega.privacy.android.app.presentation.filecontact.view.FileContactHomeScreen
@@ -12,10 +13,10 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 
 @Serializable
-class FileContactInfo(
+data class FileContactInfo(
     val folderHandle: Long,
     val folderName: String,
-) {
+) : NavKey {
     val folderId: NodeId
         get() = NodeId(folderHandle)
 }
