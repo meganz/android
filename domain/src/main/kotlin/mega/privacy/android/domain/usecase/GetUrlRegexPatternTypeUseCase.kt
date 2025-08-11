@@ -64,19 +64,16 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, VERIFY_CHANGE_MAIL_LINK_REGEX) -> VERIFY_CHANGE_MAIL_LINK
             isUrlMatchesRegexUseCase(url, RESET_PASSWORD_LINK_REGEX) -> RESET_PASSWORD_LINK
             isUrlMatchesRegexUseCase(url, PENDING_CONTACTS_LINK_REGEX) -> PENDING_CONTACTS_LINK
-            isUrlMatchesRegexUseCase(
-                url,
-                OPEN_SYNC_MEGA_FOLDER_LINK_REGEX
-            ) -> OPEN_SYNC_MEGA_FOLDER_LINK
+            isUrlMatchesRegexUseCase(url, OPEN_SYNC_MEGA_FOLDER_LINK_REGEX)
+                -> OPEN_SYNC_MEGA_FOLDER_LINK
 
             isUrlMatchesRegexUseCase(url, HANDLE_LINK_REGEX) -> HANDLE_LINK
             isUrlMatchesRegexUseCase(url, CONTACT_LINK_REGEX) -> CONTACT_LINK
             isUrlMatchesRegexUseCase(url, MEGA_DROP_LINK_REGEX) -> MEGA_DROP_LINK
             isUrlMatchesRegexUseCase(url, MEGA_FILE_REQUEST_LINK_REGEXES) -> MEGA_FILE_REQUEST_LINK
             isUrlMatchesRegexUseCase(url, MEGA_BLOG_LINK_REGEX) -> MEGA_BLOG_LINK
-            isUrlMatchesRegexUseCase(url, REVERT_CHANGE_PASSWORD_LINK_REGEX) -> {
-                REVERT_CHANGE_PASSWORD_LINK
-            }
+            isUrlMatchesRegexUseCase(url, REVERT_CHANGE_PASSWORD_LINK_REGEX)
+                -> REVERT_CHANGE_PASSWORD_LINK
 
             isUrlMatchesRegexUseCase(url, EMAIL_VERIFY_LINK_REGEX) -> EMAIL_VERIFY_LINK
             isUrlMatchesRegexUseCase(url, WEB_SESSION_LINK_REGEX) -> WEB_SESSION_LINK
@@ -85,13 +82,10 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, INSTALLER_DOWNLOAD_LINK_REGEX) -> INSTALLER_DOWNLOAD_LINK
             isUrlMatchesRegexUseCase(url, PURCHASE_LINK_REGEX) -> PURCHASE_LINK
             isUrlMatchesRegexUseCase(url, UPGRADE_LINK_REGEX) -> UPGRADE_LINK
-            isUrlMatchesRegexUseCase(
-                url,
-                ENABLE_CAMERA_UPLOADS_LINK_REGEX
-            ) -> ENABLE_CAMERA_UPLOADS_LINK
+            isUrlMatchesRegexUseCase(url, ENABLE_CAMERA_UPLOADS_LINK_REGEX)
+                -> ENABLE_CAMERA_UPLOADS_LINK
 
             isUrlMatchesRegexUseCase(url, OPEN_DEVICE_CENTER_LINK_REGEX) -> OPEN_DEVICE_CENTER_LINK
-
             else -> RESTRICTED
         }
 
@@ -109,8 +103,8 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          * 5. Any characters after Backslashes (/) or Question Mark (?) are allowed, except At Sign(@)
          */
         private val MEGA_REGEX = arrayOf(
-            "^https://mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz)(\\/|\\?)[^@]*$",
-            "^https://([a-z0-9]+\\.)+mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz)(\\/|\\?)[^@]*$"
+            "^https://mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz|\\.app)(\\/|\\?)[^@]*$",
+            "^https://([a-z0-9]+\\.)+mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz|\\.app)(\\/|\\?)[^@]*$"
         )
 
         /**
@@ -119,8 +113,10 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
         private val FILE_LINK_REGEX = arrayOf(
             "^https://mega\\.co\\.nz/.*#!.+$",
             "^https://mega\\.nz/.*#!.+$",
+            "^https://mega\\.app/.*#!.+$",
             "^https://mega\\.co\\.nz/file/.+$",
-            "^https://mega\\.nz/file/.+$"
+            "^https://mega\\.nz/file/.+$",
+            "^https://mega\\.app/file/.+$",
         )
 
         /**
@@ -130,7 +126,9 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             "^https://mega\\.co\\.nz/.*#confirm.+$",
             "^https://mega\\.co\\.nz/.*confirm.+$",
             "^https://mega\\.nz/.*#confirm.+$",
-            "^https://mega\\.nz/.*confirm.+$"
+            "^https://mega\\.nz/.*confirm.+$",
+            "^https://mega\\.app/.*#confirm.+$",
+            "^https://mega\\.app/.*confirm.+$"
         )
 
         /**
@@ -139,8 +137,10 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
         private val FOLDER_LINK_REGEX = arrayOf(
             "^https://mega\\.co\\.nz/.*#F!.+$",
             "^https://mega\\.nz/.*#F!.+$",
+            "^https://mega\\.app/.*#F!.+$",
             "^https://mega\\.co\\.nz/folder/.+$",
-            "^https://mega\\.nz/folder/.+$"
+            "^https://mega\\.nz/folder/.+$",
+            "^https://mega\\.app/folder/.+$"
         )
 
         /**
@@ -148,15 +148,20 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          */
         private val CHAT_LINK_REGEX = arrayOf(
             "^https://mega\\.co\\.nz/.*chat/.+$",
-            "^https://mega\\.nz/.*chat/.+$"
+            "^https://mega\\.nz/.*chat/.+$",
+            "^https://mega\\.app/.*chat/.+$"
         )
 
         /**
          * This Regex Pattern checks for the existence of 'password' link in MEGA Url
          */
         private val PASSWORD_LINK_REGEX = arrayOf(
-            "^https://mega\\.co\\.nz/.*#P!.+$",
-            "^https://mega\\.nz/.*#P!.+$"
+            "^https://mega\\.co\\.nz/.*#password.+$",
+            "^https://mega\\.co\\.nz/.*password.+$",
+            "^https://mega\\.nz/.*#password.+$",
+            "^https://mega\\.nz/.*password.+$",
+            "^https://mega\\.app/.*#password.+$",
+            "^https://mega\\.app/.*password.+$"
         )
 
         /**
@@ -166,7 +171,9 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             "^https://mega\\.co\\.nz/.*#newsignup.+$",
             "^https://mega\\.co\\.nz/.*newsignup.+$",
             "^https://mega\\.nz/.*#newsignup.+$",
-            "^https://mega\\.nz/.*newsignup.+$"
+            "^https://mega\\.nz/.*newsignup.+$",
+            "^https://mega\\.app/.*#newsignup.+$",
+            "^https://mega\\.app/.*newsignup.+$"
         )
 
         /**
@@ -174,7 +181,8 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          */
         private val EXPORT_MASTER_KEY_LINK_REGEX = arrayOf(
             "^https://mega\\.co\\.nz/.*#backup",
-            "^https://mega\\.nz/.*#backup"
+            "^https://mega\\.nz/.*#backup",
+            "^https://mega\\.app/.*#backup"
         )
 
         /**
@@ -184,7 +192,9 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             "^https://mega\\.co\\.nz/.*#fm/chat",
             "^https://mega\\.co\\.nz/.*fm/chat",
             "^https://mega\\.nz/.*#fm/chat",
-            "^https://mega\\.nz/.*fm/chat"
+            "^https://mega\\.nz/.*fm/chat",
+            "^https://mega\\.app/.*#fm/chat",
+            "^https://mega\\.app/.*fm/chat"
         )
 
         /**
@@ -194,7 +204,9 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             "^https://mega\\.co\\.nz/.*#cancel.+$",
             "^https://mega\\.co\\.nz/.*cancel.+$",
             "^https://mega\\.nz/.*#cancel.+$",
-            "^https://mega\\.nz/.*cancel.+$"
+            "^https://mega\\.nz/.*cancel.+$",
+            "^https://mega\\.app/.*#cancel.+$",
+            "^https://mega\\.app/.*cancel.+$"
         )
 
         /**
@@ -204,7 +216,9 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             "^https://mega\\.co\\.nz/.*#verify.+$",
             "^https://mega\\.co\\.nz/.*verify.+$",
             "^https://mega\\.nz/.*#verify.+$",
-            "^https://mega\\.nz/.*verify.+$"
+            "^https://mega\\.nz/.*verify.+$",
+            "^https://mega\\.app/.*#verify.+$",
+            "^https://mega\\.app/.*verify.+$"
         )
 
         /**
@@ -214,7 +228,9 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             "^https://mega\\.co\\.nz/.*#recover.+$",
             "^https://mega\\.co\\.nz/.*recover.+$",
             "^https://mega\\.nz/.*#recover.+$",
-            "^https://mega\\.nz/.*recover.+$"
+            "^https://mega\\.nz/.*recover.+$",
+            "^https://mega\\.app/.*#recover.+$",
+            "^https://mega\\.app/.*recover.+$"
         )
 
         /**
@@ -224,7 +240,9 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             "^https://mega\\.co\\.nz/.*#fm/ipc",
             "^https://mega\\.co\\.nz/.*fm/ipc",
             "^https://mega\\.nz/.*#fm/ipc",
-            "^https://mega\\.nz/.*fm/ipc"
+            "^https://mega\\.nz/.*fm/ipc",
+            "^https://mega\\.app/.*#fm/ipc",
+            "^https://mega\\.app/.*fm/ipc"
         )
 
         /**
@@ -232,7 +250,8 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          */
         private val HANDLE_LINK_REGEX = arrayOf(
             "^https://mega\\.co\\.nz/.*#.+$",
-            "^https://mega\\.nz/.*#.+$"
+            "^https://mega\\.nz/.*#.+$",
+            "^https://mega\\.app/.*#.+$"
         )
 
         /**
@@ -241,7 +260,8 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
 
         private val CONTACT_LINK_REGEX = arrayOf(
             "^https://mega\\.co\\.nz/C!.+$",
-            "^https://mega\\.nz/.*C!.+$"
+            "^https://mega\\.nz/.*C!.+$",
+            "^https://mega\\.app/.*C!.+$"
         )
 
         /**
@@ -249,7 +269,8 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          */
         private val MEGA_DROP_LINK_REGEX = arrayOf(
             "^https://mega\\.co\\.nz/.*megadrop/.+$",
-            "^https://mega\\.nz/.*megadrop/.+$"
+            "^https://mega\\.nz/.*megadrop/.+$",
+            "^https://mega\\.app/.*megadrop/.+$"
         )
 
         /**
@@ -257,7 +278,8 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          */
         private val MEGA_FILE_REQUEST_LINK_REGEXES = arrayOf(
             "^https://mega\\.co\\.nz/.*filerequest/.+$",
-            "^https://mega\\.nz/.*filerequest/.+$"
+            "^https://mega\\.nz/.*filerequest/.+$",
+            "^https://mega\\.app/.*filerequest/.+$"
         )
 
         /**
@@ -269,7 +291,11 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             "^https://mega\\.nz/.*blog",
             "^https://mega\\.co\\.nz/.*#blog.+$",
             "^https://mega\\.nz/.*#blog.+$",
-            "^https://mega\\.nz/.*blog.+$"
+            "^https://mega\\.nz/.*blog.+$",
+            "^https://mega\\.app/.*#blog",
+            "^https://mega\\.app/.*blog",
+            "^https://mega\\.app/.*#blog.+$",
+            "^https://mega\\.app/.*blog.+$"
         )
 
         /**
@@ -279,7 +305,9 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             "^https://mega\\.co\\.nz/.*#pwr.+$",
             "^https://mega\\.co\\.nz/.*pwr.+$",
             "^https://mega\\.nz/.*#pwr.+$",
-            "^https://mega\\.nz/.*pwr.+$"
+            "^https://mega\\.nz/.*pwr.+$",
+            "^https://mega\\.app/.*#pwr.+$",
+            "^https://mega\\.app/.*pwr.+$"
         )
 
         /**
@@ -289,7 +317,9 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             "^https://mega\\.co\\.nz/#emailverify.+$",
             "^https://mega\\.co\\.nz/emailverify.+$",
             "^https://mega\\.nz/#emailverify.+$",
-            "^https://mega\\.nz/emailverify.+$"
+            "^https://mega\\.nz/emailverify.+$",
+            "^https://mega\\.app/#emailverify.+$",
+            "^https://mega\\.app/emailverify.+$"
         )
 
         /**
@@ -297,7 +327,8 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          */
         private val WEB_SESSION_LINK_REGEX = arrayOf(
             "^https://mega\\.co\\.nz/#sitetransfer!.+$",
-            "^https://mega\\.nz/#sitetransfer!.+$"
+            "^https://mega\\.nz/#sitetransfer!.+$",
+            "^https://mega\\.app/#sitetransfer!.+$"
         )
 
         /**
@@ -307,14 +338,17 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             "^https://mega\\.co\\.nz/#businessinvite.+$",
             "^https://mega\\.co\\.nz/businessinvite.+$",
             "^https://mega\\.nz/#businessinvite.+$",
-            "^https://mega\\.nz/businessinvite.+$"
+            "^https://mega\\.nz/businessinvite.+$",
+            "^https://mega\\.app/#businessinvite.+$",
+            "^https://mega\\.app/businessinvite.+$"
         )
 
         /**
          * This Regex Pattern checks for the existence of 'collection/' link in MEGA Url
          */
         private val ALBUM_LINK_REGEX = arrayOf(
-            "^https://mega\\.nz/collection/.+$"
+            "^https://mega\\.nz/collection/.+$",
+            "^https://mega\\.app/collection/.+$",
         )
 
         /**
@@ -322,11 +356,12 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          * Checks for a url that starts with, either:
          * - https://mega.co.nz
          * - https://mega.nz
+         * - https://mega.app
          * Followed by /pro and then ? for query parameters or / for additional path
          * or /pro without any additional characters.
          */
         private val UPGRADE_PAGE_LINK_REGEX = arrayOf(
-            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz)\\/(pro[/?].*|pro)$",
+            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz|\\.app)\\/(pro[/?].*|pro)$",
         )
 
         /**
@@ -334,13 +369,14 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          * Checks for a url that starts with, either:
          * - https://mega.co.nz
          * - https://mega.nz
+         * - https://mega.app
          * Example links:
          * - https://mega.nz/MEGAvpnSetup64.exe?__hstc=254534871.de5fc61c
          * - https://mega.nz/linux/repo/xUbuntu_24.04/amd64/megacmd-xUbuntu_24.04_amd64.deb
          */
         private val INSTALLER_DOWNLOAD_LINK_REGEX = arrayOf(
-            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz)\\/MEGA(.?)+\\.(exe|dmg)[?]?.*$",
-            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz)\\/linux/repo/(.?)+$"
+            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz|\\.app)\\/MEGA(.?)+\\.(exe|dmg)[?]?.*$",
+            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz|\\.app)\\/linux/repo/(.?)+$"
         )
 
         /**
@@ -348,10 +384,11 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          * Checks for a url that starts with, either:
          * - https://mega.co.nz
          * - https://mega.nz
+         * - https://mega.app
          * Followed by /propay_1 or /propay_2 or /propay_vpn and then other characters.
          */
         private val PURCHASE_LINK_REGEX = arrayOf(
-            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz)\\/propay_.+$",
+            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz|\\.app)\\/propay_.+$",
         )
 
         /**
@@ -359,28 +396,33 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          */
         private val UPGRADE_LINK_REGEX = arrayOf(
             "^https://mega\\.nz/upgrade.+\$",
-            "^https://mega\\.nz/upgrade"
+            "^https://mega\\.nz/upgrade",
+            "^https://mega\\.app/upgrade.+\$",
+            "^https://mega\\.app/upgrade"
         )
 
         /**
          * This Regex Pattern checks for the existence of 'camera uploads' link in MEGA Url
          */
         private val ENABLE_CAMERA_UPLOADS_LINK_REGEX = arrayOf(
-            "^https://mega\\.nz/settings/camera$"
+            "^https://mega\\.nz/settings/camera$",
+            "^https://mega\\.app/settings/camera$"
         )
 
         /**
          * Regex pattern to open a Sync remote folder in Cloud Drive
          */
         private val OPEN_DEVICE_CENTER_LINK_REGEX = arrayOf(
-            "^https://mega\\.nz/devicecenter"
+            "^https://mega\\.nz/devicecenter",
+            "^https://mega\\.app/devicecenter"
         )
 
         /**
          * Regex pattern to open a Sync remote folder in Cloud Drive
          */
         private val OPEN_SYNC_MEGA_FOLDER_LINK_REGEX = arrayOf(
-            "^https://mega\\.nz/opensync#.+$"
+            "^https://mega\\.nz/opensync#.+$",
+            "^https://mega\\.app/opensync#.+$"
         )
     }
 }
