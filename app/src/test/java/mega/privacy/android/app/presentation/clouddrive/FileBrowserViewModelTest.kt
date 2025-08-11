@@ -44,10 +44,12 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.IsColoredFoldersOnboardingShownUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
+import mega.privacy.android.domain.usecase.SetColoredFoldersOnboardingShownUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
@@ -115,6 +117,7 @@ class FileBrowserViewModelTest {
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private val isColoredFoldersOnboardingShownUseCase = mock<IsColoredFoldersOnboardingShownUseCase>()
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
         onBlocking {
             invoke()
@@ -134,6 +137,7 @@ class FileBrowserViewModelTest {
     private val storageCapacityMapper = mock<StorageCapacityMapper>()
     private val setAlmostFullStorageBannerClosingTimestampUseCase =
         mock<SetAlmostFullStorageBannerClosingTimestampUseCase>()
+    private val setColoredFoldersOnboardingShownUseCase = mock<SetColoredFoldersOnboardingShownUseCase>()
     private val monitorAlmostFullStorageBannerClosingTimestampUseCase =
         mock<MonitorAlmostFullStorageBannerVisibilityUseCase>()
     private val isInTransferOverQuotaUseCase = mock<IsInTransferOverQuotaUseCase>()
@@ -168,6 +172,7 @@ class FileBrowserViewModelTest {
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            isColoredFoldersOnboardingShownUseCase = isColoredFoldersOnboardingShownUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
@@ -176,6 +181,7 @@ class FileBrowserViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             setAlmostFullStorageBannerClosingTimestampUseCase = setAlmostFullStorageBannerClosingTimestampUseCase,
+            setColoredFoldersOnboardingShownUseCase = setColoredFoldersOnboardingShownUseCase,
             monitorAlmostFullStorageBannerClosingTimestampUseCase = monitorAlmostFullStorageBannerClosingTimestampUseCase,
             storageCapacityMapper = storageCapacityMapper,
             isInTransferOverQuotaUseCase = isInTransferOverQuotaUseCase,
@@ -750,6 +756,125 @@ class FileBrowserViewModelTest {
         verify(getFileBrowserNodeChildrenUseCase).invoke(folderHandle)
     }
 
+    @Test
+    fun `test colored folders onboarding is shown when not previously shown`() = runTest {
+        // given
+        whenever(isColoredFoldersOnboardingShownUseCase()).thenReturn(false)
+
+        // when
+        underTest = FileBrowserViewModel(
+            getRootNodeUseCase = getRootNodeUseCase,
+            monitorMediaDiscoveryView = monitorMediaDiscoveryView,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            getParentNodeUseCase = getParentNodeUseCase,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
+            getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
+            getCloudSortOrder = getCloudSortOrder,
+            setViewType = setViewType,
+            monitorViewType = monitorViewType,
+            handleOptionClickMapper = handleOptionClickMapper,
+            monitorRefreshSessionUseCase = monitorRefreshSessionUseCase,
+            getBandwidthOverQuotaDelayUseCase = getBandwidthOverQuotaDelayUseCase,
+            containsMediaItemUseCase = containsMediaItemUseCase,
+            fileDurationMapper = fileDurationMapper,
+            monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            isColoredFoldersOnboardingShownUseCase = isColoredFoldersOnboardingShownUseCase,
+            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            shouldEnterMediaDiscoveryModeUseCase = shouldEnterMediaDiscoveryModeUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
+            setAlmostFullStorageBannerClosingTimestampUseCase = setAlmostFullStorageBannerClosingTimestampUseCase,
+            setColoredFoldersOnboardingShownUseCase = setColoredFoldersOnboardingShownUseCase,
+            monitorAlmostFullStorageBannerClosingTimestampUseCase = monitorAlmostFullStorageBannerClosingTimestampUseCase,
+            storageCapacityMapper = storageCapacityMapper,
+            isInTransferOverQuotaUseCase = isInTransferOverQuotaUseCase,
+            doesUriPathExistsUseCase = doesUriPathExistsUseCase,
+            defaultDispatcher = UnconfinedTestDispatcher()
+        )
+
+        // then
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.showColoredFoldersOnboarding).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test colored folders onboarding is not shown when previously shown`() = runTest {
+        // given
+        whenever(isColoredFoldersOnboardingShownUseCase()).thenReturn(true)
+
+        // when
+        underTest = FileBrowserViewModel(
+            getRootNodeUseCase = getRootNodeUseCase,
+            monitorMediaDiscoveryView = monitorMediaDiscoveryView,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            getParentNodeUseCase = getParentNodeUseCase,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
+            getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
+            getCloudSortOrder = getCloudSortOrder,
+            setViewType = setViewType,
+            monitorViewType = monitorViewType,
+            handleOptionClickMapper = handleOptionClickMapper,
+            monitorRefreshSessionUseCase = monitorRefreshSessionUseCase,
+            getBandwidthOverQuotaDelayUseCase = getBandwidthOverQuotaDelayUseCase,
+            containsMediaItemUseCase = containsMediaItemUseCase,
+            fileDurationMapper = fileDurationMapper,
+            monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            isColoredFoldersOnboardingShownUseCase = isColoredFoldersOnboardingShownUseCase,
+            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            shouldEnterMediaDiscoveryModeUseCase = shouldEnterMediaDiscoveryModeUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
+            setAlmostFullStorageBannerClosingTimestampUseCase = setAlmostFullStorageBannerClosingTimestampUseCase,
+            setColoredFoldersOnboardingShownUseCase = setColoredFoldersOnboardingShownUseCase,
+            monitorAlmostFullStorageBannerClosingTimestampUseCase = monitorAlmostFullStorageBannerClosingTimestampUseCase,
+            storageCapacityMapper = storageCapacityMapper,
+            isInTransferOverQuotaUseCase = isInTransferOverQuotaUseCase,
+            doesUriPathExistsUseCase = doesUriPathExistsUseCase,
+            defaultDispatcher = UnconfinedTestDispatcher()
+        )
+
+        // then
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.showColoredFoldersOnboarding).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test onColoredFoldersOnboardingDismissed marks onboarding as shown and updates state`() = runTest {
+        // given
+        whenever(setColoredFoldersOnboardingShownUseCase()).thenReturn(Unit)
+
+        // when
+        underTest.onColoredFoldersOnboardingDismissed()
+
+        // then
+        verify(setColoredFoldersOnboardingShownUseCase).invoke()
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.showColoredFoldersOnboarding).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private suspend fun stubCommon() {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorViewType()).thenReturn(emptyFlow())
@@ -768,6 +893,8 @@ class FileBrowserViewModelTest {
         whenever(monitorStorageStateUseCase()).thenReturn(
             StorageState.Green.asHotFlow()
         )
+        whenever(isColoredFoldersOnboardingShownUseCase()).thenReturn(false)
+        whenever(setColoredFoldersOnboardingShownUseCase()).thenReturn(Unit)
         whenever(setAlmostFullStorageBannerClosingTimestampUseCase()).thenReturn(Unit)
         whenever(monitorAlmostFullStorageBannerClosingTimestampUseCase()).thenReturn(flowOf(true))
         whenever(
@@ -799,6 +926,8 @@ class FileBrowserViewModelTest {
             monitorConnectivityUseCase,
             monitorStorageStateUseCase,
             getFeatureFlagValueUseCase,
+            isColoredFoldersOnboardingShownUseCase,
+            setColoredFoldersOnboardingShownUseCase,
             setAlmostFullStorageBannerClosingTimestampUseCase,
             monitorAlmostFullStorageBannerClosingTimestampUseCase,
             storageCapacityMapper,

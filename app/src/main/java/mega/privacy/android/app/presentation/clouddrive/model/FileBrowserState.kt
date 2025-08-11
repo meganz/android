@@ -94,6 +94,7 @@ data class FileBrowserState(
     val selectedTab: CloudDriveTab = CloudDriveTab.NONE,
     val isFromSyncTab: Boolean = false,
     val showSyncSettings: Boolean = false,
+    val showColoredFoldersOnboarding: Boolean = false,
 ) {
     val hasNoOpenedFolders get() = openedFolderNodeHandles.isEmpty()
 }

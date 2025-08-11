@@ -25,6 +25,8 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,6 +57,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -233,6 +237,7 @@ class CloudDriveSyncsFragment : Fragment() {
     /**
      * onCreateView
      */
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -387,6 +392,29 @@ class CloudDriveSyncsFragment : Fragment() {
                                 )
                             },
                         )
+                    }
+
+
+                    val modalSheetState = rememberModalBottomSheetState(
+                        skipPartiallyExpanded = true
+                    )
+                    if (uiState.showColoredFoldersOnboarding) {
+                        MegaModalBottomSheet(
+                            sheetState = modalSheetState,
+                            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
+                            onDismissRequest = {
+                                fileBrowserViewModel.onColoredFoldersOnboardingDismissed()
+                            }
+                        ) {
+                            ColoredFoldersOnboardingBottomSheet(
+                                onDismiss = {
+                                    coroutineScope.launch {
+                                        modalSheetState.hide()
+                                        fileBrowserViewModel.onColoredFoldersOnboardingDismissed()
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
                 performItemOptionsClick(uiState.optionsItemInfo)

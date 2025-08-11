@@ -543,4 +543,18 @@ interface SettingsRepository {
      *
      */
     fun monitorStartScreenPreferenceDestination(): Flow<StartScreenDestinationPreference?>
+
+    /**
+     * Monitor colored folders onboarding shown preference
+     *
+     * @return colored folders onboarding shown status as a flow
+     */
+    fun monitorColoredFoldersOnboardingShown(): Flow<Boolean>
+
+    /**
+     * Set colored folders onboarding shown
+     *
+     * @param shown true if onboarding has been shown, false otherwise
+     */
+    suspend fun setColoredFoldersOnboardingShown(shown: Boolean)
 }

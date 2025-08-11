@@ -12,11 +12,15 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import mega.privacy.android.analytics.Analytics;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetNodeLabelBinding;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.mobile.analytics.event.LabelAddedMenuItemEvent;
+import mega.privacy.mobile.analytics.event.LabelRemovedMenuItemEvent;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
+
 
 public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
 
@@ -119,6 +123,12 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
         } else if (checkedId == R.id.radio_remove) {
             megaApi.resetNodeLabel(node);
         }
+
+        Analytics.INSTANCE.getTracker().trackEvent(
+                checkedId == R.id.radio_remove
+                        ? LabelRemovedMenuItemEvent.INSTANCE
+                        : LabelAddedMenuItemEvent.INSTANCE
+        );
 
         dismiss();
     }

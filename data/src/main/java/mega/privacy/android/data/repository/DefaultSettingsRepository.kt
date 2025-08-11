@@ -651,7 +651,18 @@ internal class DefaultSettingsRepository @Inject constructor(
             .map { it?.let { StartScreenDestinationPreference(it) } }
             .flowOn(ioDispatcher)
 
+    override fun monitorColoredFoldersOnboardingShown(): Flow<Boolean> =
+        appPreferencesGateway.monitorBoolean(COLORED_FOLDERS_ONBOARDING_SHOWN_KEY, false)
+            .flowOn(ioDispatcher)
+
+    override suspend fun setColoredFoldersOnboardingShown(shown: Boolean) {
+        withContext(ioDispatcher) {
+            appPreferencesGateway.putBoolean(COLORED_FOLDERS_ONBOARDING_SHOWN_KEY, shown)
+        }
+    }
+
     companion object {
+        private const val COLORED_FOLDERS_ONBOARDING_SHOWN_KEY = "colored_folders_onboarding_shown"
         private const val DAYS_USER_FREE = 30
         private const val DAYS_USER_PRO = 90
     }

@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.extensions.updateItemAt
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
@@ -46,15 +45,18 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.IsColoredFoldersOnboardingShownUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
+import mega.privacy.android.domain.usecase.SetColoredFoldersOnboardingShownUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
@@ -118,6 +120,7 @@ class FileBrowserViewModel @Inject constructor(
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val isColoredFoldersOnboardingShownUseCase: IsColoredFoldersOnboardingShownUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
@@ -126,6 +129,7 @@ class FileBrowserViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
+    private val setColoredFoldersOnboardingShownUseCase: SetColoredFoldersOnboardingShownUseCase,
     private val monitorAlmostFullStorageBannerClosingTimestampUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
     private val storageCapacityMapper: StorageCapacityMapper,
     private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase,
@@ -163,6 +167,7 @@ class FileBrowserViewModel @Inject constructor(
                 monitorShowHiddenItems()
             }
         }
+        monitorColoredFoldersOnboarding()
         monitorStorageOverQuotaCapacity()
     }
 
@@ -171,6 +176,22 @@ class FileBrowserViewModel @Inject constructor(
             getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
         }
         return result.getOrNull() ?: false
+    }
+
+    /**
+     * Monitor colored folders onboarding
+     */
+    private fun monitorColoredFoldersOnboarding() {
+        viewModelScope.launch {
+            runCatching {
+                val isOnboardingShown = isColoredFoldersOnboardingShownUseCase()
+                if (!isOnboardingShown) {
+                    _state.update { it.copy(showColoredFoldersOnboarding = true) }
+                }
+            }.onFailure {
+                Timber.e(it, "Error checking colored folders onboarding status")
+            }
+        }
     }
 
     /**
@@ -1040,6 +1061,20 @@ class FileBrowserViewModel @Inject constructor(
 
     fun onConsumeSyncSettings() {
         _state.update { it.copy(showSyncSettings = false) }
+    }
+
+    /**
+     * Mark colored folders onboarding as shown
+     */
+    fun onColoredFoldersOnboardingDismissed() {
+        viewModelScope.launch {
+            runCatching {
+                setColoredFoldersOnboardingShownUseCase()
+                _state.update { it.copy(showColoredFoldersOnboarding = false) }
+            }.onFailure {
+                Timber.e(it, "Error setting colored folders onboarding as shown")
+            }
+        }
     }
 
     suspend fun doesUriPathExists(uriPath: UriPath) =
