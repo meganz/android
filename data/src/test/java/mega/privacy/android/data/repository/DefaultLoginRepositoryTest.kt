@@ -820,7 +820,7 @@ class DefaultLoginRepositoryTest {
     companion object {
         @JvmStatic
         fun provideSessionTransferURLParameters() = listOf(
-            Arguments.of("https://mega.nz/test"),
+            Arguments.of("https://mega.app/test"),
             Arguments.of(null),
         )
     }

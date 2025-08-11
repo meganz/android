@@ -292,7 +292,7 @@ class NodeUiItemMapperTest {
     @Test
     fun `test that invoke sets showLink to true when node has exportedData`() = runTest {
         val mockExportedData = mock<mega.privacy.android.domain.entity.node.ExportedData> {
-            whenever(it.publicLink).thenReturn("https://mega.nz/test")
+            whenever(it.publicLink).thenReturn("https://mega.app/test")
             whenever(it.publicLinkCreationTime).thenReturn(1234567890L)
         }
         val mockNodeWithLink = createMockFileNode(
