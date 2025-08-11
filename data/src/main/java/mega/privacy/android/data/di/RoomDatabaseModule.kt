@@ -33,7 +33,7 @@ import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.TypedMessageDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import timber.log.Timber
 import java.io.File
 import javax.inject.Named
@@ -70,7 +70,7 @@ internal object RoomDatabaseModule {
             sqlCipherManager.migrateToSecureDatabase(MegaDatabaseConstant.DATABASE_NAME, passphrase)
             MegaDatabase.init(
                 applicationContext,
-                SupportFactory(passphrase, null, false),
+                SupportOpenHelperFactory(passphrase, null, false),
                 legacyDatabaseMigration
             )
         } catch (e: Exception) {
@@ -95,7 +95,7 @@ internal object RoomDatabaseModule {
             sqlCipherManager.migrateToSecureDatabase(CHAT_DATABASE_NAME, passphrase)
             ChatDatabase.init(
                 applicationContext,
-                SupportFactory(passphrase, null, false),
+                SupportOpenHelperFactory(passphrase, null, false),
             )
         } catch (e: Exception) {
             sqlCipherManager.destructSecureDatabase(CHAT_DATABASE_NAME)

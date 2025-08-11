@@ -40,7 +40,6 @@ if (!shouldUsePrebuiltSdk() || isServerBuild()) {
 }
 
 include(":core:analytics:analytics-tracker")
-include(":android-database-sqlcipher")
 include(":app")
 include(":baselineprofile")
 include(":core-test")

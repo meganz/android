@@ -3,7 +3,7 @@ package mega.privacy.android.data.database
 import android.content.Context
 import androidx.security.crypto.EncryptedFile
 import dagger.hilt.android.qualifiers.ApplicationContext
-import net.sqlcipher.database.SQLiteDatabase
+import net.zetetic.database.sqlcipher.SQLiteDatabase
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -57,6 +57,7 @@ internal data class SQLCipherManager @Inject constructor(
                     dbFile.absolutePath,
                     passphrase,
                     null,
+                    null,
                 )
                 db.version
             } finally {
@@ -83,7 +84,7 @@ internal data class SQLCipherManager @Inject constructor(
     }
 
     private fun getDatabaseState(context: Context, dbPath: File): DatabaseState {
-        SQLiteDatabase.loadLibs(context)
+        System.loadLibrary("sqlcipher");
 
         if (dbPath.exists()) {
             var db: SQLiteDatabase? = null
@@ -91,7 +92,7 @@ internal data class SQLCipherManager @Inject constructor(
             return try {
                 db = SQLiteDatabase.openDatabase(
                     dbPath.absolutePath,
-                    "",
+                    //"", do not need password for open unencrypted db for sqlcipher-android
                     null,
                     SQLiteDatabase.OPEN_READONLY
                 )
@@ -113,12 +114,12 @@ internal data class SQLCipherManager @Inject constructor(
         targetFile: File,
         passphrase: ByteArray?,
     ) {
-        SQLiteDatabase.loadLibs(context)
+        System.loadLibrary("sqlcipher");
 
         if (originalFile.exists()) {
             val originalDb = SQLiteDatabase.openDatabase(
                 originalFile.absolutePath,
-                "",
+                //"", do not need password for open unencrypted db for sqlcipher-android
                 null,
                 SQLiteDatabase.OPEN_READWRITE
             )
@@ -129,6 +130,7 @@ internal data class SQLCipherManager @Inject constructor(
             val db = SQLiteDatabase.openOrCreateDatabase(
                 targetFile.absolutePath,
                 passphrase,
+                null,
                 null
             )
 
