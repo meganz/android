@@ -19,13 +19,13 @@ import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.INVALID_CHARACTERS
-import mega.privacy.android.core.nodecomponents.extension.rememberMegaNavigator
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.EmptyNodeNameException
 import mega.privacy.android.domain.exception.InvalidNodeNameException
 import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**

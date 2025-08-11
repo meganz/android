@@ -19,7 +19,7 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import dagger.hilt.android.scopes.ActivityScoped
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.camera.CameraArg
+import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.app.camera.InAppCameraLauncher
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.main.DrawerItem

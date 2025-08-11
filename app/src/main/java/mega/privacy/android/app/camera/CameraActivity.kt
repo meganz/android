@@ -25,6 +25,7 @@ import mega.privacy.android.app.camera.setting.cameraSettingModal
 import mega.privacy.android.app.camera.setting.navigateCameraSettingModal
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
+import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.shared.resources.R as sharedR
 
 @AndroidEntryPoint

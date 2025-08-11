@@ -1,4 +1,4 @@
-package mega.privacy.android.app.camera
+package mega.privacy.android.navigation.camera
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

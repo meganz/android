@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContract
 import mega.privacy.android.app.presentation.extensions.parcelable
+import mega.privacy.android.navigation.camera.CameraArg
 
 internal class InAppCameraLauncher : ActivityResultContract<CameraArg, Uri?>() {
     override fun createIntent(context: Context, input: CameraArg): Intent =

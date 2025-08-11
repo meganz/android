@@ -1,7 +1,9 @@
 package mega.privacy.android.navigation
 
+import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContract
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
+import mega.privacy.android.navigation.camera.CameraArg
 
 /**
  * Centralized interface for all activity result contracts used in the MEGA application.
@@ -60,4 +62,9 @@ interface MegaActivityResultContract {
      *         and output type [Boolean] (onboarding completion status)
      */
     val hiddenNodeOnboardingActivityResultContract: ActivityResultContract<Boolean, Boolean>
+
+    /**
+     * Contract for in-app camera functionality.
+     */
+    val inAppCameraResultContract: ActivityResultContract<CameraArg, Uri?>
 }

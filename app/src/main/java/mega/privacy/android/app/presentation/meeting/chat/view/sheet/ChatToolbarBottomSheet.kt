@@ -37,7 +37,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
-import mega.privacy.android.app.camera.CameraArg
 import mega.privacy.android.app.camera.InAppCameraLauncher
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.objects.GifData
@@ -48,6 +47,7 @@ import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButton
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButtonPlaceHolder
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
