@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,8 +33,10 @@ internal fun IssuesResolutionDialog(
     actionSelected: (action: StalledIssueResolutionAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column {
-        FolderHeader(modifier, icon, conflictName, nodeName)
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState())
+    ) {
+        FolderHeader(icon, conflictName, nodeName)
 
         actions.forEachIndexed { index: Int, action: StalledIssueResolutionAction ->
             IssueResolutionAction(
@@ -48,13 +52,12 @@ internal fun IssuesResolutionDialog(
 
 @Composable
 private fun FolderHeader(
-    modifier: Modifier,
     icon: Int,
     conflictName: String,
     nodeName: String,
 ) {
     Row(
-        modifier
+        modifier = Modifier
             .padding(start = 12.dp, top = 12.dp, end = 16.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     )
@@ -68,7 +71,7 @@ private fun FolderHeader(
         )
 
         Column(
-            Modifier
+            modifier = Modifier
                 .weight(1f)
                 .padding(start = 12.dp)
         ) {

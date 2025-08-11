@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
+import android.content.res.Configuration
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -109,9 +111,13 @@ internal fun SyncListScreen(
     var sheetContent by remember { mutableStateOf<SyncModalSheetContent?>(null) }
 
     val coroutineScope = rememberCoroutineScope()
+
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
-        confirmValueChange = { _ -> true }
+        confirmValueChange = { _ -> true },
+        skipHalfExpanded = isLandscape
     )
 
     val scaffoldState = rememberScaffoldState(snackbarHostState = snackBarHostState)
