@@ -58,10 +58,10 @@ fun SyncListRoute(
     onSelectStopBackupDestinationClicked: (String?) -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     onCameraUploadsSettingsClicked: () -> Unit,
+    onOpenMegaFolderClicked: (Long) -> Unit,
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
-    onOpenMegaFolderClicked: (Long) -> Unit,
 ) {
     val fragmentActivity = LocalContext.current.findFragmentActivity()
     val viewModelStoreOwner =
