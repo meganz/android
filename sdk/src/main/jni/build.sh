@@ -145,13 +145,6 @@ LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-v${LIBWEBSOCKETS_VERSION}.zip
 LIBWEBSOCKETS_SOURCE_FOLDER=libwebsockets-${LIBWEBSOCKETS_VERSION}
 LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/refs/heads/v${LIBWEBSOCKETS_VERSION}.zip
 
-PDFVIEWER=pdfviewer
-PDFVIEWER_VERSION=1.9.2
-PDFVIEWER_SOURCE_FILE=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}.zip
-PDFVIEWER_SOURCE_FOLDER=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}
-PDFVIEWER_DOWNLOAD_URL=https://github.com/meganz/PdfiumAndroid/archive/refs/tags/pdfium-android-${PDFVIEWER_VERSION}.zip
-PDFVIEWER_SHA1="12f58078ca8a78764734932b1fb8a2ccec7d2a56"
-
 ICU=icu
 ICU_VERSION=71_1
 ICU_SOURCE_FILE=icu4c-${ICU_VERSION}.zip
@@ -406,7 +399,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${MEDIAINFO}/${MEDIAINFO}
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FOLDER}
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
-    rm -rf ${PDFVIEWER}/${PDFVIEWER}
     rm -rf ${ICU}/${ICU_SOURCE_VERSION}
     rm -rf ${ICU}/${ICU_SOURCE_FILE}
 
@@ -429,8 +421,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${MEDIAINFO}/${MEDIAINFO_SOURCE_FILE}.ready
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
-    rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}
-    rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
     rm -rf ${ICU}/${ICU_SOURCE_FILE}.ready
 
     echo "* Deleting object files"
@@ -722,25 +712,6 @@ if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
     touch ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
 fi
 echo "* libwebsockets is ready"
-
-echo "* Setting up PdfViewer"
-if [ ! -f ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready ]; then
-    downloadCheckAndUnpack ${PDFVIEWER_DOWNLOAD_URL} ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE} ${PDFVIEWER_SHA1} ${PDFVIEWER}
-    cd ${PDFVIEWER}
-    rm -rf ${PDFVIEWER}
-    mkdir ${PDFVIEWER}
-    cd ${PDFVIEWER}
-    mkdir include
-    mkdir lib
-    mkdir src
-    cp -R ../${PDFVIEWER_SOURCE_FOLDER}/src/main/jni/include/* ./include/
-    cp -R ../${PDFVIEWER_SOURCE_FOLDER}/src/main/jni/lib/* ./lib/
-    cp -R ../${PDFVIEWER_SOURCE_FOLDER}/src/main/jni/src/* ./src/
-    rm -rf ../${PDFVIEWER_SOURCE_FOLDER}
-    cd ../..
-    touch ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
-fi
-echo "* PdfViewer is ready"
 
 echo "* Setting up ICU"
 if [ ! -f ${ICU}/${ICU_SOURCE_FILE}.ready ]; then

@@ -12,4 +12,3 @@ include $(TOP_PATH)/icu/Android.mk
 include $(TOP_PATH)/megachat/Android.mk
 include $(TOP_PATH)/mega/Android.mk
 include $(TOP_PATH)/bindings/Android.mk
-include $(TOP_PATH)/pdfviewer/Android.mk

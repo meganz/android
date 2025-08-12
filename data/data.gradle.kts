@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":shared:sync"))
     implementation(google.guava)
+    api(files("../third-party-lib/pdfiumAndroid/pdfiumandroid-1.9.3.aar"))
 
     //Test Modules
     testImplementation(project(":core-test"))
