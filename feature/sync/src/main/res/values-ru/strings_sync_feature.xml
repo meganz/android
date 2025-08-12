@@ -39,13 +39,13 @@
         <item quantity="other">%1$d файла</item>
     </plurals>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Удалить исправленные ошибки</string>
+    <string name="sync_menu_clear_issues">Удалить решённые проблемы</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Двухсторонняя синхронизация</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Переименовать все элементы</string>
     <!-- Sync to resolve conflict Merge folders -->
-    <string name="sync_stalled_issue_merge_folders">Объединить папки</string>
+    <string name="sync_stalled_issue_merge_folders">Объединить папки и переименовать файлы</string>
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">Выбрать локальный файл</string>
     <!-- Sync to resolve conflict Choose remote file -->

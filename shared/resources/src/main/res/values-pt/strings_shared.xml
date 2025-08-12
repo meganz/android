@@ -1055,17 +1055,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Novo recurso: arquivos e pastas ocultos</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">Oculte arquivos e pastas</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">Oculte arquivos e pastas importantes</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Mantenha facilmente arquivos confidenciais na sua Nuvem de arquivos privados e longe da vista. Os arquivos ocultos não aparecem na Nuvem de arquivos, Fotos e Atividades recentes de forma predeterminada.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Você pode ocultar arquivos e pastas confidenciais para ter privacidade. Somente você poderá mostrá-los, de forma individual ou exibindo temporariamente itens ocultos no menu.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Controle a visibilidade facilmente</string>
+    <string name="hidden_nodes_title_control_visibility">Exclua da Linha do tempo</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Para mostrar arquivos ocultos, ative a opção “Mostrar itens ocultos” em “Gerenciamento de arquivos” - “Interface do usuário” nas configurações do seu aplicativo.</string>
+    <string name="hidden_nodes_description_control_visibility">Somente é possível acessar itens ocultos por meio da Nuvem de arquivos: eles não aparecerão nas suas Fotos, nos Álbuns ou nas Atividades recentes.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Os arquivos compartilhados permanecem visíveis</string>
+    <string name="hidden_nodes_title_visible_shared_files">Fora do alcance</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Os arquivos e as pastas compartilhados com contatos ou por meio de links públicos permanecem acessíveis e visíveis, mesmo se estiverem ocultos</string>
+    <string name="hidden_nodes_description_visible_shared_files">Você decide quando os arquivos ocultos ficam visíveis. Há uma nova configuração para mostrar itens ocultos temporariamente.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Mantenha as suas fotos seguras, sempre</string>
     <!--Camera backup permission screen description-->
@@ -1461,9 +1461,9 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">Arquivos com o mesmo nome, mas com conteúdo diferente, terão um sufixo adicionado, como (1)</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">Todas as pastas serão mescladas. Arquivos com conteúdo igual, mas diferente, terão um sufixo adicionado, como (1).</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
     <!-- Dialog choose option -->
@@ -1471,7 +1471,7 @@
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Aplicar a todos</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">O problema foi resolvido</string>
+    <string name="sync_stalled_issue_resolved">Problema solucionado</string>
     <!-- Sync message when multiple issues resolved -->
     <string name="sync_stalled_issues_resolved">Os problemas foram resolvidos</string>
     <!-- Text of the empty playlist in Video Section -->
@@ -1483,21 +1483,35 @@
         <item quantity="other">%1$d vídeos</item>
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
-    <string name="sync_stop_backup_confirm_dialog_move_explanation">Mova essa pasta para a sua Nuvem de arquivos para obter acesso total aos seus dados. O backup já não será feito.</string>
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">Mova esta pasta para a sua Nuvem de arquivos para obter acesso total aos seus dados. O backup já não será feito.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
     <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
+    <string name="camera_uploads_banner_checking_uploads_text">Verificando se há uploads...</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
-    <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <string name="camera_uploads_banner_uploading_pending_count_text">Upload: %d itens restantes</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
-    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <string name="sync_resolve_rename_all_items_title">Renomear todos os itens?</string>
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
-    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <string name="sync_stalled_issue_merge_folders_title">Combinar pastas e renomear arquivos?</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <string name="sync_stalled_issue_choose_local_file_title">Escolher o arquivo local?</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">Escolha o arquivo armazenado no MEGA?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">Escolher o arquivo com a data de alteração mais recente?</string>
+    <!-- Colored folders onboarding title -->
+    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <!-- Colored folders onboarding description -->
+    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <!-- Dialog merge option -->
+    <string name="sync_apply_all_dialog_merge_button">Combinar</string>
+    <!-- Dialog rename option -->
+    <string name="sync_apply_all_dialog_rename_button">Renomear</string>
+    <!-- Sync text when need to solved stalled issues-->
+    <string name="sync_menu_clear_issues">Deletar os problemas solucionados</string>
+    <!--Sign Up page text field input first name error message when character limit exceeded-->
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">O nome não ter mais de 40 caracteres</string>
+    <!--Sign Up page text field input last name error message when character limit exceeded-->
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">O sobrenome não ter mais de 40 caracteres</string>
 </resources>

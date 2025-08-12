@@ -1023,17 +1023,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">新功能：隐藏的文件和文件夹</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">隐藏文件和文件夹</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">隐藏重要的文件和文件夹</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">轻松将云盘中的敏感文件设置为私密不可见。默认情况下，隐藏的文件不会在您的云盘、照片和近期中显示。</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">您可以隐藏敏感的文件和文件夹以保护隐私。只有您可以单独或通过菜单暂时显示隐藏项目，来显示它们。</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">轻松控制可见性</string>
+    <string name="hidden_nodes_title_control_visibility">从时间线中排除</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” - “User interface” in your app settings.</string>
+    <string name="hidden_nodes_description_control_visibility">隐藏的项目只能通过云盘访问，不会出现在您的照片、相册或近期记录中。</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">共享文件保持可见状态</string>
+    <string name="hidden_nodes_title_visible_shared_files">不可见</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <string name="hidden_nodes_description_visible_shared_files">您可以决定何时显示隐藏的文件。此处新增设置可以暂时显示隐藏的项目。</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
     <!--Camera backup permission screen description-->
@@ -1428,9 +1428,9 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged. Files with the same but different content will have a suffix like(1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
     <!-- Dialog choose option -->
@@ -1438,7 +1438,7 @@
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">应用于全部</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue has been solved</string>
+    <string name="sync_stalled_issue_resolved">Issue solved</string>
     <!-- Sync message when multiple issues resolved -->
     <string name="sync_stalled_issues_resolved">Issues have been solved</string>
     <!-- Text of the empty playlist in Video Section -->
@@ -1465,4 +1465,18 @@
     <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <!-- Colored folders onboarding title -->
+    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <!-- Colored folders onboarding description -->
+    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <!-- Dialog merge option -->
+    <string name="sync_apply_all_dialog_merge_button">合并</string>
+    <!-- Dialog rename option -->
+    <string name="sync_apply_all_dialog_rename_button">重命名</string>
+    <!-- Sync text when need to solved stalled issues-->
+    <string name="sync_menu_clear_issues">清除已解决的问题</string>
+    <!--Sign Up page text field input first name error message when character limit exceeded-->
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <!--Sign Up page text field input last name error message when character limit exceeded-->
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
 </resources>

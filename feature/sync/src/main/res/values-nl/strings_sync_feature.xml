@@ -31,13 +31,13 @@
         <item quantity="other">%1$d bestanden</item>
     </plurals>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Opgeloste problemen oplossen</string>
+    <string name="sync_menu_clear_issues">Opgeloste problemen wissen</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Tweezijdige synchronisatie</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Hernoem alle items</string>
     <!-- Sync to resolve conflict Merge folders -->
-    <string name="sync_stalled_issue_merge_folders">Mappen samenvoegen</string>
+    <string name="sync_stalled_issue_merge_folders">Merge folders and rename files</string>
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">Kies het lokale bestand</string>
     <!-- Sync to resolve conflict Choose remote file -->

@@ -1023,17 +1023,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">新功能：隱藏檔案和資料夾</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">隱藏檔案和資料夾</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">隱藏重要的檔案和資料夾</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">輕鬆將雲端硬碟中的敏感檔案設成私密，不讓任何人看到。預設情況下，隱藏的檔案不會在您的雲端硬碟、照片和近期活動顯示。</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">您可以隱藏敏感的檔案和資料夾以保護隱私。只有您可以單獨或透過從選單中暫時顯示隱藏項目來顯示它們。。</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">輕鬆控制可見性</string>
+    <string name="hidden_nodes_title_control_visibility">從時間軸中排除</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">若要顯示隱藏檔案，請在應用程式設定中的「檔案管理」－「使用者介面」下開啟「顯示隱藏項目」設定。</string>
+    <string name="hidden_nodes_description_control_visibility">隱藏的項目只能透過雲端硬碟存取，不會出現在您的照片、相簿或最近的活動記錄。</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">共享檔案保持可見狀態</string>
+    <string name="hidden_nodes_title_visible_shared_files">隱藏</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">共享給聯絡人，或透過公開連結共享的檔案及資料夾，即使設定隱藏，仍然可以存取和被看到</string>
+    <string name="hidden_nodes_description_visible_shared_files">您可以決定何時顯示隱藏的檔案。有一個新的設定可以暫時顯示隱藏的項目。</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">始終確保照片的安全</string>
     <!--Camera backup permission screen description-->
@@ -1427,9 +1427,9 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">名稱相同但內容不同的檔案會加上類似（1）的後綴</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">所有資料夾都將合併。名稱相同但內容不同的檔案將會加上類似（1）的後綴。</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
     <!-- Dialog choose option -->
@@ -1437,7 +1437,7 @@
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">套用至全部</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">問題已解決</string>
+    <string name="sync_stalled_issue_resolved">Issue solved</string>
     <!-- Sync message when multiple issues resolved -->
     <string name="sync_stalled_issues_resolved">問題已解決</string>
     <!-- Text of the empty playlist in Video Section -->
@@ -1464,4 +1464,18 @@
     <string name="sync_stalled_issue_choose_remote_file_title">選擇儲存在MEGA中的檔案？</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">選擇上次修改的檔案？</string>
+    <!-- Colored folders onboarding title -->
+    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <!-- Colored folders onboarding description -->
+    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <!-- Dialog merge option -->
+    <string name="sync_apply_all_dialog_merge_button">合併</string>
+    <!-- Dialog rename option -->
+    <string name="sync_apply_all_dialog_rename_button">重新命名</string>
+    <!-- Sync text when need to solved stalled issues-->
+    <string name="sync_menu_clear_issues">清除已解決的問題</string>
+    <!--Sign Up page text field input first name error message when character limit exceeded-->
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <!--Sign Up page text field input last name error message when character limit exceeded-->
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
 </resources>
