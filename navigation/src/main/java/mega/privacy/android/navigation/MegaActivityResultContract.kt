@@ -2,6 +2,7 @@ package mega.privacy.android.navigation
 
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContract
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.navigation.camera.CameraArg
 
@@ -67,4 +68,12 @@ interface MegaActivityResultContract {
      * Contract for in-app camera functionality.
      */
     val inAppCameraResultContract: ActivityResultContract<CameraArg, Uri?>
+
+    /**
+     * Contract for handling name collisions in file operations.
+     *
+     * @return [ActivityResultContract] with input type [ArrayList<NameCollision>] (list of name collisions)
+     *         and output type [String?] (resulting file name or null if no resolution was made)
+     */
+    val nameCollisionActivityContract: ActivityResultContract<ArrayList<NameCollision>, String?>
 }

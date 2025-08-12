@@ -56,6 +56,13 @@ interface AppNavigator {
     )
 
     /**
+     * Navigates to the Over Disk Quota Paywall warning screen
+     *
+     * @param context The Context
+     */
+    fun openOverDiskQuotaPaywallWarning(context: Context)
+
+    /**
      * Open chat
      *
      * @param context

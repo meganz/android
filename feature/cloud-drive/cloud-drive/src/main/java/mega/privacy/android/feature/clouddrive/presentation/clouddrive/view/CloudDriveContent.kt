@@ -1,5 +1,10 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive.view
 
+import android.Manifest.permission.CAMERA
+import android.Manifest.permission.RECORD_AUDIO
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,8 +30,8 @@ import mega.android.core.ui.components.LoadingView
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
-import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
+import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.SortOrder
@@ -33,6 +39,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ChangeViewTypeClicked
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ItemClicked
@@ -41,7 +48,9 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.NavigateToFolderEventConsumed
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.OpenedFileNodeHandled
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
-import mega.privacy.android.feature.clouddrive.R
+import mega.privacy.android.feature.clouddrive.presentation.upload.UploadingFiles
+import mega.privacy.android.navigation.camera.CameraArg
+import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,15 +74,38 @@ internal fun CloudDriveContent(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val snackbarHostState = LocalSnackBarHostState.current
+    val megaResultContract = rememberMegaResultContract()
+    var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
+
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.inAppCameraResultContract
+    ) { uri: Uri? ->
+        if (uri != null) {
+            uploadUris = listOf(uri)
+        }
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissionsResult ->
+        if (permissionsResult[CAMERA] == true) {
+            takePictureLauncher.launch(
+                CameraArg(
+                    title = context.getString(R.string.context_upload),
+                    buttonText = context.getString(R.string.context_upload)
+                )
+            )
+        } else {
+            coroutineScope.launch {
+                snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.chat_attach_pick_from_camera_deny_permission))
+            }
+        }
+    }
 
     when {
         uiState.isLoading -> {
             if (uiState.currentFolderId.longValue == -1L) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-
-                ) {
+                Box(modifier = Modifier.fillMaxSize()) {
                     LoadingView(Modifier.align(alignment = Alignment.Center))
                 }
             }
@@ -134,6 +166,15 @@ internal fun CloudDriveContent(
         )
     }
 
+    UploadingFiles(
+        parentNodeId = uiState.currentFolderId,
+        uris = uploadUris,
+        onStartUpload = { transferTriggerEvent ->
+            onTransfer(transferTriggerEvent)
+            uploadUris = emptyList()
+        },
+    )
+
     if (showUploadOptionsBottomSheet) {
         UploadOptionsBottomSheet(
             onUploadFilesClicked = {
@@ -146,7 +187,7 @@ internal fun CloudDriveContent(
                 onAction(CloudDriveAction.StartDocumentScanning)
             },
             onCaptureClicked = {
-                // TODO: Handle capture
+                cameraPermissionLauncher.launch(arrayOf(CAMERA, RECORD_AUDIO))
             },
             onNewFolderClicked = {
                 showNewFolderDialog = true

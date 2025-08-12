@@ -4,4 +4,9 @@
     <string name="context_folder_created">Folder created</string>
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Error. Folder not created</string>
+    <string name="context_upload">Upload</string>
+    <string name="upload_can_not_open">Cannot open selected file</string>
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA needs access to your camera to capture photos and videos.</string>
+    <string name="error_not_enough_free_space">Not enough free space on your device</string>
+    <string name="error_temporary_unavaible">Resource temporarily not available, please try again later</string>
 </resources>
