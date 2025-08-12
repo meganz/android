@@ -8,12 +8,14 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountUIState
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.FIRST_NAME
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.LAST_NAME
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,6 +26,8 @@ class CreateAccountCharacterLimitTest {
 
     @get:Rule
     val composeRule = createComposeRule()
+
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private fun setupRule(
         state: CreateAccountUIState = CreateAccountUIState(),
@@ -74,7 +78,7 @@ class CreateAccountCharacterLimitTest {
 
         composeRule.onNode(
             hasTestTag(FIRST_NAME)
-        ).assert(hasAnyChild(hasText("First name cannot exceed 40 characters")))
+        ).assert(hasAnyChild(hasText(context.getString(R.string.sign_up_first_name_text_field_char_limit_exceed_error))))
     }
 
     @Test
@@ -87,7 +91,7 @@ class CreateAccountCharacterLimitTest {
 
         composeRule.onNode(
             hasTestTag(LAST_NAME)
-        ).assert(hasAnyChild(hasText("Last name cannot exceed 40 characters")))
+        ).assert(hasAnyChild(hasText(context.getString(R.string.sign_up_last_name_text_field_char_limit_exceed_error))))
     }
 
     @Test
@@ -155,11 +159,11 @@ class CreateAccountCharacterLimitTest {
 
         composeRule.onNode(
             hasTestTag(FIRST_NAME)
-        ).assert(hasAnyChild(hasText("First name cannot exceed 40 characters")))
+        ).assert(hasAnyChild(hasText(context.getString(R.string.sign_up_first_name_text_field_char_limit_exceed_error))))
 
         composeRule.onNode(
             hasTestTag(LAST_NAME)
-        ).assert(hasAnyChild(hasText("Last name cannot exceed 40 characters")))
+        ).assert(hasAnyChild(hasText(context.getString(R.string.sign_up_last_name_text_field_char_limit_exceed_error))))
     }
 
     @Test
@@ -174,10 +178,11 @@ class CreateAccountCharacterLimitTest {
 
         composeRule.onNode(
             hasTestTag(FIRST_NAME)
-        ).assert(hasAnyChild(hasText("Enter a first name")))
+        ).assert(hasAnyChild(hasText(context.getString(R.string.sign_up_first_name_text_field_error_message))))
 
         composeRule.onNode(
             hasTestTag(LAST_NAME)
-        ).assert(hasAnyChild(hasText("Last name cannot exceed 40 characters")))
+        )
+            .assert(hasAnyChild(hasText(context.getString(R.string.sign_up_last_name_text_field_char_limit_exceed_error))))
     }
 }
