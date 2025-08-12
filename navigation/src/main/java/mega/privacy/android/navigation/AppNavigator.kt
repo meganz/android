@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
@@ -432,5 +433,20 @@ interface AppNavigator {
         cloudDriveParentHandle: Long,
         scanPdfUri: Uri,
         scanSoloImageUri: Uri?,
+    )
+
+    /**
+     * Open Search Activity
+     *
+     * @param context The context
+     * @param nodeSourceType The source type of the node
+     * @param parentHandle The parent handle of the node
+     * @param isFirstNavigationLevel Indicates if this is the first navigation level
+     */
+    fun openSearchActivity(
+        context: Context,
+        nodeSourceType: NodeSourceType,
+        parentHandle: Long,
+        isFirstNavigationLevel: Boolean = false,
     )
 }

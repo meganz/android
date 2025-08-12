@@ -87,4 +87,10 @@ data class CloudDriveUiState(
      */
     val selectedNodeIds: List<NodeId>
         get() = items.mapNotNull { if (it.isSelected) it.node.id else null }
+
+    /**
+     * Checks if the current folder is the root cloud drive folder.
+     */
+    val isRootCloudDrive: Boolean
+        get() = currentFolderId.longValue == -1L
 }

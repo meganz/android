@@ -65,6 +65,7 @@ class CloudDriveViewModel @Inject constructor(
     private val args = savedStateHandle.toRoute<CloudDrive>()
     private val highlightedNodeId = args.highlightedNodeHandle?.let { NodeId(it) }
     private val highlightedNodeNames = args.highlightedNodeNames
+    internal val nodeSourceType = args.nodeSourceType
 
     internal val uiState: StateFlow<CloudDriveUiState>
         field = MutableStateFlow(CloudDriveUiState(currentFolderId = NodeId(args.nodeHandle)))
@@ -186,7 +187,7 @@ class CloudDriveViewModel @Inject constructor(
         runCatching {
             getNodeByIdUseCase(folderId) to nodeUiItemMapper(
                 nodeList = getFileBrowserNodeChildrenUseCase(folderId.longValue),
-                nodeSourceType = args.nodeSourceType,
+                nodeSourceType = nodeSourceType,
                 highlightedNodeId = highlightedNodeId,
                 highlightedNames = highlightedNodeNames,
             )

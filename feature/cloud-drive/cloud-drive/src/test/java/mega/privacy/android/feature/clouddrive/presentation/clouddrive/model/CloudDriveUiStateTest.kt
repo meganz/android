@@ -281,6 +281,16 @@ class CloudDriveUiStateTest {
         assertThat(state.selectedNodeIds).isEmpty()
     }
 
+
+    @Test
+    fun `test that isRootCloudDrive is true when current folder handle is -1L`() {
+        val state = CloudDriveUiState(
+            currentFolderId = NodeId(-1L),
+        )
+
+        assertThat(state.isRootCloudDrive).isTrue()
+    }
+
     private fun createTestItems(
         selected: List<Boolean>,
         sensitive: List<Boolean>,

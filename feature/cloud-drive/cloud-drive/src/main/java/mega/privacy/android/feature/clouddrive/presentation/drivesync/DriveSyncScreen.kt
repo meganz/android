@@ -87,7 +87,12 @@ internal fun DriveSyncScreen(
                         when {
                             selectedTabIndex == 0 && cloudDriveUiState.items.isNotEmpty() -> add(
                                 TopAppBarActionWithClick(CloudDriveAppBarAction.Search) {
-                                    // TODO Handle search
+                                    megaNavigator.openSearchActivity(
+                                        context = context,
+                                        nodeSourceType = cloudDriveViewModel.nodeSourceType,
+                                        parentHandle = cloudDriveUiState.currentFolderId.longValue,
+                                        isFirstNavigationLevel = true
+                                    )
                                 })
 
                             selectedTabIndex == 1 -> add(

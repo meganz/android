@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
+import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
@@ -79,6 +80,7 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
@@ -699,10 +701,29 @@ internal class MegaNavigatorImpl @Inject constructor(
     ) {
         val intent = Intent(context, SaveScannedDocumentsActivity::class.java).apply {
             putExtra(SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT, originatedFromChat)
-            putExtra(SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE, cloudDriveParentHandle)
+            putExtra(
+                SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
+                cloudDriveParentHandle
+            )
             putExtra(SaveScannedDocumentsActivity.EXTRA_SCAN_PDF_URI, scanPdfUri)
             putExtra(SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI, scanSoloImageUri)
         }
         context.startActivity(intent)
+    }
+
+    override fun openSearchActivity(
+        context: Context,
+        nodeSourceType: NodeSourceType,
+        parentHandle: Long,
+        isFirstNavigationLevel: Boolean,
+    ) {
+        context.startActivity(
+            SearchActivity.getIntent(
+                context = context,
+                nodeSourceType = nodeSourceType,
+                parentHandle = parentHandle,
+                isFirstNavigationLevel = isFirstNavigationLevel
+            )
+        )
     }
 }

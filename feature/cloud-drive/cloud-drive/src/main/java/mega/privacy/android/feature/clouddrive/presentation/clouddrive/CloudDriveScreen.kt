@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffold
@@ -20,6 +21,7 @@ import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
 
 /**
@@ -35,6 +37,8 @@ fun CloudDriveScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val megaNavigator = rememberMegaNavigator()
 
     BackHandler(enabled = uiState.isInSelectionMode) {
         viewModel.processAction(DeselectAllItems)
@@ -53,11 +57,27 @@ fun CloudDriveScreen(
                     title = uiState.title.text,
                     navigationType = AppBarNavigationType.Back(onBack),
                     actions = buildList {
-                        when {
-                            uiState.items.isNotEmpty() -> add(
+                        if (uiState.items.isNotEmpty()) {
+                            add(
                                 TopAppBarActionWithClick(CloudDriveAppBarAction.Search) {
-                                    // TODO Handle search
-                                })
+                                    megaNavigator.openSearchActivity(
+                                        context = context,
+                                        nodeSourceType = viewModel.nodeSourceType,
+                                        parentHandle = uiState.currentFolderId.longValue,
+                                        isFirstNavigationLevel = false
+                                    )
+                                }
+                            )
+                        }
+
+                        if (!uiState.isRootCloudDrive) {
+                            add(
+                                TopAppBarActionWithClick(
+                                    CloudDriveAppBarAction.More
+                                ) {
+                                    // TODO Open node options bottom sheet
+                                }
+                            )
                         }
                     },
                 )
