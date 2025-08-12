@@ -269,7 +269,7 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Xóa liên kết</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Rời khỏi thư mục</string>
+    <string name="alert_leave_share">Từ bỏ thư mục</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Loại bỏ chia sẻ</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -1273,7 +1273,7 @@
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
-        <item quantity="other">Nếu bạn quyết định rời khỏi các thư mục này, bạn sẽ không thể truy cập lại được nữa.</item>
+        <item quantity="other">Nếu bạn quyết định từ bỏ các thư mục này, bạn sẽ không thể truy cập lại được nữa.</item>
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Trợ Giúp</string>
@@ -3471,9 +3471,9 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">Tiếp&#160;tục phát video?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">“%1$s” sẽ tiếp&#160;tục phát tại %2$s.</string>
+    <string name="video_playback_position_dialog_message">“%1$s” sẽ tiếp&#160;tục phát tại mốc %2$s.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
-    <string name="video_playback_position_dialog_resume_button">Tiếp tục phát</string>
+    <string name="video_playback_position_dialog_resume_button">Tiếp tục</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">Phát từ đầu</string>
     <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->

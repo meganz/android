@@ -691,7 +691,7 @@
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">재생목록에 추가</string>
     <!-- Stop Backup confirmation dialog text -->
-    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up this folder, you need to either move it or delete it</string>
+    <string name="sync_stop_backup_confirm_dialog_text">이 폴더의 백업을 중단하시려면, 폴더를 이동하거나 삭제해야 합니다</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">확인</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -1023,17 +1023,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">새 기능: 숨겨진 파일과 폴더</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">숨겨진 파일과 폴더</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">중요한 파일과 폴더 숨기기</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">클라우드 드라이브의 민감한 파일을 쉽게 비공개이면서 보이지 않게 보관하세요. 기본적으로, 숨겨진 파일은 클라우드 드라이브, 사진, 최근 섹션에 나타나지 않습니다.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">개인 정보 보호를 위해 민감한 파일 및 폴더를 숨길 수 있습니다. 당신만 그것들을 개별적으로 또는 일시적으로 숨겨진 항목들을 메뉴에서 나타나게 할 수 있습니다.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">가시성을 쉽게 제어</string>
+    <string name="hidden_nodes_title_control_visibility">연표에서 제외</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">숨겨진 파일을 나타내려면, 앱 설정의 “파일 관리” - “이용자 인터페이스”에서 “숨겨진 항목 보기”를 켜세요.</string>
+    <string name="hidden_nodes_description_control_visibility">숨겨진 항목은 클라우드 드라이브를 통해서만 접근 가능하며 사진, 사진첩 또는 최근 항목에 나타나지 않습니다.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">공유된 파일은 보이는 상태로 유지됩니다</string>
+    <string name="hidden_nodes_title_visible_shared_files">시야 범위 밖</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">연락처 또는 공개 링크로 공유한 파일과 폴더는 숨김 처리를 해도 접근 가능하고 보이게 됩니다</string>
+    <string name="hidden_nodes_description_visible_shared_files">숨겨진 파일이 보일 때를 정할 수 있습니다. 숨겨진 항목을 일시적으로 보이게 하는 새로운 설정이 있습니다.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">항상 사진을 안전하게 보관</string>
     <!--Camera backup permission screen description-->
@@ -1337,7 +1337,7 @@
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">정보</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">라벨</string>
+    <string name="file_properties_label">레이블</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">폴더 나가기</string>
     <!-- Option of the sliding panel to edit the link of a node -->
@@ -1381,17 +1381,17 @@
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">폴더에서 보기</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
-    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Or delete the folder from MEGA. It won’t be deleted from your device. This action can’t be undone.</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">또는 폴더를 MEGA에서 삭제합니다. 장치에서는 삭제되지 않습니다. 이 행동은 되돌릴 수 없습니다.</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Move folder to Cloud drive</string>
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">폴더를 클라우드 드라이브로 이동</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Delete folder from MEGA</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">MEGA에서 폴더 삭제</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
     <string name="camera_uploads_banner_complete_title">카메라 업로드 완료</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
+    <string name="camera_uploads_banner_no_full_access_message">당신의 추억을 잃지 않게 하기 위해, MEGA는 당신의 사진 라이브러리에 대한 전체 접근 권한이 필요합니다.</string>
     <!-- Message of notice that the zip file format is error -->
-    <string name="message_zip_format_error">File can’t be opened as the file format isn’t supported</string>
+    <string name="message_zip_format_error">파일 형식이 지원되지 않아서 파일을 열 수 없습니다</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">장치에 이 파일을 실행할 적합한 앱이 없습니다</string>
     <!-- A user can mark a folder or file with red colour. -->
@@ -1415,21 +1415,21 @@
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">오류가 발생했습니다, 다시 시도하세요.</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="general_select_create_folder">Select or create a new folder</string>
+    <string name="general_select_create_folder">폴더를 선택하거나 새 폴더를 만드세요</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
-    <string name="sync_snackbar_message_confirm_backup_moved">Backup stopped. Folder was moved to %1$s</string>
+    <string name="sync_snackbar_message_confirm_backup_moved">백업이 멈추었습니다. 폴더가 %1$s(으)로 옮겨졌습니다</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="sync_snackbar_message_confirm_backup_deleted">Backup stopped. Folder deleted from MEGA.</string>
+    <string name="sync_snackbar_message_confirm_backup_deleted">백업이 멈추었습니다. 폴더가 MEGA에서 삭제되었습니다.</string>
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
+    <string name="sync_stalled_issue_choose_local_file_explanation">MEGA의 폴더가 [A]%1$s[/A]과/와 교체됩니다. 기존 버전은 휴지통의 SyncDebris 폴더로 옮겨집니다.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder</string>
+    <string name="sync_stalled_issue_choose_remote_file_explanation">로컬 파일 [A]%1$s[/A]이/가 .debris 폴더로 옮겨졌습니다</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
+    <string name="sync_stalled_issue_choose_rename_file_explanation">같은 이름을 가졌지만 내용이 다른 파일은 (1) 같은 접미사가 붙게 됩니다</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged. Files with the same but different content will have a suffix like(1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">모든 폴더가 합쳐지고 같은 이름을 가졌지만 내용이 다른 파일은 (1) 같은 접미사가 붙게 됩니다.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
     <!-- Dialog choose option -->
@@ -1437,9 +1437,9 @@
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">모두 적용</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue has been solved</string>
+    <string name="sync_stalled_issue_resolved">문제 해결됨</string>
     <!-- Sync message when multiple issues resolved -->
-    <string name="sync_stalled_issues_resolved">Issues have been solved</string>
+    <string name="sync_stalled_issues_resolved">문제가 해결되었습니다</string>
     <!-- Text of the empty playlist in Video Section -->
     <string name="video_section_playlists_video_empty">비우기</string>
     <!-- Text of video count of playlist in Video Section -->
@@ -1447,21 +1447,35 @@
         <item quantity="other">동영상 %1$d개</item>
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
-    <string name="sync_stop_backup_confirm_dialog_move_explanation">Move this folder to your Cloud drive to get full access to your data. It will no longer be backed up to.</string>
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">당신의 데이터에 대한 전체 접근 권한을 받으려면 이 폴더를 클라우드 드라이브로 옮기세요. 앞으로는 백업되지 않습니다.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. 웹 브라우저에서 [A]https://%1$s[/A]에 방문하세요.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
+    <string name="camera_uploads_banner_checking_uploads_text">업로드 확인 중...</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
-    <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <string name="camera_uploads_banner_uploading_pending_count_text">업로드 중: %d개 항목 남음</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
-    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <string name="sync_resolve_rename_all_items_title">모든 항목의 이름을 바꿀까요?</string>
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
-    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <string name="sync_stalled_issue_merge_folders_title">폴더를 합치고 파일 이름을 바꿀까요?</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <string name="sync_stalled_issue_choose_local_file_title">로컬 파일을 선택하세요</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">MEGA에 저장될 파일을 선택하세요</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">마지막으로 수정된 파일을 선택하세요</string>
+    <!-- Colored folders onboarding title -->
+    <string name="colored_folders_onboarding_title">여러 색의 폴더, 더 깔끔한 정리</string>
+    <!-- Colored folders onboarding description -->
+    <string name="colored_folders_onboarding_description">폴더에 레이블을 추가하면, 폴더에 색깔이 나타납니다. 이것은 당신이 원하는 것을 더 빠르게 찾게 해줍니다.</string>
+    <!-- Dialog merge option -->
+    <string name="sync_apply_all_dialog_merge_button">병합</string>
+    <!-- Dialog rename option -->
+    <string name="sync_apply_all_dialog_rename_button">이름 바꾸기</string>
+    <!-- Sync text when need to solved stalled issues-->
+    <string name="sync_menu_clear_issues">해결된 문제 지우기</string>
+    <!--Sign Up page text field input first name error message when character limit exceeded-->
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">이름은 40자를 초과할 수 없습니다</string>
+    <!--Sign Up page text field input last name error message when character limit exceeded-->
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">성은 40자를 초과할 수 없습니다</string>
 </resources>

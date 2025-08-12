@@ -291,7 +291,7 @@
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Добавить синхронизацию</string>
     <!-- Text for the Sync solved issues chip -->
-    <string name="device_center_sync_solved_issues_chip_text">Решённые проблемы</string>
+    <string name="device_center_sync_solved_issues_chip_text">Исправленные ошибки</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
     <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">Эту папку невозможно синхронизировать. Настройте её синхронизацию с MEGA с помощью загрузок из камеры.</string>
     <!-- Label for the file info information screen description field -->
@@ -309,7 +309,7 @@
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
     <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Неограниченные звонки и встречи \n&#8226;&#160;Автоматическая синхронизация папок на мобильном устройстве</string>
     <!-- Text for the Sync solved issues list empty state -->
-    <string name="device_center_sync_solved_issues_empty_state_text">Нет решённых проблем</string>
+    <string name="device_center_sync_solved_issues_empty_state_text">Нет исправленных ошибок</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
     <string name="meetings_raised_hand_tooltip_title">[A]Новая функция: поднять руку[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
@@ -727,7 +727,7 @@
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">Добавить в плейлист</string>
     <!-- Stop Backup confirmation dialog text -->
-    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up this folder, you need to either move it or delete it</string>
+    <string name="sync_stop_backup_confirm_dialog_text">Чтобы прекратить резервное копирование этой папки, вам нужно либо переместить её, либо удалить</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">Подтвердить</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -1071,17 +1071,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Новая функция: скрытые файлы и папки</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">Скрывайте файлы и папки</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">Скрывайте важные файлы и папки</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">С лёгкостью сохраняйте конфиденциальные файлы на своем Облачном диске в тайне и вне поля зрения. По умолчанию скрытые файлы не отображаются в разделах «Облачный диск», «Фотографии» и «Недавние».</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Вы можете скрывать важные файлы и папки в целях конфиденциальности. Отобразить их можете только вы: либо по отдельности, либо временно временно включить отображение скрытых элементов в меню.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Простое управление видимостью</string>
+    <string name="hidden_nodes_title_control_visibility">Исключайте из «Ленты»</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Чтобы показать скрытые файлы, включите настройку «Показывать скрытые элементы» в разделе «Управление файлами» — «Пользовательский интерфейс» в настройках приложения.</string>
+    <string name="hidden_nodes_description_control_visibility">Скрытые элементы доступны только через Облачный диск и не отображаются в «Фотографиях», «Альбомах» или «Недавних».</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Общие файлы остаются видимыми</string>
+    <string name="hidden_nodes_title_visible_shared_files">С глаз долой</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Файлы и папки, которыми вы поделились с контактами или для которых созданы публичные ссылки, по-прежнему доступны и видны, даже если они скрыты</string>
+    <string name="hidden_nodes_description_visible_shared_files">Вы сами решаете, когда будут видны скрытые файлы. Появилась новая настройка для временного отображения скрытых элементов.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Ваши фото всегда в безопасности</string>
     <!--Camera backup permission screen description-->
@@ -1432,17 +1432,17 @@
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">Открыть в папке</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
-    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Or delete the folder from MEGA. It won’t be deleted from your device. This action can’t be undone.</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Или удалите папку из MEGA. Она не будет удалена с вашего устройства. Это действие нельзя отменить.</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Move folder to Cloud drive</string>
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Переместить папку на Облачный диск</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Delete folder from MEGA</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Удалить папку из MEGA</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
     <string name="camera_uploads_banner_complete_title">Загрузки из камеры завершены</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
     <string name="camera_uploads_banner_no_full_access_message">Чтобы мы не пропустили все ваши воспоминания, MEGA нужен полный доступ к галерее.</string>
     <!-- Message of notice that the zip file format is error -->
-    <string name="message_zip_format_error">File can’t be opened as the file format isn’t supported</string>
+    <string name="message_zip_format_error">Невозможно открыть файл, так как формат файла не поддерживается</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">На вашем устройстве нет подходящего приложения, чтобы открыть этот файл</string>
     <!-- A user can mark a folder or file with red colour. -->
@@ -1466,21 +1466,21 @@
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">Произошла ошибка, попробуйте ещё раз.</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="general_select_create_folder">Select or create a new folder</string>
+    <string name="general_select_create_folder">Выберите или создайте новую папку</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
-    <string name="sync_snackbar_message_confirm_backup_moved">Backup stopped. Folder was moved to %1$s</string>
+    <string name="sync_snackbar_message_confirm_backup_moved">Резервное копирование остановлено. Папка была перемещена в %1$s</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="sync_snackbar_message_confirm_backup_deleted">Backup stopped. Folder deleted from MEGA.</string>
+    <string name="sync_snackbar_message_confirm_backup_deleted">Резервное копирование остановлено. Папка удалена из MEGA.</string>
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
+    <string name="sync_stalled_issue_choose_local_file_explanation">Файл в MEGA будет заменён на [A]%1$s.[/A] Существующая версия будет перемещена в папку SyncDebris в Корзине.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder</string>
+    <string name="sync_stalled_issue_choose_remote_file_explanation">Локальный файл [A]%1$s[/A] будет перемещён в папку .debris.</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
+    <string name="sync_stalled_issue_choose_rename_file_explanation">К файлам с одинаковыми названиями, но разным содержимым будет добавлен суффикс типа (1)</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged. Files with the same but different content will have a suffix like(1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
     <!-- Dialog choose option -->
@@ -1488,9 +1488,9 @@
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Применить ко всем</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue has been solved</string>
+    <string name="sync_stalled_issue_resolved">Ошибка исправлена</string>
     <!-- Sync message when multiple issues resolved -->
-    <string name="sync_stalled_issues_resolved">Issues have been solved</string>
+    <string name="sync_stalled_issues_resolved">Ошибки исправлены</string>
     <!-- Text of the empty playlist in Video Section -->
     <string name="video_section_playlists_video_empty">Очистить</string>
     <!-- Text of video count of playlist in Video Section -->
@@ -1501,21 +1501,35 @@
         <item quantity="other">%1$d видео</item>
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
-    <string name="sync_stop_backup_confirm_dialog_move_explanation">Move this folder to your Cloud drive to get full access to your data. It will no longer be backed up to.</string>
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">Переместите эту папку на Облачный диск, чтобы получить полный доступ к данным. Резервное копирование прекратится.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
     <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
+    <string name="camera_uploads_banner_checking_uploads_text">Проверка загрузок&#8230;</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
-    <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <string name="camera_uploads_banner_uploading_pending_count_text">Загрузка: осталось элементов: %d</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
-    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <string name="sync_resolve_rename_all_items_title">Переименовать все элементы?</string>
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
-    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <string name="sync_stalled_issue_merge_folders_title">Объединить папки и переименовать файлы?</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <string name="sync_stalled_issue_choose_local_file_title">Выбрать локальный файл?</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">Выбрать файл в MEGA?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">Выбрать последний изменённый файл?</string>
+    <!-- Colored folders onboarding title -->
+    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <!-- Colored folders onboarding description -->
+    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <!-- Dialog merge option -->
+    <string name="sync_apply_all_dialog_merge_button">Объединить</string>
+    <!-- Dialog rename option -->
+    <string name="sync_apply_all_dialog_rename_button">Переименовать</string>
+    <!-- Sync text when need to solved stalled issues-->
+    <string name="sync_menu_clear_issues">Удалить решённые проблемы</string>
+    <!--Sign Up page text field input first name error message when character limit exceeded-->
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">Имя не должно превышать 40 символов</string>
+    <!--Sign Up page text field input last name error message when character limit exceeded-->
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Фамилия не должна превышать 40 символов</string>
 </resources>

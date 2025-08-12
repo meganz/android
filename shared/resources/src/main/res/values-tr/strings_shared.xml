@@ -305,7 +305,7 @@
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_no_picker_warning">Bu cihazda klasör seçmek için bir uygulama yok</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Mobil cihazınızdaki klasörleri otomatik olarak senkronize edin</string>
+    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Mobil cihazınızdaki klasörleri otomatik olarak senkronize etme</string>
     <!-- Hidden items -->
     <string name="hidden_items">Gizli öğeler</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -1039,17 +1039,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Yeni özellik: Gizli dosyalar ve klasörler</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">Dosyaları ve klasörleri gizle</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">Hide important files and folders</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Bulut depolamanızdaki hassas dosyaları kolayca gizli ve gözden uzak tutun. Varsayılan olarak, gizli dosyalar bulut depolamanızda, Fotoğraflar ve Son etkinlikler bölümünde görünmez.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy. Only you can reveal them, either individually or by temporarily displaying hidden items from the menu.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Görünürlüğü kolayca kontrol edin</string>
+    <string name="hidden_nodes_title_control_visibility">Zaman çizelgesinden hariç tut</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Gizli dosyaları göstermek için uygulama ayarlarınızda “Dosya Yönetimi” - “Kullanıcı arayüzü” altındaki “Gizli öğeleri göster” ayarını açın.</string>
+    <string name="hidden_nodes_description_control_visibility">Gizli öğeler yalnızca Bulut depolama alanı aracılığıyla erişilebilir ve Fotoğraflarınızda, Albümlerinizde veya Son etkinliklerinizde görünmez.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Paylaşılan dosyalar görünür kalır</string>
+    <string name="hidden_nodes_title_visible_shared_files">Out of sight</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Kişilerle veya genel bağlantılarla paylaşılan dosya ve klasörler gizli olsalar bile erişilebilir ve görünür durumda kalır</string>
+    <string name="hidden_nodes_description_visible_shared_files">You decide when hidden files are visible. There is a new setting to show hidden items temporarily.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Fotoğraflarınızı her zaman güvende tutun</string>
     <!--Camera backup permission screen description-->
@@ -1161,13 +1161,13 @@
     <!-- Benefit: Transfer quota sharing -->
     <string name="pro_plan_benefit_transfer_quota_sharing">Transfer kotası paylaşımı</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
-    <string name="pro_plan_benefit_auto_sync_mobile">Mobil cihazınızdaki klasörleri otomatik olarak senkronize edin</string>
+    <string name="pro_plan_benefit_auto_sync_mobile">Mobil cihazınızdaki klasörleri otomatik olarak senkronize etme</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
-    <string name="pro_plan_benefit_rewind_180_days">Silinen verileri 180 güne kadar geri sarın</string>
+    <string name="pro_plan_benefit_rewind_180_days">Silinen verileri 180 güne kadar geri sarabilme</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
-    <string name="pro_plan_benefit_host_calls_unlimited">Sınırsız katılımcıyla ve zaman kısıtlaması olmadan arama ve toplantı düzenleyin</string>
+    <string name="pro_plan_benefit_host_calls_unlimited">Sınırsız katılımcıyla ve zaman kısıtlaması olmadan arama ve toplantı düzenleme</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
-    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Çöp kutusu temizliğini 7 gün ila 10 yıl arasında planlayın</string>
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Çöp kutusunun temizlenmesini 7 gün ila 10 yıl arasında planlama</string>
     <!-- Benefit: Priority support -->
     <string name="pro_plan_benefit_priority_support">Öncelikli destek</string>
     <!-- Subscription page information section title at the bottom of the page-->
@@ -1191,7 +1191,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
     <string name="choose_account_screen_transfer_quota_label">%1$s aktarım</string>
     <!-- General month label -->
-    <string name="general_month">/ay</string>
+    <string name="general_month">/aylık</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s / Ay</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
@@ -1400,7 +1400,7 @@
     <!-- Stop Backup confirmation dialog delete explanation -->
     <string name="sync_stop_backup_confirm_dialog_delete_explanation">Veya klasörü MEGA\’dan silin. Cihazınızdan silinmez. Bu işlem geri alınamaz.</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Klasörü bulut depolamaya taşı</string>
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Klasörü, Bulut depolamaya taşı</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
     <string name="sync_stop_backup_confirm_dialog_delete_permanently">Klasörü MEGA\’dan sil</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
@@ -1444,15 +1444,15 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">Aynı ada sahip ancak farklı içeriği olan dosyalara (1) gibi bir son ek eklenecektir.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">Tüm klasörler birleştirilecektir. Aynı ada sahip ancak farklı içeriği olan dosyalara (1) gibi bir son ek eklenecektir.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
     <!-- Dialog choose option -->
-    <string name="general_dialog_choose_button">Seçiniz</string>
+    <string name="general_dialog_choose_button">Seç</string>
     <!-- Text label of Apply to all -->
-    <string name="sync_apply_to_all_checkbox">Herkese uygula</string>
+    <string name="sync_apply_to_all_checkbox">Tümüne uygula</string>
     <!-- Sync message when a single issue resolved -->
     <string name="sync_stalled_issue_resolved">Sorun çözüldü</string>
     <!-- Sync message when multiple issues resolved -->
@@ -1471,15 +1471,29 @@
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
     <string name="camera_uploads_banner_checking_uploads_text">Yüklemeler kontrol ediliyor...</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
-    <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <string name="camera_uploads_banner_uploading_pending_count_text">Yükleniyor: %d öğe kaldı</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
     <string name="sync_resolve_rename_all_items_title">Tüm öğeler yeniden adlandırılsın mı?</string>
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
     <string name="sync_stalled_issue_merge_folders_title">Klasörler birleştirilerek yeniden adlandırılsın mı?</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <string name="sync_stalled_issue_choose_local_file_title">Yerel dosya mı seçilsin?</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">MEGA\’da depolanan dosya mı seçilsin?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">Son değiştirilen dosya mı seçilsin?</string>
+    <!-- Colored folders onboarding title -->
+    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <!-- Colored folders onboarding description -->
+    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <!-- Dialog merge option -->
+    <string name="sync_apply_all_dialog_merge_button">Birleştir</string>
+    <!-- Dialog rename option -->
+    <string name="sync_apply_all_dialog_rename_button">Yeniden adlandır</string>
+    <!-- Sync text when need to solved stalled issues-->
+    <string name="sync_menu_clear_issues">Clear solved issues</string>
+    <!--Sign Up page text field input first name error message when character limit exceeded-->
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">Ad, 40 karakteri geçemez</string>
+    <!--Sign Up page text field input last name error message when character limit exceeded-->
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Soyad, 40 karakteri geçemez</string>
 </resources>

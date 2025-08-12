@@ -1103,17 +1103,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">ميزة جديدة: ملفات ومجلدات مخفية</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">إخفاء ملفات و مجلدات</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">إخفاء الملفات والمجلدات المهمة</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">يمكنك بسهولة الاحتفاظ بالملفات الحساسة في السواقة السحابية الخاصة بك وبعيدًا عن الأنظار. افتراضيًا، لا تظهر الملفات المخفية في السواقة السحابية والصور وقسم «مؤخراً».</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">يمكنك إخفاء الملفات والمجلدات الحساسة للخصوصية. يمكنك فقط الكشف عنها، إما بشكل فردي أو عن طريق عرض العناصر المخفية مؤقتًا من القائمة.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">التحكم في الرؤية بسهولة</string>
+    <string name="hidden_nodes_title_control_visibility">الاستبعاد من المخطط الزمني</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">لإظهار الملفات المخفية، قم بتشغيل إعداد «إظهار العناصر المخفية» ضمن «إدارة الملفات» - «واجهة المستخدم» في إعدادات التطبيق.</string>
+    <string name="hidden_nodes_description_control_visibility">لا يمكن الوصول إلى العناصر المخفية إلا من خلال السواقة السحابية ولن تظهر في الصور أو الألبومات أو الأحداث الأخيرة.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">تظل الملفات المشاركة مرئية</string>
+    <string name="hidden_nodes_title_visible_shared_files">بعيدًا عن الأنظار</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">لا تزال الملفات والمجلدات التي تمت مشاركتها مع جهات الاتصال أو مع الروابط العامة قابلة للوصول ومرئية حتى لو كانت مخفية</string>
+    <string name="hidden_nodes_description_visible_shared_files">عليك أن تقرر متى تكون الملفات المخفية مرئية. هناك إعداد جديد لإظهار العناصر المخفية مؤقتًا.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">حافظ على صورك آمنة دائمًا</string>
     <!--Camera backup permission screen description-->
@@ -1512,9 +1512,9 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">ستتم إضافة لاحقة مثل (1) إلى الملفات التي تحمل الاسم نفسه ولكن بمحتوى مختلف</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">سيتم دمج جميع المجلدات. ستتم إضافة لاحقة مثل (1) للملفات التي تحتوي على نفس المحتوى ولكن المختلف.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
     <!-- Dialog choose option -->
@@ -1522,7 +1522,7 @@
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">قم بالتطبيق على الكل</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">تم حل المشكلة</string>
+    <string name="sync_stalled_issue_resolved">Issue solved</string>
     <!-- Sync message when multiple issues resolved -->
     <string name="sync_stalled_issues_resolved">تم حل المشكلات</string>
     <!-- Text of the empty playlist in Video Section -->
@@ -1554,4 +1554,18 @@
     <string name="sync_stalled_issue_choose_remote_file_title">اختر الملف المخزن في ميغا MEGA؟</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">اختر آخر ملف تم تعديله؟</string>
+    <!-- Colored folders onboarding title -->
+    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <!-- Colored folders onboarding description -->
+    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <!-- Dialog merge option -->
+    <string name="sync_apply_all_dialog_merge_button">دمج</string>
+    <!-- Dialog rename option -->
+    <string name="sync_apply_all_dialog_rename_button">تغيير الاسم</string>
+    <!-- Sync text when need to solved stalled issues-->
+    <string name="sync_menu_clear_issues">Clear solved issues</string>
+    <!--Sign Up page text field input first name error message when character limit exceeded-->
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <!--Sign Up page text field input last name error message when character limit exceeded-->
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
 </resources>

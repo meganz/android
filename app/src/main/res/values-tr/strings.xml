@@ -139,7 +139,7 @@
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">Şifreleme anahtarları oluşturuluyor</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
-    <string name="login_connecting_to_server">Sunucuyla bağlantı sağlanıyor</string>
+    <string name="login_connecting_to_server">Sunucuyla bağlantı kuruluyor</string>
     <!-- Status text when updating the file manager -->
     <string name="download_updating_filelist">Dosya listesi güncelleniyor</string>
     <!-- when the user clicks on the link sent by MEGA after creating the account, this message is shown -->
@@ -913,7 +913,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">Standart</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">Yönetici</string>
+    <string name="administrator_permission_label_participants_panel">Moderatör</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">(düzenlendi)</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -2224,7 +2224,7 @@
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
     <string name="title_delete_version_history">Önceki sürümler silinsin mi?</string>
     <!-- Text of the dialog shown when it wants to delete the version history of a file -->
-    <string name="text_delete_version_history">Lütfen mevcut dosyanın silinmeyeceğini unutmayın.</string>
+    <string name="text_delete_version_history">Mevcut dosya silinmeyecektir.</string>
     <!-- Alert shown when the version history was deleted correctly -->
     <string name="version_history_deleted">Önceki sürümler silindi.</string>
     <!-- Alert shown when the version history was deleted erroneously -->
@@ -2847,7 +2847,7 @@
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Telefon numaranızı ekleyin</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
-    <string name="backup_recovery_key_subtitle">Şifrenizi hatırlıyor musunuz?\nUnutmanız durumunda MEGA şifrenizi sıfırlayamaz.</string>
+    <string name="backup_recovery_key_subtitle">Şifrenizi hatırlıyor musunuz?\nMEGA, unutmanız durumunda şifrenizi sıfırlayamaz.</string>
     <!-- Action to change name -->
     <string name="change_name_action">Adı değiştir</string>
     <!-- Action to add photo -->
@@ -2936,9 +2936,9 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Konuşmacı görünümüne sabitle</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Yönetici yap</string>
+    <string name="make_moderator">Moderatör yap</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Yönetici ata</string>
+    <string name="assign_moderator">Moderatör ata</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
     <string name="pick_new_moderator_message">Lütfen bir veya daha fazla yeni yönetici atayın.</string>
     <!-- The title of dialog for changing meeting name-->
@@ -2966,7 +2966,7 @@
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">Toplantıya daha fazla katılımcı davet edin. Davet etmek için yukarı kaydırın.</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">Yeni yönetici sizsiniz</string>
+    <string name="be_new_moderator">Yeni moderatör sizsiniz</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Toplantı bağlantısı panoya kopyalandı</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3086,7 +3086,7 @@
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Klasör yükle</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Yöneticilikten çıkart</string>
+    <string name="remove_moderator">Moderatörlükten çıkar</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Yeni abonelik mi satın almak istiyorsunuz?</string>
     <!-- Text of buy new subscription button -->
@@ -3361,8 +3361,8 @@
     <string name="account_choose_free_limited_transfer_quota">[A]Sınırlı[/A] aktarım kotası</string>
     <!-- Name of hots or hosts in the meeting info bottom panel -->
     <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
-        <item quantity="one">Yönetici: %s</item>
-        <item quantity="other">Yöneticiler: %s</item>
+        <item quantity="one">Moderatör: %s</item>
+        <item quantity="other">Moderatörler: %s</item>
     </plurals>
     <!-- Number of participants in the call in the meeting info bottom panel -->
     <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
@@ -3374,13 +3374,13 @@
     <!-- Chat log message when the permissions for a user has been changed to standard -->
     <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A], [A]%2$s[/A] [B]tarafından standart katılımcı olarak değiştirildi[/B]</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
-    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A], [A]%2$s[/A] [B]tarafından yönetici rolüne değiştirildi[/B]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A], [A]%2$s[/A] [B]tarafından moderatör rolüne değiştirildi[/B]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s, %2$s tarafından salt okunur olarak değiştirildi</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s, %2$s tarafından standart katılımcı olarak değiştirildi</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s, %2$s tarafından yönetici rolüne değiştirildi</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s, %2$s tarafından moderatör rolüne değiştirildi</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
     <string name="calls_call_screen_waiting_for_participants">Başkalarının katılması bekleniyor</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
@@ -4330,7 +4330,7 @@
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_transfer">[B]Aktarım:[/B] [A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/ay[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/aylık[/B]</string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/yıl[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
@@ -4348,15 +4348,15 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite\’da 90 güne kadar, Pro&#160;I, II ve III\’de ise 180 güne kadar silinen verileri geri sarma</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Çöp kutusu temizliğini 7 gün ila 10 yıl arasında planlayın</string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Çöp kutusunun temizlenmesini 7 gün ila 10 yıl arasında planlama</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Pro&#160;Lite satın al</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Pro&#160;Lite’ı satın al</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Pro&#160;I satın al</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Pro&#160;I’i satın al</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;II satın al</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;II’yi satın al</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III satın al</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III’ü satın al</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">Bağlantıyı yalnızca şifreye sahip kişiler açabilir</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -4603,7 +4603,7 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">Bekleme odası</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">Toplantıya yalnızca yönetici tarafından kabul edilen katılımcılar katılabilir.</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">Toplantıya yalnızca moderatör tarafından kabul edilen katılımcılar katılabilir.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">Aramalar sırasında yönetici olmayanlar tarafından eklenen katılımcılar bekleme odasına gönderilmez.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
@@ -4626,9 +4626,9 @@
     <!-- Message of adding subtitle failed for video player-->
     <string name="media_player_video_message_adding_subtitle_failed">Öğe eklenemedi</string>
     <!-- Label to indicate that you are in the waiting room waiting for the moderator to start the meeting -->
-    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Yöneticinin toplantıyı başlatması bekleniyor</string>
+    <string name="meetings_waiting_room_wait_for_host_to_start_meeting_label">Moderatörün toplantıyı başlatması bekleniyor</string>
     <!-- Label to indicate that you are in the waiting room waiting for the host to let you into the meeting -->
-    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Yöneticinin sizi içeri alması bekleniyor</string>
+    <string name="meetings_waiting_room_wait_for_host_to_let_you_in_label">Moderatörün sizi içeri alması bekleniyor</string>
     <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
     <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s, doğrulamadığınız bir kişi tarafından paylaşıldı. Ek güvenlik sağlamak için, kimlik bilgilerini kişilerde doğrulamanızı öneririz. Doğrulamak istediğiniz kişinin yanındaki üç noktaya ve ardından Bilgi\’ye dokunun.</string>
     <!-- Cancel button in leave meeting dialog in a waiting room -->
@@ -4653,11 +4653,11 @@
     <!-- Dialog button to deny entry to a participant in the call -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_button">Girişi reddet</string>
     <!-- Dialog title when a participant has been denied entry to the call -->
-    <string name="meetings_waiting_room_deny_user_dialog_title">Yönetici içeri girmenize izin vermedi</string>
+    <string name="meetings_waiting_room_deny_user_dialog_title">Moderatör sizi içeriye almadı</string>
     <!-- Dialog description when a participant has been denied entry to the call -->
     <string name="meetings_waiting_room_deny_user_dialog_description">Bekleme odasından çıkarılacaksınız.</string>
     <!-- Dialog title when waiting room has been inactive for a while -->
-    <string name="meetings_waiting_room_inactive_host_dialog_title">Yönetici yanıt vermedi</string>
+    <string name="meetings_waiting_room_inactive_host_dialog_title">Moderatör yanıt vermedi</string>
     <!-- Dialog description when waiting room has been inactive for a while -->
     <string name="meetings_waiting_room_inactive_host_dialog_description">Toplantıya katılma isteğinize yanıt gelmedi. Bekleme odasından çıkarılacaksınız. Daha sonra tekrar katılmayı deneyin.</string>
     <!-- Message after selected albums are deleted (singular) -->
@@ -4728,7 +4728,7 @@
     <!-- Title to display Current plan for user on My account screen. -->
     <string name="account_my_account_home_view_current_plan_title">Mevcut plan</string>
     <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
-    <string name="account_my_account_usage_get_more_storage_button">Daha fazla depolama edinin</string>
+    <string name="account_my_account_usage_get_more_storage_button">Daha fazla depolama edin</string>
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA, temel güvenlik güvencelerini sağlayan sıfır bilgi şifrelemesi sistemimizle iletişiminizi korur:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
@@ -4830,9 +4830,9 @@
     <!-- Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_update_button">Güncelle</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Aramadan ayrılmak için bir yönetici atayın</string>
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Aramadan ayrılmak için bir moderatör atayın</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">Aramadaki tek yönetici sizsiniz. Birinin arama üzerinde yönetici izinlerine sahip olması için ayrılmadan önce grup için başka bir yönetici atayın. Grupta yönetici olarak kalacaksınız.</string>
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">Aramadaki tek moderatör sizsiniz. Ayrılmadan önce gruptaki başka birini moderatör olarak atayın, böylece aramada birinin moderatör izinleri olur. Grupta moderatör olarak kalmaya devam edeceksiniz.</string>
     <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Ata ve ayrıl</string>
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
@@ -4892,7 +4892,7 @@
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">Tamam, anladım</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
-    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Sınırsız katılımcıyla ve zaman kısıtlaması olmadan arama ve toplantı düzenleyin</string>
+    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Sınırsız katılımcıyla ve zaman kısıtlaması olmadan arama ve toplantı düzenleme</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
     <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;Yüksek hızlı VPN\’imizle çevrim içi ortamda gizli kalın</string>
     <!-- The body of the Dialog shown to upgrade meeting from the free version -->

@@ -41,7 +41,7 @@
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Renomear todos os itens</string>
     <!-- Sync to resolve conflict Merge folders -->
-    <string name="sync_stalled_issue_merge_folders">Combinar pastas</string>
+    <string name="sync_stalled_issue_merge_folders">Combinar pastas e renomear arquivos</string>
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">Selecionar o arquivo local</string>
     <!-- Sync to resolve conflict Choose remote file -->

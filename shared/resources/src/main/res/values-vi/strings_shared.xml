@@ -1023,17 +1023,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Tính năng mới: Tệp&#160;tin và thư&#160;mục ẩn</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">Ẩn đi tệp&#160;tin và thư&#160;mục</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">Ẩn đi các tệp&#160;tin và thư&#160;mục quan&#160;trọng</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Dễ&#160;dàng giữ các tệp&#160;tin nhạy cảm trong Ổ&#160;Mây của bạn ở chế&#160;độ riêng&#160;tư và ngoài tầm nhìn. Theo mặc&#160;định, các tệp&#160;tin ẩn đi không có xuất&#160;hiện trong phần Ổ&#160;Mây, Ảnh và hoạt&#160;động Gần&#160;Đây của bạn.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Bạn có thể giấu đi các tệp&#160;tin và thư&#160;mục riêng&#160;tư của mình. Chỉ có bạn mới có thể hiện những mục đó lại, bằng cách thực&#160;hiện từng cái riêng&#160;lẻ hoặc bật hiển&#160;thị các mục đã ẩn đi trong phần menu.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Kiểm soát chế&#160;độ hiển&#160;thị dễ dàng</string>
+    <string name="hidden_nodes_title_control_visibility">Loại&#160;trừ khỏi Dòng thời&#160;gian</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Để hiển thị các tệp&#160;tin bị ẩn, hãy bật “Hiển&#160;thị các mục ẩn” trong “Quản&#160;lý tệp&#160;tin” → “Giao&#160;diện người&#160;dùng” trong phần thiết&#160;đặt của ứng&#160;dụng.</string>
+    <string name="hidden_nodes_description_control_visibility">Các mục đã ẩn đi chỉ có thể truy&#160;cập thông qua Ổ&#160;Mây và sẽ không xuất&#160;hiện trong Ảnh, Album hoặc hoạt&#160;động Gần&#160;đây của bạn.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Các tệp&#160;tin đã chia sẻ vẫn được hiển&#160;thị</string>
+    <string name="hidden_nodes_title_visible_shared_files">Ra khỏi tầm nhìn</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Các tệp&#160;tin và thư&#160;mục đã được chia&#160;sẻ với các tên liên&#160;lạc hoặc bằng đường liên&#160;kết công&#160;khai vẫn có thể truy&#160;cập được và có hiển&#160;thị, ngay cả khi bị ẩn</string>
+    <string name="hidden_nodes_description_visible_shared_files">Bạn tự quyết&#160;định khi bạn muốn các tệp&#160;tin ẩn đi được hiển&#160;thị. Có một mục lựa&#160;chọn mới trong thiết&#160;đặt để hiển&#160;thị các mục ẩn tạm&#160;thời.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Luôn luôn giữ ảnh của bạn được an&#160;toàn</string>
     <!--Camera backup permission screen description-->
@@ -1339,7 +1339,7 @@
     <!-- Context menu item. Allows to mark file/folder with own color label -->
     <string name="file_properties_label">Màu nhãn</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">Rời khỏi thư mục</string>
+    <string name="alert_leave_share">Từ bỏ thư mục</string>
     <!-- Option of the sliding panel to edit the link of a node -->
     <string name="edit_link_option">Quản lý đường liên kết</string>
     <!-- Menu option to manage a shared folder. -->
@@ -1415,21 +1415,21 @@
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">Phát sinh lỗi, xin thử lại sau.</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="general_select_create_folder">Select or create a new folder</string>
+    <string name="general_select_create_folder">Chọn hoặc tạo một thư mục mới</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
-    <string name="sync_snackbar_message_confirm_backup_moved">Backup stopped. Folder was moved to %1$s</string>
+    <string name="sync_snackbar_message_confirm_backup_moved">Sao lưu đã dừng lại. Thư mục đã di chuyển đến %1$s</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="sync_snackbar_message_confirm_backup_deleted">Backup stopped. Folder deleted from MEGA.</string>
+    <string name="sync_snackbar_message_confirm_backup_deleted">Sao lưu đã dừng lại. Thư mục bị xóa khỏi MEGA.</string>
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder</string>
+    <string name="sync_stalled_issue_choose_remote_file_explanation">Tệp tin cục bộ [A]%1$s[/A] sẽ được chuyển đến thư&#160;mục “.debris”</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged. Files with the same but different content will have a suffix like(1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
     <!-- Dialog choose option -->
@@ -1437,9 +1437,9 @@
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Áp&#160;dụng cho tất&#160;cả</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue has been solved</string>
+    <string name="sync_stalled_issue_resolved">Issue solved</string>
     <!-- Sync message when multiple issues resolved -->
-    <string name="sync_stalled_issues_resolved">Issues have been solved</string>
+    <string name="sync_stalled_issues_resolved">Các vấn đề đã được giải quyết</string>
     <!-- Text of the empty playlist in Video Section -->
     <string name="video_section_playlists_video_empty">Dọn rác</string>
     <!-- Text of video count of playlist in Video Section -->
@@ -1451,17 +1451,31 @@
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
     <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
+    <string name="camera_uploads_banner_checking_uploads_text">Đang kiểm tra các phiên tải lên...</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
-    <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <string name="camera_uploads_banner_uploading_pending_count_text">Đang tải lên: %d mục còn lại</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
-    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <string name="sync_resolve_rename_all_items_title">Đổi tên tất cả các mục?</string>
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
-    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <string name="sync_stalled_issue_merge_folders_title">Hợp nhất các thư mục và đổi tên các tệp tin?</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <string name="sync_stalled_issue_choose_local_file_title">Chọn tệp&#160;tin cục&#160;bộ?</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">Chọn tệp&#160;tin trên MEGA?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">Chọn tệp&#160;tin đã sửa&#160;đổi mới nhất?</string>
+    <!-- Colored folders onboarding title -->
+    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <!-- Colored folders onboarding description -->
+    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <!-- Dialog merge option -->
+    <string name="sync_apply_all_dialog_merge_button">Hợp nhất</string>
+    <!-- Dialog rename option -->
+    <string name="sync_apply_all_dialog_rename_button">Đổi tên</string>
+    <!-- Sync text when need to solved stalled issues-->
+    <string name="sync_menu_clear_issues">Clear solved issues</string>
+    <!--Sign Up page text field input first name error message when character limit exceeded-->
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <!--Sign Up page text field input last name error message when character limit exceeded-->
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
 </resources>

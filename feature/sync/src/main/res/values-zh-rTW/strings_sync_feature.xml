@@ -33,7 +33,7 @@
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">重新命名所有項目</string>
     <!-- Sync to resolve conflict Merge folders -->
-    <string name="sync_stalled_issue_merge_folders">合併資料夾</string>
+    <string name="sync_stalled_issue_merge_folders">Merge folders and rename files</string>
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">選擇本地檔案</string>
     <!-- Sync to resolve conflict Choose remote file -->

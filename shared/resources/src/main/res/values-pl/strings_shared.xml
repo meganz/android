@@ -1071,17 +1071,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Nowa funkcja: Ukryte pliki i katalogi</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">Ukryj pliki i katalogi</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">Ukryj ważne pliki i katalogi</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Z łatwością przechowuj poufne pliki na dysku w chmurze prywatnie i poza zasięgiem wzroku. Domyślnie ukryte plik nie są wyświetlane w sekcji Dysk w chmurze, Zdjęcia i Ostatnie.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Możesz ukryć poufne pliki i katalogi dla prywatności. Tylko Ty możesz je ujawnić, indywidualnie lub tymczasowo wyświetlając ukryte elementy z menu.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Łatwe sterowanie widocznością</string>
+    <string name="hidden_nodes_title_control_visibility">Wyklucz z osi czasu</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Aby wyświetlić ukryte pliki, włącz ustawienie „Pokaż ukryte elementy” w sekcji „Zarządzanie plikami” - „Interfejs użytkownika” w ustawieniach aplikacji.</string>
+    <string name="hidden_nodes_description_control_visibility">Ukryte elementy są dostępne tylko za pośrednictwem Dysk w chmurze i nie będą wyświetlane w Twoich Zdjęciach, Albumach Ostatnie.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Pliki udostępnione pozostają widoczne</string>
+    <string name="hidden_nodes_title_visible_shared_files">Poza zasięgiem wzroku</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Pliki i katalogi udostępniane kontaktom lub z linkami publicznymi są nadal dostępne i widoczne, nawet jeśli są ukryte</string>
+    <string name="hidden_nodes_description_visible_shared_files">Ty decydujesz, kiedy ukryte pliki są widoczne. Istnieje nowe ustawienie tymczasowego wyświetlania ukrytych elementów.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Chroń swoje zdjęcia, zawsze</string>
     <!--Camera backup permission screen description-->
@@ -1478,9 +1478,9 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">Pliki o tej samej nazwie, ale różnej zawartości, będą miały dodany sufiks, taki jak (1)</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">Wszystkie katalogi zostaną połączone. Pliki o tej samej nazwie, ale różnej zawartości, będą miały dodany sufiks, np. (1).</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
     <!-- Dialog choose option -->
@@ -1488,7 +1488,7 @@
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Zastosuj do wszystkich</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Problem został rozwiązany</string>
+    <string name="sync_stalled_issue_resolved">Problem rozwiązany</string>
     <!-- Sync message when multiple issues resolved -->
     <string name="sync_stalled_issues_resolved">Problemy zostały rozwiązane</string>
     <!-- Text of the empty playlist in Video Section -->
@@ -1518,4 +1518,18 @@
     <string name="sync_stalled_issue_choose_remote_file_title">Wybierz plik przechowywany w MEGA?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">Wybierz ostatnio zmodyfikowany plik?</string>
+    <!-- Colored folders onboarding title -->
+    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <!-- Colored folders onboarding description -->
+    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <!-- Dialog merge option -->
+    <string name="sync_apply_all_dialog_merge_button">Połącz</string>
+    <!-- Dialog rename option -->
+    <string name="sync_apply_all_dialog_rename_button">Zmień nazwę</string>
+    <!-- Sync text when need to solved stalled issues-->
+    <string name="sync_menu_clear_issues">Wyczyść rozwiązane problemy</string>
+    <!--Sign Up page text field input first name error message when character limit exceeded-->
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">Imię nie może przekraczać 40 znaków</string>
+    <!--Sign Up page text field input last name error message when character limit exceeded-->
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Nazwisko nie może przekraczać 40 znaków</string>
 </resources>

@@ -1039,17 +1039,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Neue Funktion: Verborgene Dateien und Ordner</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">Verbergen Sie Dateien und Ordner</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">Verbergen Sie wichtige Dateien und Ordner</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Schützen Sie vertrauliche Dateien in Ihrem Cloud Drive ganz einfach vor fremden Augen. Standardmäßig werden verborgene Dateien nicht in den Bereichen Cloud Drive, Fotos und Neue/Geänderte Dateien angezeigt.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Sie können sensible Dateien und Ordner zum Schutz Ihrer Privatsphäre verbergen. Nur Sie haben die Möglichkeit, diese Elemente sichtbar zu machen, entweder einzeln oder indem Sie über das Menü verborgene Elemente vorübergehend einblenden.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Einfache Steuerung der Sichtbarkeit</string>
+    <string name="hidden_nodes_title_control_visibility">Von der Zeitleiste ausschließen</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">Um verborgene Dateien anzuzeigen, aktivieren Sie in Ihren App-Einstellungen unter „Dateiverwaltung“ - „Bedienoberfläche“ den Eintrag „Verborgene Elemente anzeigen“.</string>
+    <string name="hidden_nodes_description_control_visibility">Verborgene Elemente sind nur im Cloud Drive zugänglich und erscheinen nicht in Ihren Fotos, Alben oder kürzlich verwendeten Dateien.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Freigegebene Dateien bleiben sichtbar</string>
+    <string name="hidden_nodes_title_visible_shared_files">Unsichtbar</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Dateien und Ordner, die für Kontakte oder über öffentliche Links freigegeben wurden, sind auch dann zugänglich und sichtbar, wenn sie verborgen sind</string>
+    <string name="hidden_nodes_description_visible_shared_files">Sie entscheiden, wann verborgene Dateien sichtbar sein sollen. Mit einer neuen Einstellung können Sie verborgene Elemente vorübergehend sichtbar machen.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Dauerhaft sichere Speicherung Ihrer Fotos</string>
     <!--Camera backup permission screen description-->
@@ -1444,9 +1444,9 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged. Files with the same but different content will have a suffix like(1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
     <!-- Dialog choose option -->
@@ -1454,7 +1454,7 @@
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Auf alle anwenden</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue has been solved</string>
+    <string name="sync_stalled_issue_resolved">Issue solved</string>
     <!-- Sync message when multiple issues resolved -->
     <string name="sync_stalled_issues_resolved">Issues have been solved</string>
     <!-- Text of the empty playlist in Video Section -->
@@ -1482,4 +1482,18 @@
     <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <!-- Colored folders onboarding title -->
+    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <!-- Colored folders onboarding description -->
+    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <!-- Dialog merge option -->
+    <string name="sync_apply_all_dialog_merge_button">Zusammenführen</string>
+    <!-- Dialog rename option -->
+    <string name="sync_apply_all_dialog_rename_button">Umbenennen</string>
+    <!-- Sync text when need to solved stalled issues-->
+    <string name="sync_menu_clear_issues">Gelöste Probleme entfernen</string>
+    <!--Sign Up page text field input first name error message when character limit exceeded-->
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <!--Sign Up page text field input last name error message when character limit exceeded-->
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
 </resources>
