@@ -63,6 +63,9 @@ class CloudDriveViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val args = savedStateHandle.toRoute<CloudDrive>()
+    private val highlightedNodeId = args.highlightedNodeHandle?.let { NodeId(it) }
+    private val highlightedNodeNames = args.highlightedNodeNames
+
     internal val uiState: StateFlow<CloudDriveUiState>
         field = MutableStateFlow(CloudDriveUiState(currentFolderId = NodeId(args.nodeHandle)))
 
@@ -178,13 +181,14 @@ class CloudDriveViewModel @Inject constructor(
         }
     }
 
-
     private suspend fun loadNodes() {
         val folderId = uiState.value.currentFolderId
         runCatching {
             getNodeByIdUseCase(folderId) to nodeUiItemMapper(
                 nodeList = getFileBrowserNodeChildrenUseCase(folderId.longValue),
                 nodeSourceType = args.nodeSourceType,
+                highlightedNodeId = highlightedNodeId,
+                highlightedNames = highlightedNodeNames,
             )
         }.onSuccess { (currentNode, children) ->
             val title = LocalizedText.Literal(currentNode?.name ?: "")

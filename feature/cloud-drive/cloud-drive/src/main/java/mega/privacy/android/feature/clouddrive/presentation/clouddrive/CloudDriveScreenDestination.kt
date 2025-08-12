@@ -23,6 +23,8 @@ data class CloudDrive(
     val nodeHandle: Long = -1L,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val isNewFolder: Boolean = false,
+    val highlightedNodeHandle: Long? = null,
+    val highlightedNodeNames: List<String>? = null,
 )
 
 fun NavGraphBuilder.cloudDriveScreen(

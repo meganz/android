@@ -264,7 +264,7 @@ class NodeUiItemMapperTest {
             val result = underTest(
                 nodeList = listOf(mockFolderNode),
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-                highlightedNames = setOf("Test Folder"),
+                highlightedNames = listOf("Test Folder"),
             )
 
             assertThat(result).hasSize(1)

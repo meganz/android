@@ -43,7 +43,7 @@ class NodeUiItemMapper @Inject constructor(
      * @param showPublicLinkCreationTime Whether to show public link creation time, for root directory of links
      * @param isPublicNodes Whether the nodes are public nodes like folder links
      * @param highlightedNodeId Optional highlighted node ID
-     * @param highlightedNames Optional set of highlighted names
+     * @param highlightedNames Optional list of highlighted names
      * @return List of mapped NodeUiItem
      */
     suspend operator fun invoke(
@@ -52,12 +52,13 @@ class NodeUiItemMapper @Inject constructor(
         isPublicNodes: Boolean = false,
         showPublicLinkCreationTime: Boolean = false,
         highlightedNodeId: NodeId? = null,
-        highlightedNames: Set<String>? = null,
+        highlightedNames: List<String>? = null,
         isContactVerificationOn: Boolean = false,
     ): List<NodeUiItem<TypedNode>> = withContext(ioDispatcher) {
+        val highlightedNamesSet = highlightedNames?.toSet()
         nodeList.mapAsync { node ->
             val isHighlighted = node.id == highlightedNodeId ||
-                    highlightedNames?.contains(node.name) == true
+                    highlightedNamesSet?.contains(node.name) == true
             val duration = if (node is TypedFileNode) {
                 node.type.toDuration()?.let { duration ->
                     durationInSecondsTextMapper(duration)
