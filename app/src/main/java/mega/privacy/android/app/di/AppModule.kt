@@ -17,7 +17,7 @@ import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.LegacyDatabaseMigrationImpl
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.nav.MegaNavigatorImpl
-import mega.privacy.android.app.presentation.node.MegaActivityResultContractImpl
+import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.filewrapper.FileWrapper
 import mega.privacy.android.data.gateway.FileGateway

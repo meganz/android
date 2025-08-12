@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node
+package mega.privacy.android.app.nav
 
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContract
@@ -10,6 +10,7 @@ import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.activities.contract.ShareFolderActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
 import mega.privacy.android.app.camera.InAppCameraLauncher
+import mega.privacy.android.app.nav.contract.OpenMultipleDocumentsPersistable
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.camera.CameraArg
@@ -44,4 +45,7 @@ class MegaActivityResultContractImpl @Inject constructor() : MegaActivityResultC
 
     override val nameCollisionActivityContract: ActivityResultContract<ArrayList<NameCollision>, String?>
         get() = NameCollisionActivityContract()
-} 
+
+    override val openMultipleDocumentsPersistable: ActivityResultContract<Array<String>, List<@JvmSuppressWildcards Uri>>
+        get() = OpenMultipleDocumentsPersistable()
+}

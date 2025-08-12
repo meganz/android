@@ -76,4 +76,9 @@ interface MegaActivityResultContract {
      *         and output type [String?] (resulting file name or null if no resolution was made)
      */
     val nameCollisionActivityContract: ActivityResultContract<ArrayList<NameCollision>, String?>
+
+    /**
+     * Contract for opening a multiple documents and persisting their URIs.
+     */
+    val openMultipleDocumentsPersistable: ActivityResultContract<Array<String>, List<@JvmSuppressWildcards Uri>>
 }

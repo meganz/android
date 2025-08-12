@@ -4,7 +4,6 @@ import android.Manifest
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.Activity
 import android.app.Activity.RESULT_OK
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -19,13 +18,13 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import dagger.hilt.android.scopes.ActivityScoped
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.app.camera.InAppCameraLauncher
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.NavigationDrawerManager
 import mega.privacy.android.app.main.ParentNodeManager
+import mega.privacy.android.app.nav.contract.OpenMultipleDocumentsPersistable
 import mega.privacy.android.app.presentation.bottomsheet.ShowNewFolderDialogActionListener
 import mega.privacy.android.app.presentation.bottomsheet.ShowNewTextFileDialogActionListener
 import mega.privacy.android.app.presentation.bottomsheet.TakePictureAndUploadActionListener
@@ -43,6 +42,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogS
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
 import timber.log.Timber
 import javax.inject.Inject
@@ -108,16 +108,6 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
                 managerActivity.handleFileUris(it)
             }
         }
-
-    private class OpenMultipleDocumentsPersistable :
-        ActivityResultContracts.OpenMultipleDocuments() {
-        override fun createIntent(context: Context, input: Array<String>): Intent {
-            return super.createIntent(context, input).also {
-                it.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                it.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
-            }
-        }
-    }
 
     /**
      * When manually uploading Files and the device is running Android 13 and above, this Launcher
