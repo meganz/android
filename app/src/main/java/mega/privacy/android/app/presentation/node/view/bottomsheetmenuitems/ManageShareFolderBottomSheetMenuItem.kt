@@ -3,7 +3,8 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListComposeActivity
@@ -11,8 +12,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.ManageShareFo
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.android.core.ui.model.menu.MenuAction
-import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.feature_flags.AppFeatures
 import javax.inject.Inject
 
 /**

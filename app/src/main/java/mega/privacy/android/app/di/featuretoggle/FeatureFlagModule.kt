@@ -7,12 +7,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoSet
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.data.featuretoggle.file.FileFeatureFlagValueProvider
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
+import mega.privacy.android.feature_flags.ABTestFeatures
+import mega.privacy.android.feature_flags.AppFeatures
 
 /**
  * Feature flag module

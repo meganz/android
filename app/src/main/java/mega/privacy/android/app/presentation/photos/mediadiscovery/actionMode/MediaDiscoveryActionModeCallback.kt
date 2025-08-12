@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
@@ -8,14 +7,14 @@ import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.shared.resources.R as sharedR
 
 class MediaDiscoveryActionModeCallback(
     val fragment: MediaDiscoveryFragment,

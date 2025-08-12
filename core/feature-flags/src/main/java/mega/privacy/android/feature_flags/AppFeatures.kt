@@ -1,4 +1,4 @@
-package mega.privacy.android.app.featuretoggle
+package mega.privacy.android.feature_flags
 
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority

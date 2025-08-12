@@ -20,7 +20,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.data.extensions.filterAllowedPermissions
 import mega.privacy.android.app.data.extensions.toPermissionScreen
 import mega.privacy.android.app.data.extensions.toPermissionType
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.permissions.model.Permission
 import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
 import mega.privacy.android.app.presentation.permissions.model.PermissionType
@@ -36,6 +35,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.notifications.SetNotificationPermissionShownUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
 import timber.log.Timber
 import javax.inject.Inject

@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.appstate.mapper.ScreenPreferenceDestinationMapper
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenDestinationOptionMapper
 import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenDestinationPreferenceNavKeyMapper
 import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenOptionMapper
@@ -26,6 +25,7 @@ import mega.privacy.android.domain.usecase.SetStartScreenPreference
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.domain.usecase.preference.SetStartScreenPreferenceDestinationUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.MainNavItem
 import org.junit.jupiter.api.BeforeEach
