@@ -66,7 +66,7 @@ internal class SyncStalledIssuesViewModel @Inject constructor(
                 viewModelScope.launch {
                     if (action.isApplyToAll) {
                         val groupedIssues =
-                            _state.value.stalledIssues.filter { it.actions.contains(action.selectedResolution) }
+                            _state.value.stalledIssues.filter { it.issueType == action.uiItem.issueType }
                         val result = groupedIssues.mapAsync { issue ->
                             runCatching {
                                 resolveStalledIssueUseCase(

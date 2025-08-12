@@ -140,6 +140,9 @@ internal fun SyncListScreen(
                                 stalledIssueUiItem = content.stalledIssueUiItem,
                                 selectedAction = action
                             )
+                            coroutineScope.launch {
+                                modalSheetState.hide()
+                            }
                         }
                     )
                 }

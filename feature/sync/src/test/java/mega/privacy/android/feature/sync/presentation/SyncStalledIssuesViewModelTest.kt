@@ -124,7 +124,9 @@ class SyncStalledIssuesViewModelTest {
             resolutionActionType = StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE,
             actionName = "Choose remote file",
         )
-        val stalledIssueUiItem: StalledIssueUiItem = mock()
+        val stalledIssueUiItem: StalledIssueUiItem = mock {
+            on { issueType }.thenReturn(StallIssueType.DownloadIssue)
+        }
         val stalledIssue: StalledIssue = mock()
         whenever(stalledIssueItemMapper(stalledIssueUiItem)).thenReturn(stalledIssue)
         initViewModel()
@@ -155,7 +157,7 @@ class SyncStalledIssuesViewModelTest {
             actionName = "Choose local file",
         )
         val stalledIssueUiItem = stalledIssuesUiItems.first().copy(
-            actions = listOf(selectedResolution)
+            actions = listOf(selectedResolution),
         )
         val node: FolderNode = mock {
             on { name } doReturn "Camera"
@@ -203,7 +205,9 @@ class SyncStalledIssuesViewModelTest {
             resolutionActionType = StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE,
             actionName = "Choose local file",
         )
-        val stalledIssueUiItem: StalledIssueUiItem = mock()
+        val stalledIssueUiItem: StalledIssueUiItem = mock {
+            on { issueType }.thenReturn(StallIssueType.DownloadIssue)
+        }
         val stalledIssue: StalledIssue = mock()
         whenever(stalledIssueItemMapper(stalledIssueUiItem)).thenReturn(stalledIssue)
 
