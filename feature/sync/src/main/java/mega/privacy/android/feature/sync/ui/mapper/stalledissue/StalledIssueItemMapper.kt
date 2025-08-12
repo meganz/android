@@ -86,10 +86,10 @@ internal class StalledIssueItemMapper @Inject constructor(
         StalledIssue(
             syncId = stalledIssueUiItem.syncId,
             nodeIds = stalledIssueUiItem.nodeIds,
-            localPaths = stalledIssueUiItem.localPaths,
+            localPaths = listOf(stalledIssueUiItem.displayedPath),
             issueType = stalledIssueUiItem.issueType,
             conflictName = stalledIssueUiItem.conflictName,
-            nodeNames = stalledIssueUiItem.nodeNames,
+            nodeNames = listOf(stalledIssueUiItem.displayedName),
             id = stalledIssueUiItem.id
         )
 }

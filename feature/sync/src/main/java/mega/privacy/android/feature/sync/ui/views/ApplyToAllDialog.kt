@@ -68,7 +68,8 @@ internal fun ApplyToAllDialog(
         onApplyToAll = onApplyToAll,
         onCancel = onCancel,
         modifier = modifier,
-        shouldShowApplyToAllOption = shouldShowApplyToAllOption
+        shouldShowApplyToAllOption = shouldShowApplyToAllOption,
+        actionButtonStringRes = getActionButtonString(selectedAction)
     )
 }
 
@@ -91,6 +92,7 @@ internal fun ApplyToAllDialog(
     onApplyToCurrent: () -> Unit,
     onApplyToAll: () -> Unit,
     onCancel: () -> Unit,
+    actionButtonStringRes: Int,
     modifier: Modifier = Modifier,
     shouldShowApplyToAllOption: Boolean = true,
 ) {
@@ -149,7 +151,7 @@ internal fun ApplyToAllDialog(
                 }
             }
         },
-        confirmButtonText = stringResource(sharedR.string.general_dialog_choose_button),
+        confirmButtonText = stringResource(actionButtonStringRes),
         cancelButtonText = stringResource(mega.privacy.android.core.R.string.general_cancel),
         onConfirm = {
             if (isApplyToAllChecked) {
@@ -227,6 +229,24 @@ private fun getApplyToAllTitle(
     }
 }
 
+/**
+ * Generates a string for the action button based on the selected action
+ */
+private fun getActionButtonString(
+    selectedAction: StalledIssueResolutionAction,
+): Int {
+    return when (selectedAction.resolutionActionType) {
+
+        StalledIssueResolutionActionType.RENAME_ALL_ITEMS ->
+            sharedR.string.sync_apply_all_dialog_rename_button
+
+        StalledIssueResolutionActionType.MERGE_FOLDERS ->
+            sharedR.string.sync_apply_all_dialog_merge_button
+
+        else -> sharedR.string.general_dialog_choose_button
+    }
+}
+
 // Test tags for UI testing
 internal const val TEST_TAG_APPLY_TO_ALL_DIALOG_DESCRIPTION = "apply_to_all_dialog:description"
 internal const val TEST_TAG_APPLY_TO_ALL_DIALOG_CHECKBOX_ROW = "apply_to_all_dialog:checkbox_row"
@@ -243,6 +263,7 @@ internal fun ApplyToAllDialogPreview() {
             onApplyToCurrent = {},
             onApplyToAll = {},
             onCancel = {},
+            actionButtonStringRes = sharedR.string.general_dialog_choose_button
         )
     }
 } 
