@@ -4,26 +4,23 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
+import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.ShareData
-import mega.privacy.android.domain.entity.contacts.ContactData
-import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
-import mega.privacy.android.domain.usecase.shares.DefaultGetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.domain.usecase.shares.GetOutShareByNodeIdUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -45,9 +42,6 @@ class NodeOptionsBottomSheetViewModelTest {
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val nodeAccessPermissionIconMapper: NodeAccessPermissionIconMapper = mock()
-    private val getContactItemFromInShareFolder: DefaultGetContactItemFromInShareFolder = mock()
-    private val getOutShareByNodeIdUseCase: GetOutShareByNodeIdUseCase = mock()
-    private val getContactFromEmailUseCase: GetContactFromEmailUseCase = mock()
     private val nodeBottomSheetActionMapper = mock<NodeBottomSheetActionMapper>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
 
@@ -70,6 +64,8 @@ class NodeOptionsBottomSheetViewModelTest {
         on { isShared } doReturn true
     }
 
+    private val nodeUiItemMapper: NodeUiItemMapper = mock()
+
     @BeforeEach
     fun initViewModel() {
         // Set up the MonitorConnectivityUseCase mock
@@ -88,16 +84,15 @@ class NodeOptionsBottomSheetViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
-            nodeAccessPermissionIconMapper = nodeAccessPermissionIconMapper,
-            getContactItemFromInShareFolder = getContactItemFromInShareFolder,
-            getOutShareByNodeIdUseCase = getOutShareByNodeIdUseCase,
-            getContactFromEmailUseCase = getContactFromEmailUseCase,
+            nodeUiItemMapper = nodeUiItemMapper
         )
     }
 
     @Test
     fun `test that get bottom sheet option invokes getNodeByIdUseCase`() = runTest {
         whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+        val mockNodeUi = mock<NodeUiItem<TypedNode>>()
+        whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
         whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
         whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
         whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
@@ -122,6 +117,8 @@ class NodeOptionsBottomSheetViewModelTest {
             )
 
             whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+            val mockNodeUi = mock<NodeUiItem<TypedNode>>()
+            whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
             whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
@@ -140,17 +137,18 @@ class NodeOptionsBottomSheetViewModelTest {
             viewModel.uiState.test {
                 // Initial state
                 val initialState = awaitItem()
-                assertThat(initialState.name).isEmpty()
                 assertThat(initialState.node).isNull()
                 assertThat(initialState.actions).isEmpty()
 
                 // Trigger the action
-                viewModel.getBottomSheetOptions(sampleFileNode.id.longValue, NodeSourceType.CLOUD_DRIVE)
+                viewModel.getBottomSheetOptions(
+                    sampleFileNode.id.longValue,
+                    NodeSourceType.CLOUD_DRIVE
+                )
 
                 // Wait for state update
                 val updatedState = awaitItem()
-                assertThat(updatedState.name).isEqualTo(sampleFileNode.name)
-                assertThat(updatedState.node).isEqualTo(sampleFileNode)
+                assertThat(updatedState.node).isEqualTo(mockNodeUi)
                 assertThat(updatedState.actions).isNotEmpty()
             }
         }
@@ -172,193 +170,6 @@ class NodeOptionsBottomSheetViewModelTest {
             val updatedState = awaitItem()
             assertThat(updatedState.node).isNull()
             assertThat(updatedState.actions).isEmpty()
-        }
-    }
-
-    @Test
-    fun `test that getShareInfo retrieves contact info for incoming share folder`() = runTest {
-        val contactItem = mock<ContactItem>().stub {
-            on { contactData } doReturn ContactData("John Doe", null, null, mock())
-        }
-
-        whenever(getNodeByIdUseCase(any())).thenReturn(sampleFolderNode)
-        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
-        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.READ)
-        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any())).thenReturn(
-            listOf(mock())
-        )
-        whenever(getContactItemFromInShareFolder(any(), any())).thenReturn(contactItem)
-
-        viewModel.uiState.test {
-            // Initial state
-            awaitItem()
-
-            // Trigger the action
-            viewModel.getBottomSheetOptions(
-                sampleFolderNode.id.longValue,
-                NodeSourceType.INCOMING_SHARES
-            )
-
-            // Wait for initial state update
-            val stateWithNode = awaitItem()
-            assertThat(stateWithNode.node).isEqualTo(sampleFolderNode)
-
-            // Wait for share info update
-            val stateWithShareInfo = awaitItem()
-            assertThat(stateWithShareInfo.shareInfo).isEqualTo("John Doe")
-        }
-    }
-
-    @Test
-    fun `test that getShareInfo handles incoming share folder error gracefully`() = runTest {
-        whenever(getNodeByIdUseCase(any())).thenReturn(sampleFolderNode)
-        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
-        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.READ)
-        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any())).thenReturn(
-            listOf(mock())
-        )
-        whenever(getContactItemFromInShareFolder(any(), any())).thenThrow(RuntimeException("Contact error"))
-
-        viewModel.uiState.test {
-            // Initial state
-            awaitItem()
-
-            // Trigger the action
-            viewModel.getBottomSheetOptions(
-                sampleFolderNode.id.longValue,
-                NodeSourceType.INCOMING_SHARES
-            )
-
-            // Should not crash and should still have valid state
-            val state = awaitItem()
-            assertThat(state.node).isNotNull()
-        }
-    }
-
-    @Test
-    fun `test that getShareInfo retrieves out share info for single share`() = runTest {
-        val outShare = mock<ShareData>().stub {
-            on { user } doReturn "user@example.com"
-        }
-        val contactItem = mock<ContactItem>().stub {
-            on { contactData } doReturn ContactData("Jane Doe", null, null, mock())
-        }
-
-        whenever(getNodeByIdUseCase(any())).thenReturn(sampleOutShareNode)
-        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
-        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any())).thenReturn(
-            listOf(mock())
-        )
-        whenever(getOutShareByNodeIdUseCase(any())).thenReturn(listOf(outShare))
-        whenever(getContactFromEmailUseCase(any(), any())).thenReturn(contactItem)
-
-        viewModel.uiState.test {
-            // Initial state
-            awaitItem()
-
-            // Trigger the action
-            viewModel.getBottomSheetOptions(
-                sampleOutShareNode.id.longValue,
-                NodeSourceType.OUTGOING_SHARES
-            )
-
-            // Wait for initial state update
-            val stateWithNode = awaitItem()
-            assertThat(stateWithNode.node).isEqualTo(sampleOutShareNode)
-
-            // Wait for share info update
-            val stateWithShareInfo = awaitItem()
-            assertThat(stateWithShareInfo.shareInfo).isEqualTo("Jane Doe")
-        }
-    }
-
-    @Test
-    fun `test that getShareInfo sets outgoing shares for multiple shares`() = runTest {
-        val outShares = listOf(
-            mock<ShareData>().stub { on { user } doReturn "user1@example.com" },
-            mock<ShareData>().stub { on { user } doReturn "user2@example.com" }
-        )
-
-        whenever(getNodeByIdUseCase(any())).thenReturn(sampleOutShareNode)
-        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
-        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any())).thenReturn(
-            listOf(mock())
-        )
-        whenever(getOutShareByNodeIdUseCase(any())).thenReturn(outShares)
-
-        viewModel.uiState.test {
-            // Initial state
-            awaitItem()
-
-            // Trigger the action
-            viewModel.getBottomSheetOptions(
-                sampleOutShareNode.id.longValue,
-                NodeSourceType.OUTGOING_SHARES
-            )
-
-            // Wait for initial state update
-            val stateWithNode = awaitItem()
-            assertThat(stateWithNode.node).isEqualTo(sampleOutShareNode)
-
-            // Wait for outgoing shares update
-            val stateWithOutgoingShares = awaitItem()
-            assertThat(stateWithOutgoingShares.outgoingShares).isEqualTo(outShares)
-        }
-    }
-
-    @Test
-    fun `test that getAccessPermissionIcon returns icon only for incoming shares`() = runTest {
-        whenever(getNodeByIdUseCase(any())).thenReturn(sampleFolderNode)
-        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
-        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.READ)
-        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any())).thenReturn(
-            listOf(mock())
-        )
-        whenever(nodeAccessPermissionIconMapper(AccessPermission.READ)).thenReturn(456)
-
-        viewModel.uiState.test {
-            // Initial state
-            awaitItem()
-
-            // Trigger the action
-            viewModel.getBottomSheetOptions(
-                sampleFolderNode.id.longValue,
-                NodeSourceType.INCOMING_SHARES
-            )
-
-            // Wait for state update
-            val state = awaitItem()
-            assertThat(state.accessPermissionIcon).isEqualTo(456)
-        }
-    }
-
-    @Test
-    fun `test that getAccessPermissionIcon returns null for non-incoming shares`() = runTest {
-        whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
-        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
-        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any())).thenReturn(
-            listOf(mock())
-        )
-
-        viewModel.uiState.test {
-            // Initial state
-            awaitItem()
-
-            // Trigger the action
-            viewModel.getBottomSheetOptions(sampleFileNode.id.longValue, NodeSourceType.CLOUD_DRIVE)
-
-            // Wait for state update
-            val state = awaitItem()
-            assertThat(state.accessPermissionIcon).isNull()
         }
     }
 
@@ -388,6 +199,8 @@ class NodeOptionsBottomSheetViewModelTest {
     fun `test that getBottomSheetOptions resets state before processing`() = runTest {
         // First set some state
         whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+        val mockNodeUi = mock<NodeUiItem<TypedNode>>()
+        whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
         whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
         whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
         whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
@@ -401,7 +214,7 @@ class NodeOptionsBottomSheetViewModelTest {
 
             // First call
             viewModel.getBottomSheetOptions(sampleFileNode.id.longValue, NodeSourceType.CLOUD_DRIVE)
-            
+
             // Verify state is set
             val firstState = awaitItem()
             assertThat(firstState.node).isNotNull()
@@ -413,6 +226,8 @@ class NodeOptionsBottomSheetViewModelTest {
                 on { name } doReturn "different_file.txt"
                 on { isIncomingShare } doReturn false
             }
+            val mockNodeUi = mock<NodeUiItem<TypedNode>>()
+            whenever(nodeUiItemMapper(listOf(differentNode))).thenReturn(listOf(mockNodeUi))
             whenever(getNodeByIdUseCase(NodeId(999))).thenReturn(differentNode)
 
             viewModel.getBottomSheetOptions(999L, NodeSourceType.CLOUD_DRIVE)
@@ -424,8 +239,7 @@ class NodeOptionsBottomSheetViewModelTest {
 
             // Then we get the updated state with the new node
             val secondState = awaitItem()
-            assertThat(secondState.name).isEqualTo(differentNode.name)
-            assertThat(secondState.node).isEqualTo(differentNode)
+            assertThat(secondState.node).isEqualTo(mockNodeUi)
         }
     }
 }

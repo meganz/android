@@ -14,16 +14,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
-import mega.privacy.android.core.nodecomponents.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
-import mega.privacy.android.core.nodecomponents.extension.isOutShare
+import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.qualifier.features.Backups
 import mega.privacy.android.domain.qualifier.features.CloudDrive
 import mega.privacy.android.domain.qualifier.features.IncomingShares
@@ -31,14 +27,10 @@ import mega.privacy.android.domain.qualifier.features.Links
 import mega.privacy.android.domain.qualifier.features.OutgoingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
-import mega.privacy.android.domain.usecase.shares.DefaultGetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.domain.usecase.shares.GetOutShareByNodeIdUseCase
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -59,10 +51,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
-    private val nodeAccessPermissionIconMapper: NodeAccessPermissionIconMapper,
-    private val getContactItemFromInShareFolder: DefaultGetContactItemFromInShareFolder,
-    private val getOutShareByNodeIdUseCase: GetOutShareByNodeIdUseCase,
-    private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
+    private val nodeUiItemMapper: NodeUiItemMapper,
     @CloudDrive private val cloudDriveBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
     @RubbishBin private val rubbishBinBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
     @IncomingShares private val incomingSharesBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
@@ -117,24 +106,17 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
                     accessPermission = permission,
                     isInBackUps = isInBackUps.await(),
                     isConnected = uiState.value.isOnline
-                ).groupBy { it.group }
-                    .toSortedMap()
-                    .mapValues { (_, list) ->
-                        list.sortedBy { it.orderInGroup }.toImmutableList()
-                    }
-                    .values.toImmutableList()
-                val accessPermissionIcon =
-                    getAccessPermissionIcon(permission ?: AccessPermission.UNKNOWN, typedNode)
+                ).sortedBy { it.orderInGroup }
+                    .toImmutableList()
+                val nodeUiItem = nodeUiItemMapper(listOf(typedNode)).firstOrNull()
+
                 uiState.update {
                     it.copy(
-                        name = typedNode.name,
                         actions = bottomSheetItems,
-                        node = typedNode,
+                        node = nodeUiItem,
                         error = if (bottomSheetItems.isEmpty()) triggered(Exception("No actions available")) else consumed(),
-                        accessPermissionIcon = accessPermissionIcon,
                     )
                 }
-                getShareInfo(typedNode)
             } ?: run {
                 uiState.update {
                     it.copy(error = triggered(Exception("Node is null")))
@@ -142,65 +124,6 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
             }
         }
     }
-
-    private fun getShareInfo(typedNode: TypedNode) {
-        if (typedNode.isIncomingShare && typedNode is TypedFolderNode) {
-            viewModelScope.launch {
-                runCatching {
-                    getContactItemFromInShareFolder(typedNode, true)
-                }.onSuccess { contact ->
-                    uiState.update {
-                        it.copy(
-                            shareInfo = contact?.contactData?.fullName ?: contact?.email
-                        )
-                    }
-                }.onFailure {
-                    Timber.Forest.e(it)
-                }
-            }
-        }
-        if (typedNode.isOutShare()) {
-            viewModelScope.launch {
-                runCatching {
-                    getOutShareByNodeIdUseCase(typedNode.id)
-                }.onSuccess { outShares ->
-                    if (outShares.size == 1) {
-                        outShares.first().user?.let { getShareUserInfo(it) }
-                    } else {
-                        uiState.update {
-                            it.copy(outgoingShares = outShares)
-                        }
-                    }
-                }.onFailure {
-                    Timber.Forest.e(it)
-                }
-            }
-        }
-    }
-
-    private fun getShareUserInfo(user: String) = viewModelScope.launch {
-        runCatching {
-            getContactFromEmailUseCase(user, true)
-        }.onSuccess { contact ->
-            uiState.update {
-                it.copy(
-                    shareInfo = contact?.contactData?.fullName ?: contact?.email
-                )
-            }
-        }.onFailure {
-            Timber.Forest.e(it)
-        }
-    }
-
-
-    /**
-     * Get access permission icon
-     * Access permission icon is only shown for incoming shares
-     *
-     * @return icon
-     */
-    private fun getAccessPermissionIcon(accessPermission: AccessPermission, node: TypedNode): Int? =
-        nodeAccessPermissionIconMapper(accessPermission).takeIf { node.isIncomingShare }
 
     /**
      * When error consumed
