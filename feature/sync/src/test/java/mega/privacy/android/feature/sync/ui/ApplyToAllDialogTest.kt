@@ -38,6 +38,7 @@ internal class ApplyToAllDialogTest {
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button
             )
         }
 
@@ -55,6 +56,7 @@ internal class ApplyToAllDialogTest {
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button
             )
         }
 
@@ -71,6 +73,7 @@ internal class ApplyToAllDialogTest {
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button
             )
         }
 
@@ -87,6 +90,7 @@ internal class ApplyToAllDialogTest {
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button
             )
         }
 
@@ -103,6 +107,7 @@ internal class ApplyToAllDialogTest {
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button
             )
         }
 
@@ -122,6 +127,7 @@ internal class ApplyToAllDialogTest {
                 onApplyToCurrent = { applyToCurrentCalled = true },
                 onApplyToAll = { applyToAllCalled = true },
                 onCancel = {},
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button
             )
         }
 
@@ -145,6 +151,7 @@ internal class ApplyToAllDialogTest {
                 onApplyToCurrent = { applyToCurrentCalled = true },
                 onApplyToAll = { applyToAllCalled = true },
                 onCancel = {},
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button
             )
         }
 
@@ -171,6 +178,7 @@ internal class ApplyToAllDialogTest {
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = { cancelCalled = true },
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button
             )
         }
 
@@ -190,6 +198,7 @@ internal class ApplyToAllDialogTest {
                 onApplyToAll = {},
                 onCancel = {},
                 shouldShowApplyToAllOption = false,
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button
             )
         }
 
@@ -212,6 +221,7 @@ internal class ApplyToAllDialogTest {
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = { dismissCalled = true },
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button
             )
         }
         // Click the cancel button to trigger the dismiss callback
@@ -219,5 +229,56 @@ internal class ApplyToAllDialogTest {
             .performClick()
 
         Truth.assertThat(dismissCalled).isTrue()
+    }
+
+    @Test
+    fun `test that rename button is displayed for rename action`() {
+        composeTestRule.setContent {
+            ApplyToAllDialog(
+                title = "Rename all items?",
+                description = "All conflicting items will be renamed.",
+                onApplyToCurrent = {},
+                onApplyToAll = {},
+                onCancel = {},
+                actionButtonStringRes = sharedR.string.sync_apply_all_dialog_rename_button
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_apply_all_dialog_rename_button))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that merge button is displayed for merge action`() {
+        composeTestRule.setContent {
+            ApplyToAllDialog(
+                title = "Merge folders?",
+                description = "The folders will be merged.",
+                onApplyToCurrent = {},
+                onApplyToAll = {},
+                onCancel = {},
+                actionButtonStringRes = sharedR.string.sync_apply_all_dialog_merge_button
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_apply_all_dialog_merge_button))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that choose button is displayed for default actions`() {
+        composeTestRule.setContent {
+            ApplyToAllDialog(
+                title = "Choose the local file?",
+                description = "The local file will be chosen.",
+                onApplyToCurrent = {},
+                onApplyToAll = {},
+                onCancel = {},
+                actionButtonStringRes = sharedR.string.general_dialog_choose_button
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_dialog_choose_button))
+            .assertIsDisplayed()
     }
 } 

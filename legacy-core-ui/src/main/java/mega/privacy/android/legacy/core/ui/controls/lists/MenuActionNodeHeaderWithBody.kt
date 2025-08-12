@@ -25,6 +25,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.red_500
@@ -51,6 +52,7 @@ internal const val HEADER_NODE_BODY = "menu_action_node_header_with_body:text_no
  * @param body The Node Body
  * @param nodeIcon The Node Icon
  * @param modifier The [Modifier] object
+ * @param subTitle An optional Subtitle
  * @param bodyIcon The Icon displayed on the left side of the [body], which does not exist by default
  * @param bodyColor The Text [Color] applied to the [body], which defaults to [textColorSecondary]
  * @param bodyIconColor The Body Icon [Color], which defaults to [Color.Unspecified]
@@ -62,6 +64,7 @@ fun MenuActionNodeHeaderWithBody(
     body: String,
     @DrawableRes nodeIcon: Int,
     modifier: Modifier = Modifier,
+    subTitle: String? = null,
     @DrawableRes bodyIcon: Int? = null,
     bodyColor: Color = MaterialTheme.colors.textColorSecondary,
     bodyIconColor: Color = Color.Unspecified,
@@ -95,6 +98,16 @@ fun MenuActionNodeHeaderWithBody(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
+            subTitle?.let {
+                Text(
+                    modifier = modifier.testTag(HEADER_NODE_TITLE),
+                    text = subTitle,
+                    style = MaterialTheme.typography.body2medium,
+                    color = MaterialTheme.colors.textColorSecondary,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
             Row {
                 bodyIcon?.let { nonNullBodyIcon ->
                     Icon(
@@ -194,6 +207,7 @@ private fun HeaderWithBodyIconAndVeryLongBodyPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         MenuActionNodeHeaderWithBody(
             title = "Backup Folder",
+            subTitle = "Subtitle",
             body = "Sync or backup has been stopped as you’ve logged out or closed the session. To re-enable, go to Settings in the desktop app, select the Sync or Backup tab, and check the relevant folder.",
             bodyColor = red_500,
             nodeIcon = IconPackR.drawable.ic_folder_medium_solid,

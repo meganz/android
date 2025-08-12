@@ -35,14 +35,15 @@ internal class SyncSolvedIssueScreenTest {
     @Test
     fun `test that solved issues list is displayed with local folder name`() {
         val folderName = "Folder name"
+        val folderPath = "/storage/emulated/0/Folder name"
         val resolutionExplanation = "Folders were merged"
         whenever(state.value).thenReturn(
             SyncSolvedIssuesState(
                 listOf(
                     SolvedIssueUiItem(
                         nodeIds = listOf(),
-                        nodeNames = listOf(),
-                        localPaths = listOf(folderName),
+                        nodeNames = listOf(folderName),
+                        localPaths = listOf(folderPath),
                         resolutionExplanation = resolutionExplanation,
                         icon = IconPackR.drawable.ic_folder_medium_solid,
                     )
@@ -57,6 +58,7 @@ internal class SyncSolvedIssueScreenTest {
         }
 
         composeTestRule.onNodeWithText(folderName).assertIsDisplayed()
+        composeTestRule.onNodeWithText(folderPath).assertIsDisplayed()
         composeTestRule.onNodeWithText(resolutionExplanation).assertIsDisplayed()
     }
 

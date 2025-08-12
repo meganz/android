@@ -1039,17 +1039,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">New feature: Hidden files and folders</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">Hide files and folders</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">Hide important files and folders</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">Easily keep sensitive files in your Cloud drive private and out of sight. By default, hidden files do not appear in your Cloud drive, Photos, and Recents section.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy. Only you can reveal them, either individually or by temporarily displaying hidden items from the menu.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Control visibility easily</string>
+    <string name="hidden_nodes_title_control_visibility">Exclude from Timeline</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">To show hidden files, turn on the “Show hidden items” setting under “File Management” - “User interface” in your app settings.</string>
+    <string name="hidden_nodes_description_control_visibility">Hidden items are only accessible through the Cloud drive and will not appear in your Photos, Albums or Recents.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Shared files stay visible</string>
+    <string name="hidden_nodes_title_visible_shared_files">Out of sight</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">Files and folders shared with contacts or with public links are still accessible and visible, even if hidden</string>
+    <string name="hidden_nodes_description_visible_shared_files">You decide when hidden files are visible. There is a new setting to show hidden items temporarily.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
     <!--Camera backup permission screen description-->
@@ -1440,11 +1440,11 @@
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder.</string>
+    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them.</string>
+    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged. Files with the same but different content will have a suffix like(1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
@@ -1489,5 +1489,11 @@
     <!-- Colored folders onboarding title -->
     <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a tag to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <!-- Dialog merge option -->
+    <string name="sync_apply_all_dialog_merge_button">Merge</string>
+    <!-- Dialog rename option -->
+    <string name="sync_apply_all_dialog_rename_button">Rename</string>
+    <!-- Sync text when need to solved stalled issues-->
+    <string name="sync_menu_clear_issues">Clear solved issues</string>
 </resources>
