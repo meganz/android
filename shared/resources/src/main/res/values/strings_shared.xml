@@ -1440,13 +1440,13 @@
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder</string>
+    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder.</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
+    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged. Files with the same but different content will have a suffix like(1) added.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
     <!-- Dialog choose option -->
