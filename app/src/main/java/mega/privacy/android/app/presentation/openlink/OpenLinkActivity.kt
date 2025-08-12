@@ -479,7 +479,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 finish()
             }
             //Contact link
-            matchRegexs(url, CONTACT_LINK_REGEXS) -> { //https://mega.nz/C!
+            matchRegexs(url, CONTACT_LINK_REGEXS) -> {
                 if (isLoggedIn) {
                     url?.split("C!")?.get(1)?.let {
                         startActivity(

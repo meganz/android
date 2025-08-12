@@ -540,7 +540,7 @@ internal class AlbumImportViewModel @Inject constructor(
 
     /**
      * Extract sub-handle from album link
-     * Expected URL format: https://mega.nz/collection/handle#key!subHandle123
+     * Expected URL format: [ALBUM_LINK_REGEXS]
      *
      * @param link The album link to process, defaults to albumLink property
      */
