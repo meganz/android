@@ -21,6 +21,9 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
+import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity.Companion.KEY_NEW_EMAIL
+import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity.Companion.KEY_NEW_PASSWORD
+import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity.Companion.KEY_VERIFY_TYPE
 import mega.privacy.android.app.utils.Constants.ACTION_PASS_CHANGED
 import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_2FA
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
@@ -28,7 +31,7 @@ import mega.privacy.android.app.utils.Constants.CHANGE_PASSWORD_2FA
 import mega.privacy.android.app.utils.Constants.DISABLE_2FA
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.RESULT
-import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
+import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import nz.mega.sdk.MegaError
@@ -146,7 +149,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         setSubTitle()
 
         binding.lostAuthenticationDevice.setOnClickListener {
-            this.launchUrl(RECOVERY_URL)
+            this.launchUrl(recoveryUrl(getDomainNameUseCase()))
         }
 
         setEditTextPINs()

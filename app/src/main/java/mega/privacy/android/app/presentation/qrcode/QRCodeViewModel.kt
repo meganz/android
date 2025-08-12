@@ -23,10 +23,12 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
 import mega.privacy.android.app.utils.AlertsAndWarnings
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.ConstantsUrl.megaUrl
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
+import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.domain.entity.StorageState
@@ -46,6 +48,8 @@ import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_APP_DOMAIN_NAME
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_NZ_DOMAIN_NAME
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
@@ -53,8 +57,6 @@ import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
-import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
@@ -286,7 +288,7 @@ class QRCodeViewModel @Inject constructor(
                             val contactLink = scanResult.rawValue
                             contactLink?.let {
                                 val s = contactLink.split("C!").toTypedArray()
-                                if (s.size <= 1 || s[0] != Constants.SCANNED_CONTACT_BASE_URL) {
+                                if (s.size <= 1 || matchesMegaUrl(s.firstOrNull()).not()) {
                                     setResultMessage(R.string.invalid_code)
                                 } else {
                                     queryContactLink(context, s[1])
@@ -310,6 +312,13 @@ class QRCodeViewModel @Inject constructor(
                 }
         }
     }
+
+    /**
+     * Check if the provided url matches MEGA website url
+     */
+    private fun matchesMegaUrl(url: String?) =
+        url == megaUrl(MEGA_NZ_DOMAIN_NAME)
+                || url == megaUrl(MEGA_APP_DOMAIN_NAME)
 
     /**
      * Save qr code file to cloud drive

@@ -105,7 +105,6 @@ public class Constants {
     public static final long SECONDS_TO_WAIT_ALONE_ON_THE_CALL = 2 * SECONDS_IN_MINUTE;
     public static final long SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL = 5 * SECONDS_IN_MINUTE;
 
-    public static final String SCANNED_CONTACT_BASE_URL = "https://mega.nz/";
     public static final String DISPUTE_URL = "https://mega.io/dispute";
     public static final String TAKEDOWN_URL = "https://mega.io/takedown";
     public static final String TERMS_OF_SERVICE_URL = "https://mega.io/terms";
@@ -453,112 +452,137 @@ public class Constants {
     /**
      * This Regex Pattern will check for the existence of:
      * 1. Domain with HTTPS protocol
-     * 2. Followed by either: Mega.co.nz, Mega.nz, Mega.io, Megaad.nz
+     * 2. Followed by either: Mega.co.nz, Mega.nz, Mega.io, Megaad.nz, Mega.app
      * 3. No words are allowed after the domain name, for example; <a href="https://mega.co.nzxxx">...</a> is not allowed
      * 4. Backslashes (/) or Question Mark (?) are allowed to allow path and query parameters after the MEGA domain, for example; <a href="https://mega.nz/home">...</a>
      * 5. Any characters after Backslashes (/) or Question Mark (?) are allowed, except At Sign(@)
      */
     public static final String[] MEGA_REGEXS = {
-            "^https://mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz)(\\/|\\?)[^@]*$",
-            "^https://([a-z0-9]+\\.)+mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz)(\\/|\\?)[^@]*$"
+            "^https://mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz|\\.app)(\\/|\\?)[^@]*$",
+            "^https://([a-z0-9]+\\.)+mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz|\\.app)(\\/|\\?)[^@]*$"
     };
 
     public static final String[] FILE_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#!.+$",
             "^https://mega\\.nz/.*#!.+$",
+            "^https://mega\\.app/.*#!.+$",
             "^https://mega\\.co\\.nz/file/.+$",
             "^https://mega\\.nz/file/.+$",
+            "^https://mega\\.app/file/.+$",
     };
 
     public static final String[] CONFIRMATION_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#confirm.+$",
             "^https://mega\\.co\\.nz/.*confirm.+$",
             "^https://mega\\.nz/.*#confirm.+$",
-            "^https://mega\\.nz/.*confirm.+$"
+            "^https://mega\\.nz/.*confirm.+$",
+            "^https://mega\\.app/.*#confirm.+$",
+            "^https://mega\\.app/.*confirm.+$"
     };
 
     public static final String[] FOLDER_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#F!.+$",
             "^https://mega\\.nz/.*#F!.+$",
+            "^https://mega\\.app/.*#F!.+$",
             "^https://mega\\.co\\.nz/folder/.+$",
-            "^https://mega\\.nz/folder/.+$"
+            "^https://mega\\.nz/folder/.+$",
+            "^https://mega\\.app/folder/.+$"
     };
 
     public static final String[] CHAT_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*chat/.+$",
-            "^https://mega\\.nz/.*chat/.+$"
+            "^https://mega\\.nz/.*chat/.+$",
+            "^https://mega\\.app/.*chat/.+$"
     };
 
     public static final String[] PASSWORD_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#P!.+$",
-            "^https://mega\\.nz/.*#P!.+$"
+            "^https://mega\\.nz/.*#P!.+$",
+            "^https://mega\\.app/.*#P!.+$"
     };
 
     public static final String[] ACCOUNT_INVITATION_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#newsignup.+$",
             "^https://mega\\.co\\.nz/.*newsignup.+$",
             "^https://mega\\.nz/.*#newsignup.+$",
-            "^https://mega\\.nz/.*newsignup.+$"
+            "^https://mega\\.nz/.*newsignup.+$",
+            "^https://mega\\.app/.*#newsignup.+$",
+            "^https://mega\\.app/.*newsignup.+$"
     };
 
     public static final String[] EXPORT_MASTER_KEY_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#backup",
-            "^https://mega\\.nz/.*#backup"
+            "^https://mega\\.nz/.*#backup",
+            "^https://mega\\.app/.*#backup"
     };
 
     public static final String[] NEW_MESSAGE_CHAT_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#fm/chat",
             "^https://mega\\.co\\.nz/.*fm/chat",
             "^https://mega\\.nz/.*#fm/chat",
-            "^https://mega\\.nz/.*fm/chat"
+            "^https://mega\\.nz/.*fm/chat",
+            "^https://mega\\.app/.*#fm/chat",
+            "^https://mega\\.app/.*fm/chat"
     };
 
     public static final String[] CANCEL_ACCOUNT_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#cancel.+$",
             "^https://mega\\.co\\.nz/.*cancel.+$",
             "^https://mega\\.nz/.*#cancel.+$",
-            "^https://mega\\.nz/.*cancel.+$"
+            "^https://mega\\.nz/.*cancel.+$",
+            "^https://mega\\.app/.*#cancel.+$",
+            "^https://mega\\.app/.*cancel.+$"
     };
 
     public static final String[] VERIFY_CHANGE_MAIL_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#verify.+$",
             "^https://mega\\.co\\.nz/.*verify.+$",
             "^https://mega\\.nz/.*#verify.+$",
-            "^https://mega\\.nz/.*verify.+$"
+            "^https://mega\\.nz/.*verify.+$",
+            "^https://mega\\.app/.*#verify.+$",
+            "^https://mega\\.app/.*verify.+$"
     };
 
     public static final String[] RESET_PASSWORD_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#recover.+$",
             "^https://mega\\.co\\.nz/.*recover.+$",
             "^https://mega\\.nz/.*#recover.+$",
-            "^https://mega\\.nz/.*recover.+$"
+            "^https://mega\\.nz/.*recover.+$",
+            "^https://mega\\.app/.*#recover.+$",
+            "^https://mega\\.app/.*recover.+$"
     };
 
     public static final String[] PENDING_CONTACTS_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#fm/ipc",
             "^https://mega\\.co\\.nz/.*fm/ipc",
             "^https://mega\\.nz/.*#fm/ipc",
-            "^https://mega\\.nz/.*fm/ipc"
+            "^https://mega\\.nz/.*fm/ipc",
+            "^https://mega\\.app/.*#fm/ipc",
+            "^https://mega\\.app/.*fm/ipc"
     };
 
     public static final String[] HANDLE_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#.+$",
-            "^https://mega\\.nz/.*#.+$"
+            "^https://mega\\.nz/.*#.+$",
+            "^https://mega\\.app/.*#.+$"
     };
 
     public static final String[] CONTACT_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/C!.+$",
-            "^https://mega\\.nz/.*C!.+$"
+            "^https://mega\\.nz/.*C!.+$",
+            "^https://mega\\.app/.*C!.+$"
     };
 
     public static final String[] MEGA_DROP_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*megadrop/.+$",
-            "^https://mega\\.nz/.*megadrop/.+$"
+            "^https://mega\\.nz/.*megadrop/.+$",
+            "^https://mega\\.app/.*megadrop/.+$"
     };
 
     public static final String[] MEGA_FILE_REQUEST_LINK_REGEXES = {
             "^https://mega\\.co\\.nz/.*filerequest/.+$",
-            "^https://mega\\.nz/.*filerequest/.+$"
+            "^https://mega\\.nz/.*filerequest/.+$",
+            "^https://mega\\.app/.*filerequest/.+$"
     };
 
     public static final String[] MEGA_BLOG_LINK_REGEXS = {
@@ -567,37 +591,49 @@ public class Constants {
             "^https://mega\\.nz/.*blog",
             "^https://mega\\.co\\.nz/.*#blog.+$",
             "^https://mega\\.nz/.*#blog.+$",
-            "^https://mega\\.nz/.*blog.+$"
+            "^https://mega\\.nz/.*blog.+$",
+            "^https://mega\\.app/.*#blog",
+            "^https://mega\\.app/.*blog",
+            "^https://mega\\.app/.*#blog.+$",
+            "^https://mega\\.app/.*blog.+$"
     };
 
     public static final String[] REVERT_CHANGE_PASSWORD_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#pwr.+$",
             "^https://mega\\.co\\.nz/.*pwr.+$",
             "^https://mega\\.nz/.*#pwr.+$",
-            "^https://mega\\.nz/.*pwr.+$"
+            "^https://mega\\.nz/.*pwr.+$",
+            "^https://mega\\.app/.*#pwr.+$",
+            "^https://mega\\.app/.*pwr.+$"
     };
 
     public static final String[] EMAIL_VERIFY_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#emailverify.+$",
             "^https://mega\\.co\\.nz/emailverify.+$",
             "^https://mega\\.nz/#emailverify.+$",
-            "^https://mega\\.nz/emailverify.+$"
+            "^https://mega\\.nz/emailverify.+$",
+            "^https://mega\\.app/#emailverify.+$",
+            "^https://mega\\.app/emailverify.+$"
     };
 
     public static final String[] WEB_SESSION_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#sitetransfer!.+$",
-            "^https://mega\\.nz/#sitetransfer!.+$"
+            "^https://mega\\.nz/#sitetransfer!.+$",
+            "^https://mega\\.app/#sitetransfer!.+$"
     };
 
     public static final String[] BUSINESS_INVITE_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#businessinvite.+$",
             "^https://mega\\.co\\.nz/businessinvite.+$",
             "^https://mega\\.nz/#businessinvite.+$",
-            "^https://mega\\.nz/businessinvite.+$"
+            "^https://mega\\.nz/businessinvite.+$",
+            "^https://mega\\.app/#businessinvite.+$",
+            "^https://mega\\.app/businessinvite.+$"
     };
 
     public static final String[] ALBUM_LINK_REGEXS = {
             "^https://mega\\.nz/collection/.+$",
+            "^https://mega\\.app/collection/.+$",
     };
 
     //Types of blocked accounts

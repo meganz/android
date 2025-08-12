@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.sp
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.cancelaccountplan.view.GenericInstructionStep
 import mega.privacy.android.app.presentation.cancelaccountplan.view.InstructionStepWithBoldText
+import mega.privacy.android.app.utils.ConstantsUrl.megaUrl
 import mega.privacy.android.app.utils.DomainNameFacade
-import mega.privacy.android.app.utils.MEGA_URL
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
@@ -80,7 +80,7 @@ internal fun WebCancellationInstructionsView(
             styles = hashMapOf(
                 SpanIndicator('A') to MegaSpanStyleWithAnnotation(
                     megaSpanStyle = MegaSpanStyle(color = TextColor.Accent),
-                    annotation = MEGA_URL
+                    annotation = megaUrl(DomainNameFacade.getDomainName())
                 )
             ),
             onAnnotationClick = onMegaUrlClicked,
@@ -117,7 +117,7 @@ internal fun WebCancellationInstructionsView(
                         SpanStyle(textDecoration = TextDecoration.None),
                         color = TextColor.Accent,
                     ),
-                    annotation = MEGA_URL
+                    annotation = megaUrl(DomainNameFacade.getDomainName())
                 )
             ),
             onAnnotationClick = onMegaUrlClicked,

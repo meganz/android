@@ -30,8 +30,9 @@ import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivi
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.view.NewLoginView
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
-import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL
+import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
+import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrlEmail
+import mega.privacy.android.app.utils.DomainNameFacade
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.LoginScreenEvent
@@ -214,17 +215,22 @@ private fun navigateToChangePassword(context: Context, link: String, value: Stri
 }
 
 private fun onLostAuthenticationDevice(context: Context) {
-    context.launchUrl(RECOVERY_URL)
+    context.launchUrl(recoveryUrl(DomainNameFacade.getDomainName()))
 }
 
 private fun onForgotPassword(context: Context, typedEmail: String?) {
     Timber.d("Click on button_forgot_pass")
     context.launchUrl(
         if (typedEmail.isNullOrEmpty()) {
-            RECOVERY_URL
+            recoveryUrl(DomainNameFacade.getDomainName())
         } else {
-            RECOVERY_URL_EMAIL + Base64.encodeToString(typedEmail.toByteArray(), Base64.DEFAULT)
-                .replace("\n", "")
+            val email = runCatching {
+                Base64.encodeToString(typedEmail.toByteArray(), Base64.DEFAULT)
+                    .replace("\n", "")
+            }.onFailure { Timber.e(it) }
+                .getOrNull() ?: ""
+
+            recoveryUrlEmail(DomainNameFacade.getDomainName()) + email
         }
     )
 }

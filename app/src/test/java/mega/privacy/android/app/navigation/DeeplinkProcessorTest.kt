@@ -24,6 +24,8 @@ import mega.privacy.android.app.utils.Constants.RESET_PASSWORD_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.REVERT_CHANGE_PASSWORD_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.WEB_SESSION_LINK_REGEXS
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_APP_DOMAIN_NAME
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_NZ_DOMAIN_NAME
 import mega.privacy.android.feature.sync.navigation.getSyncListRoute
 import mega.privacy.android.feature.sync.navigation.getSyncRoute
 import mega.privacy.android.navigation.DeeplinkProcessor
@@ -36,8 +38,10 @@ class DeeplinkProcessorTest {
     @Test
     fun `test that the deep link processor matches sync URLs`() = runTest {
         val urls = listOf(
-            "https://mega.nz/${getSyncRoute()}",
-            "https://mega.nz/${getSyncListRoute()}",
+            "https://$MEGA_NZ_DOMAIN_NAME/${getSyncRoute()}",
+            "https://$MEGA_NZ_DOMAIN_NAME/${getSyncListRoute()}",
+            "https://$MEGA_APP_DOMAIN_NAME/${getSyncRoute()}",
+            "https://$MEGA_APP_DOMAIN_NAME/${getSyncListRoute()}",
         )
         processors.forEach { processor ->
             urls.forEach { url ->

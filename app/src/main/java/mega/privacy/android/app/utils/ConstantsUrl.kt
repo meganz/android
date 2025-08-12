@@ -6,8 +6,17 @@ package mega.privacy.android.app.utils
 object ConstantsUrl {
 
     /**
+     * MEGA website url
+     */
+    fun megaUrl(domainName: String) = "https://$domainName/"
+
+    /**
      * Url for accessing account recovery page.
      */
-    const val RECOVERY_URL = "https://mega.nz/recovery"
-    const val RECOVERY_URL_EMAIL = "https://mega.nz/recovery?email="
+    fun recoveryUrl(domainName: String) = "https://$domainName/recovery"
+
+    /**
+     * Url for accessing account recovery page with email parameter.
+     */
+    fun recoveryUrlEmail(domainName: String) = "https://$domainName/recovery?email="
 }

@@ -81,7 +81,7 @@ import mega.privacy.android.app.utils.Constants.REVERT_CHANGE_PASSWORD_LINK_REGE
 import mega.privacy.android.app.utils.Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.Constants.WEB_SESSION_LINK_REGEXS
-import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
+import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
 import mega.privacy.android.app.utils.LinksUtil.requiresTransferSession
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.matchRegexs
@@ -91,6 +91,8 @@ import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.exception.ResetPasswordLinkException
 import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_APP_DOMAIN_NAME
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_NZ_DOMAIN_NAME
 import mega.privacy.android.navigation.DeeplinkHandler
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
@@ -415,7 +417,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 }
             }
             // Reset password - two options: logged IN or OUT
-            matchRegexs(url, RESET_PASSWORD_LINK_REGEXS) && url != RECOVERY_URL -> {
+            matchRegexs(url, RESET_PASSWORD_LINK_REGEXS) && matchesRecoveryUrl(url).not() -> {
                 Timber.d("Reset pass url")
                 viewModel.queryResetPasswordLink(url.orEmpty())
             }
@@ -568,6 +570,13 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
             }
         }
     }
+
+    /**
+     * Check if the provided url matches recovery url
+     */
+    private fun matchesRecoveryUrl(url: String?) =
+        url == recoveryUrl(MEGA_NZ_DOMAIN_NAME)
+                || url == recoveryUrl(MEGA_APP_DOMAIN_NAME)
 
     private fun navigateToResetPassword(isLoggedIn: Boolean, needsRefreshSession: Boolean) {
         if (isLoggedIn && !needsRefreshSession) {

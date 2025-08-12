@@ -2,7 +2,7 @@ package mega.privacy.android.app.fragments.homepage.banner
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
@@ -14,6 +14,8 @@ import mega.privacy.android.app.utils.Constants.MEGA_PASS_URL
 import mega.privacy.android.app.utils.Constants.MEGA_VPN_PACKAGE_NAME
 import mega.privacy.android.app.utils.Constants.MEGA_VPN_URL
 import mega.privacy.android.app.utils.LinksUtil
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_APP_DOMAIN_NAME
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_NZ_DOMAIN_NAME
 import mega.privacy.mobile.analytics.event.PwmSmartBannerItemSelectedEvent
 import mega.privacy.mobile.analytics.event.VpnSmartBannerItemSelectedEvent
 
@@ -28,20 +30,20 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
         val context = fragment.requireContext()
 
         when {
-            link == ACHIEVEMENT -> {
+            matchesAchievementUrl(link) -> {
                 val intent = Intent(context, AchievementsFeatureActivity::class.java)
                 context.startActivity(intent)
             }
 
-            link == REFERRAL -> {
+            matchesReferralUrl(link) -> {
                 LinksUtil.requiresTransferSession(context, link)
             }
 
-            link == SETTINGS -> {
+            matchesSettingsUrl(link) -> {
                 context.startActivity(Intent(context, SettingsActivity::class.java))
             }
 
-            link == TEXT_EDITOR -> {
+            matchesTextEditorUrl(link) -> {
                 (fragment.activity as ManagerActivity).showNewTextFileDialog(null)
             }
 
@@ -63,7 +65,7 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
 
     private fun openInSpecificApp(context: Context, link: String, packageName: String) {
         runCatching {
-            Intent(Intent.ACTION_VIEW, Uri.parse(link)).apply {
+            Intent(Intent.ACTION_VIEW, link.toUri()).apply {
                 setPackage(packageName)
                 context.startActivity(this)
             }
@@ -72,24 +74,33 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
                 context.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("market://details?id=$packageName")
+                        "market://details?id=$packageName".toUri()
                     )
                 )
             } catch (exception: Exception) {
                 context.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+                        "https://play.google.com/store/apps/details?id=$packageName".toUri()
                     )
                 )
             }
         }
     }
 
-    companion object {
-        private const val ACHIEVEMENT = "https://mega.nz/achievements"
-        private const val REFERRAL = "https://mega.nz/fm/refer"
-        private const val SETTINGS = "https://mega.nz/appSettings"
-        private const val TEXT_EDITOR = "https://mega.nz/newText"
-    }
+    private fun matchesAchievementUrl(link: String) =
+        link == "https://$MEGA_NZ_DOMAIN_NAME/achievements"
+                || link == "https://$MEGA_APP_DOMAIN_NAME/achievements"
+
+    private fun matchesReferralUrl(link: String) =
+        link == "https://$MEGA_NZ_DOMAIN_NAME/fm/refer"
+                || link == "https://$MEGA_APP_DOMAIN_NAME/fm/refer"
+
+    private fun matchesSettingsUrl(link: String) =
+        link == "https://$MEGA_NZ_DOMAIN_NAME/appSettings"
+                || link == "https://$MEGA_APP_DOMAIN_NAME/appSettings"
+
+    private fun matchesTextEditorUrl(link: String) =
+        link == "https://$MEGA_NZ_DOMAIN_NAME/newText"
+                || link == "https://$MEGA_APP_DOMAIN_NAME/newText"
 }

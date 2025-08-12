@@ -71,7 +71,7 @@ import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevatio
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
+import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.cloudRootHandle
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
@@ -86,6 +86,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.account.SetUserCredentialsUseCase
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
@@ -164,6 +165,9 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var passcodeCheck: PasscodeCheck
+
+    @Inject
+    lateinit var getDomainNameUseCase: GetDomainNameUseCase
 
     private val viewModel by viewModels<FileProviderViewModel>()
 
@@ -586,7 +590,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
         lostYourDeviceButton =
             findViewById<RelativeLayout?>(R.id.lost_authentication_device).apply {
                 setOnClickListener {
-                    this@FileProviderActivity.launchUrl(RECOVERY_URL)
+                    this@FileProviderActivity.launchUrl(recoveryUrl(getDomainNameUseCase()))
                 }
             }
         pinError = findViewById<TextView?>(R.id.pin_2fa_error_login).apply {
