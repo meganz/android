@@ -45,6 +45,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -119,26 +120,30 @@ class CreateAccountViewModelTest {
     }
 
     @Test
-    fun `test that first name is saved to savedStateHandle and ui state is reset when onFirstNameInputChanged is called`() =
+    fun `test that first name is saved to savedStateHandle and validation is triggered when onFirstNameInputChanged is called`() =
         runTest {
             underTest.onFirstNameInputChanged("first Name")
 
             assertThat(savedStateHandle.get<String>(KEY_FIRST_NAME)).isEqualTo("first Name")
 
             underTest.uiState.test {
-                assertThat(awaitItem().isFirstNameValid).isNull()
+                val state = awaitItem()
+                assertThat(state.isFirstNameValid).isTrue()
+                assertThat(state.isFirstNameLengthExceeded).isFalse()
             }
         }
 
     @Test
-    fun `test that last name is saved to savedStateHandle and ui state is reset when onLastNameInputChanged is called`() =
+    fun `test that last name is saved to savedStateHandle and validation is triggered when onLastNameInputChanged is called`() =
         runTest {
             underTest.onLastNameInputChanged("last Name")
 
             assertThat(savedStateHandle.get<String>(KEY_LAST_NAME)).isEqualTo("last Name")
 
             underTest.uiState.test {
-                assertThat(awaitItem().isLastNameValid).isNull()
+                val state = awaitItem()
+                assertThat(state.isLastNameValid).isTrue()
+                assertThat(state.isLastNameLengthExceeded).isFalse()
             }
         }
 
@@ -615,6 +620,493 @@ class CreateAccountViewModelTest {
 
             verify(saveLastRegisteredEmailUseCase).invoke(myEmail)
         }
+
+    @Test
+    fun `test that first name with exactly 40 characters is valid`() = runTest {
+        val firstName40Chars = "a".repeat(40)
+        underTest.onFirstNameInputChanged(firstName40Chars)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isFirstNameValid).isTrue()
+            assertThat(state.isFirstNameLengthExceeded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that first name with more than 40 characters is invalid and sets length exceeded flag`() =
+        runTest {
+            val firstName41Chars = "a".repeat(41)
+            underTest.onFirstNameInputChanged(firstName41Chars)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isFirstNameValid).isFalse()
+                assertThat(state.isFirstNameLengthExceeded).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that last name with exactly 40 characters is valid`() = runTest {
+        val lastName40Chars = "a".repeat(40)
+        underTest.onLastNameInputChanged(lastName40Chars)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLastNameValid).isTrue()
+            assertThat(state.isLastNameLengthExceeded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that last name with more than 40 characters is invalid and sets length exceeded flag`() =
+        runTest {
+            val lastName41Chars = "a".repeat(41)
+            underTest.onLastNameInputChanged(lastName41Chars)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isLastNameValid).isFalse()
+                assertThat(state.isLastNameLengthExceeded).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that first name length exceeded flag is reset when input becomes valid`() = runTest {
+        // First set an invalid name
+        val firstName41Chars = "a".repeat(41)
+        underTest.onFirstNameInputChanged(firstName41Chars)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isFirstNameLengthExceeded).isTrue()
+        }
+
+        // Then set a valid name
+        val firstName40Chars = "a".repeat(40)
+        underTest.onFirstNameInputChanged(firstName40Chars)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isFirstNameValid).isTrue()
+            assertThat(state.isFirstNameLengthExceeded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that last name length exceeded flag is reset when input becomes valid`() = runTest {
+        // First set an invalid name
+        val lastName41Chars = "a".repeat(41)
+        underTest.onLastNameInputChanged(lastName41Chars)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLastNameLengthExceeded).isTrue()
+        }
+
+        // Then set a valid name
+        val lastName40Chars = "a".repeat(40)
+        underTest.onLastNameInputChanged(lastName40Chars)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLastNameValid).isTrue()
+            assertThat(state.isLastNameLengthExceeded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that empty first name is invalid but does not set length exceeded flag`() = runTest {
+        underTest.onFirstNameInputChanged("")
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isFirstNameValid).isFalse()
+            assertThat(state.isFirstNameLengthExceeded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that empty last name is invalid but does not set length exceeded flag`() = runTest {
+        underTest.onLastNameInputChanged("")
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLastNameValid).isFalse()
+            assertThat(state.isLastNameLengthExceeded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that NAME_CHAR_LIMIT constant is 40`() {
+        assertThat(CreateAccountViewModel.NAME_CHAR_LIMIT).isEqualTo(40)
+    }
+
+    // Tests for new pure validation functions
+    @Test
+    fun `test that checkFirstNameValidity returns correct validation result for valid name`() = runTest {
+        val validName = "John"
+        val (isValid, isLengthExceeded) = underTest.checkFirstNameValidity(validName)
+        
+        assertThat(isValid).isTrue()
+        assertThat(isLengthExceeded).isFalse()
+    }
+
+    @Test
+    fun `test that checkFirstNameValidity returns correct validation result for empty name`() = runTest {
+        val emptyName = ""
+        val (isValid, isLengthExceeded) = underTest.checkFirstNameValidity(emptyName)
+        
+        assertThat(isValid).isFalse()
+        assertThat(isLengthExceeded).isFalse()
+    }
+
+    @Test
+    fun `test that checkFirstNameValidity returns correct validation result for name with exactly 40 characters`() = runTest {
+        val name40Chars = "a".repeat(40)
+        val (isValid, isLengthExceeded) = underTest.checkFirstNameValidity(name40Chars)
+        
+        assertThat(isValid).isTrue()
+        assertThat(isLengthExceeded).isFalse()
+    }
+
+    @Test
+    fun `test that checkFirstNameValidity returns correct validation result for name with more than 40 characters`() = runTest {
+        val name41Chars = "a".repeat(41)
+        val (isValid, isLengthExceeded) = underTest.checkFirstNameValidity(name41Chars)
+        
+        assertThat(isValid).isFalse()
+        assertThat(isLengthExceeded).isTrue()
+    }
+
+    @Test
+    fun `test that checkLastNameValidity returns correct validation result for valid name`() = runTest {
+        val validName = "Doe"
+        val (isValid, isLengthExceeded) = underTest.checkLastNameValidity(validName)
+        
+        assertThat(isValid).isTrue()
+        assertThat(isLengthExceeded).isFalse()
+    }
+
+    @Test
+    fun `test that checkLastNameValidity returns correct validation result for empty name`() = runTest {
+        val emptyName = ""
+        val (isValid, isLengthExceeded) = underTest.checkLastNameValidity(emptyName)
+        
+        assertThat(isValid).isFalse()
+        assertThat(isLengthExceeded).isFalse()
+    }
+
+    @Test
+    fun `test that checkLastNameValidity returns correct validation result for name with exactly 40 characters`() = runTest {
+        val name40Chars = "b".repeat(40)
+        val (isValid, isLengthExceeded) = underTest.checkLastNameValidity(name40Chars)
+        
+        assertThat(isValid).isTrue()
+        assertThat(isLengthExceeded).isFalse()
+    }
+
+    @Test
+    fun `test that checkLastNameValidity returns correct validation result for name with more than 40 characters`() = runTest {
+        val name41Chars = "b".repeat(41)
+        val (isValid, isLengthExceeded) = underTest.checkLastNameValidity(name41Chars)
+        
+        assertThat(isValid).isFalse()
+        assertThat(isLengthExceeded).isTrue()
+    }
+
+    @Test
+    fun `test that checkFirstNameValidity handles whitespace correctly`() = runTest {
+        val whitespaceName = "   "
+        val (isValid, isLengthExceeded) = underTest.checkFirstNameValidity(whitespaceName)
+        
+        assertThat(isValid).isFalse()
+        assertThat(isLengthExceeded).isFalse()
+    }
+
+    @Test
+    fun `test that checkLastNameValidity handles whitespace correctly`() = runTest {
+        val whitespaceName = "   "
+        val (isValid, isLengthExceeded) = underTest.checkLastNameValidity(whitespaceName)
+        
+        assertThat(isValid).isFalse()
+        assertThat(isLengthExceeded).isFalse()
+    }
+
+    @Test
+    fun `test that checkFirstNameValidity handles unicode characters correctly`() = runTest {
+        val unicodeName = "José-María"
+        val (isValid, isLengthExceeded) = underTest.checkFirstNameValidity(unicodeName)
+        
+        assertThat(isValid).isTrue()
+        assertThat(isLengthExceeded).isFalse()
+    }
+
+    @Test
+    fun `test that checkLastNameValidity handles unicode characters correctly`() = runTest {
+        val unicodeName = "Müller-Žáček"
+        val (isValid, isLengthExceeded) = underTest.checkLastNameValidity(unicodeName)
+        
+        assertThat(isValid).isTrue()
+        assertThat(isLengthExceeded).isFalse()
+    }
+
+    // Edge Cases and Boundary Testing
+    @Test
+    fun `test that first name with 39 characters is valid`() = runTest {
+        val firstName39Chars = "a".repeat(39)
+        underTest.onFirstNameInputChanged(firstName39Chars)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isFirstNameValid).isTrue()
+            assertThat(state.isFirstNameLengthExceeded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that last name with 39 characters is valid`() = runTest {
+        val lastName39Chars = "b".repeat(39)
+        underTest.onLastNameInputChanged(lastName39Chars)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLastNameValid).isTrue()
+            assertThat(state.isLastNameLengthExceeded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that first name with 41 characters is invalid and sets length exceeded flag`() =
+        runTest {
+            val firstName41Chars = "a".repeat(41)
+            underTest.onFirstNameInputChanged(firstName41Chars)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isFirstNameValid).isFalse()
+                assertThat(state.isFirstNameLengthExceeded).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that last name with 41 characters is invalid and sets length exceeded flag`() =
+        runTest {
+            val lastName41Chars = "b".repeat(41)
+            underTest.onLastNameInputChanged(lastName41Chars)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isLastNameValid).isFalse()
+                assertThat(state.isLastNameLengthExceeded).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that first name with 100 characters is invalid and sets length exceeded flag`() =
+        runTest {
+            val firstName100Chars = "a".repeat(100)
+            underTest.onFirstNameInputChanged(firstName100Chars)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isFirstNameValid).isFalse()
+                assertThat(state.isFirstNameLengthExceeded).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that last name with 100 characters is invalid and sets length exceeded flag`() =
+        runTest {
+            val lastName100Chars = "b".repeat(100)
+            underTest.onLastNameInputChanged(lastName100Chars)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isLastNameValid).isFalse()
+                assertThat(state.isLastNameLengthExceeded).isTrue()
+            }
+        }
+
+    // Whitespace and Special Character Testing
+    @Test
+    fun `test that first name with only spaces is invalid but does not set length exceeded flag`() =
+        runTest {
+            val firstNameSpaces = "   "
+            underTest.onFirstNameInputChanged(firstNameSpaces)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isFirstNameValid).isFalse()
+                assertThat(state.isFirstNameLengthExceeded).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that last name with only spaces is invalid but does not set length exceeded flag`() =
+        runTest {
+            val lastNameSpaces = "   "
+            underTest.onLastNameInputChanged(lastNameSpaces)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isLastNameValid).isFalse()
+                assertThat(state.isLastNameLengthExceeded).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that first name with 41 spaces is invalid and sets length exceeded flag`() = runTest {
+        val firstName41Spaces = " ".repeat(41)
+        underTest.onFirstNameInputChanged(firstName41Spaces)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isFirstNameValid).isFalse()
+            assertThat(state.isFirstNameLengthExceeded).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that first name with special characters under 40 chars is valid`() = runTest {
+        val firstNameSpecial = "João-María.O'Connor"
+        underTest.onFirstNameInputChanged(firstNameSpecial)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isFirstNameValid).isTrue()
+            assertThat(state.isFirstNameLengthExceeded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that last name with unicode characters under 40 chars is valid`() = runTest {
+        val lastNameUnicode = "Müller-Žáček"
+        underTest.onLastNameInputChanged(lastNameUnicode)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLastNameValid).isTrue()
+            assertThat(state.isLastNameLengthExceeded).isFalse()
+        }
+    }
+
+    // State Transition Testing
+    @Test
+    fun `test that changing from valid to invalid first name updates state correctly`() = runTest {
+        // Start with valid name
+        underTest.onFirstNameInputChanged("John")
+
+        underTest.uiState.test {
+            val validState = awaitItem()
+            assertThat(validState.isFirstNameValid).isTrue()
+            assertThat(validState.isFirstNameLengthExceeded).isFalse()
+        }
+
+        // Change to invalid name
+        underTest.onFirstNameInputChanged("a".repeat(50))
+
+        underTest.uiState.test {
+            val invalidState = awaitItem()
+            assertThat(invalidState.isFirstNameValid).isFalse()
+            assertThat(invalidState.isFirstNameLengthExceeded).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that changing from invalid to valid last name updates state correctly`() = runTest {
+        // Start with invalid name
+        underTest.onLastNameInputChanged("b".repeat(50))
+
+        underTest.uiState.test {
+            val invalidState = awaitItem()
+            assertThat(invalidState.isLastNameValid).isFalse()
+            assertThat(invalidState.isLastNameLengthExceeded).isTrue()
+        }
+
+        // Change to valid name
+        underTest.onLastNameInputChanged("Doe")
+
+        underTest.uiState.test {
+            val validState = awaitItem()
+            assertThat(validState.isLastNameValid).isTrue()
+            assertThat(validState.isLastNameLengthExceeded).isFalse()
+        }
+    }
+
+    // Integration Testing
+    @Test
+    fun `test that both invalid first and last names prevent account creation`() = runTest {
+        whenever(getPasswordStrengthUseCase(any())).thenReturn(PasswordStrength.GOOD)
+        whenever(isEmailValidUseCase(any())).thenReturn(true)
+        connectivityFlow.emit(true)
+
+        // Set invalid names (too long)
+        underTest.onFirstNameInputChanged("a".repeat(50))
+        underTest.onLastNameInputChanged("b".repeat(50))
+        underTest.onEmailInputChanged("test@example.com")
+        underTest.onPasswordInputChanged("ValidPassword123!")
+        underTest.onConfirmPasswordInputChanged("ValidPassword123!")
+        underTest.termsOfServiceAgreedChanged(true)
+
+        underTest.createAccount()
+
+        // Verify createAccountUseCase is not called due to validation failure
+        verify(createAccountUseCase, never()).invoke(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `test that valid names with other valid inputs allow account creation attempt`() = runTest {
+        whenever(getPasswordStrengthUseCase(any())).thenReturn(PasswordStrength.GOOD)
+        whenever(isEmailValidUseCase(any())).thenReturn(true)
+        whenever(createAccountUseCase(any(), any(), any(), any())).thenReturn(mock())
+        connectivityFlow.emit(true)
+
+        // Set valid names (exactly 40 chars)
+        underTest.onFirstNameInputChanged("a".repeat(40))
+        underTest.onLastNameInputChanged("b".repeat(40))
+        underTest.onEmailInputChanged("test@example.com")
+        underTest.onPasswordInputChanged("ValidPassword123!")
+        underTest.onConfirmPasswordInputChanged("ValidPassword123!")
+        underTest.termsOfServiceAgreedChanged(true)
+
+        underTest.createAccount()
+
+        // Verify createAccountUseCase is called with valid inputs
+        verify(createAccountUseCase).invoke(
+            "test@example.com",
+            "ValidPassword123!",
+            "a".repeat(40),
+            "b".repeat(40)
+        )
+    }
+
+    @Test
+    fun `test that mixed valid and invalid name states work correctly`() = runTest {
+        // Valid first name, invalid last name
+        underTest.onFirstNameInputChanged("John")
+        underTest.onLastNameInputChanged("a".repeat(50))
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isFirstNameValid).isTrue()
+            assertThat(state.isFirstNameLengthExceeded).isFalse()
+            assertThat(state.isLastNameValid).isFalse()
+            assertThat(state.isLastNameLengthExceeded).isTrue()
+        }
+
+        // Invalid first name, valid last name
+        underTest.onFirstNameInputChanged("b".repeat(50))
+        underTest.onLastNameInputChanged("Doe")
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isFirstNameValid).isFalse()
+            assertThat(state.isFirstNameLengthExceeded).isTrue()
+            assertThat(state.isLastNameValid).isTrue()
+            assertThat(state.isLastNameLengthExceeded).isFalse()
+        }
+    }
 
     private suspend fun initInputFields() {
         underTest.onFirstNameInputChanged("first Name")

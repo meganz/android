@@ -28,6 +28,7 @@
                 android:imeOptions="actionDone"
                 android:inputType="text"
                 android:maxLines="1"
+                android:maxLength="40"
                 android:textSize="16sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -60,6 +61,7 @@
                 android:imeOptions="actionDone"
                 android:inputType="text"
                 android:maxLines="1"
+                android:maxLength="40"
                 android:textSize="16sp" />
 
         </com.google.android.material.textfield.TextInputLayout>

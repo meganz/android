@@ -80,17 +80,98 @@ class CreateAccountViewModel @Inject constructor(
 
     internal fun onFirstNameInputChanged(firstName: String) {
         savedStateHandle[KEY_FIRST_NAME] = firstName
-        _uiState.update { it.copy(isFirstNameValid = null) }
+        updateFirstNameValidationState()
     }
 
     internal fun onLastNameInputChanged(lastName: String) {
         savedStateHandle[KEY_LAST_NAME] = lastName
-        _uiState.update { it.copy(isLastNameValid = null) }
+        updateLastNameValidationState()
     }
 
     internal fun onEmailInputChanged(email: String) {
         savedStateHandle[KEY_EMAIL] = email
         isEmailValid()
+    }
+
+    /**
+     * Checks the validity of the given first name.
+     *
+     * @param firstName The first name to validate.
+     * @return A [Pair] where:
+     *   - The first value is `true` if the first name is valid (not blank and does not exceed [NAME_CHAR_LIMIT]), `false` otherwise.
+     *   - The second value is `true` if the first name exceeds [NAME_CHAR_LIMIT], `false` otherwise.
+     *
+     * The first name is considered valid if it is not blank and its length does not exceed [NAME_CHAR_LIMIT].
+     * If the length exceeds [NAME_CHAR_LIMIT], the second value will be `true` to indicate the limit has been exceeded.
+     */
+    internal fun checkFirstNameValidity(firstName: String): Pair<Boolean, Boolean> {
+        val isLengthExceeded = firstName.length > NAME_CHAR_LIMIT
+        val isValid = firstName.isNotBlank() && !isLengthExceeded
+        return isValid to isLengthExceeded
+    }
+
+    /**
+     * Checks the validity of the given last name.
+     *
+     * @param lastName The last name to validate.
+     * @return A [Pair] where:
+     *   - The first value is `true` if the last name is valid (not blank and does not exceed [NAME_CHAR_LIMIT]), `false` otherwise.
+     *   - The second value is `true` if the last name exceeds [NAME_CHAR_LIMIT], `false` otherwise.
+     *
+     * The last name is considered valid if it is not blank and its length does not exceed [NAME_CHAR_LIMIT].
+     * If the length exceeds [NAME_CHAR_LIMIT], the second value will be `true` to indicate the limit has been exceeded.
+     */
+    internal fun checkLastNameValidity(lastName: String): Pair<Boolean, Boolean> {
+        val isLengthExceeded = lastName.length > NAME_CHAR_LIMIT
+        val isValid = lastName.isNotBlank() && !isLengthExceeded
+        return isValid to isLengthExceeded
+    }
+
+    /**
+     * Updates the UI state for the first name field by retrieving the current value from [savedStateHandle],
+     * validating it using [checkFirstNameValidity], and updating [_uiState] accordingly.
+     *
+     * This function is responsible for ensuring that the UI reflects the latest validation state of the first name,
+     * including whether the name is valid and whether it exceeds the allowed character limit.
+     *
+     * The validation logic considers a first name valid if it is not blank and does not exceed [NAME_CHAR_LIMIT].
+     * If the length exceeds [NAME_CHAR_LIMIT], the UI state will indicate that the limit has been exceeded.
+     *
+     * This function should be called whenever the first name input changes.
+     */
+    private fun updateFirstNameValidationState() {
+        val firstName: String = savedStateHandle[KEY_FIRST_NAME] ?: ""
+        val (isValid, isLengthExceeded) = checkFirstNameValidity(firstName)
+        Timber.d("CreateAccountViewModel, isValid: $isValid, isLengthExceeded: $isLengthExceeded")
+        _uiState.update {
+            it.copy(
+                isFirstNameValid = isValid,
+                isFirstNameLengthExceeded = isLengthExceeded
+            )
+        }
+    }
+
+    /**
+     * Updates the UI state for the last name field by retrieving the current value from [savedStateHandle],
+     * validating it using [checkLastNameValidity], and updating [_uiState] accordingly.
+     *
+     * This function ensures that the UI reflects the latest validation state of the last name,
+     * including whether the name is valid and whether it exceeds the allowed character limit.
+     *
+     * The validation logic considers a last name valid if it is not blank and does not exceed [NAME_CHAR_LIMIT].
+     * If the length exceeds [NAME_CHAR_LIMIT], the UI state will indicate that the limit has been exceeded.
+     *
+     * This function should be called whenever the last name input changes.
+     */
+    private fun updateLastNameValidationState() {
+        val lastName: String = savedStateHandle[KEY_LAST_NAME] ?: ""
+        val (isValid, isLengthExceeded) = checkLastNameValidity(lastName)
+        _uiState.update {
+            it.copy(
+                isLastNameValid = isValid,
+                isLastNameLengthExceeded = isLengthExceeded
+            )
+        }
     }
 
     private fun isEmailValid(): Boolean {
@@ -108,16 +189,14 @@ class CreateAccountViewModel @Inject constructor(
 
     private fun isFirstNameValid(): Boolean {
         val firstName: String = savedStateHandle[KEY_FIRST_NAME] ?: ""
-        val isFirstNameValid = firstName.isBlank().not()
-        _uiState.update { it.copy(isFirstNameValid = isFirstNameValid) }
-        return isFirstNameValid
+        val (isValid, _) = checkFirstNameValidity(firstName)
+        return isValid
     }
 
     private fun isLastNameValid(): Boolean {
         val lastName: String = savedStateHandle[KEY_LAST_NAME] ?: ""
-        val isLastNameValid = lastName.isBlank().not()
-        _uiState.update { it.copy(isLastNameValid = isLastNameValid) }
-        return isLastNameValid
+        val (isValid, _) = checkLastNameValidity(lastName)
+        return isValid
     }
 
     internal fun onPasswordInputChanged(password: String) = viewModelScope.launch {
@@ -344,6 +423,8 @@ class CreateAccountViewModel @Inject constructor(
         const val KEY_E2EE = "e2ee"
 
         const val EMAIL_CHAR_LIMIT = 190
+
+        const val NAME_CHAR_LIMIT = 40
 
         const val MIN_PASSWORD_LENGTH_DESIGN_REVAMP = 8
     }

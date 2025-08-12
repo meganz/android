@@ -76,13 +76,17 @@ class EditProfileViewModel @Inject constructor(
 
     private fun getUserFistName(forceRefresh: Boolean) = viewModelScope.launch {
         runCatching { getCurrentUserFirstName(forceRefresh) }
-            .onSuccess { _state.update { state -> state.copy(firstName = it) } }
+            .onSuccess { firstName -> 
+                _state.update { state -> state.copy(firstName = firstName ?: "") } 
+            }
             .onFailure { Timber.w("Exception getting user first name.", it) }
     }
 
     private fun getUserLastName(forceRefresh: Boolean) = viewModelScope.launch {
         runCatching { getCurrentUserLastName(forceRefresh) }
-            .onSuccess { _state.update { state -> state.copy(lastName = it) } }
+            .onSuccess { lastName -> 
+                _state.update { state -> state.copy(lastName = lastName ?: "") } 
+            }
             .onFailure { Timber.w("Exception getting user last name.", it) }
     }
 

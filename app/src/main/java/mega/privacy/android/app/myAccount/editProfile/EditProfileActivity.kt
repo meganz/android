@@ -94,6 +94,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         private const val NAME_SIZE = 16F
         private const val EMAIL_SIZE = 12F
         private const val PADDING_LEFT_STATE = 8F
+        private const val MAX_NAME_LENGTH = 40
 
         private const val CHANGE_NAME_SHOWN = "CHANGE_NAME_SHOWN"
         private const val FIRST_NAME_TYPED = "FIRST_NAME_TYPED"
@@ -615,6 +616,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 quitEditTextError(dialogBinding.lastNameLayout, dialogBinding.lastNameErrorIcon)
 
                 dialogBinding.firstNameField.apply {
+                    // Set InputFilter to enforce maxLength from XML
+                    setFilters(arrayOf(android.text.InputFilter.LengthFilter(MAX_NAME_LENGTH)))
+
                     setText(firstName ?: editProfileViewModel.getFirstName())
                     setOnEditorActionListener { _, actionId, _ ->
                         if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -639,6 +643,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 }
 
                 dialogBinding.lastNameField.apply {
+                    // Set InputFilter to enforce maxLength from XML
+                    setFilters(arrayOf(android.text.InputFilter.LengthFilter(MAX_NAME_LENGTH)))
+                    
                     setText(lastName ?: editProfileViewModel.getLastName())
                     setOnEditorActionListener { _, actionId, _ ->
                         if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -665,12 +672,24 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                             getString(R.string.error_enter_username),
                             dialogBinding.firstNameLayout, dialogBinding.firstNameErrorIcon
                         )
+                    } else if (dialogBinding.firstNameField.text.toString().length > MAX_NAME_LENGTH) {
+                        errorShown = true
+                        setEditTextError(
+                            getString(sharedR.string.sign_up_first_name_text_field_char_limit_exceed_error),
+                            dialogBinding.firstNameLayout, dialogBinding.firstNameErrorIcon
+                        )
                     }
 
                     if (dialogBinding.lastNameField.text.isNullOrEmpty()) {
                         errorShown = true
                         setEditTextError(
                             getString(R.string.error_enter_userlastname),
+                            dialogBinding.lastNameLayout, dialogBinding.lastNameErrorIcon
+                        )
+                    } else if (dialogBinding.lastNameField.text.toString().length > MAX_NAME_LENGTH) {
+                        errorShown = true
+                        setEditTextError(
+                            getString(sharedR.string.sign_up_last_name_text_field_char_limit_exceed_error),
                             dialogBinding.lastNameLayout, dialogBinding.lastNameErrorIcon
                         )
                     }

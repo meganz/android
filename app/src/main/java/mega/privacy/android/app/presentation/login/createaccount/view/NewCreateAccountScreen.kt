@@ -88,6 +88,7 @@ import mega.privacy.android.app.presentation.login.createaccount.CreateAccountVi
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_FIRST_NAME
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_LAST_NAME
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.KEY_PASSWORD
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.NAME_CHAR_LIMIT
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountStatus
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountUIState
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.CONFIRM_PASSWORD
@@ -336,13 +337,18 @@ internal fun NewCreateAccountScreen(
                         ),
                     label = stringResource(id = R.string.first_name_text),
                     keyboardType = KeyboardType.Text,
+                    maxCharLimit = NAME_CHAR_LIMIT,
                     onValueChanged = {
-                        firstName = it.trim()
+                        val trimmedValue = it.trim()
+                        firstName = trimmedValue
                         onFirstNameInputChanged(firstName)
                     },
                     imeAction = ImeAction.Next,
-                    errorText = stringResource(id = sharedR.string.sign_up_first_name_text_field_error_message)
-                        .takeIf { uiState.isFirstNameValid == false },
+                    errorText = when {
+                        uiState.isFirstNameLengthExceeded == true -> stringResource(id = sharedR.string.sign_up_first_name_text_field_char_limit_exceed_error)
+                        uiState.isFirstNameValid == false -> stringResource(id = sharedR.string.sign_up_first_name_text_field_error_message)
+                        else -> null
+                    },
                     text = firstName
                 )
 
@@ -364,13 +370,18 @@ internal fun NewCreateAccountScreen(
                         ),
                     label = stringResource(id = R.string.lastname_text),
                     keyboardType = KeyboardType.Text,
+                    maxCharLimit = NAME_CHAR_LIMIT,
                     onValueChanged = {
-                        lastName = it.trim()
+                        val trimmedValue = it.trim()
+                        lastName = trimmedValue
                         onLastNameInputChanged(lastName)
                     },
                     imeAction = ImeAction.Next,
-                    errorText = stringResource(id = sharedR.string.sign_up_last_name_text_field_error_message)
-                        .takeIf { uiState.isLastNameValid == false },
+                    errorText = when {
+                        uiState.isLastNameLengthExceeded == true -> stringResource(id = sharedR.string.sign_up_last_name_text_field_char_limit_exceed_error)
+                        uiState.isLastNameValid == false -> stringResource(id = sharedR.string.sign_up_last_name_text_field_error_message)
+                        else -> null
+                    },
                     text = lastName
                 )
 

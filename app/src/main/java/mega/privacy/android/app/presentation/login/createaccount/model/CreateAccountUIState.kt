@@ -67,6 +67,10 @@ data class CreateAccountUIState(
 
     val isEmailLengthExceeded: Boolean? = null,
 
+    val isFirstNameLengthExceeded: Boolean? = null,
+
+    val isLastNameLengthExceeded: Boolean? = null,
+
     val isPasswordLengthSufficient: Boolean? = null,
 
     val doesPasswordContainMixedCase: Boolean = false,

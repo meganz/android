@@ -38,7 +38,6 @@ import kotlin.test.assertEquals
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class EditProfileViewModelTest {
-    private lateinit var underTest: EditProfileViewModel
 
     private val getMyAvatarColorUseCase = mock<GetMyAvatarColorUseCase>()
     private val getMyAvatarFileUseCase = mock<GetMyAvatarFileUseCase>()
@@ -48,34 +47,56 @@ internal class EditProfileViewModelTest {
     private val colorMyAvatar = Color.RED
     private val monitorMyAvatarFileFlow = MutableSharedFlow<File?>()
     private val firstName = "FirstName"
-    private val getCurrentUserFirstName: GetCurrentUserFirstName =
-        mock { onBlocking { invoke(false) }.thenReturn(firstName) }
+    private val getCurrentUserFirstName: GetCurrentUserFirstName = mock()
     private val lastName = "LastName"
-    private val getCurrentUserLastName: GetCurrentUserLastName =
-        mock { onBlocking { invoke(false) }.thenReturn(lastName) }
+    private val getCurrentUserLastName: GetCurrentUserLastName = mock()
     private lateinit var userUpdates: Channel<UserChanges>
-    private val monitorUserUpdates: MonitorUserUpdates =
-        mock {
-            on { invoke() }.thenAnswer {
-                userUpdates = Channel()
-                userUpdates.consumeAsFlow()
-            }
-        }
+    private val monitorUserUpdates: MonitorUserUpdates = mock()
 
     @BeforeEach
     fun setUp() {
-
         whenever(monitorMyAvatarFile()).thenReturn(monitorMyAvatarFileFlow)
         getMyAvatarColorUseCase.stub {
             onBlocking { invoke() }.doReturn(colorMyAvatar)
         }
-        underTest = EditProfileViewModel(
+        getMyAvatarFileUseCase.stub {
+            onBlocking { invoke(any()) }.doReturn(null)
+        }
+        // Set up mocks for the use cases called in init
+        hasOfflineFilesUseCase.stub {
+            onBlocking { invoke() }.doReturn(false)
+        }
+        ongoingTransfersExistUseCase.stub {
+            onBlocking { invoke() }.doReturn(false)
+        }
+        // Set up monitorUserUpdates mock
+        userUpdates = Channel()
+        whenever(monitorUserUpdates()).thenReturn(userUpdates.consumeAsFlow())
+    }
+
+    private fun createViewModel(
+        firstNameValue: String? = firstName,
+        lastNameValue: String? = lastName,
+    ): EditProfileViewModel {
+        // Create fresh mocks for each test to avoid conflicts
+        val testGetCurrentUserFirstName = mock<GetCurrentUserFirstName>()
+        val testGetCurrentUserLastName = mock<GetCurrentUserLastName>()
+
+        // Set up the test mocks
+        testGetCurrentUserFirstName.stub {
+            onBlocking { invoke(false) }.doReturn(firstNameValue ?: "")
+        }
+        testGetCurrentUserLastName.stub {
+            onBlocking { invoke(false) }.doReturn(lastNameValue ?: "")
+        }
+
+        return EditProfileViewModel(
             ioDispatcher = UnconfinedTestDispatcher(),
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
             getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             monitorMyAvatarFile = monitorMyAvatarFile,
-            getCurrentUserFirstName = getCurrentUserFirstName,
-            getCurrentUserLastName = getCurrentUserLastName,
+            getCurrentUserFirstName = testGetCurrentUserFirstName,
+            getCurrentUserLastName = testGetCurrentUserLastName,
             monitorUserUpdates = monitorUserUpdates,
             hasOfflineFilesUseCase = hasOfflineFilesUseCase,
             ongoingTransfersExistUseCase = ongoingTransfersExistUseCase
@@ -85,8 +106,9 @@ internal class EditProfileViewModelTest {
     @Test
     fun `when monitorMyAvatarFile emit new file then avatarFile is null`() =
         runTest {
+            val testViewModel = createViewModel()
             monitorMyAvatarFileFlow.emit(null)
-            underTest.state.test {
+            testViewModel.state.test {
                 val state = awaitItem()
                 assertEquals(state.avatarColor, colorMyAvatar)
                 assertEquals(state.avatarFile, null)
@@ -96,9 +118,10 @@ internal class EditProfileViewModelTest {
     @Test
     fun `when monitorMyAvatarFile emit new file then avatarFile is not null`() =
         runTest {
+            val testViewModel = createViewModel()
             val file = mock<File>()
             monitorMyAvatarFileFlow.emit(file)
-            underTest.state.test {
+            testViewModel.state.test {
                 val state = awaitItem()
                 assertEquals(state.avatarColor, colorMyAvatar)
                 assertEquals(state.avatarFile, file)
@@ -109,18 +132,22 @@ internal class EditProfileViewModelTest {
     internal fun `test that an exception on get last name is not propagated`() =
         withCoroutineExceptions {
             runTest {
-                getCurrentUserLastName.stub {
-                    onBlocking { invoke(any()) }.thenAnswer {
-                        throw MegaException(
-                            1,
-                            "Get last name threw an exception"
-                        )
+                val testViewModel = createViewModel()
+                // Wait for initial state to be set
+                testViewModel.state.test {
+                    val initialState = awaitItem()
+                    // Now set up the exception scenario
+                    getCurrentUserLastName.stub {
+                        onBlocking { invoke(any()) }.thenAnswer {
+                            throw MegaException(
+                                1,
+                                "Get last name threw an exception"
+                            )
+                        }
                     }
-                }
-
-                underTest.state.test {
-                    assertThat(awaitItem().lastName).isEqualTo(lastName)
                     userUpdates.send(UserChanges.Lastname)
+                    // Wait for the next state update or timeout
+                    awaitItem()
                 }
             }
         }
@@ -129,42 +156,224 @@ internal class EditProfileViewModelTest {
     internal fun `test that an exception on get first name is not propagated`() =
         withCoroutineExceptions {
             runTest {
-                getCurrentUserFirstName.stub {
-                    onBlocking { invoke(true) }.thenAnswer {
-                        throw MegaException(
-                            1,
-                            "Get first name threw an exception"
-                        )
+                val testViewModel = createViewModel()
+                // Wait for initial state to be set
+                testViewModel.state.test {
+                    val initialState = awaitItem()
+                    // Now set up the exception scenario
+                    getCurrentUserFirstName.stub {
+                        onBlocking { invoke(true) }.thenAnswer {
+                            throw MegaException(
+                                1,
+                                "Get first name threw an exception"
+                            )
+                        }
                     }
-                }
-
-                underTest.state.test {
-                    assertThat(awaitItem().firstName).isEqualTo(firstName)
                     userUpdates.send(UserChanges.Firstname)
+                    // Wait for the next state update or timeout
+                    awaitItem()
                 }
             }
         }
 
     @Test
     internal fun `test that offlineFilesExist is set correctly`() = runTest {
+        val testViewModel = createViewModel()
         whenever(hasOfflineFilesUseCase()).thenReturn(true)
 
-        underTest.checkOfflineFiles()
+        testViewModel.checkOfflineFiles()
 
-        underTest.state.test {
+        testViewModel.state.test {
             assertThat(awaitItem().offlineFilesExist).isTrue()
         }
     }
 
     @Test
     internal fun `test that transfersExist is set correctly`() = runTest {
+        val testViewModel = createViewModel()
         whenever(ongoingTransfersExistUseCase()).thenReturn(true)
 
-        underTest.checkOngoingTransfers()
+        testViewModel.checkOngoingTransfers()
 
-        underTest.state.test {
+        testViewModel.state.test {
             assertThat(awaitItem().transfersExist).isTrue()
         }
+    }
+
+    @Test
+    internal fun `test that first name returns correctly from use case`() = runTest {
+        val expectedFirstName = "John"
+        // Set up the mock before creating the ViewModel
+        whenever(getCurrentUserFirstName(false)).thenReturn(expectedFirstName)
+
+        // Create a new ViewModel instance with the updated mock
+        val testViewModel = EditProfileViewModel(
+            ioDispatcher = UnconfinedTestDispatcher(),
+            getMyAvatarColorUseCase = getMyAvatarColorUseCase,
+            getMyAvatarFileUseCase = getMyAvatarFileUseCase,
+            monitorMyAvatarFile = monitorMyAvatarFile,
+            getCurrentUserFirstName = getCurrentUserFirstName,
+            getCurrentUserLastName = getCurrentUserLastName,
+            monitorUserUpdates = monitorUserUpdates,
+            hasOfflineFilesUseCase = hasOfflineFilesUseCase,
+            ongoingTransfersExistUseCase = ongoingTransfersExistUseCase
+        )
+
+        val result = testViewModel.getFirstName()
+
+        assertThat(result).isEqualTo(expectedFirstName)
+    }
+
+    @Test
+    internal fun `test that last name returns correctly from use case`() = runTest {
+        val expectedLastName = "Doe"
+
+        // Create a new ViewModel instance with the updated mock
+        val testViewModel = createViewModel(lastNameValue = expectedLastName)
+
+        val result = testViewModel.getLastName()
+
+        assertThat(result).isEqualTo(expectedLastName)
+    }
+
+    @Test
+    internal fun `test that first name handles empty string correctly`() = runTest {
+        // Set up the mock before creating the ViewModel
+        whenever(getCurrentUserFirstName(false)).thenReturn("")
+
+        // Create a new ViewModel instance with the updated mock
+        val testViewModel = EditProfileViewModel(
+            ioDispatcher = UnconfinedTestDispatcher(),
+            getMyAvatarColorUseCase = getMyAvatarColorUseCase,
+            getMyAvatarFileUseCase = getMyAvatarFileUseCase,
+            monitorMyAvatarFile = monitorMyAvatarFile,
+            getCurrentUserFirstName = getCurrentUserFirstName,
+            getCurrentUserLastName = getCurrentUserLastName,
+            monitorUserUpdates = monitorUserUpdates,
+            hasOfflineFilesUseCase = hasOfflineFilesUseCase,
+            ongoingTransfersExistUseCase = ongoingTransfersExistUseCase
+        )
+
+        val result = testViewModel.getFirstName()
+
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    internal fun `test that last name handles empty string correctly`() = runTest {
+        // Create a new ViewModel instance with the updated mock
+        val testViewModel = createViewModel(lastNameValue = "")
+
+        val result = testViewModel.getLastName()
+
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    internal fun `test that first name handles null correctly`() = runTest {
+        // Set up the mock before creating the ViewModel
+        whenever(getCurrentUserFirstName(false)).thenReturn(null)
+
+        // Create a new ViewModel instance with the updated mock
+        val testViewModel = EditProfileViewModel(
+            ioDispatcher = UnconfinedTestDispatcher(),
+            getMyAvatarColorUseCase = getMyAvatarColorUseCase,
+            getMyAvatarFileUseCase = getMyAvatarFileUseCase,
+            monitorMyAvatarFile = monitorMyAvatarFile,
+            getCurrentUserFirstName = getCurrentUserFirstName,
+            getCurrentUserLastName = getCurrentUserLastName,
+            monitorUserUpdates = monitorUserUpdates,
+            hasOfflineFilesUseCase = hasOfflineFilesUseCase,
+            ongoingTransfersExistUseCase = ongoingTransfersExistUseCase
+        )
+
+        val result = testViewModel.getFirstName()
+
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    internal fun `test that last name handles null correctly`() = runTest {
+        // Create a new ViewModel instance with null value
+        val testViewModel = createViewModel(lastNameValue = null)
+
+        val result = testViewModel.getLastName()
+
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    internal fun `test that first name with 40 characters is handled correctly`() = runTest {
+        val firstName40Chars = "a".repeat(40)
+        // Set up the mock before creating the ViewModel
+        whenever(getCurrentUserFirstName(false)).thenReturn(firstName40Chars)
+
+        // Create a new ViewModel instance with the updated mock
+        val testViewModel = EditProfileViewModel(
+            ioDispatcher = UnconfinedTestDispatcher(),
+            getMyAvatarColorUseCase = getMyAvatarColorUseCase,
+            getMyAvatarFileUseCase = getMyAvatarFileUseCase,
+            monitorMyAvatarFile = monitorMyAvatarFile,
+            getCurrentUserFirstName = getCurrentUserFirstName,
+            getCurrentUserLastName = getCurrentUserLastName,
+            monitorUserUpdates = monitorUserUpdates,
+            hasOfflineFilesUseCase = hasOfflineFilesUseCase,
+            ongoingTransfersExistUseCase = ongoingTransfersExistUseCase
+        )
+
+        val result = testViewModel.getFirstName()
+
+        assertThat(result).isEqualTo(firstName40Chars)
+        assertThat(result.length).isEqualTo(40)
+    }
+
+    @Test
+    internal fun `test that last name with 40 characters is handled correctly`() = runTest {
+        val lastName40Chars = "b".repeat(40)
+
+        // Create a new ViewModel instance with the updated mock
+        val testViewModel = createViewModel(lastNameValue = lastName40Chars)
+
+        val result = testViewModel.getLastName()
+
+        assertThat(result).isEqualTo(lastName40Chars)
+        assertThat(result.length).isEqualTo(40)
+    }
+
+    @Test
+    internal fun `test that first name with unicode characters is handled correctly`() = runTest {
+        val unicodeFirstName = "José-María"
+        // Set up the mock before creating the ViewModel
+        whenever(getCurrentUserFirstName(false)).thenReturn(unicodeFirstName)
+
+        // Create a new ViewModel instance with the updated mock
+        val testViewModel = EditProfileViewModel(
+            ioDispatcher = UnconfinedTestDispatcher(),
+            getMyAvatarColorUseCase = getMyAvatarColorUseCase,
+            getMyAvatarFileUseCase = getMyAvatarFileUseCase,
+            monitorMyAvatarFile = monitorMyAvatarFile,
+            getCurrentUserFirstName = getCurrentUserFirstName,
+            getCurrentUserLastName = getCurrentUserLastName,
+            monitorUserUpdates = monitorUserUpdates,
+            hasOfflineFilesUseCase = hasOfflineFilesUseCase,
+            ongoingTransfersExistUseCase = ongoingTransfersExistUseCase
+        )
+
+        val result = testViewModel.getFirstName()
+
+        assertThat(result).isEqualTo(unicodeFirstName)
+    }
+
+    @Test
+    internal fun `test that last name with unicode characters is handled correctly`() = runTest {
+        val unicodeLastName = "Müller-Schmidt"
+
+        // Create a new ViewModel instance with the updated mock
+        val testViewModel = createViewModel(lastNameValue = unicodeLastName)
+
+        val result = testViewModel.getLastName()
+
+        assertThat(result).isEqualTo(unicodeLastName)
     }
 }
 

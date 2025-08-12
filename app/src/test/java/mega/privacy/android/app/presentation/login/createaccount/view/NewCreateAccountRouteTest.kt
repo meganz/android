@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.text.input.ImeAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.login.createaccount.model.CreateAccountUIState
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.CONFIRM_PASSWORD
 import mega.privacy.android.app.presentation.login.createaccount.view.CreateAccountTestTags.CREATE_ACCOUNT_BUTTON
@@ -224,5 +225,39 @@ class NewCreateAccountRouteTest {
         composeRule.onNodeWithTag(CreateAccountTestTags.CREATE_ACCOUNT_BUTTON).performScrollTo()
             .performClick()
         verify(createAccountClicked).invoke()
+    }
+
+    @Test
+    fun `test that first name input with valid length triggers callback`() {
+        val firstNameChanged: (String) -> Unit = mock()
+        val validFirstName = "John"
+
+        with(composeRule) {
+            setupRule(onFirstNameInputChanged = firstNameChanged)
+
+            val firstNameField = composeRule.onNode(
+                hasAnyAncestor(hasTestTag(FIRST_NAME)) and hasImeAction(ImeAction.Next)
+            )
+
+            firstNameField.performTextInput(validFirstName)
+            verify(firstNameChanged).invoke(validFirstName)
+        }
+    }
+
+    @Test
+    fun `test that last name input with valid length triggers callback`() {
+        val lastNameChanged: (String) -> Unit = mock()
+        val validLastName = "Doe"
+
+        with(composeRule) {
+            setupRule(onLastNameInputChanged = lastNameChanged)
+
+            val lastNameField = composeRule.onNode(
+                hasAnyAncestor(hasTestTag(LAST_NAME)) and hasImeAction(ImeAction.Next)
+            )
+
+            lastNameField.performTextInput(validLastName)
+            verify(lastNameChanged).invoke(validLastName)
+        }
     }
 }

@@ -1482,6 +1482,10 @@
     <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <!--Sign Up page text field input first name error message when character limit exceeded-->
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name cannot exceed 40 characters</string>
+    <!--Sign Up page text field input last name error message when character limit exceeded-->
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name cannot exceed 40 characters</string>
     <!-- Colored folders onboarding title -->
     <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
     <!-- Colored folders onboarding description -->
