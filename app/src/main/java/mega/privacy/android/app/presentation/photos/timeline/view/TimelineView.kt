@@ -48,10 +48,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
@@ -76,6 +78,7 @@ import mega.privacy.android.shared.original.core.ui.theme.yellow_700
 import mega.privacy.android.shared.original.core.ui.theme.yellow_700_alpha_015
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
+
 /**
  * Base Compose Timeline View
  */
@@ -92,7 +95,8 @@ fun TimelineView(
     onClickCameraUploadsSync: () -> Unit = {},
     onClickCameraUploadsUploading: () -> Unit = {},
     onChangeCameraUploadsPermissions: () -> Unit = {},
-    onCloseCameraUploadsLimitedAccess: () -> Unit = {},
+    onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit = {},
+    onEnableCameraUploads: () -> Unit = {},
     clearCameraUploadsMessage: () -> Unit = {},
     clearCameraUploadsChangePermissionsMessage: () -> Unit = {},
     clearCameraUploadsCompletedMessage: () -> Unit = {},
@@ -270,7 +274,8 @@ fun TimelineView(
                             onCardClick = onCardClick,
                             onTimeBarTabSelected = onTimeBarTabSelected,
                             onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                            onCloseCameraUploadsLimitedAccess = onCloseCameraUploadsLimitedAccess,
+                            onUpdateCameraUploadsLimitedAccessState = onUpdateCameraUploadsLimitedAccessState,
+                            onEnableCameraUploads = onEnableCameraUploads,
                         )
                     }
                 } else {
@@ -295,9 +300,12 @@ private fun HandlePhotosGridView(
     onCardClick: (DateCard) -> Unit,
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
-    onCloseCameraUploadsLimitedAccess: () -> Unit,
+    onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit,
+    onEnableCameraUploads: () -> Unit,
 ) {
-    val isBannerShown = (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
+    var isBannerShown by remember { mutableStateOf(false) }
+    var isWarningBannerShown by remember { mutableStateOf(false) }
+
     LaunchedEffect(
         timelineViewState.scrollStartIndex,
         timelineViewState.scrollStartOffset,
@@ -309,16 +317,61 @@ private fun HandlePhotosGridView(
         )
     }
 
+    LaunchedEffect(
+        isScrollingDown,
+        isScrolledToEnd,
+        isScrolledToTop,
+        timelineViewState.isCameraUploadsLimitedAccess
+    ) {
+        isBannerShown = (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
+
+        if (lazyGridState.isScrollInProgress
+            && (isScrollingDown || isScrolledToEnd)
+            && timelineViewState.isCameraUploadsLimitedAccess
+        ) {
+            onUpdateCameraUploadsLimitedAccessState(false)
+        }
+        isWarningBannerShown = (!isScrollingDown && !isScrolledToEnd)
+                || isScrolledToTop
+                || timelineViewState.isCameraUploadsLimitedAccess
+    }
+
     LaunchedEffect(timelineViewState.isCameraUploadsLimitedAccess) {
-        if (timelineViewState.isCameraUploadsLimitedAccess) {
+        if (timelineViewState.isCameraUploadsLimitedAccess
+            && !timelineViewState.isCameraUploadsBannerImprovementEnabled
+        ) {
             lazyGridState.scrollToItem(0)
         }
     }
     // Load Photos
     Column {
         if (timelineViewState.isCameraUploadsBannerImprovementEnabled) {
-            SlideBanner(visible = isBannerShown) {
-                CameraUploadsBanner(timelineViewState)
+            val bannerType = getCameraUploadsBannerType(timelineViewState)
+            val pendingCount = timelineViewState.pending
+
+            when (bannerType) {
+                CameraUploadsBannerType.NoFullAccess -> {
+                    SlideBanner(visible = isWarningBannerShown) {
+                        CameraUploadsWarningBanner(
+                            bannerType = bannerType,
+                            onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                            onUpdateCameraUploadsLimitedAccessState = { isVisible ->
+                                isWarningBannerShown = isVisible
+                                onUpdateCameraUploadsLimitedAccessState(isVisible)
+                            }
+                        )
+                    }
+                }
+
+                else -> {
+                    SlideBanner(visible = isBannerShown) {
+                        CameraUploadsBanner(
+                            bannerType = bannerType,
+                            pendingCount = pendingCount,
+                            onEnableCameraUploads = onEnableCameraUploads,
+                        )
+                    }
+                }
             }
         }
 
@@ -349,7 +402,7 @@ private fun HandlePhotosGridView(
                             if (timelineViewState.isCameraUploadsLimitedAccess) {
                                 CameraUploadsLimitedAccess(
                                     onClick = onChangeCameraUploadsPermissions,
-                                    onClose = onCloseCameraUploadsLimitedAccess,
+                                    onClose = { onUpdateCameraUploadsLimitedAccessState(false) },
                                 )
                             }
                         }
@@ -493,13 +546,61 @@ fun CameraUploadsLimitedAccess(
     )
 }
 
+private fun getCameraUploadsBannerType(
+    timelineViewState: TimelineViewState,
+): CameraUploadsBannerType {
+    return when {
+        timelineViewState.enableCameraUploadButtonShowing && timelineViewState.selectedPhotoCount == 0 ->
+            CameraUploadsBannerType.EnableCameraUploads
+
+        timelineViewState.showCameraUploadsWarning -> CameraUploadsBannerType.NoFullAccess
+
+        timelineViewState.cameraUploadsStatus == CameraUploadsStatus.Sync ->
+            CameraUploadsBannerType.CheckingUploads
+
+        timelineViewState.cameraUploadsStatus == CameraUploadsStatus.Uploading ->
+            CameraUploadsBannerType.PendingCount
+
+        else -> CameraUploadsBannerType.NONE
+    }
+}
+
+
+@Composable
+private fun CameraUploadsWarningBanner(
+    bannerType: CameraUploadsBannerType,
+    onChangeCameraUploadsPermissions: () -> Unit,
+    onUpdateCameraUploadsLimitedAccessState: (Boolean) -> Unit,
+) {
+    if (bannerType == CameraUploadsBannerType.NoFullAccess) {
+        LaunchedEffect(Unit) {
+            delay(5000)
+            onUpdateCameraUploadsLimitedAccessState(false)
+        }
+
+        CameraUploadsNoFullAccessBanner(
+            onClick = onChangeCameraUploadsPermissions,
+            onClose = { onUpdateCameraUploadsLimitedAccessState(false) },
+        )
+    }
+}
+
 @Composable
 private fun CameraUploadsBanner(
-    timelineViewState: TimelineViewState,
+    bannerType: CameraUploadsBannerType,
+    pendingCount: Int,
+    onEnableCameraUploads: () -> Unit,
 ) {
-    when (timelineViewState.cameraUploadsStatus) {
-        CameraUploadsStatus.Sync -> CameraUploadsCheckingUploadsBanner()
-        CameraUploadsStatus.Uploading -> CameraUploadsPendingCountBanner(timelineViewState.pending)
+    when (bannerType) {
+        CameraUploadsBannerType.EnableCameraUploads ->
+            EnableCameraUploadsBanner(onClick = onEnableCameraUploads)
+
+        CameraUploadsBannerType.CheckingUploads ->
+            CameraUploadsCheckingUploadsBanner()
+
+        CameraUploadsBannerType.PendingCount ->
+            CameraUploadsPendingCountBanner(pendingCount)
+
         else -> {}
     }
 }
@@ -509,20 +610,20 @@ private fun SlideBanner(
     visible: Boolean,
     content: @Composable () -> Unit,
 ) {
-    val duration = 300
+    val animationDuration = 300
     AnimatedVisibility(
         visible = visible,
         enter = slideInVertically(
-            animationSpec = tween(duration),
+            animationSpec = tween(animationDuration),
             initialOffsetY = { -it }
         ) + fadeIn(
-            animationSpec = tween(duration)
+            animationSpec = tween(animationDuration)
         ),
         exit = slideOutVertically(
-            animationSpec = tween(duration),
+            animationSpec = tween(animationDuration),
             targetOffsetY = { -it }
         ) + fadeOut(
-            animationSpec = tween(duration)
+            animationSpec = tween(animationDuration)
         )
     ) {
         content()

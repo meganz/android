@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -168,7 +169,7 @@ fun CameraUploadsNoFullAccessBanner(
     CameraUploadsBanner(
         modifier = modifier.clickable {
             onClick()
-        },
+        }.testTag(TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status_warning,
         title = stringResource(sharedR.string.camera_uploads_banner_complete_title),
         description = description,
@@ -193,7 +194,7 @@ fun EnableCameraUploadsBanner(
     CameraUploadsBanner(
         modifier = modifier.clickable {
             onClick()
-        },
+        }.testTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status,
         title = stringResource(R.string.settings_camera_upload_on),
         description = stringResource(id = R.string.enable_cu_subtitle),
@@ -214,7 +215,7 @@ fun CameraUploadsCheckingUploadsBanner(
     modifier: Modifier = Modifier,
 ) {
     CameraUploadsBanner(
-        modifier = modifier,
+        modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_CHECKING_UPLOADS_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status_sync,
         title = stringResource(sharedR.string.camera_uploads_banner_checking_uploads_text),
         description = null
@@ -227,7 +228,7 @@ fun CameraUploadsPendingCountBanner(
     modifier: Modifier = Modifier,
 ) {
     CameraUploadsBanner(
-        modifier = modifier,
+        modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_PENDING_COUNT_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status_uploading,
         title = stringResource(
             sharedR.string.camera_uploads_banner_uploading_pending_count_text,
@@ -348,3 +349,27 @@ fun PreviewCameraUploadsStatusCompleted() {
 fun PreviewCameraUploadsStatusWarning() {
     CameraUploadsStatusWarning(progress = 0.4f, onClick = { /*TODO*/ })
 }
+
+/**
+ * Test tag for enable camera uploads banner
+ */
+const val TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG =
+    "timeline_enable_camera_uploads_banner_test_tag"
+
+/**
+ * Test tag for camera uploads checking uploads banner
+ */
+const val TIMELINE_CAMERA_UPLOADS_CHECKING_UPLOADS_BANNER_TEST_TAG =
+    "timeline_camera_uploads_checking_uploads_banner_test_tag"
+
+/**
+ * Test tag for camera uploads pending count banner
+ */
+const val TIMELINE_CAMERA_UPLOADS_PENDING_COUNT_BANNER_TEST_TAG =
+    "timeline_camera_uploads_pending_count_banner_test_tag"
+
+/**
+ * Test tag for camera uploads no full access banner
+ */
+const val TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG =
+    "timeline_camera_uploads_no_full_access_banner_test_tag"

@@ -78,7 +78,9 @@ fun PhotosGridView(
         timelineViewState.enableCameraUploadButtonShowing
                 && !timelineViewState.showCameraUploadsWarning
                 && timelineViewState.selectedPhotoCount == 0
+                && !timelineViewState.isCameraUploadsBannerImprovementEnabled
     val isCameraUploadsLimitedAccess = timelineViewState.isCameraUploadsLimitedAccess
+            && !timelineViewState.isCameraUploadsBannerImprovementEnabled
     val uiPhotoList = timelineViewState.photosListItems
     val currentZoomLevel = timelineViewState.currentZoomLevel
     val potentialItems =
@@ -132,17 +134,10 @@ fun PhotosGridView(
                 key = "camera-uploads-limited-access-banner",
                 span = { GridItemSpan(maxLineSpan) },
             ) {
-                if (timelineViewState.isCameraUploadsBannerImprovementEnabled) {
-                    CameraUploadsNoFullAccessBanner(
-                        onClick = onChangeCameraUploadsPermissions,
-                        onClose = { onUpdateCameraUploadsLimitedAccessState(false) },
-                    )
-                } else {
-                    CameraUploadsLimitedAccess(
-                        onClick = onChangeCameraUploadsPermissions,
-                        onClose = { onUpdateCameraUploadsLimitedAccessState(false) },
-                    )
-                }
+                CameraUploadsLimitedAccess(
+                    onClick = onChangeCameraUploadsPermissions,
+                    onClose = { onUpdateCameraUploadsLimitedAccessState(false) },
+                )
             }
         }
 
@@ -151,11 +146,7 @@ fun PhotosGridView(
                 key = "enable-camera-uploads-banner",
                 span = { GridItemSpan(maxLineSpan) },
             ) {
-                if (timelineViewState.isCameraUploadsBannerImprovementEnabled) {
-                    EnableCameraUploadsBanner(onClick = onEnableCameraUploads)
-                } else {
-                    NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
-                }
+                NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
             }
         }
 

@@ -41,6 +41,7 @@ fun EmptyState(
     onEnableCameraUploads: () -> Unit = {},
 ) {
     val enableCameraUploadButtonShowing = timelineViewState.enableCameraUploadButtonShowing
+            && !timelineViewState.isCameraUploadsBannerImprovementEnabled
     val currentMediaSource = timelineViewState.currentMediaSource
 
     if (enableCameraUploadButtonShowing && currentMediaSource != CLOUD_DRIVE) {
@@ -55,11 +56,7 @@ fun EmptyState(
         }
 
         if (enableCameraUploadButtonShowing) {
-            if (timelineViewState.isCameraUploadsBannerImprovementEnabled) {
-                EnableCameraUploadsBanner(onClick = onEnableCameraUploads)
-            } else {
-                NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
-            }
+            NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
         }
     } else {
         Column(
@@ -69,11 +66,7 @@ fun EmptyState(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (enableCameraUploadButtonShowing) {
-                if (timelineViewState.isCameraUploadsBannerImprovementEnabled) {
-                    EnableCameraUploadsBanner(onClick = onEnableCameraUploads)
-                } else {
-                    NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
-                }
+                NewEnableCameraUploadsButton(onClick = onEnableCameraUploads)
             }
 
             Spacer(modifier = Modifier.height(16.dp))

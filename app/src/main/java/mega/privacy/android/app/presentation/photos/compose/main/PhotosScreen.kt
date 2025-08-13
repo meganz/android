@@ -130,6 +130,9 @@ fun PhotosScreen(
                 lazyGridState = timelineLazyGridState,
                 onCardClick = timelineViewModel::onCardClick,
                 onTimeBarTabSelected = timelineViewModel::onTimeBarTabSelected,
+                onEnableCameraUploads = onNavigateCameraUploadsSettings,
+                onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                onUpdateCameraUploadsLimitedAccessState = timelineViewModel::setCameraUploadsLimitedAccess,
                 enableCUView = {
                     EnableCameraUploadsScreen(
                         onEnable = onNavigateCameraUploadsSettings,
@@ -165,10 +168,6 @@ fun PhotosScreen(
                             timelineViewState.pending,
                         )
                     )
-                },
-                onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                onCloseCameraUploadsLimitedAccess = {
-                    timelineViewModel.setCameraUploadsLimitedAccess(false)
                 },
                 clearCameraUploadsMessage = {
                     timelineViewModel.setCameraUploadsMessage("")
