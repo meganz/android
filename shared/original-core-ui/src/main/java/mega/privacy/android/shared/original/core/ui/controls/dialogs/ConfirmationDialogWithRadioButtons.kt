@@ -73,6 +73,7 @@ fun <T> ConfirmationDialogWithRadioButtons(
         Surface(
             modifier = Modifier.semantics { testTagsAsResourceId = true },
             elevation = 24.dp,
+            color = DSTokens.colors.background.surface2,
             shape = RoundedCornerShape(4.dp)
         ) {
             Column(

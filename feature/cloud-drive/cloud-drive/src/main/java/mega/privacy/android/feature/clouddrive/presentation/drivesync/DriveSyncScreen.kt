@@ -38,6 +38,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriv
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
+import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
 import mega.privacy.android.shared.resources.R as sharedR
@@ -59,13 +60,11 @@ internal fun DriveSyncScreen(
     val context = LocalContext.current
     val megaNavigator = viewModel.megaNavigator
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
+    var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
+    var showSyncSettings by rememberSaveable { mutableStateOf(false) }
 
     BackHandler(enabled = cloudDriveUiState.isInSelectionMode) {
         cloudDriveViewModel.processAction(DeselectAllItems)
-    }
-
-    var selectedTabIndex by rememberSaveable {
-        mutableIntStateOf(0)
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -99,7 +98,7 @@ internal fun DriveSyncScreen(
                                 TopAppBarActionWithClick(
                                     CloudDriveAppBarAction.More
                                 ) {
-                                    // TODO Handle sync more action
+                                    showSyncSettings = true
                                 })
                         }
                     }
@@ -209,4 +208,8 @@ internal fun DriveSyncScreen(
         cloudDriveUiState = cloudDriveUiState,
         cloudDriveViewModel = cloudDriveViewModel,
     )
+
+    SyncSettingsBottomSheetViewM3(shouldShowBottomSheet = showSyncSettings) {
+        showSyncSettings = false
+    }
 }
