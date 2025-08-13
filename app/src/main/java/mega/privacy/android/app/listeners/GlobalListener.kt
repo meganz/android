@@ -12,6 +12,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
+import com.google.android.gms.ads.MobileAds
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +38,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
@@ -50,6 +52,7 @@ import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUs
 import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
 import mega.privacy.android.domain.usecase.contact.GetIncomingContactRequestsNotificationListUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import mega.privacy.android.domain.usecase.pdf.CheckIfShouldDeleteLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastMiscLoadedUseCase
@@ -65,6 +68,7 @@ import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 /**
@@ -92,8 +96,9 @@ class GlobalListener @Inject constructor(
     private val broadcastMiscLoadedUseCase: BroadcastMiscLoadedUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val checkIfShouldDeleteLastPageViewedInPdfUseCase: CheckIfShouldDeleteLastPageViewedInPdfUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : MegaGlobalListenerInterface {
-
+    private val isMobileAdsInitializeCalled = AtomicBoolean(false)
     private val globalSyncUpdates = MutableSharedFlow<Unit>()
 
     init {
@@ -291,6 +296,7 @@ class GlobalListener @Inject constructor(
                     broadcastMiscLoadedUseCase()
                 }
                 getInstance().checkEnabledCookies()
+                initialiseAdsIfNeeded()
             }
 
             MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()
@@ -437,6 +443,26 @@ class GlobalListener @Inject constructor(
                 getAccountDetailsUseCase(forceRefresh = true)
             }.onFailure {
                 Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Initialise ads if needed
+     */
+    private fun initialiseAdsIfNeeded() {
+        applicationScope.launch {
+            runCatching {
+                val isAdsFeatureEnabled =
+                    getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
+                if (isAdsFeatureEnabled) {
+                    if (!isMobileAdsInitializeCalled.getAndSet(true)) {
+                        Timber.d("Initialising MobileAds")
+                        MobileAds.initialize(appContext)
+                    }
+                }
+            }.onFailure {
+                Timber.e(it, "MobileAds initialization failed")
             }
         }
     }

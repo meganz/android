@@ -21,7 +21,6 @@ import coil3.gif.GifDecoder
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.svg.SvgDecoder
 import coil3.video.VideoFrameDecoder
-import com.google.android.gms.ads.MobileAds
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.Lazy
@@ -60,11 +59,9 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
@@ -203,12 +200,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     internal lateinit var updateApiServerUseCase: UpdateApiServerUseCase
 
-    /**
-     * [GetFeatureFlagValueUseCase]
-     */
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
-
     @Inject
     lateinit var monitorAndHandleTransferEventsUseCase: MonitorAndHandleTransferEventsUseCase
 
@@ -254,7 +245,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         monitorTransferEventsToStartWorkersIfNeeded()
         setupMegaChatApi()
         getMiscFlagsIfNeeded()
-        initialiseAdsIfNeeded()
         applicationScope.launch {
             runCatching { updateApiServerUseCase() }
         }
@@ -428,23 +418,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                     reconnectDelay = Duration.ZERO
                     Timber.v("Worker started for $it")
                 }
-        }
-    }
-
-    /**
-     * Initialise ads if needed
-     */
-    private fun initialiseAdsIfNeeded() {
-        applicationScope.launch(Dispatchers.IO) {
-            runCatching {
-                val isAdsFeatureEnabled =
-                    getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
-                if (isAdsFeatureEnabled) {
-                    MobileAds.initialize(this@MegaApplication)
-                }
-            }.onFailure {
-                Timber.e(it, "MobileAds initialization failed")
-            }
         }
     }
 
