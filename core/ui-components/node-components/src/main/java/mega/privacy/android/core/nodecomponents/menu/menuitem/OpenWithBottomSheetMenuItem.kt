@@ -10,10 +10,10 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.menu.menuaction.OpenWithMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -28,7 +28,6 @@ import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNod
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Open with bottom sheet menu item
@@ -114,6 +113,7 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
                 navController.context.startActivity(this)
             } else if (localFile == null) {
                 parentCoroutineScope.ensureActive()
+                // Todo: navigationHandler
                 navController.navigate(cannotOpenFileDialog)
             } else {
                 // Todo provide snackbar

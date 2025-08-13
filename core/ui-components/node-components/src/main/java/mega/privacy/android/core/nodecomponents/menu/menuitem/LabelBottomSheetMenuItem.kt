@@ -4,20 +4,19 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.mapper.NodeLabelResourceMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.LabelMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuitem.components.LabelAccessoryView
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.GetNodeLabelUseCase
 import java.io.File
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 internal const val changeLabelBottomSheetRoute =
     "search/node_bottom_sheet/change_label_bottom_sheet"
@@ -85,6 +84,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
+        // Todo: navigationHandler
         navController.navigate(
             route = changeLabelBottomSheetRoute.plus(File.separator).plus(node.id.longValue)
         )

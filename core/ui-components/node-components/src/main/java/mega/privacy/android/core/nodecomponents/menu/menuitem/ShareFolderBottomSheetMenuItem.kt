@@ -6,12 +6,12 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.extension.isOutShare
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareFolderMenuAction
-import mega.privacy.android.core.nodecomponents.extension.isOutShare
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
@@ -20,7 +20,6 @@ import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCas
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Share folder bottom sheet menu item
@@ -67,6 +66,7 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
                             nodeHandlesToJsonMapper(handles)
                         }.onSuccess { handle ->
                             parentCoroutineScope.ensureActive()
+                            // Todo: navigationHandler
                             navController.navigate(
                                 searchFolderShareDialog.plus("/${handle}")
                             )

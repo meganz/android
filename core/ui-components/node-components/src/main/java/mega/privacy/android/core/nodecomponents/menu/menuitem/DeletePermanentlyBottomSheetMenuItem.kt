@@ -2,16 +2,15 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DeletePermanentlyMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Delete menu item
@@ -41,7 +40,10 @@ class DeletePermanentlyBottomSheetMenuItem @Inject constructor(
         onDismiss()
         val handles = listOf(node.id.longValue)
         runCatching { nodeHandlesToJsonMapper(handles) }
-            .onSuccess { navController.navigate(route = "$moveToRubbishOrDelete/${true}/${it}") }
+            .onSuccess {
+                // Todo: navigationHandler
+                navController.navigate(route = "$moveToRubbishOrDelete/${true}/${it}")
+            }
             .onFailure { Timber.Forest.e(it) }
     }
 

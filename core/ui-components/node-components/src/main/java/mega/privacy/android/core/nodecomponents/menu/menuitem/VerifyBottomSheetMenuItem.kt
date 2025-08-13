@@ -2,13 +2,13 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.extension.isOutShare
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
-import mega.privacy.android.core.nodecomponents.extension.isOutShare
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -17,7 +17,6 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Verify bottom sheet menu item
@@ -86,6 +85,7 @@ class VerifyBottomSheetMenuItem @Inject constructor(
         shareData?.let {
             if (it.isVerified.not() && it.isPending) {
                 // If the share is pending, we need to show cannot verify dialog
+                // Todo: navigationHandler
                 navController.navigate(cannotVerifyUserRoute.plus("/${it.user}"))
             } else {
                 // If the share is not pending, we need to show the credentials activity

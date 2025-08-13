@@ -2,17 +2,16 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.extension.isOutShare
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareMenuAction
-import mega.privacy.android.core.nodecomponents.extension.isOutShare
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Remove share bottom sheet menu item
@@ -42,6 +41,7 @@ class RemoveShareBottomSheetMenuItem @Inject constructor(
         val nodeList = listOf(node.id.longValue)
         runCatching { nodeHandlesToJsonMapper(nodeList) }
             .onSuccess {
+                // Todo: navigationHandler
                 navController.navigate(
                     searchRemoveFolderShareDialog.plus("/${it}")
                 )

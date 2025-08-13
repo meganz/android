@@ -61,7 +61,7 @@ fun NodeOptionsBottomSheetRoute(
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun NodeOptionsBottomSheetContent(
+internal fun NodeOptionsBottomSheetContent(
     uiState: NodeBottomSheetState,
     actionHandler: NodeActionHandler,
     onDismiss: () -> Unit,
