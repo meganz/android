@@ -237,7 +237,7 @@ class BackgroundRequestListener @Inject constructor(
                 runCatching { localLogoutAppUseCase() }
                     .onFailure { Timber.d(it) }
             }
-        } else if (e.errorCode == MegaError.API_EBLOCKED || request.paramType == MegaError.API_ESID) {
+        } else if (e.errorCode == MegaError.API_EBLOCKED || request.paramType == MegaError.API_EBLOCKED) {
             api.localLogout()
             megaChatApi.logout()
         } else if (e.errorCode == MegaError.API_OK) {
