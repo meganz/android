@@ -8,11 +8,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,11 +30,14 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LoadingView
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.list.NodesView
+import mega.privacy.android.core.nodecomponents.sheet.NodeOptionsBottomSheetRoute
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
@@ -76,7 +81,6 @@ internal fun CloudDriveContent(
     val snackbarHostState = LocalSnackBarHostState.current
     val megaResultContract = rememberMegaResultContract()
     var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
-
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.inAppCameraResultContract
     ) { uri: Uri? ->
@@ -101,6 +105,8 @@ internal fun CloudDriveContent(
             }
         }
     }
+    var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
+    var nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     when {
         uiState.isLoading -> {
@@ -125,7 +131,7 @@ internal fun CloudDriveContent(
             items = uiState.items,
             isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
             showHiddenNodes = uiState.showHiddenNodes,
-            onMenuClick = { },
+            onMenuClick = { visibleNodeOptionId = it.id },
             onItemClicked = { onAction(ItemClicked(it)) },
             onLongClicked = { onAction(ItemLongClicked(it)) },
             sortOrder = "Name",
@@ -225,5 +231,23 @@ internal fun CloudDriveContent(
                 showNewTextFileDialog = false
             }
         )
+    }
+
+    // Todo: We will remove this, and replace it with NavigationHandler
+    // Temporary solution to show node options bottom sheet, because navigation file
+    // is not yet implemented in node-components module.
+    visibleNodeOptionId?.let { nodeId ->
+        MegaModalBottomSheet(
+            modifier = Modifier.statusBarsPadding(),
+            sheetState = nodeOptionSheetState,
+            onDismissRequest = { visibleNodeOptionId = null },
+            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
+        ) {
+            NodeOptionsBottomSheetRoute(
+                onDismiss = { visibleNodeOptionId = null },
+                nodeId = nodeId.longValue,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            )
+        }
     }
 }
