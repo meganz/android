@@ -5,7 +5,9 @@ import javax.inject.Inject
 
 /**
  * Get Handle From Contact Link Use Case
- * For example contact link https://mega.nz/C!86YkxIDC
+ * For example contact links:
+ *  - https://mega.nz/C!86YkxIDC
+ *  - https://mega.app/C!86YkxIDC
  */
 class GetHandleFromContactLinkUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,

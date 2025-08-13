@@ -6,8 +6,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -28,19 +29,25 @@ internal class GetHandleFromContactLinkUseCaseTest {
         reset(nodeRepository)
     }
 
-    @Test
-    fun `test that getHandleFromContactLink returns invalid handle when link is invalid`() =
-        runTest {
-            val link = "https://mega.nz/B!86YkxIDC"
-            whenever(nodeRepository.getInvalidHandle()).thenReturn(-1)
-            Truth.assertThat(underTest(link)).isEqualTo(-1L)
-        }
+    @ParameterizedTest
+    @MethodSource("domainProvider")
+    fun `test that getHandleFromContactLink returns invalid handle when link is invalid`(
+        domain: String,
+    ) = runTest {
+        val link = "https://$domain/B!86YkxIDC"
+        whenever(nodeRepository.getInvalidHandle()).thenReturn(-1)
+        Truth.assertThat(underTest(link)).isEqualTo(-1L)
+    }
 
-    @Test
-    fun `test that getHandleFromContactLink returns correctly handle when link is invalid`() =
-        runTest {
-            val link = "https://mega.nz/C!86YkxIDC"
-            whenever(nodeRepository.convertBase64ToHandle("86YkxIDC")).thenReturn(1L)
-            Truth.assertThat(underTest(link)).isEqualTo(1L)
-        }
+    @ParameterizedTest
+    @MethodSource("domainProvider")
+    fun `test that getHandleFromContactLink returns correctly handle when link is invalid`(
+        domain: String,
+    ) = runTest {
+        val link = "https://$domain/C!86YkxIDC"
+        whenever(nodeRepository.convertBase64ToHandle("86YkxIDC")).thenReturn(1L)
+        Truth.assertThat(underTest(link)).isEqualTo(1L)
+    }
+
+    private fun domainProvider() = listOf("mega.nz", "mega.app")
 }

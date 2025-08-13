@@ -8,28 +8,41 @@ import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.repository.AlbumRepository
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetPublicAlbumUseCaseTest {
     private lateinit var underTest: GetPublicAlbumUseCase
 
     private val albumRepository = mock<AlbumRepository>()
 
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = GetPublicAlbumUseCase(
             albumRepository = albumRepository,
         )
     }
 
-    @Test
-    fun `test that use case returns correct result`() = runTest {
+    @BeforeEach
+    fun resetMocks() {
+        reset(albumRepository)
+    }
+
+    @ParameterizedTest
+    @MethodSource("domainProvider")
+    fun `test that use case returns correct result`(
+        domain: String,
+    ) = runTest {
         // given
-        val albumLink = AlbumLink("https://mega.nz/collection/example")
+        val albumLink = AlbumLink("https://$domain/collection/example")
 
         val userSet = mock<UserSet> {
             on { id }.thenReturn(1L)
@@ -51,4 +64,6 @@ class GetPublicAlbumUseCaseTest {
         assertThat(albumPhotos.first).isNotNull()
         assertThat(albumPhotos.second).isEqualTo(albumPhotoIds)
     }
+
+    private fun domainProvider() = listOf("mega.nz", "mega.app")
 }
