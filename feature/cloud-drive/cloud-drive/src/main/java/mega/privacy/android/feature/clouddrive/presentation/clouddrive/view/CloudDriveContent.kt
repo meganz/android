@@ -247,6 +247,7 @@ internal fun CloudDriveContent(
                 onDismiss = { visibleNodeOptionId = null },
                 nodeId = nodeId.longValue,
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                onTransfer = onTransfer
             )
         }
     }

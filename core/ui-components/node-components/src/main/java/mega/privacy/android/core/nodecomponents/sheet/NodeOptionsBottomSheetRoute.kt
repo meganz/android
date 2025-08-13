@@ -26,6 +26,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.text
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,17 +35,25 @@ fun NodeOptionsBottomSheetRoute(
     onDismiss: () -> Unit,
     nodeId: Long,
     nodeSourceType: NodeSourceType,
+    onTransfer: (TransferTriggerEvent) -> Unit,
     viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
+    val nodeOptionActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val actionHandler = rememberNodeActionHandler(nodeOptionsActionViewModel)
 
     LaunchedEffect(Unit) {
         keyboardController?.hide()
         viewModel.getBottomSheetOptions(nodeId, nodeSourceType)
     }
+
+    EventEffect(
+        event = nodeOptionActionState.downloadEvent,
+        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
+        action = onTransfer
+    )
 
     NodeOptionsBottomSheetContent(
         uiState = uiState,
@@ -105,5 +114,3 @@ internal fun NodeOptionsBottomSheetContent(
         }
     }
 }
-
-internal const val DIVIDER_TAG = "node_options_bottom_sheet:divider"
