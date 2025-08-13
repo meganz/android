@@ -45,7 +45,7 @@ class ManageShareFolderBottomSheetMenuItem @Inject constructor(
         onDismiss()
         val context = navController.context
         parentCoroutineScope.launch {
-            val intent = if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {
+            val intent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
                 FileContactListComposeActivity.newIntent(
                     context = context,
                     nodeHandle = node.id.longValue,

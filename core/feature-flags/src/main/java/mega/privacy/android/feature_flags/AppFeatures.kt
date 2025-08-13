@@ -48,14 +48,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * File contacts compose u i
-     */
-    FileContactsComposeUI(
-        "Enable compose version of the file contacts ui",
-        false,
-    ),
-
-    /**
      * Contacts compose u i
      */
     ContactsComposeUI(

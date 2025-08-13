@@ -115,7 +115,7 @@ class FileBackupManager(
                 ACTION_BACKUP_SHARE_FOLDER -> activity.lifecycleScope.launch {
                     if (megaNode?.let { megaNodeUtilWrapper.isOutShare(it) } == true) {
                         val intent =
-                            if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {
+                            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
                                 FileContactListComposeActivity.newIntent(
                                     context = activity,
                                     nodeHandle = megaNode.handle,

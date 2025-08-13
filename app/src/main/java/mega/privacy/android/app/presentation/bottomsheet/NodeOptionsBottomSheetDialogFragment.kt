@@ -1708,7 +1708,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             if (it.typedNode.isOutShare()) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     val intent =
-                        if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {
+                        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
                             FileContactListComposeActivity.newIntent(
                                 context = requireContext(),
                                 nodeHandle = it.typedNode.id.longValue,

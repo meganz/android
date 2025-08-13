@@ -427,7 +427,7 @@ class FileInfoActivity : BaseActivity() {
 
     private fun navigateToSharedContacts() {
         lifecycleScope.launch {
-            val intent = if (getFeatureFlagValueUseCase(AppFeatures.FileContactsComposeUI)) {
+            val intent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
                 Intent(this@FileInfoActivity, FileContactListComposeActivity::class.java)
             } else {
                 Intent(this@FileInfoActivity, FileContactListActivity::class.java)
