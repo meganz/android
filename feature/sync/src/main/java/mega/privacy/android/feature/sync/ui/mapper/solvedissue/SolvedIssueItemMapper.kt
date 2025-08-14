@@ -60,7 +60,16 @@ internal class SolvedIssueItemMapper @Inject constructor(
     ): List<Pair<String, String>> {
         return nodes.mapIndexed { index, node ->
             val path = localPaths.getOrNull(index) ?: ""
-            node.name to path
+            node.name to path.let {
+                if (it.startsWith("content://")) {
+                    runCatching { parseContentUri(path).second }.getOrElse { throwable ->
+                        Timber.e("Error parsing content URI: $path and reason $throwable")
+                        ""
+                    }
+                } else {
+                    it
+                }
+            }
         }
     }
 
