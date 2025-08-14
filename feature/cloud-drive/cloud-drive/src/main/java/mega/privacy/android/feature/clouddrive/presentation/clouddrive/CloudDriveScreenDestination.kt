@@ -18,9 +18,19 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
 
+/**
+ * Cloud drive route args
+ * @property nodeHandle the handle of the node to display
+ * @property nodeName optional name to show as screen title
+ * @property nodeSourceType the source type of the node
+ * @property isNewFolder whether the screen is opened after creating a new folder
+ * @property highlightedNodeHandle the handle of the node to highlight
+ * @property highlightedNodeNames the names of the nodes to highlight
+ */
 @Serializable
 data class CloudDrive(
     val nodeHandle: Long = -1L,
+    val nodeName: String? = null,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val isNewFolder: Boolean = false,
     val highlightedNodeHandle: Long? = null,
@@ -30,7 +40,7 @@ data class CloudDrive(
 fun NavGraphBuilder.cloudDriveScreen(
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    onNavigateToFolder: (NodeId) -> Unit,
+    onNavigateToFolder: (NodeId, String?) -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
 ) {
     composable<CloudDrive> { backStackEntry ->

@@ -13,7 +13,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriv
 data object DriveSync : NavKey
 
 fun NavGraphBuilder.driveSyncScreen(
-    onNavigateToFolder: (NodeId) -> Unit,
+    onNavigateToFolder: (NodeId, String?) -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
     setNavigationVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,

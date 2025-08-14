@@ -413,7 +413,7 @@ class CloudDriveViewModelTest {
 
         underTest.uiState.test {
             val updatedState = awaitItem()
-            assertThat(updatedState.navigateToFolderEvent).isEqualTo(triggered(nodeUiItem.id))
+            assertThat(updatedState.navigateToFolderEvent).isEqualTo(triggered(folderNode))
         }
     }
 
@@ -666,7 +666,7 @@ class CloudDriveViewModelTest {
             underTest.processAction(CloudDriveAction.NavigateToFolderEventConsumed)
             val stateAfterConsume = awaitItem()
 
-            assertThat(stateAfterClick.navigateToFolderEvent).isEqualTo(triggered(folderNodeId))
+            assertThat(stateAfterClick.navigateToFolderEvent).isEqualTo(triggered(folderNode))
             assertThat(stateAfterConsume.navigateToFolderEvent).isEqualTo(consumed())
         }
     }

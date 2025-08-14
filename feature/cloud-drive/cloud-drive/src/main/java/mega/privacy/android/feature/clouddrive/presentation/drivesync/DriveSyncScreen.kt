@@ -44,12 +44,17 @@ import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithCli
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * Drive Sync Screen, shown in the Drive bottom navigation tab.
+ * Drive Sync Screen, shown in the Drive bottom navigation tab
+ *
+ * @param onNavigateToFolder Callback to navigate to a specific folder, accepts NodeId and an optional name for folder title
+ * @param onCreatedNewFolder Callback to be invoked when a new folder is created, accepts NodeId of the new folder
+ * @param setNavigationItemVisibility Callback to set the visibility of the navigation item
+ * @param viewModel ViewModel for managing the state of the Drive Sync screen
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DriveSyncScreen(
-    onNavigateToFolder: (NodeId) -> Unit,
+    onNavigateToFolder: (NodeId, String?) -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
     setNavigationItemVisibility: (Boolean) -> Unit,
     viewModel: DriveSyncViewModel = hiltViewModel(),
@@ -182,7 +187,7 @@ internal fun DriveSyncScreen(
                             megaNavigator.openUpgradeAccount(context)
                         },
                         onOpenMegaFolderClicked = { handle ->
-                            onNavigateToFolder(NodeId(handle))
+                            onNavigateToFolder(NodeId(handle), null)
                         },
                         onCameraUploadsSettingsClicked = {
                             megaNavigator.openSettingsCameraUploads(context)

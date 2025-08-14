@@ -22,8 +22,13 @@ class DriveSyncNavItem : MainNavItem {
     override val screen: NavGraphBuilder.(NavigationHandler, NavigationUiController, TransferHandler) -> Unit =
         { navigationHandler, navigationController, transferHandler ->
             driveSyncScreen(
-                onNavigateToFolder = { nodeId ->
-                    navigationHandler.navigate(CloudDrive(nodeHandle = nodeId.longValue))
+                onNavigateToFolder = { nodeId, name ->
+                    navigationHandler.navigate(
+                        CloudDrive(
+                            nodeHandle = nodeId.longValue,
+                            nodeName = name
+                        )
+                    )
                 },
                 onCreatedNewFolder = { nodeId ->
                     navigationHandler.navigate(

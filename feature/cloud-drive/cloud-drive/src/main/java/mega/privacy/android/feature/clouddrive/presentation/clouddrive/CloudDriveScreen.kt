@@ -26,11 +26,17 @@ import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithCli
 
 /**
  * Cloud Drive Screen, used to display contents of a folder
+ *
+ * @param onBack Callback to be invoked when the back button is pressed
+ * @param onNavigateToFolder Callback to navigate to a specific folder, accepts NodeId and an name for folder title
+ * @param onCreatedNewFolder Callback to be invoked when a new folder is created, accepts NodeId of the new folder
+ * @param onTransfer Callback to handle transfer events
+ * @param viewModel ViewModel for managing the state of the Cloud Drive screen
  */
 @Composable
 fun CloudDriveScreen(
     onBack: () -> Unit,
-    onNavigateToFolder: (NodeId) -> Unit,
+    onNavigateToFolder: (NodeId, String?) -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),

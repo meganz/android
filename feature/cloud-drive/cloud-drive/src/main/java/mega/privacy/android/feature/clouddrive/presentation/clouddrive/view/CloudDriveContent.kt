@@ -64,7 +64,7 @@ internal fun CloudDriveContent(
     showUploadOptionsBottomSheet: Boolean,
     onDismissUploadOptionsBottomSheet: () -> Unit,
     onAction: (CloudDriveAction) -> Unit,
-    onNavigateToFolder: (NodeId) -> Unit,
+    onNavigateToFolder: (NodeId, String?) -> Unit,
     onNavigateBack: () -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
@@ -162,8 +162,8 @@ internal fun CloudDriveContent(
     EventEffect(
         event = uiState.navigateToFolderEvent,
         onConsumed = { onAction(NavigateToFolderEventConsumed) }
-    ) { nodeId ->
-        onNavigateToFolder(nodeId)
+    ) { node ->
+        onNavigateToFolder(node.id, node.name)
     }
 
     EventEffect(

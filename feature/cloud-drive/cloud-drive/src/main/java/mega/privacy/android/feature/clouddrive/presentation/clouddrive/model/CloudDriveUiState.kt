@@ -32,7 +32,7 @@ data class CloudDriveUiState(
     val currentFolderId: NodeId = NodeId(-1L),
     val items: List<NodeUiItem<TypedNode>> = emptyList(),
     val currentViewType: ViewType = ViewType.LIST,
-    val navigateToFolderEvent: StateEventWithContent<NodeId> = consumed(),
+    val navigateToFolderEvent: StateEventWithContent<TypedNode> = consumed(),
     val navigateBack: StateEvent = consumed,
     val openedFileNode: TypedFileNode? = null,
     val showHiddenNodes: Boolean = false,

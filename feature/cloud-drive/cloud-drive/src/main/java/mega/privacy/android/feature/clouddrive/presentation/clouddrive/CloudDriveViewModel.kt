@@ -68,7 +68,12 @@ class CloudDriveViewModel @Inject constructor(
     internal val nodeSourceType = args.nodeSourceType
 
     internal val uiState: StateFlow<CloudDriveUiState>
-        field = MutableStateFlow(CloudDriveUiState(currentFolderId = NodeId(args.nodeHandle)))
+        field = MutableStateFlow(
+            CloudDriveUiState(
+                title = LocalizedText.Literal(args.nodeName ?: ""),
+                currentFolderId = NodeId(args.nodeHandle)
+            )
+        )
 
     init {
         monitorViewType()
@@ -206,8 +211,11 @@ class CloudDriveViewModel @Inject constructor(
             getNodeByIdUseCase(uiState.value.currentFolderId)
         }.onSuccess { currentNode ->
             val title = LocalizedText.Literal(currentNode?.name ?: "")
-            uiState.update { state ->
-                state.copy(title = title)
+            // Only update state if fetched title is different
+            if (uiState.value.title != title) {
+                uiState.update { state ->
+                    state.copy(title = title)
+                }
             }
         }.onFailure {
             Timber.e(it, "Failed to get node for title update")
@@ -226,7 +234,7 @@ class CloudDriveViewModel @Inject constructor(
             is TypedFolderNode -> {
                 uiState.update { state ->
                     state.copy(
-                        navigateToFolderEvent = triggered(nodeUiItem.id)
+                        navigateToFolderEvent = triggered(nodeUiItem.node)
                     )
                 }
             }
