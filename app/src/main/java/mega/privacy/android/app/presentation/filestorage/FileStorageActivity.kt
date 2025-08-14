@@ -17,6 +17,7 @@ import android.view.Window
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
@@ -84,6 +85,13 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
     private var toolbarView: Toolbar? = null
     private var loading: View? = null
 
+    private val onBackPressedCallback: OnBackPressedCallback =
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                onBack()
+            }
+        }
+
     /**
      * onCreate
      */
@@ -92,6 +100,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
         this.enableEdgeToEdge()
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         setContentView(R.layout.activity_filestorage)
         this.consumeInsetsWithToolbar(
             WindowInsetsCompat.Type.systemBars(),
@@ -516,7 +525,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
     /**
      * onBackPressed
      */
-    override fun onBackPressed() {
+    fun onBack() {
         retryConnectionsAndSignalPresence()
         // Go one level higher if not at root, otherwise finish
         if (viewModel.goToParent()) {
@@ -529,7 +538,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
                 mLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
             }
         } else {
-            super.onBackPressed()
+            finish()
         }
     }
 
