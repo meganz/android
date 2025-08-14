@@ -292,6 +292,8 @@ interface AppNavigator {
         context: Context,
         launcher: ActivityResultLauncher<Intent>,
         initialUri: Uri? = null,
+        isUpload: Boolean = false,
+        parentId: NodeId? = null
     )
 
     /**

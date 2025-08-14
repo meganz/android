@@ -311,6 +311,7 @@ import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetView
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
@@ -6033,7 +6034,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
             requestCode == Constants.REQUEST_CODE_GET_FOLDER_CONTENT -> {
                 if (intent != null && resultCode == Activity.RESULT_OK) {
-                    val result = intent.getStringExtra(Constants.EXTRA_ACTION_RESULT)
+                    val result = intent.getStringExtra(ExtraConstant.EXTRA_ACTION_RESULT)
                     if (TextUtil.isTextEmpty(result)) {
                         return
                     }

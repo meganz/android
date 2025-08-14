@@ -1,8 +1,12 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive.view
 
 import android.Manifest.permission.CAMERA
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.RECORD_AUDIO
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
@@ -54,8 +58,11 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.OpenedFileNodeHandled
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature.clouddrive.presentation.upload.UploadingFiles
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.camera.CameraArg
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +87,71 @@ internal fun CloudDriveContent(
     val context = LocalContext.current
     val snackbarHostState = LocalSnackBarHostState.current
     val megaResultContract = rememberMegaResultContract()
+    val megaNavigator = rememberMegaNavigator()
     var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
+    var isUploadFolder by rememberSaveable { mutableStateOf(false) }
+
+    val internalFolderPickerLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val intent = it.data
+            val resultCode = it.resultCode
+            if (intent != null && resultCode == Activity.RESULT_OK) {
+                val result = intent.getStringExtra(ExtraConstant.EXTRA_ACTION_RESULT)
+                if (!result.isNullOrEmpty()) {
+                    coroutineScope.launch {
+                        snackbarHostState?.showAutoDurationSnackbar(result)
+                    }
+                }
+            }
+        }
+
+    val openMultipleDocumentLauncher =
+        rememberLauncherForActivityResult(megaResultContract.openMultipleDocumentsPersistable) {
+            if (it.isNotEmpty()) {
+                uploadUris = it
+            }
+        }
+
+    val uploadFolderLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val intent = it.data
+            val uri = intent?.data
+            if (it.resultCode == Activity.RESULT_OK && uri != null) {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                megaNavigator.openInternalFolderPicker(
+                    context = context,
+                    isUpload = true,
+                    parentId = uiState.currentFolderId,
+                    initialUri = uri,
+                    launcher = internalFolderPickerLauncher
+                )
+            }
+        }
+
+    val manualUploadFilesLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        runCatching {
+            if (isUploadFolder) {
+                uploadFolderLauncher.launch(
+                    Intent.createChooser(
+                        Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION),
+                        null
+                    )
+                )
+            } else {
+                openMultipleDocumentLauncher.launch(arrayOf("*/*"))
+            }
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
+
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.inAppCameraResultContract
     ) { uri: Uri? ->
@@ -197,10 +268,35 @@ internal fun CloudDriveContent(
     if (showUploadOptionsBottomSheet) {
         UploadOptionsBottomSheet(
             onUploadFilesClicked = {
-                // TODO: Handle upload files
+                isUploadFolder = false
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    manualUploadFilesLauncher.launch(POST_NOTIFICATIONS)
+                } else {
+                    runCatching {
+                        openMultipleDocumentLauncher.launch(arrayOf("*/*"))
+                    }.onFailure {
+                        Timber.e(it, "Activity not found")
+                    }
+                }
             },
             onUploadFolderClicked = {
-                // TODO: Handle upload folder
+                isUploadFolder = true
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    manualUploadFilesLauncher.launch(POST_NOTIFICATIONS)
+                } else {
+                    runCatching {
+                        uploadFolderLauncher.launch(
+                            Intent.createChooser(
+                                Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION),
+                                null
+                            )
+                        )
+                    }.onFailure {
+                        Timber.e(it, "Activity not found")
+                    }
+                }
             },
             onScanDocumentClicked = {
                 onAction(CloudDriveAction.StartDocumentScanning)

@@ -46,8 +46,6 @@ public class Constants {
 
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
 
-    public static final String EXTRA_ACTION_RESULT = "EXTRA_ACTION_RESULT";
-
     public static final String FROM_HOME_PAGE = "FROM_HOME_PAGE";
 
     public static final String RESULT = "RESULT";

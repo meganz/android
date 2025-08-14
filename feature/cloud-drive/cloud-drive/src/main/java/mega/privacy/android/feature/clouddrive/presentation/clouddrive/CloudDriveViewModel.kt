@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -59,6 +60,7 @@ class CloudDriveViewModel @Inject constructor(
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val scannerHandler: ScannerHandler,
+    private val getRootNodeUseCase: GetRootNodeUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -188,17 +190,24 @@ class CloudDriveViewModel @Inject constructor(
 
     private suspend fun loadNodes() {
         runCatching {
-            nodeUiItemMapper(
-                nodeList = getFileBrowserNodeChildrenUseCase(uiState.value.currentFolderId.longValue),
+            val folderId = uiState.value.currentFolderId
+            val parentOrRootNodeId = if (folderId.longValue != -1L) {
+                folderId
+            } else {
+                getRootNodeUseCase()?.id ?: NodeId(-1L)
+            }
+            parentOrRootNodeId to nodeUiItemMapper(
+                nodeList = getFileBrowserNodeChildrenUseCase(parentOrRootNodeId.longValue),
                 nodeSourceType = nodeSourceType,
                 highlightedNodeId = highlightedNodeId,
                 highlightedNames = highlightedNodeNames,
             )
-        }.onSuccess { children ->
+        }.onSuccess { (parentOrRootNodeId, children) ->
             uiState.update { state ->
                 state.copy(
                     isLoading = false,
                     items = children,
+                    currentFolderId = parentOrRootNodeId,
                 )
             }
         }.onFailure {

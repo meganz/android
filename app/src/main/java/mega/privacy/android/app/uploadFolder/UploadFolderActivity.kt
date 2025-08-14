@@ -48,7 +48,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.uploadFolder.list.adapter.FolderContentAdapter
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
-import mega.privacy.android.app.utils.Constants.EXTRA_ACTION_RESULT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_COLLISION_RESULTS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
@@ -58,6 +57,7 @@ import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.navigation.ExtraConstant.EXTRA_ACTION_RESULT
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber

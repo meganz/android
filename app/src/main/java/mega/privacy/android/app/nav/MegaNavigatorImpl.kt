@@ -493,11 +493,24 @@ internal class MegaNavigatorImpl @Inject constructor(
         context: Context,
         launcher: ActivityResultLauncher<Intent>,
         initialUri: Uri?,
+        isUpload: Boolean,
+        parentId: NodeId?,
     ) {
         launcher.launch(
             Intent(context, UploadFolderActivity::class.java).apply {
                 data = initialUri
-                putExtra(UploadFolderActivity.UPLOAD_FOLDER_TYPE, UploadFolderType.SINGLE_SELECT)
+                if (isUpload) {
+                    putExtra(
+                        UploadFolderActivity.UPLOAD_FOLDER_TYPE,
+                        UploadFolderType.SELECT_AND_UPLOAD
+                    )
+                } else {
+                    putExtra(
+                        UploadFolderActivity.UPLOAD_FOLDER_TYPE,
+                        UploadFolderType.SINGLE_SELECT
+                    )
+                }
+                putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentId?.longValue ?: -1L)
             }
         )
     }

@@ -93,6 +93,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
@@ -706,7 +707,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             UploadUtil.getFolder(this, resultCode, intent, parentHandle)
         } else if (requestCode == Constants.REQUEST_CODE_GET_FOLDER_CONTENT) {
             if (intent != null && resultCode == RESULT_OK) {
-                val result = intent.getStringExtra(Constants.EXTRA_ACTION_RESULT)
+                val result = intent.getStringExtra(ExtraConstant.EXTRA_ACTION_RESULT)
                 if (TextUtil.isTextEmpty(result)) {
                     return
                 }
