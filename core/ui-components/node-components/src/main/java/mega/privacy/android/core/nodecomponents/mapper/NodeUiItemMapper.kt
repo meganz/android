@@ -67,7 +67,6 @@ class NodeUiItemMapper @Inject constructor(
             NodeUiItem(
                 node = node,
                 isSelected = false,
-                isDummy = false,
                 isHighlighted = isHighlighted,
                 title = getNodeTitle(node),
                 subtitle = nodeSubtitleMapper(

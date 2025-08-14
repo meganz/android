@@ -14,7 +14,6 @@ internal class FolderNodePreviewDataProvider :
 
     private val nodeUIItem1 = NodeUiItem<TypedFolderNode>(
         isSelected = false,
-        isDummy = false,
         node = object : TypedFolderNode {
             override val isInRubbishBin = false
             override val isShared = false
@@ -49,7 +48,6 @@ internal class FolderNodePreviewDataProvider :
 
     private val nodeUIItem2 = NodeUiItem<TypedFolderNode>(
         isSelected = false,
-        isDummy = false,
         node = object : TypedFolderNode {
             override val isInRubbishBin = false
             override val isShared = false
@@ -84,7 +82,6 @@ internal class FolderNodePreviewDataProvider :
 
     private val nodeUIItem3 = NodeUiItem<TypedFolderNode>(
         isSelected = false,
-        isDummy = false,
         node = object : TypedFolderNode {
             override val isInRubbishBin = false
             override val isShared = false

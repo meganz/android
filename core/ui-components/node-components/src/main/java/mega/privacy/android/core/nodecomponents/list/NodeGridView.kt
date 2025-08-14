@@ -32,6 +32,7 @@ This method will show [NodeUIItem] in Grid manner based on span and getting thum
  * @param gridState the state of the grid
  * @param showMediaDiscoveryButton whether to show media discovery button
  * @param modifier
+ * @param highlightText the text to highlight in the grid items
  * @param spanCount the span count of the grid
  * @param showChangeViewType whether to show change view type button
  */
@@ -50,6 +51,7 @@ fun <T : TypedNode> NodeGridView(
     gridState: LazyGridState,
     showMediaDiscoveryButton: Boolean,
     modifier: Modifier = Modifier,
+    highlightText: String = "",
     spanCount: Int = 2,
     showChangeViewType: Boolean = true,
     inSelectionMode: Boolean = false,
@@ -88,17 +90,14 @@ fun <T : TypedNode> NodeGridView(
         items(
             count = nodeUiItems.size,
             key = {
-                if (nodeUiItems[it].isDummy) {
-                    it
-                } else {
-                    nodeUiItems[it].id.longValue
-                }
+                nodeUiItems[it].id.longValue
             },
         ) {
             val nodeUiItem = nodeUiItems[it]
             NodeGridViewItem(
                 nodeUiItem = nodeUiItems[it],
                 isInSelectionMode = inSelectionMode,
+                highlightText = highlightText,
                 onClick = { onItemClicked(nodeUiItem) },
                 onLongClick = { onLongClick(nodeUiItem) },
                 onMenuClick = { onMenuClick(nodeUiItem) },

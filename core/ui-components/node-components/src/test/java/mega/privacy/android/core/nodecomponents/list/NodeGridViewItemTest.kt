@@ -34,7 +34,6 @@ class NodeGridViewItemTest {
         isInSelectionMode: Boolean = false,
         isFolderNode: Boolean = false,
         isVideoNode: Boolean = false,
-        isInvisible: Boolean = false,
         isSensitive: Boolean = false,
         showBlurEffect: Boolean = false,
         isHighlighted: Boolean = false,
@@ -56,7 +55,6 @@ class NodeGridViewItemTest {
                 isInSelectionMode = isInSelectionMode,
                 isFolderNode = isFolderNode,
                 isVideoNode = isVideoNode,
-                isDummy = isInvisible,
                 isSensitive = isSensitive,
                 showBlurEffect = showBlurEffect,
                 isHighlighted = isHighlighted,
@@ -84,14 +82,6 @@ class NodeGridViewItemTest {
         setContent(isFolderNode = false)
 
         composeTestRule.onNodeWithTag(THUMBNAIL_FILE_TEST_TAG, useUnmergedTree = true)
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that folder icon is displayed for folder nodes`() {
-        setContent(isFolderNode = true)
-
-        composeTestRule.onNodeWithTag(FOLDER_VIEW_ICON_TEST_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
@@ -210,15 +200,6 @@ class NodeGridViewItemTest {
     }
 
     @Test
-    fun `test that item is invisible when isInvisible is true`() {
-        setContent(isInvisible = true)
-
-        // The item should be a spacer, so no content should be visible
-        composeTestRule.onNodeWithText("Test File").assertDoesNotExist()
-        composeTestRule.onNodeWithTag(NODE_TITLE_TEXT_TEST_TAG).assertDoesNotExist()
-    }
-
-    @Test
     fun `test that item has reduced opacity when isSensitive is true`() {
         setContent(isSensitive = true)
 
@@ -238,18 +219,6 @@ class NodeGridViewItemTest {
             .assertIsDisplayed()
         // The name should be displayed but truncated
         composeTestRule.onNodeWithText(longName).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that folder nodes have different text layout`() {
-        setContent(
-            isFolderNode = true,
-            name = "Test Folder"
-        )
-
-        composeTestRule.onNodeWithText("Test Folder").assertIsDisplayed()
-        composeTestRule.onNodeWithTag(FOLDER_VIEW_ICON_TEST_TAG, useUnmergedTree = true)
-            .assertIsDisplayed()
     }
 
     @Test
@@ -285,18 +254,6 @@ class NodeGridViewItemTest {
         composeTestRule.onAllNodesWithTag(GRID_VIEW_CHECKBOX_TAG, useUnmergedTree = true)
             .assertAny(hasTestTag(GRID_VIEW_CHECKBOX_TAG))
         composeTestRule.onNodeWithTag(GRID_VIEW_MORE_ICON_TEST_TAG).assertDoesNotExist()
-    }
-
-    @Test
-    fun `test that folder nodes have border when not selected`() {
-        setContent(
-            isFolderNode = true,
-            isSelected = false
-        )
-
-        // Folder nodes should have a border
-        composeTestRule.onNodeWithTag(FOLDER_VIEW_ICON_TEST_TAG, useUnmergedTree = true)
-            .assertIsDisplayed()
     }
 
     @Test
@@ -385,19 +342,6 @@ class NodeGridViewItemTest {
         // The item should be visible with selected background
         composeTestRule.onNodeWithText("Test File").assertIsDisplayed()
         composeTestRule.onNodeWithTag(NODE_TITLE_TEXT_TEST_TAG, useUnmergedTree = true)
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that folder nodes have single line text`() {
-        setContent(
-            isFolderNode = true,
-            name = "Very long folder name that should be truncated to single line"
-        )
-
-        composeTestRule.onNodeWithText("Very long folder name that should be truncated to single line")
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(FOLDER_VIEW_ICON_TEST_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 

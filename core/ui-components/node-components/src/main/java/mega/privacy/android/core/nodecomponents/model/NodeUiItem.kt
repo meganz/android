@@ -8,7 +8,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * This class is used to display list items on screen
  * @property node [Node]
  * @param isSelected Node is selected
- * @param isDummy True if a dummy item
  * @param isHighlighted Node is highlighted because it comes from "Locate" action in notification
  * @param title Localized title for the node
  * @param subtitle NodeSubtitleText for the node that can be resolved to localized string in Composable
@@ -31,7 +30,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 data class NodeUiItem<T : TypedNode>(
     val node: T,
     val isSelected: Boolean,
-    val isDummy: Boolean = false,
     val isHighlighted: Boolean = false,
     val title: LocalizedText = LocalizedText.Literal(""),
     val subtitle: NodeSubtitleText = NodeSubtitleText.Empty,

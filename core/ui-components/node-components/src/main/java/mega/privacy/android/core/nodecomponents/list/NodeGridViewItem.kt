@@ -1,9 +1,7 @@
 package mega.privacy.android.core.nodecomponents.list
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +14,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,7 +31,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -42,14 +38,13 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
-import mega.android.core.ui.modifiers.conditional
+import mega.android.core.ui.components.text.HighlightedText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -62,6 +57,7 @@ import mega.privacy.android.icon.pack.R as IconPackR
  * @param nodeUiItem The NodeUiItem containing all UI properties
  * @param modifier Optional [Modifier] to be applied to the component
  * @param isInSelectionMode Whether the grid is in selection mode (shows checkbox instead of more menu)
+ * @param highlightText Text to highlight in the node name
  * @param onClick Callback invoked when the item is clicked
  * @param onLongClick Callback invoked when the item is long-pressed
  * @param onMenuClick Callback invoked when the more options menu is clicked
@@ -71,6 +67,7 @@ fun <T : TypedNode> NodeGridViewItem(
     nodeUiItem: NodeUiItem<T>,
     modifier: Modifier = Modifier,
     isInSelectionMode: Boolean = false,
+    highlightText: String = "",
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     onMenuClick: (() -> Unit) = {},
@@ -86,10 +83,10 @@ fun <T : TypedNode> NodeGridViewItem(
         isInSelectionMode = isInSelectionMode,
         isFolderNode = nodeUiItem.isFolderNode,
         isVideoNode = nodeUiItem.isVideoNode,
+        highlightText = highlightText,
         onClick = onClick,
         onLongClick = onLongClick,
         onMenuClick = onMenuClick,
-        isDummy = nodeUiItem.isDummy,
         isSensitive = nodeUiItem.isSensitive,
         showBlurEffect = nodeUiItem.showBlurEffect,
         isHighlighted = nodeUiItem.isHighlighted,
@@ -116,7 +113,7 @@ fun <T : TypedNode> NodeGridViewItem(
  * @param onClick Callback invoked when the item is clicked
  * @param onLongClick Callback invoked when the item is long-pressed
  * @param onMenuClick Callback invoked when the more options menu is clicked
- * @param isDummy Whether the item should be dummy (renders as a grid spacer)
+ * @param isSensitive Whether the item contains sensitive content (reduces opacity)
  * @param isSensitive Whether the item contains sensitive content (reduces opacity)
  * @param showBlurEffect Whether to apply blur effect to thumbnails for sensitive content
  * @param isHighlighted Whether the item should be highlighted (different background color)
@@ -136,10 +133,10 @@ fun NodeGridViewItem(
     isInSelectionMode: Boolean = false,
     isFolderNode: Boolean = false,
     isVideoNode: Boolean = false,
+    highlightText: String = "",
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     onMenuClick: (() -> Unit) = {},
-    isDummy: Boolean = false,
     isSensitive: Boolean = false,
     showBlurEffect: Boolean = false,
     isHighlighted: Boolean = false,
@@ -147,141 +144,185 @@ fun NodeGridViewItem(
     showFavourite: Boolean = false,
     label: NodeLabel? = null,
 ) {
-    if (isDummy) {
-        Spacer(
-            modifier = Modifier
-                .height(folderMinHeight)
-                .fillMaxWidth(),
-        )
-    } else {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
-                .conditional(isFolderNode) {
-                    border(
-                        width = 1.dp,
-                        color = DSTokens.colors.border.subtle,
-                        shape = DSTokens.shapes.extraSmall,
-                    )
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
+            .clip(DSTokens.shapes.extraSmall)
+            .background(
+                when {
+                    isSelected -> DSTokens.colors.background.surface1
+                    isHighlighted -> DSTokens.colors.background.surface2
+                    else -> DSTokens.colors.background.pageBackground
                 }
+            )
+            .combinedClickable(
+                onClick = { onClick() },
+                onLongClick = { onLongClick() },
+            )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(5f / 4f)
                 .clip(DSTokens.shapes.extraSmall)
-                .background(
-                    when {
-                        isSelected -> DSTokens.colors.background.surface1
-                        isHighlighted -> DSTokens.colors.background.surface2
-                        else -> DSTokens.colors.background.pageBackground
-                    }
-                )
-                .combinedClickable(
-                    onClick = { onClick() },
-                    onLongClick = { onLongClick() },
-                )
+                .background(DSTokens.colors.background.surface2)
         ) {
-            if (!isFolderNode) {
+            NodeThumbnailView(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .testTag(THUMBNAIL_FILE_TEST_TAG),
+                layoutType = ThumbnailLayoutType.Grid,
+                data = thumbnailData,
+                defaultImage = iconRes,
+                contentDescription = name,
+                contentScale = ContentScale.Crop,
+                blurImage = showBlurEffect && isSensitive
+            )
+
+            if (isVideoNode) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(5f / 4f)
-                        .clip(DSTokens.shapes.extraSmall)
-                        .background(DSTokens.colors.background.surface2)
+                        .fillMaxSize()
+                        .background(DSTokens.colors.background.blur)
                 ) {
-                    NodeThumbnailView(
+                    MegaIcon(
+                        imageVector = IconPack.Medium.Thin.Solid.PlayCircle,
                         modifier = Modifier
                             .align(Alignment.Center)
-                            .testTag(THUMBNAIL_FILE_TEST_TAG),
-                        layoutType = ThumbnailLayoutType.Grid,
-                        data = thumbnailData,
-                        defaultImage = iconRes,
-                        contentDescription = name,
-                        contentScale = ContentScale.Crop,
-                        blurImage = showBlurEffect && isSensitive
+                            .size(32.dp)
+                            .testTag(VIDEO_PLAY_ICON_TEST_TAG),
+                        contentDescription = "Play Icon",
+                        tint = IconColor.OnColor,
                     )
-
-                    if (isVideoNode) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(DSTokens.colors.background.blur)
-                        ) {
-                            MegaIcon(
-                                imageVector = IconPack.Medium.Thin.Solid.PlayCircle,
-                                modifier = Modifier
-                                    .align(Alignment.Center)
-                                    .size(32.dp)
-                                    .testTag(VIDEO_PLAY_ICON_TEST_TAG),
-                                contentDescription = "Play Icon",
-                                tint = IconColor.OnColor,
-                            )
-                        }
-                    }
-
-                    // Top right icons
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(DSTokens.spacings.s2),
-                        horizontalArrangement = Arrangement.spacedBy(DSTokens.spacings.s2)
-                    ) {
-                        if (showFavourite) {
-                            MegaIcon(
-                                imageVector = IconPack.Small.Thin.Solid.Heart,
-                                tint = IconColor.Secondary,
-                                contentDescription = "Favourite",
-                                modifier = Modifier
-                                    .testTag(GRID_VIEW_FAVOURITE_ICON_TEST_TAG)
-                                    .badgeStyle()
-                            )
-                        }
-                        if (showLink) {
-                            MegaIcon(
-                                imageVector = IconPack.Medium.Thin.Outline.Link01,
-                                tint = IconColor.Secondary,
-                                contentDescription = "Link",
-                                modifier = Modifier
-                                    .testTag(GRID_VIEW_LINK_ICON_TEST_TAG)
-                                    .badgeStyle(),
-                            )
-                        }
-                    }
-
-                    if (duration != null) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .padding(4.dp)
-                                .clip(shape = RoundedCornerShape(size = 3.dp))
-                                .background(
-                                    color = DSTokens.colors.background.surfaceInverseAccent,
-                                )
-                                .padding(
-                                    horizontal = DSTokens.spacings.s2,
-                                    vertical = DSTokens.spacings.s1
-                                ),
-                        ) {
-                            MegaText(
-                                text = duration,
-                                style = AppTheme.typography.bodySmall,
-                                textColor = TextColor.OnColor,
-                                modifier = Modifier
-                                    .testTag(VIDEO_DURATION_TEST_TAG),
-                            )
-                        }
-                    }
                 }
             }
 
-            Footer(
-                name = name,
-                isFolderNode = isFolderNode,
-                iconRes = iconRes,
-                isTakenDown = isTakenDown,
-                isSensitive = isSensitive,
-                onMenuClick = onMenuClick,
-                isSelected = isSelected,
-                isInSelectionMode = isInSelectionMode,
-                label = label,
-            )
+            // Top right badges
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(DSTokens.spacings.s2),
+                horizontalArrangement = Arrangement.spacedBy(DSTokens.spacings.s2)
+            ) {
+                if (showFavourite) {
+                    MegaIcon(
+                        imageVector = IconPack.Small.Thin.Solid.Heart,
+                        tint = IconColor.Secondary,
+                        contentDescription = "Favourite",
+                        modifier = Modifier
+                            .testTag(GRID_VIEW_FAVOURITE_ICON_TEST_TAG)
+                            .badgeStyle()
+                    )
+                }
+                if (showLink) {
+                    MegaIcon(
+                        imageVector = IconPack.Medium.Thin.Outline.Link01,
+                        tint = IconColor.Secondary,
+                        contentDescription = "Link",
+                        modifier = Modifier
+                            .testTag(GRID_VIEW_LINK_ICON_TEST_TAG)
+                            .badgeStyle(),
+                    )
+                }
+
+                if (isTakenDown) {
+                    MegaIcon(
+                        imageVector = IconPack.Medium.Thin.Outline.AlertTriangle,
+                        contentDescription = "Taken Down",
+                        tint = IconColor.Brand,
+                        modifier = Modifier
+                            .badgeStyle()
+                            .testTag(GRID_VIEW_TAKEN_TEST_TAG),
+                    )
+                }
+            }
+
+            if (duration != null) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(4.dp)
+                        .clip(shape = RoundedCornerShape(size = 3.dp))
+                        .background(
+                            color = DSTokens.colors.background.surfaceInverseAccent,
+                        )
+                        .padding(
+                            horizontal = DSTokens.spacings.s2,
+                            vertical = DSTokens.spacings.s1
+                        ),
+                ) {
+                    MegaText(
+                        text = duration,
+                        style = AppTheme.typography.bodySmall,
+                        textColor = TextColor.OnColor,
+                        modifier = Modifier
+                            .testTag(VIDEO_DURATION_TEST_TAG),
+                    )
+                }
+            }
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = folderMinHeight),
+            horizontalArrangement = Arrangement.spacedBy(DSTokens.spacings.s2, Alignment.Start),
+        ) {
+            Spacer(modifier = Modifier.width(DSTokens.spacings.s2))
+
+            if (label != null) {
+                NodeLabelCircle(
+                    label = label,
+                    modifier = Modifier
+                        .testTag(GRID_VIEW_LABEL_TEST_TAG),
+                )
+            }
+
+            if (highlightText.isNotBlank()) {
+                HighlightedText(
+                    text = name,
+                    highlightText = highlightText,
+                    textColor = if (isTakenDown) TextColor.Error else TextColor.Primary,
+                    style = AppTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(NODE_TITLE_TEXT_TEST_TAG),
+                )
+            } else {
+                MegaText(
+                    text = name,
+                    overflow = TextOverflow.MiddleEllipsis,
+                    maxLines = 2,
+                    textColor = if (isTakenDown) TextColor.Error else TextColor.Primary,
+                    style = AppTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(NODE_TITLE_TEXT_TEST_TAG),
+                )
+            }
+
+            if (isInSelectionMode) {
+                Checkbox(
+                    checked = isSelected,
+                    onCheckStateChanged = {},
+                    tapTargetArea = false,
+                    clickable = false,
+                    modifier = Modifier.testTag(GRID_VIEW_CHECKBOX_TAG)
+                )
+                Spacer(modifier = Modifier.width(DSTokens.spacings.s1))
+            } else {
+                MegaIcon(
+                    imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
+                    tint = IconColor.Secondary,
+                    contentDescription = "More",
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { onMenuClick() }
+                        .testTag(GRID_VIEW_MORE_ICON_TEST_TAG)
+                )
+            }
         }
     }
 }
@@ -296,93 +337,6 @@ private fun Modifier.badgeStyle(): Modifier = this
         shape = DSTokens.shapes.extraSmall
     )
     .padding(4.dp)
-
-@Composable
-private fun Footer(
-    isFolderNode: Boolean,
-    iconRes: Int,
-    name: String,
-    isTakenDown: Boolean,
-    isSensitive: Boolean,
-    onMenuClick: (() -> Unit),
-    isSelected: Boolean,
-    modifier: Modifier = Modifier,
-    isInSelectionMode: Boolean = false,
-    label: NodeLabel? = null,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = folderMinHeight)
-            .conditional(isFolderNode) {
-                padding(horizontal = DSTokens.spacings.s2)
-            },
-        horizontalArrangement = Arrangement.spacedBy(DSTokens.spacings.s2, Alignment.Start),
-    ) {
-        if (isFolderNode) {
-            Image(
-                painter = painterResource(id = iconRes),
-                contentDescription = "Folder",
-                modifier = Modifier
-                    .padding(start = 4.dp)
-                    .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
-                    .size(24.dp)
-                    .testTag(FOLDER_VIEW_ICON_TEST_TAG),
-            )
-        } else {
-            Spacer(modifier = Modifier.width(DSTokens.spacings.s2))
-        }
-        if (label != null) {
-            NodeLabelCircle(
-                label = label,
-                modifier = Modifier
-                    .testTag(GRID_VIEW_LABEL_TEST_TAG),
-            )
-        }
-        MegaText(
-            text = name,
-            textColor = if (isTakenDown) TextColor.Error else TextColor.Primary,
-            style = AppTheme.typography.bodySmall,
-            overflow = TextOverflow.MiddleEllipsis,
-            maxLines = if (isFolderNode) 1 else 2,
-            modifier = Modifier
-                .weight(1f)
-                .testTag(NODE_TITLE_TEXT_TEST_TAG),
-        )
-        if (isTakenDown) {
-            MegaIcon(
-                imageVector = IconPack.Medium.Thin.Outline.AlertTriangle,
-                contentDescription = "Taken Down",
-                tint = IconColor.Brand,
-                modifier = Modifier
-                    .size(22.dp)
-                    .testTag(GRID_VIEW_TAKEN_TEST_TAG),
-            )
-        }
-        if (isInSelectionMode) {
-            Checkbox(
-                checked = isSelected,
-                onCheckStateChanged = {},
-                tapTargetArea = false,
-                clickable = false,
-                modifier = Modifier.testTag(GRID_VIEW_CHECKBOX_TAG)
-            )
-            Spacer(modifier = Modifier.width(DSTokens.spacings.s1))
-        } else {
-            MegaIcon(
-                imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
-                tint = IconColor.Secondary,
-                contentDescription = "More",
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable { onMenuClick() }
-                    .testTag(GRID_VIEW_MORE_ICON_TEST_TAG)
-            )
-        }
-    }
-}
-
 
 @CombinedThemePreviews
 @Composable

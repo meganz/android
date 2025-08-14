@@ -83,8 +83,6 @@ fun <T : TypedNode> NodesView(
         nodeUIItems = items,
         showHiddenItems = showHiddenNodes,
         isHiddenNodesEnabled = isHiddenNodesEnabled,
-        isListView = isListView,
-        spanCount = span
     )
     val highlightedIndex = remember(visibleItems) {
         visibleItems.indexOfFirst { it.isHighlighted }
@@ -178,47 +176,17 @@ fun <T : TypedNode> NodesView(
  * @param nodeUIItems list of [NodeUiItem]
  * @param showHiddenItems whether to show hidden items
  * @param isHiddenNodesEnabled whether hidden nodes are enabled
- * @param spanCount span count of [NodeGridView]
  */
 @Composable
 internal fun <T : TypedNode> rememberNodeItems(
     nodeUIItems: List<NodeUiItem<T>>,
     showHiddenItems: Boolean,
     isHiddenNodesEnabled: Boolean,
-    isListView: Boolean,
-    spanCount: Int,
-) = remember(spanCount, isListView, showHiddenItems, nodeUIItems.hashCode()) {
-    val filteredItems = if (showHiddenItems || !isHiddenNodesEnabled) {
+) = remember(showHiddenItems, nodeUIItems.hashCode()) {
+    return@remember if (showHiddenItems || !isHiddenNodesEnabled) {
         nodeUIItems
     } else {
         nodeUIItems.filterNot { it.isSensitive }
-    }
-    if (isListView) return@remember filteredItems
-
-    // Fill folder grid row with dummy items so that file grid items start from a new row
-    var folderCount = 0
-    var lastFolderIndex = -1
-    filteredItems.forEachIndexed { index, item ->
-        if (item.node is FolderNode) {
-            folderCount++
-            lastFolderIndex = index
-        }
-    }
-    val remainder = folderCount % spanCount
-    // Early return if no dummy items are needed
-    if (remainder == 0 || folderCount >= filteredItems.size)
-        return@remember filteredItems
-
-    val placeholderCount = spanCount - remainder
-    val dummyNode = filteredItems[lastFolderIndex].copy(isDummy = true)
-
-    buildList(filteredItems.size + placeholderCount) {
-        filteredItems.forEachIndexed { index, item ->
-            add(item)
-            if (index == lastFolderIndex) {
-                repeat(placeholderCount) { add(dummyNode) }
-            }
-        }
     }
 }
 
