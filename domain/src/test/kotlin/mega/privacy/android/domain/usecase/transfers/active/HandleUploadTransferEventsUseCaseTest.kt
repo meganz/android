@@ -10,6 +10,9 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -30,20 +33,27 @@ class HandleUploadTransferEventsUseCaseTest {
     private lateinit var underTest: HandleUploadTransferEventsUseCase
 
     private val setNodeAttributesAfterUploadUseCase = mock<SetNodeAttributesAfterUploadUseCase>()
+    private val broadcastStorageOverQuotaUseCase = mock<BroadcastStorageOverQuotaUseCase>()
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
+
+    private var lastNodeId = 343L
 
     @BeforeAll
     fun setUp() {
         underTest = HandleUploadTransferEventsUseCase(
-            setNodeAttributesAfterUploadUseCase,
-            testScope
+            setNodeAttributesAfterUploadUseCase = setNodeAttributesAfterUploadUseCase,
+            broadcastStorageOverQuotaUseCase = broadcastStorageOverQuotaUseCase,
+            applicationScope = testScope,
         )
     }
 
     @BeforeEach
     fun cleanUp() {
-        reset(setNodeAttributesAfterUploadUseCase)
+        reset(
+            setNodeAttributesAfterUploadUseCase,
+            broadcastStorageOverQuotaUseCase,
+        )
     }
 
     @ParameterizedTest
@@ -166,34 +176,69 @@ class HandleUploadTransferEventsUseCaseTest {
         )
     }
 
-    @Test
-    fun `test that multiple calls to use case do not block each other`() = runTest(testDispatcher) {
-        val transfer1 = createTransferMock(TransferType.GENERAL_UPLOAD)
-        val transfer2 = createTransferMock(TransferType.CHAT_UPLOAD)
-        val finishEvent1 = TransferEvent.TransferFinishEvent(transfer1, null)
-        val finishEvent2 = TransferEvent.TransferFinishEvent(transfer2, null)
+    @ParameterizedTest
+    @EnumSource(value = TransferType::class, names = ["GENERAL_UPLOAD", "CHAT_UPLOAD", "CU_UPLOAD"])
+    fun `test that broadcastStorageOverQuotaUseCase is invoked when a QuotaExceededMegaException is received as a temporal error for upload Event and the transfer isForeignOverQuota value is false`(
+        type: TransferType,
+    ) = runTest {
+        val transfer = mock<Transfer> {
+            on { this.transferType }.thenReturn(type)
+            on { this.isForeignOverQuota }.thenReturn(false)
+        }
+        val transferEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+            on { this.transfer }.thenReturn(transfer)
+            on { this.error }.thenReturn(QuotaExceededMegaException(1, value = 1))
+        }
+        underTest.invoke(transferEvent)
+        verify(broadcastStorageOverQuotaUseCase).invoke(true)
+    }
 
-        // Both calls should return immediately
-        underTest(finishEvent1)
-        underTest(finishEvent2)
+    @ParameterizedTest
+    @EnumSource(value = TransferType::class, names = ["GENERAL_UPLOAD", "CHAT_UPLOAD", "CU_UPLOAD"])
+    fun `test that broadcastStorageOverQuotaUseCase is not invoked when a QuotaExceededMegaException is received as a temporal error for upload Event and the transfer isForeignOverQuota value is true`(
+        type: TransferType,
+    ) = runTest {
+        val transfer = mock<Transfer> {
+            on { this.transferType }.thenReturn(type)
+            on { this.isForeignOverQuota }.thenReturn(true)
+        }
+        val transferEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+            on { this.transfer }.thenReturn(transfer)
+            on { this.error }.thenReturn(QuotaExceededMegaException(1, value = 1))
+        }
+        underTest.invoke(transferEvent)
+        verifyNoInteractions(broadcastStorageOverQuotaUseCase)
+    }
 
-        // At this point, neither background processing should have started yet
-        verifyNoInteractions(setNodeAttributesAfterUploadUseCase)
+    @ParameterizedTest
+    @EnumSource(value = TransferType::class, names = ["GENERAL_UPLOAD", "CHAT_UPLOAD", "CU_UPLOAD"])
+    fun `test that broadcastStorageOverQuotaUseCase is invoked with parameter equals to false when a Start event is received for upload Event`(
+        type: TransferType,
+    ) = runTest {
+        val transfer = mock<Transfer> {
+            on { this.transferType }.thenReturn(type)
+        }
+        val transferEvent = mock<TransferEvent.TransferStartEvent> {
+            on { this.transfer }.thenReturn(transfer)
+        }
+        underTest.invoke(transferEvent)
+        verify(broadcastStorageOverQuotaUseCase).invoke(false)
+    }
 
-        // Advance the dispatcher to allow both background processes to complete
-        advanceUntilIdle()
-
-        // Now both background processes should have completed
-        verify(setNodeAttributesAfterUploadUseCase)(
-            nodeHandle = transfer1.nodeHandle,
-            uriPath = UriPath(transfer1.localPath),
-            appData = transfer1.appData
-        )
-        verify(setNodeAttributesAfterUploadUseCase)(
-            nodeHandle = transfer2.nodeHandle,
-            uriPath = UriPath(transfer2.localPath),
-            appData = transfer2.appData
-        )
+    @ParameterizedTest
+    @EnumSource(value = TransferType::class, names = ["GENERAL_UPLOAD", "CHAT_UPLOAD", "CU_UPLOAD"])
+    fun `test that broadcastStorageOverQuotaUseCase is invoked with parameter equals to false when an Update event is received for upload Event`(
+        type: TransferType,
+    ) = runTest {
+        reset(broadcastStorageOverQuotaUseCase)
+        val transfer = mock<Transfer> {
+            on { this.transferType }.thenReturn(type)
+        }
+        val transferEvent = mock<TransferEvent.TransferUpdateEvent> {
+            on { this.transfer }.thenReturn(transfer)
+        }
+        underTest.invoke(transferEvent)
+        verify(broadcastStorageOverQuotaUseCase).invoke(false)
     }
 
     private fun createTransferMock(
@@ -212,5 +257,21 @@ class HandleUploadTransferEventsUseCaseTest {
         }
     }
 
-    private var lastNodeId = 343L
+    private fun provideFinishEvents(): List<TransferEvent.TransferFinishEvent> = buildList {
+        TransferType.entries.forEach { transferType ->
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(transferType)
+                on { this.appData }.thenReturn(emptyList())
+            }
+            val event = mock<TransferEvent.TransferFinishEvent> {
+                on { this.transfer } doReturn transfer
+            }
+            val eventError = mock<TransferEvent.TransferFinishEvent> {
+                on { this.transfer } doReturn transfer
+                on { this.error }.thenReturn(BusinessAccountExpiredMegaException(1))
+            }
+            add(event)
+            add(eventError)
+        }
+    }
 }

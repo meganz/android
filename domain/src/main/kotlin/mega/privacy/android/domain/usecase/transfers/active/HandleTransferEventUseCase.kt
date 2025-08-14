@@ -1,17 +1,15 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
-import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import javax.inject.Inject
 
 /**
@@ -22,9 +20,6 @@ import javax.inject.Inject
 class HandleTransferEventUseCase @Inject internal constructor(
     private val transferRepository: TransferRepository,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
-    private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
-    private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase,
-    private val handleAvailableOfflineEventUseCase: HandleAvailableOfflineEventUseCase,
     private val crashReporter: CrashReporter,
 ) : IHandleTransferEventUseCase {
 
@@ -33,54 +28,24 @@ class HandleTransferEventUseCase @Inject internal constructor(
      * @param events the [TransferEvent] that has been received.
      */
     override suspend operator fun invoke(vararg events: TransferEvent) {
-        val transferEvents = events.asList().takeIf { it.isNotEmpty() } ?: return
+        events.asList().takeIf { it.isNotEmpty() }?.let { transferEvents ->
+            checkPossiblePerformanceIssues(transferEvents)
 
-        checkPossiblePerformanceIssues(transferEvents)
-        checkOverQuota(transferEvents)
-        checkBusinessAccountExpired(transferEvents)
+            coroutineScope {
+                val checkBusinessAccountDeferred =
+                    async { checkBusinessAccountExpired(transferEvents) }
+                val updateInProgressDeferred = async { updateInProgressTransfers(transferEvents) }
+                val updateTransferredBytesDeferred =
+                    async { updateTransferredBytes(transferEvents) }
+                val updateActiveTransfersDeferred = async { updateActiveTransfers(transferEvents) }
+                val addCompletedTransferDeferred = async { addCompletedTransfer(transferEvents) }
 
-        transferEvents.forEach { event ->
-            handleAvailableOfflineEventUseCase(event)
-        }
-
-        updateInProgressTransfers(transferEvents)
-        updateTransferredBytes(transferEvents)
-        updateActiveTransfers(transferEvents)
-
-        val completedEventsMap = transferEvents
-            .filterNot { it.transfer.isFolderTransfer || it.transfer.isPreviewDownload() }
-            .filterIsInstance<TransferEvent.TransferFinishEvent>()
-
-        if (completedEventsMap.isNotEmpty()) {
-            transferRepository.addCompletedTransfers(completedEventsMap)
-        }
-    }
-
-    private suspend fun checkOverQuota(events: List<TransferEvent>) {
-        // check transfer over quota
-        events.scan(null as Boolean?) { previous, it ->
-            when {
-                !it.transfer.transferType.isDownloadType() -> previous
-                it is TransferEvent.TransferStartEvent || it is TransferEvent.TransferUpdateEvent -> false
-                (it as? TransferEvent.TransferTemporaryErrorEvent)?.error is QuotaExceededMegaException -> true
-                else -> previous
+                checkBusinessAccountDeferred.await()
+                updateInProgressDeferred.await()
+                updateTransferredBytesDeferred.await()
+                updateActiveTransfersDeferred.await()
+                addCompletedTransferDeferred.await()
             }
-        }.lastOrNull()?.let { transferOverQuota ->
-            broadcastTransferOverQuotaUseCase(transferOverQuota)
-        }
-
-        // check storage over quota
-        events.scan(null as Boolean?) { previous, it ->
-            when {
-                !it.transfer.transferType.isUploadType() -> previous
-                it is TransferEvent.TransferStartEvent || it is TransferEvent.TransferUpdateEvent -> false
-                (it as? TransferEvent.TransferTemporaryErrorEvent)?.error is QuotaExceededMegaException
-                        && it.transfer.isForeignOverQuota.not() -> true
-
-                else -> previous
-            }
-        }.lastOrNull()?.let { transferOverQuota ->
-            broadcastStorageOverQuotaUseCase(transferOverQuota)
         }
     }
 
@@ -184,6 +149,17 @@ class HandleTransferEventUseCase @Inject internal constructor(
                             + FOLDER_COUNT_STRING + folderUpdate.folderCount
                             + FILE_COUNT_STRING + folderUpdate.fileCount
                 )
+            }
+    }
+
+    private suspend fun addCompletedTransfer(events: List<TransferEvent>) {
+        events
+            .filterNot { it.transfer.isFolderTransfer || it.transfer.isPreviewDownload() }
+            .filterIsInstance<TransferEvent.TransferFinishEvent>()
+            .let { completedEventsMap ->
+                if (completedEventsMap.isNotEmpty()) {
+                    transferRepository.addCompletedTransfers(completedEventsMap)
+                }
             }
     }
 }
