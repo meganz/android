@@ -31,7 +31,7 @@
         <item quantity="other">%1$d dosya</item>
     </plurals>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear solved issues</string>
+    <string name="sync_menu_clear_issues">Çözülen sorunları temizle</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">İki yönlü senkronizasyon</string>
     <!-- Sync when stalled issues, message of the conflict -->

@@ -1398,7 +1398,7 @@
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">In Ordner ansehen</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
-    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Or delete the folder from MEGA. It won’t be deleted from your device. This action can’t be undone.</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Oder löschen Sie den Ordner auf MEGA. Auf Ihrem Gerät wird er nicht gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
     <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Ordner in Cloud Drive verschieben</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
@@ -1428,23 +1428,23 @@
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">Ein Fehler ist aufgetreten. Die Datei kann mit dieser App nicht geöffnet werden.</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
-    <string name="intent_not_available_file">You may not have any apps installed which support this file type</string>
+    <string name="intent_not_available_file">Sie haben keine App installiert, die diesen Dateityp unterstützt</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">Ein Fehler ist aufgetreten, bitte versuchen Sie es erneut.</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="general_select_create_folder">Select or create a new folder</string>
+    <string name="general_select_create_folder">Wählen oder erstellen Sie einen Ordner</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
-    <string name="sync_snackbar_message_confirm_backup_moved">Backup stopped. Folder was moved to %1$s</string>
+    <string name="sync_snackbar_message_confirm_backup_moved">Backup beendet. Ordner wurde nach %1$s verschoben</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="sync_snackbar_message_confirm_backup_deleted">Backup stopped. Folder deleted from MEGA.</string>
+    <string name="sync_snackbar_message_confirm_backup_deleted">Backup beendet. Ordner aus MEGA gelöscht.</string>
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
+    <string name="sync_stalled_issue_choose_local_file_explanation">Die Datei auf MEGA wird durch [A]%1$s[/A] ersetzt. Die vorhandene Version wird in den Ordner SyncDebris in Ihrem Papierkorb verschoben.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder</string>
+    <string name="sync_stalled_issue_choose_remote_file_explanation">Die lokale Datei [A]%1$s[/A] wird in den Ordner .debris verschoben</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
+    <string name="sync_stalled_issue_choose_rename_file_explanation">Dateien mit gleichem Namen, aber unterschiedlichem Inhalt werden mit einem Zusatz wie (1) versehen</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">Alle Ordner werden zusammengeführt und Dateien mit gleichem Namen, aber unterschiedlichem Inhalt werden mit einem Zusatz wie (1) versehen.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
@@ -1454,9 +1454,9 @@
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Auf alle anwenden</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue solved</string>
+    <string name="sync_stalled_issue_resolved">Problem gelöst</string>
     <!-- Sync message when multiple issues resolved -->
-    <string name="sync_stalled_issues_resolved">Issues have been solved</string>
+    <string name="sync_stalled_issues_resolved">Probleme wurden gelöst</string>
     <!-- Text of the empty playlist in Video Section -->
     <string name="video_section_playlists_video_empty">Leer</string>
     <!-- Text of video count of playlist in Video Section -->
@@ -1467,25 +1467,25 @@
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">Verschieben Sie diesen Ordner in Ihr Cloud Drive, um vollständigen Zugriff auf Ihre Daten zu erhalten. Dieser Ordner wird dann nicht mehr für Backups verwendet.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Öffnen Sie [A]https://%1$s[/A] In Ihrem Webbrowser.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
+    <string name="camera_uploads_banner_checking_uploads_text">Prüfe auf Uploads&#8230;</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
-    <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <string name="camera_uploads_banner_uploading_pending_count_text">Upload im Gange: noch %d Elemente</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
-    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <string name="sync_resolve_rename_all_items_title">Alle Elemente umbenennen?</string>
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
-    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <string name="sync_stalled_issue_merge_folders_title">Ordner zusammenführen und Dateien umbenennen?</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <string name="sync_stalled_issue_choose_local_file_title">Lokale Datei auswählen?</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">Datei auf MEGA auswählen?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">Zuletzt geänderte Datei auswählen?</string>
     <!-- Colored folders onboarding title -->
-    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <string name="colored_folders_onboarding_title">Bunte Ordner, mehr Übersicht</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">Wenn Sie einen Ordner mit einem Label versehen, wird dessen Farbe direkt auf dem Ordner angezeigt. So finden Sie die benötigten Inhalte schneller.</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">Zusammenführen</string>
     <!-- Dialog rename option -->
@@ -1493,7 +1493,7 @@
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">Gelöste Probleme entfernen</string>
     <!--Sign Up page text field input first name error message when character limit exceeded-->
-    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">Der Vorname darf nicht länger als 40 Zeichen sein</string>
     <!--Sign Up page text field input last name error message when character limit exceeded-->
-    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Der Nachname darf nicht länger als 40 Zeichen sein</string>
 </resources>

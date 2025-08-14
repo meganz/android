@@ -1039,17 +1039,17 @@
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Yeni özellik: Gizli dosyalar ve klasörler</string>
     <!-- Hidden nodes: hide files and folders feature -->
-    <string name="hidden_nodes_title_hide_files_folders_feature">Hide important files and folders</string>
+    <string name="hidden_nodes_title_hide_files_folders_feature">Önemli dosya ve klasörleri gizleme</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">You can conceal sensitive files and folders for privacy. Only you can reveal them, either individually or by temporarily displaying hidden items from the menu.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Önemli dosya ve klasörleri gizleyin. Gizlilik için hassas dosya ve klasörleri gizleyebilirsiniz. Bunları yalnızca siz, tek tek veya menüden gizli öğeleri geçici olarak göstererek açığa çıkarabilirsiniz.</string>
     <!-- Hidden nodes: control visibility feature -->
-    <string name="hidden_nodes_title_control_visibility">Zaman çizelgesinden hariç tut</string>
+    <string name="hidden_nodes_title_control_visibility">Zaman çizelgesinden hariç tutulur</string>
     <!-- Hidden nodes description: control visibility feature -->
     <string name="hidden_nodes_description_control_visibility">Gizli öğeler yalnızca Bulut depolama alanı aracılığıyla erişilebilir ve Fotoğraflarınızda, Albümlerinizde veya Son etkinliklerinizde görünmez.</string>
     <!-- Hidden nodes: shared files stay visible feature -->
-    <string name="hidden_nodes_title_visible_shared_files">Out of sight</string>
+    <string name="hidden_nodes_title_visible_shared_files">Gözden uzak</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">You decide when hidden files are visible. There is a new setting to show hidden items temporarily.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Gizli dosyaların ne zaman görünür olacağına siz karar verin. Gizli öğeleri geçici olarak göstermek için yeni bir ayar bulunmaktadır.</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">Fotoğraflarınızı her zaman güvende tutun</string>
     <!--Camera backup permission screen description-->
@@ -1173,7 +1173,7 @@
     <!-- Subscription page information section title at the bottom of the page-->
     <string name="choose_account_screen_subscription_information_title">Abonelik detayları</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
-    <string name="choose_account_screen_subscription_information_description">Abonelikler, seçilen ilk dönemle aynı süredeki ardışık abonelik dönemleri için otomatik olarak yenilenir.\n\nPlan aboneliğinizi istediğiniz zaman, ancak bir sonraki abonelik ödemenizin vadesinden en geç 24 saat önce iptal edebilirsiniz. [A]Ayarlarınızdan aboneliğinizi nasıl yöneteceğinizi öğrenin[/A].</string>
+    <string name="choose_account_screen_subscription_information_description">Abonelikler, seçilen ilk dönemle aynı süredeki ardışık abonelik dönemleri için otomatik olarak yinelenir.\n\nPlan aboneliğinizi istediğiniz zaman, ancak bir sonraki abonelik ödemenizin vadesinden en geç 24 saat önce iptal edebilirsiniz. [A]Ayarlarınızdan aboneliğinizi nasıl yöneteceğinizi öğrenin[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
     <string name="choose_account_screen_terms_and_policies_link_text">[A]Hizmet Şartları[/A] ve [B]Gizlilik Politikası[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
@@ -1444,7 +1444,7 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">Aynı ada sahip ancak farklı içeriği olan dosyalara (1) gibi bir son ek eklenecektir.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">Tüm klasörler birleştirilecek ve aynı ada sahip ancak farklı içeriği olan dosyalara (1) gibi bir son ek eklenecektir.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
@@ -1467,7 +1467,7 @@
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">Verilerinize tam erişim sağlamak için bu klasörü Bulut depolamanıza taşıyın. Artık yedeklenmeyecektir.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1.Web tarayıcınızda [A]https://%1$s[/A] adresini ziyaret edin.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
     <string name="camera_uploads_banner_checking_uploads_text">Yüklemeler kontrol ediliyor...</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
@@ -1483,9 +1483,9 @@
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">Son değiştirilen dosya mı seçilsin?</string>
     <!-- Colored folders onboarding title -->
-    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <string name="colored_folders_onboarding_title">Renkli klasörler, daha net düzenleme</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">Bir klasöre işaret eklediğinizde, rengi doğrudan klasörün üzerinde görünür. Bu, ihtiyacınız olanı daha hızlı bulmanıza yardımcı olur.</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">Birleştir</string>
     <!-- Dialog rename option -->

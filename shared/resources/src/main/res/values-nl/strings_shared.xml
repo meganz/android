@@ -1434,17 +1434,17 @@
     <!-- Name for a general label which action is "Select or create new folder" -->
     <string name="general_select_create_folder">Selecteer of maak een nieuwe map</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
-    <string name="sync_snackbar_message_confirm_backup_moved">Backup stopped. Folder was moved to %1$s</string>
+    <string name="sync_snackbar_message_confirm_backup_moved">De back-up is gestopt. De map is verplaatst naar %1$s</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="sync_snackbar_message_confirm_backup_deleted">Backup stopped. Folder deleted from MEGA.</string>
+    <string name="sync_snackbar_message_confirm_backup_deleted">De back-up is gestopt. Map verwijderd uit MEGA.</string>
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
+    <string name="sync_stalled_issue_choose_local_file_explanation">Het bestand op MEGA wordt vervangen door [A]%1$s.[/A] De bestaande versie wordt verplaatst naar de map SyncDebris in uwPrullenbak.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder</string>
+    <string name="sync_stalled_issue_choose_remote_file_explanation">Het lokale bestand [A]%1$s[/A] wordt verplaatst naar de map .debris</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
+    <string name="sync_stalled_issue_choose_rename_file_explanation">Bestanden met dezelfde naam maar met verschillende inhoud krijgen een achtervoegsel zoals (1) toegevoegd</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">Alle mappen worden samengevoegd en aan bestanden met dezelfde naam maar met verschillende inhoud wordt een achtervoegsel zoals (1) toegevoegd.</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
@@ -1454,9 +1454,9 @@
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Toepassen op alles</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue solved</string>
+    <string name="sync_stalled_issue_resolved">Probleem opgelost</string>
     <!-- Sync message when multiple issues resolved -->
-    <string name="sync_stalled_issues_resolved">Issues have been solved</string>
+    <string name="sync_stalled_issues_resolved">De problemen zijn opgelost</string>
     <!-- Text of the empty playlist in Video Section -->
     <string name="video_section_playlists_video_empty">Leegmaken</string>
     <!-- Text of video count of playlist in Video Section -->
@@ -1467,25 +1467,25 @@
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">Verplaats deze map naar je Cloud-schijf om volledige toegang tot uw gegevens te krijgen. Er wordt niet langer een back-up van gemaakt naar.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Bezoek [A]https://%1$s[/A] in uw webbrowser.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
+    <string name="camera_uploads_banner_checking_uploads_text">Controleren op uploads...</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
-    <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <string name="camera_uploads_banner_uploading_pending_count_text">Uploaden: %d items over</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
-    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <string name="sync_resolve_rename_all_items_title">Alle items hernoemen?</string>
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
-    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <string name="sync_stalled_issue_merge_folders_title">Mappen samenvoegen en bestanden hernoemen?</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <string name="sync_stalled_issue_choose_local_file_title">Kies het lokale bestand?</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">Kies het bestand dat is opgeslagen in MEGA?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">Kies het laatst gewijzigde bestand?</string>
     <!-- Colored folders onboarding title -->
-    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <string name="colored_folders_onboarding_title">Kleurrijke mappen, overzichtelijkere organisatie</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">Wanneer je een label aan een map toevoegt, wordt de kleur ervan direct op de map weergegeven. Zo vind u sneller wat u nodig hebt.</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">Samenvoegen</string>
     <!-- Dialog rename option -->
@@ -1493,7 +1493,7 @@
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">Opgeloste problemen wissen</string>
     <!--Sign Up page text field input first name error message when character limit exceeded-->
-    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">De voornaam mag niet langer zijn dan 40 tekens</string>
     <!--Sign Up page text field input last name error message when character limit exceeded-->
-    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Achternaam mag niet langer zijn dan 40 tekens</string>
 </resources>
