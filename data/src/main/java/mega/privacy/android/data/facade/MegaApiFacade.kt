@@ -1588,4 +1588,8 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun resumeTransfersForNotLoggedInInstance() {
         megaApi.resumeTransfersForNotLoggedInInstance()
     }
+
+    override fun addRequestListener(listener: MegaRequestListenerInterface) {
+        megaApi.addRequestListener(listener)
+    }
 }

@@ -3792,4 +3792,11 @@ interface MegaApiGateway {
      * Please avoid calling this method when logged in.
      */
     suspend fun resumeTransfersForNotLoggedInInstance()
+
+    /**
+     * Add request listener
+     *
+     * @param listener
+     */
+    fun addRequestListener(listener: MegaRequestListenerInterface)
 }

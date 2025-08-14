@@ -1,0 +1,278 @@
+package mega.privacy.android.data.gateway.global
+
+import dagger.Lazy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.facade.AccountInfoWrapper
+import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
+import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.LoginMutex
+import mega.privacy.android.domain.usecase.IsUseHttpsEnabledUseCase
+import mega.privacy.android.domain.usecase.SetUseHttpsUseCase
+import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
+import mega.privacy.android.domain.usecase.account.ResetAccountDetailsTimeStampUseCase
+import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
+import mega.privacy.android.domain.usecase.account.SetUnverifiedBusinessAccountUseCase
+import mega.privacy.android.domain.usecase.backup.SetupDeviceNameUseCase
+import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
+import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
+import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCase
+import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
+import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
+import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
+import mega.privacy.android.domain.usecase.network.BroadcastSslVerificationFailedUseCase
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaUser
+import timber.log.Timber
+import javax.inject.Inject
+
+/**
+ * Background request listener
+ *
+ * This listener is used to handle requests in the background.
+ *
+ * @property appEventGateway
+ * @property setLogoutFlagWrapper
+ * @property userAttributeDatabaseUpdater
+ * @property setupMegaChatApiWrapper
+ * @property accountInfoWrapper
+ * @property megaChatApi
+ * @property dbH
+ * @property megaApi
+ * @property applicationScope
+ * @property getFullAccountInfoUseCase
+ * @property broadcastFetchNodesFinishUseCase
+ * @property localLogoutAppUseCase
+ * @property setupDeviceNameUseCase
+ * @property broadcastBusinessAccountExpiredUseCase
+ * @property loginMutex
+ * @property updatePushNotificationSettingsUseCase
+ * @property shouldShowRichLinkWarningUseCase
+ * @property isRichPreviewsEnabledUseCase
+ * @property isUseHttpsEnabledUseCase
+ * @property setUseHttpsUseCase
+ * @property resetAccountDetailsTimeStampUseCase
+ * @property broadcastSslVerificationFailedUseCase
+ * @property setLoggedOutFromAnotherLocationUseCase
+ * @property setIsUnverifiedBusinessAccountUseCase
+ */
+internal class GlobalRequestListener @Inject constructor(
+    private val appEventGateway: AppEventGateway,
+    private val setLogoutFlagWrapper: SetLogoutFlagWrapper,
+    private val userAttributeDatabaseUpdater: UserAttributeDatabaseUpdater,
+    private val setupMegaChatApiWrapper: SetupMegaChatApiWrapper,
+    private val accountInfoWrapper: AccountInfoWrapper,
+    private val megaChatApi: MegaChatApiAndroid,
+    private val dbH: Lazy<DatabaseHandler>,
+    @MegaApi private val megaApi: MegaApiAndroid,
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
+    private val broadcastFetchNodesFinishUseCase: BroadcastFetchNodesFinishUseCase,
+    private val localLogoutAppUseCase: LocalLogoutAppUseCase,
+    private val setupDeviceNameUseCase: SetupDeviceNameUseCase,
+    private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
+    @LoginMutex private val loginMutex: Mutex,
+    private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
+    private val shouldShowRichLinkWarningUseCase: ShouldShowRichLinkWarningUseCase,
+    private val isRichPreviewsEnabledUseCase: IsRichPreviewsEnabledUseCase,
+    private val isUseHttpsEnabledUseCase: IsUseHttpsEnabledUseCase,
+    private val setUseHttpsUseCase: SetUseHttpsUseCase,
+    private val resetAccountDetailsTimeStampUseCase: ResetAccountDetailsTimeStampUseCase,
+    private val broadcastSslVerificationFailedUseCase: BroadcastSslVerificationFailedUseCase,
+    private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase,
+    private val setIsUnverifiedBusinessAccountUseCase: SetUnverifiedBusinessAccountUseCase,
+) : MegaRequestListenerInterface {
+    /**
+     * On request start
+     */
+    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
+        Timber.d("BackgroundRequestListener:onRequestStart: ${request.requestString}")
+    }
+
+    /**
+     * On request update
+     */
+    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
+        Timber.d("BackgroundRequestListener:onRequestUpdate: ${request.requestString}")
+    }
+
+    /**
+     * On request finish
+     */
+    override fun onRequestFinish(
+        api: MegaApiJava,
+        request: MegaRequest,
+        e: MegaError,
+    ) {
+        Timber.d("BackgroundRequestListener:onRequestFinish: ${request.requestString}____${e.errorCode}___${request.paramType}")
+        if (e.errorCode == MegaError.API_EPAYWALL) {
+            applicationScope.launch {
+                appEventGateway.broadcastTransferOverQuota(true)
+            }
+            return
+        }
+        if (e.errorCode == MegaError.API_ESUBUSERKEYMISSING) {
+            applicationScope.launch {
+                setIsUnverifiedBusinessAccountUseCase(true)
+            }
+            return
+        }
+        if (e.errorCode == MegaError.API_EBUSINESSPASTDUE) {
+            applicationScope.launch {
+                broadcastBusinessAccountExpiredUseCase()
+            }
+            return
+        }
+        when (request.type) {
+            MegaRequest.TYPE_LOGOUT -> handleLogoutRequest(e, request, api)
+            MegaRequest.TYPE_FETCH_NODES -> handleFetchNodeRequest(e)
+            MegaRequest.TYPE_GET_ATTR_USER -> handleGetAttrUserRequest(request, e)
+        }
+    }
+
+    private fun handleGetAttrUserRequest(request: MegaRequest, e: MegaError) {
+        if (e.errorCode == MegaError.API_OK) {
+            if (request.paramType == MegaApiJava.USER_ATTR_FIRSTNAME || request.paramType == MegaApiJava.USER_ATTR_LASTNAME) {
+                request.email?.let { email ->
+                    megaApi.getContact(email)?.let { user ->
+                        Timber.d("User handle: ${user.handle}")
+                        Timber.d("Visibility: ${user.visibility}") //If user visibility == MegaUser.VISIBILITY_UNKNOWN then, non contact
+                        if (user.visibility != MegaUser.VISIBILITY_VISIBLE) {
+                            Timber.d("Non-contact")
+                            when (request.paramType) {
+                                MegaApiJava.USER_ATTR_FIRSTNAME -> {
+                                    dbH.get().setNonContactEmail(
+                                        request.email,
+                                        user.handle.toString() + ""
+                                    )
+                                    dbH.get().setNonContactFirstName(
+                                        request.text,
+                                        user.handle.toString() + ""
+                                    )
+                                }
+
+                                MegaApiJava.USER_ATTR_LASTNAME -> {
+                                    dbH.get().setNonContactLastName(
+                                        request.text,
+                                        user.handle.toString() + ""
+                                    )
+                                }
+
+                                else -> {}
+                            }
+                        } else {
+                            Timber.d("The user is or was CONTACT:")
+                        }
+                    } ?: run {
+                        Timber.w("User is NULL")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleFetchNodeRequest(e: MegaError) {
+        Timber.d("TYPE_FETCH_NODES")
+        applicationScope.launch {
+            runCatching { loginMutex.unlock() }
+                .onFailure { Timber.w(it, "Exception unlocking login mutex") }
+
+            broadcastFetchNodesFinishUseCase()
+            runCatching {
+                setUseHttpsUseCase(isUseHttpsEnabledUseCase())
+                resetAccountDetailsTimeStampUseCase()
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+
+        if (e.errorCode == MegaError.API_OK) {
+            askForFullAccountInfo()
+            applicationScope.launch {
+                runCatching {
+                    shouldShowRichLinkWarningUseCase()
+                    isRichPreviewsEnabledUseCase()
+                }.onFailure {
+                    Timber.e(it, "Error checking rich link settings")
+                }
+            }
+            if (dbH.get().myChatFilesFolderHandle == INVALID_HANDLE) {
+                megaApi.getMyChatFilesFolder(userAttributeDatabaseUpdater)
+            }
+            setupMegaChatApiWrapper()
+            applicationScope.launch {
+                // Init CU sync data after login successfully
+                runCatching {
+                    setupDeviceNameUseCase()
+                }.onFailure {
+                    Timber.e(it)
+                }
+
+                runCatching {
+                    updatePushNotificationSettingsUseCase()
+                }.onFailure {
+                    Timber.e(it)
+                }
+            }
+        }
+    }
+
+    private fun handleLogoutRequest(
+        e: MegaError,
+        request: MegaRequest,
+        api: MegaApiJava,
+    ) {
+        Timber.d("Logout finished: ${e.errorString}(${e.errorCode})")
+        if (e.errorCode == MegaError.API_EINCOMPLETE) {
+            if (request.paramType == MegaError.API_ESSL) {
+                Timber.w("SSL verification failed")
+                applicationScope.launch {
+                    broadcastSslVerificationFailedUseCase()
+                }
+            }
+        } else if (e.errorCode == MegaError.API_ESID || request.paramType == MegaError.API_ESID) {
+            Timber.w("TYPE_LOGOUT:API_ESID")
+            applicationScope.launch {
+                accountInfoWrapper.resetAccountInfo()
+                setLoggedOutFromAnotherLocationUseCase(true)
+                runCatching { localLogoutAppUseCase() }
+                    .onFailure { Timber.d(it) }
+            }
+        } else if (e.errorCode == MegaError.API_EBLOCKED || request.paramType == MegaError.API_EBLOCKED) {
+            megaApi.localLogout()
+            megaChatApi.logout()
+        } else if (e.errorCode == MegaError.API_OK) {
+            Timber.d("END logout sdk request - wait chat logout")
+            setLogoutFlagWrapper(false)
+        }
+    }
+
+    /**
+     * On request temporary error
+     */
+    override fun onRequestTemporaryError(
+        api: MegaApiJava,
+        request: MegaRequest, e: MegaError,
+    ) {
+        Timber.d("BackgroundRequestListener: onRequestTemporaryError: ${request.requestString}")
+    }
+
+    private fun askForFullAccountInfo() {
+        Timber.d("askForFullAccountInfo")
+        applicationScope.launch {
+            runCatching { getFullAccountInfoUseCase() }.onFailure {
+                Timber.w(it, "Exception getting full account info.")
+            }
+        }
+    }
+}
