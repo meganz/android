@@ -458,4 +458,14 @@ interface AppNavigator {
         parentHandle: Long,
         isFirstNavigationLevel: Boolean = false,
     )
+
+    /**
+     * Open take down policy link in custom tabs
+     */
+    fun openTakedownPolicyLink(context: Context)
+
+    /**
+     * Open dispute take down link in custom tabs
+     */
+    fun openDisputeTakedownLink(context: Context)
 }

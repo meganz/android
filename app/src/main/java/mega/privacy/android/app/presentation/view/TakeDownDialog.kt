@@ -16,8 +16,8 @@ import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedClickableText
-import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.legacy.core.ui.model.SpanStyleWithAnnotation
+import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
@@ -29,6 +29,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSe
  * @param onDeny
  * @param onLinkClick
  */
+@Deprecated("Use the new TakeDownDialog from node-components instead")
 @Composable
 fun TakeDownDialog(
     isFolder: Boolean,

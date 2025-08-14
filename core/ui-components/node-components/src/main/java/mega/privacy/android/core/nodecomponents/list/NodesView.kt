@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.nodecomponents.dialog.TakeDownDialog
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -152,22 +153,14 @@ fun <T : TypedNode> NodesView(
         )
     }
 
-// TODO
-//    if (showTakenDownDialog) {
-//        TakeDownDialog(
-//            isFolder = false,
-//            onConfirm = {
-//                showTakenDownDialog = false
-//            },
-//            onDeny = {
-//                showTakenDownDialog = false
-//                onDisputeTakeDownClicked.invoke(Constants.DISPUTE_URL)
-//            },
-//            onLinkClick = {
-//                onLinkClicked(it)
-//            }
-//        )
-//   }
+    if (showTakenDownDialog) {
+        TakeDownDialog(
+            isFolder = false,
+            onDismiss = {
+                showTakenDownDialog = false
+            }
+        )
+    }
 }
 
 

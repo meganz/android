@@ -168,4 +168,20 @@
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
     <!-- End of node list item resources -->
+
+    <!-- Start of take down dialog strings -->
+    <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
+    <string name="dialog_taken_down_folder_title">Cannot open folder</string>
+    <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
+    <string name="dialog_taken_down_file_title">Cannot open file</string>
+    <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
+    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
+    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_ok">OK</string>
+    <!-- option to dispute taken down file or folder -->
+    <string name="dispute_takendown_file">Dispute takedown</string>
+    <!-- End of take down dialog strings -->
+
 </resources>

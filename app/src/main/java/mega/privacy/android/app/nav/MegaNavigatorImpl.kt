@@ -739,4 +739,18 @@ internal class MegaNavigatorImpl @Inject constructor(
             )
         )
     }
+
+    override fun openTakedownPolicyLink(context: Context) {
+        launchUrl(
+            context = context,
+            url = "https://${getDomainNameUseCase()}/takedown"
+        )
+    }
+
+    override fun openDisputeTakedownLink(context: Context) {
+        launchUrl(
+            context = context,
+            url = "https://${getDomainNameUseCase()}/dispute"
+        )
+    }
 }
