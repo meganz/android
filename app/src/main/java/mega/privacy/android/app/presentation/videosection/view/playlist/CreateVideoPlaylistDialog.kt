@@ -230,9 +230,9 @@ internal fun CreateVideoPlaylistDialog(
                     focusedElevation = 0.dp
                 ),
             ) {
-                Text(
+                MegaText(
                     text = positiveButtonText,
-                    color = accent_900
+                    textColor = TextColor.Primary,
                 )
             }
         },
@@ -251,9 +251,9 @@ internal fun CreateVideoPlaylistDialog(
                     focusedElevation = 0.dp
                 ),
             ) {
-                Text(
+                MegaText(
                     stringResource(id = sharedR.string.general_dialog_cancel_button),
-                    color = accent_900
+                    textColor = TextColor.Primary,
                 )
             }
         }
