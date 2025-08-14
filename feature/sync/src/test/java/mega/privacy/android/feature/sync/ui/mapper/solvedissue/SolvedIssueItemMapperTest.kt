@@ -325,12 +325,65 @@ internal class SolvedIssueItemMapperTest {
         whenever(resolutionActionTypeToResolutionNameMapper(resolutionActionType))
             .thenReturn(expectedResolutionName)
 
-        // When
+
         val result = underTest(solvedIssue, emptyList())
 
-        // Then
         assertThat(result.resolutionExplanation).isEqualTo(expectedResolutionName)
         verify(resolutionActionTypeToResolutionNameMapper).invoke(resolutionActionType)
+    }
+
+    @Test
+    fun `test that SolvedIssue is mapped with node name and parsed content URI path`() = runTest {
+        mockStatic(Uri::class.java).use { uriMock ->
+            val uriString =
+                "content://com.android.externalstorage.documents/tree/primary%3ASync%2Fdocument.pdf/"
+            val expectedParsedPath = "primary:Sync"
+            val contentUriMock: Uri = mock {
+                on { scheme } doReturn "content"
+                on { pathSegments } doReturn listOf(
+                    "tree",
+                    "primary:Sync",
+                    "document",
+                    "primary:Sync",
+                    "document.pdf",
+                )
+            }
+
+            whenever(Uri.parse(uriString)).thenReturn(contentUriMock)
+
+            val solvedIssue = SolvedIssue(
+                syncId = 8L,
+                nodeIds = listOf(NodeId(11L)),
+                localPaths = listOf(uriString),
+                resolutionExplanation = "CHOOSE_LOCAL_FILE"
+            )
+
+            val fileTypeInfo = PdfFileTypeInfo
+            val fileNode: FileNode = mock {
+                on { name } doReturn "document.pdf"
+                on { type } doReturn fileTypeInfo
+            }
+
+            val expectedResolutionName = "Choose local file"
+            val expectedIcon = 54321
+
+            whenever(resolutionActionTypeToResolutionNameMapper(StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE))
+                .thenReturn(expectedResolutionName)
+            whenever(fileTypeIconMapper("pdf")).thenReturn(expectedIcon)
+
+            val result = underTest(solvedIssue, listOf(fileNode))
+
+            assertThat(result.nodeIds).isEqualTo(listOf(NodeId(11L)))
+            assertThat(result.nodeNames).isEqualTo(listOf("document.pdf")) // Name from node
+            assertThat(result.localPaths).isEqualTo(listOf(expectedParsedPath)) // Parsed from URI
+            assertThat(result.resolutionExplanation).isEqualTo(expectedResolutionName)
+            assertThat(result.icon).isEqualTo(expectedIcon)
+
+            verify(resolutionActionTypeToResolutionNameMapper).invoke(
+                StalledIssueResolutionActionType.CHOOSE_LOCAL_FILE
+            )
+            verify(fileTypeIconMapper).invoke("pdf")
+        }
     }
 
     private fun resolutionActionTypeProvider() = Stream.of(
