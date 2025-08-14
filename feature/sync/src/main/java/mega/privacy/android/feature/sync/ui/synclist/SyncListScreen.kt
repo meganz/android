@@ -122,6 +122,7 @@ internal fun SyncListScreen(
     val scaffoldState = rememberScaffoldState(snackbarHostState = snackBarHostState)
 
     val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
+    val syncStalledIssueState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
 
     BottomSheet(
         modalSheetState = modalSheetState,
@@ -166,7 +167,7 @@ internal fun SyncListScreen(
                         onCancel = {
                             sheetContent = null
                         },
-                        shouldShowApplyToAllOption = syncFoldersState.stalledIssueCount > 1,
+                        shouldShowApplyToAllOption = syncStalledIssueState.stalledIssues.size > 1,
                     )
                 }
 

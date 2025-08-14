@@ -86,7 +86,9 @@ internal class StalledIssueItemMapper @Inject constructor(
         StalledIssue(
             syncId = stalledIssueUiItem.syncId,
             nodeIds = stalledIssueUiItem.nodeIds,
-            localPaths = listOf(stalledIssueUiItem.displayedPath),
+            localPaths = stalledIssueUiItem.localPaths.takeIf { it.isNotEmpty() } ?: listOf(
+                stalledIssueUiItem.displayedPath
+            ),
             issueType = stalledIssueUiItem.issueType,
             conflictName = stalledIssueUiItem.conflictName,
             nodeNames = listOf(stalledIssueUiItem.displayedName),

@@ -23,6 +23,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -37,6 +38,11 @@ class StalledIssueItemMapperTest {
 
     @BeforeEach
     fun setUp() {
+        reset(
+            stalledIssueResolutionActionMapper,
+            fileTypeIconMapper,
+            stalledIssueDetailInfoMapper
+        )
         underTest = StalledIssueItemMapper(
             stalledIssueResolutionActionMapper = stalledIssueResolutionActionMapper,
             fileTypeIconMapper = fileTypeIconMapper,
@@ -228,5 +234,124 @@ class StalledIssueItemMapperTest {
 
         assertThat(result.displayedName).isEqualTo("file.kt")
         assertThat(result.displayedPath).isEqualTo("Documents/Projects/Android")
+    }
+
+    @Test
+    fun `test that Uri pathSegments drop logic works correctly with different segment counts`() =
+        runTest {
+            mockStatic(Uri::class.java).use { uriMock ->
+                val uriString =
+                    "content://documents/tree/primary:Downloads/document/primary:Downloads/folder1/folder2/file.txt"
+                val contentUriMock: Uri = mock {
+                    on { scheme } doReturn "content"
+                    on { pathSegments } doReturn listOf(
+                        "tree",
+                        "primary:Downloads",
+                        "document",
+                        "primary:Downloads",
+                        "folder1",
+                        "folder2",
+                        "file.txt"
+                    )
+                }
+
+                whenever(contentUriMock.toString()).thenReturn(uriString)
+                whenever(Uri.parse(uriString)).thenReturn(contentUriMock)
+
+                val stalledIssue = StalledIssue(
+                    syncId = 10L,
+                    nodeIds = listOf(NodeId(13L)),
+                    localPaths = listOf(uriString),
+                    issueType = StallIssueType.DownloadIssue,
+                    conflictName = "uri segments test",
+                    nodeNames = emptyList(),
+                    id = "1_3_0"
+                )
+                val detailedInfo = StalledIssueDetailedInfo("URI Title", "URI Description")
+                val resolutionActions = listOf<StalledIssueResolutionAction>()
+
+                whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
+                whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, true))
+                    .thenReturn(resolutionActions)
+
+                val result = underTest(stalledIssue, emptyList())
+
+                assertThat(result.displayedName).isEqualTo("file.txt")
+                assertThat(result.displayedPath).isEqualTo("primary:Downloads/folder1/folder2")
+            }
+        }
+
+    @Test
+    fun `test that areAllNodesFolders is false when nodes contain mixed types`() = runTest {
+        val stalledIssue = StalledIssue(
+            syncId = 9L,
+            nodeIds = listOf(NodeId(11L), NodeId(12L)),
+            localPaths = listOf("/storage/emulated/0/Mixed"),
+            issueType = StallIssueType.UploadIssue,
+            conflictName = "mixed nodes conflict",
+            nodeNames = listOf("folder", "file.txt"),
+            id = "1_3_0"
+        )
+        val folderNode: FolderNode = mock()
+        val fileNode: FileNode = mock {
+            on { type } doReturn PdfFileTypeInfo
+        }
+        val detailedInfo = StalledIssueDetailedInfo("Mixed Title", "Mixed Description")
+        val resolutionActions = listOf<StalledIssueResolutionAction>()
+
+        whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
+        whenever(stalledIssueResolutionActionMapper(StallIssueType.UploadIssue, false))
+            .thenReturn(resolutionActions)
+
+        val result = underTest(stalledIssue, listOf(folderNode, fileNode))
+
+        // Verify that areAllNodesFolders = false was passed to the mapper
+        verify(stalledIssueResolutionActionMapper)(StallIssueType.UploadIssue, false)
+    }
+
+    @Test
+    fun `test that StalledIssueUiItem with empty localPaths uses displayedPath`() {
+        val stalledIssueUiItem = StalledIssueUiItem(
+            syncId = 1L,
+            nodeIds = listOf(NodeId(3L)),
+            localPaths = emptyList(),
+            issueType = StallIssueType.DownloadIssue,
+            conflictName = "conflicting folder",
+            nodeNames = listOf("Camera"),
+            icon = 0,
+            detailedInfo = StalledIssueDetailedInfo("", ""),
+            actions = emptyList(),
+            displayedName = "Camera",
+            displayedPath = "/storage/emulated/0/DCIM",
+            id = "1_3_0"
+        )
+
+        val result = underTest(stalledIssueUiItem)
+
+        assertThat(result.localPaths).isEqualTo(listOf("/storage/emulated/0/DCIM"))
+    }
+
+    @Test
+    fun `test that mapping handles single level path correctly`() = runTest {
+        val stalledIssue = StalledIssue(
+            syncId = 6L,
+            nodeIds = listOf(NodeId(8L)),
+            localPaths = listOf("/storage/emulated/0/Documents"),
+            issueType = StallIssueType.DownloadIssue,
+            conflictName = "single level conflict",
+            nodeNames = listOf("Documents/file.txt"),
+            id = "1_3_0"
+        )
+        val detailedInfo = StalledIssueDetailedInfo("Single Title", "Single Description")
+        val resolutionActions = listOf<StalledIssueResolutionAction>()
+
+        whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
+        whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, true))
+            .thenReturn(resolutionActions)
+
+        val result = underTest(stalledIssue, emptyList())
+
+        assertThat(result.displayedName).isEqualTo("file.txt")
+        assertThat(result.displayedPath).isEqualTo("Documents")
     }
 }

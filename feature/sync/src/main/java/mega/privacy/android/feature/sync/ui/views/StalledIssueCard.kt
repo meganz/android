@@ -23,6 +23,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
+import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -66,7 +67,8 @@ internal fun StalledIssueCard(
                         .testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_NAME),
                     text = nodeName,
                     style = MaterialTheme.typography.bodyLarge,
-                    textColor = TextColor.Primary
+                    textColor = TextColor.Primary,
+                    overflow = LongTextBehaviour.MiddleEllipsis,
                 )
                 if (nodePath.isNotEmpty()) {
                     MegaText(
@@ -75,14 +77,16 @@ internal fun StalledIssueCard(
                             .testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_NODE_PATH),
                         text = nodePath,
                         style = MaterialTheme.typography.bodyMedium,
-                        textColor = TextColor.Secondary
+                        textColor = TextColor.Secondary,
+                        overflow = LongTextBehaviour.MiddleEllipsis,
                     )
                 }
                 MegaText(
                     modifier = Modifier.testTag(TEST_TAG_STALLED_ISSUE_CARD_TEXT_CONFLICT_NAME),
                     text = conflictName,
                     style = MaterialTheme.typography.bodySmall,
-                    textColor = TextColor.Brand
+                    textColor = TextColor.Brand,
+                    overflow = LongTextBehaviour.MiddleEllipsis,
                 )
             }
             MegaIcon(
