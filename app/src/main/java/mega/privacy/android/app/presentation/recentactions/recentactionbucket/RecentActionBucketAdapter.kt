@@ -28,6 +28,7 @@ import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketAdapter.ViewHolderMultipleBucket
+import mega.privacy.android.app.utils.BlurTransformation
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
@@ -159,9 +160,16 @@ class RecentActionBucketAdapter(
                     .data(fromHandle(megaNode.handle))
                     .target(holder.thumbnailMedia)
                     .transformations(
-                        RoundedCornersTransformation(
-                            radius = context.resources.getDimension(R.dimen.thumbnail_corner_radius),
-                        )
+                        buildList {
+                            if (node.isMarkedSensitive || node.isSensitiveInherited) {
+                                add(BlurTransformation(context, radius = 16f))
+                            }
+                            add(
+                                RoundedCornersTransformation(
+                                    radius = context.resources.getDimension(R.dimen.thumbnail_corner_radius),
+                                )
+                            )
+                        }
                     )
                     .build()
                 SingletonImageLoader.get(context).enqueue(imageRequest)

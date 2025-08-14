@@ -20,8 +20,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import coil3.compose.AsyncImagePainter
-import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
@@ -129,41 +127,35 @@ fun ThumbnailView(
     contentScale: ContentScale = ContentScale.Fit,
     onSuccess: (Modifier) -> Modifier,
 ) {
-    data?.let {
+    if (data != null) {
         var padding by remember { mutableStateOf(0.dp) }
         var cornerRadius by remember { mutableStateOf(0.dp) }
+        var finalModifier by remember { mutableStateOf(modifier) }
 
-        val painter = rememberAsyncImagePainter(
+        AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(data)
                 .crossfade(true)
                 .error(defaultImage)
                 .placeholder(defaultImage)
-                .build()
-        )
-
-        var finalModifier: Modifier = modifier
-
-        val state = painter.state
-        if (state is AsyncImagePainter.State.Success) {
-            finalModifier = onSuccess(modifier)
-            padding = 4.dp
-            cornerRadius = 4.dp
-        } else if (state is AsyncImagePainter.State.Error) {
-            padding = 0.dp
-            cornerRadius = 0.dp
-        }
-
-        Image(
-            painter = painter,
+                .build(),
+            contentDescription = contentDescription,
+            contentScale = contentScale,
             modifier = finalModifier
                 .aspectRatio(1f)
                 .padding(padding)
                 .clip(RoundedCornerShape(cornerRadius)),
-            contentScale = contentScale,
-            contentDescription = contentDescription
+            onSuccess = {
+                finalModifier = onSuccess(modifier)
+                padding = 4.dp
+                cornerRadius = 4.dp
+            },
+            onError = {
+                padding = 0.dp
+                cornerRadius = 0.dp
+            }
         )
-    } ?: run {
+    } else {
         Image(
             modifier = modifier,
             painter = painterResource(id = defaultImage),
