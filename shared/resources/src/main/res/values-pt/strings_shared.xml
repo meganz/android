@@ -1461,7 +1461,7 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">Arquivos com o mesmo nome, mas com conteúdo diferente, terão um sufixo adicionado, como (1)</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">Todas as pastas serão mescladas, e os arquivos com o mesmo nome, mas com conteúdo diferente, terão um sufixo adicionado, como (1).</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
@@ -1485,7 +1485,7 @@
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">Mova esta pasta para a sua Nuvem de arquivos para obter acesso total aos seus dados. O backup já não será feito.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Acesse [A]https://%1$s[/A] usando um navegador.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
     <string name="camera_uploads_banner_checking_uploads_text">Verificando se há uploads...</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
@@ -1501,9 +1501,9 @@
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">Escolher o arquivo com a data de alteração mais recente?</string>
     <!-- Colored folders onboarding title -->
-    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <string name="colored_folders_onboarding_title">Pastas coloridas, melhor organização</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">Quando você adicionar uma etiqueta a uma pasta, a cor vai aparecer diretamente na pasta, para que você possa encontrar o que precisa com mais rapidez.</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">Combinar</string>
     <!-- Dialog rename option -->

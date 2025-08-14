@@ -1427,7 +1427,7 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">同じ名前で内容が異なるファイルには、(1)のような接尾辞が追加されます。</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">すべてのフォルダが結合され、名前が同じで内容が異なるファイルには(1)のような接尾辞が追加されます。</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
@@ -1449,7 +1449,7 @@
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">データへのフルアクセスを取得するには、このフォルダをクラウドドライブに移動してください。今後はバックアップされなくなります。</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1.ウェブブラウザで[A]https://%1$s[/A]にアクセスする。</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
     <string name="camera_uploads_banner_checking_uploads_text">アップロードを確認中&#8230;</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
@@ -1465,9 +1465,9 @@
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">最後に変更されたファイルを選択しますか？</string>
     <!-- Colored folders onboarding title -->
-    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <string name="colored_folders_onboarding_title">カラフルなフォルダで整理整頓</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">フォルダにラベルを追加すると、その色がフォルダ上に直接表示されます。これにより、ご必要なものを素早く見つけられます。</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">マージ</string>
     <!-- Dialog rename option -->
