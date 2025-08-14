@@ -1478,7 +1478,7 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">К файлам с одинаковыми названиями, но разным содержимым будет добавлен суффикс типа (1)</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">Все папки будут объединены. К файлам с одинаковым названием, но разным содержимым будет добавлен суффикс типа (1).</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
@@ -1503,7 +1503,7 @@
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">Переместите эту папку на Облачный диск, чтобы получить полный доступ к данным. Резервное копирование прекратится.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Откройте [A]https://%1$s[/A] в веб-браузере.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
     <string name="camera_uploads_banner_checking_uploads_text">Проверка загрузок&#8230;</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
@@ -1519,9 +1519,9 @@
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">Выбрать последний изменённый файл?</string>
     <!-- Colored folders onboarding title -->
-    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <string name="colored_folders_onboarding_title">Красочные папки, понятная организация</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">Когда вы добавляете метку для папки, папка примет её цвет. Это поможет вам быстрее находить нужное.</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">Объединить</string>
     <!-- Dialog rename option -->
