@@ -4,6 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
+import mega.privacy.android.domain.repository.apiserver.ApiServerRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,18 +28,20 @@ class HandleLocalIpChangeUseCaseTest {
 
     private val environmentRepository = mock<EnvironmentRepository>()
     private val accountRepository = mock<AccountRepository>()
+    private val apiServerRepository = mock<ApiServerRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = HandleLocalIpChangeUseCase(
             accountRepository = accountRepository,
             environmentRepository = environmentRepository,
+            apiServerRepository = apiServerRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(environmentRepository, accountRepository)
+        reset(environmentRepository, accountRepository, apiServerRepository)
     }
 
     @Test
@@ -57,7 +60,7 @@ class HandleLocalIpChangeUseCaseTest {
             whenever(environmentRepository.getLocalIpAddress()).thenReturn(ipAddress)
             whenever(environmentRepository.getIpAddress()).thenReturn(null)
             underTest(shouldRetryChatConnections = shouldRetryChatConnections)
-            verify(accountRepository).reconnect()
+            verify(apiServerRepository).reconnect()
             if (shouldRetryChatConnections) {
                 verify(accountRepository).retryChatPendingConnections(true)
             }
@@ -73,7 +76,7 @@ class HandleLocalIpChangeUseCaseTest {
         whenever(environmentRepository.getLocalIpAddress()).thenReturn(ipAddress)
         whenever(environmentRepository.getIpAddress()).thenReturn(previousIpAddress)
         underTest(shouldRetryChatConnections = shouldRetryChatConnections)
-        verify(accountRepository).reconnect()
+        verify(apiServerRepository).reconnect()
         if (shouldRetryChatConnections) {
             verify(accountRepository).retryChatPendingConnections(true)
         }

@@ -904,11 +904,6 @@ internal class DefaultAccountRepository @Inject constructor(
     override fun getAccountType(): AccountType =
         accountTypeMapper(myAccountInfoFacade.accountTypeId)
 
-    override suspend fun reconnect() = withContext(ioDispatcher) {
-        Timber.d("Reconnect...")
-        megaApiGateway.reconnect()
-    }
-
     override suspend fun retryPendingConnections() = withContext(ioDispatcher) {
         Timber.d("Retrying pending connections...")
         megaApiGateway.retryPendingConnections()

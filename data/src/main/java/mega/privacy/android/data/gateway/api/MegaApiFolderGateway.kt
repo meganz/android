@@ -221,4 +221,9 @@ interface MegaApiFolderGateway {
         megaCancelToken: MegaCancelToken,
         megaSearchPage: MegaSearchPage? = null
     ): List<MegaNode>
+
+    /**
+     * Reconnect.
+     */
+    suspend fun reconnect()
 }

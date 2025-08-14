@@ -99,4 +99,8 @@ internal class MegaApiFolderFacade @Inject constructor(
         megaCancelToken: MegaCancelToken,
         megaSearchPage: MegaSearchPage?,
     ): List<MegaNode> = megaApiFolder.search(filter, order, megaCancelToken, megaSearchPage)
+
+    override suspend fun reconnect() {
+        megaApiFolder.reconnect()
+    }
 }

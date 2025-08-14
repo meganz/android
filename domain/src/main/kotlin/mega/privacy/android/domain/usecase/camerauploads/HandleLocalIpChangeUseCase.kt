@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
+import mega.privacy.android.domain.repository.apiserver.ApiServerRepository
 import javax.inject.Inject
 
 /**
@@ -10,6 +11,7 @@ import javax.inject.Inject
 class HandleLocalIpChangeUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
     private val environmentRepository: EnvironmentRepository,
+    private val apiServerRepository: ApiServerRepository,
 ) {
 
     /**
@@ -21,7 +23,7 @@ class HandleLocalIpChangeUseCase @Inject constructor(
         environmentRepository.setIpAddress(currentIP)
         if (!currentIP.isNullOrEmpty() && currentIP.compareTo(HOST_ADDRESS) != 0) {
             if (previousIP == null || currentIP.compareTo(previousIP) != 0) {
-                accountRepository.reconnect()
+                apiServerRepository.reconnect()
                 if (shouldRetryChatConnections) {
                     accountRepository.retryChatPendingConnections(disconnect = true)
                 }

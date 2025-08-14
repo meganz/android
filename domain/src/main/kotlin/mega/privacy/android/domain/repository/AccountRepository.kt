@@ -451,11 +451,6 @@ interface AccountRepository {
     fun getAccountType(): AccountType
 
     /**
-     * Reconnect and retry all transfers.
-     */
-    suspend fun reconnect()
-
-    /**
      * Refreshes DNS servers and retries pending connections.
      */
     suspend fun retryPendingConnections()

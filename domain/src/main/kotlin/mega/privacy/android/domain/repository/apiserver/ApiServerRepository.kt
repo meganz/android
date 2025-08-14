@@ -41,4 +41,14 @@ interface ApiServerRepository {
      * @param apiServer [ApiServer]
      */
     suspend fun setNewApi(apiServer: ApiServer)
+
+    /**
+     * Reconnect
+     */
+    suspend fun reconnect()
+
+    /**
+     * Reconnect
+     */
+    suspend fun reconnectFolderApi()
 }

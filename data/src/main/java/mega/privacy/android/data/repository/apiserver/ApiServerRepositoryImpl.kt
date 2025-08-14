@@ -11,6 +11,7 @@ import mega.privacy.android.data.mapper.apiserver.ApiServerMapper
 import mega.privacy.android.domain.entity.apiserver.ApiServer
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.apiserver.ApiServerRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 internal class ApiServerRepositoryImpl @Inject constructor(
@@ -42,6 +43,16 @@ internal class ApiServerRepositoryImpl @Inject constructor(
     override suspend fun setNewApi(apiServer: ApiServer) = withContext(ioDispatcher) {
         context.getSharedPreferences(API_SERVER_PREFERENCES, Context.MODE_PRIVATE)
             .edit { putInt(API_SERVER, apiServer.value) }
+    }
+
+    override suspend fun reconnect() = withContext(ioDispatcher) {
+        Timber.d("Reconnect api...")
+        megaApiGateway.reconnect()
+    }
+
+    override suspend fun reconnectFolderApi() = withContext(ioDispatcher) {
+        Timber.d("Reconnect folder api...")
+        megaApiFolderGateway.reconnect()
     }
 
     companion object {
