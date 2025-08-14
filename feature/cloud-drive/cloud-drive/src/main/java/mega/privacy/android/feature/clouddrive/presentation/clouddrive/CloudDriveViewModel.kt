@@ -74,9 +74,8 @@ class CloudDriveViewModel @Inject constructor(
         monitorViewType()
         monitorAccountDetail()
         monitorHiddenNodes()
-        viewModelScope.launch {
-            loadNodes()
-        }
+        viewModelScope.launch { updateTitle() }
+        viewModelScope.launch { loadNodes() }
         monitorNodeUpdates()
     }
 
@@ -183,25 +182,35 @@ class CloudDriveViewModel @Inject constructor(
     }
 
     private suspend fun loadNodes() {
-        val folderId = uiState.value.currentFolderId
         runCatching {
-            getNodeByIdUseCase(folderId) to nodeUiItemMapper(
-                nodeList = getFileBrowserNodeChildrenUseCase(folderId.longValue),
+            nodeUiItemMapper(
+                nodeList = getFileBrowserNodeChildrenUseCase(uiState.value.currentFolderId.longValue),
                 nodeSourceType = nodeSourceType,
                 highlightedNodeId = highlightedNodeId,
                 highlightedNames = highlightedNodeNames,
             )
-        }.onSuccess { (currentNode, children) ->
-            val title = LocalizedText.Literal(currentNode?.name ?: "")
+        }.onSuccess { children ->
             uiState.update { state ->
                 state.copy(
-                    title = title,
                     isLoading = false,
                     items = children,
                 )
             }
         }.onFailure {
             Timber.e(it)
+        }
+    }
+
+    private suspend fun updateTitle() {
+        runCatching {
+            getNodeByIdUseCase(uiState.value.currentFolderId)
+        }.onSuccess { currentNode ->
+            val title = LocalizedText.Literal(currentNode?.name ?: "")
+            uiState.update { state ->
+                state.copy(title = title)
+            }
+        }.onFailure {
+            Timber.e(it, "Failed to get node for title update")
         }
     }
 

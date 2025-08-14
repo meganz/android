@@ -5,9 +5,7 @@ import android.Manifest.permission.RECORD_AUDIO
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -16,19 +14,20 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import mega.android.core.ui.components.LoadingView
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
@@ -37,6 +36,7 @@ import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.list.NodesView
+import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.sheet.NodeOptionsBottomSheetRoute
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.SortOrder
@@ -107,13 +107,26 @@ internal fun CloudDriveContent(
     }
     var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
     var nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var shouldShowSkeleton by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.isLoading) {
+        if (uiState.isLoading) {
+            delay(200L)
+            if (this.isActive) {
+                shouldShowSkeleton = true
+            }
+        } else {
+            shouldShowSkeleton = false
+        }
+    }
 
     when {
         uiState.isLoading -> {
-            if (uiState.currentFolderId.longValue == -1L) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    LoadingView(Modifier.align(alignment = Alignment.Center))
-                }
+            if (shouldShowSkeleton) {
+                NodesViewSkeleton(
+                    contentPadding = contentPadding,
+                    isListView = uiState.currentViewType == ViewType.LIST
+                )
             }
         }
 
@@ -134,14 +147,14 @@ internal fun CloudDriveContent(
             onMenuClick = { visibleNodeOptionId = it.id },
             onItemClicked = { onAction(ItemClicked(it)) },
             onLongClicked = { onAction(ItemLongClicked(it)) },
-            sortOrder = "Name",
+            sortOrder = "Name", // TODO: Replace with actual sort order from state
             isListView = uiState.currentViewType == ViewType.LIST,
-            onSortOrderClick = {},
+            onSortOrderClick = {}, // TODO: Handle sort order click
             onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
-            onLinkClicked = {},
-            onDisputeTakeDownClicked = {},
+            onLinkClicked = {}, // TODO: Handle link click
+            onDisputeTakeDownClicked = {}, // TODO: Handle dispute take down
             showMediaDiscoveryButton = false,
-            onEnterMediaDiscoveryClick = {},
+            onEnterMediaDiscoveryClick = {}, // TODO: Handle media discovery click
             inSelectionMode = uiState.isInSelectionMode,
         )
     }

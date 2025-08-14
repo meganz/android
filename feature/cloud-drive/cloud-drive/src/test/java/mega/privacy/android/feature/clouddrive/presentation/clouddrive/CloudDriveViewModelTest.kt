@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
@@ -46,6 +47,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -161,6 +163,21 @@ class CloudDriveViewModelTest {
             assertThat(initialState.showHiddenNodes).isFalse()
             assertThat(initialState.isHiddenNodesEnabled).isFalse()
             assertThat(initialState.isHiddenNodesOnboarded).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that title is updated correctly`() = runTest {
+        val mockFolder = mock<TypedFolderNode> {
+            on { name } doReturn "Test Folder2"
+        }
+        whenever(getNodeByIdUseCase(any())).thenReturn(mockFolder)
+        setupTestData(emptyList())
+        val underTest = createViewModel()
+        advanceUntilIdle()
+        underTest.uiState.test {
+            val updatedState = awaitItem()
+            assertThat(updatedState.title).isEqualTo(LocalizedText.Literal("Test Folder2"))
         }
     }
 
