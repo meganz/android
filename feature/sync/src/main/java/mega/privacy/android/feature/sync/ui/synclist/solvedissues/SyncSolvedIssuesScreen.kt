@@ -9,15 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.ui.model.SolvedIssueUiItem
 import mega.privacy.android.feature.sync.ui.synclist.BOTTOM_PADDING
+import mega.privacy.android.feature.sync.ui.views.SolvedIssueCard
 import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionNodeHeaderWithBody
-import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
-import mega.privacy.android.shared.original.core.ui.controls.status.getStatusIconColor
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -40,15 +37,12 @@ internal fun SyncSolvedIssuesScreen(solvedIssues: List<SolvedIssueUiItem>) {
                 }
             } else {
                 items(solvedIssues) { solvedIssue ->
-                    MenuActionNodeHeaderWithBody(
+                    SolvedIssueCard(
                         title = solvedIssue.nodeNames.firstOrNull()
                             ?: solvedIssue.localPaths.first(),
                         subTitle = solvedIssue.localPaths.firstOrNull(),
                         body = solvedIssue.resolutionExplanation,
                         nodeIcon = solvedIssue.icon,
-                        bodyIcon = CoreUiR.drawable.ic_check_circle,
-                        bodyColor = StatusColor.Success.getStatusIconColor(),
-                        bodyIconColor = StatusColor.Success.getStatusIconColor(),
                     )
                 }
             }

@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.mapper.stalledissue.ResolutionActionTypeToResolutionNameMapper
+import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -61,7 +62,6 @@ internal class SolvedIssueItemMapperTest {
             on { name } doReturn "Camera"
         }
         val expectedResolutionName = "Rename all items"
-        val expectedIcon = 0 // Resource ID is 0 in unit tests
 
         whenever(resolutionActionTypeToResolutionNameMapper(StalledIssueResolutionActionType.RENAME_ALL_ITEMS))
             .thenReturn(expectedResolutionName)
@@ -71,8 +71,7 @@ internal class SolvedIssueItemMapperTest {
         assertThat(result.nodeNames).isEqualTo(listOf("Camera"))
         assertThat(result.localPaths).isEqualTo(listOf("/storage/emulated/0/DCIM"))
         assertThat(result.resolutionExplanation).isEqualTo(expectedResolutionName)
-        // In unit tests, resource IDs might be resolved, so we just check that it's not 0
-        assertThat(result.icon).isNotEqualTo(0)
+        assertThat(result.icon).isEqualTo(iconPackR.drawable.ic_folder_medium_solid)
 
         verify(resolutionActionTypeToResolutionNameMapper).invoke(StalledIssueResolutionActionType.RENAME_ALL_ITEMS)
     }
@@ -143,7 +142,7 @@ internal class SolvedIssueItemMapperTest {
             val result = underTest(solvedIssue, emptyList())
 
             assertThat(result.nodeIds).isEqualTo(listOf(NodeId(5L)))
-            assertThat(result.nodeNames).isEmpty()
+            assertThat(result.nodeNames).isEqualTo(listOf("someFolder"))
             // The mapper should parse the URI and extract the path segments correctly
             assertThat(result.localPaths).isEqualTo(listOf(expectedParsedPath))
             assertThat(result.resolutionExplanation).isEqualTo(expectedResolutionName)
@@ -207,8 +206,8 @@ internal class SolvedIssueItemMapperTest {
             val result = underTest(solvedIssue, emptyList())
 
             assertThat(result.nodeIds).isEqualTo(listOf(NodeId(8L)))
-            assertThat(result.nodeNames).isEmpty()
-            assertThat(result.localPaths).isEqualTo(listOf("/storage/emulated/0/Documents/file.txt"))
+            assertThat(result.nodeNames).isEqualTo(listOf("file.txt"))
+            assertThat(result.localPaths).isEqualTo(listOf("/storage/emulated/0/Documents"))
             assertThat(result.resolutionExplanation).isEqualTo(expectedResolutionName)
             assertThat(result.icon).isEqualTo(expectedIcon)
 
@@ -236,10 +235,10 @@ internal class SolvedIssueItemMapperTest {
             val result = underTest(solvedIssue, emptyList())
 
             assertThat(result.nodeIds).isEqualTo(listOf(NodeId(9L)))
-            assertThat(result.nodeNames).isEmpty()
-            assertThat(result.localPaths).isEqualTo(listOf("/storage/emulated/0/Unknown"))
+            assertThat(result.nodeNames).isEqualTo(listOf("Unknown"))
+            assertThat(result.localPaths).isEqualTo(listOf("/storage/emulated/0"))
             assertThat(result.resolutionExplanation).isEqualTo(expectedResolutionName)
-            assertThat(result.icon).isEqualTo(0) // Resource ID is 0 in unit tests
+            assertThat(result.icon).isEqualTo(iconPackR.drawable.ic_generic_medium_solid)
 
             verify(resolutionActionTypeToResolutionNameMapper).invoke(
                 StalledIssueResolutionActionType.UNKNOWN
@@ -263,10 +262,10 @@ internal class SolvedIssueItemMapperTest {
         val result = underTest(solvedIssue, emptyList())
 
         assertThat(result.nodeIds).isEqualTo(listOf(NodeId(10L)))
-        assertThat(result.nodeNames).isEmpty()
-        assertThat(result.localPaths).isEqualTo(listOf("/storage/emulated/0/Empty"))
+        assertThat(result.nodeNames).isEqualTo(listOf("Empty"))
+        assertThat(result.localPaths).isEqualTo(listOf("/storage/emulated/0"))
         assertThat(result.resolutionExplanation).isEqualTo(expectedResolutionName)
-        assertThat(result.icon).isEqualTo(0) // Resource ID is 0 in unit tests
+        assertThat(result.icon).isEqualTo(iconPackR.drawable.ic_generic_medium_solid)
 
         verify(resolutionActionTypeToResolutionNameMapper).invoke(StalledIssueResolutionActionType.RENAME_ALL_ITEMS)
     }

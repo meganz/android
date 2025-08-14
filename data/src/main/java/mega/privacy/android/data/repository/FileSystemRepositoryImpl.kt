@@ -335,8 +335,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun deleteSyncDocumentFileBySyncContentUri(uriPath: UriPath) =
         withContext(ioDispatcher) {
-            documentFileWrapper.getDocumentFileForSyncContentUri(uriPath.value)
-                ?.delete() == true
+            documentFileWrapper.getDocumentFileForSyncContentUri(uriPath.value).let {
+                Timber.d("Deleting document file: $uriPath, uri: ${it?.uri}")
+                it?.delete() == true
+            }
         }
 
 
