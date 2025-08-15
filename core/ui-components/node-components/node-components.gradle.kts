@@ -23,6 +23,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":core:ui-components:snowflake-components"))
     implementation(project(":core:feature-flags"))
+    implementation(project(":core:navigation-contract"))
 
     //core components
     implementation(lib.mega.core.ui)

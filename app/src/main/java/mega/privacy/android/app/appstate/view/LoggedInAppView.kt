@@ -3,7 +3,6 @@ package mega.privacy.android.app.appstate.view
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.rememberNavController
 import mega.privacy.android.app.appstate.AppStateViewModel
 import mega.privacy.android.app.appstate.model.AppState
 
@@ -16,7 +15,6 @@ internal fun LoggedInAppView(
     when (val appState = state) {
         is AppState.Data -> {
             MegaApp(
-                navController = rememberNavController(),
                 appState = appState,
                 onInteraction = viewModel::signalPresence,
             )

@@ -16,22 +16,26 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.app.appstate.model.AppState
 import mega.privacy.android.app.appstate.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.transfer.TransferHandlerImpl
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.core.nodecomponents.navigation.MegaBottomSheetNavigationProvider
+import mega.privacy.android.core.nodecomponents.navigation.rememberBottomSheetNavigator
 import mega.privacy.android.navigation.megaNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MegaApp(
-    navController: NavHostController,
     appState: AppState.Data,
     onInteraction: () -> Unit,
 ) {
     val context = LocalContext.current
+    val bottomSheetNavigator = rememberBottomSheetNavigator()
+    val navController = rememberNavController(bottomSheetNavigator)
     val megaNavigator = remember { context.megaNavigator }
     val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
     val navigationHandler = remember { NavigationHandlerImpl(navController) }
@@ -52,18 +56,22 @@ fun MegaApp(
         CompositionLocalProvider(
             LocalSnackBarHostState provides snackbarHostState
         ) {
-            NavHost(
-                navController = navController,
-                startDestination = MainNavigationScaffoldDestination,
+            MegaBottomSheetNavigationProvider(
+                megaBottomSheetNavigator = bottomSheetNavigator
             ) {
-                mainNavigationScaffold(
-                    transferHandler = transferHandler,
-                    navigationHandler = navigationHandler,
-                )
-                appState.featureDestinations
-                    .forEach {
-                        it.navigationGraph(this, navigationHandler, transferHandler)
-                    }
+                NavHost(
+                    navController = navController,
+                    startDestination = MainNavigationScaffoldDestination,
+                ) {
+                    mainNavigationScaffold(
+                        transferHandler = transferHandler,
+                        navigationHandler = navigationHandler,
+                    )
+                    appState.featureDestinations
+                        .forEach {
+                            it.navigationGraph(this, navigationHandler, transferHandler)
+                        }
+                }
             }
 
             StartTransferComponent(
