@@ -42,6 +42,7 @@ fun NavGraphBuilder.cloudDriveScreen(
     onTransfer: (TransferTriggerEvent) -> Unit,
     onNavigateToFolder: (NodeId, String?) -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
+    openNodeOptions: (NodeId) -> Unit,
 ) {
     composable<CloudDrive> { backStackEntry ->
         val args = backStackEntry.toRoute<CloudDrive>()
@@ -63,6 +64,7 @@ fun NavGraphBuilder.cloudDriveScreen(
             onBack = onBack,
             onNavigateToFolder = onNavigateToFolder,
             onCreatedNewFolder = onCreatedNewFolder,
+            openNodeOptions = openNodeOptions,
             onTransfer = onTransfer,
         )
     }

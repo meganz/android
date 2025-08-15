@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.clouddrive.navigation
 
 import androidx.navigation.NavGraphBuilder
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheet
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDrive
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -28,7 +30,15 @@ class CloudDriveFeatureDestination : FeatureDestination {
                             isNewFolder = true
                         )
                     )
-                }
+                },
+                openNodeOptions = { nodeId ->
+                    navigationHandler.navigate(
+                        NodeOptionsBottomSheet(
+                            nodeHandle = nodeId.longValue,
+                            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+                        )
+                    )
+                },
             )
         }
 }

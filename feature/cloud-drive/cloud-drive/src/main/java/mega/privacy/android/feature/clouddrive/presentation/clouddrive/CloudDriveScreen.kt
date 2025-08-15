@@ -38,6 +38,7 @@ fun CloudDriveScreen(
     onBack: () -> Unit,
     onNavigateToFolder: (NodeId, String?) -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
+    openNodeOptions: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),
 ) {
@@ -115,6 +116,7 @@ fun CloudDriveScreen(
                 onNavigateBack = onBack,
                 onTransfer = onTransfer,
                 onCreatedNewFolder = onCreatedNewFolder,
+                openNodeOptions = openNodeOptions
             )
         }
     )

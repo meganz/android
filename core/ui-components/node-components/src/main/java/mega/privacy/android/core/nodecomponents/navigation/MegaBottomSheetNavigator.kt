@@ -6,7 +6,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
@@ -256,6 +255,11 @@ class MegaBottomSheetNavigator(
                 animateToDismiss()
             }
 
+            /**
+             * Function that marks navigation transitions as complete
+             * This is called when the sheet becomes visible to ensure proper
+             * navigation state synchronization
+             */
             val onCurrentSheetVisible by rememberUpdatedState {
                 {
                     runCatching {

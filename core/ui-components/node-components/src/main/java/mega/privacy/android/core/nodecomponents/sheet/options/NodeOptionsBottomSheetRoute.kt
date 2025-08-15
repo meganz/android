@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.sheet
+package mega.privacy.android.core.nodecomponents.sheet.options
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,7 +24,6 @@ import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.text
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import timber.log.Timber

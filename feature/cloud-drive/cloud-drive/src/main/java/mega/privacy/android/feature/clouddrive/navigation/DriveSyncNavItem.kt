@@ -5,6 +5,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheet
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDrive
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.DriveSync
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
@@ -35,6 +37,14 @@ class DriveSyncNavItem : MainNavItem {
                         CloudDrive(
                             nodeHandle = nodeId.longValue,
                             isNewFolder = true
+                        )
+                    )
+                },
+                openNodeOptions = { nodeId ->
+                    navigationHandler.navigate(
+                        NodeOptionsBottomSheet(
+                            nodeHandle = nodeId.longValue,
+                            nodeSourceType = NodeSourceType.CLOUD_DRIVE
                         )
                     )
                 },

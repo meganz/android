@@ -56,6 +56,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal fun DriveSyncScreen(
     onNavigateToFolder: (NodeId, String?) -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
+    openNodeOptions: (NodeId) -> Unit,
     setNavigationItemVisibility: (Boolean) -> Unit,
     viewModel: DriveSyncViewModel = hiltViewModel(),
     cloudDriveViewModel: CloudDriveViewModel = hiltViewModel(),
@@ -150,6 +151,7 @@ internal fun DriveSyncScreen(
                         onNavigateBack = { }, // Ignore back navigation in this tab
                         onTransfer = onTransfer,
                         onCreatedNewFolder = onCreatedNewFolder,
+                        openNodeOptions = openNodeOptions,
                         showUploadOptionsBottomSheet = showUploadOptionsBottomSheet,
                         onDismissUploadOptionsBottomSheet = {
                             showUploadOptionsBottomSheet = false

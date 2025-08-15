@@ -10,7 +10,6 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -33,15 +32,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.android.core.ui.components.sheets.MegaModalBottomSheet
-import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
-import mega.privacy.android.core.nodecomponents.sheet.NodeOptionsBottomSheetRoute
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
@@ -74,6 +70,7 @@ internal fun CloudDriveContent(
     onNavigateToFolder: (NodeId, String?) -> Unit,
     onNavigateBack: () -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
+    openNodeOptions: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
@@ -214,7 +211,7 @@ internal fun CloudDriveContent(
             items = uiState.items,
             isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
             showHiddenNodes = uiState.showHiddenNodes,
-            onMenuClick = { visibleNodeOptionId = it.id },
+            onMenuClick = { openNodeOptions(it.node.id) },
             onItemClicked = { onAction(ItemClicked(it)) },
             onLongClicked = { onAction(ItemLongClicked(it)) },
             sortOrder = "Name", // TODO: Replace with actual sort order from state
@@ -337,24 +334,5 @@ internal fun CloudDriveContent(
                 showNewTextFileDialog = false
             }
         )
-    }
-
-    // Todo: We will remove this, and replace it with NavigationHandler
-    // Temporary solution to show node options bottom sheet, because navigation file
-    // is not yet implemented in node-components module.
-    visibleNodeOptionId?.let { nodeId ->
-        MegaModalBottomSheet(
-            modifier = Modifier.statusBarsPadding(),
-            sheetState = nodeOptionSheetState,
-            onDismissRequest = { visibleNodeOptionId = null },
-            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
-        ) {
-            NodeOptionsBottomSheetRoute(
-                onDismiss = { visibleNodeOptionId = null },
-                nodeId = nodeId.longValue,
-                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-                onTransfer = onTransfer
-            )
-        }
     }
 }

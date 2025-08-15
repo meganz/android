@@ -18,6 +18,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetContent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
