@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
-import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper

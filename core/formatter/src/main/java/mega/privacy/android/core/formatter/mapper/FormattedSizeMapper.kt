@@ -1,7 +1,7 @@
-package mega.privacy.android.app.upgradeAccount.model.mapper
+package mega.privacy.android.core.formatter.mapper
 
-import mega.privacy.android.app.R
-import mega.privacy.android.app.upgradeAccount.model.FormattedSize
+import mega.privacy.android.core.formatter.R
+import mega.privacy.android.core.formatter.model.FormattedSize
 import java.text.DecimalFormat
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ class FormattedSizeMapper @Inject constructor() {
      * @param usePlaceholder [Boolean]
      * @return FormattedSize
      */
-    internal operator fun invoke(size: Int, usePlaceholder: Boolean = true): FormattedSize {
+    operator fun invoke(size: Int, usePlaceholder: Boolean = true): FormattedSize {
         val decimalFormatter = DecimalFormat("###.##")
         return if (size < 1024) {
             FormattedSize(

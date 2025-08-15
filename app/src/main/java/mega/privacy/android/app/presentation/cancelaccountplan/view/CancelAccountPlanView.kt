@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancelAccountPlanUiState
-import mega.privacy.android.app.upgradeAccount.model.FormattedSize
+import mega.privacy.android.core.formatter.model.FormattedSize
 import mega.privacy.android.icon.pack.R.drawable
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton

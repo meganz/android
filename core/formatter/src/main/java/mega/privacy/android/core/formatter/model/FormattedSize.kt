@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upgradeAccount.model
+package mega.privacy.android.core.formatter.model
 
 /**
  * FormattedTransferSize model to share correct string for units (e.g. GB or TB) and properly formatted size as string (for storage or transfer)

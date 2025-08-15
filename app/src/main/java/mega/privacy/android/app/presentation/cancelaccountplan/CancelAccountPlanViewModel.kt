@@ -12,7 +12,7 @@ import mega.privacy.android.app.presentation.cancelaccountplan.model.CancelAccou
 import mega.privacy.android.app.presentation.cancelaccountplan.model.UICancellationSurveyAnswer
 import mega.privacy.android.app.presentation.cancelaccountplan.model.mapper.CancellationInstructionsTypeMapper
 import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
-import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionOption

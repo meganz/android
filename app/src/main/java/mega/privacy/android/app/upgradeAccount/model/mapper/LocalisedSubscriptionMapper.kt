@@ -1,6 +1,7 @@
 package mega.privacy.android.app.upgradeAccount.model.mapper
 
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.Subscription
 import javax.inject.Inject
 

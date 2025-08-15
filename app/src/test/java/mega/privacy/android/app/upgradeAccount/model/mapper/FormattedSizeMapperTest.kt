@@ -2,8 +2,8 @@ package mega.privacy.android.app.upgradeAccount.model.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
-import mega.privacy.android.app.upgradeAccount.model.FormattedSize
-import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
+import mega.privacy.android.core.formatter.model.FormattedSize
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments

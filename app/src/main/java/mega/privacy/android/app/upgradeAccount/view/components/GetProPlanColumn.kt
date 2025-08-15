@@ -20,7 +20,7 @@ import com.google.accompanist.placeholder.placeholder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
-import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_TEXT

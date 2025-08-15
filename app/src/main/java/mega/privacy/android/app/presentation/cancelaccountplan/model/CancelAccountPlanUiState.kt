@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.cancelaccountplan.model
 
 import mega.privacy.android.app.R
-import mega.privacy.android.app.upgradeAccount.model.FormattedSize
+import mega.privacy.android.core.formatter.model.FormattedSize
 import mega.privacy.android.domain.entity.AccountType
 
 

@@ -1,7 +1,5 @@
 package mega.privacy.android.app.upgradeAccount.view.components
 
-import mega.privacy.android.shared.resources.R as sharedR
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -22,15 +20,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
-import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
+import mega.privacy.android.shared.original.core.ui.controls.chip.NotificationChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
@@ -40,13 +41,10 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.body2
 import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
-import mega.privacy.android.shared.original.core.ui.controls.chip.NotificationChipStyle
+import mega.privacy.android.shared.resources.R as sharedR
 import java.util.Locale
 
 

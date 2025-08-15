@@ -64,7 +64,7 @@ import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
 import mega.privacy.android.app.upgradeAccount.model.UserSubscription
 import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
-import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.view.components.MonthlyYearlyTabs

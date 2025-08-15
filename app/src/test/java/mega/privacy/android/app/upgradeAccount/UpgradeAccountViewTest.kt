@@ -18,7 +18,7 @@ import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
 import mega.privacy.android.app.upgradeAccount.model.UserSubscription
-import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.view.BILLING_WARNING_CLOSE_BUTTON_TAG

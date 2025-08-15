@@ -1,8 +1,9 @@
 package mega.privacy.android.app.upgradeAccount.model
 
-import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
+import mega.privacy.android.core.formatter.model.FormattedSize
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import java.util.Locale
