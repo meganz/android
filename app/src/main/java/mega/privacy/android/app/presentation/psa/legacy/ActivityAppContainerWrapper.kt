@@ -17,6 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.container.LegacyMegaAppContainer
+import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaViewModel
 import mega.privacy.android.app.presentation.psa.model.PsaState
@@ -65,6 +66,7 @@ class ActivityAppContainerWrapper @Inject constructor(
     private fun onCreate() {
         val activity = context as Activity
         val psaViewHolder = (activity as? ManagerActivity)?.psaViewHolder
+        val isLoginActivity = activity is LoginActivity
         if (activity.findViewById<ComposeView>(R.id.legacy_container) == null
         ) {
             val view = ComposeView(activity)
@@ -76,10 +78,12 @@ class ActivityAppContainerWrapper @Inject constructor(
                         }
                         val themeMode by monitorThemeModeUseCase()
                             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+
                         val viewModel: PsaViewModel = hiltViewModel()
                         val psaState by psaGlobalState.state.collectAsStateWithLifecycle((context as LifecycleOwner))
 
                         LaunchedEffect(psaState) {
+                            if (isLoginActivity) return@LaunchedEffect
                             when (val current = psaState) {
                                 is PsaState.InfoPsa -> {
                                     psaViewHolder?.bind(fromInfoPsa(current))
@@ -105,10 +109,11 @@ class ActivityAppContainerWrapper @Inject constructor(
                             }
                         }
 
+                        val hasPsaViewHolder = psaViewHolder != null
                         val handledPsaState = when (psaState) {
-                            is PsaState.InfoPsa -> if (psaViewHolder == null) psaState else PsaState.NoPsa
+                            is PsaState.InfoPsa -> if (hasPsaViewHolder.not() && isLoginActivity.not()) psaState else PsaState.NoPsa
                             PsaState.NoPsa -> psaState
-                            is PsaState.StandardPsa -> if (psaViewHolder == null) psaState else PsaState.NoPsa
+                            is PsaState.StandardPsa -> if (hasPsaViewHolder.not() && isLoginActivity.not()) psaState else PsaState.NoPsa
                             is PsaState.WebPsa -> psaState
                         }
 
