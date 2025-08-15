@@ -75,7 +75,6 @@ internal fun CloudDriveContent(
     onNavigateBack: () -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    onAddFilesClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
@@ -203,7 +202,7 @@ internal fun CloudDriveContent(
 
         uiState.isEmpty -> {
             CloudDriveEmptyView(
-                onAddFilesClick = onAddFilesClick
+                isRootCloudDrive = uiState.isCloudDriveRoot
             )
         }
 
@@ -222,8 +221,6 @@ internal fun CloudDriveContent(
             isListView = uiState.currentViewType == ViewType.LIST,
             onSortOrderClick = {}, // TODO: Handle sort order click
             onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
-            onLinkClicked = {}, // TODO: Handle link click
-            onDisputeTakeDownClicked = {}, // TODO: Handle dispute take down
             showMediaDiscoveryButton = false,
             onEnterMediaDiscoveryClick = {}, // TODO: Handle media discovery click
             inSelectionMode = uiState.isInSelectionMode,

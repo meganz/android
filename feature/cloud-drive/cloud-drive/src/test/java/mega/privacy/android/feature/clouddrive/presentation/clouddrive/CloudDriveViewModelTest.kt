@@ -1357,4 +1357,62 @@ class CloudDriveViewModelTest {
         verify(getRootNodeUseCase).invoke()
         verify(getFileBrowserNodeChildrenUseCase).invoke(-1L)
     }
+
+    @Test
+    fun `test that isCloudDriveRoot is true when nodeHandle is -1L`() = runTest {
+        setupTestData(emptyList())
+        whenever(getRootNodeUseCase()).thenReturn(null)
+        whenever(getNodeByIdUseCase(eq(NodeId(-1L)))).thenReturn(null)
+        whenever(getFileBrowserNodeChildrenUseCase(-1L)).thenReturn(emptyList())
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+        whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
+
+        val underTest = createViewModel(-1L)
+
+        underTest.uiState.test {
+            awaitItem() // Initial state
+            val state = awaitItem() // State after loadNodes
+            assertThat(state.isCloudDriveRoot).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isCloudDriveRoot is false when nodeHandle is not -1L`() = runTest {
+        setupTestData(emptyList())
+        val underTest = createViewModel(123L)
+
+        underTest.uiState.test {
+            awaitItem() // Initial state
+            val state = awaitItem() // State after loadNodes
+            assertThat(state.isCloudDriveRoot).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that isCloudDriveRoot is true when nodeHandle is -1L and getRootNodeUseCase returns a node`() =
+        runTest {
+            val rootNodeId = NodeId(789L)
+            val rootNode = mock<TypedFolderNode> {
+                on { id } doReturn rootNodeId
+                on { name } doReturn "Root"
+            }
+
+            setupTestData(emptyList())
+            whenever(getRootNodeUseCase()).thenReturn(rootNode)
+            whenever(getNodeByIdUseCase(eq(rootNodeId))).thenReturn(rootNode)
+            whenever(getFileBrowserNodeChildrenUseCase(rootNodeId.longValue)).thenReturn(emptyList())
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
+
+            val underTest = createViewModel(-1L)
+
+            underTest.uiState.test {
+                awaitItem() // Initial state
+                val state = awaitItem() // State after loadNodes
+                assertThat(state.isCloudDriveRoot).isTrue()
+                assertThat(state.currentFolderId).isEqualTo(rootNodeId)
+            }
+        }
 } 

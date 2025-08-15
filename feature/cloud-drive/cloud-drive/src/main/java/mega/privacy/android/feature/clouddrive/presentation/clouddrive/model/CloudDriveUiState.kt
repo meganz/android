@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param title Name of the folder
  * @property isLoading True if nodes are loading
  * @property currentFolderId The current folder id being displayed
+ * @property isCloudDriveRoot True if the current folder is the root of the Cloud Drive
  * @property items List of nodes in the current folder
  * @property currentViewType The current view type of the Cloud Drive
  * @property navigateToFolderEvent Event to navigate to a folder
@@ -30,6 +31,7 @@ data class CloudDriveUiState(
     val title: LocalizedText = LocalizedText.Literal(""),
     val isLoading: Boolean = true,
     val currentFolderId: NodeId = NodeId(-1L),
+    val isCloudDriveRoot: Boolean = false,
     val items: List<NodeUiItem<TypedNode>> = emptyList(),
     val currentViewType: ViewType = ViewType.LIST,
     val navigateToFolderEvent: StateEventWithContent<TypedNode> = consumed(),
@@ -87,10 +89,4 @@ data class CloudDriveUiState(
      */
     val selectedNodeIds: List<NodeId>
         get() = items.mapNotNull { if (it.isSelected) it.node.id else null }
-
-    /**
-     * Checks if the current folder is the root cloud drive folder.
-     */
-    val isRootCloudDrive: Boolean
-        get() = currentFolderId.longValue == -1L
 }

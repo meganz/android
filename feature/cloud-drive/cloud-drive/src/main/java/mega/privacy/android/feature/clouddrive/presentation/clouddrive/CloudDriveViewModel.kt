@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.NonCancellable.children
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -191,23 +192,24 @@ class CloudDriveViewModel @Inject constructor(
     private suspend fun loadNodes() {
         runCatching {
             val folderId = uiState.value.currentFolderId
-            val parentOrRootNodeId = if (folderId.longValue != -1L) {
-                folderId
-            } else {
+            val isCloudDriveRoot = folderId.longValue == -1L
+            val folderOrRootNodeId = if (isCloudDriveRoot) {
                 getRootNodeUseCase()?.id ?: NodeId(-1L)
+            } else {
+                folderId
             }
-            parentOrRootNodeId to nodeUiItemMapper(
-                nodeList = getFileBrowserNodeChildrenUseCase(parentOrRootNodeId.longValue),
+            val children = nodeUiItemMapper(
+                nodeList = getFileBrowserNodeChildrenUseCase(folderOrRootNodeId.longValue),
                 nodeSourceType = nodeSourceType,
                 highlightedNodeId = highlightedNodeId,
                 highlightedNames = highlightedNodeNames,
             )
-        }.onSuccess { (parentOrRootNodeId, children) ->
             uiState.update { state ->
                 state.copy(
                     isLoading = false,
                     items = children,
-                    currentFolderId = parentOrRootNodeId,
+                    currentFolderId = folderOrRootNodeId,
+                    isCloudDriveRoot = isCloudDriveRoot,
                 )
             }
         }.onFailure {

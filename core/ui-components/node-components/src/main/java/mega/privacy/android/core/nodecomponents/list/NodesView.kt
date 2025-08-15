@@ -33,8 +33,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param isListView whether the current view is list view
  * @param onSortOrderClick callback for sort order click
  * @param onChangeViewTypeClicked callback for change view type click
- * @param onLinkClicked callback for link click
- * @param onDisputeTakeDownClicked callback for dispute take down click
  * @param modifier
  * @param listState the state of the list
  * @param gridState the state of the grid
@@ -59,8 +57,6 @@ fun <T : TypedNode> NodesView(
     isListView: Boolean,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClicked: () -> Unit,
-    onLinkClicked: (String) -> Unit,
-    onDisputeTakeDownClicked: (String) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),

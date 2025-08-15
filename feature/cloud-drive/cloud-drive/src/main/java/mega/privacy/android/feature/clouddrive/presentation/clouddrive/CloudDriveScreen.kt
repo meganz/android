@@ -76,7 +76,7 @@ fun CloudDriveScreen(
                             )
                         }
 
-                        if (!uiState.isRootCloudDrive) {
+                        if (!uiState.isCloudDriveRoot) {
                             add(
                                 TopAppBarActionWithClick(
                                     CloudDriveAppBarAction.More
@@ -100,7 +100,7 @@ fun CloudDriveScreen(
         },
         floatingActionButton = {
             AddContentFab(
-                visible = !uiState.isInSelectionMode && uiState.visibleItemsCount > 0,
+                visible = !uiState.isInSelectionMode,
                 onClick = { showUploadOptionsBottomSheet = true }
             )
         },
@@ -114,7 +114,6 @@ fun CloudDriveScreen(
                 onNavigateToFolder = onNavigateToFolder,
                 onNavigateBack = onBack,
                 onTransfer = onTransfer,
-                onAddFilesClick = { showUploadOptionsBottomSheet = true },
                 onCreatedNewFolder = onCreatedNewFolder,
             )
         }
