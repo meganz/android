@@ -39,5 +39,5 @@ data class NodeActionState(
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val selectAll: StateEvent = consumed,
     val clearAll: StateEvent = consumed,
-    val infoToShowEvent: StateEventWithContent<LocalizedText?> = consumed(),
+    val infoToShowEvent: StateEventWithContent<LocalizedText> = consumed(),
 )

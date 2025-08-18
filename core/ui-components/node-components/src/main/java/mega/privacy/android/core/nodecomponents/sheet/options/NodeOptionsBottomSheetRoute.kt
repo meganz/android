@@ -35,13 +35,13 @@ fun NodeOptionsBottomSheetRoute(
     nodeId: Long,
     nodeSourceType: NodeSourceType,
     onTransfer: (TransferTriggerEvent) -> Unit,
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    actionHandler: NodeActionHandler = rememberNodeActionHandler(nodeOptionsActionViewModel),
     viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
     val nodeOptionActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    val actionHandler = rememberNodeActionHandler(nodeOptionsActionViewModel)
 
     LaunchedEffect(Unit) {
         keyboardController?.hide()

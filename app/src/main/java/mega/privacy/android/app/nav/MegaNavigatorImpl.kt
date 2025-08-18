@@ -8,11 +8,13 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
+import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
@@ -44,6 +46,7 @@ import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountSource
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderType
+import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_DEVICE_CENTER
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_SYNC_MEGA_FOLDER
@@ -71,6 +74,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTIO
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
@@ -751,6 +755,25 @@ internal class MegaNavigatorImpl @Inject constructor(
         launchUrl(
             context = context,
             url = "https://${getDomainNameUseCase()}/dispute"
+        )
+    }
+
+    override fun openAchievements(context: Context) {
+        context.startActivity(
+            Intent(context, MyAccountActivity::class.java)
+                .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
+        )
+    }
+
+    override fun openAskForCustomizedPlan(
+        context: Context,
+        myEmail: String?,
+        accountType: AccountType
+    ) {
+        AlertsAndWarnings.askForCustomizedPlan(
+            context = context,
+            myEmail = myEmail,
+            accountType = accountType
         )
     }
 }

@@ -88,8 +88,6 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
-    // Todo handle snackbar
-    //private val snackBarHandler: SnackBarHandler,
     private val moveRequestMessageMapper: NodeMoveRequestMessageMapper,
     private val versionHistoryRemoveMessageMapper: NodeVersionHistoryRemoveMessageMapper,
     private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase,
@@ -110,7 +108,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
-    internal val uiState: StateFlow<NodeActionState>
+    val uiState: StateFlow<NodeActionState>
         field = MutableStateFlow(NodeActionState())
 
     /**
@@ -147,10 +145,15 @@ class NodeOptionsActionViewModel @Inject constructor(
         applicationScope.launch {
             runCatching {
                 moveNodesUseCase(nodes)
-            }.onSuccess {
+            }.onSuccess { result ->
                 setMoveTargetPath(nodes.values.first())
-                // Todo handle snackbar
-                // snackBarHandler.postSnackbarMessage(moveRequestMessageMapper(it))
+                uiState.update {
+                    it.copy(
+                        infoToShowEvent = triggered(
+                            LocalizedText.Literal(moveRequestMessageMapper(result))
+                        )
+                    )
+                }
             }.onFailure {
                 manageCopyMoveError(it)
                 Timber.e(it)
@@ -167,10 +170,15 @@ class NodeOptionsActionViewModel @Inject constructor(
         applicationScope.launch {
             runCatching {
                 copyNodesUseCase(nodes)
-            }.onSuccess {
+            }.onSuccess { result ->
                 setCopyTargetPath(nodes.values.first())
-                // Todo handle snackbar
-                // snackBarHandler.postSnackbarMessage(moveRequestMessageMapper(it))
+                uiState.update {
+                    it.copy(
+                        infoToShowEvent = triggered(
+                            LocalizedText.Literal(moveRequestMessageMapper(result))
+                        )
+                    )
+                }
             }.onFailure {
                 manageCopyMoveError(it)
                 Timber.e(it)

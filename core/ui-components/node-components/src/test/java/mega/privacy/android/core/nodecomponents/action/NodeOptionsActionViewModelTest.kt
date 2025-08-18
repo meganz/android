@@ -15,10 +15,9 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.android.core.ui.model.menu.MenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -59,8 +58,8 @@ import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -152,6 +151,7 @@ class NodeOptionsActionViewModelTest {
         runTest {
             whenever(moveNodesUseCase(emptyMap())).thenThrow(ForeignNodeException())
             initViewModel()
+            whenever(moveRequestMessageMapper(any())).thenReturn("Move successful")
             viewModel.moveNodes(emptyMap())
             verify(moveNodesUseCase).invoke(emptyMap())
             viewModel.uiState.test {
@@ -201,6 +201,7 @@ class NodeOptionsActionViewModelTest {
         whenever(moveNodesUseCase(mapOf(sampleNode.id.longValue to sampleNode.id.longValue)))
             .thenReturn(MoveRequestResult.GeneralMovement(0, 0))
         initViewModel()
+        whenever(moveRequestMessageMapper(any())).thenReturn("Move successful")
         viewModel.moveNodes(mapOf(sampleNode.id.longValue to sampleNode.id.longValue))
         verify(setMoveLatestTargetPathUseCase).invoke(sampleNode.id.longValue)
     }
@@ -222,6 +223,7 @@ class NodeOptionsActionViewModelTest {
         runTest {
             whenever(copyNodesUseCase(emptyMap())).thenThrow(ForeignNodeException())
             initViewModel()
+            whenever(moveRequestMessageMapper(any())).thenReturn("Move successful")
             viewModel.copyNodes(emptyMap())
             verify(copyNodesUseCase).invoke(emptyMap())
             viewModel.uiState.test {
@@ -236,6 +238,7 @@ class NodeOptionsActionViewModelTest {
         whenever(copyNodesUseCase(mapOf(sampleNode.id.longValue to sampleNode.id.longValue)))
             .thenReturn(MoveRequestResult.GeneralMovement(0, 0))
         initViewModel()
+        whenever(moveRequestMessageMapper(any())).thenReturn("Move successful")
         viewModel.copyNodes(mapOf(sampleNode.id.longValue to sampleNode.id.longValue))
         verify(setCopyLatestTargetPathUseCase).invoke(sampleNode.id.longValue)
     }

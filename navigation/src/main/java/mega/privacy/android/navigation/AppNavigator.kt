@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
@@ -293,7 +294,7 @@ interface AppNavigator {
         launcher: ActivityResultLauncher<Intent>,
         initialUri: Uri? = null,
         isUpload: Boolean = false,
-        parentId: NodeId? = null
+        parentId: NodeId? = null,
     )
 
     /**
@@ -468,4 +469,20 @@ interface AppNavigator {
      * Open dispute take down link in custom tabs
      */
     fun openDisputeTakedownLink(context: Context)
+
+    /**
+     * Open achievements screen
+     *
+     * @param context The context
+     */
+    fun openAchievements(context: Context)
+
+    /**
+     * Open customized plan screen
+     *
+     * @param context The context
+     * @param email The email of the user
+     * @param accountType The account type
+     */
+    fun openAskForCustomizedPlan(context: Context, email: String?, accountType: AccountType)
 }

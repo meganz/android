@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -27,17 +28,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
@@ -77,6 +85,8 @@ internal fun CloudDriveContent(
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
 ) {
+    val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
+    val actionHandler = rememberNodeActionHandler(nodeOptionsActionViewModel)
     var showNewFolderDialog by remember { mutableStateOf(false) }
     var showNewTextFileDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -86,6 +96,8 @@ internal fun CloudDriveContent(
     val megaNavigator = rememberMegaNavigator()
     var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
     var isUploadFolder by rememberSaveable { mutableStateOf(false) }
+
+    val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
     val internalFolderPickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -148,6 +160,24 @@ internal fun CloudDriveContent(
         }
     }
 
+    val nameCollisionLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.nameCollisionActivityContract
+    ) { message ->
+        if (!message.isNullOrEmpty()) {
+            coroutineScope.launch {
+                snackbarHostState?.showAutoDurationSnackbar(message)
+            }
+        }
+    }
+
+    HandleNodeOptionEvent(
+        megaNavigator = megaNavigator,
+        nodeActionState = nodeActionState,
+        nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+        nameCollisionLauncher = nameCollisionLauncher,
+        snackbarHostState = snackbarHostState,
+    )
+
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.inAppCameraResultContract
     ) { uri: Uri? ->
@@ -173,7 +203,7 @@ internal fun CloudDriveContent(
         }
     }
     var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
-    var nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var shouldShowSkeleton by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isLoading) {
@@ -211,7 +241,7 @@ internal fun CloudDriveContent(
             items = uiState.items,
             isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
             showHiddenNodes = uiState.showHiddenNodes,
-            onMenuClick = { openNodeOptions(it.node.id) },
+            onMenuClick = { visibleNodeOptionId = it.id },
             onItemClicked = { onAction(ItemClicked(it)) },
             onLongClicked = { onAction(ItemLongClicked(it)) },
             sortOrder = "Name", // TODO: Replace with actual sort order from state
@@ -251,6 +281,7 @@ internal fun CloudDriveContent(
     }
 
     UploadingFiles(
+        nameCollisionLauncher = nameCollisionLauncher,
         parentNodeId = uiState.currentFolderId,
         uris = uploadUris,
         onStartUpload = { transferTriggerEvent ->
@@ -334,5 +365,26 @@ internal fun CloudDriveContent(
                 showNewTextFileDialog = false
             }
         )
+    }
+
+    // Todo: We will remove this, and replace it with NavigationHandler
+    // Temporary solution to show node options bottom sheet, because navigation file
+    // is not yet implemented in node-components module.
+    visibleNodeOptionId?.let { nodeId ->
+        MegaModalBottomSheet(
+            modifier = Modifier.statusBarsPadding(),
+            sheetState = nodeOptionSheetState,
+            onDismissRequest = { visibleNodeOptionId = null },
+            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
+        ) {
+            NodeOptionsBottomSheetRoute(
+                onDismiss = { visibleNodeOptionId = null },
+                nodeId = nodeId.longValue,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                onTransfer = onTransfer,
+                actionHandler = actionHandler,
+                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            )
+        }
     }
 }

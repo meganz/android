@@ -33,8 +33,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.dialogs.DialogButton
@@ -64,7 +64,7 @@ internal const val VERTICAL_ACTION_TAG_M3 = "storage_status_dialog_m3:button_ver
  * Helper compose view to show StorageStatusDialogView M3 including viewModel and navigation logic
  */
 @Composable
-internal fun StorageStatusDialogViewM3(
+fun StorageStatusDialogViewM3(
     storageState: StorageState,
     preWarning: Boolean,
     overQuotaAlert: Boolean,
@@ -74,7 +74,7 @@ internal fun StorageStatusDialogViewM3(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     isVisible: Boolean = true,
-    viewModel: StorageStatusViewModel = viewModel(),
+    viewModel: StorageStatusViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
@@ -250,23 +250,6 @@ private fun StorageStatusDialogContentM3(
             content()
             buttons()
         }
-    }
-}
-
-/**
- * Simple clone of FlowRow that arranges its children in a horizontal flow
- * following the same pattern as MegaBasicDialogFlowRow from BasicDialog
- */
-@Composable
-private fun StorageStatusDialogFlowRow(content: @Composable () -> Unit) {
-    // For now, using a simple Row layout for horizontal buttons
-    // This matches the behavior of the M2 version
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        content()
     }
 }
 
