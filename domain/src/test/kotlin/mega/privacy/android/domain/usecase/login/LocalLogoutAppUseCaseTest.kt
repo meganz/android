@@ -8,6 +8,7 @@ import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BannerRepository
 import mega.privacy.android.domain.repository.BillingRepository
+import mega.privacy.android.domain.repository.DomainNameMigrationRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -50,6 +51,7 @@ class LocalLogoutAppUseCaseTest {
     private val setSecurityUpgradeInAppUseCase = mock<SetSecurityUpgradeInAppUseCase>()
     private val bannerRepository = mock<BannerRepository>()
     private val pdfRepository = mock<PdfRepository>()
+    private val domainNameMigrationRepository = mock<DomainNameMigrationRepository>()
 
     @BeforeAll
     fun setUp() {
@@ -70,6 +72,7 @@ class LocalLogoutAppUseCaseTest {
             setSecurityUpgradeInAppUseCase = setSecurityUpgradeInAppUseCase,
             bannerRepository = bannerRepository,
             pdfRepository = pdfRepository,
+            domainNameMigrationRepository = domainNameMigrationRepository,
         )
     }
 
@@ -89,6 +92,7 @@ class LocalLogoutAppUseCaseTest {
             setSecurityUpgradeInAppUseCase,
             bannerRepository,
             pdfRepository,
+            domainNameMigrationRepository,
         )
     }
 
@@ -118,5 +122,6 @@ class LocalLogoutAppUseCaseTest {
         verify(setSecurityUpgradeInAppUseCase).invoke(false)
         verify(bannerRepository).clearCache()
         verify(pdfRepository).deleteAllLastPageViewedInPdf()
+        verify(domainNameMigrationRepository).setDomainNameMegaDotApp(false)
     }
 }

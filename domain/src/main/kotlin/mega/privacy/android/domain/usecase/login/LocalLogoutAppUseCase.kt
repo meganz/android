@@ -6,6 +6,7 @@ import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BannerRepository
 import mega.privacy.android.domain.repository.BillingRepository
+import mega.privacy.android.domain.repository.DomainNameMigrationRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -40,6 +41,7 @@ class LocalLogoutAppUseCase @Inject constructor(
     private val setSecurityUpgradeInAppUseCase: SetSecurityUpgradeInAppUseCase,
     private val bannerRepository: BannerRepository,
     private val pdfRepository: PdfRepository,
+    private val domainNameMigrationRepository: DomainNameMigrationRepository,
 ) {
 
     /**
@@ -75,5 +77,6 @@ class LocalLogoutAppUseCase @Inject constructor(
         stopAudioService()
         clearPsaUseCase()
         setSecurityUpgradeInAppUseCase(false)
+        domainNameMigrationRepository.setDomainNameMegaDotApp(false)
     }
 }
