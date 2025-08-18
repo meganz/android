@@ -5,11 +5,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
-import mega.privacy.android.app.main.dialog.storagestatus.ACHIEVEMENT_TAG
-import mega.privacy.android.app.main.dialog.storagestatus.HORIZONTAL_ACTION_TAG
-import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
-import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusUiState
-import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusViewModel
+import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusUiState
+import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusViewModel
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import org.junit.Rule

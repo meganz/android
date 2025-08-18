@@ -12,7 +12,7 @@ import mega.privacy.android.app.main.dialog.storagestatus.HORIZONTAL_DISMISS_TAG
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.main.dialog.storagestatus.VERTICAL_ACTION_TAG
 import mega.privacy.android.app.main.dialog.storagestatus.VERTICAL_DISMISS_TAG
-import mega.privacy.android.app.myAccount.StorageStatusDialogState
+import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogState
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import org.junit.Rule

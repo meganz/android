@@ -187,8 +187,23 @@
     <!-- Start of empty strings -->
     <string name="context_empty_cloud_drive">[B]No files in your [/B][A]Cloud drive[/A]</string>
     <string name="file_browser_empty_folder_new">[B]Empty[/B][A] Folder[/A]</string>
-
     <!-- End of empty strings -->
 
-
+    <!-- Storage Status Dialog M3 strings -->
+    <string name="general_dismiss">Dismiss</string>
+    <string name="action_upgrade_account">Upgrade account</string>
+    <string name="overquota_alert_text">You have exceeded your storage limit. Would you like to upgrade your account?</string>
+    <string name="overquota_alert_title">Storage quota exceeded</string>
+    <string name="pre_overquota_alert_text">This action cannot be completed as it would take you over your current storage limit. Would you like to upgrade your account?</string>
+    <string name="text_almost_full_warning">Cloud drive is almost full. Upgrade to Pro and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_almost_full_warning_pro_account">Cloud drive is almost full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_almost_full_warning_pro3_account">Cloud drive is almost full. If you need more storage please contact MEGA support to get a custom plan.</string>
+    <string name="text_storage_full_warning">Cloud drive is full. Upgrade to Pro and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_storage_full_warning_pro_account">Cloud drive is full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_storage_full_warning_pro3_account">Cloud drive is full. If you need more storage please contact MEGA support to get a custom plan.</string>
+    <string name="button_plans_almost_full_warning">See plans</string>
+    <string name="button_custom_almost_full_warning">Custom plan</string>
+    <string name="button_bonus_almost_full_warning">Get Bonus</string>
+    <string name="general_upgrade_button">Upgrade</string>
+    <!-- End of Storage Status Dialog M3 strings -->
 </resources>

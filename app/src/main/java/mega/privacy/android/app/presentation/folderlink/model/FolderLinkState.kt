@@ -5,7 +5,7 @@ import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.myAccount.StorageStatusDialogState
+import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogState
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.TypedFolderNode

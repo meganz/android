@@ -3,8 +3,8 @@ package mega.privacy.android.app.main.dialog.storagestatus
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product
@@ -95,24 +95,6 @@ internal class StorageStatusViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 Truth.assertThat(state.product).isEqualTo(product)
-            }
-        }
-
-    @Test
-    fun `test that product updated correctly when calling getPricing doesn't return PRO_III product`() =
-        runTest {
-            val product = mock<Product> {
-                on { level }.thenReturn(Constants.PRO_II)
-                on { months }.thenReturn(1)
-            }
-            val pricing = mock<Pricing> {
-                on { products }.thenReturn(listOf(product))
-            }
-            whenever(getPricing(false)).thenReturn(pricing)
-            initTestClass()
-            underTest.state.test {
-                val state = awaitItem()
-                Truth.assertThat(state.product).isNull()
             }
         }
 }

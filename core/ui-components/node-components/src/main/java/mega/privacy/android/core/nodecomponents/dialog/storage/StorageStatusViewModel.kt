@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.dialog.storagestatus
+package mega.privacy.android.core.nodecomponents.dialog.storage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.usecase.GetPricing
@@ -18,7 +17,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-internal class StorageStatusViewModel @Inject constructor(
+class StorageStatusViewModel @Inject constructor(
     private val getPricing: GetPricing,
     private val isAchievementsEnabled: IsAchievementsEnabled,
     private val getAccountTypeUseCase: GetAccountTypeUseCase,
@@ -45,7 +44,13 @@ internal class StorageStatusViewModel @Inject constructor(
             runCatching {
                 getPricing(false).products
             }.onSuccess { products ->
-                _state.update { it.copy(product = products.firstOrNull { product -> product.level == Constants.PRO_III && product.months == 1 }) }
+                _state.update {
+                    it.copy(
+                        product = products
+                            .filter { product -> product.months == 1 }
+                            .maxBy { product -> product.storage }
+                    )
+                }
             }.onFailure {
                 Timber.e(it)
             }

@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.updateItemAt
-import mega.privacy.android.app.myAccount.StorageStatusDialogState
+import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogState
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.data.NodeUIItem

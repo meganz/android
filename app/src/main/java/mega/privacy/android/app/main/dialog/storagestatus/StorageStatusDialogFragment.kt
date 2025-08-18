@@ -20,10 +20,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.utils.AlertsAndWarnings
+import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogState
+import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusViewModel
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode

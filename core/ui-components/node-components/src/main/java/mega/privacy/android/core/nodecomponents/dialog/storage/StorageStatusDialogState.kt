@@ -1,4 +1,4 @@
-package mega.privacy.android.app.myAccount
+package mega.privacy.android.core.nodecomponents.dialog.storage
 
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product

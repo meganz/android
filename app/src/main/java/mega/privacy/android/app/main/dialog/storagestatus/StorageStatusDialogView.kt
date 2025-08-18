@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.dialog.storagestatus
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -32,14 +31,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogState
+import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusViewModel
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.h6
+import mega.privacy.android.shared.resources.R as sharedR
 
 internal const val TITLE_TAG = "storage_status_dialog:text_title"
 internal const val IMAGE_STATUS_TAG = "storage_status_dialog:image_status"
@@ -234,9 +235,10 @@ private fun getDetail(state: StorageStatusDialogState): DialogViewDetail {
     val verticalActionButtonText: String
     val horizontalActionButtonText: String
 
-    if (state.product != null) {
-        storageString = Util.getSizeStringGBBased(state.product.storage.toLong())
-        transferString = Util.getSizeStringGBBased(state.product.transfer.toLong())
+    val product = state.product
+    if (product != null) {
+        storageString = Util.getSizeStringGBBased(product.storage.toLong())
+        transferString = Util.getSizeStringGBBased(product.transfer.toLong())
     }
 
     when (state.storageState) {
@@ -282,7 +284,7 @@ private fun getDetail(state: StorageStatusDialogState): DialogViewDetail {
         AccountType.PRO_LITE, AccountType.PRO_I,
         AccountType.PRO_II, AccountType.BASIC,
         AccountType.STARTER, AccountType.ESSENTIAL,
-        -> {
+            -> {
             when (state.storageState) {
                 StorageState.Orange -> {
                     contentText = String.format(
