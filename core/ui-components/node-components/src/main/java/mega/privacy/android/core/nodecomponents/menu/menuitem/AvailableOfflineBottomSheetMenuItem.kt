@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
+import mega.privacy.android.navigation.contract.NavigationHandler
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -33,13 +34,13 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
     override fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler, navController, coroutineScope ->
+        { onDismiss, handler, navigationHandler, scope ->
             val onClick = getOnClickFunction(
                 node = selectedNode,
                 onDismiss = onDismiss,
                 actionHandler = handler,
-                navController = navController,
-                parentCoroutineScope = coroutineScope
+                navigationHandler = navigationHandler,
+                parentCoroutineScope = scope
             )
             NodeActionListTile(
                 text = menuAction.getDescription(),
@@ -67,7 +68,7 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()

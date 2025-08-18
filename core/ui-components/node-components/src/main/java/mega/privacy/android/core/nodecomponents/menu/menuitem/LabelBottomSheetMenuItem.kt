@@ -2,7 +2,6 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
@@ -15,7 +14,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.GetNodeLabelUseCase
-import java.io.File
+import mega.privacy.android.navigation.contract.NavigationHandler
 import javax.inject.Inject
 
 internal const val changeLabelBottomSheetRoute =
@@ -35,7 +34,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
     override fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler, navController, scope ->
+        { onDismiss, handler, navigationHandler, scope ->
             NodeActionListTile(
                 text = menuAction.getDescription(),
                 icon = menuAction.getIconPainter(),
@@ -44,7 +43,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
                     node = selectedNode,
                     onDismiss = onDismiss,
                     actionHandler = handler,
-                    navController = navController,
+                    navigationHandler = navigationHandler,
                     parentCoroutineScope = scope
                 ),
                 trailingItem = {
@@ -80,14 +79,11 @@ class LabelBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
-        // Todo: navigationHandler
-        navController.navigate(
-            route = changeLabelBottomSheetRoute.plus(File.separator).plus(node.id.longValue)
-        )
+        //navigationHandler.navigate(ChangeLabelBottomSheet(node.id))
     }
 
     override val groupId: Int

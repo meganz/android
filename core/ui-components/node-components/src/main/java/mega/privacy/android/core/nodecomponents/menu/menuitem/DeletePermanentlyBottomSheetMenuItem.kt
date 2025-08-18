@@ -9,6 +9,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.DeletePermanentl
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.navigation.contract.NavigationHandler
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -34,7 +35,7 @@ class DeletePermanentlyBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
@@ -42,7 +43,7 @@ class DeletePermanentlyBottomSheetMenuItem @Inject constructor(
         runCatching { nodeHandlesToJsonMapper(handles) }
             .onSuccess {
                 // Todo: navigationHandler
-                navController.navigate(route = "$moveToRubbishOrDelete/${true}/${it}")
+                //navController.navigate(route = "$moveToRubbishOrDelete/${true}/${it}")
             }
             .onFailure { Timber.Forest.e(it) }
     }

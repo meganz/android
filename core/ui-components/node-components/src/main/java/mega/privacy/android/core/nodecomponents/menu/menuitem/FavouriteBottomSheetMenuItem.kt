@@ -14,6 +14,7 @@ import mega.privacy.android.domain.usecase.UpdateNodeFavoriteUseCase
 import timber.log.Timber
 import javax.inject.Inject
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Favourite bottom sheet menu action
@@ -41,7 +42,7 @@ class FavouriteBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()

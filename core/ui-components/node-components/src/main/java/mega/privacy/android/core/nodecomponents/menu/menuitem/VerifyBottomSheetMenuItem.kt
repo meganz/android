@@ -1,6 +1,7 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import androidx.navigation.NavHostController
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.NavigationHandler
 import javax.inject.Inject
 
 /**
@@ -24,6 +26,7 @@ import javax.inject.Inject
  * @param menuAction [VerifyMenuAction]
  */
 class VerifyBottomSheetMenuItem @Inject constructor(
+    @ApplicationContext private val context: Context,
     override val menuAction: VerifyMenuAction,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
@@ -34,7 +37,7 @@ class VerifyBottomSheetMenuItem @Inject constructor(
     override fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler, navController, scope ->
+        { onDismiss, handler, navigationHandler, scope ->
             NodeActionListTile(
                 text = menuAction.getDescription().format(shareData?.user.orEmpty()),
                 icon = menuAction.getIconPainter(),
@@ -43,7 +46,7 @@ class VerifyBottomSheetMenuItem @Inject constructor(
                     node = selectedNode,
                     onDismiss = onDismiss,
                     actionHandler = handler,
-                    navController = navController,
+                    navigationHandler = navigationHandler,
                     parentCoroutineScope = scope,
                 ),
             )
@@ -78,7 +81,7 @@ class VerifyBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
@@ -86,10 +89,10 @@ class VerifyBottomSheetMenuItem @Inject constructor(
             if (it.isVerified.not() && it.isPending) {
                 // If the share is pending, we need to show cannot verify dialog
                 // Todo: navigationHandler
-                navController.navigate(cannotVerifyUserRoute.plus("/${it.user}"))
+//                navController.navigate(cannotVerifyUserRoute.plus("/${it.user}"))
             } else {
                 // If the share is not pending, we need to show the credentials activity
-                navController.context.apply {
+                context.apply {
                     megaNavigator.openAuthenticityCredentialsActivity(
                         context = this,
                         email = it.user.orEmpty(),

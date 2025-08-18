@@ -8,6 +8,7 @@ import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Bottom sheet click handler
@@ -15,7 +16,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 typealias BottomSheetClickHandler = @Composable (
     onDismiss: () -> Unit,
     actionHandler: NodeActionHandler,
-    navController: NavHostController,
+    navigationHandler: NavigationHandler,
     coroutineScope: CoroutineScope,
 ) -> Unit
 
@@ -30,7 +31,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
     fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler, navController, coroutineScope ->
+        { onDismiss, handler, navigationHandler, scope ->
             NodeActionListTile(
                 menuAction = menuAction,
                 isDestructive = isDestructiveAction,
@@ -38,8 +39,8 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
                     node = selectedNode,
                     onDismiss = onDismiss,
                     actionHandler = handler,
-                    navController = navController,
-                    parentCoroutineScope = coroutineScope
+                    navigationHandler = navigationHandler,
+                    parentCoroutineScope = scope
                 ),
             )
         }
@@ -66,7 +67,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         actionHandler(menuAction, node)

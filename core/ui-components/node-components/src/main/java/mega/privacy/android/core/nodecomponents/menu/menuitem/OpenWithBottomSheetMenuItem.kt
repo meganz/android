@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
+import mega.privacy.android.navigation.contract.NavigationHandler
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -65,7 +66,7 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         if (node is TypedFileNode) {
@@ -73,11 +74,11 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
                 withContext(NonCancellable) {
                     val file = getLocalFile(node)
                     if (node.type is AudioFileTypeInfo || node.type is VideoFileTypeInfo) {
-                        openAudioOrVideoFiles(file, node, navController, parentCoroutineScope)
+                        openAudioOrVideoFiles(file, node, navigationHandler, parentCoroutineScope)
                     } else {
                         file?.let {
                             openNotStreamableFiles(
-                                navController,
+                                navigationHandler,
                                 it,
                                 node.type,
                                 parentCoroutineScope
@@ -95,7 +96,7 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
     private suspend fun openAudioOrVideoFiles(
         localFile: File?,
         node: TypedFileNode,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ) {
         val fileUri = getAudioOrVideoFileUri(localFile, node)
@@ -110,11 +111,11 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 parentCoroutineScope.ensureActive()
-                navController.context.startActivity(this)
+                //navController.context.startActivity(this)
             } else if (localFile == null) {
                 parentCoroutineScope.ensureActive()
                 // Todo: navigationHandler
-                navController.navigate(cannotOpenFileDialog)
+                //navController.navigate(cannotOpenFileDialog)
             } else {
                 // Todo provide snackbar
                 // snackBarHandler.postSnackbarMessage(R.string.intent_not_available_file)
@@ -123,7 +124,7 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
     }
 
     private suspend fun openNotStreamableFiles(
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         localFile: File?,
         fileTypeInfo: FileTypeInfo,
         parentCoroutineScope: CoroutineScope,
@@ -138,7 +139,8 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
                 if (resolveActivity(context.packageManager) != null) {
                     flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                     parentCoroutineScope.ensureActive()
-                    navController.context.startActivity(this@apply)
+                    // Todo NavigationHandler
+                    //navController.context.startActivity(this@apply)
                 } else {
                     // Todo provide snackbar
                     // snackBarHandler.postSnackbarMessage(R.string.intent_not_available)

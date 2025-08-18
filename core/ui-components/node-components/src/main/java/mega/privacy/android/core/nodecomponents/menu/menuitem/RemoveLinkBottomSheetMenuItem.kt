@@ -9,6 +9,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAc
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.navigation.contract.NavigationHandler
 import java.io.File
 import javax.inject.Inject
 
@@ -33,15 +34,15 @@ class RemoveLinkBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         // Todo: navigationHandler
-        navController.navigate(
-            removeNodeLinkRoute.plus(File.separator)
-                .plus(nodeHandlesToJsonMapper(listOf(node.id.longValue)))
-        )
+//        navController.navigate(
+//            removeNodeLinkRoute.plus(File.separator)
+//                .plus(nodeHandlesToJsonMapper(listOf(node.id.longValue)))
+//        )
     }
 
     override val menuAction = RemoveLinkMenuAction(170)

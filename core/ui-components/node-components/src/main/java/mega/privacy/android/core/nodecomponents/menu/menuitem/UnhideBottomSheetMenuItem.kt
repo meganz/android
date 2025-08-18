@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import timber.log.Timber
 import javax.inject.Inject
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Unhide bottom sheet menu item
@@ -57,7 +58,7 @@ class UnhideBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         parentCoroutineScope.launch {

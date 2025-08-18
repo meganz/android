@@ -13,6 +13,7 @@ class CloudDriveFeatureDestination : FeatureDestination {
     override val navigationGraph: NavGraphBuilder.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             cloudDriveScreen(
+                navigationHandler = navigationHandler,
                 onBack = navigationHandler::back,
                 onTransfer = transferHandler::setTransferEvent,
                 onNavigateToFolder = { nodeId, name ->

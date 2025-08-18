@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
+import mega.privacy.android.navigation.contract.NavigationHandler
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -49,7 +50,7 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
@@ -67,9 +68,9 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
                         }.onSuccess { handle ->
                             parentCoroutineScope.ensureActive()
                             // Todo: navigationHandler
-                            navController.navigate(
-                                searchFolderShareDialog.plus("/${handle}")
-                            )
+//                            navController.navigate(
+//                                searchFolderShareDialog.plus("/${handle}")
+//                            )
                         }.onFailure {
                             Timber.e(it)
                         }

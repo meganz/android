@@ -21,6 +21,7 @@ import mega.privacy.android.feature.clouddrive.model.CloudDriveAppBarAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
 
@@ -35,6 +36,7 @@ import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithCli
  */
 @Composable
 fun CloudDriveScreen(
+    navigationHandler: NavigationHandler,
     onBack: () -> Unit,
     onNavigateToFolder: (NodeId, String?) -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
@@ -107,6 +109,7 @@ fun CloudDriveScreen(
         },
         content = { innerPadding ->
             CloudDriveContent(
+                navigationHandler = navigationHandler,
                 uiState = uiState,
                 showUploadOptionsBottomSheet = showUploadOptionsBottomSheet,
                 onDismissUploadOptionsBottomSheet = { showUploadOptionsBottomSheet = false },
@@ -116,7 +119,6 @@ fun CloudDriveScreen(
                 onNavigateBack = onBack,
                 onTransfer = onTransfer,
                 onCreatedNewFolder = onCreatedNewFolder,
-                openNodeOptions = openNodeOptions
             )
         }
     )

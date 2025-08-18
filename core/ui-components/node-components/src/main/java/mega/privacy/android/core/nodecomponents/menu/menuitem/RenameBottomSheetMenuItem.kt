@@ -8,6 +8,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.RenameMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.navigation.contract.NavigationHandler
 import javax.inject.Inject
 
 /**
@@ -32,12 +33,12 @@ class RenameBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         // Todo: navigationHandler
-        navController.navigate(searchRenameDialog.plus("/${node.id.longValue}"))
+//        navController.navigate(searchRenameDialog.plus("/${node.id.longValue}"))
     }
 
     override val groupId = 8

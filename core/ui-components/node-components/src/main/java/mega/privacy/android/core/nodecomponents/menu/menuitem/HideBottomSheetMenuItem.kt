@@ -34,6 +34,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Hide bottom sheet menu item
@@ -53,7 +54,7 @@ class HideBottomSheetMenuItem @Inject constructor(
     private var isBusinessAccountExpired: Boolean = false
 
     override fun buildComposeControl(selectedNode: TypedNode): BottomSheetClickHandler =
-        { onDismiss, handler, navController, coroutineScope ->
+        { onDismiss, handler, navigationHandler, scope ->
             NodeActionListTile(
                 text = menuAction.getDescription(),
                 icon = menuAction.getIconPainter(),
@@ -62,8 +63,8 @@ class HideBottomSheetMenuItem @Inject constructor(
                     node = selectedNode,
                     onDismiss = onDismiss,
                     actionHandler = handler,
-                    navController = navController,
-                    parentCoroutineScope = coroutineScope
+                    navigationHandler = navigationHandler,
+                    parentCoroutineScope = scope
                 ),
                 trailingItem = {
                     if (!isPaid || isBusinessAccountExpired) {
@@ -116,7 +117,7 @@ class HideBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         parentCoroutineScope.launch {

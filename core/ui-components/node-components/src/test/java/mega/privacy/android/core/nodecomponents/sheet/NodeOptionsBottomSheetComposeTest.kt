@@ -22,6 +22,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.navigation.contract.NavigationHandler
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,6 +38,7 @@ class NodeOptionsBottomSheetComposeTest {
     private fun setContent(
         uiState: NodeBottomSheetState = NodeBottomSheetState(),
         actionHandler: NodeActionHandler = mock(),
+        navigationHandler: NavigationHandler = mock(),
         onDismiss: () -> Unit = {},
         onConsumeErrorState: () -> Unit = {},
     ) {
@@ -55,6 +57,7 @@ class NodeOptionsBottomSheetComposeTest {
                 uiState = uiState,
                 actionHandler = actionHandler,
                 onDismiss = onDismiss,
+                navigationHandler = navigationHandler,
                 onConsumeErrorState = onConsumeErrorState,
             )
         }

@@ -1,6 +1,8 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
+import android.content.Context
 import androidx.navigation.NavHostController
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
@@ -11,6 +13,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Dispute take down menu item
@@ -18,6 +21,7 @@ import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
  * @param menuAction [DisputeTakeDownMenuAction]
  */
 class DisputeTakeDownBottomSheetMenuItem @Inject constructor(
+    @ApplicationContext private val context: Context,
     override val menuAction: DisputeTakeDownMenuAction,
     private val megaNavigator: MegaNavigator,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
@@ -34,11 +38,11 @@ class DisputeTakeDownBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
-        megaNavigator.launchUrl(navController.context, DISPUTE_URL)
+        megaNavigator.launchUrl(context, DISPUTE_URL)
     }
 
     override val groupId = 4

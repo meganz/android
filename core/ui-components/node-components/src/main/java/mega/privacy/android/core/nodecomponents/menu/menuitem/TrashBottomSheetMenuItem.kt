@@ -9,6 +9,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.navigation.contract.NavigationHandler
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -39,7 +40,7 @@ class TrashBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
@@ -47,7 +48,7 @@ class TrashBottomSheetMenuItem @Inject constructor(
         runCatching { nodeHandlesToJsonMapper(handles) }
             .onSuccess {
                 // Todo: navigationHandler
-                navController.navigate(route = "$moveToRubbishOrDelete/${false}/${it}")
+//                navController.navigate(route = "$moveToRubbishOrDelete/${false}/${it}")
             }
             .onFailure { Timber.e(it) }
     }

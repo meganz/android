@@ -1,6 +1,8 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
+import android.content.Context
 import androidx.navigation.NavHostController
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
@@ -11,6 +13,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Info bottom sheet menu action
@@ -18,6 +21,7 @@ import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
  * @param menuAction [InfoMenuAction]
  */
 class InfoBottomSheetMenuItem @Inject constructor(
+    @ApplicationContext private val context: Context,
     override val menuAction: InfoMenuAction,
     private val megaNavigator: MegaNavigator
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
@@ -33,12 +37,12 @@ class InfoBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         megaNavigator.openFileInfoActivity(
-            context = navController.context,
+            context = context,
             handle = node.id.longValue
         )
     }

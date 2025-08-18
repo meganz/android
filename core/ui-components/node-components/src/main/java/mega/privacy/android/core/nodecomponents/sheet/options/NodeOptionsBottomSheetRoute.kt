@@ -26,11 +26,13 @@ import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.text
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.navigation.contract.NavigationHandler
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NodeOptionsBottomSheetRoute(
+    navigationHandler: NavigationHandler,
     onDismiss: () -> Unit,
     nodeId: Long,
     nodeSourceType: NodeSourceType,
@@ -56,6 +58,7 @@ fun NodeOptionsBottomSheetRoute(
 
     NodeOptionsBottomSheetContent(
         uiState = uiState,
+        navigationHandler = navigationHandler,
         actionHandler = actionHandler,
         onDismiss = onDismiss,
         onConsumeErrorState = viewModel::onConsumeErrorState,
@@ -71,6 +74,7 @@ fun NodeOptionsBottomSheetRoute(
 @Composable
 internal fun NodeOptionsBottomSheetContent(
     uiState: NodeBottomSheetState,
+    navigationHandler: NavigationHandler,
     actionHandler: NodeActionHandler,
     onDismiss: () -> Unit,
     onConsumeErrorState: () -> Unit = {},
@@ -107,7 +111,7 @@ internal fun NodeOptionsBottomSheetContent(
             item.control(
                 onDismiss,
                 actionHandler,
-                navHostController,
+                navigationHandler,
                 coroutineScope
             )
         }

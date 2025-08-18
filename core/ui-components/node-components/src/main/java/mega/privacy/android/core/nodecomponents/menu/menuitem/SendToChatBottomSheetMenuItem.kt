@@ -15,6 +15,7 @@ import mega.privacy.android.domain.usecase.chat.GetNodeToAttachUseCase
 import timber.log.Timber
 import javax.inject.Inject
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Send to chat bottom sheet menu item
@@ -45,7 +46,7 @@ class SendToChatBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         if (node is TypedFileNode) {

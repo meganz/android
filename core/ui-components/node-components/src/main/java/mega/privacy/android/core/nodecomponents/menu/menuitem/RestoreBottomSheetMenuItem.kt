@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import timber.log.Timber
 import javax.inject.Inject
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Restore bottom sheet menu item
@@ -45,7 +46,7 @@ class RestoreBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         val restoreHandle = node.restoreId?.longValue ?: -1L

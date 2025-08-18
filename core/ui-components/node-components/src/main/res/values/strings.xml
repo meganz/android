@@ -187,6 +187,9 @@
     <!-- Start of empty strings -->
     <string name="context_empty_cloud_drive">[B]No files in your [/B][A]Cloud drive[/A]</string>
     <string name="file_browser_empty_folder_new">[B]Empty[/B][A] Folder[/A]</string>
+
+    <string name="title_label" />
+    <string name="action_remove_label" />
     <!-- End of empty strings -->
 
     <!-- Storage Status Dialog M3 strings -->

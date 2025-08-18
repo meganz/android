@@ -3,10 +3,10 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -24,12 +24,12 @@ class VersionsBottomSheetMenuItem @Inject constructor(
     override fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler, navController, scope ->
+        { onDismiss, handler, navigationHandler, scope ->
             val onClick = getOnClickFunction(
                 node = selectedNode,
                 onDismiss = onDismiss,
                 actionHandler = handler,
-                navController = navController,
+                navigationHandler = navigationHandler,
                 parentCoroutineScope = scope
             )
             NodeActionListTile(

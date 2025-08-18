@@ -1,6 +1,8 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
+import android.content.Context
 import androidx.navigation.NavHostController
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuActionWithIcon
@@ -13,6 +15,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.NavigationHandler
 import javax.inject.Inject
 
 /**
@@ -21,6 +24,7 @@ import javax.inject.Inject
  * @param menuAction [ManageShareFolderMenuAction]
  */
 class ManageShareFolderBottomSheetMenuItem @Inject constructor(
+    @ApplicationContext private val context: Context,
     override val menuAction: ManageShareFolderMenuAction,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val megaNavigator: MegaNavigator
@@ -40,11 +44,10 @@ class ManageShareFolderBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
-        val context = navController.context
         parentCoroutineScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
                 megaNavigator.openFileContactListActivity(context, node.id.longValue, node.name)

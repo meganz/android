@@ -40,6 +40,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithClick
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -54,9 +55,9 @@ import mega.privacy.android.shared.resources.R as sharedR
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DriveSyncScreen(
+    navigationHandler: NavigationHandler,
     onNavigateToFolder: (NodeId, String?) -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
-    openNodeOptions: (NodeId) -> Unit,
     setNavigationItemVisibility: (Boolean) -> Unit,
     viewModel: DriveSyncViewModel = hiltViewModel(),
     cloudDriveViewModel: CloudDriveViewModel = hiltViewModel(),
@@ -141,6 +142,7 @@ internal fun DriveSyncScreen(
                     tabItem = TabItems(stringResource(sharedR.string.general_section_cloud_drive)),
                 ) { _, _, modifier ->
                     CloudDriveContent(
+                        navigationHandler = navigationHandler,
                         contentPadding = PaddingValues(
                             top = 12.dp,
                             bottom = paddingValues.calculateBottomPadding()
@@ -151,7 +153,6 @@ internal fun DriveSyncScreen(
                         onNavigateBack = { }, // Ignore back navigation in this tab
                         onTransfer = onTransfer,
                         onCreatedNewFolder = onCreatedNewFolder,
-                        openNodeOptions = openNodeOptions,
                         showUploadOptionsBottomSheet = showUploadOptionsBottomSheet,
                         onDismissUploadOptionsBottomSheet = {
                             showUploadOptionsBottomSheet = false

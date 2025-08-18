@@ -25,6 +25,7 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Share bottom sheet menu item
@@ -54,10 +55,9 @@ class ShareBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
-        val context = navController.context
         parentCoroutineScope.launch {
             withContext(NonCancellable) {
                 // Todo handle analytics tracking

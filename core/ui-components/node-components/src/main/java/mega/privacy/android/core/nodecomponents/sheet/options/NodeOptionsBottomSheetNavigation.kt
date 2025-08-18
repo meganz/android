@@ -29,6 +29,7 @@ internal fun NavGraphBuilder.nodeOptionsBottomSheet(
         }
 
         NodeOptionsBottomSheetRoute(
+            navigationHandler = navigationHandler,
             onDismiss = navigationHandler::back,
             nodeId = args.nodeHandle,
             nodeSourceType = args.nodeSourceType,

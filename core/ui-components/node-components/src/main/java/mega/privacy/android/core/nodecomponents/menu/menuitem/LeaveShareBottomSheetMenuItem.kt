@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Leave share bottom sheet menu item
@@ -34,7 +35,7 @@ class LeaveShareBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: NodeActionHandler,
-        navController: NavHostController,
+        navigationHandler: NavigationHandler,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
@@ -43,9 +44,9 @@ class LeaveShareBottomSheetMenuItem @Inject constructor(
             nodeHandlesToJsonMapper(nodeHandleList)
         }.onSuccess {
             // Todo: navigationHandler
-            navController.navigate(
-                searchLeaveShareFolderDialog.plus("/${it}")
-            )
+//            navController.navigate(
+//                searchLeaveShareFolderDialog.plus("/${it}")
+//            )
         }
     }
 

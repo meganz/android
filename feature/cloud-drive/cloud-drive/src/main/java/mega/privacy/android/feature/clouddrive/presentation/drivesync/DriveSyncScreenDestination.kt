@@ -8,14 +8,15 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 @Serializable
 data object DriveSync : NavKey
 
 fun NavGraphBuilder.driveSyncScreen(
+    navigationHandler: NavigationHandler,
     onNavigateToFolder: (NodeId, String?) -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
-    openNodeOptions: (NodeId) -> Unit,
     setNavigationVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
@@ -23,11 +24,11 @@ fun NavGraphBuilder.driveSyncScreen(
         val viewModel = hiltViewModel<DriveSyncViewModel>()
         val cloudDriveViewModel = hiltViewModel<CloudDriveViewModel>()
         DriveSyncScreen(
+            navigationHandler = navigationHandler,
             viewModel = viewModel,
             cloudDriveViewModel = cloudDriveViewModel,
             onNavigateToFolder = onNavigateToFolder,
             onCreatedNewFolder = onCreatedNewFolder,
-            openNodeOptions = openNodeOptions,
             setNavigationItemVisibility = setNavigationVisibility,
             onTransfer = onTransfer,
         )

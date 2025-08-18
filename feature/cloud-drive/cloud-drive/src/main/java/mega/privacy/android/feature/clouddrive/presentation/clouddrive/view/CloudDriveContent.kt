@@ -64,6 +64,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.upload.UploadingFiles
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.camera.CameraArg
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import timber.log.Timber
@@ -71,6 +72,7 @@ import timber.log.Timber
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CloudDriveContent(
+    navigationHandler: NavigationHandler,
     uiState: CloudDriveUiState,
     showUploadOptionsBottomSheet: Boolean,
     onDismissUploadOptionsBottomSheet: () -> Unit,
@@ -78,7 +80,6 @@ internal fun CloudDriveContent(
     onNavigateToFolder: (NodeId, String?) -> Unit,
     onNavigateBack: () -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
-    openNodeOptions: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
@@ -378,6 +379,7 @@ internal fun CloudDriveContent(
             bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
         ) {
             NodeOptionsBottomSheetRoute(
+                navigationHandler = navigationHandler,
                 onDismiss = { visibleNodeOptionId = null },
                 nodeId = nodeId.longValue,
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,

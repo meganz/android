@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
+import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Cloud drive route args
@@ -38,6 +39,7 @@ data class CloudDrive(
 )
 
 fun NavGraphBuilder.cloudDriveScreen(
+    navigationHandler: NavigationHandler,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onNavigateToFolder: (NodeId, String?) -> Unit,
@@ -60,6 +62,7 @@ fun NavGraphBuilder.cloudDriveScreen(
         }
 
         CloudDriveScreen(
+            navigationHandler = navigationHandler,
             viewModel = viewModel,
             onBack = onBack,
             onNavigateToFolder = onNavigateToFolder,
