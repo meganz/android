@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.photos.albums.add
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,6 +42,7 @@ import mega.privacy.android.legacy.core.ui.controls.appbar.CollapsedSearchAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun AddToAlbumScreen(
@@ -89,6 +89,7 @@ internal fun AddToAlbumScreen(
                             sharedR.plurals.album_add_to_message,
                             state.completionType,
                             state.mediaHolderName,
+                            state.numAddedItems,
                         )
                     } else {
                         context.resources.getQuantityString(
