@@ -14,7 +14,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import mega.android.core.ui.components.LocalSnackBarHostState
@@ -23,8 +22,8 @@ import mega.privacy.android.app.appstate.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.transfer.TransferHandlerImpl
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.core.nodecomponents.navigation.MegaBottomSheetNavigationProvider
-import mega.privacy.android.core.nodecomponents.navigation.rememberBottomSheetNavigator
+import mega.privacy.android.navigation.contract.bottomsheet.MegaBottomSheetNavigationProvider
+import mega.privacy.android.navigation.contract.bottomsheet.rememberBottomSheetNavigator
 import mega.privacy.android.navigation.megaNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)

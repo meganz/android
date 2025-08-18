@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package mega.privacy.android.core.nodecomponents.navigation
+package mega.privacy.android.navigation.contract.bottomsheet
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box

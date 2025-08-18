@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.navigation
+package mega.privacy.android.navigation.contract.bottomsheet
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable

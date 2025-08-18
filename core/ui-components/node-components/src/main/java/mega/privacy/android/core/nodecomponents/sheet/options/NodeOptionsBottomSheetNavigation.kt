@@ -4,7 +4,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import mega.privacy.android.core.nodecomponents.navigation.megaBottomSheet
+import mega.privacy.android.navigation.contract.bottomsheet.megaBottomSheet
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
