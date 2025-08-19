@@ -5,6 +5,7 @@ import mega.privacy.android.domain.exception.MegaIllegalArgumentException
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.ResourceAlreadyExistsMegaException
+import mega.privacy.android.domain.exception.TooManyRequestsMegaException
 import nz.mega.sdk.MegaError
 
 /**
@@ -35,6 +36,13 @@ fun MegaError.toException(methodName: String) = when (errorCode) {
     )
 
     MegaError.API_EARGS -> MegaIllegalArgumentException(
+        errorCode,
+        errorString,
+        value,
+        methodName
+    )
+
+    MegaError.API_ETOOMANY -> TooManyRequestsMegaException(
         errorCode,
         errorString,
         value,

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.settings.reportissue
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,9 +22,11 @@ import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueUiState
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.domain.entity.SubmitIssueRequest
+import mega.privacy.android.domain.exception.TooManyRequestsMegaException
 import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
 import mega.privacy.android.domain.usecase.SubmitIssueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -165,6 +166,15 @@ class ReportIssueViewModel @Inject constructor(
                         result = SubmitIssueResult.Success,
                         uploadProgress = null,
                         canSubmit = false
+                    )
+                }
+            }
+
+            is TooManyRequestsMegaException -> {
+                _uiState.update {
+                    it.copy(
+                        result = SubmitIssueResult.TooManyRequests(getSupportEmailUseCase()),
+                        uploadProgress = null
                     )
                 }
             }

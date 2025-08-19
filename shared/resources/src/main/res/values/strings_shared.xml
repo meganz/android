@@ -1148,8 +1148,6 @@
     <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Recommended</string>
-    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
-    <string name="transfers_over_quota_banner_title">Get more transfer quota</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">Upgrade now</string>
     <!-- Section title for additional benefits of Pro plans -->
@@ -1444,11 +1442,11 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">The most recently updated file will replace the older one in both locations</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">Choose</string>
     <!-- Text label of Apply to all -->
@@ -1496,4 +1494,6 @@
     <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
     <!--Sign Up page text field input last name error message when character limit exceeded-->
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
+    <!-- Error message when IP has already sent an issue report and needs to wait -->
+    <string name="report_issue_too_many_times_error">Your IP has already sent an issue report. Please wait 10 minutes before trying again or contact %1$s for assistance.</string>
 </resources>
