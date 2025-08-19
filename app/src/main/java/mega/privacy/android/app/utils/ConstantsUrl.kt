@@ -18,5 +18,15 @@ object ConstantsUrl {
     /**
      * Url for accessing account recovery page with email parameter.
      */
-    fun recoveryUrlEmail(domainName: String) = "https://$domainName/recovery?email="
+    fun recoveryUrlWithEmail(domainName: String) = "https://$domainName/recovery?email="
+
+    /**
+     * Url for VPN
+     */
+    fun megaVpnUrl(domainName: String) = "https://vpn.$domainName"
+
+    /**
+     * Url for MEGA PWM
+     */
+    fun megaPwmUrl(domainName: String) = "https://pwm.$domainName"
 }

@@ -10,9 +10,9 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.achievements.AchievementsFeatureActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.utils.Constants.MEGA_PASS_PACKAGE_NAME
-import mega.privacy.android.app.utils.Constants.MEGA_PASS_URL
 import mega.privacy.android.app.utils.Constants.MEGA_VPN_PACKAGE_NAME
-import mega.privacy.android.app.utils.Constants.MEGA_VPN_URL
+import mega.privacy.android.app.utils.ConstantsUrl.megaPwmUrl
+import mega.privacy.android.app.utils.ConstantsUrl.megaVpnUrl
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_APP_DOMAIN_NAME
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_NZ_DOMAIN_NAME
@@ -47,12 +47,12 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
                 (fragment.activity as ManagerActivity).showNewTextFileDialog(null)
             }
 
-            link.startsWith(MEGA_VPN_URL) -> {
+            matchesVpnUrl(link) -> {
                 Analytics.tracker.trackEvent(VpnSmartBannerItemSelectedEvent)
                 openInSpecificApp(context, link, MEGA_VPN_PACKAGE_NAME)
             }
 
-            link.startsWith(MEGA_PASS_URL) -> {
+            matchesPwmUrl(link) -> {
                 Analytics.tracker.trackEvent(PwmSmartBannerItemSelectedEvent)
                 openInSpecificApp(context, link, MEGA_PASS_PACKAGE_NAME)
             }
@@ -103,4 +103,12 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
     private fun matchesTextEditorUrl(link: String) =
         link == "https://$MEGA_NZ_DOMAIN_NAME/newText"
                 || link == "https://$MEGA_APP_DOMAIN_NAME/newText"
+
+    private fun matchesVpnUrl(link: String) =
+        link.startsWith(megaVpnUrl(MEGA_NZ_DOMAIN_NAME))
+                || link.startsWith(megaVpnUrl(MEGA_APP_DOMAIN_NAME))
+
+    private fun matchesPwmUrl(link: String) =
+        link.startsWith(megaPwmUrl(MEGA_NZ_DOMAIN_NAME))
+                || link.startsWith(megaPwmUrl(MEGA_APP_DOMAIN_NAME))
 }

@@ -31,7 +31,7 @@ import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.view.NewLoginView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
-import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrlEmail
+import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrlWithEmail
 import mega.privacy.android.app.utils.DomainNameFacade
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.shared.resources.R as sharedR
@@ -230,7 +230,7 @@ private fun onForgotPassword(context: Context, typedEmail: String?) {
             }.onFailure { Timber.e(it) }
                 .getOrNull() ?: ""
 
-            recoveryUrlEmail(DomainNameFacade.getDomainName()) + email
+            recoveryUrlWithEmail(DomainNameFacade.getDomainName()) + email
         }
     )
 }
