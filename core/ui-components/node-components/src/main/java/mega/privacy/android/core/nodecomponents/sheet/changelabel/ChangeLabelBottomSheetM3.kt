@@ -1,6 +1,5 @@
 package mega.privacy.android.core.nodecomponents.sheet.changelabel
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,22 +10,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.divider.SubtleDivider
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.model.label.ChangeLabelState
 import mega.privacy.android.core.nodecomponents.model.label.Label
 import mega.privacy.android.domain.entity.NodeLabel
@@ -66,33 +64,37 @@ private fun ChangeLabelBottomSheetContentM3(
     Column {
         MegaText(
             modifier = Modifier
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
             text = stringResource(id = R.string.title_label),
             textColor = TextColor.Secondary,
+            style = AppTheme.typography.titleMedium
         )
-        SubtleDivider(modifier = Modifier.padding(start = 16.dp))
+
         LazyColumn {
             items(state.labelList.size) {
                 val label = state.labelList[it]
-                val icon = if (label.isSelected) {
-                    rememberVectorPainter(IconPack.Medium.Thin.Solid.CheckCircle)
-                } else {
-                    painterResource(R.drawable.ic_label_unchecked)
-                }
 
                 FlexibleLineListItem(
                     modifier = Modifier
                         .fillMaxWidth(),
                     title = stringResource(label.labelName),
                     leadingElement = {
-                        Image(
+                        NodeLabelCircle(
                             modifier = Modifier
-                                .align(Alignment.Center)
-                                .size(24.dp),
-                            painter = icon,
-                            contentDescription = "Label icon",
-                            colorFilter = ColorFilter.tint(color = colorResource(id = label.labelColor))
+                                .align(Alignment.Center),
+                            label = label.label
                         )
+                    },
+                    trailingElement = {
+                        if (label.isSelected) {
+                            MegaIcon(
+                                modifier = Modifier
+                                    .size(24.dp),
+                                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Check),
+                                contentDescription = "Selected label icon",
+                                tint = IconColor.Secondary
+                            )
+                        }
                     },
                     onClickListener = { onLabelSelected(label.label) }
                 )

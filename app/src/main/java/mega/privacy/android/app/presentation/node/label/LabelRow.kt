@@ -21,7 +21,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.core.nodecomponents.R as coreNodeComponentsR
 import mega.privacy.android.core.nodecomponents.model.label.Label
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
@@ -48,7 +47,7 @@ internal fun LabelRow(
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
                     .size(24.dp),
-                painter = painterResource(id = if (label.isSelected) R.drawable.ic_label_checked else coreNodeComponentsR.drawable.ic_label_unchecked),
+                painter = painterResource(id = if (label.isSelected) R.drawable.ic_label_checked else R.drawable.ic_label_unchecked),
                 contentDescription = "Label icon",
                 colorFilter = ColorFilter.tint(color = colorResource(id = label.labelColor))
             )

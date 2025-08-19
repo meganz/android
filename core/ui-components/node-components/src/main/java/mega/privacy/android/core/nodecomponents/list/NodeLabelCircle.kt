@@ -30,7 +30,7 @@ fun NodeLabelCircle(
         NodeLabel.GREEN -> R.color.label_green
         NodeLabel.BLUE -> R.color.label_blue
         NodeLabel.PURPLE -> R.color.label_purple
-        NodeLabel.GREY -> R.color.label_purple
+        NodeLabel.GREY -> R.color.label_grey
     }.let { colorResource(id = it) }
     Canvas(
         modifier = modifier.size(size),
