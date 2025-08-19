@@ -267,8 +267,8 @@ class GridViewPagerAdapter(
      */
     @SuppressLint("NotifyDataSetChanged")
     private fun updatePageWithChange(pageWithChange: Int, position: Int) {
-        val participantsForPage = data[pageWithChange]
-        adapterList[pageWithChange]?.let {
+        val participantsForPage = data.getOrNull(pageWithChange) ?: return
+        adapterList.getOrNull(pageWithChange)?.let {
             it.submitList(participantsForPage) {
                 when (pageWithChange) {
                     0 -> {
