@@ -11,6 +11,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.LabelMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuitem.components.LabelAccessoryView
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.GetNodeLabelUseCase
@@ -83,7 +84,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
-        //navigationHandler.navigate(ChangeLabelBottomSheet(node.id))
+        navigationHandler.navigate(ChangeLabelBottomSheet(node.id.longValue))
     }
 
     override val groupId: Int

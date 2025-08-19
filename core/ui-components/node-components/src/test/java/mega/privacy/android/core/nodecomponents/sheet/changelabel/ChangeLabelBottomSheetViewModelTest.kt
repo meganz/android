@@ -1,16 +1,16 @@
-package mega.privacy.android.app.presentation.node.label
+package mega.privacy.android.core.nodecomponents.sheet.changelabel
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.NodeLabelResourceMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeLabelUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLabelListUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLabelUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -27,7 +27,7 @@ class ChangeLabelBottomSheetViewModelTest {
     private val changeLabelUseCase = mock<UpdateNodeLabelUseCase>()
     private val getNodeLabelListUseCase = mock<GetNodeLabelListUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
-    private val nodeLabelMapper = NodeLabelMapper()
+    private val getNodeLabelUseCase = mock<GetNodeLabelUseCase>()
     private val nodeLabelResourceMapper: NodeLabelResourceMapper = NodeLabelResourceMapper()
     private lateinit var underTest: ChangeLabelBottomSheetViewModel
     private val node = mock<TypedFolderNode> {
@@ -56,7 +56,7 @@ class ChangeLabelBottomSheetViewModelTest {
         underTest = ChangeLabelBottomSheetViewModel(
             changeLabelUseCase,
             getNodeLabelListUseCase,
-            nodeLabelMapper,
+            getNodeLabelUseCase,
             nodeLabelResourceMapper,
             getNodeByIdUseCase
         )

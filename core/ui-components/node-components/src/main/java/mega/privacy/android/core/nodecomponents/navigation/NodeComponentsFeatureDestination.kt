@@ -1,6 +1,7 @@
 package mega.privacy.android.core.nodecomponents.navigation
 
 import androidx.navigation.NavGraphBuilder
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.changeLabelBottomSheetNavigation
 import mega.privacy.android.core.nodecomponents.sheet.options.nodeOptionsBottomSheet
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -10,5 +11,6 @@ class NodeComponentsFeatureDestination : FeatureDestination {
     override val navigationGraph: NavGraphBuilder.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             nodeOptionsBottomSheet(navigationHandler, transferHandler::setTransferEvent)
+            changeLabelBottomSheetNavigation(navigationHandler::back)
         }
 }
