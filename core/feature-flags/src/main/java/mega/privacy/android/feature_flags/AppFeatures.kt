@@ -18,7 +18,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
 
     CameraUploadsBannerImprovement(
         "Enable Camera Uploads Banner Improvement",
-        false
+        true
     ),
 
     AudioPlaybackPosition(
