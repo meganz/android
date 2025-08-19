@@ -10,6 +10,7 @@ import android.view.Surface
 import androidx.annotation.OptIn
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.net.toUri
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
@@ -23,16 +24,21 @@ import androidx.media3.common.VideoSize
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.source.ShuffleOrder
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.upstream.DefaultBandwidthMeter
 import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.ui.PlayerNotificationManager
 import androidx.media3.ui.PlayerView
 import com.google.common.collect.ImmutableList
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.flowOf
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
@@ -46,9 +52,9 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.icon.pack.R
+import mega.privacy.mobile.analytics.event.VideoBufferingExceeded_1_SecondEvent
 import timber.log.Timber
 import javax.inject.Inject
-import androidx.core.net.toUri
 
 /**
  * The implementation of MediaPlayerGateway
@@ -72,6 +78,151 @@ class MediaPlayerFacade @Inject constructor(
 
     @Volatile
     private var hasSwitchTrackOnInit = false
+
+    private val bandwidthMeter = DefaultBandwidthMeter.Builder(context).build()
+
+    private val loggingTransferListener = object : androidx.media3.datasource.TransferListener {
+        private var totalBytesTransferred = 0L
+        private var transferStartTime = 0L
+        private var lastLogTime = 0L
+        private var lastTotalBytesTransferred = 0L
+
+        override fun onTransferInitializing(
+            source: androidx.media3.datasource.DataSource,
+            dataSpec: androidx.media3.datasource.DataSpec,
+            isNetwork: Boolean,
+        ) {
+            Timber.d("TransferListener initializing: ${dataSpec.uri}, isNetwork: $isNetwork")
+        }
+
+        override fun onTransferStart(
+            source: androidx.media3.datasource.DataSource,
+            dataSpec: androidx.media3.datasource.DataSpec,
+            isNetwork: Boolean,
+        ) {
+            transferStartTime = System.currentTimeMillis()
+            lastLogTime = transferStartTime
+            lastTotalBytesTransferred = 0L
+            Timber.d("TransferListener started: ${dataSpec.uri}, isNetwork: $isNetwork")
+        }
+
+        override fun onBytesTransferred(
+            source: androidx.media3.datasource.DataSource,
+            dataSpec: androidx.media3.datasource.DataSpec,
+            isNetwork: Boolean,
+            bytesTransferred: Int,
+        ) {
+            if (isNetwork && bytesTransferred > 0) {
+                totalBytesTransferred += bytesTransferred
+                val currentTime = System.currentTimeMillis()
+
+                // Log only if 1 second has passed since last log
+                if (currentTime - lastLogTime >= 1000) {
+                    val bitrate = bandwidthMeter.bitrateEstimate
+                    val duration = currentTime - transferStartTime
+
+                    // Calculate current bitrate for the last second
+                    val bytesInLastSecond = totalBytesTransferred - lastTotalBytesTransferred
+                    val currentBitrate = bytesInLastSecond * 8
+
+                    if (duration > 0) {
+                        val averageBitrate = (totalBytesTransferred * 8 * 1000) / duration
+                        Timber.d(
+                            """
+                                TransferListener Bandwidth:
+                                Estimated: %.2f kbps
+                                Current: %.2f kbps (last second)
+                                Average: %.2f kbps (from start)
+                                Total transferred: %.2f KB
+                                Duration: %ds
+                                Bytes in last second: %.2f KB
+                            """.trimIndent(),
+                            bitrate / 1024f,
+                            currentBitrate / 1024f,
+                            averageBitrate / 1024f,
+                            totalBytesTransferred / 1024f,
+                            duration / 1000,
+                            bytesInLastSecond / 1024f
+                        )
+                    } else {
+                        Timber.d(
+                            """
+                                TransferListener Bandwidth:
+                                Estimated: %.2f kbps
+                                Current: %.2f kbps (last second)
+                                Total transferred: %.2f KB
+                                Duration: %ds
+                                Bytes in last second: %.2f KB
+                            """.trimIndent(),
+                            bitrate / 1024f,
+                            currentBitrate / 1024f,
+                            totalBytesTransferred / 1024f,
+                            duration / 1000,
+                            bytesInLastSecond / 1024f
+                        )
+                    }
+
+                    lastLogTime = currentTime
+                    lastTotalBytesTransferred = totalBytesTransferred
+                }
+            }
+        }
+
+        override fun onTransferEnd(
+            source: androidx.media3.datasource.DataSource,
+            dataSpec: androidx.media3.datasource.DataSpec,
+            isNetwork: Boolean,
+        ) {
+            val currentTime = System.currentTimeMillis()
+            val duration = currentTime - transferStartTime
+            val bitrate = bandwidthMeter.bitrateEstimate
+
+            if (duration > 0) {
+                val averageBitrate = (totalBytesTransferred * 8 * 1000) / duration
+                Timber.d(
+                    """
+                        TransferListener Transfer ended:
+                        URI: %s
+                        Total: %.2f KB
+                        Duration: %ds
+                        Avg bitrate: %.2f kbps
+                        Estimated: %.2f kbps
+                    """.trimIndent(),
+                    dataSpec.uri,
+                    totalBytesTransferred / 1024f,
+                    duration / 1000,
+                    averageBitrate / 1024f,
+                    bitrate / 1024f
+                )
+            } else {
+                Timber.d(
+                    """
+                        TransferListener Transfer ended:
+                        URI: %s
+                        Total: %.2f KB
+                        Estimated: %.2f kbps
+                    """.trimIndent(),
+                    dataSpec.uri,
+                    totalBytesTransferred / 1024f,
+                    bitrate / 1024f
+                )
+            }
+
+            totalBytesTransferred = 0L
+            transferStartTime = 0L
+            lastLogTime = 0L
+            lastTotalBytesTransferred = 0L
+        }
+    }
+
+    private val dataSourceFactory = DefaultHttpDataSource.Factory()
+        .setAllowCrossProtocolRedirects(true)
+        .setUserAgent("ExoPlayer")
+        .setTransferListener(loggingTransferListener)
+
+    private val mediaSourceFactory = ProgressiveMediaSource.Factory(dataSourceFactory)
+
+    private var bufferingStartTime: Long = 0L
 
     override fun createPlayer(
         shuffleEnabled: Boolean?,
@@ -122,6 +273,7 @@ class MediaPlayerFacade @Inject constructor(
                     }
 
                     override fun onPlaybackStateChanged(playbackState: Int) {
+                        startSavingBufferingState(playbackState)
                         mediaPlayerCallback.onPlaybackStateChangedCallback(playbackState)
                     }
 
@@ -168,6 +320,27 @@ class MediaPlayerFacade @Inject constructor(
         player = MediaMegaPlayer(exoPlayer)
         playerNotificationManager?.setPlayer(player)
         return exoPlayer
+    }
+
+    private fun startSavingBufferingState(playbackState: Int) {
+        when (playbackState) {
+            Player.STATE_BUFFERING -> bufferingStartTime = System.currentTimeMillis()
+            Player.STATE_READY -> {
+                if (bufferingStartTime > 0) {
+                    val duration = System.currentTimeMillis() - bufferingStartTime
+                    if (duration > 1000) {
+                        logBufferingEvent(duration)
+                    }
+                    bufferingStartTime = 0L
+                }
+            }
+        }
+    }
+
+    private fun logBufferingEvent(duration: Long) {
+        val seconds = duration / 1000.0
+        Analytics.tracker.trackEvent(VideoBufferingExceeded_1_SecondEvent)
+        Timber.d("Buffering > 1s detected: %.2f s".format(seconds))
     }
 
     private fun switchRendererToTextTrackType() {
@@ -343,35 +516,69 @@ class MediaPlayerFacade @Inject constructor(
 
     override fun buildPlaySources(mediaPlaySources: MediaPlaySources) {
         with(mediaPlaySources) {
-            if (newIndexForCurrentItem == INVALID_VALUE) {
-                player?.setMediaItems(mediaItems)
-            } else {
-                player?.let { player ->
-                    val oldIndexForCurrentItem = player.currentMediaItemIndex
-                    val oldItemsCount = player.mediaItemCount
-                    // Check the parameters whether matched the required of removeMediaItems() function
+            runCatching {
+                val mediaSources = convertMediaItemsToMediaSources(mediaItems)
+
+                if (newIndexForCurrentItem == INVALID_VALUE) {
+                    exoPlayer.setMediaSources(mediaSources)
+                } else {
+                    val oldIndexForCurrentItem = exoPlayer.currentMediaItemIndex
+                    val oldItemsCount = exoPlayer.mediaItemCount
+
                     if (oldIndexForCurrentItem >= -1 && oldItemsCount >= 0) {
+                        // Remove items after the current item
                         if (oldItemsCount > oldIndexForCurrentItem + 1) {
-                            player.removeMediaItems(oldIndexForCurrentItem + 1, oldItemsCount)
+                            for (i in oldItemsCount - 1 downTo oldIndexForCurrentItem + 1) {
+                                exoPlayer.removeMediaItem(i)
+                            }
                         }
+                        // Remove items before the current item
                         if (oldIndexForCurrentItem > 0) {
-                            player.removeMediaItems(0, oldIndexForCurrentItem)
+                            for (i in oldIndexForCurrentItem - 1 downTo 0) {
+                                exoPlayer.removeMediaItem(i)
+                            }
                         }
                     }
 
-                    // Check parameters to ensure "fromIndex >= 0 && toIndex <= size && toIndex >= fromIndex"
-                    if (newIndexForCurrentItem in mediaItems.indices) {
+                    if (newIndexForCurrentItem in mediaSources.indices) {
                         if (newIndexForCurrentItem > 0) {
-                            player.addMediaItems(0, mediaItems.subList(0, newIndexForCurrentItem))
+                            exoPlayer.addMediaSources(
+                                0,
+                                mediaSources.subList(0, newIndexForCurrentItem)
+                            )
                         }
-                        if (mediaItems.size > newIndexForCurrentItem + 1) {
-                            player.addMediaItems(
-                                mediaItems.subList(newIndexForCurrentItem + 1, mediaItems.size)
+                        if (mediaSources.size > newIndexForCurrentItem + 1) {
+                            exoPlayer.addMediaSources(
+                                mediaSources.subList(newIndexForCurrentItem + 1, mediaSources.size)
                             )
                         }
                     }
                 }
+            }.onFailure { e ->
+                Timber.e(e, "Error building play sources")
+                e.message?.let {
+                    crashReporter.log(it)
+                }
             }
+        }
+    }
+
+    /**
+     * Convert MediaItems to MediaSources using the custom MediaSource.Factory
+     *
+     * @param mediaItems List of MediaItems to convert
+     * @return List of MediaSources
+     */
+    private fun convertMediaItemsToMediaSources(mediaItems: List<MediaItem>): List<MediaSource> {
+        return mediaItems.map { mediaItem ->
+            runCatching {
+                mediaSourceFactory.createMediaSource(mediaItem)
+            }.onFailure { e ->
+                Timber.e(e, "Error creating MediaSource for mediaItem: ${mediaItem.mediaId}")
+                e.message?.let {
+                    crashReporter.log(it)
+                }
+            }.getOrThrow()
         }
     }
 
