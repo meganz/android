@@ -316,7 +316,7 @@ class NodeAttachmentHistoryAdapter(
             if (chatRoom == null) return
 
             if (chatRoom.isGroup) {
-                holder.fullNameTitle = cC.getParticipantFullName(userHandle)
+                holder.fullNameTitle = cC.getParticipantFullName(userHandle) ?: ""
 
                 if (holder.fullNameTitle.trim { it <= ' ' }.isEmpty()) {
                     Timber.w("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle")
