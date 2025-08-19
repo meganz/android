@@ -12,7 +12,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.notifications.CameraUploadsNotificationManager
@@ -27,8 +26,10 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.SetLogoutFlagWrapperImpl
+import mega.privacy.android.app.utils.wrapper.SetupMegaChatApiWrapperImpl
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.global.SetupMegaChatApiWrapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
@@ -36,6 +37,7 @@ import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.shared.resources.R as sharedR
 import org.webrtc.Camera1Enumerator
 import org.webrtc.CameraEnumerator
 
@@ -63,6 +65,9 @@ abstract class UtilWrapperModule {
 
     @Binds
     abstract fun bindSetLogoutFlagWrapper(implementation: SetLogoutFlagWrapperImpl): SetLogoutFlagWrapper
+
+    @Binds
+    abstract fun bindSetupMegaChatApiWrapper(implementation: SetupMegaChatApiWrapperImpl): SetupMegaChatApiWrapper
 
 
     companion object {

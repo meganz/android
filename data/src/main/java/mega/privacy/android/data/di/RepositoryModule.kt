@@ -47,6 +47,7 @@ import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.HttpConnectionRepositoryImpl
 import mega.privacy.android.data.repository.ImageRepositoryImpl
 import mega.privacy.android.data.repository.InAppUpdateRepositoryImpl
+import mega.privacy.android.data.repository.InitializationRepositoryImpl
 import mega.privacy.android.data.repository.LegacyNotificationRepository
 import mega.privacy.android.data.repository.MediaRecorderRepositoryImpl
 import mega.privacy.android.data.repository.MegaNodeRepository
@@ -104,6 +105,7 @@ import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.HttpConnectionRepository
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.InAppUpdateRepository
+import mega.privacy.android.domain.repository.InitializationRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.MediaRecorderRepository
 import mega.privacy.android.domain.repository.NetworkRepository
@@ -379,4 +381,9 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindDomainNameMigrationRepository(repository: DomainNameMigrationRepositoryImpl): DomainNameMigrationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindInitializationRepository(implementation: InitializationRepositoryImpl): InitializationRepository
+
 }

@@ -4,12 +4,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
-import mega.privacy.android.app.di.UtilWrapperModule
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
+import mega.privacy.android.data.gateway.global.SetupMegaChatApiWrapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
@@ -49,5 +49,8 @@ object TestWrapperModule {
 
     @Provides
     fun provideApplicationIpAddressWrapper(): ApplicationIpAddressWrapper = mock()
+
+    @Provides
+    fun provideSetupMegaChatApiWrapper(): SetupMegaChatApiWrapper = mock()
 
 }

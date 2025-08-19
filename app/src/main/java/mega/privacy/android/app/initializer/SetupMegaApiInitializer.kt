@@ -7,10 +7,16 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.globalmanagement.BackgroundRequestListener
 import mega.privacy.android.app.listeners.GlobalListener
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.global.InitialiseGlobalListenersUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -47,6 +53,27 @@ class SetupMegaApiInitializer : Initializer<Unit> {
          *
          */
         fun requestListener(): BackgroundRequestListener
+
+        /**
+         * Get feature flag value use case
+         *
+         * @return [GetFeatureFlagValueUseCase]
+         */
+        fun getFeatureFlagValueUseCase(): GetFeatureFlagValueUseCase
+
+        /**
+         * App scope
+         *
+         */
+        @ApplicationScope
+        fun appScope(): CoroutineScope
+
+        /**
+         * Initialise global request listener use case
+         *
+         * @return [InitialiseGlobalRequestListenerUseCase]
+         */
+        fun initialiseGlobalRequestListenerUseCase(): InitialiseGlobalListenersUseCase
     }
 
     /**
@@ -74,7 +101,14 @@ class SetupMegaApiInitializer : Initializer<Unit> {
         setupMegaApiInitializerEntryPoint: SetupMegaApiInitializerEntryPoint,
     ) {
         Timber.d("ADD REQUEST LISTENER")
-        megaApiAndroid.addRequestListener(setupMegaApiInitializerEntryPoint.requestListener())
+        setupMegaApiInitializerEntryPoint.appScope().launch {
+            if (setupMegaApiInitializerEntryPoint.getFeatureFlagValueUseCase()(AppFeatures.SingleActivity)) {
+                setupMegaApiInitializerEntryPoint.initialiseGlobalRequestListenerUseCase()()
+            } else {
+                megaApiAndroid.addRequestListener(setupMegaApiInitializerEntryPoint.requestListener())
+            }
+        }
+
         megaApiAndroid.addGlobalListener(setupMegaApiInitializerEntryPoint.globalListener())
     }
 
