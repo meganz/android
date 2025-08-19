@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUs
 import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
 import mega.privacy.android.domain.usecase.contact.GetIncomingContactRequestsNotificationListUseCase
+import mega.privacy.android.domain.usecase.domainmigration.UpdateDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import mega.privacy.android.domain.usecase.pdf.CheckIfShouldDeleteLastPageViewedInPdfUseCase
@@ -97,6 +98,7 @@ class GlobalListener @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     private val checkIfShouldDeleteLastPageViewedInPdfUseCase: CheckIfShouldDeleteLastPageViewedInPdfUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val updateDomainNameUseCase: UpdateDomainNameUseCase,
 ) : MegaGlobalListenerInterface {
     private val isMobileAdsInitializeCalled = AtomicBoolean(false)
     private val globalSyncUpdates = MutableSharedFlow<Unit>()
@@ -297,6 +299,7 @@ class GlobalListener @Inject constructor(
                 }
                 getInstance().checkEnabledCookies()
                 initialiseAdsIfNeeded()
+                updateDomainName()
             }
 
             MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()
@@ -464,6 +467,13 @@ class GlobalListener @Inject constructor(
             }.onFailure {
                 Timber.e(it, "MobileAds initialization failed")
             }
+        }
+    }
+
+    private fun updateDomainName() {
+        applicationScope.launch {
+            runCatching { updateDomainNameUseCase() }
+                .onFailure { Timber.e(it, "UpdateDomainNameUseCase failed") }
         }
     }
 }

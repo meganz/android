@@ -33,7 +33,6 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
-import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.MegaException
@@ -52,7 +51,6 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
-import mega.privacy.android.domain.usecase.domainmigration.UpdateDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -169,7 +167,6 @@ internal class LoginViewModelTest {
     private val ephemeralCredentialManager = mock<EphemeralCredentialManager>()
     private val resumeTransfersForNotLoggedInInstanceUseCase =
         mock<ResumeTransfersForNotLoggedInInstanceUseCase>()
-    private val updateDomainNameUseCase = mock<UpdateDomainNameUseCase>()
     private val updateCrashAndPerformanceReportersUseCase =
         mock<UpdateCrashAndPerformanceReportersUseCase>()
     private val startScreenUtil = mock<StartScreenUtil>()
@@ -228,7 +225,6 @@ internal class LoginViewModelTest {
             shouldShowUpgradeAccountUseCase = shouldShowUpgradeAccountUseCase,
             ephemeralCredentialManager = ephemeralCredentialManager,
             resumeTransfersForNotLoggedInInstanceUseCase = resumeTransfersForNotLoggedInInstanceUseCase,
-            updateDomainNameUseCase = updateDomainNameUseCase,
             updateCrashAndPerformanceReportersUseCase = updateCrashAndPerformanceReportersUseCase,
             startScreenUtil = startScreenUtil
         )
@@ -267,7 +263,6 @@ internal class LoginViewModelTest {
             resumeTransfersForNotLoggedInInstanceUseCase,
             startScreenUtil,
             updateCrashAndPerformanceReportersUseCase,
-            updateDomainNameUseCase,
         )
     }
 
@@ -745,18 +740,6 @@ internal class LoginViewModelTest {
 
             verify(updateCrashAndPerformanceReportersUseCase).invoke()
         }
-
-    @Test
-    fun `test that updateDomainNameUseCase is invoked when fetchNodes finishes`() = runTest {
-        val update = FetchNodesUpdate(progress = Progress(1.0f))
-
-        whenever(fetchNodesUseCase()) doReturn flowOf(update)
-
-        underTest.fetchNodes()
-        advanceUntilIdle()
-
-        verify(updateDomainNameUseCase).invoke()
-    }
 
     companion object {
         private val scheduler = TestCoroutineScheduler()

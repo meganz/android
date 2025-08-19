@@ -75,7 +75,6 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
-import mega.privacy.android.domain.usecase.domainmigration.UpdateDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -168,7 +167,6 @@ class LoginViewModel @Inject constructor(
     private val shouldShowUpgradeAccountUseCase: ShouldShowUpgradeAccountUseCase,
     private val ephemeralCredentialManager: EphemeralCredentialManager,
     private val resumeTransfersForNotLoggedInInstanceUseCase: ResumeTransfersForNotLoggedInInstanceUseCase,
-    private val updateDomainNameUseCase: UpdateDomainNameUseCase,
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
     private val startScreenUtil: StartScreenUtil,
 ) : ViewModel() {
@@ -939,7 +937,6 @@ class LoginViewModel @Inject constructor(
                             )
                         }
                         startWorkers()
-                        updateFlags()
                     } else {
                         Timber.d("fetch nodes update")
                         _state.update { it.copy(fetchNodesUpdate = update) }
@@ -988,13 +985,6 @@ class LoginViewModel @Inject constructor(
             }.onFailure { error ->
                 Timber.e(error, "Task failed")
             }
-        }
-    }
-
-    private fun updateFlags() {
-        applicationScope.launch {
-            runCatching { updateDomainNameUseCase() }
-                .onFailure { Timber.e(it, "UpdateDomainNameUseCase failed") }
         }
     }
 
