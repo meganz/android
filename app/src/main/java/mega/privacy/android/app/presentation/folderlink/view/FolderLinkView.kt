@@ -450,6 +450,16 @@ internal fun ImportDownloadView(
     onSaveToDeviceClicked: () -> Unit,
 ) {
     Row(modifier = modifier, horizontalArrangement = Arrangement.End) {
+        DebouncedButtonContainer(onSaveToDeviceClicked) { isClickAllowed, debouncedOnClick ->
+            TextMegaButton(
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .testTag(SAVE_BUTTON_TAG),
+                textId = R.string.general_save_to_device,
+                onClick = debouncedOnClick,
+                enabled = isClickAllowed,
+            )
+        }
         if (hasDbCredentials) {
             TextMegaButton(
                 modifier = Modifier
@@ -459,16 +469,6 @@ internal fun ImportDownloadView(
                 onClick = {
                     onImportClicked(null)
                 },
-            )
-        }
-        DebouncedButtonContainer(onSaveToDeviceClicked) { isClickAllowed, debouncedOnClick ->
-            TextMegaButton(
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .testTag(SAVE_BUTTON_TAG),
-                textId = R.string.general_save_to_device,
-                onClick = debouncedOnClick,
-                enabled = isClickAllowed,
             )
         }
     }
