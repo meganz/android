@@ -7,6 +7,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -14,7 +15,9 @@ import mega.privacy.android.app.components.TwoLineCheckPreference
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_ASK_ME_ALWAYS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD_LOCATION
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * The fragment for download settings
@@ -25,6 +28,8 @@ class DownloadSettingsFragment : PreferenceFragmentCompat() {
 
     private var downloadLocation: Preference? = null
     private var storageAskMeAlways: TwoLineCheckPreference? = null
+
+    private lateinit var rootView: View
 
     private lateinit var selectFolderLauncher: ActivityResultLauncher<Uri?>
 
@@ -37,6 +42,7 @@ class DownloadSettingsFragment : PreferenceFragmentCompat() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        rootView = view
         collectUIState()
         selectFolderLauncher = launchFolderPicker(
             onCancel = { Timber.w("REQUEST_DOWNLOAD_FOLDER - canceled") }
@@ -69,7 +75,17 @@ class DownloadSettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun launchFolderSelectionScreen() = Preference.OnPreferenceClickListener {
-        selectFolderLauncher.launch(null)
+        runCatching { selectFolderLauncher.launch(null) }
+            .onFailure {
+                Timber.e(it)
+
+                Snackbar.make(
+                    rootView,
+                    sharedR.string.general_no_picker_warning,
+                    4.seconds.inWholeMilliseconds.toInt(),
+                ).show()
+            }
+
         true
     }
 
