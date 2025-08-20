@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.view
+package mega.privacy.android.app.appstate.content.view
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
@@ -17,7 +17,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.privacy.android.app.appstate.model.AppState
+import mega.privacy.android.app.appstate.content.model.AppContentState
+import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
+import mega.privacy.android.app.appstate.content.navigation.view.MainNavigationScaffoldDestination
+import mega.privacy.android.app.appstate.content.navigation.view.mainNavigationScaffold
 import mega.privacy.android.app.appstate.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.transfer.TransferHandlerImpl
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
@@ -29,7 +32,7 @@ import mega.privacy.android.navigation.megaNavigator
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MegaApp(
-    appState: AppState.Data,
+    appContentState: AppContentState.Data,
     onInteraction: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -66,7 +69,7 @@ fun MegaApp(
                         transferHandler = transferHandler,
                         navigationHandler = navigationHandler,
                     )
-                    appState.featureDestinations
+                    appContentState.featureDestinations
                         .forEach {
                             it.navigationGraph(this, navigationHandler, transferHandler)
                         }

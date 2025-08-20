@@ -14,9 +14,10 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.appstate.initialisation.AuthInitialiser
-import mega.privacy.android.app.appstate.mapper.BlockedStateMapper
-import mega.privacy.android.app.appstate.model.AuthState
+import mega.privacy.android.app.appstate.global.GlobalStateViewModel
+import mega.privacy.android.app.appstate.global.mapper.BlockedStateMapper
+import mega.privacy.android.app.appstate.global.model.GlobalState
+import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountBlockedType
@@ -44,14 +45,14 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AuthStateViewModelTest {
-    private lateinit var underTest: AuthStateViewModel
+class GlobalStateViewModelTest {
+    private lateinit var underTest: GlobalStateViewModel
     private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
     private val monitorUserCredentialsUseCase = mock<MonitorUserCredentialsUseCase>()
     private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
     private val handleBlockedStateSessionUseCase = mock<HandleBlockedStateSessionUseCase>()
 
-    private val authInitialiser = mock<AuthInitialiser>()
+    private val globalInitialiser = mock<GlobalInitialiser>()
 
     @BeforeAll
     fun initialisation() {
@@ -65,10 +66,10 @@ class AuthStateViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        underTest = AuthStateViewModel(
+        underTest = GlobalStateViewModel(
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
-            authInitialiser = authInitialiser,
+            globalInitialiser = globalInitialiser,
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             blockedStateMapper = BlockedStateMapper(),
             handleBlockedStateSessionUseCase = handleBlockedStateSessionUseCase,
@@ -80,14 +81,14 @@ class AuthStateViewModelTest {
         reset(
             monitorThemeModeUseCase,
             monitorUserCredentialsUseCase,
-            authInitialiser,
+            globalInitialiser,
             handleBlockedStateSessionUseCase,
         )
     }
 
     @Test
     fun `test that app start initializers are called during initialization`() = runTest {
-        verify(authInitialiser).onAppStart()
+        verify(globalInitialiser).onAppStart()
     }
 
     @Test
@@ -105,10 +106,10 @@ class AuthStateViewModelTest {
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state).isInstanceOf(AuthState.RequireLogin::class.java)
+            assertThat(state).isInstanceOf(GlobalState.RequireLogin::class.java)
 
             // Verify pre-login initializers were called with null session
-            verify(authInitialiser).onPreLogin(null)
+            verify(globalInitialiser).onPreLogin(null)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -134,10 +135,10 @@ class AuthStateViewModelTest {
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state).isInstanceOf(AuthState.LoggedIn::class.java)
+            assertThat(state).isInstanceOf(GlobalState.LoggedIn::class.java)
 
             // Verify pre-login initializers were called with existing session
-            verify(authInitialiser).onPreLogin("existing-session")
+            verify(globalInitialiser).onPreLogin("existing-session")
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -163,13 +164,13 @@ class AuthStateViewModelTest {
 
         stubNotBlockedState()
 
-        underTest.state.filterIsInstance<AuthState.LoggedIn>().test {
+        underTest.state.filterIsInstance<GlobalState.LoggedIn>().test {
             val state = awaitItem()
             assertThat(state.themeMode).isEqualTo(themeMode)
             assertThat(state.session).isEqualTo(credentials.session)
 
             // Verify post-login initializers were called with the session
-            verify(authInitialiser).onPostLogin("test-session")
+            verify(globalInitialiser).onPostLogin("test-session")
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -190,10 +191,10 @@ class AuthStateViewModelTest {
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state).isInstanceOf(AuthState.RequireLogin::class.java)
+            assertThat(state).isInstanceOf(GlobalState.RequireLogin::class.java)
 
             // Verify post-login initializers were NOT called
-            verify(authInitialiser, never()).onPostLogin(any())
+            verify(globalInitialiser, never()).onPostLogin(any())
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -204,7 +205,7 @@ class AuthStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(emptyFlow<UserCredentials>())
         }
-        assertThat(underTest.state.value).isEqualTo(AuthState.Loading(ThemeMode.System))
+        assertThat(underTest.state.value).isEqualTo(GlobalState.Loading(ThemeMode.System))
     }
 
     @Test
@@ -219,8 +220,8 @@ class AuthStateViewModelTest {
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state).isInstanceOf(AuthState.RequireLogin::class.java)
-            assertThat((state as AuthState.RequireLogin).themeMode).isEqualTo(themeMode)
+            assertThat(state).isInstanceOf(GlobalState.RequireLogin::class.java)
+            assertThat((state as GlobalState.RequireLogin).themeMode).isEqualTo(themeMode)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -247,8 +248,8 @@ class AuthStateViewModelTest {
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state).isInstanceOf(AuthState.RequireLogin::class.java)
-                assertThat((state as AuthState.RequireLogin).themeMode).isEqualTo(themeMode)
+                assertThat(state).isInstanceOf(GlobalState.RequireLogin::class.java)
+                assertThat((state as GlobalState.RequireLogin).themeMode).isEqualTo(themeMode)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -273,7 +274,7 @@ class AuthStateViewModelTest {
 
             stubNotBlockedState()
 
-            underTest.state.filterIsInstance<AuthState.LoggedIn>().test {
+            underTest.state.filterIsInstance<GlobalState.LoggedIn>().test {
                 val state = awaitItem()
                 assertThat(state.themeMode).isEqualTo(themeMode)
                 assertThat(state.session).isEqualTo(credentials.session)
@@ -305,15 +306,15 @@ class AuthStateViewModelTest {
         underTest.state.test {
             // Initial state should be loading
             val initialState = awaitItem()
-            assertThat(initialState).isInstanceOf(AuthState.RequireLogin::class.java)
+            assertThat(initialState).isInstanceOf(GlobalState.RequireLogin::class.java)
 
             // Emit credentials
             credentialsFlow.emit(credentials)
 
             // State should transition to logged in
             val loggedInState = awaitItem()
-            assertThat(loggedInState).isInstanceOf(AuthState.LoggedIn::class.java)
-            assertThat((loggedInState as AuthState.LoggedIn).session).isEqualTo(credentials.session)
+            assertThat(loggedInState).isInstanceOf(GlobalState.LoggedIn::class.java)
+            assertThat((loggedInState as GlobalState.LoggedIn).session).isEqualTo(credentials.session)
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -343,14 +344,14 @@ class AuthStateViewModelTest {
             underTest.state.test {
                 // Initial state should be logged in
                 val initialState = awaitItem()
-                assertThat(initialState).isInstanceOf(AuthState.LoggedIn::class.java)
+                assertThat(initialState).isInstanceOf(GlobalState.LoggedIn::class.java)
 
                 // Emit null credentials
                 credentialsFlow.emit(null)
 
                 // State should transition to loading
                 val loadingState = awaitItem()
-                assertThat(loadingState).isInstanceOf(AuthState.RequireLogin::class.java)
+                assertThat(loadingState).isInstanceOf(GlobalState.RequireLogin::class.java)
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -377,7 +378,7 @@ class AuthStateViewModelTest {
             on { invoke() }.thenReturn(MutableStateFlow(credentials))
         }
 
-        underTest.state.filterIsInstance<AuthState.LoggedIn>().test {
+        underTest.state.filterIsInstance<GlobalState.LoggedIn>().test {
             val initialState = awaitItem()
             assertThat(initialState.themeMode).isEqualTo(initialThemeMode)
 
@@ -402,7 +403,7 @@ class AuthStateViewModelTest {
         underTest.state.test {
             // Should still emit the initial loading state even with errors
             val state = awaitItem()
-            assertThat(state).isInstanceOf(AuthState.Loading::class.java)
+            assertThat(state).isInstanceOf(GlobalState.Loading::class.java)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -430,8 +431,8 @@ class AuthStateViewModelTest {
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state).isInstanceOf(AuthState.LoggedIn::class.java)
-            assertThat((state as AuthState.LoggedIn).themeMode).isEqualTo(ThemeMode.System)
+            assertThat(state).isInstanceOf(GlobalState.LoggedIn::class.java)
+            assertThat((state as GlobalState.LoggedIn).themeMode).isEqualTo(ThemeMode.System)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -464,12 +465,12 @@ class AuthStateViewModelTest {
         underTest.state.test {
             // Should still emit the initial loading state even with errors
             val state = awaitItem()
-            assertThat(state).isInstanceOf(AuthState.RequireLogin::class.java)
-            assertThat((state as AuthState.RequireLogin).themeMode).isEqualTo(ThemeMode.System)
+            assertThat(state).isInstanceOf(GlobalState.RequireLogin::class.java)
+            assertThat((state as GlobalState.RequireLogin).themeMode).isEqualTo(ThemeMode.System)
             credentialsFlow.emit(credentials)
             val newState = awaitItem()
-            assertThat(newState).isInstanceOf(AuthState.LoggedIn::class.java)
-            assertThat((newState as AuthState.LoggedIn).themeMode).isEqualTo(
+            assertThat(newState).isInstanceOf(GlobalState.LoggedIn::class.java)
+            assertThat((newState as GlobalState.LoggedIn).themeMode).isEqualTo(
                 expectedThemeMode
             )
             cancelAndIgnoreRemainingEvents()
@@ -497,7 +498,7 @@ class AuthStateViewModelTest {
             stubNotBlockedState()
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state).isInstanceOf(AuthState.LoggedIn::class.java)
+                assertThat(state).isInstanceOf(GlobalState.LoggedIn::class.java)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -515,7 +516,7 @@ class AuthStateViewModelTest {
             stubNotBlockedState()
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state).isInstanceOf(AuthState.RequireLogin::class.java)
+                assertThat(state).isInstanceOf(GlobalState.RequireLogin::class.java)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -547,7 +548,7 @@ class AuthStateViewModelTest {
             }
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state).isInstanceOf(AuthState.RequireLogin::class.java)
+                assertThat(state).isInstanceOf(GlobalState.RequireLogin::class.java)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -588,7 +589,7 @@ class AuthStateViewModelTest {
             underTest.state.test {
                 // Initial state should be logged in
                 val initialState = awaitItem()
-                assertThat(initialState).isInstanceOf(AuthState.LoggedIn::class.java)
+                assertThat(initialState).isInstanceOf(GlobalState.LoggedIn::class.java)
 
                 // Emit null credentials
                 blockedFlow.emit(
@@ -601,7 +602,7 @@ class AuthStateViewModelTest {
 
                 // State should transition to loading
                 val loadingState = awaitItem()
-                assertThat(loadingState).isInstanceOf(AuthState.RequireLogin::class.java)
+                assertThat(loadingState).isInstanceOf(GlobalState.RequireLogin::class.java)
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -640,7 +641,7 @@ class AuthStateViewModelTest {
             underTest.state.test {
                 // Initial state should be logged in
                 val initialState = awaitItem()
-                assertThat(initialState).isInstanceOf(AuthState.RequireLogin::class.java)
+                assertThat(initialState).isInstanceOf(GlobalState.RequireLogin::class.java)
 
                 // Emit null credentials
                 blockedFlow.emit(
@@ -649,8 +650,8 @@ class AuthStateViewModelTest {
 
                 // State should transition to loading
                 val loadingState = awaitItem()
-                assertThat(loadingState).isInstanceOf(AuthState.LoggedIn::class.java)
-                assertThat((loadingState as AuthState.LoggedIn).session).isEqualTo(credentials.session)
+                assertThat(loadingState).isInstanceOf(GlobalState.LoggedIn::class.java)
+                assertThat((loadingState as GlobalState.LoggedIn).session).isEqualTo(credentials.session)
 
                 cancelAndIgnoreRemainingEvents()
             }
@@ -690,7 +691,7 @@ class AuthStateViewModelTest {
             underTest.state.test {
                 // Initial state should be logged in
                 val initialState = awaitItem()
-                assertThat(initialState).isInstanceOf(AuthState.LoggedIn::class.java)
+                assertThat(initialState).isInstanceOf(GlobalState.LoggedIn::class.java)
 
                 // Emit new credentials
                 credentialsFlow.emit(updatedCredentials)
@@ -698,7 +699,7 @@ class AuthStateViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(authInitialiser, times(1)).onPreLogin(session)
+            verify(globalInitialiser, times(1)).onPreLogin(session)
         }
 
     @Test
@@ -724,7 +725,7 @@ class AuthStateViewModelTest {
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
             advanceTimeBy(6_000) // Advance time past ui state flow timeout
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
-            verify(authInitialiser, times(1)).onPreLogin(session)
+            verify(globalInitialiser, times(1)).onPreLogin(session)
         }
 
     @Test
@@ -747,12 +748,12 @@ class AuthStateViewModelTest {
             }
             stubNotBlockedState()
             underTest.state.test {
-                assertThat(awaitItem()).isInstanceOf(AuthState.LoggedIn::class.java)
+                assertThat(awaitItem()).isInstanceOf(GlobalState.LoggedIn::class.java)
                 cancelAndIgnoreRemainingEvents()
             }
             advanceTimeBy(6_000) // Advance time past ui state flow timeout
             underTest.state.test {
-                assertThat(awaitItem()).isInstanceOf(AuthState.LoggedIn::class.java)
+                assertThat(awaitItem()).isInstanceOf(GlobalState.LoggedIn::class.java)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -778,13 +779,13 @@ class AuthStateViewModelTest {
             }
             stubNotBlockedState()
             underTest.state.test {
-                assertThat(awaitItem()).isInstanceOf(AuthState.LoggedIn::class.java)
+                assertThat(awaitItem()).isInstanceOf(GlobalState.LoggedIn::class.java)
                 cancelAndIgnoreRemainingEvents()
             }
             advanceTimeBy(6_000) // Advance time past ui state flow timeout
             credentialsFlow.emit(null)
             underTest.state.test {
-                assertThat(awaitItem()).isInstanceOf(AuthState.RequireLogin::class.java)
+                assertThat(awaitItem()).isInstanceOf(GlobalState.RequireLogin::class.java)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -823,7 +824,7 @@ class AuthStateViewModelTest {
             underTest.state.test {
                 // Initial state should be logged in
                 val initialState = awaitItem()
-                assertThat(initialState).isInstanceOf(AuthState.LoggedIn::class.java)
+                assertThat(initialState).isInstanceOf(GlobalState.LoggedIn::class.java)
 
                 // Emit new credentials
                 credentialsFlow.emit(updatedCredentials)
@@ -831,7 +832,7 @@ class AuthStateViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(authInitialiser, times(1)).onPostLogin(session)
+            verify(globalInitialiser, times(1)).onPostLogin(session)
         }
 
     @Test
@@ -857,7 +858,7 @@ class AuthStateViewModelTest {
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
             advanceTimeBy(6_000) // Advance time past ui state flow timeout
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
-            verify(authInitialiser, times(1)).onPostLogin(session)
+            verify(globalInitialiser, times(1)).onPostLogin(session)
         }
 
     @Test

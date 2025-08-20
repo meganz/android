@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate
+package mega.privacy.android.app.appstate.content
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.appstate.model.AppState
+import mega.privacy.android.app.appstate.content.model.AppContentState
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
-class AppStateViewModel @Inject constructor(
+class AppContentStateViewModel @Inject constructor(
     private val featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>,
     private val getEnabledFlaggedItemsUseCase: GetEnabledFlaggedItemsUseCase,
     private val retryConnectionsAndSignalPresenceUseCase: RetryConnectionsAndSignalPresenceUseCase,
@@ -38,7 +38,7 @@ class AppStateViewModel @Inject constructor(
 
     private val updatePresenceFlow = MutableStateFlow(false)
 
-    val state: StateFlow<AppState> by lazy {
+    val state: StateFlow<AppContentState> by lazy {
         combine(
             getEnabledFlaggedItemsUseCase(featureDestinations)
                 .log("Feature Destinations"),
@@ -48,11 +48,11 @@ class AppStateViewModel @Inject constructor(
                 .log("Fetch Nodes Finish"),
         ) { featureItems, rootNodeExist ->
             if (rootNodeExist) {
-                AppState.Data(
+                AppContentState.Data(
                     featureDestinations = featureItems.toImmutableSet(),
                 )
             } else {
-                AppState.FetchingNodes
+                AppContentState.FetchingNodes
             }
         }.onStart {
             trackPresence()
@@ -63,7 +63,7 @@ class AppStateViewModel @Inject constructor(
                 Timber.d("AppState emitted: $it")
             }.asUiStateFlow(
                 scope = viewModelScope,
-                initialValue = AppState.Loading
+                initialValue = AppContentState.Loading
             )
     }
 

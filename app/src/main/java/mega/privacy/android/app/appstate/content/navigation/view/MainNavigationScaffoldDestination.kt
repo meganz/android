@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.view
+package mega.privacy.android.app.appstate.content.navigation.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -27,8 +27,8 @@ import androidx.navigation.navOptions
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.R
-import mega.privacy.android.app.appstate.NavigationItemStateViewModel
-import mega.privacy.android.app.appstate.model.MainNavState
+import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
+import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.app.presentation.login.view.MEGA_LOGO_TEST_TAG
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -47,7 +47,7 @@ fun NavGraphBuilder.mainNavigationScaffold(
     composable<MainNavigationScaffoldDestination> {
         val navController = rememberNavController()
 
-        val viewModel = hiltViewModel<NavigationItemStateViewModel>()
+        val viewModel = hiltViewModel<MainNavigationStateViewModel>()
         val state by viewModel.state.collectAsStateWithLifecycle()
 
         val currentDestination = navController.currentBackStackEntryAsState().value?.destination

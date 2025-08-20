@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.appstate.mapper.ScreenPreferenceDestinationMapper
+import mega.privacy.android.app.appstate.content.mapper.ScreenPreferenceDestinationMapper
 import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenDestinationOptionMapper
 import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenDestinationPreferenceNavKeyMapper
 import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenOptionMapper

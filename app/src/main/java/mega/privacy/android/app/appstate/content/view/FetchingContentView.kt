@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.view
+package mega.privacy.android.app.appstate.content.view
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
@@ -16,10 +16,10 @@ import mega.privacy.android.app.presentation.login.view.LoginInProgressContent
  * Composable function to display the login in progress view.
  *
  * @param modifier The modifier to be applied to the view.
- * @param viewModel The [LoginInProgressViewModel] instance to manage the state of the view.
+ * @param viewModel The [mega.privacy.android.app.presentation.login.LoginInProgressViewModel] instance to manage the state of the view.
  */
 @Composable
-fun LoginInProgressView(
+fun FetchingContentView(
     modifier: Modifier = Modifier,
     viewModel: LoginInProgressViewModel = hiltViewModel(),
 ) {

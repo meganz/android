@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate
+package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,8 +18,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.take
-import mega.privacy.android.app.appstate.mapper.ScreenPreferenceDestinationMapper
-import mega.privacy.android.app.appstate.model.MainNavState
+import mega.privacy.android.app.appstate.content.mapper.ScreenPreferenceDestinationMapper
+import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
@@ -30,7 +30,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class NavigationItemStateViewModel @Inject constructor(
+class MainNavigationStateViewModel @Inject constructor(
     private val mainDestinations: Set<@JvmSuppressWildcards MainNavItem>,
     private val getEnabledFlaggedItemsUseCase: GetEnabledFlaggedItemsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,

@@ -14,8 +14,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.appstate.mapper.ScreenPreferenceDestinationMapper
-import mega.privacy.android.app.appstate.model.MainNavState
+import mega.privacy.android.app.appstate.content.mapper.ScreenPreferenceDestinationMapper
+import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
+import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.app.presentation.settings.compose.home.view.SettingsHomeViewKtTest
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.navigation.Flagged
@@ -38,8 +39,8 @@ import org.mockito.kotlin.stub
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class NavigationItemStateViewModelTest {
-    private lateinit var underTest: NavigationItemStateViewModel
+class MainNavigationStateViewModelTest {
+    private lateinit var underTest: MainNavigationStateViewModel
 
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val getEnabledFlaggedItemsUseCase = mock<GetEnabledFlaggedItemsUseCase>()
@@ -312,7 +313,7 @@ class NavigationItemStateViewModelTest {
     private fun initUnderTest(
         mainDestinations: Set<MainNavItem>,
     ) {
-        underTest = NavigationItemStateViewModel(
+        underTest = MainNavigationStateViewModel(
             mainDestinations = mainDestinations,
             getEnabledFlaggedItemsUseCase = getEnabledFlaggedItemsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,

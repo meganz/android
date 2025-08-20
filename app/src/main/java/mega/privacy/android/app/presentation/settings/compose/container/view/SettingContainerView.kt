@@ -8,7 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import mega.privacy.android.app.appstate.view.NavigationHandlerImpl
+import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
 import mega.privacy.android.app.presentation.settings.compose.container.SettingContainerViewModel
 import mega.privacy.android.app.presentation.settings.compose.home.EmptySettingsView
 import mega.privacy.android.app.presentation.settings.compose.navigation.settingsGraph

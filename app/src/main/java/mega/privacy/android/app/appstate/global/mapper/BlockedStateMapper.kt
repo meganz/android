@@ -1,6 +1,6 @@
-package mega.privacy.android.app.appstate.mapper
+package mega.privacy.android.app.appstate.global.mapper
 
-import mega.privacy.android.app.appstate.model.BlockedState
+import mega.privacy.android.app.appstate.global.model.BlockedState
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import javax.inject.Inject

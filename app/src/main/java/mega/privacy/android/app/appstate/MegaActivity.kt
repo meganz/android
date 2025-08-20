@@ -16,8 +16,10 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.app.appstate.model.AuthState
-import mega.privacy.android.app.appstate.view.LoggedInAppView
+import mega.privacy.android.app.appstate.content.AppContentStateViewModel
+import mega.privacy.android.app.appstate.content.view.AppContentView
+import mega.privacy.android.app.appstate.global.GlobalStateViewModel
+import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginGraph
@@ -53,16 +55,16 @@ class MegaActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
         enableEdgeToEdge()
         setContent {
-            val viewModel = viewModel<AuthStateViewModel>()
+            val viewModel = viewModel<GlobalStateViewModel>()
             val state = viewModel.state.collectAsStateWithLifecycle()
             val navController = rememberNavController()
             // This is used to recompose the LoginGraph when new login request is made
-            keepSplashScreen = state.value is AuthState.Loading
+            keepSplashScreen = state.value is GlobalState.Loading
 
             LaunchedEffect(state.value) {
                 when (val currentState = state.value) {
-                    is AuthState.Loading -> {}
-                    is AuthState.LoggedIn -> {
+                    is GlobalState.Loading -> {}
+                    is GlobalState.LoggedIn -> {
                         navController.navigate(route = LoggedInScreens(session = currentState.session)) {
                             popUpTo(0) {
                                 inclusive = true
@@ -70,7 +72,7 @@ class MegaActivity : ComponentActivity() {
                         }
                     }
 
-                    is AuthState.RequireLogin -> {
+                    is GlobalState.RequireLogin -> {
                         navController.navigate(
                             route = LoginGraph(
                                 startScreen = intent.getIntExtra(Constants.VISIBLE_FRAGMENT, -1)
@@ -105,9 +107,9 @@ class MegaActivity : ComponentActivity() {
                     )
 
                     composable<LoggedInScreens> {
-                        val appStateViewModel = hiltViewModel<AppStateViewModel>()
-                        LoggedInAppView(
-                            viewModel = appStateViewModel,
+                        val appContentStateViewModel = hiltViewModel<AppContentStateViewModel>()
+                        AppContentView(
+                            viewModel = appContentStateViewModel,
                         )
                     }
                 }

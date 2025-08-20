@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.mapper
+package mega.privacy.android.app.appstate.content.mapper
 
 import kotlinx.serialization.json.Json
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
@@ -9,6 +9,6 @@ class ScreenPreferenceDestinationMapper @Inject constructor() {
         startScreenDestinationPreference: StartScreenDestinationPreference?,
     ) = runCatching {
         val preferenceString = startScreenDestinationPreference?.serialisedDestination
-        preferenceString?.let { Json.decodeFromString(NavKeySerializer, it) }
+        preferenceString?.let { Json.Default.decodeFromString(NavKeySerializer, it) }
     }.getOrNull()
 }

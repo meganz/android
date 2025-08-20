@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.view
+package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.flow.mapNotNull

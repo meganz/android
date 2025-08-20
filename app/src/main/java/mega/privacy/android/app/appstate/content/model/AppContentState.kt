@@ -1,16 +1,16 @@
-package mega.privacy.android.app.appstate.model
+package mega.privacy.android.app.appstate.content.model
 
 import androidx.compose.runtime.Stable
 import kotlinx.collections.immutable.ImmutableSet
 import mega.privacy.android.navigation.contract.FeatureDestination
 
 @Stable
-sealed interface AppState {
-    data object Loading : AppState
+sealed interface AppContentState {
+    data object Loading : AppContentState
 
     data class Data(
         val featureDestinations: ImmutableSet<FeatureDestination>,
-    ) : AppState
+    ) : AppContentState
 
-    data object FetchingNodes : AppState
+    data object FetchingNodes : AppContentState
 }

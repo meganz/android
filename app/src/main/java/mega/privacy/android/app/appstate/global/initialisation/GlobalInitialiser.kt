@@ -11,14 +11,14 @@ import javax.inject.Inject
 
 /**
  * Auth initialiser handles initialisation tasks during user auth.
- * It's an abstraction that simplifies the logic in the [mega.privacy.android.app.appstate.AuthStateViewModel].
+ * It's an abstraction that simplifies the logic in the [mega.privacy.android.app.appstate.global.GlobalStateViewModel].
  *
  * @property coroutineScope
  * @property appStartInitialisers
  * @property preLoginInitialisers
  * @property postLoginInitialisers
  */
-class AuthInitialiser @Inject constructor(
+class GlobalInitialiser @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
     private val appStartInitialisers: Set<@JvmSuppressWildcards AppStartInitialiser>,
     private val preLoginInitialisers: Set<@JvmSuppressWildcards PreLoginInitialiser>,

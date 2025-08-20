@@ -16,7 +16,7 @@ import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AuthInitialiserTest {
-    private lateinit var underTest: AuthInitialiser
+    private lateinit var underTest: GlobalInitialiser
 
     @Test
     fun `test that app start initialisers are called in onAppStart`() = runTest {
@@ -166,7 +166,7 @@ class AuthInitialiserTest {
         preLoginInitialisers: Set<PreLoginInitialiser> = emptySet(),
         postLoginInitialisers: Set<PostLoginInitialiser> = emptySet(),
     ) {
-        underTest = AuthInitialiser(
+        underTest = GlobalInitialiser(
             coroutineScope = testScope,
             appStartInitialisers = appStartInitialisers,
             preLoginInitialisers = preLoginInitialisers,

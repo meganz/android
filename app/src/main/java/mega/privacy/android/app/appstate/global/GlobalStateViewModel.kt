@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate
+package mega.privacy.android.app.appstate.global
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
-import mega.privacy.android.app.appstate.initialisation.AuthInitialiser
-import mega.privacy.android.app.appstate.mapper.BlockedStateMapper
-import mega.privacy.android.app.appstate.model.AuthState
-import mega.privacy.android.app.appstate.model.BlockedState
+import mega.privacy.android.app.appstate.global.mapper.BlockedStateMapper
+import mega.privacy.android.app.appstate.global.model.BlockedState
+import mega.privacy.android.app.appstate.global.model.GlobalState
+import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.extension.onFirst
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -30,26 +30,26 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class AuthStateViewModel @Inject constructor(
+class GlobalStateViewModel @Inject constructor(
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
-    private val authInitialiser: AuthInitialiser,
+    private val globalInitialiser: GlobalInitialiser,
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val blockedStateMapper: BlockedStateMapper,
     private val handleBlockedStateSessionUseCase: HandleBlockedStateSessionUseCase,
 ) : ViewModel() {
     init {
-        authInitialiser.onAppStart()
+        globalInitialiser.onAppStart()
     }
 
     private var lastLoggedInSession: String? = null
 
-    val state: StateFlow<AuthState> by lazy {
+    val state: StateFlow<GlobalState> by lazy {
         getStateValues().onEach { state ->
-            if (state is AuthState.LoggedIn) {
+            if (state is GlobalState.LoggedIn) {
                 if (lastLoggedInSession != state.session) {
                     lastLoggedInSession = state.session
-                    authInitialiser.onPostLogin(state.session)
+                    globalInitialiser.onPostLogin(state.session)
                 }
             }
         }.catch {
@@ -59,16 +59,16 @@ class AuthStateViewModel @Inject constructor(
                 Timber.d("AuthState emitted: $it")
             }.asUiStateFlow(
                 scope = viewModelScope,
-                initialValue = AuthState.Loading(ThemeMode.System)
+                initialValue = GlobalState.Loading(ThemeMode.System)
             )
     }
 
-    private fun getStateValues(): Flow<AuthState> {
+    private fun getStateValues(): Flow<GlobalState> {
         return monitorBlockedState().map { blockedState ->
             if (blockedState is BlockedState.NotBlocked && blockedState.session != null) {
-                { themeMode: ThemeMode -> AuthState.LoggedIn(themeMode, blockedState.session) }
+                { themeMode: ThemeMode -> GlobalState.LoggedIn(themeMode, blockedState.session) }
             } else {
-                { themeMode: ThemeMode -> AuthState.RequireLogin(themeMode, blockedState) }
+                { themeMode: ThemeMode -> GlobalState.RequireLogin(themeMode, blockedState) }
             }
         }.flatMapLatest { stateFunction ->
             monitorThemeModeUseCase().catch {
@@ -99,7 +99,7 @@ class AuthStateViewModel @Inject constructor(
             .distinctUntilChanged()
             .onFirst(
                 predicate = { true },
-                action = { authInitialiser.onPreLogin(it) }
+                action = { globalInitialiser.onPreLogin(it) }
             ).shareIn(
                 scope = viewModelScope,
                 started = SharingStarted.Lazily,

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.mapper
+package mega.privacy.android.app.appstate.content.mapper
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.ExperimentalSerializationApi

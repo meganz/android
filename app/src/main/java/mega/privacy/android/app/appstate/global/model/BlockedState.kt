@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.model
+package mega.privacy.android.app.appstate.global.model
 
 sealed interface BlockedState {
     data class NotBlocked(val session: String?) : BlockedState

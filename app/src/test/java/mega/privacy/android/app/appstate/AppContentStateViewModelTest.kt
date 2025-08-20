@@ -15,7 +15,8 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.appstate.model.AppState
+import mega.privacy.android.app.appstate.content.AppContentStateViewModel
+import mega.privacy.android.app.appstate.content.model.AppContentState
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.navigation.Flagged
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -39,8 +40,8 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AppStateViewModelTest {
-    private lateinit var underTest: AppStateViewModel
+class AppContentStateViewModelTest {
+    private lateinit var underTest: AppContentStateViewModel
     private val getEnabledFlaggedItemsUseCase = mock<GetEnabledFlaggedItemsUseCase>()
     private val retryConnectionsAndSignalPresenceUseCase =
         mock<RetryConnectionsAndSignalPresenceUseCase>()
@@ -76,7 +77,7 @@ class AppStateViewModelTest {
     fun `test that initial state is loading`() = runTest {
         val featureDestinations = emptySet<@JvmSuppressWildcards FeatureDestination>()
         initUnderTest(featureDestinations)
-        assertThat(underTest.state.value).isEqualTo(AppState.Loading)
+        assertThat(underTest.state.value).isEqualTo(AppContentState.Loading)
     }
 
 
@@ -93,7 +94,7 @@ class AppStateViewModelTest {
         initUnderTest(expected)
 
         underTest.state
-            .filterIsInstance<AppState.Data>()
+            .filterIsInstance<AppContentState.Data>()
             .test {
                 assertThat(awaitItem().featureDestinations).isEqualTo(expected)
                 cancelAndIgnoreRemainingEvents()
@@ -120,7 +121,7 @@ class AppStateViewModelTest {
             initUnderTest(featureDestinations)
 
             underTest.state
-                .filterIsInstance<AppState.Data>()
+                .filterIsInstance<AppContentState.Data>()
                 .test {
                     assertThat(awaitItem().featureDestinations).containsExactly(expected)
                     cancelAndIgnoreRemainingEvents()
@@ -150,7 +151,7 @@ class AppStateViewModelTest {
         stubMonitoFetchNodes()
         initUnderTest(featureDestinations)
         underTest.state
-            .filterIsInstance<AppState.Data>()
+            .filterIsInstance<AppContentState.Data>()
             .test {
                 assertThat(awaitItem().featureDestinations).containsExactly(expected, alsoExpected)
                 cancelAndIgnoreRemainingEvents()
@@ -173,7 +174,7 @@ class AppStateViewModelTest {
 
             // Wait for initial state to be emitted
             underTest.state
-                .filterIsInstance<AppState.Data>()
+                .filterIsInstance<AppContentState.Data>()
                 .test {
                     awaitItem()
                     cancelAndIgnoreRemainingEvents()
@@ -211,7 +212,7 @@ class AppStateViewModelTest {
 
         // Wait for initial state to be emitted
         underTest.state
-            .filterIsInstance<AppState.Data>()
+            .filterIsInstance<AppContentState.Data>()
             .test {
                 awaitItem()
                 cancelAndIgnoreRemainingEvents()
@@ -255,7 +256,7 @@ class AppStateViewModelTest {
     private fun initUnderTest(
         featureDestinations: Set<FeatureDestination>,
     ) {
-        underTest = AppStateViewModel(
+        underTest = AppContentStateViewModel(
             featureDestinations = featureDestinations,
             getEnabledFlaggedItemsUseCase = getEnabledFlaggedItemsUseCase,
             retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase,

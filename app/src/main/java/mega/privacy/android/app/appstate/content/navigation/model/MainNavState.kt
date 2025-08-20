@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.model
+package mega.privacy.android.app.appstate.content.navigation.model
 
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavGraphBuilder
