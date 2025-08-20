@@ -1236,4 +1236,8 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaApiGateway.removeVersions(listener)
         }
     }
+
+    override suspend fun getRootNodeId(): NodeId? = withContext(ioDispatcher) {
+        megaApiGateway.getRootNode()?.let { NodeId(it.handle) }
+    }
 }

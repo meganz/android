@@ -845,4 +845,11 @@ interface NodeRepository {
      * Remove all versions of a nodes in app
      */
     suspend fun removeAllVersions()
+
+    /**
+     * Get root node id
+     *
+     * @return The root node id if found else null
+     */
+    suspend fun getRootNodeId(): NodeId?
 }

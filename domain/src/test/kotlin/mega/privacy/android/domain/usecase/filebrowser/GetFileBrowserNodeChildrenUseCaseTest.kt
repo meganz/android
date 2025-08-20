@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.node.DefaultTypedFolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.node.AddNodesTypeUseCase
 import org.junit.Before
 import org.junit.Test
@@ -20,7 +20,7 @@ import org.mockito.kotlin.whenever
 class GetFileBrowserNodeChildrenUseCaseTest {
     private lateinit var underTest: GetFileBrowserNodeChildrenUseCase
 
-    private val getRootNodeUseCase: GetRootNodeUseCase = mock()
+    private val getRootNodeIdUseCase: GetRootNodeIdUseCase = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val nodeRepository: NodeRepository = mock()
     private val addNodesTypeUseCase: AddNodesTypeUseCase = mock()
@@ -28,7 +28,7 @@ class GetFileBrowserNodeChildrenUseCaseTest {
     @Before
     fun setUp() {
         underTest = GetFileBrowserNodeChildrenUseCase(
-            getRootNodeUseCase = getRootNodeUseCase,
+            getRootNodeIdUseCase = getRootNodeIdUseCase,
             getCloudSortOrder = getCloudSortOrder,
             nodeRepository = nodeRepository,
             addNodesTypeUseCase = addNodesTypeUseCase,
@@ -39,14 +39,14 @@ class GetFileBrowserNodeChildrenUseCaseTest {
     fun `test that getRootNodeUseCase is invoked once when the parent handle is -1`() = runTest {
         whenever(nodeRepository.getInvalidHandle()).thenReturn(-1L)
         underTest(-1)
-        verify(getRootNodeUseCase).invoke()
+        verify(getRootNodeIdUseCase).invoke()
     }
 
     @Test
     fun `test that the file browser children is empty when getRootNodeUseCase returns null`() =
         runTest {
             whenever(nodeRepository.getInvalidHandle()).thenReturn(-1L)
-            whenever(getRootNodeUseCase()).thenReturn(null)
+            whenever(getRootNodeIdUseCase()).thenReturn(null)
             val list = underTest(-1)
             Truth.assertThat(list).isEmpty()
         }

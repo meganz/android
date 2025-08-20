@@ -7,7 +7,6 @@ import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.NonCancellable.children
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -33,7 +32,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -61,7 +60,7 @@ class CloudDriveViewModel @Inject constructor(
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val scannerHandler: ScannerHandler,
-    private val getRootNodeUseCase: GetRootNodeUseCase,
+    private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -194,7 +193,7 @@ class CloudDriveViewModel @Inject constructor(
             val folderId = uiState.value.currentFolderId
             val isCloudDriveRoot = folderId.longValue == -1L
             val folderOrRootNodeId = if (isCloudDriveRoot) {
-                getRootNodeUseCase()?.id ?: NodeId(-1L)
+                getRootNodeIdUseCase() ?: NodeId(-1L)
             } else {
                 folderId
             }

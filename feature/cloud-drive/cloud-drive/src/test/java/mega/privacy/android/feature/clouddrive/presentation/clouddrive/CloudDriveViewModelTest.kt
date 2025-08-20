@@ -34,7 +34,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -74,7 +74,7 @@ class CloudDriveViewModelTest {
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase = mock()
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
     private val scannerHandler: ScannerHandler = mock()
-    private val getRootNodeUseCase: GetRootNodeUseCase = mock()
+    private val getRootNodeIdUseCase: GetRootNodeIdUseCase = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
 
@@ -99,7 +99,7 @@ class CloudDriveViewModelTest {
             monitorNodeUpdatesByIdUseCase,
             nodeUiItemMapper,
             scannerHandler,
-            getRootNodeUseCase
+            getRootNodeIdUseCase
         )
     }
 
@@ -116,7 +116,7 @@ class CloudDriveViewModelTest {
         monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
         nodeUiItemMapper = nodeUiItemMapper,
         scannerHandler = scannerHandler,
-        getRootNodeUseCase = getRootNodeUseCase,
+        getRootNodeIdUseCase = getRootNodeIdUseCase,
         savedStateHandle = SavedStateHandle.Companion.invoke(
             route = CloudDrive(nodeHandle)
         ),
@@ -1319,7 +1319,7 @@ class CloudDriveViewModelTest {
     // Root Node Fallback Logic Tests
 
     @Test
-    fun `test that loadNodes calls getRootNodeUseCase when folderId is -1L`() = runTest {
+    fun `test that loadNodes calls getRootNodeIdUseCase when folderId is -1L`() = runTest {
         val rootNodeId = NodeId(789L)
         val rootNode = mock<TypedFolderNode> {
             on { id } doReturn rootNodeId
@@ -1327,7 +1327,7 @@ class CloudDriveViewModelTest {
         }
 
         setupTestData(emptyList())
-        whenever(getRootNodeUseCase()).thenReturn(rootNode)
+        whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
         whenever(getNodeByIdUseCase(eq(rootNodeId))).thenReturn(rootNode)
         whenever(getFileBrowserNodeChildrenUseCase(rootNodeId.longValue)).thenReturn(emptyList())
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
@@ -1337,14 +1337,14 @@ class CloudDriveViewModelTest {
         createViewModel(-1L)
         advanceUntilIdle()
 
-        verify(getRootNodeUseCase).invoke()
+        verify(getRootNodeIdUseCase).invoke()
         verify(getFileBrowserNodeChildrenUseCase).invoke(rootNodeId.longValue)
     }
 
     @Test
-    fun `test that loadNodes uses NodeId(-1L) when getRootNodeUseCase returns null`() = runTest {
+    fun `test that loadNodes uses NodeId(-1L) when getRootNodeIdUseCase returns null`() = runTest {
         setupTestData(emptyList())
-        whenever(getRootNodeUseCase()).thenReturn(null)
+        whenever(getRootNodeIdUseCase()).thenReturn(null)
         whenever(getNodeByIdUseCase(eq(NodeId(-1L)))).thenReturn(null)
         whenever(getFileBrowserNodeChildrenUseCase(-1L)).thenReturn(emptyList())
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
@@ -1354,14 +1354,14 @@ class CloudDriveViewModelTest {
         createViewModel(-1L)
         advanceUntilIdle()
 
-        verify(getRootNodeUseCase).invoke()
+        verify(getRootNodeIdUseCase).invoke()
         verify(getFileBrowserNodeChildrenUseCase).invoke(-1L)
     }
 
     @Test
     fun `test that isCloudDriveRoot is true when nodeHandle is -1L`() = runTest {
         setupTestData(emptyList())
-        whenever(getRootNodeUseCase()).thenReturn(null)
+        whenever(getRootNodeIdUseCase()).thenReturn(null)
         whenever(getNodeByIdUseCase(eq(NodeId(-1L)))).thenReturn(null)
         whenever(getFileBrowserNodeChildrenUseCase(-1L)).thenReturn(emptyList())
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
@@ -1390,7 +1390,7 @@ class CloudDriveViewModelTest {
     }
 
     @Test
-    fun `test that isCloudDriveRoot is true when nodeHandle is -1L and getRootNodeUseCase returns a node`() =
+    fun `test that isCloudDriveRoot is true when nodeHandle is -1L and getRootNodeIdUseCase returns a node id`() =
         runTest {
             val rootNodeId = NodeId(789L)
             val rootNode = mock<TypedFolderNode> {
@@ -1399,7 +1399,7 @@ class CloudDriveViewModelTest {
             }
 
             setupTestData(emptyList())
-            whenever(getRootNodeUseCase()).thenReturn(rootNode)
+            whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
             whenever(getNodeByIdUseCase(eq(rootNodeId))).thenReturn(rootNode)
             whenever(getFileBrowserNodeChildrenUseCase(rootNodeId.longValue)).thenReturn(emptyList())
             whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
