@@ -434,11 +434,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".mediaplayer.LegacyVideoPlayerActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/Theme.Mega.FullScreen.VideoPlayer"
-            android:windowSoftInputMode="adjustNothing" />
-        <activity
             android:name=".mediaplayer.VideoPlayerComposeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/Theme.Mega.FullScreen.VideoPlayer"
@@ -676,9 +671,6 @@
         <activity
             android:name=".upgradeAccount.ChooseAccountActivity"
             android:label="@string/choose_account_fragment"
-            android:launchMode="singleTop" />
-        <activity
-            android:name=".mediaplayer.SelectSubtitleFileActivity"
             android:launchMode="singleTop" />
         <activity
             android:name=".presentation.videosection.VideoSelectedActivity"

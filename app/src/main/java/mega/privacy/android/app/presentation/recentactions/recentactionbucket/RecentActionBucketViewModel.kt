@@ -91,6 +91,9 @@ class RecentActionBucketViewModel @Inject constructor(
      */
     var isInShare = false
 
+    //This flag is used to determine whether the uiDirty state needs to be cleared.
+    private var isClearUiDirty = false
+
     /**
      *  List of node items in the current bucket
      */
@@ -238,6 +241,13 @@ class RecentActionBucketViewModel @Inject constructor(
      * @param node the node item
      */
     fun onNodeLongClicked(position: Int, node: NodeItem) {
+        if (isClearUiDirty) {
+            if (selectedNodes.isEmpty()) {
+                items.value.forEach { it.uiDirty = true }
+            }
+            isClearUiDirty = false
+        }
+
         val nodeList = items.value
 
         if (position < 0 || position >= nodeList.size || nodeList[position].hashCode() != node.hashCode()
@@ -294,6 +304,7 @@ class RecentActionBucketViewModel @Inject constructor(
     }
 
     fun hideOrUnhideNodes(nodeIds: List<NodeId>, hide: Boolean) = viewModelScope.launch {
+        isClearUiDirty = true
         nodeIds.forEach {
             async {
                 runCatching {
