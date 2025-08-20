@@ -1,9 +1,7 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
@@ -14,8 +12,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.chat.GetNodeToAttachUseCase
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
-import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 
 /**
  * Send to chat bottom sheet menu item
@@ -44,20 +41,17 @@ class SendToChatBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler
     ): () -> Unit = {
         if (node is TypedFileNode) {
             scope.launch {
                 runCatching {
                     getNodeToAttachUseCase(node)
                 }.onSuccess { typedNode ->
-                    typedNode?.let { actionHandler(menuAction, it) }
+                    typedNode?.let { handler.actionHandler(menuAction, it) }
                 }.onFailure { Timber.e(it) }
             }
         }
-        onDismiss()
+        handler.onDismiss()
     }
 }

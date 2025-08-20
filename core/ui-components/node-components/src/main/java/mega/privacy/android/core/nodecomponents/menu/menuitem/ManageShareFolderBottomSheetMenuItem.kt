@@ -1,21 +1,18 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import android.content.Context
-import androidx.navigation.NavHostController
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.extension.isOutShare
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageShareFolderMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.contract.NavigationHandler
 import javax.inject.Inject
 
 /**
@@ -42,13 +39,10 @@ class ManageShareFolderBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler
     ): () -> Unit = {
-        onDismiss()
-        parentCoroutineScope.launch {
+        handler.onDismiss()
+        handler.coroutineScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
                 megaNavigator.openFileContactListActivity(context, node.id.longValue, node.name)
             } else {

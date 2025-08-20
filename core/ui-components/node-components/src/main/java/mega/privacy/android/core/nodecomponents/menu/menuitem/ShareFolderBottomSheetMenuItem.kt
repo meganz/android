@@ -1,16 +1,14 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import androidx.navigation.NavHostController
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.extension.isOutShare
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareFolderMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -18,7 +16,6 @@ import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
-import mega.privacy.android.navigation.contract.NavigationHandler
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -48,13 +45,10 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler
     ): () -> Unit = {
-        onDismiss()
-        parentCoroutineScope.launch {
+        handler.onDismiss()
+        handler.coroutineScope.launch {
             withContext(NonCancellable) {
                 if (node is TypedFolderNode) {
                     runCatching { createShareKeyUseCase(node) }.onFailure { Timber.e(it) }
@@ -66,7 +60,7 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
                         runCatching {
                             nodeHandlesToJsonMapper(handles)
                         }.onSuccess { handle ->
-                            parentCoroutineScope.ensureActive()
+                            handler.coroutineScope.ensureActive()
                             // Todo: navigationHandler
 //                            navController.navigate(
 //                                searchFolderShareDialog.plus("/${handle}")
@@ -75,8 +69,8 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
                             Timber.e(it)
                         }
                     } else {
-                        parentCoroutineScope.ensureActive()
-                        actionHandler(menuAction, node)
+                        handler.coroutineScope.ensureActive()
+                        handler.actionHandler(menuAction, node)
                     }
                 }
             }

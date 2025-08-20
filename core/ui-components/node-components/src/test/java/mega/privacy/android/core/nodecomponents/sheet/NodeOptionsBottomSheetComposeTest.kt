@@ -96,11 +96,11 @@ class NodeOptionsBottomSheetComposeTest {
         val mockAction = mock<NodeActionModeMenuItem>()
 
         // Create a simple action that renders a text
-        whenever(mockAction.control).thenReturn { onDismiss, handler, navController, coroutineScope ->
+        whenever(mockAction.control).thenReturn { handler ->
             NodeActionListTile(
                 menuAction = AvailableOfflineMenuAction(),
                 isDestructive = false,
-                onActionClicked = { onDismiss() }
+                onActionClicked = { handler.onDismiss() }
             )
         }
 

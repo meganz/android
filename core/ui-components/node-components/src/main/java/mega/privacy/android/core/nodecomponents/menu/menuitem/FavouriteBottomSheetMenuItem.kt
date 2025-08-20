@@ -1,7 +1,5 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import androidx.navigation.NavHostController
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -13,8 +11,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.UpdateNodeFavoriteUseCase
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
-import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 
 /**
  * Favourite bottom sheet menu action
@@ -40,13 +37,10 @@ class FavouriteBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler
     ): () -> Unit = {
-        onDismiss()
-        parentCoroutineScope.launch {
+        handler.onDismiss()
+        handler.coroutineScope.launch {
             withContext(NonCancellable) {
                 runCatching {
                     updateNodeFavoriteUseCase(nodeId = node.id, isFavorite = node.isFavourite.not())

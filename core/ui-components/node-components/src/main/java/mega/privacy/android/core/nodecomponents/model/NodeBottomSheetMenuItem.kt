@@ -1,11 +1,12 @@
 package mega.privacy.android.core.nodecomponents.model
 
+import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
+import mega.android.core.ui.model.SnackBarAttributes
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -13,12 +14,14 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 /**
  * Bottom sheet click handler
  */
-typealias BottomSheetClickHandler = @Composable (
-    onDismiss: () -> Unit,
-    actionHandler: NodeActionHandler,
-    navigationHandler: NavigationHandler,
-    coroutineScope: CoroutineScope,
-) -> Unit
+data class BottomSheetClickHandler(
+    val onDismiss: () -> Unit,
+    val actionHandler: NodeActionHandler,
+    val navigationHandler: NavigationHandler,
+    val coroutineScope: CoroutineScope,
+    val context: Context,
+    val snackbarHandler: (SnackBarAttributes) -> Unit,
+)
 
 /**
  * Node bottom sheet menu item
@@ -30,17 +33,14 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
      */
     fun buildComposeControl(
         selectedNode: TypedNode,
-    ): BottomSheetClickHandler =
-        { onDismiss, handler, navigationHandler, scope ->
+    ): @Composable (BottomSheetClickHandler) -> Unit =
+        { handler ->
             NodeActionListTile(
                 menuAction = menuAction,
                 isDestructive = isDestructiveAction,
                 onActionClicked = getOnClickFunction(
                     node = selectedNode,
-                    onDismiss = onDismiss,
-                    actionHandler = handler,
-                    navigationHandler = navigationHandler,
-                    parentCoroutineScope = scope
+                    handler = handler,
                 ),
             )
         }
@@ -65,13 +65,10 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
      */
     fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler
     ): () -> Unit = {
-        actionHandler(menuAction, node)
-        onDismiss()
+        handler.actionHandler(menuAction, node)
+        handler.onDismiss()
     }
 
     /**

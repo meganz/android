@@ -1,5 +1,6 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
+import androidx.compose.runtime.Composable
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.theme.values.TextColor
@@ -23,28 +24,24 @@ class VersionsBottomSheetMenuItem @Inject constructor(
 
     override fun buildComposeControl(
         selectedNode: TypedNode,
-    ): BottomSheetClickHandler =
-        { onDismiss, handler, navigationHandler, scope ->
-            val onClick = getOnClickFunction(
-                node = selectedNode,
-                onDismiss = onDismiss,
-                actionHandler = handler,
-                navigationHandler = navigationHandler,
-                parentCoroutineScope = scope
-            )
-            NodeActionListTile(
-                text = menuAction.getDescription(),
-                icon = menuAction.getIconPainter(),
-                isDestructive = isDestructiveAction,
-                onActionClicked = onClick,
-                trailingItem = {
-                    MegaText(
-                        text = selectedNode.versionCount.toString(),
-                        textColor = TextColor.Secondary
-                    )
-                }
-            )
-        }
+    ): @Composable (BottomSheetClickHandler) -> Unit = { handler ->
+        val onClick = getOnClickFunction(
+            node = selectedNode,
+            handler = handler
+        )
+        NodeActionListTile(
+            text = menuAction.getDescription(),
+            icon = menuAction.getIconPainter(),
+            isDestructive = isDestructiveAction,
+            onActionClicked = onClick,
+            trailingItem = {
+                MegaText(
+                    text = selectedNode.versionCount.toString(),
+                    textColor = TextColor.Secondary
+                )
+            }
+        )
+    }
 
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,

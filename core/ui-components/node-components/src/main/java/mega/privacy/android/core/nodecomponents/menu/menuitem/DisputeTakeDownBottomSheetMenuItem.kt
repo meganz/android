@@ -1,10 +1,7 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import android.content.Context
-import androidx.navigation.NavHostController
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DisputeTakeDownMenuAction
@@ -12,8 +9,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
-import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 
 /**
  * Dispute take down menu item
@@ -36,12 +32,9 @@ class DisputeTakeDownBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler
     ): () -> Unit = {
-        onDismiss()
+        handler.onDismiss()
         megaNavigator.launchUrl(context, DISPUTE_URL)
     }
 

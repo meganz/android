@@ -1,7 +1,5 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import androidx.navigation.NavHostController
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuActionWithIcon
@@ -18,8 +16,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
-import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 
 /**
  * Unhide bottom sheet menu item
@@ -56,17 +53,14 @@ class UnhideBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler
     ): () -> Unit = {
-        parentCoroutineScope.launch {
+        handler.coroutineScope.launch {
             runCatching {
                 updateNodeSensitiveUseCase(node.id, false)
             }.onFailure { Timber.e(it) }
         }
-        onDismiss()
+        handler.onDismiss()
     }
 
     private suspend fun isHiddenNodesActive(): Boolean {

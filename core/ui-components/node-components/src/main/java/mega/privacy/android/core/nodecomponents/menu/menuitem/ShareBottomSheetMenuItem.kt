@@ -3,14 +3,11 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.navigation.NavHostController
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
@@ -24,8 +21,7 @@ import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
-import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 
 /**
  * Share bottom sheet menu item
@@ -53,12 +49,9 @@ class ShareBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler
     ): () -> Unit = {
-        parentCoroutineScope.launch {
+        handler.coroutineScope.launch {
             withContext(NonCancellable) {
                 // Todo handle analytics tracking
                 //Analytics.tracker.trackEvent(SearchResultShareMenuItemEvent)
@@ -78,7 +71,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
                                 Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                             )
                         }
-                        parentCoroutineScope.ensureActive()
+                        handler.coroutineScope.ensureActive()
                         context.startActivity(
                             Intent.createChooser(
                                 shareIntent,
@@ -89,7 +82,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
                 } else {
                     val publicLink = node.exportedData?.publicLink
                     if (publicLink != null) {
-                        parentCoroutineScope.ensureActive()
+                        handler.coroutineScope.ensureActive()
                         startShareIntent(
                             context = context,
                             path = publicLink,
@@ -97,7 +90,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
                         )
                     } else {
                         val exportPath = exportNodesUseCase(node.id)
-                        parentCoroutineScope.ensureActive()
+                        handler.coroutineScope.ensureActive()
                         startShareIntent(
                             context = context,
                             path = exportPath,
@@ -107,7 +100,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
                 }
             }
         }
-        onDismiss()
+        handler.onDismiss()
     }
 
 

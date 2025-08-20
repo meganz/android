@@ -1,5 +1,7 @@
 package mega.privacy.android.core.nodecomponents.model
 
+import androidx.compose.runtime.Composable
+
 /**
  * Bottom sheet menu item
  *
@@ -10,5 +12,5 @@ package mega.privacy.android.core.nodecomponents.model
 data class NodeActionModeMenuItem(
     val group: Int,
     val orderInGroup: Int,
-    val control: BottomSheetClickHandler,
+    val control: @Composable (BottomSheetClickHandler) -> Unit,
 )

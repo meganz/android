@@ -1,10 +1,9 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import android.content.Context
+import androidx.compose.runtime.Composable
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.extension.isOutShare
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
@@ -17,7 +16,6 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.contract.NavigationHandler
 import javax.inject.Inject
 
 /**
@@ -34,23 +32,20 @@ class VerifyBottomSheetMenuItem @Inject constructor(
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
 
     private var shareData: ShareData? = null
+
     override fun buildComposeControl(
         selectedNode: TypedNode,
-    ): BottomSheetClickHandler =
-        { onDismiss, handler, navigationHandler, scope ->
-            NodeActionListTile(
-                text = menuAction.getDescription().format(shareData?.user.orEmpty()),
-                icon = menuAction.getIconPainter(),
-                isDestructive = isDestructiveAction,
-                onActionClicked = getOnClickFunction(
-                    node = selectedNode,
-                    onDismiss = onDismiss,
-                    actionHandler = handler,
-                    navigationHandler = navigationHandler,
-                    parentCoroutineScope = scope,
-                ),
-            )
-        }
+    ): @Composable (BottomSheetClickHandler) -> Unit = { handler ->
+        NodeActionListTile(
+            text = menuAction.getDescription().format(shareData?.user.orEmpty()),
+            icon = menuAction.getIconPainter(),
+            isDestructive = isDestructiveAction,
+            onActionClicked = getOnClickFunction(
+                node = selectedNode,
+                handler = handler
+            ),
+        )
+    }
 
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -79,12 +74,9 @@ class VerifyBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler,
     ): () -> Unit = {
-        onDismiss()
+        handler.onDismiss()
         shareData?.let {
             if (it.isVerified.not() && it.isPending) {
                 // If the share is pending, we need to show cannot verify dialog

@@ -3,7 +3,6 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.navigation.NavHostController
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
@@ -11,8 +10,8 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.menu.menuaction.OpenWithMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -64,33 +63,35 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler,
     ): () -> Unit = {
         if (node is TypedFileNode) {
-            parentCoroutineScope.launch {
+            handler.coroutineScope.launch {
                 withContext(NonCancellable) {
                     val file = getLocalFile(node)
                     if (node.type is AudioFileTypeInfo || node.type is VideoFileTypeInfo) {
-                        openAudioOrVideoFiles(file, node, navigationHandler, parentCoroutineScope)
+                        openAudioOrVideoFiles(
+                            file,
+                            node,
+                            handler.navigationHandler,
+                            handler.coroutineScope
+                        )
                     } else {
                         file?.let {
                             openNotStreamableFiles(
-                                navigationHandler,
+                                handler.navigationHandler,
                                 it,
                                 node.type,
-                                parentCoroutineScope
+                                handler.coroutineScope
                             )
-                        } ?: actionHandler(menuAction, node)
+                        } ?: handler.actionHandler(menuAction, node)
                     }
                 }
             }
         } else {
             Timber.Forest.e("Cannot do the operation open with: Node is not a FileNode")
         }
-        onDismiss()
+        handler.onDismiss()
     }
 
     private suspend fun openAudioOrVideoFiles(

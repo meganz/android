@@ -1,12 +1,10 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import android.content.Context
-import androidx.navigation.NavHostController
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.menu.menuaction.EditMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.TextFileTypeInfo
@@ -19,7 +17,6 @@ import mega.privacy.android.domain.entity.shares.AccessPermission.READWRITE
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.contract.NavigationHandler
 import java.io.File
 import javax.inject.Inject
 
@@ -56,10 +53,7 @@ class EditBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler
     ): () -> Unit = {
         megaNavigator.openTextEditorActivity(
             context = context,
@@ -67,6 +61,6 @@ class EditBottomSheetMenuItem @Inject constructor(
             mode = TextEditorMode.Edit,
             nodeSourceType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
         )
-        onDismiss()
+        handler.onDismiss()
     }
 }

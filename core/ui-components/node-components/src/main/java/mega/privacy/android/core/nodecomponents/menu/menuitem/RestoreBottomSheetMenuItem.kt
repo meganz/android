@@ -1,7 +1,5 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import androidx.navigation.NavHostController
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -16,8 +14,7 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
-import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 
 /**
  * Restore bottom sheet menu item
@@ -44,22 +41,19 @@ class RestoreBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler
     ): () -> Unit = {
         val restoreHandle = node.restoreId?.longValue ?: -1L
-        onDismiss()
+        handler.onDismiss()
         val restoreMap = mapOf(Pair(node.id.longValue, restoreHandle))
-        parentCoroutineScope.launch {
+        handler.coroutineScope.launch {
             withContext(NonCancellable) {
                 runCatching {
                     checkNodesNameCollisionUseCase(restoreMap, NodeNameCollisionType.RESTORE)
                 }.onSuccess { result ->
                     if (result.conflictNodes.isNotEmpty()) {
-                        parentCoroutineScope.ensureActive()
-                        actionHandler(menuAction, node)
+                        handler.coroutineScope.ensureActive()
+                        handler.actionHandler(menuAction, node)
                     }
                     if (result.noConflictNodes.isNotEmpty()) {
                         val restoreResult = restoreNodesUseCase(result.noConflictNodes)

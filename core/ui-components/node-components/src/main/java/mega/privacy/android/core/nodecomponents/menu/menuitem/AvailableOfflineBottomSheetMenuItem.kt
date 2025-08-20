@@ -1,13 +1,11 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import androidx.navigation.NavHostController
-import kotlinx.coroutines.CoroutineScope
+import androidx.compose.runtime.Composable
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.components.toggle.Toggle
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
@@ -16,7 +14,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
-import mega.privacy.android.navigation.contract.NavigationHandler
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -33,28 +30,24 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
 
     override fun buildComposeControl(
         selectedNode: TypedNode,
-    ): BottomSheetClickHandler =
-        { onDismiss, handler, navigationHandler, scope ->
-            val onClick = getOnClickFunction(
-                node = selectedNode,
-                onDismiss = onDismiss,
-                actionHandler = handler,
-                navigationHandler = navigationHandler,
-                parentCoroutineScope = scope
-            )
-            NodeActionListTile(
-                text = menuAction.getDescription(),
-                icon = menuAction.getIconPainter(),
-                isDestructive = isDestructiveAction,
-                onActionClicked = onClick,
-                trailingItem = {
-                    Toggle(
-                        isChecked = selectedNode.isAvailableOffline,
-                        onCheckedChange = { onClick() },
-                    )
-                }
-            )
-        }
+    ): @Composable (BottomSheetClickHandler) -> Unit = { handler ->
+        val onClick = getOnClickFunction(
+            node = selectedNode,
+            handler = handler
+        )
+        NodeActionListTile(
+            text = menuAction.getDescription(),
+            icon = menuAction.getIconPainter(),
+            isDestructive = isDestructiveAction,
+            onActionClicked = onClick,
+            trailingItem = {
+                Toggle(
+                    isChecked = selectedNode.isAvailableOffline,
+                    onCheckedChange = { onClick() },
+                )
+            }
+        )
+    }
 
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -66,14 +59,11 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler,
     ): () -> Unit = {
-        onDismiss()
+        handler.onDismiss()
         if (node.isAvailableOffline) {
-            parentCoroutineScope.launch {
+            handler.coroutineScope.launch {
                 withContext(NonCancellable) {
                     runCatching {
                         removeOfflineNodeUseCase(nodeId = node.id)
@@ -81,7 +71,7 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
                 }
             }
         } else {
-            actionHandler(menuAction, node)
+            handler.actionHandler(menuAction, node)
         }
     }
 

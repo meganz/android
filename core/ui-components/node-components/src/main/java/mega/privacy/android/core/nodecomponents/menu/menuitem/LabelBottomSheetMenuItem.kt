@@ -1,10 +1,9 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.mapper.NodeLabelResourceMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.LabelMenuAction
@@ -15,7 +14,6 @@ import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBot
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.GetNodeLabelUseCase
-import mega.privacy.android.navigation.contract.NavigationHandler
 import javax.inject.Inject
 
 internal const val changeLabelBottomSheetRoute =
@@ -34,36 +32,32 @@ class LabelBottomSheetMenuItem @Inject constructor(
 
     override fun buildComposeControl(
         selectedNode: TypedNode,
-    ): BottomSheetClickHandler =
-        { onDismiss, handler, navigationHandler, scope ->
-            NodeActionListTile(
-                text = menuAction.getDescription(),
-                icon = menuAction.getIconPainter(),
-                isDestructive = isDestructiveAction,
-                onActionClicked = getOnClickFunction(
-                    node = selectedNode,
-                    onDismiss = onDismiss,
-                    actionHandler = handler,
-                    navigationHandler = navigationHandler,
-                    parentCoroutineScope = scope
-                ),
-                trailingItem = {
-                    val nodeLabel = getNodeLabelUseCase(selectedNode.label)
-                    val resource = nodeLabel?.let {
-                        labelResourceMapper(
-                            nodeLabel = it,
-                            selectedLabel = null
-                        )
-                    }
-                    resource?.let {
-                        LabelAccessoryView(
-                            text = stringResource(id = it.labelName),
-                            color = colorResource(it.labelColor)
-                        )
-                    }
+    ): @Composable (BottomSheetClickHandler) -> Unit = { handler ->
+        NodeActionListTile(
+            text = menuAction.getDescription(),
+            icon = menuAction.getIconPainter(),
+            isDestructive = isDestructiveAction,
+            onActionClicked = getOnClickFunction(
+                node = selectedNode,
+                handler = handler
+            ),
+            trailingItem = {
+                val nodeLabel = getNodeLabelUseCase(selectedNode.label)
+                val resource = nodeLabel?.let {
+                    labelResourceMapper(
+                        nodeLabel = it,
+                        selectedLabel = null
+                    )
                 }
-            )
-        }
+                resource?.let {
+                    LabelAccessoryView(
+                        text = stringResource(id = it.labelName),
+                        color = colorResource(it.labelColor)
+                    )
+                }
+            }
+        )
+    }
 
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -78,13 +72,10 @@ class LabelBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler,
     ): () -> Unit = {
-        onDismiss()
-        navigationHandler.navigate(ChangeLabelBottomSheet(node.id.longValue))
+        handler.onDismiss()
+        handler.navigationHandler.navigate(ChangeLabelBottomSheet(node.id.longValue))
     }
 
     override val groupId: Int

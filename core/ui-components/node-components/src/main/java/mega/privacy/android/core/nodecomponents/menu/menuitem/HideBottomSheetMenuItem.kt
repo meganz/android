@@ -2,17 +2,15 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
@@ -33,8 +31,6 @@ import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
-import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
  * Hide bottom sheet menu item
@@ -53,41 +49,39 @@ class HideBottomSheetMenuItem @Inject constructor(
     private var isPaid: Boolean = false
     private var isBusinessAccountExpired: Boolean = false
 
-    override fun buildComposeControl(selectedNode: TypedNode): BottomSheetClickHandler =
-        { onDismiss, handler, navigationHandler, scope ->
-            NodeActionListTile(
-                text = menuAction.getDescription(),
-                icon = menuAction.getIconPainter(),
-                isDestructive = isDestructiveAction,
-                onActionClicked = getOnClickFunction(
-                    node = selectedNode,
-                    onDismiss = onDismiss,
-                    actionHandler = handler,
-                    navigationHandler = navigationHandler,
-                    parentCoroutineScope = scope
-                ),
-                trailingItem = {
-                    if (!isPaid || isBusinessAccountExpired) {
-                        MegaText(
-                            text = stringResource(id = sharedR.string.general_pro_only_label),
-                            textColor = TextColor.Accent,
-                        )
-                    } else {
-                        MegaIcon(
-                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.HelpCircle),
-                            contentDescription = null,
-                            modifier = Modifier.Companion
-                                .size(24.dp)
-                                .clickable {
-                                    handler(menuAction, selectedNode)
-                                    onDismiss()
-                                },
-                            tint = IconColor.Secondary
-                        )
-                    }
+    override fun buildComposeControl(
+        selectedNode: TypedNode,
+    ): @Composable (BottomSheetClickHandler) -> Unit = { handler ->
+        NodeActionListTile(
+            text = menuAction.getDescription(),
+            icon = menuAction.getIconPainter(),
+            isDestructive = isDestructiveAction,
+            onActionClicked = getOnClickFunction(
+                node = selectedNode,
+                handler = handler
+            ),
+            trailingItem = {
+                if (!isPaid || isBusinessAccountExpired) {
+                    MegaText(
+                        text = stringResource(id = sharedR.string.general_pro_only_label),
+                        textColor = TextColor.Accent,
+                    )
+                } else {
+                    MegaIcon(
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.HelpCircle),
+                        contentDescription = null,
+                        modifier = Modifier.Companion
+                            .size(24.dp)
+                            .clickable {
+                                handler.actionHandler(menuAction, selectedNode)
+                                handler.onDismiss()
+                            },
+                        tint = IconColor.Secondary
+                    )
                 }
-            )
-        }
+            }
+        )
+    }
 
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -115,24 +109,21 @@ class HideBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        onDismiss: () -> Unit,
-        actionHandler: NodeActionHandler,
-        navigationHandler: NavigationHandler,
-        parentCoroutineScope: CoroutineScope,
+        handler: BottomSheetClickHandler,
     ): () -> Unit = {
-        parentCoroutineScope.launch {
+        handler.coroutineScope.launch {
             // Todo handle analytics tracking
             //Analytics.tracker.trackEvent(HideNodeMenuItemEvent)
             val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
             if (!this@HideBottomSheetMenuItem.isPaid || isBusinessAccountExpired) {
-                actionHandler(menuAction, node)
+                handler.actionHandler(menuAction, node)
             } else if (node.isMarkedSensitive || isHiddenNodesOnboarded) {
                 updateNodeSensitiveUseCase(node.id, true)
             } else {
-                actionHandler(menuAction, node)
+                handler.actionHandler(menuAction, node)
             }
         }
-        onDismiss()
+        handler.onDismiss()
     }
 
     private suspend fun isHiddenNodesActive(): Boolean {
