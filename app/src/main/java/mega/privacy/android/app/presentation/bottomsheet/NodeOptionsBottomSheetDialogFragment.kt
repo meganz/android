@@ -1779,8 +1779,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
             Util.showSnackbar(requireActivity(), message)
         }
-
-        setStateBottomSheetBehaviorHidden()
+        dismiss()
     }
 
     companion object {
