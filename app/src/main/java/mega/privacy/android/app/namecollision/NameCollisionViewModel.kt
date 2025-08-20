@@ -24,8 +24,8 @@ import mega.privacy.android.app.namecollision.model.NameCollisionUiState
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NameCollision
@@ -760,10 +760,12 @@ class NameCollisionViewModel @Inject constructor(
      * Consumes the upload event.
      */
     fun consumeUploadEvent() {
-        (uiState.value.uploadEvent as StateEventWithContentTriggered).content.collisionChoice?.let { choice ->
-            continueWithNext(choice)
+        with(uiState.value.uploadEvent) {
+            if (this is StateEventWithContentTriggered) {
+                content.collisionChoice?.let { continueWithNext(it) }
+                _uiState.update { state -> state.copy(uploadEvent = consumed()) }
+            }
         }
-        _uiState.update { state -> state.copy(uploadEvent = consumed()) }
     }
 
     /**

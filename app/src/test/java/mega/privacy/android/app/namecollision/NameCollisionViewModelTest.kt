@@ -225,7 +225,11 @@ internal class NameCollisionViewModelTest {
             uploadFiles(pathsAndNames, destinationId, choice)
             uiState.map { it.uploadEvent }.test {
                 assertThat(awaitItem()).isEqualTo(expected)
-                consumeUploadEvent()
+            }
+
+            consumeUploadEvent()
+            advanceUntilIdle()
+            uiState.map { it.uploadEvent }.test {
                 assertThat(awaitItem()).isEqualTo(consumed())
             }
         }
