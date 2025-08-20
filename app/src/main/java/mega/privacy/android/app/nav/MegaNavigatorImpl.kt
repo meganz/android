@@ -42,8 +42,6 @@ import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivit
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountSource
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -90,11 +88,9 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.settings.SettingsNavigator
 import timber.log.Timber
@@ -108,7 +104,6 @@ import javax.inject.Inject
  */
 internal class MegaNavigatorImpl @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
@@ -145,21 +140,10 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openUpgradeAccount(context: Context, isFromAdsFree: Boolean) {
-        applicationScope.launch {
-            val isUpgradeAccountRevampEnabled =
-                getFeatureFlagValueUseCase(AppFeatures.UpdateAccountRevamp)
-            if (isUpgradeAccountRevampEnabled) {
-                ChooseAccountActivity.navigateToUpgradeAccount(
-                    context = context,
-                    isFromAdsFree = isFromAdsFree
-                )
-            } else {
-                UpgradeAccountActivity.navigate(
-                    context = context,
-                    source = if (isFromAdsFree) UpgradeAccountSource.ADS_FREE_SCREEN else UpgradeAccountSource.UNKNOWN
-                )
-            }
-        }
+        ChooseAccountActivity.navigateToUpgradeAccount(
+            context = context,
+            isFromAdsFree = isFromAdsFree
+        )
     }
 
     private fun getChatActivityIntent(

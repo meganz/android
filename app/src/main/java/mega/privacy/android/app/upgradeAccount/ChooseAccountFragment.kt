@@ -25,8 +25,8 @@ import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel.Companion.getProductId
 import mega.privacy.android.app.utils.billing.PaymentUtils
+import mega.privacy.android.app.utils.billing.PaymentUtils.getProductId
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.billing.BillingEvent

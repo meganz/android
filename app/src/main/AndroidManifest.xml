@@ -672,10 +672,7 @@
         <activity
             android:name=".presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity"
             android:launchMode="singleTop" />
-        <activity
-            android:name=".upgradeAccount.UpgradeAccountActivity"
-            android:label="@string/action_upgrade_account"
-            android:launchMode="singleTop" />
+
         <activity
             android:name=".upgradeAccount.ChooseAccountActivity"
             android:label="@string/choose_account_fragment"

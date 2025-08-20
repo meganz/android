@@ -180,13 +180,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
         true,
     ),
 
-    /**
-     *  Update Account Revamp with new components
-     */
-    UpdateAccountRevamp(
-        "Update Account Revamp with new components",
-        true,
-    ),
+
 
     /**
      *  Enable pagination in timeline photos
