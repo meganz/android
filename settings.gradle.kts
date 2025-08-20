@@ -67,6 +67,7 @@ include(":feature:cloud-drive:cloud-drive")
 include(":feature:cloud-drive:cloud-drive-snowflake-components")
 include(":core:ui-components:node-components")
 include(":core:feature-flags")
+include(":third-party-lib:pdfiumAndroid")
 
 
 include(":core:ui-components:snowflake-components")
