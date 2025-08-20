@@ -31,7 +31,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -48,7 +48,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CloudDriveViewModel @Inject constructor(
-    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getNodeNameByIdUseCase: GetNodeNameByIdUseCase,
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
     private val setViewTypeUseCase: SetViewType,
     private val monitorViewTypeUseCase: MonitorViewType,
@@ -218,9 +218,9 @@ class CloudDriveViewModel @Inject constructor(
 
     private suspend fun updateTitle() {
         runCatching {
-            getNodeByIdUseCase(uiState.value.currentFolderId)
-        }.onSuccess { currentNode ->
-            val title = LocalizedText.Literal(currentNode?.name ?: "")
+            getNodeNameByIdUseCase(uiState.value.currentFolderId)
+        }.onSuccess { nodeName ->
+            val title = LocalizedText.Literal(nodeName ?: "")
             // Only update state if fetched title is different
             if (uiState.value.title != title) {
                 uiState.update { state ->
@@ -228,7 +228,7 @@ class CloudDriveViewModel @Inject constructor(
                 }
             }
         }.onFailure {
-            Timber.e(it, "Failed to get node for title update")
+            Timber.e(it, "Failed to get node name for title update")
         }
     }
 

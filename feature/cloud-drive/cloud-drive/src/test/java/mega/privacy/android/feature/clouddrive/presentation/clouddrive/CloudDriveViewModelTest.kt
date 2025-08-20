@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -63,6 +64,7 @@ import org.robolectric.annotation.Config
 class CloudDriveViewModelTest {
 
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
+    private val getNodeNameByIdUseCase: GetNodeNameByIdUseCase = mock()
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase = mock()
     private val setViewTypeUseCase: SetViewType = mock()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
@@ -88,6 +90,7 @@ class CloudDriveViewModelTest {
         Dispatchers.resetMain()
         reset(
             getNodeByIdUseCase,
+            getNodeNameByIdUseCase,
             getFileBrowserNodeChildrenUseCase,
             setViewTypeUseCase,
             monitorViewTypeUseCase,
@@ -104,7 +107,7 @@ class CloudDriveViewModelTest {
     }
 
     private fun createViewModel(nodeHandle: Long = folderNodeHandle) = CloudDriveViewModel(
-        getNodeByIdUseCase = getNodeByIdUseCase,
+        getNodeNameByIdUseCase = getNodeNameByIdUseCase,
         getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
         setViewTypeUseCase = setViewTypeUseCase,
         monitorViewTypeUseCase = monitorViewTypeUseCase,
@@ -123,11 +126,7 @@ class CloudDriveViewModelTest {
     )
 
     private suspend fun setupTestData(items: List<TypedNode>) {
-        val folderNode = mock<TypedFolderNode> {
-            on { id } doReturn folderNodeId
-            on { name } doReturn "Test Folder"
-        }
-        whenever(getNodeByIdUseCase(eq(folderNodeId))).thenReturn(folderNode)
+        whenever(getNodeNameByIdUseCase(eq(folderNodeId))).thenReturn("Test folder")
         whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
 
         val nodeUiItems = items.map { node ->
@@ -172,10 +171,7 @@ class CloudDriveViewModelTest {
 
     @Test
     fun `test that title is updated correctly`() = runTest {
-        val mockFolder = mock<TypedFolderNode> {
-            on { name } doReturn "Test Folder2"
-        }
-        whenever(getNodeByIdUseCase(any())).thenReturn(mockFolder)
+        whenever(getNodeNameByIdUseCase(any())).thenReturn("Test Folder2")
         setupTestData(emptyList())
         val underTest = createViewModel()
         advanceUntilIdle()

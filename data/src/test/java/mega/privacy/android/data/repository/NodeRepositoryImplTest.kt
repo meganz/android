@@ -1554,6 +1554,52 @@ internal class NodeRepositoryImplTest {
         assertThat(underTest.getNodeLabel(1)).isEqualTo(mockResult)
     }
 
+    @Test
+    fun `test that getNodeNameById returns node name when node exists`() = runTest {
+        val nodeId = NodeId(123L)
+        val expectedName = "TestNode.txt"
+        val megaNode = mock<MegaNode> {
+            on { name }.thenReturn(expectedName)
+        }
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+
+        val actual = underTest.getNodeNameById(nodeId)
+
+        assertThat(actual).isEqualTo(expectedName)
+    }
+
+    @Test
+    fun `test that getNodeNameById returns null when node does not exist`() = runTest {
+        val nodeId = NodeId(123L)
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(null)
+
+        val actual = underTest.getNodeNameById(nodeId)
+
+        assertThat(actual).isNull()
+    }
+
+    @Test
+    fun `test that getRootNodeId returns node id when root node exists`() = runTest {
+        val expectedNodeId = NodeId(456L)
+        val megaNode = mock<MegaNode> {
+            on { handle }.thenReturn(expectedNodeId.longValue)
+        }
+        whenever(megaApiGateway.getRootNode()).thenReturn(megaNode)
+
+        val actual = underTest.getRootNodeId()
+
+        assertThat(actual).isEqualTo(expectedNodeId)
+    }
+
+    @Test
+    fun `test that getRootNodeId returns null when root node does not exist`() = runTest {
+        whenever(megaApiGateway.getRootNode()).thenReturn(null)
+
+        val actual = underTest.getRootNodeId()
+
+        assertThat(actual).isNull()
+    }
+
     private fun provideNodeId() = Stream.of(
         Arguments.of(null),
         Arguments.of(NodeId(2L)),

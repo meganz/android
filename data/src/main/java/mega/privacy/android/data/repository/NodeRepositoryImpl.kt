@@ -1240,4 +1240,8 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getRootNodeId(): NodeId? = withContext(ioDispatcher) {
         megaApiGateway.getRootNode()?.let { NodeId(it.handle) }
     }
+
+    override suspend fun getNodeNameById(nodeId: NodeId): String? = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.name
+    }
 }

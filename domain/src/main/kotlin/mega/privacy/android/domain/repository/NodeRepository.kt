@@ -852,4 +852,12 @@ interface NodeRepository {
      * @return The root node id if found else null
      */
     suspend fun getRootNodeId(): NodeId?
+
+    /**
+     * Get node name by id
+     *
+     * @param nodeId
+     * @return The node name if found else null
+     */
+    suspend fun getNodeNameById(nodeId: NodeId): String?
 }
