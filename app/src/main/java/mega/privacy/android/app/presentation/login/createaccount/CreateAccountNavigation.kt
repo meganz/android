@@ -8,12 +8,17 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.login.LoginGraph
 import mega.privacy.android.app.presentation.login.LoginGraphContent
+import mega.privacy.android.app.presentation.login.LoginScreen
 import mega.privacy.android.app.presentation.login.LoginViewModel
+import mega.privacy.android.app.presentation.login.StartRoute
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
 import mega.privacy.android.app.presentation.login.createaccount.view.NewCreateAccountRoute
+import mega.privacy.android.app.presentation.login.onboarding.TourScreen
 
 @Serializable
 data object CreateAccountRoute
@@ -33,7 +38,16 @@ internal fun NavGraphBuilder.createAccountScreen(
             hiltViewModel<LoginViewModel>(parentEntry)
         }
         LoginGraphContent(
-            navController = navController,
+            navigateToLoginScreen = { navController.navigate(LoginScreen) },
+            navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
+            navigateToTourScreen = {
+                navController.navigate(TourScreen, navOptions {
+                    popUpTo<StartRoute> {
+                        inclusive = false
+                    }
+                })
+            },
+            navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailScreen) },
             viewModel = sharedViewModel,
             chatRequestHandler = chatRequestHandler,
             onFinish = onFinish,

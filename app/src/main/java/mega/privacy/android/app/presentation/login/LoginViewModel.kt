@@ -197,6 +197,7 @@ class LoginViewModel @Inject constructor(
     private var performFetchNodesJob: Job? = null
 
     init {
+        Timber.d("LoginViewModel init $this")
         enableAndMonitorRequestStatusProgressEvent()
         viewModelScope.launch {
             runCatching {

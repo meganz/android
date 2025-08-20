@@ -10,6 +10,9 @@ import androidx.navigation.navOptions
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.billing.BillingViewModel
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
+import mega.privacy.android.app.presentation.login.onboarding.TourScreen
 
 @Serializable
 data object LoginScreen
@@ -28,7 +31,16 @@ internal fun NavGraphBuilder.loginScreen(
         val sharedViewModel = activityViewModel ?: hiltViewModel<LoginViewModel>(parentEntry)
         val billingViewModel = hiltViewModel<BillingViewModel>(parentEntry)
         LoginGraphContent(
-            navController = navController,
+            navigateToLoginScreen = { navController.navigate(LoginScreen) },
+            navigateToCreateAccountScreen = { navController.navigate(CreateAccountRoute) },
+            navigateToTourScreen = {
+                navController.navigate(TourScreen, navOptions {
+                    popUpTo<StartRoute> {
+                        inclusive = false
+                    }
+                })
+            },
+            navigateToConfirmationEmailScreen = { navController.navigate(ConfirmationEmailScreen) },
             viewModel = sharedViewModel,
             chatRequestHandler = chatRequestHandler,
             onFinish = onFinish,

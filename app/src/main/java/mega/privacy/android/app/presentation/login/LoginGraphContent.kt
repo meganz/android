@@ -11,21 +11,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavOptions
 import kotlinx.coroutines.flow.collectLatest
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
-import mega.privacy.android.app.presentation.login.confirmemail.openConfirmationEmailScreen
-import mega.privacy.android.app.presentation.login.createaccount.openCreateAccountScreen
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
-import mega.privacy.android.app.presentation.login.onboarding.openTourScreen
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 
 /**
@@ -34,11 +28,14 @@ import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
  */
 @Composable
 fun LoginGraphContent(
-    navController: NavController,
+    navigateToLoginScreen: () -> Unit,
+    navigateToCreateAccountScreen: () -> Unit,
+    navigateToTourScreen: () -> Unit,
+    navigateToConfirmationEmailScreen: () -> Unit,
     chatRequestHandler: MegaChatRequestHandler,
     onFinish: () -> Unit,
     stopShowingSplashScreen: () -> Unit,
-    viewModel: LoginViewModel = hiltViewModel(),
+    viewModel: LoginViewModel,
     content: @Composable () -> Unit = {},
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -90,18 +87,15 @@ fun LoginGraphContent(
             }
 
             when (fragmentType) {
-                LoginFragmentType.Login -> navController.openLoginScreen()
-                LoginFragmentType.CreateAccount -> navController.openCreateAccountScreen()
+                LoginFragmentType.Login -> navigateToLoginScreen()
+                LoginFragmentType.CreateAccount -> navigateToCreateAccountScreen()
 
                 LoginFragmentType.Tour -> {
                     focusManager.clearFocus()
-                    navController.openTourScreen(
-                        NavOptions.Builder().setPopUpTo(route = StartRoute, inclusive = false)
-                            .build()
-                    )
+                    navigateToTourScreen()
                 }
 
-                LoginFragmentType.ConfirmEmail -> navController.openConfirmationEmailScreen()
+                LoginFragmentType.ConfirmEmail -> navigateToConfirmationEmailScreen()
             }
             viewModel.isPendingToShowFragmentConsumed()
         }
