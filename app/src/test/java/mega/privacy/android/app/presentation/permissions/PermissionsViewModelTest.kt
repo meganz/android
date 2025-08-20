@@ -20,11 +20,9 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.SetNotificationPermissionShownUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -33,7 +31,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -47,7 +44,6 @@ class PermissionsViewModelTest {
     private lateinit var underTest: PermissionsViewModel
 
     private val defaultAccountRepository: AccountRepository = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val setNotificationPermissionShownUseCase: SetNotificationPermissionShownUseCase =
@@ -67,7 +63,6 @@ class PermissionsViewModelTest {
     fun resetMocks() {
         reset(
             defaultAccountRepository,
-            getFeatureFlagValueUseCase,
             setNotificationPermissionShownUseCase,
             monitorThemeModeUseCase,
             checkEnableCameraUploadsStatusUseCase,
@@ -81,7 +76,6 @@ class PermissionsViewModelTest {
         underTest = PermissionsViewModel(
             defaultAccountRepository = defaultAccountRepository,
             ioDispatcher = testDispatcher,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             setNotificationPermissionShownUseCase = setNotificationPermissionShownUseCase,
             checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
@@ -91,20 +85,6 @@ class PermissionsViewModelTest {
         )
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that onboarding flags are set correctly`(isEnabled: Boolean) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp))
-            .thenReturn(isEnabled)
-
-        init()
-
-        underTest.setData(emptyList())
-
-        underTest.uiState.test {
-            assertThat(awaitItem().isOnboardingRevampEnabled).isEqualTo(isEnabled)
-        }
-    }
 
     @ParameterizedTest
     @EnumSource(ThemeMode::class)
@@ -121,9 +101,6 @@ class PermissionsViewModelTest {
     @Test
     fun `test that first visible permission should default to first missing permission`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp))
-                .thenReturn(true)
-
             init()
 
             underTest.setData(
@@ -140,9 +117,6 @@ class PermissionsViewModelTest {
     @Test
     fun `test that on next permission should update ui state`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp))
-                .thenReturn(true)
-
             init()
 
             underTest.setData(
@@ -162,9 +136,6 @@ class PermissionsViewModelTest {
     @Test
     fun `test that on next permission should trigger finish event when null`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp))
-                .thenReturn(true)
-
             init()
 
             underTest.setData(
@@ -192,7 +163,6 @@ class PermissionsViewModelTest {
 
     @Test
     fun `test that camera uploads should enable when media permission request granted`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp)).thenReturn(true)
         whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
 
         init()
@@ -214,7 +184,6 @@ class PermissionsViewModelTest {
 
     @Test
     fun `test that camera upload should enable when status returns other than enable`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp)).thenReturn(true)
         whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT)
 
         init()
@@ -232,7 +201,6 @@ class PermissionsViewModelTest {
     @Test
     fun `test that camera upload should not enable when checking status throws exception`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp)).thenReturn(true)
             whenever(checkEnableCameraUploadsStatusUseCase()).thenThrow(RuntimeException())
 
             init()
@@ -250,7 +218,6 @@ class PermissionsViewModelTest {
     @Test
     fun `test that when exception thrown on enabling camera upload should not track event`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp)).thenReturn(true)
             whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
             whenever(
                 enableCameraUploadsInPhotosUseCase.invoke(

@@ -5,7 +5,6 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.ThemeMode
 
 data class PermissionsUIState(
-    val isOnboardingRevampEnabled: Boolean? = null,
     val themeMode: ThemeMode = ThemeMode.System,
     val visiblePermission: NewPermissionScreen = NewPermissionScreen.Loading,
     val finishEvent: StateEvent = consumed,

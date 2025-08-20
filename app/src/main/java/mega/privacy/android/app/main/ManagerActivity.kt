@@ -311,8 +311,8 @@ import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetView
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
-import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
@@ -2393,46 +2393,38 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         askPermissions = false
         showStorageAlertWithDelay = true
 
-        lifecycleScope.launch {
-            val isOnboardingRevamp = getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp)
-            //If mobile device and not onboarding revamp, only portrait mode is allowed
-            if (isTablet().not() && !isOnboardingRevamp) {
-                Timber.d("Mobile only portrait mode")
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        val shouldShowNotificationPermission =
+            intent?.getBooleanExtra(
+                IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION,
+                false
+            ) == true
+
+        val needsToShowPermissions =
+            (!isNotificationPermissionGranted() && shouldShowNotificationPermission) || hasMissingPermission()
+
+        if (needsToShowPermissions) {
+            val currentFragment =
+                supportFragmentManager.findFragmentById(R.id.fragment_container)
+            if (currentFragment?.tag != FragmentTag.PERMISSIONS.tag) {
+                deleteCurrentFragment()
             }
-            val shouldShowNotificationPermission =
-                intent?.getBooleanExtra(
-                    IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION,
-                    false
-                ) == true
 
-            val needsToShowPermissions =
-                (!isNotificationPermissionGranted() && shouldShowNotificationPermission) || hasMissingPermission()
-
-            if (needsToShowPermissions) {
-                val currentFragment =
-                    supportFragmentManager.findFragmentById(R.id.fragment_container)
-                if (currentFragment?.tag != FragmentTag.PERMISSIONS.tag) {
-                    deleteCurrentFragment()
-                }
-
-                if (permissionsFragment == null) {
-                    permissionsFragment = PermissionsFragment().apply {
-                        if (shouldShowNotificationPermission) {
-                            arguments = bundleOf(
-                                IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION to true
-                            )
-                        }
+            if (permissionsFragment == null) {
+                permissionsFragment = PermissionsFragment().apply {
+                    if (shouldShowNotificationPermission) {
+                        arguments = bundleOf(
+                            IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION to true
+                        )
                     }
                 }
-
-                permissionsFragment?.let {
-                    replaceFragment(it, FragmentTag.PERMISSIONS.tag)
-                }
-
-                onAskingPermissionsFragment = true
-                selectDrawerItem(drawerItem)
             }
+
+            permissionsFragment?.let {
+                replaceFragment(it, FragmentTag.PERMISSIONS.tag)
+            }
+
+            onAskingPermissionsFragment = true
+            selectDrawerItem(drawerItem)
         }
     }
 
@@ -2446,12 +2438,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
     }
 
-    private suspend fun hasMissingPermission(): Boolean {
+    private fun hasMissingPermission(): Boolean {
         val context = this@ManagerActivity
         // Temporary: This will be removed later once the feature flag is removed. We cannot call this
         // from the ViewModel because it creates a weird race condition. The "askForAccess" is called
         // before the feature flag value is set.
-        val isOnboardingRevamp = getFeatureFlagValueUseCase(AppFeatures.OnboardingRevamp)
         val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             arrayOf(
                 PermissionUtils.getAudioPermissionByVersion(),
@@ -2469,25 +2460,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
         // Check if any permission is missing. Onboarding revamp only requires notifications and read storage
         // permissions, while the old onboarding requires all of them
-        return if (isOnboardingRevamp) {
-            listOf(isNotificationPermissionGranted(), readStorageGranted)
-        } else {
-            val writeStorageGranted: Boolean =
-                hasPermissions(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            val cameraGranted: Boolean = hasPermissions(context, Manifest.permission.CAMERA)
-            val microphoneGranted: Boolean =
-                hasPermissions(context, Manifest.permission.RECORD_AUDIO)
-            val bluetoothGranted = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S
-                    || hasPermissions(context, Manifest.permission.BLUETOOTH_CONNECT))
-            listOf(
-                isNotificationPermissionGranted(),
-                writeStorageGranted,
-                readStorageGranted,
-                cameraGranted,
-                microphoneGranted,
-                bluetoothGranted
-            )
-        }.any { it == false }
+        return listOf(isNotificationPermissionGranted(), readStorageGranted).any { !it }
     }
 
     private fun isNotificationPermissionGranted(): Boolean =
