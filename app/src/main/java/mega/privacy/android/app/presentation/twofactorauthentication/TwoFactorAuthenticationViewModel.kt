@@ -16,11 +16,11 @@ import mega.privacy.android.app.presentation.twofactorauthentication.extensions.
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
-import mega.privacy.android.domain.usecase.auth.EnableMultiFactorAuthUseCase
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
+import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
+import mega.privacy.android.domain.usecase.auth.EnableMultiFactorAuthUseCase
 import mega.privacy.android.domain.usecase.auth.GetMultiFactorAuthCodeUseCase
 import mega.privacy.android.domain.usecase.auth.IsMasterKeyExportedUseCase
-import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import javax.inject.Inject
 
@@ -159,7 +159,7 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
                     height = height,
                     penColor = penColor,
                     bgColor = bgColor
-                ).let { bitmap ->
+                )?.let { bitmap ->
                     _uiState.update {
                         it.copy(
                             isQRCodeGenerationCompleted = true,

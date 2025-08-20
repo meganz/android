@@ -49,7 +49,7 @@ fun QRCode(
                     height = 300,
                     penColor = penColor.toArgb(),
                     bgColor = bgColor.toArgb(),
-                ).asImageBitmap()
+                )?.asImageBitmap()
             }
         }
     }

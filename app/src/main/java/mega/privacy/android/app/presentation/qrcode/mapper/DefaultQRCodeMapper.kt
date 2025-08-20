@@ -26,8 +26,8 @@ class DefaultQRCodeMapper @Inject constructor(
         height: Int,
         penColor: Int,
         bgColor: Int,
-    ): Bitmap = withContext(defaultDispatcher) {
-
+    ): Bitmap? = withContext(defaultDispatcher) {
+        if (text.isBlank()) return@withContext null
         // use zxing library to generate QR code
         val hints: MutableMap<EncodeHintType, ErrorCorrectionLevel?> =
             EnumMap<EncodeHintType, ErrorCorrectionLevel>(EncodeHintType::class.java).apply {
