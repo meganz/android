@@ -40,6 +40,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import mega.android.core.ui.components.LinkSpannedText
@@ -61,13 +62,18 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
+import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.ProFeature
 import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
-import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider
+import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
+import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.utils.Constants.PRIVACY_POLICY_URL
 import mega.privacy.android.app.utils.Constants.TERMS_OF_SERVICE_URL
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
 import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
 import mega.privacy.android.feature.payment.components.ChooseAccountScreenTopBar
@@ -460,6 +466,89 @@ internal fun NewChooseAccountScreenPreview(
             onFreePlanClicked = {},
             maybeLaterClicked = {},
             onBack = {}
+        )
+    }
+}
+
+internal class ChooseAccountPreviewProvider :
+    PreviewParameterProvider<ChooseAccountState> {
+    override val values: Sequence<ChooseAccountState>
+        get() = sequenceOf(
+            ChooseAccountState(
+                localisedSubscriptionsList = localisedSubscriptionsList
+            )
+        )
+
+    companion object {
+        val localisedPriceStringMapper = LocalisedPriceStringMapper()
+        val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
+        val formattedSizeMapper = FormattedSizeMapper()
+
+        val subscriptionProI = LocalisedSubscription(
+            accountType = AccountType.PRO_I,
+            storage = 2048,
+            monthlyTransfer = 2048,
+            yearlyTransfer = 24576,
+            monthlyAmount = CurrencyAmount(9.99F, Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                99.99F,
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+
+        val subscriptionProII = LocalisedSubscription(
+            accountType = AccountType.PRO_II,
+            storage = 8192,
+            monthlyTransfer = 8192,
+            yearlyTransfer = 98304,
+            monthlyAmount = CurrencyAmount(19.99F, Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                199.99F,
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+
+        val subscriptionProIII = LocalisedSubscription(
+            accountType = AccountType.PRO_III,
+            storage = 16384,
+            monthlyTransfer = 16384,
+            yearlyTransfer = 196608,
+            monthlyAmount = CurrencyAmount(29.99F, Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                299.99F,
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+
+        val subscriptionProLite = LocalisedSubscription(
+            accountType = AccountType.PRO_LITE,
+            storage = 400,
+            monthlyTransfer = 1024,
+            yearlyTransfer = 12288,
+            monthlyAmount = CurrencyAmount(4.99F, Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                49.99F,
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+
+        val localisedSubscriptionsList: List<LocalisedSubscription> = listOf(
+            subscriptionProLite,
+            subscriptionProI,
+            subscriptionProII,
+            subscriptionProIII
         )
     }
 }

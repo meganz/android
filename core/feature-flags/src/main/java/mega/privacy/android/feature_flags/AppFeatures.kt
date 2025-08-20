@@ -181,14 +181,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     *  Onboarding Pro Promo Revamp with new components
-     */
-    OnboardingProPromoRevamp(
-        "Onboarding Pro Promo Revamp with new components",
-        true,
-    ),
-
-    /**
      *  Update Account Revamp with new components
      */
     UpdateAccountRevamp(

@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
-import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
@@ -29,7 +29,6 @@ import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -63,8 +62,6 @@ class ChooseAccountViewModelTest {
         )
     private val getRecommendedSubscriptionUseCase =
         mock<GetRecommendedSubscriptionUseCase>()
-    private val getFeatureFlagValueUseCase =
-        mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(true) }
     private val isBillingAvailableUseCase = mock<IsBillingAvailableUseCase>()
     private val getPaymentMethodUseCase = mock<GetPaymentMethodUseCase>()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
@@ -79,7 +76,6 @@ class ChooseAccountViewModelTest {
             formattedSizeMapper,
             getRecommendedSubscriptionUseCase,
             getPricing,
-            getFeatureFlagValueUseCase,
             getPaymentMethodUseCase,
             isBillingAvailableUseCase,
             monitorAccountDetailUseCase,
@@ -93,7 +89,6 @@ class ChooseAccountViewModelTest {
             getYearlySubscriptionsUseCase = getYearlySubscriptionsUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
             getRecommendedSubscriptionUseCase = getRecommendedSubscriptionUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPaymentMethodUseCase = getPaymentMethodUseCase,
             isBillingAvailableUseCase = isBillingAvailableUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
@@ -116,7 +111,6 @@ class ChooseAccountViewModelTest {
     @Test
     fun `test that initial state has all Pro plans listed`() = runTest {
         whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
         whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
         initViewModel()
@@ -145,7 +139,6 @@ class ChooseAccountViewModelTest {
         whenever(getRecommendedSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
         whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
         whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         initViewModel()
         underTest.state.map { it.cheapestSubscriptionAvailable }.test {
             assertThat(awaitItem()).isEqualTo(expectedResult)
@@ -153,57 +146,11 @@ class ChooseAccountViewModelTest {
     }
 
     @Test
-    fun `test that initial state has a feature flag for Variant A set properly if it's enabled`() =
-        runTest {
-            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-            whenever(getRecommendedSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
-            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
-            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
-            initViewModel()
-
-            underTest.state.map { it.enableVariantAUI }.test {
-                assertThat(awaitItem()).isEqualTo(true)
-            }
-        }
-
-    @Test
-    fun `test that initial state has a feature flag for Variant B set properly if it's enabled`() =
-        runTest {
-            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-            whenever(getRecommendedSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
-            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
-            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
-            initViewModel()
-
-            underTest.state.map { it.enableVariantBUI }.test {
-                assertThat(awaitItem()).isEqualTo(true)
-            }
-        }
-
-    @Test
-    fun `test that initial state has a feature flag for Ads feature set properly if it's enabled`() =
-        runTest {
-            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-            whenever(getRecommendedSubscriptionUseCase()).thenReturn(subscriptionProLiteMonthly)
-            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
-            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
-            initViewModel()
-
-            underTest.state.map { it.showAdsFeature }.test {
-                assertThat(awaitItem()).isEqualTo(true)
-            }
-        }
-
-    @Test
     fun `test that isPaymentMethodAvailable returns true when isBillingAvailableUseCase returns true and getPaymentMethodUseCase contains PAYMENT_METHOD_GOOGLE_WALLET`() =
         runTest {
             whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
             whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
             whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
             whenever(isBillingAvailableUseCase()).thenReturn(true)
             whenever(getPaymentMethodUseCase(false)).thenReturn(PaymentMethodFlags(1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET))
             initViewModel()
@@ -229,8 +176,6 @@ class ChooseAccountViewModelTest {
             whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
             whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
             whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
-
             initViewModel()
 
             underTest.state.test {

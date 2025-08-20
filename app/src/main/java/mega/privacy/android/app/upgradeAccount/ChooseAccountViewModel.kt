@@ -15,10 +15,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
@@ -27,8 +25,6 @@ import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUse
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.ABTestFeatures
-import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -41,7 +37,6 @@ import javax.inject.Inject
  * @param getYearlySubscriptionsUseCase use case to get the list of yearly subscriptions available in the app
  * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
  * @param getRecommendedSubscriptionUseCase use case to get the cheapest subscription available in the app
- * @param getFeatureFlagValueUseCase use case to get the value of a feature flag
  * @param isBillingAvailableUseCase use case to check if billing is available
  * @param getPaymentMethodUseCase use case to to get available payment method (Google Wallet)
  *
@@ -54,7 +49,6 @@ internal class ChooseAccountViewModel @Inject constructor(
     private val getYearlySubscriptionsUseCase: GetYearlySubscriptionsUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
     private val isBillingAvailableUseCase: IsBillingAvailableUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
@@ -112,30 +106,6 @@ internal class ChooseAccountViewModel @Inject constructor(
                 )
             }
         }
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.OnboardingProPromoRevamp)
-            }.onSuccess { isProPromoRevampEnabled ->
-                _state.update {
-                    it.copy(
-                        isProPromoRevampEnabled = isProPromoRevampEnabled
-                    )
-                }
-            }.onFailure { Timber.e("Failed to fetch feature flags with error: ${it.message}") }
-        }
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(ABTestFeatures.ChooseAccountScreenVariantA) to
-                        getFeatureFlagValueUseCase(ABTestFeatures.ChooseAccountScreenVariantB)
-            }.onSuccess { (variantA, variantB) ->
-                _state.update {
-                    it.copy(
-                        enableVariantAUI = variantA,
-                        enableVariantBUI = variantB
-                    )
-                }
-            }.onFailure { Timber.e("Failed to fetch feature flags with error: ${it.message}") }
-        }
 
         viewModelScope.launch {
             val paymentMethod =
@@ -147,18 +117,6 @@ internal class ChooseAccountViewModel @Inject constructor(
                     && ((paymentMethod.flag and (1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET)) != 0L) // check bit enable
             _state.update {
                 it.copy(isPaymentMethodAvailable = isBillingAvailable)
-            }
-        }
-        viewModelScope.launch {
-            runCatching {
-                val showAds = getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
-                _state.update { state ->
-                    state.copy(
-                        showAdsFeature = showAds
-                    )
-                }
-            }.onFailure {
-                Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
             }
         }
         if (isUpgradeAccountFlow) {
@@ -193,7 +151,7 @@ internal class ChooseAccountViewModel @Inject constructor(
     fun refreshPricing() {
         viewModelScope.launch {
             val pricing = runCatching { getPricing(false) }.getOrElse {
-                Timber.w("Returning empty pricing as get pricing failed.", it)
+                Timber.w(it, "Returning empty pricing as get pricing failed.")
                 Pricing(emptyList())
             }
             _state.update {
@@ -201,24 +159,4 @@ internal class ChooseAccountViewModel @Inject constructor(
             }
         }
     }
-
-    /**
-     * On selecting monthly or yearly plan
-     *
-     * @param isMonthly
-     */
-    fun onSelectingMonthlyPlan(isMonthly: Boolean) =
-        _state.update {
-            it.copy(isMonthlySelected = isMonthly)
-        }
-
-    /**
-     * On selecting monthly or yearly plan
-     *
-     * @param chosenPlan
-     */
-    fun onSelectingPlanType(chosenPlan: AccountType) =
-        _state.update {
-            it.copy(chosenPlan = chosenPlan)
-        }
 }

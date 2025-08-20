@@ -1,6 +1,5 @@
 package mega.privacy.android.app.upgradeAccount.view.components
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -17,8 +16,8 @@ import androidx.compose.ui.unit.sp
 import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.app.upgradeAccount.ChooseAccountPreviewProvider.Companion.localisedSubscriptionsList
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
-import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider.Companion.localisedSubscriptionsList
 import mega.privacy.android.app.upgradeAccount.view.GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG
 import mega.privacy.android.app.upgradeAccount.view.SUBSCRIPTION_DETAILS_DESCRIPTION_TAG
 import mega.privacy.android.app.upgradeAccount.view.SUBSCRIPTION_DETAILS_TITLE_TAG
@@ -34,6 +33,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
+import mega.privacy.android.shared.resources.R as sharedR
 import java.util.Locale
 
 /**

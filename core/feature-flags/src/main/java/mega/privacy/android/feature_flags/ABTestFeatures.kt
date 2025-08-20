@@ -30,39 +30,7 @@ enum class ABTestFeatures(
         experimentName = "devtest",
         description = "Remote feature flag from API for any tests related to A/B testing",
         defaultValue = false
-    ),
-
-    /**
-     * Enable new design Variant A for ChooseAccount screen
-     */
-    ChooseAccountScreenVariantA(
-        experimentName = "obusd",
-        description = "Enable new design (Variant A) for ChooseAccount screen (Onboarding Upselling dialog)",
-        defaultValue = false,
-        checkRemote = true,
-    ) {
-        override fun mapValue(input: Long): Boolean = when (input) {
-            1L -> true
-            else -> false
-        }
-    },
-
-
-    /**
-     * Enable new design Variant B for ChooseAccount screen
-     */
-    ChooseAccountScreenVariantB(
-        experimentName = "obusd",
-        description = "Enable new design (Variant B) for ChooseAccount screen (Onboarding Upselling dialog)",
-        defaultValue = false,
-        checkRemote = true,
-    ) {
-        override fun mapValue(input: Long): Boolean = when (input) {
-            2L -> true
-            else -> false
-        }
-    }
-    ;
+    );
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
