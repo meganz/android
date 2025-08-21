@@ -26,6 +26,11 @@ enum class InviteContactRequest {
     AlreadySent,
 
     /**
+     * Invitation already received.
+     */
+    AlreadyReceived,
+
+    /**
      * Already contact.
      */
     AlreadyContact,

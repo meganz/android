@@ -681,7 +681,6 @@ class DefaultContactsRepositoryTest {
     @Test
     fun `test that mega api gateway to get last name is always called when force refresh is enabled`() =
         runTest {
-
             val expectedLastName = "cde"
             val request = mock<MegaRequest> {
                 on { text }.thenReturn(expectedLastName)
@@ -699,7 +698,6 @@ class DefaultContactsRepositoryTest {
     @Test
     fun `test that successful invite contact returns Sent enum value`() = runTest {
         val myEmail = "myEmail@mega.co.nz"
-        val outgoingContactRequests = arrayListOf<MegaContactRequest>()
         val request = mock<MegaRequest> {
             on { email }.thenReturn(myEmail)
         }
@@ -712,23 +710,22 @@ class DefaultContactsRepositoryTest {
                 mock(), request, megaError
             )
         }
-        whenever(megaApiGateway.outgoingContactRequests()).thenReturn(outgoingContactRequests)
         whenever(
             inviteContactRequestMapper(
-                megaError,
-                myEmail,
-                outgoingContactRequests
+                error = any(),
+                email = any(),
+                getOutgoingContactRequests = any(),
+                getIncomingContactRequests = any(),
             )
         ).thenReturn(expectedResult)
 
-        val result = underTest.inviteContact(userEmail, userHandle, null)
-        assertThat(result).isEqualTo(expectedResult)
+        assertThat(underTest.inviteContact(userEmail, userHandle, null))
+            .isEqualTo(expectedResult)
     }
 
     @Test
     fun `test that inviting existing contact returns AlreadyContact enum value`() = runTest {
         val myEmail = "myEmail@mega.co.nz"
-        val outgoingContactRequests = arrayListOf<MegaContactRequest>()
         val request = mock<MegaRequest> {
             on { email }.thenReturn(myEmail)
         }
@@ -740,23 +737,22 @@ class DefaultContactsRepositoryTest {
                 mock(), request, megaError
             )
         }
-        whenever(megaApiGateway.outgoingContactRequests()).thenReturn(outgoingContactRequests)
         whenever(
             inviteContactRequestMapper(
-                megaError,
-                myEmail,
-                outgoingContactRequests
+                error = any(),
+                email = any(),
+                getOutgoingContactRequests = any(),
+                getIncomingContactRequests = any(),
             )
         ).thenReturn(expectedResult)
 
-        val result = underTest.inviteContact(userEmail, userHandle, null)
-        assertThat(result).isEqualTo(expectedResult)
+        assertThat(underTest.inviteContact(userEmail, userHandle, null))
+            .isEqualTo(expectedResult)
     }
 
     @Test
     fun `test that inviting contact with self email returns InvalidEmail enum value`() = runTest {
         val myEmail = "myEmail@mega.co.nz"
-        val outgoingContactRequests = arrayListOf<MegaContactRequest>()
         val request = mock<MegaRequest> {
             on { email }.thenReturn(myEmail)
         }
@@ -768,24 +764,23 @@ class DefaultContactsRepositoryTest {
                 mock(), request, megaError
             )
         }
-        whenever(megaApiGateway.outgoingContactRequests()).thenReturn(outgoingContactRequests)
         whenever(
             inviteContactRequestMapper(
-                megaError,
-                myEmail,
-                outgoingContactRequests
+                error = any(),
+                email = any(),
+                getOutgoingContactRequests = any(),
+                getIncomingContactRequests = any(),
             )
         ).thenReturn(expectedResult)
 
-        val result = underTest.inviteContact(userEmail, userHandle, null)
-        assertThat(result).isEqualTo(expectedResult)
+        assertThat(underTest.inviteContact(userEmail, userHandle, null))
+            .isEqualTo(expectedResult)
     }
 
     @Test(expected = MegaException::class)
     fun `test that error on inviting contact throw MegaException when mapper throw exception`() =
         runTest {
             val myEmail = "myEmail@mega.co.nz"
-            val outgoingContactRequests = arrayListOf<MegaContactRequest>()
             val request = mock<MegaRequest> {
                 on { email }.thenReturn(myEmail)
             }
@@ -796,12 +791,12 @@ class DefaultContactsRepositoryTest {
                     mock(), request, megaError
                 )
             }
-            whenever(megaApiGateway.outgoingContactRequests()).thenReturn(outgoingContactRequests)
             whenever(
                 inviteContactRequestMapper(
-                    megaError,
-                    myEmail,
-                    outgoingContactRequests
+                    error = any(),
+                    email = any(),
+                    getOutgoingContactRequests = any(),
+                    getIncomingContactRequests = any(),
                 )
             ).thenThrow(MegaException::class.java)
 
@@ -1303,7 +1298,7 @@ class DefaultContactsRepositoryTest {
             val contactRequest = mock<MegaContactRequest> {
                 on { targetEmail }.thenReturn(myEmail)
             }
-            whenever(megaApiGateway.outgoingContactRequests()).thenReturn(arrayListOf(contactRequest))
+            whenever(megaApiGateway.getOutgoingContactRequests()).thenReturn(arrayListOf(contactRequest))
             assertThat(underTest.isContactRequestSent(myEmail)).isTrue()
         }
 
@@ -1314,7 +1309,7 @@ class DefaultContactsRepositoryTest {
             val contactRequest = mock<MegaContactRequest> {
                 on { targetEmail }.thenReturn("abc")
             }
-            whenever(megaApiGateway.outgoingContactRequests()).thenReturn(arrayListOf(contactRequest))
+            whenever(megaApiGateway.getOutgoingContactRequests()).thenReturn(arrayListOf(contactRequest))
             assertThat(underTest.isContactRequestSent(myEmail)).isFalse()
         }
 

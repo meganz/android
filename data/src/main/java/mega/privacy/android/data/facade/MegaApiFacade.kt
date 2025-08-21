@@ -1005,7 +1005,7 @@ internal class MegaApiFacade @Inject constructor(
         listener
     )
 
-    override fun outgoingContactRequests(): ArrayList<MegaContactRequest> =
+    override suspend fun getOutgoingContactRequests(): ArrayList<MegaContactRequest> =
         megaApi.outgoingContactRequests
 
     override fun createFolder(

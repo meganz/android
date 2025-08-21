@@ -28,6 +28,7 @@ import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
+import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
@@ -88,6 +89,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
@@ -158,6 +160,7 @@ class ChatRepositoryImplTest {
         lastMessageTypeMapper = lastMessageTypeMapper,
         chatListItemChangesMapper = chatListItemChangesMapper
     )
+    private val inviteContactRequestMapper = mock<InviteContactRequestMapper>()
 
     @BeforeAll
     fun init() {
@@ -205,6 +208,7 @@ class ChatRepositoryImplTest {
             chatPresenceConfigMapper = chatPresenceConfigMapper,
             context = context,
             chatFilesFolderUserAttributeMapper = chatFilesFolderUserAttributeMapper,
+            inviteContactRequestMapper = inviteContactRequestMapper,
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)
@@ -223,6 +227,7 @@ class ChatRepositoryImplTest {
             megaApiGateway,
             chatRequestMapper,
             localStorageGateway,
+            inviteContactRequestMapper,
         )
     }
 
@@ -416,22 +421,33 @@ class ChatRepositoryImplTest {
             verify(chatRequestMapper).invoke(any())
         }
 
-    @Test
-    fun `test that inviteContact invokes the right methods`() =
-        runTest {
-            whenever(megaApiGateway.inviteContact(any(), any())).thenAnswer {
-                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    mock(),
-                    megaErrorSuccess,
-                )
-            }
-
-            val result = underTest.inviteContact(userEmail)
-
-            verify(megaApiGateway).inviteContact(eq(userEmail), any())
-            assertThat(result).isEqualTo(InviteContactRequest.Sent)
+    @ParameterizedTest
+    @EnumSource(InviteContactRequest::class)
+    fun `test that inviteContact invokes the right methods and returns correctly`(
+        expected: InviteContactRequest,
+    ) = runTest {
+        val request = mock<MegaRequest> {
+            on { email }.thenReturn(userEmail)
         }
+        whenever(megaApiGateway.inviteContact(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                request,
+                megaErrorSuccess,
+            )
+        }
+        whenever(
+            inviteContactRequestMapper(
+                error = any(),
+                email = any(),
+                getOutgoingContactRequests = any(),
+                getIncomingContactRequests = any(),
+            )
+        ).thenReturn(expected)
+
+        assertThat(underTest.inviteContact(userEmail)).isEqualTo(expected)
+        verify(megaApiGateway).inviteContact(eq(userEmail), any())
+    }
 
     @Test
     fun `test that updateChatPermissions invokes the right methods`() =

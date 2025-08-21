@@ -41,6 +41,7 @@ import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
+import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
@@ -173,6 +174,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val chatPresenceConfigMapper: ChatPresenceConfigMapper,
     @ApplicationContext private val context: Context,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
+    private val inviteContactRequestMapper: InviteContactRequestMapper,
 ) : ChatRepository {
     private val richLinkConfig = MutableStateFlow(RichLinkConfig())
     private var chatRoomUpdates: HashMap<Long, Flow<ChatRoomUpdate>> = hashMapOf()
@@ -566,30 +568,28 @@ internal class ChatRepositoryImpl @Inject constructor(
                 megaApiGateway.inviteContact(
                     email,
                     OptionalMegaRequestListenerInterface(
-                        onRequestFinish = onRequestInviteContactCompleted(continuation)
+                        onRequestFinish = { request: MegaRequest, error: MegaError ->
+                            launch {
+                                continuation.resumeWith(runCatching {
+                                    inviteContactRequestMapper(
+                                        error,
+                                        request.email,
+                                        {
+                                            megaApiGateway.getOutgoingContactRequests()
+                                        },
+                                        {
+                                            megaApiGateway.getIncomingContactRequests()
+                                        },
+                                    )
+                                }.onFailure { Timber.e(it) }
+                                )
+                            }
+                        }
                     )
                 )
             }
         }
 
-    private fun onRequestInviteContactCompleted(continuation: Continuation<InviteContactRequest>) =
-        { request: MegaRequest, error: MegaError ->
-            when (error.errorCode) {
-                MegaError.API_OK -> continuation.resumeWith(Result.success(InviteContactRequest.Sent))
-                MegaError.API_EEXIST -> {
-                    if (megaApiGateway.outgoingContactRequests()
-                            .any { it.targetEmail == request.email }
-                    ) {
-                        continuation.resumeWith(Result.success(InviteContactRequest.AlreadySent))
-                    } else {
-                        continuation.resumeWith(Result.success(InviteContactRequest.AlreadyContact))
-                    }
-                }
-
-                MegaError.API_EARGS -> continuation.resumeWith(Result.success(InviteContactRequest.InvalidEmail))
-                else -> continuation.failWithError(error, "onRequestInviteContactCompleted")
-            }
-        }
 
     override suspend fun updateChatPermissions(
         chatId: Long,

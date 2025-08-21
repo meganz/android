@@ -774,7 +774,7 @@ interface MegaApiGateway {
      *
      * @return all incoming contact requests or null
      */
-    suspend fun getIncomingContactRequests(): ArrayList<MegaContactRequest>?
+    suspend fun getIncomingContactRequests(): List<MegaContactRequest>
 
     /**
      * Get contact request by request handle
@@ -1804,7 +1804,7 @@ interface MegaApiGateway {
      *
      * @return list of [MegaContactRequest]
      */
-    fun outgoingContactRequests(): ArrayList<MegaContactRequest>
+    suspend fun getOutgoingContactRequests(): List<MegaContactRequest>
 
     /**
      * Create a folder in the MEGA account

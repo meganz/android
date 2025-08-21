@@ -31,6 +31,7 @@ internal class InviteContactRequestStringMapper @Inject constructor(
                 activity.getString(R.string.error_own_email_as_contact)
 
             InviteContactRequest.InvalidStatus -> ""
+            InviteContactRequest.AlreadyReceived -> TODO()
         }
     }
 }

@@ -2263,6 +2263,7 @@ class MeetingActivityViewModel @Inject constructor(
 
                         InviteContactRequest.InvalidEmail -> context.getString(R.string.error_own_email_as_contact)
                         InviteContactRequest.InvalidStatus -> context.getString(R.string.general_error)
+                        InviteContactRequest.AlreadyReceived -> TODO()
                     }
 
                     showSnackBar(text)

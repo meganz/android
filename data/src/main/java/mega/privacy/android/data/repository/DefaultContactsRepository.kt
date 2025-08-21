@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.FileConstant
@@ -651,13 +652,21 @@ internal class DefaultContactsRepository @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->
-                    continuation.resumeWith(runCatching {
-                        inviteContactRequestMapper(
-                            error,
-                            request.email,
-                            megaApiGateway.outgoingContactRequests()
+                    launch {
+                        continuation.resumeWith(runCatching {
+                            inviteContactRequestMapper(
+                                error,
+                                request.email,
+                                {
+                                    megaApiGateway.getOutgoingContactRequests()
+                                },
+                                {
+                                    megaApiGateway.getIncomingContactRequests()
+                                },
+                            )
+                        }.onFailure { Timber.e(it) }
                         )
-                    })
+                    }
                 }
             )
             megaApiGateway.inviteContact(
@@ -666,7 +675,6 @@ internal class DefaultContactsRepository @Inject constructor(
                 message,
                 listener
             )
-
         }
     }
 
@@ -924,7 +932,7 @@ internal class DefaultContactsRepository @Inject constructor(
     }
 
     override suspend fun isContactRequestSent(email: String) = withContext(ioDispatcher) {
-        megaApiGateway.outgoingContactRequests().any { it.targetEmail == email }
+        megaApiGateway.getOutgoingContactRequests().any { it.targetEmail == email }
     }
 
     override suspend fun hasAnyContact() = withContext(ioDispatcher) {
@@ -1040,7 +1048,7 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun getOutgoingContactRequests(): List<ContactRequest> =
         withContext(ioDispatcher) {
-            megaApiGateway.outgoingContactRequests().map(contactRequestMapper)
+            megaApiGateway.getOutgoingContactRequests().map(contactRequestMapper)
         }
 
     override fun monitorContactByHandle(contactId: Long): Flow<Contact> =

@@ -13,18 +13,27 @@ import javax.inject.Inject
 internal class InviteContactRequestMapper @Inject constructor() {
 
     @Throws(MegaException::class)
-    operator fun invoke(
+    suspend operator fun invoke(
         error: MegaError,
         email: String,
-        outgoingContactRequests: List<MegaContactRequest>,
+        getOutgoingContactRequests: suspend () -> List<MegaContactRequest>,
+        getIncomingContactRequests: suspend () -> List<MegaContactRequest>,
     ): InviteContactRequest {
         return when (error.errorCode) {
             MegaError.API_OK -> InviteContactRequest.Sent
             MegaError.API_EEXIST -> {
-                if (outgoingContactRequests.any { it.targetEmail == email }) {
-                    InviteContactRequest.AlreadySent
-                } else {
-                    InviteContactRequest.AlreadyContact
+                when {
+                    getOutgoingContactRequests().any { it.targetEmail == email } -> {
+                        InviteContactRequest.AlreadySent
+                    }
+
+                    getIncomingContactRequests().any { it.sourceEmail == email } -> {
+                        InviteContactRequest.AlreadyReceived
+                    }
+
+                    else -> {
+                        InviteContactRequest.AlreadyContact
+                    }
                 }
             }
 
