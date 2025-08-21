@@ -39,6 +39,7 @@ class NodeUiItemMapper @Inject constructor(
     /**
      * Map a list of nodes to NodeUiItems
      * @param nodeList List of nodes to map
+     * @param existingItems Optional list of existing NodeUiItems to preserve selection state from
      * @param nodeSourceType Source type for determining specific logic
      * @param showPublicLinkCreationTime Whether to show public link creation time, for root directory of links
      * @param isPublicNodes Whether the nodes are public nodes like folder links
@@ -48,6 +49,7 @@ class NodeUiItemMapper @Inject constructor(
      */
     suspend operator fun invoke(
         nodeList: List<TypedNode>,
+        existingItems: List<NodeUiItem<TypedNode>>? = null,
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
         isPublicNodes: Boolean = false,
         showPublicLinkCreationTime: Boolean = false,
@@ -56,6 +58,13 @@ class NodeUiItemMapper @Inject constructor(
         isContactVerificationOn: Boolean = false,
     ): List<NodeUiItem<TypedNode>> = withContext(ioDispatcher) {
         val highlightedNamesSet = highlightedNames?.toSet()
+        val selectedNodeIds = existingItems?.let { items ->
+            buildSet {
+                items.forEach { item ->
+                    if (item.isSelected) add(item.node.id)
+                }
+            }
+        }
         nodeList.mapAsync { node ->
             val isHighlighted = node.id == highlightedNodeId ||
                     highlightedNamesSet?.contains(node.name) == true
@@ -66,7 +75,7 @@ class NodeUiItemMapper @Inject constructor(
             } else null
             NodeUiItem(
                 node = node,
-                isSelected = false,
+                isSelected = selectedNodeIds?.contains(node.id) ?: false,
                 isHighlighted = isHighlighted,
                 title = getNodeTitle(node),
                 subtitle = nodeSubtitleMapper(

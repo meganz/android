@@ -202,6 +202,7 @@ class CloudDriveViewModel @Inject constructor(
                 nodeSourceType = nodeSourceType,
                 highlightedNodeId = highlightedNodeId,
                 highlightedNames = highlightedNodeNames,
+                existingItems = uiState.value.items,
             )
             uiState.update { state ->
                 state.copy(

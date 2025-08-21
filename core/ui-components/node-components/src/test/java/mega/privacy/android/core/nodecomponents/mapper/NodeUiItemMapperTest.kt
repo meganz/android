@@ -8,6 +8,7 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.model.NodeSubtitleText
+import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.ShareData
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.icon.pack.R as IconPackR
@@ -582,4 +584,185 @@ class NodeUiItemMapperTest {
             assertThat(result).hasSize(1)
             assertThat(result[0].title).isEqualTo(LocalizedText.Literal("Unverified Share With Count"))
         }
+
+    // Helper function to create NodeUiItem<TypedNode> for testing
+    private fun createNodeUiItem(
+        node: TypedNode,
+        isSelected: Boolean = false,
+        isHighlighted: Boolean = false,
+    ): NodeUiItem<TypedNode> = NodeUiItem(
+        node = node,
+        isSelected = isSelected,
+        isHighlighted = isHighlighted,
+        title = LocalizedText.Literal(node.name),
+        subtitle = NodeSubtitleText.FileSubtitle(
+            fileSizeResId = R.string.label_file_size_kilo_byte,
+            fileSizeValue = 1.0,
+            modificationTime = 1234567890L,
+            showPublicLinkCreationTime = false
+        ),
+        formattedDescription = null,
+        tags = emptyList(),
+        iconRes = if (node is TypedFolderNode) IconPackR.drawable.ic_folder_medium_solid
+        else IconPackR.drawable.ic_text_medium_solid,
+        thumbnailData = null,
+        accessPermissionIcon = null,
+        showIsVerified = false,
+        showLink = false,
+        showFavourite = false,
+        isSensitive = false,
+        showBlurEffect = false,
+        isFolderNode = node is TypedFolderNode,
+        isVideoNode = false,
+        duration = null,
+    )
+
+    @Test
+    fun `test that invoke preserves selection state when existingItems is provided`() = runTest {
+        val folderNode = createMockFolderNode(id = 1L, name = "Folder 1")
+        val fileNode = createMockFileNode(id = 2L, name = "File 1")
+        val nodeList = listOf(folderNode, fileNode)
+
+        // Create existing items with some selected
+        val existingItems = listOf(
+            createNodeUiItem(node = folderNode, isSelected = true),
+            createNodeUiItem(node = fileNode, isSelected = false)
+        )
+
+        val result = underTest(
+            nodeList = nodeList,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            existingItems = existingItems,
+        )
+
+        assertThat(result).hasSize(2)
+        // Folder should remain selected
+        assertThat(result[0].isSelected).isTrue()
+        assertThat(result[0].node.id).isEqualTo(NodeId(1L))
+        // File should remain unselected
+        assertThat(result[1].isSelected).isFalse()
+        assertThat(result[1].node.id).isEqualTo(NodeId(2L))
+    }
+
+    @Test
+    fun `test that invoke defaults to false when existingItems is null`() = runTest {
+        val folderNode = createMockFolderNode(id = 1L, name = "Folder 1")
+        val fileNode = createMockFileNode(id = 2L, name = "File 1")
+        val nodeList = listOf(folderNode, fileNode)
+
+        val result = underTest(
+            nodeList = nodeList,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            existingItems = null, // No existing items provided
+        )
+
+        assertThat(result).hasSize(2)
+        // Both should default to unselected
+        assertThat(result[0].isSelected).isFalse()
+        assertThat(result[1].isSelected).isFalse()
+    }
+
+    @Test
+    fun `test that invoke defaults to false when existingItems is empty`() = runTest {
+        val folderNode = createMockFolderNode(id = 1L, name = "Folder 1")
+        val fileNode = createMockFileNode(id = 2L, name = "File 1")
+        val nodeList = listOf(folderNode, fileNode)
+
+        val result = underTest(
+            nodeList = nodeList,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            existingItems = emptyList(), // Empty existing items
+        )
+
+        assertThat(result).hasSize(2)
+        // Both should default to unselected
+        assertThat(result[0].isSelected).isFalse()
+        assertThat(result[1].isSelected).isFalse()
+    }
+
+    @Test
+    fun `test that invoke handles partial selection state preservation`() = runTest {
+        val folderNode = createMockFolderNode(id = 1L, name = "Folder 1")
+        val fileNode1 = createMockFileNode(id = 2L, name = "File 1")
+        val fileNode2 = createMockFileNode(id = 3L, name = "File 2")
+        val nodeList = listOf(folderNode, fileNode1, fileNode2)
+
+        // Create existing items with only some nodes (simulating new nodes added)
+        val existingItems = listOf(
+            createNodeUiItem(node = folderNode, isSelected = true),
+            createNodeUiItem(node = fileNode1, isSelected = false)
+            // Note: fileNode2 (id=3) is not in existing items (new node)
+        )
+
+        val result = underTest(
+            nodeList = nodeList,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            existingItems = existingItems,
+        )
+
+        assertThat(result).hasSize(3)
+        // Folder should remain selected (from existing items)
+        assertThat(result[0].isSelected).isTrue()
+        assertThat(result[0].node.id).isEqualTo(NodeId(1L))
+        // File 1 should remain unselected (from existing items)
+        assertThat(result[1].isSelected).isFalse()
+        assertThat(result[1].node.id).isEqualTo(NodeId(2L))
+        // File 2 should default to unselected (new node, not in existing items)
+        assertThat(result[2].isSelected).isFalse()
+        assertThat(result[2].node.id).isEqualTo(NodeId(3L))
+    }
+
+    @Test
+    fun `test that invoke handles all nodes selected in existing items`() = runTest {
+        val folderNode = createMockFolderNode(id = 1L, name = "Folder 1")
+        val fileNode = createMockFileNode(id = 2L, name = "File 1")
+        val nodeList = listOf(folderNode, fileNode)
+
+        // Create existing items with all selected
+        val existingItems = listOf(
+            createNodeUiItem(node = folderNode, isSelected = true),
+            createNodeUiItem(node = fileNode, isSelected = true)
+        )
+
+        val result = underTest(
+            nodeList = nodeList,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            existingItems = existingItems,
+        )
+
+        assertThat(result).hasSize(2)
+        // Both should remain selected
+        assertThat(result[0].isSelected).isTrue()
+        assertThat(result[1].isSelected).isTrue()
+    }
+
+    @Test
+    fun `test that invoke preserves selection state with different node order`() = runTest {
+        val folderNode = createMockFolderNode(id = 1L, name = "Folder 1")
+        val fileNode = createMockFileNode(id = 2L, name = "File 1")
+
+        // Original order: folder, file
+        val nodeList = listOf(folderNode, fileNode)
+
+        // Existing items in different order: file, folder
+        val existingItems = listOf(
+            createNodeUiItem(node = fileNode, isSelected = true),
+            createNodeUiItem(node = folderNode, isSelected = false)
+        )
+
+        val result = underTest(
+            nodeList = nodeList,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            existingItems = existingItems,
+        )
+
+        assertThat(result).hasSize(2)
+        // Result order should match nodeList order, but selection should be preserved by ID
+        // First result is folder (id=1) - should be unselected
+        assertThat(result[0].node.id).isEqualTo(NodeId(1L))
+        assertThat(result[0].isSelected).isFalse()
+        // Second result is file (id=2) - should be selected
+        assertThat(result[1].node.id).isEqualTo(NodeId(2L))
+        assertThat(result[1].isSelected).isTrue()
+    }
 } 

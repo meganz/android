@@ -138,6 +138,7 @@ class CloudDriveViewModelTest {
         whenever(
             nodeUiItemMapper(
                 nodeList = items,
+                existingItems = emptyList(),
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 isPublicNodes = false,
                 showPublicLinkCreationTime = false,
