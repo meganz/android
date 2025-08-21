@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.button.SecondaryFilledButton
@@ -56,7 +57,7 @@ import timber.log.Timber
 
 @Composable
 fun MenuHomeScreen(
-    navigateToFeature: (Any) -> Unit,
+    navigateToFeature: (NavKey) -> Unit,
     viewModel: MenuViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -66,7 +67,7 @@ fun MenuHomeScreen(
 @Composable
 fun MenuHomeScreenUi(
     uiState: MenuUiState,
-    navigateToFeature: (Any) -> Unit,
+    navigateToFeature: (NavKey) -> Unit,
 ) {
     var isPrivacySuiteExpanded by rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current

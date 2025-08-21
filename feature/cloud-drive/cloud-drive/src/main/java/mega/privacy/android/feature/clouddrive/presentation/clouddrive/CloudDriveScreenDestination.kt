@@ -10,6 +10,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
@@ -36,7 +37,7 @@ data class CloudDrive(
     val isNewFolder: Boolean = false,
     val highlightedNodeHandle: Long? = null,
     val highlightedNodeNames: List<String>? = null,
-)
+) : NavKey
 
 fun NavGraphBuilder.cloudDriveScreen(
     navigationHandler: NavigationHandler,

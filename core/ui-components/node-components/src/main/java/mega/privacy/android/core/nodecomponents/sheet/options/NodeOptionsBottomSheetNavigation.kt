@@ -3,17 +3,18 @@ package mega.privacy.android.core.nodecomponents.sheet.options
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.toRoute
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
-import mega.privacy.android.navigation.contract.bottomsheet.megaBottomSheet
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.bottomsheet.megaBottomSheet
 
 @Serializable
 data class NodeOptionsBottomSheet(
     val nodeHandle: Long = -1L,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
-)
+) : NavKey
 
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun NavGraphBuilder.nodeOptionsBottomSheet(

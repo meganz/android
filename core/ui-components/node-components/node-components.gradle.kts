@@ -45,6 +45,7 @@ dependencies {
     implementation(lib.coil.compose)
     implementation(androidx.hilt.navigation)
     implementation(google.services.mlkit.document.scanner)
+    implementation(androidx.navigation3.runtime)
 
     //test
     testImplementation(project(":core-test"))

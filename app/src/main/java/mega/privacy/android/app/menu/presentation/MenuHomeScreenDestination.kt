@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object MenuHomeScreen : NavKey
 
-fun NavGraphBuilder.menuHomeScreen(onNavigate: (Any) -> Unit) {
+fun NavGraphBuilder.menuHomeScreen(onNavigate: (NavKey) -> Unit) {
     composable<MenuHomeScreen> {
         MenuHomeScreen(
             navigateToFeature = { onNavigate(it) },

@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.Color
+import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +64,7 @@ class MenuViewModelTest {
     private val fileSizeStringMapper = mock<FileSizeStringMapper>()
     private val monitorUserCredentialsUseCase = mock<MonitorUserCredentialsUseCase>()
 
-    private object TestDestination
+    private object TestDestination : NavKey
 
     @BeforeAll
     fun initialisation() {

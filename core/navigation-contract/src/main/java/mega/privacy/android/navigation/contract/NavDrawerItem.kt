@@ -1,8 +1,8 @@
 package mega.privacy.android.navigation.contract
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -24,7 +24,7 @@ sealed interface NavDrawerItem {
      * @property actionLabel Optional action label for the item
      */
     open class Account(
-        override val destination: Any,
+        override val destination: NavKey,
         override val icon: ImageVector,
         @StringRes override val title: Int,
         val subTitle: Flow<String?>? = null,
@@ -42,12 +42,12 @@ sealed interface NavDrawerItem {
      * @property link External link URL for the privacy suite feature
      */
     open class PrivacySuite(
-        override val destination: Any,
+        override val destination: NavKey,
         override val icon: ImageVector,
         @StringRes override val title: Int,
         @StringRes val subTitle: Int,
         val link: String,
-        val appPackage: String? = null
+        val appPackage: String? = null,
     ) : NavDrawerItem
 }
 

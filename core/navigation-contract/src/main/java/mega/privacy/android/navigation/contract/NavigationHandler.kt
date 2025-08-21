@@ -1,5 +1,6 @@
 package mega.privacy.android.navigation.contract
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -17,7 +18,7 @@ interface NavigationHandler {
      *
      * @param destination The destination to navigate to
      */
-    fun navigate(destination: Any)
+    fun navigate(destination: NavKey)
 
     /**
      * Pop back stack to a specific destination.
@@ -25,14 +26,23 @@ interface NavigationHandler {
      * @param destination The destination to pop back to
      * @param inclusive Whether to include the destination in the pop operation
      */
-    fun backTo(destination: Any, inclusive: Boolean = false)
+    fun backTo(destination: NavKey, inclusive: Boolean = false)
 
     /**
      * Clear the entire back stack and navigate to a destination.
      *
      * @param destination The destination to navigate to
      */
-    fun navigateAndClearBackStack(destination: Any)
+    fun navigateAndClearBackStack(destination: NavKey)
+
+    /**
+     * Navigate to a destination and clear the back stack up to a new parent destination.
+     *
+     * @param destination The destination to navigate to
+     * @param newParent The new parent destination to set in the back stack
+     * @param inclusive Whether to include the new parent in the pop operation
+     */
+    fun navigateAndClearTo(destination: NavKey, newParent: NavKey, inclusive: Boolean = false)
 
     /**
      * Set result and pop

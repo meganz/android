@@ -26,7 +26,7 @@ fun NavGraphBuilder.exampleHomeScreen(
 }
 
 fun NavGraphBuilder.otherExampleHomeScreen(
-    onNavigate: (Any) -> Unit,
+    onNavigate: (NavKey) -> Unit,
     resultFlow: (String) -> Flow<Int?>,
 ) {
     composable<HomeScreen2> {

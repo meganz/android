@@ -1,6 +1,7 @@
 package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.navigation.NavHostController
+import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.mapNotNull
 import mega.privacy.android.navigation.contract.NavigationHandler
 
@@ -15,17 +16,23 @@ class NavigationHandlerImpl(
         navController.popBackStack()
     }
 
-    override fun navigate(destination: Any) {
+    override fun navigate(destination: NavKey) {
         navController.navigate(destination)
     }
 
-    override fun backTo(destination: Any, inclusive: Boolean) {
+    override fun backTo(destination: NavKey, inclusive: Boolean) {
         navController.popBackStack(destination, inclusive)
     }
 
-    override fun navigateAndClearBackStack(destination: Any) {
+    override fun navigateAndClearBackStack(destination: NavKey) {
         navController.navigate(destination) {
             popUpTo(0) { inclusive = true }
+        }
+    }
+
+    override fun navigateAndClearTo(destination: NavKey, newParent: NavKey, inclusive: Boolean) {
+        navController.navigate(destination) {
+            popUpTo(newParent) { this.inclusive = inclusive }
         }
     }
 

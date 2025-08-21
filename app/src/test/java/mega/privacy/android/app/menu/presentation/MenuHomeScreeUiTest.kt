@@ -12,6 +12,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performScrollTo
+import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.parcelize.Parcelize
@@ -34,7 +35,7 @@ class MenuHomeScreeUiTest {
     val composeRule = createComposeRule()
 
     @Parcelize
-    object TestDestination : Parcelable
+    object TestDestination : Parcelable, NavKey
 
     val myAccountItems = mapOf(
         1 to NavDrawerItem.Account(
