@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node.dialogs.renamenode
+package mega.privacy.android.core.nodecomponents.dialog.rename
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,29 +10,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
+import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnLoadNodeName
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameConfirmed
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameValidationPassed
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.node.ValidNameType
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameConfirmed
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameSucceeded
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnLoadNodeName
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameValidationPassed
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
-import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-internal class RenameNodeDialogViewModel @Inject constructor(
+class RenameNodeDialogViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
-    private val checkForValidNameUseCase: CheckForValidNameUseCase,
-    private val renameNodeUseCase: RenameNodeUseCase,
-    private val snackBarHandler: SnackBarHandler,
+    private val checkForValidNameUseCase: CheckForValidNameUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RenameNodeDialogState())
@@ -68,12 +64,8 @@ internal class RenameNodeDialogViewModel @Inject constructor(
                 }
             }
 
-            is OnRenameSucceeded -> {
-                snackBarHandler.postSnackbarMessage(R.string.context_correctly_renamed)
-            }
-
             is OnRenameValidationPassed -> {
-                _state.update { it.copy(renameValidationPassedEvent = consumed) }
+                _state.update { it.copy(renameValidationPassedEvent = consumed()) }
             }
 
             is OnChangeNodeExtensionDialogShown -> {
@@ -110,22 +102,9 @@ internal class RenameNodeDialogViewModel @Inject constructor(
             else -> {
                 _state.update {
                     it.copy(
-                        renameValidationPassedEvent = triggered
+                        renameValidationPassedEvent = triggered(action.newNodeName)
                     )
                 }
-                renameNode(action.nodeId, action.newNodeName)
-            }
-        }
-    }
-
-    private fun renameNode(nodeId: Long, newNodeName: String) {
-        applicationScope.launch {
-            runCatching {
-                renameNodeUseCase(nodeId, newNodeName)
-            }.onSuccess {
-                snackBarHandler.postSnackbarMessage(R.string.context_correctly_renamed)
-            }.onFailure {
-                Timber.e(it)
             }
         }
     }

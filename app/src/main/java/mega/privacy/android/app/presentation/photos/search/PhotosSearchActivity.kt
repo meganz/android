@@ -11,6 +11,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.os.bundleOf
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +23,7 @@ import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.main.ManagerActivity
@@ -127,8 +129,17 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 val bottomSheetNavigator = rememberBottomSheetNavigator()
                 val navController = rememberNavController(bottomSheetNavigator)
                 val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
-
+                val context = LocalContext.current
                 val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
+
+                EventEffect(
+                    nodeActionState.onRenameSucceedEvent,
+                    nodeActionsViewModel::resetOnRenameSucceedEvent
+                ) {
+                    snackbarHostState.showSnackbar(
+                        message = context.getString(R.string.context_correctly_renamed)
+                    )
+                }
 
                 MegaBottomSheetLayout(
                     bottomSheetNavigator = bottomSheetNavigator,
@@ -173,7 +184,10 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
                             changeLabelBottomSheetNavigation(navController)
 
-                            renameDialogNavigation(navController)
+                            renameDialogNavigation(
+                                navHostController = navController,
+                                onRenameNode = nodeActionsViewModel::renameNode,
+                            )
 
                             changeNodeExtensionDialogNavigation(navController)
 

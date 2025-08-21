@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.node.dialogs.renamenode
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
@@ -18,13 +17,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnLoadNodeName
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameConfirmed
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameValidationPassed
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnLoadNodeName
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameConfirmed
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameValidationPassed
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogState
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogViewModel
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 
 internal const val RENAME_NODE_DIALOG_TAG = "rename_node_dialog:input_dialog"
 internal const val NODE_NAME_INVALID_CHARACTERS = "\" * / : < > ? \\ |"
@@ -40,6 +42,7 @@ internal const val NODE_NAME_INVALID_CHARACTERS = "\" * / : < > ? \\ |"
 internal fun RenameNodeDialog(
     nodeId: Long,
     onDismiss: () -> Unit,
+    onRenameNode: (nodeId: Long, newNodeName: String) -> Unit,
     onOpenChangeExtensionDialog: (newName: String) -> Unit,
     viewModel: RenameNodeDialogViewModel = hiltViewModel(),
 ) {
@@ -54,7 +57,8 @@ internal fun RenameNodeDialog(
         onConsumed = {
             viewModel.handleAction(OnRenameValidationPassed)
         },
-        action = {
+        action = { newNodeName ->
+            onRenameNode(nodeId, newNodeName)
             onDismiss()
         }
     )

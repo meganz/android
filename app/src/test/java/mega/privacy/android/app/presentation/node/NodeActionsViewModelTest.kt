@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -55,6 +56,7 @@ import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -107,6 +109,7 @@ class NodeActionsViewModelTest {
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
+    private val renameNodeUseCase = mock<RenameNodeUseCase>()
 
     private fun initViewModel() {
         viewModel = NodeActionsViewModel(
@@ -132,7 +135,8 @@ class NodeActionsViewModelTest {
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
-            fileTypeInfoMapper = fileTypeInfoMapper
+            fileTypeInfoMapper = fileTypeInfoMapper,
+            renameNodeUseCase = renameNodeUseCase,
         )
     }
 
@@ -462,6 +466,19 @@ class NodeActionsViewModelTest {
         whenever(fileTypeInfoMapper(file.name)) doReturn expected
         val actual = viewModel.getTypeInfo(file)
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that on rename success should update state`() = runTest {
+        val nodeHandle = 123L
+        val newNodeName = "New Node Name"
+        whenever(renameNodeUseCase(nodeHandle, newNodeName)).thenReturn(Unit)
+        initViewModel()
+        viewModel.renameNode(nodeHandle, newNodeName)
+        viewModel.state.test {
+            val state = awaitItem()
+            assertThat(state.onRenameSucceedEvent).isEqualTo(triggered)
+        }
     }
 }
 

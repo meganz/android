@@ -11,6 +11,7 @@ import java.io.File
 
 internal fun NavGraphBuilder.renameDialogNavigation(
     navHostController: NavHostController,
+    onRenameNode: (nodeId: Long, newNodeName: String) -> Unit,
 ) {
     dialog(
         route = "$searchRenameDialog/{$nodeListHandle}",
@@ -34,6 +35,7 @@ internal fun NavGraphBuilder.renameDialogNavigation(
                             .plus(File.separator).plus(nodeId)
                     )
                 },
+                onRenameNode = onRenameNode,
             )
         }
     }

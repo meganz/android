@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.search
 
+import androidx.compose.material.SnackbarHostState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -49,6 +50,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     handleClick: (TypedNode?) -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
     listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
+    onRenameNode: (nodeId: Long, newNodeName: String) -> Unit,
 ) {
     composable(searchRoute) {
         SearchScreen(
@@ -68,6 +70,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     )
     renameDialogNavigation(
         navHostController = navHostController,
+        onRenameNode = onRenameNode,
     )
     nodeBottomSheetNavigation(
         nodeActionHandler = nodeActionHandler,

@@ -40,4 +40,5 @@ data class NodeActionState(
     val selectAll: StateEvent = consumed,
     val clearAll: StateEvent = consumed,
     val infoToShowEvent: StateEventWithContent<InfoToShow?> = consumed(),
+    val onRenameSucceedEvent: StateEvent = consumed
 )

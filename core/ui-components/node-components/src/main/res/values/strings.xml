@@ -209,4 +209,11 @@
     <string name="button_bonus_almost_full_warning">Get Bonus</string>
     <string name="general_upgrade_button">Upgrade</string>
     <!-- End of Storage Status Dialog M3 strings -->
+
+    <!-- Start of Rename dialog resources -->
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">To proceed you need to type a file extension</string>
+    <!-- success message when renaming a node -->
+    <string name="context_correctly_renamed">Item renamed</string>
+    <!-- End of Rename dialog resources -->
 </resources>

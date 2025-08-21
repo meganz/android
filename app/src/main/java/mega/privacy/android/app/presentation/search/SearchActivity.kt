@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -36,6 +37,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -308,7 +310,8 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                     } else {
                                         onBackPressedDispatcher.onBackPressed()
                                     }
-                                }
+                                },
+                                snackbarHostState = snackbarHostState,
                             )
 
                             RequestStatusProgressContainer(

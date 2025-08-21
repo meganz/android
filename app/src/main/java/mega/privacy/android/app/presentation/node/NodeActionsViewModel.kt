@@ -54,6 +54,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import timber.log.Timber
@@ -104,6 +105,7 @@ class NodeActionsViewModel @Inject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val renameNodeUseCase: RenameNodeUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -570,4 +572,20 @@ class NodeActionsViewModel @Inject constructor(
      * return the file type of the given file
      */
     fun getTypeInfo(file: File) = fileTypeInfoMapper(file.name)
+
+    fun renameNode(nodeId: Long, newNodeName: String) {
+        applicationScope.launch {
+            runCatching {
+                renameNodeUseCase(nodeId, newNodeName)
+            }.onSuccess {
+                _state.update { it.copy(onRenameSucceedEvent = triggered) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    fun resetOnRenameSucceedEvent() {
+        _state.update { it.copy(onRenameSucceedEvent = consumed) }
+    }
 }
