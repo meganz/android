@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">تم إلغاء الاشتراك بشكل صحيح</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">لم نتمكن من إلغاء اشتراكك. الرجاء مراسلتنا عبر البريد الإلكتروني support&#64;mega.nz للمساعدة.</string>
+    <string name="cancel_subscription_error">لم نتمكن من إلغاء اشتراكك. الرجاء مراسلتنا عبر البريد الإلكتروني support&#64;mega.io للمساعدة.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">غلق الجلسات الأخرى</string>
     <!-- Message after kill all opened sessions -->
@@ -789,7 +789,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">البريد الإلكتروني أو كلمة المرور غير صالحين. حاول مرة أخرى</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">تم تعليق حسابك بسبب انتهاكات شروط الخدمة. يرجى التواصل على support&#64;mega.nz</string>
+    <string name="error_account_suspended">تم تعليق حسابك بسبب انتهاكات شروط الخدمة. يرجى التواصل على support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">هناك الكثير من المحاولات الفاشلة لتسجيل الدخول، يرجى الانتظار لمدة ساعة.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -5728,7 +5728,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">تم إيقاف الترفيع مؤقتًا لأن البطارية أقل من %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">توقفت ترفيعات الكاميرا عن العمل. حاول إعادة تمكين ترفيعات الكاميرا لحلها. إذا استمرت المشكلة، تواصل مع support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">توقفت ترفيعات الكاميرا عن العمل. حاول إعادة تمكين ترفيعات الكاميرا لحلها. إذا استمرت المشكلة، تواصل مع support&#64;mega.io.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="zero">ترفيعات الكاميرا قيد الإنجاز، %1$d ملف معلق</item>

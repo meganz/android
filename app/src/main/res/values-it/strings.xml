@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">La sottoscrizione è stata annullata</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Non ci è stato possibile annullare il tuo abbonamento. Per favore, contatta support&#64;mega.nz per assistenza.</string>
+    <string name="cancel_subscription_error">Non ci è stato possibile annullare il tuo abbonamento. Per favore, contatta support&#64;mega.io per assistenza.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Chiudi le altre sessioni</string>
     <!-- Message after kill all opened sessions -->
@@ -765,7 +765,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">E-mail o password non valide. Per favore, riprova.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Il tuo account è stato sospeso a causa di violazioni dei Termini di servizio. Per favore, contatta support&#64;mega.nz</string>
+    <string name="error_account_suspended">Il tuo account è stato sospeso a causa di violazioni dei Termini di servizio. Per favore, contatta support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Troppi tentativi falliti di effettuare il login, per favore aspetta un’ora.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -3593,9 +3593,9 @@
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">Visualizzazione a galleria</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
+    <string name="settings_media_discovery_view_context">Apri le cartelle che contengono solo immagini o video in una griglia visiva. Sfoglia i contenuti multimediali utilizzando le anteprime in miniatura e filtra per data.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in gallery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Poiché questa cartella contiene solo immagini e video, l\’abbiamo aperta automaticamente nella visualizzazione a galleria. Puoi goderti i tuoi contenuti visivi con un layout più coinvolgente. Puoi disattivarlo nelle Impostazioni.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Impostazioni</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4895,9 +4895,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Originale</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Gallery view in subfolders</string>
+    <string name="settings_media_discovery_sub_folder_title">Visualizzazione a galleria delle sottocartelle</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in gallery view</string>
+    <string name="settings_media_discovery_sub_folder_context">Le immagini e i video delle sottocartelle verranno inclusi nella visualizzazione a galleria</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Nessun risultato</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -5061,11 +5061,11 @@
     <!-- Camera uploads updated info in Photos screen. -->
     <string name="photos_camera_uploads_updated">Caricamenti da fotocamera aggiornati</string>
     <!-- Camera uploads no internet info in Photos screen. -->
-    <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
+    <string name="photos_camera_uploads_no_internet">Caricamento interrotto a causa della mancanza di connessione Internet</string>
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Caricamento sospeso perché la batteria è minore del %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">I Caricamenti da fotocamera hanno smesso di funzionare. Prova a riattivare i Caricamenti da fotocamera per risolvere il problema. Se il problema persiste, contatta support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">I Caricamenti da fotocamera hanno smesso di funzionare. Prova a riattivare i Caricamenti da fotocamera per risolvere il problema. Se il problema persiste, contatta support&#64;mega.io</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Caricamenti da fotocamera in corso, %1$d file in attesa</item>

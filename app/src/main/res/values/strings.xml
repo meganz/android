@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">The subscription has been cancelled</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">We were unable to cancel your subscription. Please contact support&#64;mega.nz for assistance.</string>
+    <string name="cancel_subscription_error">We were unable to cancel your subscription. Please contact support&#64;mega.io for assistance.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Close other sessions</string>
     <!-- Message after kill all opened sessions -->
@@ -757,7 +757,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Invalid email address or password. Please try again.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Your account has been suspended due to Terms of Service violations. Please contact support&#64;mega.nz</string>
+    <string name="error_account_suspended">Your account has been suspended due to Terms of Service violations. Please contact support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Too many failed attempts to log in, please wait for an hour.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -4850,7 +4850,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Upload paused as battery is below %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.io</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Camera uploads in progress, %1$d file pending</item>

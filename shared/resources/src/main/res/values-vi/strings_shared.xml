@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Không đủ không&#160;gian lưu&#160;trữ trong thiết&#160;bị của bạn</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Một lỗi không xác&#160;định được đã xảy ra. Liên&#160;hệ support@mega.nz.</string>
+    <string name="general_sync_message_unknown_error">Một lỗi không xác&#160;định được đã xảy ra. Liên&#160;hệ support@mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Thư&#160;mục không thể đồng&#160;bộ hoặc sao&#160;lưu được bởi vì thư&#160;mục tương&#160;ứng trên MEGA đang nằm trong Thùng&#160;Rác</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -1132,8 +1132,6 @@
     <string name="pro_plan_feature_pass_desc">Sắp xếp tất cả mật khẩu của bạn và giữ chúng an toàn với trình quản lý mật khẩu của chúng tôi</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Khuyên dùng</string>
-    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
-    <string name="transfers_over_quota_banner_title">Tăng hạn mức truyền tải</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">Nâng&#160;cấp ngay</string>
     <!-- Section title for additional benefits of Pro plans -->
@@ -1337,7 +1335,7 @@
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Thông tin</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Màu nhãn</string>
+    <string name="file_properties_label">Thêm nhãn</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">Từ bỏ thư mục</string>
     <!-- Option of the sliding panel to edit the link of a node -->
@@ -1381,7 +1379,7 @@
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">Xem trong thư&#160;mục chứa</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
-    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Or delete the folder from MEGA. It won’t be deleted from your device. This action can’t be undone.</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Hoặc xóa thư mục này khỏi MEGA. Thư&#160;mục sẽ vẫn giữ nguyên&#160;vẹn trong thiết&#160;bị của bạn. Hành&#160;động này sẽ không&#160;thể hồi lại được.</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
     <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Chuyển thư&#160;mục vào Ổ&#160;Mây</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
@@ -1421,23 +1419,23 @@
     <!-- Name for a general label which action is "Select or create new folder" -->
     <string name="sync_snackbar_message_confirm_backup_deleted">Sao lưu đã dừng lại. Thư mục bị xóa khỏi MEGA.</string>
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
+    <string name="sync_stalled_issue_choose_local_file_explanation">Cái tệp&#160;tin đang có trên MEGA sẽ thay thế bằng [A]%1$s.[/A] Còn phiên bản hiện có sẽ được chuyển vào thư mục SyncDebris trong Thùng&#160;Rác của bạn.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_remote_file_explanation">Tệp tin cục bộ [A]%1$s[/A] sẽ được chuyển đến thư&#160;mục “.debris”</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
+    <string name="sync_stalled_issue_choose_rename_file_explanation">Các tệp tin có cùng tên nhưng nội dung khác nhau sẽ được đánh số như (1)(2)(3) vào tên từng cái</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">Các thư mục sẽ được hợp nhất và các tệp&#160;tin có cùng tên nhưng nội dung khác nhau sẽ được đánh số như (1)(2)(3) vào tên từng cái</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">Tệp tin đã cập nhật gần đây nhất sẽ thay thế tệp tin cũ hơn có ở cả hai vị&#160;trí</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">Chọn</string>
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Áp&#160;dụng cho tất&#160;cả</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue solved</string>
+    <string name="sync_stalled_issue_resolved">Vấn đề đã giải quyết</string>
     <!-- Sync message when multiple issues resolved -->
     <string name="sync_stalled_issues_resolved">Các vấn đề đã được giải quyết</string>
     <!-- Text of the empty playlist in Video Section -->
@@ -1449,7 +1447,7 @@
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">Di chuyển thư&#160;mục này vào Ổ&#160;Mây của bạn để có được toàn quyền truy&#160;cập vào dữ&#160;liệu của mình nhưng thư&#160;mục sẽ không còn được sao lưu.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Truy cập [A]https://%1$s[/A] với trình duyệt web của bạn.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
     <string name="camera_uploads_banner_checking_uploads_text">Đang kiểm tra các phiên tải lên...</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
@@ -1465,17 +1463,19 @@
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">Chọn tệp&#160;tin đã sửa&#160;đổi mới nhất?</string>
     <!-- Colored folders onboarding title -->
-    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <string name="colored_folders_onboarding_title">Thư mục đầy màu&#160;sắc, dễ ngăn&#160;nắp hơn</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">Khi bạn thêm nhãn vào một thư&#160;mục, màu nhãn sẽ hiển&#160;thị trên thư&#160;mục. Để giúp bạn tìm thấy những gì bạn cần nhanh hơn.</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">Hợp nhất</string>
     <!-- Dialog rename option -->
     <string name="sync_apply_all_dialog_rename_button">Đổi tên</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear solved issues</string>
+    <string name="sync_menu_clear_issues">Dọn các vấn&#160;đề đã giải&#160;quyết</string>
     <!--Sign Up page text field input first name error message when character limit exceeded-->
-    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">Tên không được vượt quá 40 ký tự</string>
     <!--Sign Up page text field input last name error message when character limit exceeded-->
-    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Họ của tên không được vượt quá 40 ký tự</string>
+    <!-- Error message when IP has already sent an issue report and needs to wait -->
+    <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
 </resources>

@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Ruang penyimpanan tidak mencukupi di perangkat anda</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact support@mega.nz.</string>
+    <string name="general_sync_message_unknown_error">Terjadi kesalahan yang tidak diketahui. Kontak support@mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Folder tidak dapat disinkronkan atau dicadangkan karena folder MEGA ada di tempat sampah</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -79,7 +79,7 @@
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_backup_rewind">Jangan pernah kehilangan data lagi</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore files and folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Putar ulang untuk mengembalikan file dan folder ke tanggal apa pun hingga 180 hari, sehingga data anda tidak mengalami kecelakaan dan rusak.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Tipe</string>
     <!-- Search drop down chips filter type file type images -->
@@ -149,7 +149,7 @@
     <!-- Rename playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_rename_playlist_dialog_title">Ubah nama</string>
     <!-- Error message when the playlist name already exists -->
-    <string name="video_section_playlists_error_message_playlist_name_exists">A playlist with this name already exists. Enter a different name.</string>
+    <string name="video_section_playlists_error_message_playlist_name_exists">Daftar putar dengan nama ini sudah ada. Masukkan nama yang berbeda.</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_delete_playlist_dialog_title">Hapus playlist?</string>
     <!-- Delete button title of the video section playlists tab delete playlist dialog -->
@@ -163,20 +163,18 @@
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
     <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Hapus</string>
     <!-- Play all button title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_play_all_button">Play all</string>
+    <string name="video_section_playlist_detail_play_all_button">Mainkan semua</string>
     <!-- Text that indicates that there’s no videos in the video playlist detail to show. -->
     <string name="video_section_playlist_detail_empty_hint_videos">Tidak ada video</string>
     <!-- Top bar title of the video section video selected page -->
     <string name="video_section_video_selected_top_bar_title">Pilih file</string>
     <!-- Message when deleting the playlists of the video section playlists tab. %1$d will be replaced the number of deleted playlists -->
     <plurals name="video_section_playlists_delete_playlists_message">
-        <item quantity="one">Deleted %1$d playlist</item>
-        <item quantity="other">Deleted %1$d playlists</item>
+        <item quantity="other">Dihapus %1$d daftar putar</item>
     </plurals>
     <!-- Message when adding the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_add_videos_message">
-        <item quantity="one">Added %1$d item to “%2$s”</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
+        <item quantity="other">Ditambahkan %1$d item untuk ”%2$s”</item>
     </plurals>
     <!-- Message when removing the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_remove_videos_message">
@@ -187,11 +185,11 @@
         <item quantity="other">%1$d video</item>
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
-    <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
+    <string name="chat_click_link_in_message_intent_not_available">Anda mungkin tidak menginstal aplikasi apa pun yang dapat membuka situs web ini</string>
     <!-- Message when deleting a singular playlist of the video section playlists tab. %1$s will be replaced the name of deleted playlist -->
     <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” dihapus</string>
     <!-- The name of the Settings Camera Uploads Option, which decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
-    <string name="settings_camera_uploads_upload_only_while_charging_option_name">Upload only while charging</string>
+    <string name="settings_camera_uploads_upload_only_while_charging_option_name">Unggah hanya saat mengisi daya</string>
     <!-- Text for the header of the screen to add a new sync folder -->
     <string name="sync_add_new_sync_folder_header_text">Tambah folder yang disinkronkan:</string>
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
@@ -205,7 +203,7 @@
     <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
     <string name="dialog_onboarding_button_continue">Lanjutkan</string>
     <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
+    <string name="dialog_onboarding_app_bar_title">Pilih paket MEGA anda</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">Memiliki</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
@@ -229,35 +227,35 @@
         <item quantity="other">Bagikan link</item>
     </plurals>
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
-    <string name="transfers_dialog_save_download_location_title">Save all your downloaded files to “%1$s”?</string>
+    <string name="transfers_dialog_save_download_location_title">Simpan semua file yang anda unduh ke ”%1$s“?</string>
     <!-- Option to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_always_here_option">Always download here</string>
+    <string name="transfers_dialog_save_download_location_always_here_option">Selalu unduh di sini</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
-    <string name="transfers_dialog_save_download_location_always_ask_option">Always ask for destination</string>
+    <string name="transfers_dialog_save_download_location_always_ask_option">Selalu minta tujuan</string>
     <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_giga_byte_standalone">GB</string>
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">Starting from %1$s&#160;%2$s, find the perfect fit for your storage needs.</string>
+    <string name="dialog_onboarding_feature_storage_description">Mulai dari %1$s&#160;%2$s, temukan yang cocok untuk kebutuhan penyimpanan anda.</string>
     <!-- Title of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_title">Insufficient storage space</string>
+    <string name="sync_error_dialog_insufficient_storage_title">Ruang penyimpanan tidak mencukupi</string>
     <!-- Body text of the insufficient storage error dialog -->
-    <string name="sync_error_dialog_insufficient_storage_body">The size of this folder will take your MEGA account over its storage limit. To be able to sync it, you will need to either free up some space or upgrade your MEGA account.</string>
+    <string name="sync_error_dialog_insufficient_storage_body">Ukuran folder ini akan membuat akun MEGA anda melebihi batas penyimpanannya. Untuk dapat menyinkronkannya, anda harus mengosongkan ruang atau meningkatkan akun MEGA anda.</string>
     <!-- Confirm button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_confirm_button">Lihat rencana</string>
     <!-- Cancel button text of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_cancel_button">Jangan Sekarang</string>
     <!-- Title of the insufficient storage error banner -->
-    <string name="sync_error_storage_over_quota_banner_title">Syncing paused, your MEGA plan has run out of storage</string>
+    <string name="sync_error_storage_over_quota_banner_title">Sinkronisasi dijeda, paket MEGA anda kehabisan penyimpanan</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">Upload paused, device is not charging</string>
+    <string name="camera_uploads_phone_not_charging_message">Unggahan dijeda, perangkat tidak mengisi daya</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
-    <string name="device_center_list_view_item_status_nothing_setup">No syncs set up</string>
+    <string name="device_center_list_view_item_status_nothing_setup">Tidak ada pengaturan sinkronisasi</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_title">Akun dinonaktifkan</string>
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
-    <string name="account_pro_flexi_account_deactivated_dialog_body">Your Pro&#160;Flexi account has been deactivated due to payment failure or you’ve cancelled your subscription. You won’t be able to access the data stored in your account. \nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="account_pro_flexi_account_deactivated_dialog_body">Akun Pro&#160;Flexi anda telah dinonaktifkan karena kegagalan pembayaran atau anda telah membatalkan langganan anda. Anda tidak akan dapat mengakses data yang tersimpan di akun anda. \nUntuk melakukan pembayaran dan mengaktifkan kembali langganan anda, masuk ke MEGA melalui browser.</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
     <string name="general_low_tier_plan_starter_label">MEGA&#160;Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
@@ -267,11 +265,11 @@
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_body">Unggahan akan dihentikan sementara sampai anda mulai mengisi daya perangkat anda. Unggahan akan tetap dihentikan sementara jika baterai anda di bawah 20%.</string>
     <!-- Label for the button or menu option to add a new sync -->
-    <string name="device_center_sync_add_new_syn_button_option">Add new sync</string>
+    <string name="device_center_sync_add_new_syn_button_option">Tambahkan sinkronisasi baru</string>
     <!-- Text for the Sync solved issues chip -->
-    <string name="device_center_sync_solved_issues_chip_text">Solved issues</string>
+    <string name="device_center_sync_solved_issues_chip_text">Masalah yang diselesaikan</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
-    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">This folder can’t be synced. Set it up to sync to MEGA using Camera uploads.</string>
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">Folder ini tidak dapat disinkronkan. Atur untuk disinkronkan ke MEGA menggunakan unggahan Kamera.</string>
     <!-- Label for the file info information screen description field -->
     <string name="file_info_information_description_label">Deskripsi</string>
     <!-- Placeholder for the file info information screen description field -->
@@ -283,23 +281,23 @@
     <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
     <string name="dialog_onboarding_feature_title_additional_features">Ditambah akses ke manfaat besar ini:</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
+    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Panggilan dan rapat tanpa batas \n&#8226;&#160;Sinkronkan folder di perangkat seluler anda secara otomatis \n&#8226;&#160;Tidak ada iklan</string>
     <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Panggilan dan rapat tanpa batas \n&#8226;&#160;Sinkronkan folder di perangkat seluler anda secara otomatis</string>
     <!-- Text for the Sync solved issues list empty state -->
-    <string name="device_center_sync_solved_issues_empty_state_text">No solved issues</string>
+    <string name="device_center_sync_solved_issues_empty_state_text">Tidak ada masalah yang terpecahkan</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
-    <string name="meetings_raised_hand_tooltip_title">[A]New feature: Raise hand[/A]</string>
+    <string name="meetings_raised_hand_tooltip_title">[A]Fitur baru: Angkat tangan[/A]</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Uploads folder conflict</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Konflik folder unggahan</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your Camera uploads folder and secondary media uploads folder cannot be related to each other. Choose a different folder.</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Folder Unggahan Kamera dan folder unggahan media sekunder tidak dapat dikaitkan satu sama lain. Pilih folder yang berbeda.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Oke, mengerti</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_no_picker_warning">This device doesn’t have an app to select folders</string>
+    <string name="general_no_picker_warning">Perangkat ini tidak memiliki aplikasi untuk memilih folder</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Sinkronkan folder di perangkat seluler anda secara otomatis</string>
     <!-- Hidden items -->
     <string name="hidden_items">Item tersembunyi</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -315,23 +313,23 @@
     <!-- label for add tags page existing tags label -->
     <string name="add_tags_label_existing_tags">Tag yang ada</string>
     <!-- error label for add tags page when special characters added -->
-    <string name="add_tags_error_special_characters">Tags can’t contain spaces or non-alphanumeric symbols. Tags written with capital letters will be displayed in lowercase.</string>
+    <string name="add_tags_error_special_characters">Tag tidak boleh berisi spasi atau simbol non-alfanumerik. Tag yang ditulis dengan huruf kapital akan ditampilkan dalam huruf kecil.</string>
     <!-- error label for add tags page when tag count is maximum -->
-    <string name="add_tags_error_max_tags">The maximum number of tags is %1$d</string>
+    <string name="add_tags_error_max_tags">Jumlah maksimum tag adalah %1$d</string>
     <!-- title label for tags page -->
     <string name="add_tags_page_title_label">Tag</string>
     <!-- The placeholder for read only files/folders with no description in info screen-->
     <string name="file_info_information_no_description_placeholder">Tidak ada deskripsi</string>
     <!-- Top bar title of the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_top_bar_title">Add to playlist</string>
+    <string name="video_to_playlist_top_bar_title">Tambahkan ke daftar putar</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">Daftar putar baru</string>
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">Anda akan kehilangan fitur-fitur ini</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
-    <string name="account_cancel_account_screen_plan_access_until_expiration">You’ll still have access to these features until your MEGA plan expires, then you’ll be moved to a free account.</string>
+    <string name="account_cancel_account_screen_plan_access_until_expiration">Anda masih akan memiliki akses ke fitur-fitur ini sampai paket MEGA anda berakhir, kemudian anda akan dipindahkan ke akun gratis.</string>
     <!-- Warning message about current storage usage when cancelling the plan -->
-    <string name="account_cancel_account_screen_plan_current_storage_warning">You are currently using %1s of storage, which you will risk losing.</string>
+    <string name="account_cancel_account_screen_plan_current_storage_warning">Saat ini anda menggunakan %1s penyimpanan, yang berisiko dapat hilang.</string>
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Fitur</string>
     <!-- Column header indicating features available with the free plan -->
@@ -385,53 +383,53 @@
     <!-- Title shown when reactivating the subscription -->
     <string name="account_cancellation_instructions_reactivate_subscription_title">Aktifkan kembali langganan</string>
     <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
-    <string name="account_cancellation_instructions_not_managed_by_google">Your subscription is not managed by Google</string>
+    <string name="account_cancellation_instructions_not_managed_by_google">Langganan anda tidak dikelola oleh Google</string>
     <!-- Message shown when cancelling the current plan in the instructions screen, informing the user about how to cancel subscription -->
     <string name="account_cancellation_instructions_message_apple_description">Ini karena anda berlangganan MEGA melalui Apple. Untuk membatalkan langganan anda, anda harus:</string>
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
-    <string name="account_cancellation_instructions_ios_device">On an iOS Device</string>
+    <string name="account_cancellation_instructions_ios_device">Di Perangkat iOS</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
-    <string name="account_cancellation_instructions_open_settings">1. Open the [A]Settings[/A] app.</string>
+    <string name="account_cancellation_instructions_open_settings">1. Buka aplikasi [A]Pengaturan[/A].</string>
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
-    <string name="account_cancellation_instructions_tap_on_name">2. Tap on your name.</string>
+    <string name="account_cancellation_instructions_tap_on_name">2. Ketuk nama anda.</string>
     <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
-    <string name="account_cancellation_instructions_select_subscriptions">3. Tap [A]Subscriptions[/A].</string>
+    <string name="account_cancellation_instructions_select_subscriptions">3. Ketuk [A]Langganan[/A].</string>
     <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
-    <string name="account_cancellation_instructions_select_mega_subscription">4. Tap your MEGA subscription.</string>
+    <string name="account_cancellation_instructions_select_mega_subscription">4. Ketuk langganan MEGA anda.</string>
     <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
-    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Tap [A]Cancel subscription[/A].</string>
+    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Ketuk [A]Batalkan langganan[/A].</string>
     <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
     <string name="account_cancellation_instructions_detailed_instructions">[A]Ketuk di sini[/A] untuk petunjuk terperinci tentang cara membatalkan langganan anda di komputer atau perangkat lain.</string>
     <!-- Title shown when needing to cancel the subscription using a web browser -->
     <string name="account_cancellation_instructions_cancellation_web_browser_needed">Anda perlu membatalkan langganan anda menggunakan browser web</string>
     <!-- Title shown when needing to reactivate the subscription using a web browser -->
-    <string name="account_cancellation_instructions_reactivation_web_browser_needed">You need to reactivate your subscription using a web browser</string>
+    <string name="account_cancellation_instructions_reactivation_web_browser_needed">Anda perlu mengaktifkan kembali langganan anda menggunakan browser web</string>
     <!-- Message shown when reactivating the current plan in the instructions screen, informing the user about how to reactivate the subscription -->
-    <string name="account_cancellation_instructions_reactivation_web_browser_description">This is because you subscribed to MEGA in your web browser. To reactivate your subscription, you will need to:</string>
+    <string name="account_cancellation_instructions_reactivation_web_browser_description">Ini karena anda berlangganan MEGA di browser web anda. Untuk mengaktifkan kembali langganan anda, anda harus:</string>
     <!-- Description explaining why the subscription needs to be canceled using a web browser -->
     <string name="account_cancellation_instructions_web_browser_description">Ini karena anda berlangganan MEGA di browser web anda. Untuk membatalkan langganan anda, anda harus:</string>
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">Di komputer</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Visit [A]https://mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website">1. Kunjungi [A]https://mega.nz[/A] di browser web anda.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Masuk ke akun MEGA anda.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
     <string name="account_cancellation_instructions_click_main_menu">3. Klik menu utama.</string>
     <!-- Step 4: instruction step no.4 to Click Settings of the MEGA account on MEGA website -->
-    <string name="account_cancellation_instructions_click_settings">4. Click [A]Settings.[/A]</string>
+    <string name="account_cancellation_instructions_click_settings">4. Klik [A]Pengaturan.[/A]</string>
     <!-- Step 5: instruction step no.5 to Click on Plan section of the MEGA account on MEGA website-->
-    <string name="account_cancellation_instructions_click_plan">5. Click [A]Plan[/A].</string>
+    <string name="account_cancellation_instructions_click_plan">5. Klik [A]Rencana[/A].</string>
     <!-- Step 6: instruction step no.6 Click Cancel subscription of the MEGA account on MEGA website -->
-    <string name="account_cancellation_instructions_click_cancel_subscription">6. Click [A]Cancel subscription[/A].</string>
+    <string name="account_cancellation_instructions_click_cancel_subscription">6. Klik [A]Batalkan langganan[/A].</string>
     <!-- Alternative Step 6: instruction step no.5 Click Reactivate subscription when user's subscription has expired of the MEGA account on MEGA website-->
-    <string name="account_cancellation_instructions_click_reactivate_subscription">6. Click [A]Reactivate subscription[/A].</string>
+    <string name="account_cancellation_instructions_click_reactivate_subscription">6. Klik [A]Aktifkan kembali langganan[/A].</string>
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">Pada perangkat seluler</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. Ketuk avatar anda.</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
-    <string name="account_cancellation_instructions_tap_cancel_subscription">4. Tap [A]Cancel subscription[/A].</string>
+    <string name="account_cancellation_instructions_tap_cancel_subscription">4. Ketuk [A]Batalkan langganan[/A].</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">Tidak ada koneksi internet</string>
     <!-- Menu option to create a new folder in the file manager -->
@@ -464,38 +462,36 @@
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
     <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
-        <item quantity="one">%1$d/%2$d folder</item>
-        <item quantity="other">%1$d/%2$d folders</item>
+        <item quantity="other">%1$d/%2$d folder</item>
     </plurals>
     <!-- Title of the clear debris item displayed in the sync settings menu -->
-    <string name="settings_sync_clear_debris_item_title">Clear .debris (local cache)</string>
+    <string name="settings_sync_clear_debris_item_title">Hapus .debris .(cache lokal)</string>
     <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_title">Clear debris?</string>
+    <string name="settings_sync_clear_debris_dialog_title">Bersihkan puing kecil?</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_body">Backups of the previous versions of your synced files will be permanently deleted from your device. \n\nCheck the .debris folder in your local device to see if you need to restore anything.</string>
+    <string name="settings_sync_clear_debris_dialog_body">Cadangan versi sebelumnya dari file yang disinkronkan akan dihapus secara permanen dari perangkat anda. \n\nPeriksa folder.di perangkat lokal anda untuk melihat apakah anda perlu memulihkan apa pun.</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_continue">Lanjutkan</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
-    <string name="settings_sync_debris_cleared_message">.debris folder successfully cleared</string>
+    <string name="settings_sync_debris_cleared_message">folder .debris berhasil dibersihkan</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Found %1$s and %2$d file.</item>
-        <item quantity="other">Found %1$s and %2$d files.</item>
+        <item quantity="other">Ditemukan %1$s dan %2$d folder.</item>
     </plurals>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Membatalkan transfer&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
+    <string name="report_issue_error_minimum_characters">Pertanyaan harus minimal 10 karakter</string>
     <!-- placeholder message for report issue-->
     <string name="report_issue_description_placeholder_message">Jelaskan masalah dengan setidaknya 10 karakter</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Jaga percakapan tetap pribadi</string>
     <!--Subtitle text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <string name="chat_recent_list_empty_subtitle">Semua pesan, obrolan grup, dan panggilan anda dilindungi oleh enkripsi zero-knowledge kami. [A]Pelajari lebih lanjut[/A]</string>
     <!-- Label of the action button of inviting a friend from contact screen -->
     <string name="chat_recent_invite_friend">Undang teman</string>
     <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat_title">Invite friends with confidence</string>
+    <string name="invite_contacts_to_start_chat_title">Undang teman dengan percaya diri</string>
     <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat_subtitle">Dengan kode keamanan dan verifikasi terbaik, hubungi tanpa takut penipuan, penambangan data, atau pencurian informasi</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -541,25 +537,25 @@
     <!-- Text that there is no recent activity of the video recently watched page  -->
     <string name="video_section_empty_hint_no_recently_activity">Tidak Ada Aktivitas Terbaru</string>
     <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Hapus dari yang baru ditonton</string>
     <!-- Message that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched</string>
+    <string name="video_section_message_remove_recently_watched_item">Dihapus dari yang baru-baru ini ditonton</string>
     <!-- Message that clear recently watched in the video recently watched page  -->
-    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
+    <string name="video_section_message_clear_recently_watched">Baru-baru ini ditonton telah dihapus</string>
     <!-- Title of the Document Scanning Error Dialog -->
-    <string name="document_scanning_error_dialog_title">Scan incomplete</string>
+    <string name="document_scanning_error_dialog_title">Pindai tidak lengkap</string>
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
-    <string name="document_scanning_error_type_insufficient_ram">Your phone doesn’t meet the minimum memory requirements to complete the scan</string>
+    <string name="document_scanning_error_type_insufficient_ram">Ponsel anda tidak memenuhi persyaratan memori minimum untuk menyelesaikan pemindaian</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">We’re having trouble opening the document scanner. Close and re-open the app, and try again.</string>
+    <string name="document_scanning_error_type_generic_error">Kami mengalami kesulitan membuka pemindai dokumen. Tutup dan buka kembali aplikasi, lalu coba lagi.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Tutup</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
     <string name="meeting_recent_list_empty_title">Lindungi panggilan anda</string>
     <!--Subtitle text from Meeting screen empty view-->
-    <string name="meeting_recent_list_empty_subtitle">Your meetings, family calls, and private conversations are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <string name="meeting_recent_list_empty_subtitle">Rapat, panggilan keluarga, dan percakapan pribadi anda dilindungi oleh enkripsi zero-knowledge kami. [A]Pelajari lebih lanjut[/A]</string>
     <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
-    <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
+    <string name="account_cancel_subscription_survey_minimum_character_limit">Pesan harus minimal 10 karakter</string>
     <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
     <string name="account_cancel_subscription_survey_enter_details">Masukkan detail</string>
     <!-- the bonus title of join without account on left meeting page-->
@@ -567,17 +563,17 @@
     <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_whats_new_label">Apa yang baru</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_title">Easy, automated sync</string>
+    <string name="sync_promotion_bottom_sheet_title">Sinkronisasi otomatis yang mudah</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sync folders</string>
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sinkronkan folder</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Back up folders") -->
-    <string name="sync_promotion_bottom_sheet_secondary_button_text">Back up folders</string>
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Cadangkan folder</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync options updated</string>
+    <string name="settings_sync_option_updated_message">Opsi sinkronisasi diperbarui</string>
     <!-- Title of the Contact Permission Explanation -->
-    <string name="title_enable_access_contact">Enable access to invite friends</string>
+    <string name="title_enable_access_contact">Aktifkan akses untuk mengundang teman</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">You can also add contacts from your phone’s contact list, if you allow MEGA access to the list.</string>
+    <string name="subtitle_enable_access_contact">Anda juga dapat menambahkan kontak dari daftar kontak ponsel anda, jika anda mengizinkan akses MEGA ke daftar.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Izinkan Akses</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -611,35 +607,35 @@
     <!-- Backup title for toolbar when inside new backup screen -->
     <string name="sync_add_new_backup_toolbar_title">Cadangkan</string>
     <!-- Text for the header of the screen to add a new backup folder -->
-    <string name="sync_add_new_backup_header_text">Add backup folder:</string>
+    <string name="sync_add_new_backup_header_text">Tambahkan folder cadangan:</string>
     <!-- Text to indicate the type of sync in the card header when adding a new backup folder -->
     <string name="sync_add_new_backup_card_sync_type_text">Cadangkan</string>
     <!-- Text for the label to select the device folder or source for a new backup folder -->
-    <string name="sync_add_new_backup_choose_device_folder_title">Back up from</string>
+    <string name="sync_add_new_backup_choose_device_folder_title">Cadangkan dari</string>
     <!-- Text for the label to indicate the destiny of a new backup folder -->
     <string name="sync_add_new_backup_choose_mega_folder_title">Cadangkan ke</string>
     <!-- Backup text for the the button to begin backup -->
     <string name="sync_add_new_backup_proceed_button_label">Cadangkan</string>
     <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
-    <string name="sync_backup_access_storage_permission_dialog_title">Allow MEGA to access all files?</string>
+    <string name="sync_backup_access_storage_permission_dialog_title">Izinkan MEGA untuk mengakses semua file?</string>
     <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
-    <string name="sync_backup_access_storage_permission_dialog_message">To back up your files, MEGA needs access to the files and folders on your device. Your data is always safe with us.</string>
+    <string name="sync_backup_access_storage_permission_dialog_message">Untuk membuat cadangan file anda, MEGA memerlukan akses ke file dan folder di perangkat anda. Data anda selalu aman bersama kami.</string>
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
-    <string name="sync_add_new_backup_storage_permission_banner">MEGA needs access to your device storage in order to back up your local folder. [U]Tap to grant access[/U]</string>
+    <string name="sync_add_new_backup_storage_permission_banner">MEGA membutuhkan akses ke penyimpanan perangkat anda untuk membuat cadangan folder lokal anda. [U]Ketuk untuk memberikan akses[/U]</string>
     <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <string name="files_permission_screen_title">Izinkan MEGA mengakses file perangkat anda</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
+    <string name="files_permission_screen_message">Dengan mengizinkan akses MEGA ke file anda, anda dapat mengunggah ke MEGA tanpa membuat salinan sementara, menghemat ruang di perangkat anda dan mengaktifkan unggahan lebih cepat.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Jangan tampilkan ini lagi</string>
     <!-- Title of the dialog to confirm stop a sync -->
     <string name="sync_stop_sync_confirm_dialog_title">Hentikan sinkronisasi?</string>
     <!-- Message of the dialog to confirm stop a sync -->
-    <string name="sync_stop_sync_confirm_dialog_message">This will stop the sync process between the two folders but won’t remove the folders.</string>
+    <string name="sync_stop_sync_confirm_dialog_message">Ini akan menghentikan proses sinkronisasi antara dua folder tetapi tidak akan menghapus folder.</string>
     <!-- Label for the button to stop a sync -->
     <string name="sync_stop_sync_button">Berhenti menyinkronkan</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
-    <string name="sync_snackbar_message_confirm_sync_stopped">Sync stopped</string>
+    <string name="sync_snackbar_message_confirm_sync_stopped">Sinkronisasi berhenti</string>
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">Hentikan pencadangan</string>
     <!-- Label for the button to stop a backup -->
@@ -653,33 +649,33 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favorit</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No syncs or backups have been set up yet</string>
+    <string name="device_center_sync_backup_list_empty_state_title">Belum ada sinkronisasi atau cadangan yang disiapkan</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_message">Sync or back up a folder on your device with a folder on MEGA</string>
+    <string name="device_center_sync_backup_list_empty_state_message">Sinkronkan atau mencadangkan folder di perangkat anda dengan folder di MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA dapat melihat nama dan deskripsi rapat anda, tetapi kami merahasiakannya</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
     <string name="notifications_notification_item_new_tag">Baru</string>
     <!-- Title in the display over other apps permission screen -->
-    <string name="display_over_other_apps_permission_screen_title">Allow MEGA to display over other apps</string>
+    <string name="display_over_other_apps_permission_screen_title">Izinkan MEGA untuk ditampilkan di atas aplikasi lain</string>
     <!-- Context message in the display over other apps permission screen -->
-    <string name="display_over_other_apps_permission_screen_message">MEGA needs your permission to display over apps. This means that you’ll never miss another incoming call notification.</string>
+    <string name="display_over_other_apps_permission_screen_message">MEGA membutuhkan izin anda untuk menampilkan aplikasi. Ini berarti anda tidak akan pernah melewatkan pemberitahuan panggilan masuk lainnya.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Berikan izin</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
-    <string name="dialog_not_enough_space_to_upload_title">Not enough space to upload new files</string>
+    <string name="dialog_not_enough_space_to_upload_title">Tidak cukup ruang untuk mengunggah file baru</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a higher plan, or free up some space, to upload new files. [A]Learn more[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">Anda melebihi kuota penyimpanan snda. Tingkatkan ke paket yang lebih tinggi, atau kosongkan ruang, untuk mengunggah file baru. [A]Pelajari selengkapnya[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">Tingkatkan</string>
     <!-- Photos search welcome title -->
-    <string name="photos_search_welcome_title">Find what you’re looking for</string>
+    <string name="photos_search_welcome_title">Temukan apa yang anda cari</string>
     <!-- Photos search welcome description -->
-    <string name="photos_search_welcome_description">Search for photos, videos, and albums</string>
+    <string name="photos_search_welcome_description">Cari foto, video, dan album</string>
     <!-- Photos search empty state title -->
     <string name="photos_search_empty_state_title">Tidak ada hasil yang cocok</string>
     <!-- Photos search empty state description -->
-    <string name="photos_search_empty_state_description">Try a different search term</string>
+    <string name="photos_search_empty_state_description">Coba istilah pencarian yang berbeda</string>
     <!-- Photos search recent search -->
     <string name="photos_search_recent_search">Pencarian baru-baru ini</string>
     <!-- Add to album by image -->
@@ -688,15 +684,14 @@
     <string name="album_add_to_media">Tambahkan ke</string>
     <!-- Add to album success message -->
     <plurals name="album_add_to_message">
-        <item quantity="one">Added to “%1$s”</item>
-        <item quantity="other">Added %2$d items to “%1$s”</item>
+        <item quantity="other">Ditambahkan %2$d item untuk ”%1$s”</item>
     </plurals>
     <!-- Name for a general button which action is "Open" something -->
     <string name="general_open_button">Buka</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
-    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Add to playlist</string>
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Tambahkan ke daftar putar</string>
     <!-- Stop Backup confirmation dialog text -->
-    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up this folder, you need to either move it or delete it</string>
+    <string name="sync_stop_backup_confirm_dialog_text">Untuk berhenti membuat cadangan folder ini, anda harus memindahkannya atau menghapusnya</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">Konfirmasi</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -705,33 +700,32 @@
     <string name="video_to_playlist_add_button">Tambah</string>
     <!-- The success Message when adding the video to the playlists from the video section. -->
     <plurals name="video_section_playlists_add_to_playlists_successfully_message">
-        <item quantity="one">Added 1 item to “%1$s”</item>
-        <item quantity="other">Added 1 item to %1$d playlists</item>
+        <item quantity="other">Ditambahkan 1 item ke %1$d daftar putar</item>
     </plurals>
     <!-- Name for a general label which action is "Select" something -->
     <string name="general_select">Pilih</string>
     <!-- Name for a general label which action is "Select folder" -->
     <string name="general_select_folder">Pilih folder</string>
     <!-- Message shown to user when app is connected to the MEGA server -->
-    <string name="login_connected_to_server">Connected to the server</string>
+    <string name="login_connected_to_server">Terhubung ke server</string>
     <!-- User Alert notification for scheduled recurring meeting changes -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A] [B]updated the recurring meeting details to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A] [B]memperbarui detail rapat berulang ke[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting hour change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A] [B]updated the recurring meeting time to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A] [B]memperbarui waktu pertemuan berulang ke[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting date of the week change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A] [B]updated the recurring meeting date to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A] [B]memperbarui tanggal pertemuan berulang ke[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting multiple fields change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A] [B]updated the meeting to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A] [B]memperbarui rapat ke[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A] [B]cancelled the occurrence scheduled for[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A] [B]membatalkan kejadian yang dijadwalkan untuk[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A] [B]updated an occurrence to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A] [B]memperbarui kejadian ke[/B]</string>
     <!-- User Alert notification for scheduled meeting date change -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%s[/A] [B]updated the meeting date to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%s[/A] [B]memperbarui tanggal pertemuan ke[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]updated the meeting time to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]memperbarui waktu pertemuan untuk[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]cancelled the meeting scheduled for[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]membatalkan pertemuan yang dijadwalkan untuk[/B]</string>
     <!-- Title of the ads free introduction screen -->
     <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
     <!-- Description of the ads free introduction screen -->
@@ -745,7 +739,7 @@
     <!-- The Transfer sharing description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_description">Orang yang berbagi data dengan anda dapat menggunakan kuota transfer anda untuk mengunduh item yang anda bagikan.</string>
     <!-- The additional security label in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass dan MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">Tetapkan kata sandi dan tanggal kedaluwarsa untuk tautan file dan folder.</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
@@ -761,19 +755,19 @@
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">Tidak ada favorit</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
-    <string name="document_scanning_settings_toolbar_title">Scan settings</string>
+    <string name="document_scanning_settings_toolbar_title">Pengaturan pindai</string>
     <!-- Title of the camera setting screen -->
-    <string name="camera_settings_title">Camera settings</string>
+    <string name="camera_settings_title">Pengaturan kamera</string>
     <!-- Title of the save location in the camera setting screen -->
-    <string name="camera_settings_save_location_title">Save location</string>
+    <string name="camera_settings_save_location_title">Simpan lokasi</string>
     <!-- Description of the save location in the camera setting screen -->
-    <string name="camera_settings_save_location_description">Enable geotagging for photos and videos</string>
+    <string name="camera_settings_save_location_description">Aktifkan geotagging untuk foto dan video</string>
     <!-- Message when user denies location permission in the camera setting screen -->
-    <string name="camera_settings_save_location_permission_denied">Allow MEGA to access this device’s location to continue</string>
+    <string name="camera_settings_save_location_permission_denied">Izinkan MEGA mengakses lokasi perangkat ini untuk melanjutkan</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
-    <string name="sync_local_device_folder_currently_synced_message">This folder is already synced</string>
+    <string name="sync_local_device_folder_currently_synced_message">Folder ini sudah disinkronkan</string>
     <!-- Warning message to indicate that cannot select a currently backed up folder -->
-    <string name="sync_local_device_folder_currently_backed_up_message">This folder is already backed up</string>
+    <string name="sync_local_device_folder_currently_backed_up_message">Folder ini sudah dicadangkan</string>
     <!-- The name of every users root drive in the cloud of MEGA. -->
     <string name="general_section_cloud_drive">Cloud drive</string>
     <!-- App Bar Title in of Cloud Drive Bottom Menu -->
@@ -781,59 +775,57 @@
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Sinkronisasi</string>
     <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
-    <string name="transfers_completed_one_read_error_retrying">Your upload can’t be completed or retried, because MEGA can no longer access the file</string>
+    <string name="transfers_completed_one_read_error_retrying">Unggahan anda tidak dapat diselesaikan atau dicoba lagi, karena MEGA tidak dapat lagi mengakses file</string>
     <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
-    <string name="transfers_completed_some_read_error_retrying">Some or all of your uploads can’t be completed or retried, because MEGA can no longer access the files</string>
+    <string name="transfers_completed_some_read_error_retrying">Beberapa atau semua unggahan anda tidak dapat diselesaikan atau dicoba lagi, karena MEGA tidak dapat lagi mengakses file</string>
     <!-- Title for Offline Folder exposed via SAF -->
-    <string name="general_mega_offline">MEGA Offline files</string>
+    <string name="general_mega_offline">MEGA File Offline</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
-    <string name="transfers_notification_location_content">Location: %1$s</string>
+    <string name="transfers_notification_location_content">Lokasi: %1$s</string>
     <!-- Notification action for download final notification. It will open the file explorer activity to show the destination folder -->
-    <string name="transfers_notification_location_action">Locate</string>
+    <string name="transfers_notification_location_action">Temukan</string>
     <!-- Notification content for download final notification in case of a single file downloaded. -->
-    <string name="transfers_notification_title_single_download">Downloaded “%1$s”</string>
+    <string name="transfers_notification_title_single_download">Diunduh ”%1$s”</string>
     <!-- Label for the button or menu option to add a new backup -->
-    <string name="device_center_sync_add_new_backup_button_option">Add new backup</string>
+    <string name="device_center_sync_add_new_backup_button_option">Tambahkan cadangan baru</string>
     <!-- Notification content for download final notification in case of a single file downloaded to preview. -->
-    <string name="transfers_notification_title_preview_download">“%1$s” is ready to preview</string>
+    <string name="transfers_notification_title_preview_download">”%1$s” siap untuk pratinjau</string>
     <!-- Notification action for download final notification. It will open a dialog with installed apps which can open the file -->
     <string name="transfers_notification_preview_action">Pratinjau</string>
     <!-- Title for the OS dialog shown with available apps to open a file -->
-    <string name="open_with_os_dialog_title">Open “%1$s” with</string>
+    <string name="open_with_os_dialog_title">Buka ”%1$s” dengan</string>
     <!-- The Scan Confirmation screen error message shown when the new filename does not contain the file extension that was selected -->
-    <string name="document_scanning_settings_missing_file_extension_error_message">Missing file extension (%s)</string>
+    <string name="document_scanning_settings_missing_file_extension_error_message">Ekstensi file yang hilang (%s)</string>
     <!-- The Scan Confirmation screen error message shown when the filename does not end with the expected file extension -->
-    <string name="document_scanning_settings_non_matching_file_extension_error_message">File extension doesn’t match file type</string>
+    <string name="document_scanning_settings_non_matching_file_extension_error_message">Ekstensi file tidak cocok dengan jenis file</string>
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
-    <string name="document_scanning_settings_file_extension_required_error_message">File extension is needed</string>
+    <string name="document_scanning_settings_file_extension_required_error_message">Ekstensi file diperlukan</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA will fetch a temporary copy of this file so you can preview it. It won’t be saved or available outside the app. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">MEGA akan mengambil salinan sementara dari file ini sehingga anda dapat mempratinjaunya. Itu tidak akan disimpan atau tersedia di luar aplikasi. %1$s akan diunduh.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Completing operation: %1$d%%</string>
+    <string name="login_completing_operation">Menyelesaikan operasi: %1$d%%</string>
     <!-- Add to album files existed message -->
     <plurals name="album_add_to_files_existed">
-        <item quantity="one">This file already exists in “%1$s” and cannot be added again</item>
-        <item quantity="other">These files already exist in “%1$s” and cannot be added again</item>
+        <item quantity="other">File-file ini sudah ada di ”%1$s” dan tidak dapat ditambahkan lagi</item>
     </plurals>
     <!--Content on the Multi-Factor Authentication Login page -->
     <string name="multi_factor_auth_login_verification_content">Masukkan kode 6 digit dari aplikasi otentikator anda.</string>
     <!--Message to be shown to the user when they entered an incorrect verification code-->
     <string name="multi_factor_auth_login_verification_input_error_text">Kode verifikasi salah</string>
     <!-- Notification text for preview downloads.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview">Preparing %1$s for preview</string>
+    <string name="transfers_notification_downloading_preview">Mempersiapkan %1$s untuk pratinjau</string>
     <!-- Notification text for preview downloads, paused state.  Please do not modify the %s placeholder as it will be replaced by the name of the file to be donwloaded -->
-    <string name="transfers_notification_downloading_preview_paused">Preparing %1$s for preview (paused)</string>
+    <string name="transfers_notification_downloading_preview_paused">Mempersiapkan %1$s untuk pratinjau (dijeda)</string>
     <!-- Message when successfully deleting items from the audio queue. %1$s will be replaced with the item name %2$d will be replaced with the removal count. -->
     <plurals name="audio_queue_items_removal_success_message">
-        <item quantity="one">“%1$s” was removed from the queue</item>
-        <item quantity="other">Removed %2$d items from the queue</item>
+        <item quantity="other">Dihapus %2$d item dari antrian</item>
     </plurals>
     <!-- Title for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_title">Transfers are paused</string>
+    <string name="transfers_preview_paused_dialog_title">Transfer dijeda</string>
     <!-- Message for the dialog to inform that a transfer is needed to preview a file and transfers are paused-->
-    <string name="transfers_preview_paused_dialog_text">To preview “%1$s” you will need to resume paused transfers</string>
+    <string name="transfers_preview_paused_dialog_text">Untuk pratinjau ”%1$s” anda harus melanjutkan transfer yang dijeda</string>
     <!--SD Card text shown as title in FileStorage screen -->
-    <string name="general_sd_card">SD card</string>
+    <string name="general_sd_card">Kartu SD</string>
     <!--The title of the Login page-->
     <string name="login_page_title">Masuk ke akun MEGA anda</string>
     <!--Message to be shown to the user when they entered an invalid email-->
@@ -869,28 +861,27 @@
     <!-- Ad settings label in the cookie settings page -->
     <string name="settings_cookie_settings_label_ad_settings">Pengaturan iklan</string>
     <!-- Ads personalization label in the cookie settings page -->
-    <string name="settings_cookie_settings_label_ads_personalization">Ads personalisation</string>
+    <string name="settings_cookie_settings_label_ads_personalization">Personalisasi iklan</string>
     <!-- Cookie settings title in the cookie settings page -->
     <string name="settings_cookie_setting_title_cookie_and_ad_settings">Pengaturan cookie dan iklan</string>
     <!-- Body text of the bottom sheet to promote Sync feature. The placeholders are to underline text -->
-    <string name="sync_promotion_bottom_sheet_body_text">Sync or back up a folder on your device with a folder on MEGA. [U]Learn more[/U]</string>
+    <string name="sync_promotion_bottom_sheet_body_text">Sinkronkan atau cadangkan folder di perangkat anda dengan folder di MEGA. [U]Pelajari lebih lanjut[/U]</string>
     <!-- Title of note to self chat -->
     <string name="chat_note_to_self_chat_title">Catatan untuk diri sendiri</string>
     <!-- First message header in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header">Simpan untuk dirimu sendiri</string>
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
-        <item quantity="one">1 file added to “%1$s”. Duplicate files cannot be added again.</item>
-        <item quantity="other">%2$d files added to “%1$s”. Duplicate files cannot be added again.</item>
+        <item quantity="other">%2$d file ditambahkan ke ”%1$s”. File duplikat tidak dapat ditambahkan lagi.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
+    <string name="transfers_start_upload_profile_qr_code_message">Menyimpan %1$s ke drive Cloud...</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">Anda akan dikenakan biaya %1$s segera tetapi langganan anda tidak akan diperpanjang secara otomatis setelah 12 bulan karena peraturan pemerintah. Ini akan menjadi tanggung jawab anda untuk memperbarui langganan anda setelah habis masa berlakunya. Anda dapat mengelola atau membatalkan langganan kapan saja melalui Langganan di [A]Google&#160;Play[/A]. Dengan memutakhirkan akun anda, Anda menyetujui [B]Ketentuan Layanan[/B] dan [C]Kebijakan Privasi[/C] MEGA.</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Sedang mengunggah&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploading&#8230;</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% mengunggah...</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Tidak aktif</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
@@ -918,7 +909,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Konfirmasi email</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]Help Centre[/A].</string>
+    <string name="email_confirmation_content">Kami telah mengirim email ke [P]%s[/P] dengan sebuah link. Ketuk tautan untuk memverifikasi alamat email anda dan mengaktifkan akun anda. \n\nJika anda tidak menerima email, periksa folder spam anda atau coba lagi. Untuk masalah lain, silakan kunjungi [A]Pusat Bantuan[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Kirim lagi</string>
     <!-- General change email address -->
@@ -934,25 +925,25 @@
     <!-- First message header paragraph in note to self chat -->
     <string name="chat_note_to_self_chat_first_message_header_paragraph">Ruang pribadi untuk gambar, informasi penting, atau ide-ide besar. Selalu disinkronkan, dan dilindungi dengan enkripsi zero-knowledge.</string>
     <!-- Title of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_title">Syncing paused due to low battery</string>
+    <string name="general_sync_notification_low_battery_title">Sinkronisasi dijeda karena baterai lemah</string>
     <!-- Text of the notification displayed when Syncs are paused due to low battery conditions -->
-    <string name="general_sync_notification_low_battery_text">Connect to power source to resume</string>
+    <string name="general_sync_notification_low_battery_text">Hubungkan ke sumber daya untuk melanjutkan</string>
     <!-- Title of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_title">Syncing paused due to lost connection</string>
+    <string name="general_sync_notification_lost_wifi_title">Sinkronisasi dijeda karena koneksi hilang</string>
     <!-- Text of the notification displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_notification_lost_wifi_text">Reconnect to Wi-Fi to resume</string>
+    <string name="general_sync_notification_lost_wifi_text">Sambungkan kembali ke Wi-Fi untuk melanjutkan</string>
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_title">Syncing has stopped</string>
+    <string name="general_sync_notification_generic_error_title">Sinkronisasi telah berhenti</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Check your syncs in the app to resolve this.</string>
+    <string name="general_sync_notification_generic_error_text">Periksa sinkronisasi anda di aplikasi untuk mengatasi masalah ini.</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_title">Sync issues detected</string>
+    <string name="general_sync_notification_stalled_issues_title">Masalah sinkronisasi terdeteksi</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
-    <string name="general_sync_notification_stalled_issues_text">View and resolve issues</string>
+    <string name="general_sync_notification_stalled_issues_text">Lihat dan selesaikan masalah</string>
     <!-- The name of the Device or Folder Status which signifies that an error has occurred -->
     <string name="device_center_list_view_item_status_error">Kesalahan</string>
     <!-- Hint shown in the field to write a message in the note to self chat screen -->
-    <string name="chat_note_to_self_chat_message_hint">Write a message to yourself</string>
+    <string name="chat_note_to_self_chat_message_hint">Tulis pesan untuk diri sendiri</string>
     <!--The title of the Change Email Address page-->
     <string name="change_email_address_title">Ganti e-mail</string>
     <!--Change Email Address page content text to ask user to enter a new email address -->
@@ -964,7 +955,7 @@
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">Alamat email diperbarui</string>
     <!-- Snackbar text to inform the user that download started -->
-    <string name="transfers_download_started_snackbar">Download started. See notification for details.</string>
+    <string name="transfers_download_started_snackbar">Pengunduhan dimulai. Lihat pemberitahuan untuk detailnya.</string>
     <!--Sign Up page text field input first name error message when empty-->
     <string name="sign_up_first_name_text_field_error_message">Masukkan nama depan</string>
     <!--Sign Up page text field input last name error message when empty-->
@@ -990,43 +981,43 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Sudah punya akun MEGA? [A]Masuk[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Loading file&#8230;</string>
+    <string name="transfers_fake_preview_text">Memuat berkas...</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_title">Cancel preview?</string>
+    <string name="transfers_cancel_preview_download_warning_title">Batalkan pratinjau?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
-    <string name="transfers_cancel_preview_download_warning_text">You will no longer be able to preview this file</string>
+    <string name="transfers_cancel_preview_download_warning_text">Anda tidak akan lagi dapat melihat pratinjau file ini</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again</string>
+    <string name="transfers_fake_preview_screen_general_error">Pratinjau gagal dimuat, coba lagi</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_preview_download">Something went wrong. Preview was not cancelled. See notification for details.</string>
+    <string name="transfers_error_cancelling_preview_download">Ada yang tidak beres. Pratinjau tidak dibatalkan. Lihat pemberitahuan untuk detailnya.</string>
     <!-- Title of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_title">Backup name already exists</string>
+    <string name="sync_rename_and_create_backup_dialog_title">Nama cadangan sudah ada</string>
     <!-- Text of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_text">A folder with the same name already exists in your Backups. Rename the new folder to continue with the backup. Folder name will not change on your device.</string>
+    <string name="sync_rename_and_create_backup_dialog_text">Folder dengan nama yang sama sudah ada di Cadangan anda. Ganti nama folder baru untuk melanjutkan dengan cadangan. Nama folder tidak akan berubah pada perangkat anda.</string>
     <!-- Rename and Create Backup Dialog hint text (input field description) -->
-    <string name="sync_rename_and_create_backup_dialog_hint_text">Backup name</string>
+    <string name="sync_rename_and_create_backup_dialog_hint_text">Nama cadangan</string>
     <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_positive_button">Ubah nama</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Masukkan nama cadangan</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">A backup with this name already exists. Enter a different name.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">Cadangan dengan nama ini sudah ada. Masukkan nama yang berbeda.</string>
     <!-- USP Carousel page 1 title-->
     <string name="carousel_page_title_slide_1">Anda memegang kunci</string>
     <!-- USP Carousel page 1 description-->
-    <string name="carousel_page_description_slide_1">User controlled, zero-knowledge encryption means no one can see your data unless you want them to - not even us!</string>
+    <string name="carousel_page_description_slide_1">Enkripsi tanpa pengetahuan yang dikendalikan pengguna berarti tidak ada yang dapat melihat data anda kecuali anda menginginkannya - bahkan kami!</string>
     <!-- USP Carousel page 2 title-->
-    <string name="carousel_page_title_slide_2">Keep every moment safe</string>
+    <string name="carousel_page_title_slide_2">Jaga setiap saat aman</string>
     <!-- USP Carousel page 2 description-->
-    <string name="carousel_page_description_slide_2">With automatic camera uploads to MEGA Cloud, and generous storage, you’ll never lose a precious memory</string>
+    <string name="carousel_page_description_slide_2">Dengan unggahan kamera otomatis ke MEGA Cloud, dan penyimpanan yang luas, anda tidak akan pernah kehilangan memori berharga</string>
     <!-- USP Carousel page 3 title-->
-    <string name="carousel_page_title_slide_3">Your data. Your space.</string>
+    <string name="carousel_page_title_slide_3">Data anda. Ruang anda.</string>
     <!-- USP Carousel page 3 description-->
-    <string name="carousel_page_description_slide_3">Ample storage and easy ways to transfer, share, and organise your files means you can safely use MEGA for whatever you choose</string>
+    <string name="carousel_page_description_slide_3">Penyimpanan yang cukup dan cara mudah untuk mentransfer, berbagi, dan mengatur file anda berarti anda dapat menggunakan MEGA dengan aman untuk apa pun yang anda pilih</string>
     <!-- USP Carousel page 4 title-->
     <string name="carousel_page_title_slide_4">Katakan secara pribadi</string>
     <!-- USP Carousel page 4 description-->
-    <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
+    <string name="carousel_page_description_slide_4">Mengobrol dengan teman dan keluarga, berbagi foto atau informasi sensitif, panggilan video, dan jadwalkan rapat. Keamanan dan privasi terjamin.</string>
     <!-- Create account label-->
     <string name="general_label_create_account">Buat akun MEGA</string>
     <!-- The new feature hidden nodes feature -->
@@ -1044,53 +1035,53 @@
     <!-- Hidden nodes description: shared files stay visible feature -->
     <string name="hidden_nodes_description_visible_shared_files">Anda memutuskan kapan file tersembunyi terlihat. Ada pengaturan baru untuk menampilkan item tersembunyi sementara.</string>
     <!--Camera backup permission screen title-->
-    <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
+    <string name="camera_backup_permission_screen_title">Jaga foto anda tetap aman, selalu</string>
     <!--Camera backup permission screen description-->
-    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <string name="camera_backup_permission_screen_description">Ingatanmu penting.\n\nPengunggahan kamera secara otomatis mencadangkan foto dan video anda ke drive MEGA Cloud anda, jadi anda tidak perlu khawatir kehilangannya.</string>
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
-    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <string name="camera_backup_permission_banner_info_description">Pengunggahan kamera membutuhkan [A]akses penuh[/A] ke perpustakaan foto perangkat anda</string>
     <!--Button text to request camera backup permission-->
     <string name="camera_backup_permission_enable_button_text">Aktifkan Unggahan camera</string>
     <!--Permission screen skip requesting permission button text-->
-    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <string name="permission_screen_skip_permission_request_button_text">Lewati untuk saat ini</string>
     <!--Notification permission screen title-->
-    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <string name="notification_permission_screen_title">Jangan pernah melewatkan pembaruan penting</string>
     <!--Notification permission screen description-->
-    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <string name="notification_permission_screen_description">Tetap terinformasi dengan pembaruan real-time yang penting bagi anda. Dapatkan peringatan untuk aktivitas folder bersama, pembaruan keamanan, dan penawaran eksklusif, sehingga anda tidak pernah melewatkan sesuatu yang penting.\n\nAnda dapat mengelola preferensi pemberitahuan kapan saja di pengaturan perangkat anda.</string>
     <!--Button text to request Notification permission-->
     <string name="notification_permission_enable_button_text">Aktifkan Notifikasi</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
-    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
+    <string name="transfers_notification_title_single_upload">Diunggah ”%1$s”</string>
     <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_warning_lost_wifi_title">Syncing paused due to lost connection.</string>
+    <string name="general_sync_warning_lost_wifi_title">Sinkronisasi dijeda karena koneksi hilang.</string>
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_warning_lost_wifi_text">Reconnect to Wi-Fi to resume.</string>
+    <string name="general_sync_warning_lost_wifi_text">Sambungkan kembali ke Wi-Fi untuk melanjutkan.</string>
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
     <string name="general_link_unavailable_subtitle">Ini bisa terjadi karena alasan berikut:</string>
     <!-- Bullet point shown when link is unavailable due to invalid URL -->
-    <string name="general_link_unavailable_invalid_url">Invalid URL - the link you’re trying to access does not exist</string>
+    <string name="general_link_unavailable_invalid_url">URL tidak valid - tautan yang anda coba akses tidak ada</string>
     <!-- Bullet point shown when link is unavailable due to expiration -->
-    <string name="general_link_expired">The link has expired</string>
+    <string name="general_link_expired">Tautan telah kedaluwarsa</string>
     <!-- Title shown when a folder link is unavailable (general case) -->
-    <string name="folder_link_unavailable_title">The folder link you’re trying to access is not available</string>
+    <string name="folder_link_unavailable_title">Tautan folder yang anda coba akses tidak tersedia</string>
     <!-- Bullet point shown when a folder link is unavailable because the link has been disabled -->
-    <string name="folder_link_unavailable_disabled">The folder link has been disabled by the owner</string>
+    <string name="folder_link_unavailable_disabled">Tautan folder telah dinonaktifkan oleh pemilik</string>
     <!-- Title shown when a folder link has expired -->
-    <string name="folder_link_expired_title">The folder link you’re trying to access is no longer available</string>
+    <string name="folder_link_expired_title">Tautan folder yang anda coba akses tidak lagi tersedia</string>
     <!-- Title of the dialog shown when the user needs to verify administrator credentials -->
-    <string name="unverified_business_account_dialog_title">Verify administrator credentials to continue</string>
+    <string name="unverified_business_account_dialog_title">Verifikasi kredensi administrator untuk melanjutkan</string>
     <!-- Description of the dialog explaining the need to verify administrator credentials -->
-    <string name="unverified_business_account_dialog_description">You need to verify your Business account administrator’s credentials in order to continue. Log in to your account in a desktop web browser and complete the credential verification.</string>
+    <string name="unverified_business_account_dialog_description">Anda perlu memverifikasi kredensial administrator akun Bisnis anda untuk melanjutkan. Masuk ke akun anda di browser web desktop dan selesaikan verifikasi kredensi.</string>
     <!-- Title shown when a file link is unavailable (general case) -->
-    <string name="file_link_unavailable_title">The file link you’re trying to access is no longer available</string>
+    <string name="file_link_unavailable_title">Tautan file yang anda coba akses tidak lagi tersedia</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="file_link_unavailable_disabled">The file link has been disabled by the owner</string>
+    <string name="file_link_unavailable_disabled">Tautan file telah dinonaktifkan oleh pemilik</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="file_link_unavailable_deleted">The file has been deleted</string>
+    <string name="file_link_unavailable_deleted">File telah dihapus</string>
     <!-- Title shown when a file link has expired -->
-    <string name="file_link_expired_title">The file link you’re trying to access is not available</string>
+    <string name="file_link_expired_title">Tautan file yang anda coba akses tidak tersedia</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="folder_link_unavailable_deleted">The folder has been deleted</string>
+    <string name="folder_link_unavailable_deleted">Folder telah dihapus</string>
     <!-- Tooltip description for transfer section play action -->
     <string name="transfers_section_action_play">Mulai</string>
     <!-- Tooltip description for transfer section play action -->
@@ -1108,17 +1099,17 @@
     <!--Text for showing the empty state when there are no completed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
     <string name="transfers_no_completed_transfers_empty_text">Tidak ada transfer selesai</string>
     <!--Text for showing the empty state when there are no failed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
-    <string name="transfers_no_failed_transfers_empty_text">[A]No failed transfers[/A]</string>
+    <string name="transfers_no_failed_transfers_empty_text">[A]Tidak ada transfer yang gagal[/A]</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the current transferred size, the second one is to set the size of the file. Example 12.4MB of 33.3MB -->
-    <string name="transfers_completed_transfer_size_indicator">%1$s of %2$s</string>
+    <string name="transfers_completed_transfer_size_indicator">%1$s dari %2$s</string>
     <!-- Title for the Free Plan card -->
     <string name="free_plan_card_title">Mulailah dengan paket gratis kami</string>
     <!-- Description for the Free Plan card -->
-    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our free plan offers generous amounts of storage and transfer quota</string>
+    <string name="free_plan_card_description">Anda belum perlu berkomitmen untuk paket berbayar, paket gratis kami menawarkan jumlah penyimpanan dan kuota transfer yang besar</string>
     <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">20 GB of storage</string>
+    <string name="free_plan_card_storage_feature">Penyimpanan 20 GB</string>
     <!-- Feature text for Free Plan transfer quota -->
-    <string name="free_plan_card_transfer_feature">Limited transfers</string>
+    <string name="free_plan_card_transfer_feature">Transfer terbatas</string>
     <!-- Button text for Free Plan card -->
     <string name="free_plan_card_button">Mulai Gratis</string>
     <!-- Section title for the features list -->
@@ -1126,27 +1117,25 @@
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">Penyimpanan murah hati</string>
     <!-- Description for generous storage feature with placeholder -->
-    <string name="pro_plan_feature_storage_desc">Store up to %1$s of data</string>
+    <string name="pro_plan_feature_storage_desc">Simpan hingga %1$s dari data</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Berbagi transfer</string>
     <!-- Description for transfer sharing feature -->
-    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files</string>
+    <string name="pro_plan_feature_transfer_desc">Orang yang berbagi item dengan anda dapat menggunakan kuota anda untuk mengunduh dan melakukan streaming file</string>
     <!-- Title for MEGA VPN feature -->
     <string name="pro_plan_feature_vpn_title">Akses ke MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_desc">Stay safe online with our high-speed VPN that’s both fast and simple to use</string>
+    <string name="pro_plan_feature_vpn_desc">Tetap aman saat online dengan VPN berkecepatan tinggi kami yang cepat dan mudah digunakan</string>
     <!-- Title for MEGA Pass feature -->
     <string name="pro_plan_feature_pass_title">MEGA&#160;Pass</string>
     <!-- Description for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager</string>
+    <string name="pro_plan_feature_pass_desc">Atur semua kata sandi anda dan jaga agar tetap aman dengan pengelola kata sandi kami</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Disarankan</string>
-    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
-    <string name="transfers_over_quota_banner_title">Dapatkan kuota transfer lebih</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">Tingkatkan sekarang</string>
     <!-- Section title for additional benefits of Pro plans -->
-    <string name="pro_plan_additional_benefits_section_title">Additional benefits of Pro plans</string>
+    <string name="pro_plan_additional_benefits_section_title">Manfaat tambahan dari paket Pro</string>
     <!-- Benefit: Password-protected links -->
     <string name="pro_plan_benefit_password_protected_links">Tautan yang dilindungi kata sandi</string>
     <!-- Benefit: Links with expiry dates -->
@@ -1154,21 +1143,21 @@
     <!-- Benefit: Transfer quota sharing -->
     <string name="pro_plan_benefit_transfer_quota_sharing">Pembagian kuota transfer</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
-    <string name="pro_plan_benefit_auto_sync_mobile">Automatically sync the folders on your mobile device</string>
+    <string name="pro_plan_benefit_auto_sync_mobile">Sinkronkan folder di perangkat seluler anda secara otomatis</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
-    <string name="pro_plan_benefit_rewind_180_days">Rewind up to 180 days of deleted data</string>
+    <string name="pro_plan_benefit_rewind_180_days">Putar ulang hingga 180 hari data yang dihapus</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
-    <string name="pro_plan_benefit_host_calls_unlimited">Host calls and meetings with unlimited participants and no time restrictions</string>
+    <string name="pro_plan_benefit_host_calls_unlimited">Selenggarakan panggilan dan rapat dengan peserta tak terbatas dan tanpa batasan waktu</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
-    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Schedule Rubbish bin clearing between 7 days and 10 years</string>
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Jadwalkan pembersihan Tempat Sampah antara 7 hari dan 10 tahun</string>
     <!-- Benefit: Priority support -->
     <string name="pro_plan_benefit_priority_support">Dukungan prioritas</string>
     <!-- Subscription page information section title at the bottom of the page-->
     <string name="choose_account_screen_subscription_information_title">Detail langganan</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
-    <string name="choose_account_screen_subscription_information_description">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.\n\nYou can cancel your plan subscription any time but no later than 24 hours before your next subscription payment is due. [A]Learn how to manage your subscription in your settings[/A].</string>
+    <string name="choose_account_screen_subscription_information_description">Langganan diperpanjang secara otomatis untuk periode berlangganan berturut-turut dengan durasi yang sama dan dengan harga yang sama dengan periode awal yang dipilih.\n\nAnda dapat membatalkan langganan paket kapan saja tetapi selambat-lambatnya 24 jam sebelum pembayaran langganan berikutnya jatuh tempo. [A]Pelajari cara mengelola langganan anda di pengaturan[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]Terms of Service[/A] and [B]Privacy Policy[/B]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]Keijbakan Layanan[/A] dan [B]Kebijakan Privasi[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">Dapatkan lebih banyak dengan paket Pro</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1184,26 +1173,25 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
     <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
     <!-- General month label -->
-    <string name="general_month">/month</string>
+    <string name="general_month">/bulan</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s per bulan</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">%1$s charged yearly</string>
+    <string name="choose_account_screen_billed_yearly">%1$s dibebankan setiap tahun</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
-        <item quantity="one">%1$d item unhidden</item>
-        <item quantity="other">%1$d items unhidden</item>
+        <item quantity="other">%1$d item tidak disembunyikan</item>
     </plurals>
     <!-- Title for secure slideshow mode tutorial -->
-    <string name="slideshow_tutorial_title">Play slideshows securely</string>
+    <string name="slideshow_tutorial_title">Putar tayangan slide dengan aman</string>
     <!-- Step 1 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step1">Press the power button to lock your screen.</string>
+    <string name="slideshow_tutorial_step1">Tekan tombol daya untuk mengunci layar anda.</string>
     <!-- Step 2 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step2">Wait for 2 seconds.</string>
+    <string name="slideshow_tutorial_step2">Tunggu selama 2 detik.</string>
     <!-- Step 3 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step3">Press the power button again to turn the screen back on.</string>
+    <string name="slideshow_tutorial_step3">Tekan tombol daya lagi untuk menghidupkan kembali layar.</string>
     <!-- Note indicating the slideshow plays securely while locked -->
-    <string name="slideshow_tutorial_note">The slideshow will play while your device remains securely locked.</string>
+    <string name="slideshow_tutorial_note">Tayangan slide akan diputar sementara perangkat anda tetap terkunci dengan aman.</string>
     <!-- State to indicate an achievement has applied -->
     <string name="applied_label">Diterapkan</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
@@ -1229,31 +1217,31 @@
     <!-- text of received mega pass free trial in achivements section -->
     <string name="text_received_mega_pass_free_trial">Anda telah menerima %1$s ruang penyimpanan untuk memulai MEGA&#160;Lulus uji coba gratis</string>
     <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
+    <string name="sync_change_root_uri_warning_title">Beberapa folder tidak dapat disinkronkan atau dicadangkan karena aplikasi MEGA telah kehilangan izin untuk mengakses folder lokal. Ketuk Lanjutkan untuk menambahkan kembali izin untuk setiap folder yang terpengaruh.</string>
     <!-- Title for the free plan card when the user is an existing account -->
-    <string name="free_plan_card_existing_title">Continue with your free plan</string>
+    <string name="free_plan_card_existing_title">Lanjutkan dengan paket gratis anda</string>
     <!-- Button text for existing users to continue with the free plan -->
-    <string name="free_plan_card_existing_button">Continue with free plan</string>
+    <string name="free_plan_card_existing_button">Lanjutkan dengan paket gratis</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">%1$s penyimpanan</string>
     <!-- Sort by newest shares -->
-    <string name="general_sort_newest_shares">Newest shares</string>
+    <string name="general_sort_newest_shares">Berbagi terbaru</string>
     <!-- Sort by oldest shares -->
-    <string name="general_sort_oldest_shares">Oldest shares</string>
+    <string name="general_sort_oldest_shares">Berbagi tertua</string>
     <!-- Title for recovery key error dialog -->
-    <string name="recovery_key_error_title">Recovery key error</string>
+    <string name="recovery_key_error_title">Kesalahan kunci pemulihan</string>
     <!-- Description for recovery key error dialog -->
-    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again.</string>
+    <string name="recovery_key_error_description">Kunci pemulihan yang anda berikan tidak valid, atau tidak untuk akun ini. Periksa apakah anda menggunakan kunci yang benar dan coba lagi.</string>
     <!-- Label for the current plan badge in the pro plan card -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Rencana saat ini</string>
     <!-- Error message when achievements status is unavailable -->
-    <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
+    <string name="achievement_status_unavailable">Status pencapaian anda saat ini tidak tersedia. Coba lagi nanti.</string>
     <!-- Warning indicating that the transfer quota limit has been reached -->
     <string name="transfers_transfer_quota_banner_title">Dapatkan kuota transfer lebih</string>
     <!-- Warning indicating that the storage quota limit has been reached -->
-    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <string name="transfers_storage_quota_banner_title">Dapatkan lebih banyak kuota penyimpanan</string>
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
-    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <string name="transfers_storage_and_transfer_quota_banner_title">Dapatkan lebih banyak kuota penyimpanan dan transfer</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">Pusat Bantuan</string>
     <!-- Warning informing the transfers queue has been paused -->
@@ -1261,7 +1249,7 @@
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">Lanjutkan semuanya</string>
     <!-- Sync over quota warning title -->
-    <string name="sync_storage_over_quota_warning_title">Syncing paused, your MEGA plan has run out of storage</string>
+    <string name="sync_storage_over_quota_warning_title">Sinkronisasi dijeda, paket MEGA anda kehabisan penyimpanan</string>
     <!-- Label for contacts -->
     <string name="general_section_contacts">Kontak</string>
     <!-- Label for achievements -->
@@ -1271,49 +1259,49 @@
     <!-- Label for transfers -->
     <string name="general_section_transfers">Pemindahan</string>
     <!-- Label for offline files -->
-    <string name="general_section_offline_files">Offline files</string>
+    <string name="general_section_offline_files">File offline</string>
     <!-- Label for rubbish bin -->
     <string name="general_section_rubbish_bin">Tempat Sampah</string>
     <!-- Subtitle for VPN -->
-    <string name="menu_item_vpn_subtitle">High-speed VPN</string>
+    <string name="menu_item_vpn_subtitle">VPN berkecepatan tinggi</string>
     <!-- Subtitle for MEGA PASS -->
-    <string name="menu_item_mega_pass_subtitle">Securely store and autofill your passwords</string>
+    <string name="menu_item_mega_pass_subtitle">Simpan dan isi otomatis kata sandi anda dengan aman</string>
     <!-- Subtitle for transfer.it -->
-    <string name="menu_item_transfer_it_subtitle">Fast, secure file transfers</string>
+    <string name="menu_item_transfer_it_subtitle">Transfer file yang cepat dan aman</string>
     <!-- Label for transfer it -->
     <string name="general_section_transfer_it">Transfer.it</string>
     <!-- Label for Menu -->
     <string name="general_menu">Menu</string>
     <!-- Connection type option in Sync Settings Screen -->
-    <string name="settings_sync_connection_type_title">Connection type</string>
+    <string name="settings_sync_connection_type_title">Jenis koneksi</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">Unggahan kamera dijeda</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">Sambungkan ke WIFI atau izinkan data seluler</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">Izinkan data seluler</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Previewing large file</string>
+    <string name="alert_larger_file_preview_title">Pratinjau file besar</string>
     <!-- Alert confirm button before download a big file for preview -->
-    <string name="alert_larger_file_preview_confirm_button">Preview now</string>
+    <string name="alert_larger_file_preview_confirm_button">Pratinjau sekarang</string>
     <!-- Alert always allow button before download a big file for preview -->
-    <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
+    <string name="alert_larger_file_preview_always_allow_button">Selalu izinkan pratinjau</string>
     <!-- The camera uploads notification content to reminder there is no network connection-->
-    <string name="camera_uploads_notification_content_no_network_connection">Waiting for WiFi or mobile data</string>
+    <string name="camera_uploads_notification_content_no_network_connection">Menunggu WiFi atau data seluler</string>
     <!-- Settings title  for sync power options -->
-    <string name="settings_sync_power_settings_title">Power options</string>
+    <string name="settings_sync_power_settings_title">Opsi daya</string>
     <!-- Sync always label for sync power options -->
-    <string name="settings_sync_power_always_title">Sync always</string>
+    <string name="settings_sync_power_always_title">Selalu sinkronkan</string>
     <!-- Sync only when charging label for sync power options -->
-    <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
+    <string name="settings_sync_battery_sync_only_when_charging_title">Sinkronkan hanya saat mengisi daya</string>
     <!-- Message shown when uploading edited image as a new file -->
-    <string name="photo_editor_upload_message">Uploading edits as a new file</string>
+    <string name="photo_editor_upload_message">Mengunggah suntingan sebagai file baru</string>
     <!-- Dialog title asking user to discard changes -->
     <string name="general_dialog_title_discard_changes">Buang perubahan?</string>
     <!-- Dialog title asking user to disable camera uploads -->
-    <string name="settings_camera_uploads_disable_warning">Disable Camera uploads?</string>
+    <string name="settings_camera_uploads_disable_warning">Nonaktifkan unggahan kamera?</string>
     <!-- Sync settings change message prefix -->
-    <string name="settings_sync_message_prefix">Sync changed to:</string>
+    <string name="settings_sync_message_prefix">Sinkronisasi diubah menjadi:</string>
     <!--Title of playback position dialog that is displayed when audio has playback position history. -->
     <string name="audio_playback_position_dialog_title">Lanjutkan audio?</string>
     <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
@@ -1391,17 +1379,17 @@
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">Lihat dalam folder</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
-    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Or delete the folder from MEGA. It won’t be deleted from your device. This action can’t be undone.</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Atau hapus folder dari MEGA. Itu tidak akan dihapus dari perangkat anda. Tindakan ini tidak dapat dibatalkan.</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Move folder to Cloud drive</string>
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Pindahkan folder ke drive Cloud</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Delete folder from MEGA</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Hapus folder dari MEGA</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
     <string name="camera_uploads_banner_complete_title">Unggahan kamera selesai</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
+    <string name="camera_uploads_banner_no_full_access_message">Untuk memastikan kami tidak melewatkan semua kenangan anda, MEGA membutuhkan akses penuh ke perpustakaan foto anda.</string>
     <!-- Message of notice that the zip file format is error -->
-    <string name="message_zip_format_error">File can’t be opened as the file format isn’t supported</string>
+    <string name="message_zip_format_error">File tidak dapat dibuka karena format file tidak didukung</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Tidak ada aplikasi yang cocok untuk membuka file ini di perangkat anda</string>
     <!-- A user can mark a folder or file with red colour. -->
@@ -1425,31 +1413,31 @@
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">Sebuah error terjadi, harap coba kembali.</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="general_select_create_folder">Select or create a new folder</string>
+    <string name="general_select_create_folder">Pilih atau buat folder baru</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
-    <string name="sync_snackbar_message_confirm_backup_moved">Backup stopped. Folder was moved to %1$s</string>
+    <string name="sync_snackbar_message_confirm_backup_moved">Cadangan berhenti. Folder dipindahkan ke %1$s</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="sync_snackbar_message_confirm_backup_deleted">Backup stopped. Folder deleted from MEGA.</string>
+    <string name="sync_snackbar_message_confirm_backup_deleted">Cadangan berhenti. Folder dihapus dari MEGA.</string>
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
+    <string name="sync_stalled_issue_choose_local_file_explanation">File di MEGA akan diganti dengan [A]%1$s.[/A] Versi yang ada akan dipindahkan ke folder SyncDebris di tempat sampah anda.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder</string>
+    <string name="sync_stalled_issue_choose_remote_file_explanation">File lokal [A]%1$s[/A] akan dipindahkan ke folder.</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
+    <string name="sync_stalled_issue_choose_rename_file_explanation">File dengan nama yang sama tetapi konten yang berbeda akan memiliki akhiran seperti (1) ditambahkan ke dalamnya</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">Semua folder akan digabungkan dan file dengan nama yang sama tetapi konten yang berbeda akan memiliki akhiran seperti (1) ditambahkan</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">File yang terbaru diperbarui akan menggantikan yang lama di kedua lokasi</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">Pilih</string>
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Terapkan untuk semua</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue solved</string>
+    <string name="sync_stalled_issue_resolved">Masalah terpecahkan</string>
     <!-- Sync message when multiple issues resolved -->
-    <string name="sync_stalled_issues_resolved">Issues have been solved</string>
+    <string name="sync_stalled_issues_resolved">Masalah telah terpecahkan</string>
     <!-- Text of the empty playlist in Video Section -->
     <string name="video_section_playlists_video_empty">Kosongkan</string>
     <!-- Text of video count of playlist in Video Section -->
@@ -1457,35 +1445,37 @@
         <item quantity="other">%1$d video</item>
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
-    <string name="sync_stop_backup_confirm_dialog_move_explanation">Move this folder to your Cloud drive to get full access to your data. It will no longer be backed up to.</string>
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">Pindahkan folder ini ke drive Cloud anda untuk mendapatkan akses penuh ke data anda. Itu tidak akan lagi didukung.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Kunjungi [A]https://%1$s[/A] di browser web anda.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
+    <string name="camera_uploads_banner_checking_uploads_text">Memeriksa unggahan...</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
-    <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <string name="camera_uploads_banner_uploading_pending_count_text">Mengunggah: %d item yang tersisa</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
-    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <string name="sync_resolve_rename_all_items_title">Ganti nama semua item?</string>
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
-    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <string name="sync_stalled_issue_merge_folders_title">Gabungkan folder dan ganti nama file?</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <string name="sync_stalled_issue_choose_local_file_title">Pilih file lokal?</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">Pilih file yang disimpan di MEGA?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">Pilih file terakhir yang dimodifikasi?</string>
     <!-- Colored folders onboarding title -->
-    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <string name="colored_folders_onboarding_title">Folder berwarna-warni, organisasi yang lebih jelas</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">Ketika anda menambahkan label ke folder, warnanya akan muncul langsung di folder. Ini membantu anda menemukan apa yang anda butuhkan lebih cepat.</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">Gabungkan</string>
     <!-- Dialog rename option -->
     <string name="sync_apply_all_dialog_rename_button">Ubah nama</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear solved issues</string>
+    <string name="sync_menu_clear_issues">Hapus masalah yang diselesaikan</string>
     <!--Sign Up page text field input first name error message when character limit exceeded-->
-    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">Nama depan tidak boleh melebihi 40 karakter</string>
     <!--Sign Up page text field input last name error message when character limit exceeded-->
-    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Nama belakang tidak boleh melebihi 40 karakter</string>
+    <!-- Error message when IP has already sent an issue report and needs to wait -->
+    <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
 </resources>

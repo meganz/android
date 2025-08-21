@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Não há espaço de armazenamento suficiente no seu dispositivo</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Ocorreu um erro desconhecido - entre em contato com support@mega.nz.</string>
+    <string name="general_sync_message_unknown_error">Ocorreu um erro desconhecido - entre em contato com support@mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Não é possível sincronizar ou fazer backup porque a pasta no MEGA está na Lixeira</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -1164,8 +1164,6 @@
     <string name="pro_plan_feature_pass_desc">Organize todas as suas senhas e mantenha-as seguras com o nosso gerenciador de senhas</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Recomendado</string>
-    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
-    <string name="transfers_over_quota_banner_title">Obter mais cota de transferência</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">Fazer upgrade</string>
     <!-- Section title for additional benefits of Pro plans -->
@@ -1461,11 +1459,11 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">Arquivos com o mesmo nome, mas com conteúdo diferente, terão um sufixo adicionado, como (1)</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">Todas as pastas serão mescladas, e os arquivos com o mesmo nome, mas com conteúdo diferente, terão um sufixo adicionado, como (1).</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">Todas as pastas serão mescladas, e os arquivos com o mesmo nome, mas com conteúdo diferente, terão um sufixo adicionado, como (1)</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">O arquivo com a data de atualização mais recente vai substituir o anterior em ambos locais</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">Selecionar</string>
     <!-- Text label of Apply to all -->
@@ -1514,4 +1512,6 @@
     <string name="sign_up_first_name_text_field_char_limit_exceed_error">O nome não ter mais de 40 caracteres</string>
     <!--Sign Up page text field input last name error message when character limit exceeded-->
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">O sobrenome não ter mais de 40 caracteres</string>
+    <!-- Error message when IP has already sent an issue report and needs to wait -->
+    <string name="report_issue_too_many_times_error">Você já enviou um relatório de problema nos últimos 10 minutos. Espere antes de tentar novamente ou entre em contato com %1$s para obter assistência.</string>
 </resources>

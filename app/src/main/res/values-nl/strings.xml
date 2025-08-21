@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Het abonnement is geannuleerd</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">We konden uw abonnement niet annuleren. Neem a.u.b. contact op met support&#64;mega.nz voor assistentie.</string>
+    <string name="cancel_subscription_error">We konden uw abonnement niet annuleren. Neem a.u.b. contact op met support&#64;mega.io voor assistentie.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Sluit andere sessies</string>
     <!-- Message after kill all opened sessions -->
@@ -757,7 +757,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Ongeldig e-mailadres of wachtwoord. Probeer nogmaals.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Uw account is geschorst door schending van de Algemene Voorwaarden. Neem contact op met support&#64;mega.nz</string>
+    <string name="error_account_suspended">Uw account is geschorst door schending van de Algemene Voorwaarden. Neem contact op met support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Teveel mislukte pogingen om in te loggen, alstublieft wacht voor een uur.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -4844,7 +4844,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Het uploaden is gepauzeerd omdat de batterij lager is dan %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Het uploaden van de camera werkt niet meer. Probeer camera-uploads opnieuw in te schakelen om het probleem op te lossen. Als het probleem zich blijft voordoen, neem contact op met support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Het uploaden van de camera werkt niet meer. Probeer camera-uploads opnieuw in te schakelen om het probleem op te lossen. Als het probleem zich blijft voordoen, neem contact op met support&#64;mega.io.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Camera uploads zijn in behandeling,%1$d bestand in wachtrij</item>

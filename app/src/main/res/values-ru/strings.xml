@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Подписка была отменена</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Мы не смогли отменить вашу подписку. Пожалуйста, свяжитесь с support&#64;mega.nz</string>
+    <string name="cancel_subscription_error">Мы не смогли отменить вашу подписку. Пожалуйста, свяжитесь с support&#64;mega.io</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Закрыть другие сеансы</string>
     <!-- Message after kill all opened sessions -->
@@ -773,7 +773,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Неверная почта или пароль. Пожалуйста, попробуйте ещё раз.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Ваш аккаунт был заблокирован из-за нарушений условий использования. Пожалуйста, свяжитесь с support&#64;mega.nz</string>
+    <string name="error_account_suspended">Ваш аккаунт был заблокирован из-за нарушений условий использования. Пожалуйста, свяжитесь с support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Слишком много неудачных попыток войти. Пожалуйста, подождите час.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -5286,7 +5286,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Загрузка приостановлена, так как заряд батареи ниже %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Загрузки из камеры перестали работать. Попробуйте повторно включить загрузки из камеры. Если проблема повторяется, напишите на support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Загрузки из камеры перестали работать. Попробуйте повторно включить загрузки из камеры. Если проблема повторяется, напишите на support&#64;mega.io.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Выполняется загрузка из камеры, %1$d файл ожидает обработки</item>

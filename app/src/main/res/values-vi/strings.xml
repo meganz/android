@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Gói đăng ký dịch vụ đã được hủy bỏ</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Có rắc rối trong việc hủy bỏ gói đăng ký dịch vụ. Xin liên hệ với support&#64;mega.nz để được nhận giúp đỡ.</string>
+    <string name="cancel_subscription_error">Có rắc rối trong việc hủy bỏ gói đăng ký dịch vụ. Xin liên hệ với support&#64;mega.io để được nhận giúp đỡ.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Đóng các phiên khác lại</string>
     <!-- Message after kill all opened sessions -->
@@ -749,7 +749,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">E-mail hoặc mật khẩu không hợp lệ. Xin thử lại</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Tài khoản bị đình chỉ do vi phạm Điều Khoản Dịch Vụ. Xin liên hệ support&#64;mega.nz để được giải quyết.</string>
+    <string name="error_account_suspended">Tài khoản bị đình chỉ do vi phạm Điều Khoản Dịch Vụ. Xin liên hệ support&#64;mega.io để được giải quyết.</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Đăng nhập sai quá nhiều lần, xin chờ một tiếng đồng hồ rồi thử lại.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -4623,7 +4623,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Tải lên bị tạm dừng vì pin ở dưới %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Đăng tải camêra đã dừng hoạt&#160;động. Hãy thử bật lại đăng tải camêra để giải&#160;quyết. Nếu vấn&#160;đề tiếp diễn, vui lòng liên&#160;hệ với support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Đăng tải camêra đã dừng hoạt&#160;động. Hãy thử bật lại đăng tải camêra để giải&#160;quyết. Nếu vấn&#160;đề tiếp diễn, vui lòng liên&#160;hệ với support&#64;mega.io</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">Việc đăng&#160;tải camêra đang được thực hiện, %1$d tệp đang chờ</item>

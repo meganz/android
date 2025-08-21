@@ -27,13 +27,13 @@
         <item quantity="other">%1$d berkas</item>
     </plurals>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear solved issues</string>
+    <string name="sync_menu_clear_issues">Hapus masalah yang diselesaikan</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Sinkronisasi dua arah</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Ganti nama semua item</string>
     <!-- Sync to resolve conflict Merge folders -->
-    <string name="sync_stalled_issue_merge_folders">Merge folders and rename files</string>
+    <string name="sync_stalled_issue_merge_folders">Gabungkan folder dan ganti nama file</string>
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">Pilih file lokal</string>
     <!-- Sync to resolve conflict Choose remote file -->
@@ -125,7 +125,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Kesalahan lokal mencegah akses folder</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Kesalahan sistem file mencegah akses folder.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Target terlalu dalam pada struktur folder anda.\nPindahkan ke lokasi yang kedalamannya kurang dari 64 folder.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -143,5 +143,5 @@
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Menunggu pemindaian selesai untuk menentukan apakah file dipindahkan atau dihapus.</string>
     <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
+    <string name="sync_change_root_uri_warning_title">Beberapa folder tidak dapat disinkronkan atau dicadangkan karena aplikasi MEGA telah kehilangan izin untuk mengakses folder lokal. Ketuk Lanjutkan untuk menambahkan kembali izin untuk setiap folder yang terpengaruh.</string>
 </resources>

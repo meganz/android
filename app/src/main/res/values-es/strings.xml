@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">La suscripción ha sido cancelada</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">La suscripción no se ha cancelado correctamente. Ponte en contacto con support&#64;mega.nz para obtener ayuda.</string>
+    <string name="cancel_subscription_error">La suscripción no se ha cancelado correctamente. Ponte en contacto con support&#64;mega.io para obtener ayuda.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Cerrar el resto de sesiones</string>
     <!-- Message after kill all opened sessions -->
@@ -765,7 +765,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Correo electrónico o contraseña no válidos Vuelve a intentarlo.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Tu cuenta ha sido suspendida por infringir nuestros Términos de servicio. Por favor, ponte en contacto con support&#64;mega.nz</string>
+    <string name="error_account_suspended">Tu cuenta ha sido suspendida por infringir nuestros Términos de servicio. Por favor, ponte en contacto con support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Demasiados intentos de acceso incorréctos. Vuelve a intentarlo en una hora.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -5065,7 +5065,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">La subida está en pausa porque la batería está por debajo del %1$d&#160;%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Las subidas de la cámara han dejado de funcionar. Intenta volver a activarlas para solucionarlo. Si el problema persiste, contacta con support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Las subidas de la cámara han dejado de funcionar. Intenta volver a activarlas para solucionarlo. Si el problema persiste, contacta con support&#64;mega.io.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Subidas de la cámara en curso, %1$d archivo pendiente</item>

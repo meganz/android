@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Langganan berhasil dibatalkan</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Kami tidak dapat membatalkan langganan anda. Silahkan hubungi support&#64;mega.nz  untuk mendapatkan bantuan.</string>
+    <string name="cancel_subscription_error">Kami tidak dapat membatalkan langganan anda. Silahkan hubungi support&#64;mega.io untuk mendapatkan bantuan.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Tutup sesi lain</string>
     <!-- Message after kill all opened sessions -->
@@ -749,7 +749,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">E-mail atau kata sandi tidak valid. Silakan coba lagi.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Akun anda telah di tangguhkan karena penyalahgunaan Kebijakan Pelayanan. Harap kontak support&#64;mega.nz</string>
+    <string name="error_account_suspended">Akun anda telah di tangguhkan karena penyalahgunaan Kebijakan Pelayanan. Harap kontak support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Terlalu banyak coba masuk yang gagal, mohon tunggu selama satu jam.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -861,7 +861,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">Kerahasiaan</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">You’re logged in to a different MEGA account. Log out and open the password reset link again.</string>
+    <string name="error_not_logged_with_correct_account">Anda masuk ke akun MEGA yang berbeda. Keluar dan buka tautan reset kata sandi lagi.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
     <string name="cancel_link_expired">Link batal ini telah kadarluarsa, coba lagi.</string>
     <!-- Text shown after searching and no results found -->
@@ -1603,7 +1603,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Aktifkan pratinjau tautan terkirim</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Generates previews for certain links you send in chat, when available. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
+    <string name="text_enable_rich_links">Menghasilkan pratinjau untuk tautan tertentu yang anda kirim dalam obrolan, jika tersedia. Perhatikan bahwa mengambil pratinjau ini tidak dilindungi oleh enkripsi zero-knowledge.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Harap masukkan kata sandi yang lebih kuat</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -3417,9 +3417,9 @@
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">Tampilan galeri</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Open folders with only images or videos in a visual grid. Browse media by thumbnails and filter by date.</string>
+    <string name="settings_media_discovery_view_context">Buka folder dengan hanya gambar atau video dalam kisi visual. Jelajahi media berdasarkan thumbnail dan filter berdasarkan tanggal.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in gallery view. You can enjoy your visual content with a more immersive layout. You can disable this in Settings.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Karena folder ini hanya berisi gambar dan video, kami secara otomatis membukanya dalam tampilan galeri. Anda dapat menikmati konten visual anda dengan tata letak yang lebih imersif. Anda dapat menonaktifkan ini di Pengaturan.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Pengaturan</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4461,9 +4461,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Original</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Gallery view in subfolders</string>
+    <string name="settings_media_discovery_sub_folder_title">Tampilan galeri di subfolder</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Images and videos from subfolders will also be included in gallery view</string>
+    <string name="settings_media_discovery_sub_folder_context">Gambar dan video dari subfolder juga akan disertakan dalam tampilan galeri</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Tidak ada hasil</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4619,11 +4619,11 @@
     <!-- Camera uploads updated info in Photos screen. -->
     <string name="photos_camera_uploads_updated">Unggahan kamera diperbarui</string>
     <!-- Camera uploads no internet info in Photos screen. -->
-    <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
+    <string name="photos_camera_uploads_no_internet">Upload dijeda karena tidak ada koneksi internet</string>
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Unggahan dijeda karena baterai di bawah %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Unggahan kamera berhenti berfungsi. Coba aktifkan kembali unggahan kamera untuk menyelesaikannya. Jika masalah berlanjut, hubungi support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Unggahan kamera berhenti berfungsi. Coba aktifkan kembali unggahan kamera untuk menyelesaikannya. Jika masalah berlanjut, hubungi support&#64;mega.io</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">Pengunggahan kamera sedang berlangsung, %1$d file tertunda</item>

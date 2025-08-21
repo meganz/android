@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Abonamentul a fost anulat</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Nu am putut să vă anulăm abonamentul. Vă rugăm să contactați support&#64;mega.nz pentru asistență.</string>
+    <string name="cancel_subscription_error">Nu am putut să vă anulăm abonamentul. Vă rugăm să contactați support&#64;mega.io pentru asistență.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Închide celelalte sesiuni</string>
     <!-- Message after kill all opened sessions -->
@@ -765,7 +765,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Adresă de e-mail sau parolă nevalide. Vă rugăm să încercați din nou.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Contul dvs. a fost suspendat din cauza încălcărilor Termenii de utilizare a serviciului. Va rugam sa contactati support&#64;mega.nz</string>
+    <string name="error_account_suspended">Contul dvs. a fost suspendat din cauza încălcărilor Termenii de utilizare a serviciului. Va rugam sa contactati support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Prea multe încercări eșuate de autentificare, vă rugăm să așteptați o oră.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -5015,7 +5015,7 @@
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
     <string name="transfers_confirm_large_download_button_start">Începeți descărcarea</string>
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
-    <string name="transfers_confirm_large_download_button_start_always">Descărcați întotdeauna și nu întrebați din nou</string>
+    <string name="transfers_confirm_large_download_button_start_always">Descarcă întotdeauna și nu întrebați din nou</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
         <item quantity="one">Folderul a fost partajat</item>
@@ -5065,7 +5065,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Încărcarea a fost întreruptă deoarece bateria este sub %1$d&#160;%%.</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Încărcări camere au încetat să funcționeze. Încercați să reactivați încărcările camerei pentru a o rezolva. Dacă problema persistă, contactați support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Încărcări camere au încetat să funcționeze. Încercați să reactivați încărcările camerei pentru a o rezolva. Dacă problema persistă, contactați support&#64;mega.io.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Încărcări cameră în desfășurare, %1$d&#160;fișier în așteptare</item>

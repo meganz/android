@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Spațiu de stocare insuficient pe dispozitiv</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">A apărut o eroare necunoscută. Contactați support@mega.nz.</string>
+    <string name="general_sync_message_unknown_error">A apărut o eroare necunoscută. Contactați support@mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Folderul nu poate fi sincronizat sau backup-uite, deoarece folderul MEGA se află în Coșul de gunoi</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -245,7 +245,7 @@
     <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads. Please do not modify the %s placeholder as it will be replaced by the name of the folder where the files will be downloaded-->
     <string name="transfers_dialog_save_download_location_title">Salvați toate fișierele descărcate în ”%1$s„?</string>
     <!-- Option to use the selected location as default location for next downloads-->
-    <string name="transfers_dialog_save_download_location_always_here_option">Întotdeauna descărcați aici</string>
+    <string name="transfers_dialog_save_download_location_always_here_option">Întotdeauna descarcă aici</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
     <string name="transfers_dialog_save_download_location_always_ask_option">Întotdeauna cereți locația</string>
     <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
@@ -1164,8 +1164,6 @@
     <string name="pro_plan_feature_pass_desc">Organizați-vă toate parolele și păstrați-le în siguranță cu managerul nostru de parole</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Recomandat</string>
-    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
-    <string name="transfers_over_quota_banner_title">Obține o cotă de transfer mai mare</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">Upgradați acum</string>
     <!-- Section title for additional benefits of Pro plans -->
@@ -1451,29 +1449,29 @@
     <!-- Name for a general label which action is "Select or create new folder" -->
     <string name="general_select_create_folder">Selectați sau creați un folder nou</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
-    <string name="sync_snackbar_message_confirm_backup_moved">Backup stopped. Folder was moved to %1$s</string>
+    <string name="sync_snackbar_message_confirm_backup_moved">Copia de rezervă s-a oprit. Folderul a fost mutat în %1$s</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="sync_snackbar_message_confirm_backup_deleted">Backup stopped. Folder deleted from MEGA.</string>
+    <string name="sync_snackbar_message_confirm_backup_deleted">Copie de rezervă oprită. Folderul a fost șters din MEGA.</string>
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
+    <string name="sync_stalled_issue_choose_local_file_explanation">Fișierul de pe MEGA va fi înlocuit cu [A]%1$s.[/A] Versiunea existentă va fi mutată în folderul SyncDebris din Coșul de gunoi.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder</string>
+    <string name="sync_stalled_issue_choose_remote_file_explanation">Fișierul local [A]%1$s[/A] va fi mutat în folderul.</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
+    <string name="sync_stalled_issue_choose_rename_file_explanation">Fișierele cu același nume, dar conținut diferit vor avea un sufix precum (1) adăugat la ele</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">Toate folderele vor fi îmbinate și fișierele cu același nume, dar conținut diferit vor avea un sufix precum (1) adăugat</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">Cel mai recent fișier actualizat îl va înlocui pe cel mai vechi în ambele locații</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">Alege</string>
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Se aplică în toate cazurile</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue solved</string>
+    <string name="sync_stalled_issue_resolved">Problema rezolvată</string>
     <!-- Sync message when multiple issues resolved -->
-    <string name="sync_stalled_issues_resolved">Issues have been solved</string>
+    <string name="sync_stalled_issues_resolved">Problemele au fost rezolvate</string>
     <!-- Text of the empty playlist in Video Section -->
     <string name="video_section_playlists_video_empty">Golește</string>
     <!-- Text of video count of playlist in Video Section -->
@@ -1485,25 +1483,25 @@
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">Mutați acest folder pe Unitatea cloud pentru a obține acces complet la datele dvs. Nu va mai fi susținut.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Accesa [A]https://%1$s[/A] în browserul dvs. web.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
+    <string name="camera_uploads_banner_checking_uploads_text">Se verifică încărcările&#8230;</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
-    <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <string name="camera_uploads_banner_uploading_pending_count_text">Se încarcă: %d elemente rămase</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
-    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <string name="sync_resolve_rename_all_items_title">Redenumiți toate elementele?</string>
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
-    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <string name="sync_stalled_issue_merge_folders_title">Îmbinați folderele și redenumiți fișierele?</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <string name="sync_stalled_issue_choose_local_file_title">Alegeți fișierul local?</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">Alegeți fișierul stocat în MEGA?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">Alegeți ultimul fișier modificat?</string>
     <!-- Colored folders onboarding title -->
-    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <string name="colored_folders_onboarding_title">Foldere colorate, organizare mai clară</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">Când adăugați o etichetă într-un folder, culoarea acesteia va apărea direct pe folder. Acest lucru vă ajută să găsiți mai repede ceea ce aveți nevoie.</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">Îmbină</string>
     <!-- Dialog rename option -->
@@ -1511,7 +1509,9 @@
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">Ștergeți problemele rezolvate</string>
     <!--Sign Up page text field input first name error message when character limit exceeded-->
-    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">Prenumele nu pot depăși 40 de caractere</string>
     <!--Sign Up page text field input last name error message when character limit exceeded-->
-    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Numele de familie nu poate depăși 40 de caractere</string>
+    <!-- Error message when IP has already sent an issue report and needs to wait -->
+    <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
 </resources>

@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">구독이 취소되었습니다</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">당신의 구독을 취소할 수 없었습니다. 도움을 받으려면 support&#64;mega.nz로 연락주세요.</string>
+    <string name="cancel_subscription_error">당신의 구독을 취소할 수 없었습니다. 도움을 받으려면 support&#64;mega.io로 연락주세요.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">다른 세션 닫기</string>
     <!-- Message after kill all opened sessions -->
@@ -749,7 +749,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">잘못된 이메일 또는 암호입니다. 다시 시도하세요.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">당신의 계정은 이용 약관 위반으로 인해 정지되어 있습니다. support&#64;mega.nz로 연락주세요.</string>
+    <string name="error_account_suspended">당신의 계정은 이용 약관 위반으로 인해 정지되어 있습니다. support&#64;mega.io로 연락주세요.</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">로그인 시도 실패가 너무 많습니다, 1시간 동안 기다려주세요.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -4623,7 +4623,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">배터리가 %1$d%% 이하이기 대문에 업로드를 일시정지 하였습니다</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">카메라 업로드가 작동을 멈추었습니다. 해결하려면 카메라 업로드를 재활성화 하세요. 만약 문제가 계속되면, support&#64;mega.nz으로 연락하세요.</string>
+    <string name="photos_camera_uploads_general_issue">카메라 업로드가 작동을 멈추었습니다. 해결하려면 카메라 업로드를 재활성화 하세요. 만약 문제가 계속되면, support&#64;mega.io으로 연락하세요.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>

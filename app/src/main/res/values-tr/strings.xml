@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Abonelik iptal edildi</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Aboneliğinizi iptal edemedik. Yardım için lütfen support&#64;mega.nz ile iletişime geçin.</string>
+    <string name="cancel_subscription_error">Aboneliğinizi iptal edemedik. Yardım için lütfen support&#64;mega.io ile iletişime geçin.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Diğer tüm oturumları kapat</string>
     <!-- Message after kill all opened sessions -->
@@ -757,7 +757,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Geçersiz e-posta adresi veya şifre. Lütfen tekrar deneyin.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Hesabınız Hizmet Şartları ihlalleri nedeniyle askıya alındı. Lütfen support&#64;mega.nz ile iletişime geçin.</string>
+    <string name="error_account_suspended">Hesabınız Hizmet Şartları ihlalleri nedeniyle askıya alındı. Lütfen support&#64;mega.io ile iletişime geçin.</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Giriş yapmak için çok fazla başarısız deneme oldu, lütfen bir saat bekleyin.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -1007,7 +1007,7 @@
     <!-- Label for the option of setting to change the colour theme -->
     <string name="set_color_theme_label">Renk teması</string>
     <!-- Answer for confirmation dialog. -->
-    <string name="general_dismiss">Kapat</string>
+    <string name="general_dismiss">Yok say</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_unrecognizable">Mesaj tanınamıyor.</string>
     <!-- Title of the settings section to configure the autoaway of chat presence -->
@@ -1222,7 +1222,7 @@
     <!-- part of the string in incoming shared folder notification -->
     <string name="incoming_folder_notification">kimden</string>
     <!-- title of incoming shared folder notification -->
-    <string name="title_incoming_folder_notification">Yeni paylaşılan klasör</string>
+    <string name="title_incoming_folder_notification">Paylaşılan yeni klasör</string>
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_contact_request_notification">Yeni kişi isteği</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
@@ -3202,7 +3202,7 @@
     <!-- Warning informing transfers were cancelled. -->
     <string name="transfers_cancelled">Aktarımlar iptal edildi.</string>
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
-    <string name="title_duplicated_items">Benzer öğeler</string>
+    <string name="title_duplicated_items">Yinelenen öğeler</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
     <string name="file_already_exists_in_location">Hedefte [B]%1$s[/B] adlı bir dosya zaten mevcut.</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
@@ -4361,8 +4361,8 @@
     <string name="cloud_drive_subtitle_link_access_password">Bağlantıyı yalnızca şifreye sahip kişiler açabilir</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
     <plurals name="general_name_collision_file_apply_for_all">
-        <item quantity="one">Benzer öğeye uygula</item>
-        <item quantity="other">Tüm %1$d benzer öğelere uygula</item>
+        <item quantity="one">Yinelenen öğeye uygula</item>
+        <item quantity="other">Tüm %1$d yinelenen öğeye uygula</item>
     </plurals>
     <!-- Title of the meeting info screen -->
     <string name="meetings_info_title">Bilgi</string>
@@ -4844,7 +4844,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Pil %%%1$d altında olduğu için yükleme duraklatıldı</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Kamera yüklemeleri çalışmayı durdurdu. Çözmek için kamera yüklemelerini yeniden etkinleştirmeyi deneyin. Sorun devam ederse support&#64;mega.nz ile iletişime geçin.</string>
+    <string name="photos_camera_uploads_general_issue">Kamera yüklemeleri çalışmayı durdurdu. Çözmek için kamera yüklemelerini yeniden etkinleştirmeyi deneyin. Sorun devam ederse support&#64;mega.io ile iletişime geçin.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Kamera yüklemeleri devam ediyor, %1$d dosya beklemede</item>

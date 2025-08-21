@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Niewystarczająca ilość miejsca na urządzeniu</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Wystąpił nieznany błąd. Skontaktuj się z support@mega.nz.</string>
+    <string name="general_sync_message_unknown_error">Wystąpił nieznany błąd. Skontaktuj się z support@mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Nie można synchronizować ani utworzyć kopii zapasowej katalogu, ponieważ katalog MEGA znajduje się w koszu</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -1180,8 +1180,6 @@
     <string name="pro_plan_feature_pass_desc">Zorganizuj wszystkie swoje hasła i chroń je za pomocą naszego menedżera haseł</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Polecam</string>
-    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
-    <string name="transfers_over_quota_banner_title">Zwiększ swój transfer</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">Zmień teraz</string>
     <!-- Section title for additional benefits of Pro plans -->
@@ -1480,9 +1478,9 @@
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_merge_folder_explanation">Wszystkie katalogi zostaną połączone, a pliki o tej samej nazwie, ale różnej zawartości, będą miały dodany sufiks, np. (1).</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">Najnowszy zaktualizowany plik zastąpi starszy w obu lokalizacjach</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">Wybierz</string>
     <!-- Text label of Apply to all -->
@@ -1532,4 +1530,6 @@
     <string name="sign_up_first_name_text_field_char_limit_exceed_error">Imię nie może przekraczać 40 znaków</string>
     <!--Sign Up page text field input last name error message when character limit exceeded-->
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">Nazwisko nie może przekraczać 40 znaków</string>
+    <!-- Error message when IP has already sent an issue report and needs to wait -->
+    <string name="report_issue_too_many_times_error">W ciągu ostatnich 10 minut już wysłałeś zgłoszenie problemu. Proszę poczekaj przed ponowną próbą lub skontaktuj się z %1$s po pomoc.</string>
 </resources>

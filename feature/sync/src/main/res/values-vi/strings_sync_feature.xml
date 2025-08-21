@@ -27,13 +27,13 @@
         <item quantity="other">%1$d tệp tin</item>
     </plurals>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear solved issues</string>
+    <string name="sync_menu_clear_issues">Dọn các vấn&#160;đề đã giải&#160;quyết</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Đồng&#160;bộ hai chiều</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Đổi tên tất cả các mục</string>
     <!-- Sync to resolve conflict Merge folders -->
-    <string name="sync_stalled_issue_merge_folders">Merge folders and rename files</string>
+    <string name="sync_stalled_issue_merge_folders">Hợp nhất các thư mục và đổi tên các tệp tin</string>
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">Chọn tệp&#160;tin cục&#160;bộ</string>
     <!-- Sync to resolve conflict Choose remote file -->

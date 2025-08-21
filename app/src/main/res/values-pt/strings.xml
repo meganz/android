@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">A assinatura foi cancelada</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Não foi possível cancelar a sua assinatura. Por favor, entre em contato com support&#64;mega.nz</string>
+    <string name="cancel_subscription_error">Não foi possível cancelar a sua assinatura. Por favor, entre em contato com support&#64;mega.io</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Fechar outras sessões</string>
     <!-- Message after kill all opened sessions -->
@@ -765,7 +765,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Email ou senha inválidos - tente novamente.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">A sua conta foi suspensa for infringir os Termos de serviço. Para mais informações, entre em contato com support&#64;mega.nz</string>
+    <string name="error_account_suspended">A sua conta foi suspensa for infringir os Termos de serviço. Para mais informações, entre em contato com support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Muitas tentativas de login incorretas. Por favor, aguarde uma hora.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -5065,7 +5065,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">O upload foi pausado porque a bateria há menos de %1$d%% de bateria</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Os uploads da câmera pararam de funcionar - tente reativar o uploads da câmera novamente. Se o problema persistir, entre em contato através de support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Os uploads da câmera pararam de funcionar - tente reativar o uploads da câmera novamente. Se o problema persistir, entre em contato através de support&#64;mega.io.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Uploads da câmera em andamento, %1$d arquivo pendente</item>

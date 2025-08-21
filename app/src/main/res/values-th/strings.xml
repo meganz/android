@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">การสมัครใช้งานได้ถูกยกเลิกแล้ว</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">เราไม่สามารถยกเลิกการสมัครใช้งานของคุณได้ กรุณาติดต่อ support&#64;mega.nz เพื่อขอความช่วยเหลือ</string>
+    <string name="cancel_subscription_error">เราไม่สามารถยกเลิกการสมัครใช้งานของคุณได้ กรุณาติดต่อ support&#64;mega.io เพื่อขอความช่วยเหลือ</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">ปิดเซสชั่นอื่น ๆ</string>
     <!-- Message after kill all opened sessions -->
@@ -749,7 +749,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">บัญชีของคุณถูกระงับ เนื่องจากละเมิดเงื่อนไขการให้บริการกรุณาติดต่อ support&#64;mega.nz</string>
+    <string name="error_account_suspended">บัญชีของคุณถูกระงับ เนื่องจากละเมิดเงื่อนไขการให้บริการกรุณาติดต่อ support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">มีการเข้าสู่ระบบไม่สำเร็จหลายครั้งเกินไป กรุณารอประมาณหนึ่งชั่วโมง</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -4623,7 +4623,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">การอัปโหลดถูกหยุดชั่วคราว เนื่องจากแบตเตอรี่เหลือต่ำกว่า %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">การอัปโหลดจากกล้องหยุดทำงาน ลองเปิดใช้งานการอัปโหลดรูปภาพจากกล้องอีกครั้งเพื่อแก้ไข หากปัญหายังมีอยู่ให้ติดต่อ support&#64;mega.nz</string>
+    <string name="photos_camera_uploads_general_issue">การอัปโหลดจากกล้องหยุดทำงาน ลองเปิดใช้งานการอัปโหลดรูปภาพจากกล้องอีกครั้งเพื่อแก้ไข หากปัญหายังมีอยู่ให้ติดต่อ support&#64;mega.io</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">การอัปโหลดจากกล้องกำลังอยู่ในระหว่างดำเนินการ มี %1$d ไฟล์รอดำเนินการ</item>

@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">พื้นที่เก็บข้อมูลในอุปกรณ์ของคุณไม่เพียงพอ</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ ติดต่อ support@mega.nz</string>
+    <string name="general_sync_message_unknown_error">เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ ติดต่อ support@mega.io</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">ไม่สามารถซิงค์หรือสำรองข้อมูลโฟลเดอร์ได้ เนื่องจากโฟลเดอร์ MEGA อยู่ในถังขยะ</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -1025,15 +1025,15 @@
     <!-- Hidden nodes: hide files and folders feature -->
     <string name="hidden_nodes_title_hide_files_folders_feature">ซ่อนไฟล์และโฟลเดอร์สำคัญ</string>
     <!-- Hidden nodes description: hide files and folders feature -->
-    <string name="hidden_nodes_description_hide_files_folders_feature">เก็บไฟล์และโฟลเดอร์ลับไว้ส่วนตัว เฉพาะคุณเท่านั้นที่สามารถดูได้ โดยสามารถเลือกดูทีละรายการ หรือแสดงไฟล์ที่ซ่อนไว้ชั่วคราวจากเมนู</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">คุณสามารถซ่อนไฟล์และโฟลเดอร์ส่วนตัวเพื่อเพิ่มความเป็นส่วนตัวได้ และมีเพียงคุณเท่านั้นที่จะสั่งให้แสดงไฟล์เหล่านั้นทีละรายการ หรือจะเลือกแสดงรายการที่ซ่อนทั้งหมดชั่วคราวจากเมนูก็ได้</string>
     <!-- Hidden nodes: control visibility feature -->
     <string name="hidden_nodes_title_control_visibility">ไม่แสดงในไทม์ไลน์</string>
     <!-- Hidden nodes description: control visibility feature -->
-    <string name="hidden_nodes_description_control_visibility">รายการที่ซ่อนจะมองเห็นได้เฉพาะในคลาวด์ไดร์ฟเท่านั้น และจะไม่ปรากฏในรูปภาพ อัลบั้ม หรือรายการล่าสุด</string>
+    <string name="hidden_nodes_description_control_visibility">ไฟล์ที่ซ่อนไว้จะเปิดดูได้จากคลาวด์ไดร์ฟเท่านั้น และจะไม่ไปแสดงในหน้ารูปถ่าย อัลบั้ม หรือ ล่าสุด</string>
     <!-- Hidden nodes: shared files stay visible feature -->
     <string name="hidden_nodes_title_visible_shared_files">แสดงไฟล์ที่ซ่อนอยู่</string>
     <!-- Hidden nodes description: shared files stay visible feature -->
-    <string name="hidden_nodes_description_visible_shared_files">คุณสามารถเลือกได้ว่าต้องการให้ไฟล์ที่ซ่อนอยู่ปรากฏหรือไม่ มีการตั้งค่าใหม่ที่ช่วยให้คุณแสดงไฟล์ที่ซ่อนอยู่ชั่วคราวได้</string>
+    <string name="hidden_nodes_description_visible_shared_files">คุณเลือกได้ว่าจะให้ไฟล์ที่ซ่อนไว้แสดงขึ้นมาเมื่อใด โดยเราได้เพิ่มการตั้งค่าใหม่เพื่อให้คุณเลือกแสดงไฟล์ที่ซ่อนไว้ทั้งหมดเป็นการชั่วคราวได้</string>
     <!--Camera backup permission screen title-->
     <string name="camera_backup_permission_screen_title">เก็บภาพถ่ายของคุณให้ปลอดภัยเสมอ</string>
     <!--Camera backup permission screen description-->
@@ -1132,8 +1132,6 @@
     <string name="pro_plan_feature_pass_desc">จัดการรหัสผ่านทั้งหมดของคุณและเก็บไว้อย่างปลอดภัยด้วยตัวจัดการรหัสผ่านของเรา</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">แนะนำ</string>
-    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
-    <string name="transfers_over_quota_banner_title">รับโควต้าการถ่ายโอนเพิ่มขึ้น</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">อัปเกรดตอนนี้เลย</string>
     <!-- Section title for additional benefits of Pro plans -->
@@ -1417,29 +1415,29 @@
     <!-- Name for a general label which action is "Select or create new folder" -->
     <string name="general_select_create_folder">เลือกหรือสร้างโฟลเดอร์ใหม่</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
-    <string name="sync_snackbar_message_confirm_backup_moved">Backup stopped. Folder was moved to %1$s</string>
+    <string name="sync_snackbar_message_confirm_backup_moved">การสำรองข้อมูลหยุดลง โฟลเดอร์ถูกย้ายไปยัง %1$s</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="sync_snackbar_message_confirm_backup_deleted">Backup stopped. Folder deleted from MEGA.</string>
+    <string name="sync_snackbar_message_confirm_backup_deleted">การสำรองข้อมูลหยุดลง โฟลเดอร์ถูกลบจาก MEGA แล้ว</string>
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
+    <string name="sync_stalled_issue_choose_local_file_explanation">ไฟล์บน MEGA จะถูกแทนที่ด้วย [A]%1$s[/A] เวอร์ชันที่มีอยู่จะถูกย้ายไปยังโฟลเดอร์ SyncDebris ในถังขยะของคุณ</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder</string>
+    <string name="sync_stalled_issue_choose_remote_file_explanation">ไฟล์บนเครื่อง [A]%1$s[/A] จะถูกย้ายไปยังโฟลเดอร์ .debris</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
+    <string name="sync_stalled_issue_choose_rename_file_explanation">ไฟล์ที่ชื่อซ้ำกันแต่เนื้อหาต่างกัน จะมีส่วนต่อท้าย เช่น (1) เพิ่มเข้ามา</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">โฟลเดอร์ทั้งหมดจะถูกรวมเข้าด้วยกัน และไฟล์ที่มีชื่อเดียวกันแต่เนื้อหาต่างกันจะถูกเพิ่มส่วนต่อท้าย เช่น (1)</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">ไฟล์ที่อัปเดตล่าสุดจะมาแทนที่ไฟล์เก่าในทั้งสองตำแหน่ง</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">เลือก</string>
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">นำไปใช้ทั้งหมด</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue solved</string>
+    <string name="sync_stalled_issue_resolved">แก้ไขปัญหาเรียบร้อย</string>
     <!-- Sync message when multiple issues resolved -->
-    <string name="sync_stalled_issues_resolved">Issues have been solved</string>
+    <string name="sync_stalled_issues_resolved">แก้ไขปัญหาต่าง ๆ เรียบร้อยแล้ว</string>
     <!-- Text of the empty playlist in Video Section -->
     <string name="video_section_playlists_video_empty">ว่างเปล่า</string>
     <!-- Text of video count of playlist in Video Section -->
@@ -1447,27 +1445,27 @@
         <item quantity="other">%1$d วิดีโอ</item>
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
-    <string name="sync_stop_backup_confirm_dialog_move_explanation">ย้ายโฟลเดอร์นี้ไปยังคลาวด์ไดร์ฟของคุณ เพื่อให้คุณเข้าถึงข้อมูลได้แบบเต็มที่ และจะไม่มีการสำรองข้อมูลอีกต่อไป</string>
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">ย้ายโฟลเดอร์นี้ไปที่คลาวด์ไดร์ฟเพื่อเข้าถึงข้อมูลได้เต็มรูปแบบ และโฟลเดอร์นี้จะไม่อยู่ในการสำรองข้อมูลอีกต่อไป</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1.เปิด [A]https://%1$s[/A] ในเว็บเบราว์เซอร์ของคุณ</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
+    <string name="camera_uploads_banner_checking_uploads_text">กำลังตรวจสอบการอัปโหลด&#8230;</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
-    <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <string name="camera_uploads_banner_uploading_pending_count_text">กำลังอัปโหลด: เหลืออีก %d รายการ</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
-    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <string name="sync_resolve_rename_all_items_title">เปลี่ยนชื่อทุกรายการหรือไม่</string>
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
-    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <string name="sync_stalled_issue_merge_folders_title">รวมโฟลเดอร์และเปลี่ยนชื่อไฟล์หรือไม่</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <string name="sync_stalled_issue_choose_local_file_title">เลือกไฟล์บนเครื่องหรือไม่</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">เลือกไฟล์ที่จัดเก็บใน MEGA หรือไม่</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">เลือกไฟล์ที่แก้ไขล่าสุดหรือไม่</string>
     <!-- Colored folders onboarding title -->
-    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <string name="colored_folders_onboarding_title">โฟลเดอร์หลากสีสัน จัดระเบียบได้ชัดเจนยิ่งขึ้น</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">เมื่อคุณเพิ่มป้ายกำกับให้โฟลเดอร์ สีของป้ายกำกับจะแสดงบนโฟลเดอร์โดยตรง ซึ่งจะช่วยให้คุณค้นหาสิ่งที่ต้องการได้เร็วขึ้น</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">รวม</string>
     <!-- Dialog rename option -->
@@ -1475,7 +1473,9 @@
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">ล้างรายการที่แก้ไขปัญหาเสร็จแล้ว</string>
     <!--Sign Up page text field input first name error message when character limit exceeded-->
-    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">ชื่อต้องมีความยาวไม่เกิน 40 ตัวอักษร</string>
     <!--Sign Up page text field input last name error message when character limit exceeded-->
-    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">นามสกุลต้องมีความยาวไม่เกิน 40 ตัวอักษร</string>
+    <!-- Error message when IP has already sent an issue report and needs to wait -->
+    <string name="report_issue_too_many_times_error">คุณเพิ่งส่งรายงานปัญหาไปเมื่อไม่ถึง 10 นาทีที่แล้ว กรุณารออีกสักครู่ก่อนลองใหม่อีกครั้ง หรือติดต่อ %1$s เพื่อรับความช่วยเหลือ</string>
 </resources>

@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">此筆訂閱已經成功取消</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">我們無法取消您的訂閱。請聯繫 support&#64;mega.nz 取得協助。</string>
+    <string name="cancel_subscription_error">我們無法取消您的訂閱。請聯繫 support&#64;mega.io 取得協助。</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">關閉其他登入帳戶</string>
     <!-- Message after kill all opened sessions -->
@@ -749,7 +749,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">無效的電子郵件地址或密碼。請重試。</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">由於違反服務條款，您的帳戶已被暫停。請聯繫 support&#64;mega.nz</string>
+    <string name="error_account_suspended">由於違反服務條款，您的帳戶已被暫停。請聯繫 support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">嘗試登入失敗的次數太多，請稍候一個小時後再試。</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -4623,7 +4623,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">由於電池電量低於%1$d%%，上傳已暫停</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">相機上傳停止運作。嘗試重新啟用相機上傳來解決問題。如果問題仍然存在，聯繫support&#64;mega.nz。</string>
+    <string name="photos_camera_uploads_general_issue">相機上傳停止運作。嘗試重新啟用相機上傳來解決問題。如果問題仍然存在，聯繫support&#64;mega.io。</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">相機上傳正在進行中，%1$d個檔案待處理</item>

@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">مساحة تخزين غير كافية على جهازك</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">حدث خطأ غير معروف. تواصل مع support@mega.nz.</string>
+    <string name="general_sync_message_unknown_error">حدث خطأ غير معروف. تواصل مع support@mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">لا يمكن مزامنة المجلد أو نسخه احتياطيًا لأن مجلد ميغا MEGA موجود في سلة المحذوفات</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -1212,8 +1212,6 @@
     <string name="pro_plan_feature_pass_desc">قم بتنظيم جميع كلمات المرور الخاصة بك واحتفظ بها آمنة مع مدير كلمات المرور الخاص بنا</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">موصي به</string>
-    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
-    <string name="transfers_over_quota_banner_title">الحصول على المزيد من حصة النقل</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">رق حسابك الآن</string>
     <!-- Section title for additional benefits of Pro plans -->
@@ -1512,17 +1510,17 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">ستتم إضافة لاحقة مثل (1) إلى الملفات التي تحمل الاسم نفسه ولكن بمحتوى مختلف</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">سيتم دمج جميع المجلدات وستتم إضافة الملفات التي تحمل الاسم نفسه ولكن المحتوى المختلف سيحتوي على لاحقة مثل (1)</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">سيحل الملف الذي تم تحديثه مؤخرًا محل الملف الأقدم في كلا الموقعين</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">اختر</string>
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">قم بالتطبيق على الكل</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue solved</string>
+    <string name="sync_stalled_issue_resolved">تم حل المشكلة</string>
     <!-- Sync message when multiple issues resolved -->
     <string name="sync_stalled_issues_resolved">تم حل المشكلات</string>
     <!-- Text of the empty playlist in Video Section -->
@@ -1539,7 +1537,7 @@
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">انقل هذا المجلد إلى السواقة السحابية الخاصة بك للوصول الكامل إلى بياناتك. لن يتم نسخها احتياطيًا بعد الآن.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. زيارة [A]https://%1$s[/A] في متصفح الويب الخاص بك.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
     <string name="camera_uploads_banner_checking_uploads_text">جاري التحقق من الترفيعات...</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
@@ -1555,17 +1553,19 @@
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
     <string name="sync_stalled_issue_choose_latest_modified_time_title">اختر آخر ملف تم تعديله؟</string>
     <!-- Colored folders onboarding title -->
-    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <string name="colored_folders_onboarding_title">مجلدات ملونة، تنظيم أكثر وضوحًا</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">عند إضافة تسمية إلى مجلد، سيظهر لونها مباشرة على المجلد. يساعدك هذا في العثور على ما تحتاجه بشكل أسرع.</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">دمج</string>
     <!-- Dialog rename option -->
     <string name="sync_apply_all_dialog_rename_button">تغيير الاسم</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear solved issues</string>
+    <string name="sync_menu_clear_issues">مسح المشاكل التي تم حلها</string>
     <!--Sign Up page text field input first name error message when character limit exceeded-->
-    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">لا يمكن أن يتجاوز الاسم الأول 40 محرفًا</string>
     <!--Sign Up page text field input last name error message when character limit exceeded-->
-    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">لا يمكن أن يتجاوز الاسم الأخير 40 محرفًا</string>
+    <!-- Error message when IP has already sent an issue report and needs to wait -->
+    <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
 </resources>

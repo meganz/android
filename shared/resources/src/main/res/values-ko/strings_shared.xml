@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">장치에 충분한 저장 공간이 없습니다</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">알 수 없는 오류가 발생하였습니다. support@mega.nz에 연락하세요.</string>
+    <string name="general_sync_message_unknown_error">알 수 없는 오류가 발생하였습니다. support@mega.io에 연락하세요.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">MEGA 폴더가 휴지통에 있어서 폴더를 동기화 또는 백업할 수 없습니다</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -1132,8 +1132,6 @@
     <string name="pro_plan_feature_pass_desc">우리의 암호 관리자로 당신의 모든 암호를 정리하고 안전하게 지키세요</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">권고됨</string>
-    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
-    <string name="transfers_over_quota_banner_title">더 많은 전송 할당량 받기</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">지금 업그레이드</string>
     <!-- Section title for additional benefits of Pro plans -->
@@ -1427,11 +1425,11 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">같은 이름을 가졌지만 내용이 다른 파일은 (1) 같은 접미사가 붙게 됩니다</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">모든 폴더가 합쳐지고 같은 이름을 가졌지만 내용이 다른 파일은 (1) 같은 접미사가 붙게 됩니다.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">모든 폴더가 합쳐지고 같은 이름을 가졌지만 내용이 다른 파일은 (1) 같은 접미사가 붙게 됩니다</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">가장 최근에 업데이트된 파일이 두 위치의 오래된 파일을 대체하게 됩니다</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">선택</string>
     <!-- Text label of Apply to all -->
@@ -1478,4 +1476,6 @@
     <string name="sign_up_first_name_text_field_char_limit_exceed_error">이름은 40자를 초과할 수 없습니다</string>
     <!--Sign Up page text field input last name error message when character limit exceeded-->
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">성은 40자를 초과할 수 없습니다</string>
+    <!-- Error message when IP has already sent an issue report and needs to wait -->
+    <string name="report_issue_too_many_times_error">이미 10분 내에 문제 보고를 보낸 적이 있습니다. 다시 시도하기 전에 기다리거나, 도움을 받으려면 %1$s에 연락하세요.</string>
 </resources>

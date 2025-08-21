@@ -37,7 +37,7 @@
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Alle Elemente umbenennen</string>
     <!-- Sync to resolve conflict Merge folders -->
-    <string name="sync_stalled_issue_merge_folders">Merge folders and rename files</string>
+    <string name="sync_stalled_issue_merge_folders">Ordner zusammenführen und Dateien umbenennen</string>
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">Lokale Datei auswählen</string>
     <!-- Sync to resolve conflict Choose remote file -->
@@ -129,7 +129,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Ein lokaler Fehler verhindert den Ordnerzugriff</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Ein Dateisystemfehler verhindert den Ordnerzugriff.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">Das Ziel befindet sich zu tief in Ihrer Ordnerstruktur.\nBitte verschieben Sie es an einen Speicherort, der weniger als 64 Ordner tief ist.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->

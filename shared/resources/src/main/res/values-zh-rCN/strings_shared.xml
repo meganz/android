@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">您设备上的存储空间不足</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">出现未知错误。请联系support@mega.nz。</string>
+    <string name="general_sync_message_unknown_error">出现未知错误。请联系support@mega.io。</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">由于MEGA文件夹位于回收站中，文件夹无法同步或备份</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -411,7 +411,7 @@
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">在计算机上</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Visit [A]https://mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website">请在您的网络浏览器中1.访问[A]https://mega.nz[/A]。</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. 登入您的MEGA帐户。</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
@@ -691,7 +691,7 @@
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">添加到播放列表</string>
     <!-- Stop Backup confirmation dialog text -->
-    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up this folder, you need to either move it or delete it</string>
+    <string name="sync_stop_backup_confirm_dialog_text">要停止备份此文件夹，您需要将其移动或删除</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">确认</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -801,7 +801,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">需要文件扩展名</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA will fetch a temporary copy of this file so you can preview it. It won’t be saved or available outside the app. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">MEGA将获取这个文件的临时副本，以便您预览。它不会被保存，也不会在应用程序之外可用。%1$s将被下载。</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">完成进度：%1$d%%</string>
     <!-- Add to album files existed message -->
@@ -877,7 +877,7 @@
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">正在保存%1$s到云盘...</string>
     <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">您将被立即收费%1$s，但由于政府规定，您的订阅不会在12个月后自动续订。订阅到期后，您需要自行续订。您可以随时通过[A]Google&#160;Play[/A]的订阅部分中管理或取消您的订阅。升级您的帐户即表示您同意MEGA的[B]服务条款[/B]和[C]隐私政策[/C]。</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">正在上传&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -909,7 +909,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">电子邮件确认</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]Help Centre[/A].</string>
+    <string name="email_confirmation_content">我们已经发送了一封电子邮件至[P]%s[/P]并附带链接。请点击该链接验证您的电子邮件地址并激活您的帐户。 \n\n如果您没有收到电子邮件，请检查您的垃圾邮件文件夹或重试。如有任何其他问题，请访问我们的[A]帮助中心[/A]。</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">重新发送</string>
     <!-- General change email address -->
@@ -935,7 +935,7 @@
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
     <string name="general_sync_notification_generic_error_title">同步已停止</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Check your syncs in the app to resolve this.</string>
+    <string name="general_sync_notification_generic_error_text">在应用程序中检查您的同步以解决此问题。</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
     <string name="general_sync_notification_stalled_issues_title">检测到同步问题</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
@@ -987,37 +987,37 @@
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_text">您将无法再预览此文件</string>
     <!-- Warning text informing that a file preview failed to load. -->
-    <string name="transfers_fake_preview_screen_general_error">Preview failed to load, try again</string>
+    <string name="transfers_fake_preview_screen_general_error">预览加载失败，请重试</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
     <string name="transfers_error_cancelling_preview_download">出了点问题。预览未取消。详情请参阅通知。</string>
     <!-- Title of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_title">Backup name already exists</string>
+    <string name="sync_rename_and_create_backup_dialog_title">备份名称已经存在</string>
     <!-- Text of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_text">A folder with the same name already exists in your Backups. Rename the new folder to continue with the backup. Folder name will not change on your device.</string>
+    <string name="sync_rename_and_create_backup_dialog_text">您的备份中已经存在同名文件夹。重命名新文件夹以继续备份。您的设备上的文件夹名不会更改。</string>
     <!-- Rename and Create Backup Dialog hint text (input field description) -->
-    <string name="sync_rename_and_create_backup_dialog_hint_text">Backup name</string>
+    <string name="sync_rename_and_create_backup_dialog_hint_text">备份名称</string>
     <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_positive_button">重命名</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Enter a backup name</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">输入备份名称</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
-    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">A backup with this name already exists. Enter a different name.</string>
+    <string name="sync_rename_and_create_backup_dialog_error_message_name_already_exists">已存在相同名称的备份。请输入不同的名称。</string>
     <!-- USP Carousel page 1 title-->
     <string name="carousel_page_title_slide_1">您持有这把密钥</string>
     <!-- USP Carousel page 1 description-->
-    <string name="carousel_page_description_slide_1">User controlled, zero-knowledge encryption means no one can see your data unless you want them to - not even us!</string>
+    <string name="carousel_page_description_slide_1">用户控制的零知识加密意味着除非您愿意，否则没有人能看到您的数据，即使是我们也是如此！</string>
     <!-- USP Carousel page 2 title-->
-    <string name="carousel_page_title_slide_2">Keep every moment safe</string>
+    <string name="carousel_page_title_slide_2">确保每时每刻的安全</string>
     <!-- USP Carousel page 2 description-->
-    <string name="carousel_page_description_slide_2">With automatic camera uploads to MEGA Cloud, and generous storage, you’ll never lose a precious memory</string>
+    <string name="carousel_page_description_slide_2">借助自动将相机上传到MEGA云端，以及充足的存储空间，您永远不会丢失宝贵的回忆。</string>
     <!-- USP Carousel page 3 title-->
-    <string name="carousel_page_title_slide_3">Your data. Your space.</string>
+    <string name="carousel_page_title_slide_3">您的数据。您的地盘。</string>
     <!-- USP Carousel page 3 description-->
-    <string name="carousel_page_description_slide_3">Ample storage and easy ways to transfer, share, and organise your files means you can safely use MEGA for whatever you choose</string>
+    <string name="carousel_page_description_slide_3">充足的存储空间和简易的传输、共享和整理文件的方式意味着您可以安全地使用MEGA执行任意操作</string>
     <!-- USP Carousel page 4 title-->
     <string name="carousel_page_title_slide_4">私密的谈话</string>
     <!-- USP Carousel page 4 description-->
-    <string name="carousel_page_description_slide_4">Chat with friends and family, share photos or sensitive information, video call and schedule meetings. Safety and privacy guaranteed.</string>
+    <string name="carousel_page_description_slide_4">与朋友和家人聊天、共享照片或敏感信息、视频对话和安排会议。安全和隐私都得到保障。</string>
     <!-- Create account label-->
     <string name="general_label_create_account">创建MEGA帐户</string>
     <!-- The new feature hidden nodes feature -->
@@ -1035,53 +1035,53 @@
     <!-- Hidden nodes description: shared files stay visible feature -->
     <string name="hidden_nodes_description_visible_shared_files">您可以决定何时显示隐藏的文件。此处新增设置可以暂时显示隐藏的项目。</string>
     <!--Camera backup permission screen title-->
-    <string name="camera_backup_permission_screen_title">Keep your photos safe, always</string>
+    <string name="camera_backup_permission_screen_title">始终确保您照片的安全</string>
     <!--Camera backup permission screen description-->
-    <string name="camera_backup_permission_screen_description">Your memories matter.\n\nCamera uploads automatically backs up your photos and videos to your MEGA Cloud drive, so you never have to worry about losing them.</string>
+    <string name="camera_backup_permission_screen_description">您的回忆很重要。\n\n相机上传会自动将您的照片和视频备份到您的MEGA云盘上，因此您不必担心丢失它们。</string>
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
-    <string name="camera_backup_permission_banner_info_description">Camera uploads requires [A]full access[/A] to your device’s photo library</string>
+    <string name="camera_backup_permission_banner_info_description">相机上传需要[A]完全访问[/A]您设备的照片库</string>
     <!--Button text to request camera backup permission-->
     <string name="camera_backup_permission_enable_button_text">启用相机上传</string>
     <!--Permission screen skip requesting permission button text-->
-    <string name="permission_screen_skip_permission_request_button_text">Skip for now</string>
+    <string name="permission_screen_skip_permission_request_button_text">暂时跳过</string>
     <!--Notification permission screen title-->
-    <string name="notification_permission_screen_title">Never miss an important update</string>
+    <string name="notification_permission_screen_title">千万不要错过重要的更新</string>
     <!--Notification permission screen description-->
-    <string name="notification_permission_screen_description">Stay informed with real-time updates that matter to you. Get alerts for shared folder activity, security updates, and exclusive offers, so you never miss anything important.\n\nYou can manage notification preferences at any time in your device’s settings.</string>
+    <string name="notification_permission_screen_description">随时了解对您重要的实时更新。获取有关已共享文件夹活动、安全更新和独家优惠的提醒，这样您就不会错过任何重要内容。\n\n您可以随时在设备的设置中管理通知偏好。</string>
     <!--Button text to request Notification permission-->
     <string name="notification_permission_enable_button_text">启用提醒通知</string>
     <!-- Notification content for upload final notification in case of a single file upload. -->
-    <string name="transfers_notification_title_single_upload">Uploaded “%1$s”</string>
+    <string name="transfers_notification_title_single_upload">已上传”%1$s”</string>
     <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_warning_lost_wifi_title">Syncing paused due to lost connection.</string>
+    <string name="general_sync_warning_lost_wifi_title">由于连接中断，同步已暂停。</string>
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_warning_lost_wifi_text">Reconnect to Wi-Fi to resume.</string>
+    <string name="general_sync_warning_lost_wifi_text">重新连接到Wi-Fi即可恢复。</string>
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
     <string name="general_link_unavailable_subtitle">这可能是由于以下原因：</string>
     <!-- Bullet point shown when link is unavailable due to invalid URL -->
-    <string name="general_link_unavailable_invalid_url">Invalid URL - the link you’re trying to access does not exist</string>
+    <string name="general_link_unavailable_invalid_url">网址无效 - 您尝试访问的链接不存在</string>
     <!-- Bullet point shown when link is unavailable due to expiration -->
-    <string name="general_link_expired">The link has expired</string>
+    <string name="general_link_expired">该链接已过期</string>
     <!-- Title shown when a folder link is unavailable (general case) -->
-    <string name="folder_link_unavailable_title">The folder link you’re trying to access is not available</string>
+    <string name="folder_link_unavailable_title">您尝试访问的文件夹链接无法使用</string>
     <!-- Bullet point shown when a folder link is unavailable because the link has been disabled -->
-    <string name="folder_link_unavailable_disabled">The folder link has been disabled by the owner</string>
+    <string name="folder_link_unavailable_disabled">所有者已停用该文件夹链接</string>
     <!-- Title shown when a folder link has expired -->
-    <string name="folder_link_expired_title">The folder link you’re trying to access is no longer available</string>
+    <string name="folder_link_expired_title">您尝试访问的文件夹链接已不再可用</string>
     <!-- Title of the dialog shown when the user needs to verify administrator credentials -->
-    <string name="unverified_business_account_dialog_title">Verify administrator credentials to continue</string>
+    <string name="unverified_business_account_dialog_title">验证管理员凭证以继续</string>
     <!-- Description of the dialog explaining the need to verify administrator credentials -->
-    <string name="unverified_business_account_dialog_description">You need to verify your Business account administrator’s credentials in order to continue. Log in to your account in a desktop web browser and complete the credential verification.</string>
+    <string name="unverified_business_account_dialog_description">您需要验证企业帐户管理员的凭证才能继续。请在桌面浏览器中登录您的帐户并完成凭证验证。</string>
     <!-- Title shown when a file link is unavailable (general case) -->
-    <string name="file_link_unavailable_title">The file link you’re trying to access is no longer available</string>
+    <string name="file_link_unavailable_title">您尝试访问的文件链接已不再可用</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="file_link_unavailable_disabled">The file link has been disabled by the owner</string>
+    <string name="file_link_unavailable_disabled">所有者已停用该文件链接</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="file_link_unavailable_deleted">The file has been deleted</string>
+    <string name="file_link_unavailable_deleted">该文件已被删除</string>
     <!-- Title shown when a file link has expired -->
-    <string name="file_link_expired_title">The file link you’re trying to access is not available</string>
+    <string name="file_link_expired_title">您尝试访问的文件链接不可用</string>
     <!-- Bullet point shown when a file link is unavailable because the link has been disabled -->
-    <string name="folder_link_unavailable_deleted">The folder has been deleted</string>
+    <string name="folder_link_unavailable_deleted">该文件夹已被删除</string>
     <!-- Tooltip description for transfer section play action -->
     <string name="transfers_section_action_play">播放</string>
     <!-- Tooltip description for transfer section play action -->
@@ -1099,17 +1099,17 @@
     <!--Text for showing the empty state when there are no completed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
     <string name="transfers_no_completed_transfers_empty_text">没有已完成的传输</string>
     <!--Text for showing the empty state when there are no failed transfers. The [A][/A] format marks are to put the text in a different color and style.-->
-    <string name="transfers_no_failed_transfers_empty_text">[A]No failed transfers[/A]</string>
+    <string name="transfers_no_failed_transfers_empty_text">[A]没有失败的传输[/A]</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the current transferred size, the second one is to set the size of the file. Example 12.4MB of 33.3MB -->
-    <string name="transfers_completed_transfer_size_indicator">%1$s of %2$s</string>
+    <string name="transfers_completed_transfer_size_indicator">%2$s中的%1$s</string>
     <!-- Title for the Free Plan card -->
     <string name="free_plan_card_title">开始使用我们的免费方案</string>
     <!-- Description for the Free Plan card -->
-    <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our free plan offers generous amounts of storage and transfer quota</string>
+    <string name="free_plan_card_description">您暂时不必购买付费方案，我们的免费计划提供大量的存储和传输配额</string>
     <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">20 GB of storage</string>
+    <string name="free_plan_card_storage_feature">20GB的存储空间</string>
     <!-- Feature text for Free Plan transfer quota -->
-    <string name="free_plan_card_transfer_feature">Limited transfers</string>
+    <string name="free_plan_card_transfer_feature">有限的传输</string>
     <!-- Button text for Free Plan card -->
     <string name="free_plan_card_button">使用免费帐户</string>
     <!-- Section title for the features list -->
@@ -1117,27 +1117,25 @@
     <!-- Title for generous storage feature -->
     <string name="pro_plan_feature_storage_title">大容量存储空间</string>
     <!-- Description for generous storage feature with placeholder -->
-    <string name="pro_plan_feature_storage_desc">Store up to %1$s of data</string>
+    <string name="pro_plan_feature_storage_desc">最多可存储%1$s的数据</string>
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">传输流量共享</string>
     <!-- Description for transfer sharing feature -->
-    <string name="pro_plan_feature_transfer_desc">People you share items with can use your quota to download and stream files</string>
+    <string name="pro_plan_feature_transfer_desc">接收您共享项目的人可以使用您的配额下载和串流文件</string>
     <!-- Title for MEGA VPN feature -->
     <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
-    <string name="pro_plan_feature_vpn_desc">Stay safe online with our high-speed VPN that’s both fast and simple to use</string>
+    <string name="pro_plan_feature_vpn_desc">使用我们既快速又简单易用的高速VPN保持在线安全</string>
     <!-- Title for MEGA Pass feature -->
     <string name="pro_plan_feature_pass_title">MEGA&#160;Pass</string>
     <!-- Description for MEGA Pass feature -->
-    <string name="pro_plan_feature_pass_desc">Organise all your passwords and keep them safe with our password manager</string>
+    <string name="pro_plan_feature_pass_desc">使用我们的密码管理器整理您所有密码并确保其安全</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">推荐</string>
-    <!-- Label indicating the action ‘upgrade now’ to get more transfer quota -->
-    <string name="transfers_over_quota_banner_title">获取更多流量</string>
     <!-- Text for the upgrade banner action -->
     <string name="transfers_over_quota_banner_action_button">立即升级</string>
     <!-- Section title for additional benefits of Pro plans -->
-    <string name="pro_plan_additional_benefits_section_title">Additional benefits of Pro plans</string>
+    <string name="pro_plan_additional_benefits_section_title">Pro计划的其他好处</string>
     <!-- Benefit: Password-protected links -->
     <string name="pro_plan_benefit_password_protected_links">密码保护链接</string>
     <!-- Benefit: Links with expiry dates -->
@@ -1145,21 +1143,21 @@
     <!-- Benefit: Transfer quota sharing -->
     <string name="pro_plan_benefit_transfer_quota_sharing">传输流量共享</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
-    <string name="pro_plan_benefit_auto_sync_mobile">Automatically sync the folders on your mobile device</string>
+    <string name="pro_plan_benefit_auto_sync_mobile">自动同步移动设备上的文件夹</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
-    <string name="pro_plan_benefit_rewind_180_days">Rewind up to 180 days of deleted data</string>
+    <string name="pro_plan_benefit_rewind_180_days">还原最多180天的已删除数据</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
-    <string name="pro_plan_benefit_host_calls_unlimited">Host calls and meetings with unlimited participants and no time restrictions</string>
+    <string name="pro_plan_benefit_host_calls_unlimited">主持电话和会议，参与者与通话时间均没有限制</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
-    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Schedule Rubbish bin clearing between 7 days and 10 years</string>
+    <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">设置回收站清理时间从7天到10年的任意时间</string>
     <!-- Benefit: Priority support -->
     <string name="pro_plan_benefit_priority_support">优先支持服务</string>
     <!-- Subscription page information section title at the bottom of the page-->
     <string name="choose_account_screen_subscription_information_title">订阅详情</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
-    <string name="choose_account_screen_subscription_information_description">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.\n\nYou can cancel your plan subscription any time but no later than 24 hours before your next subscription payment is due. [A]Learn how to manage your subscription in your settings[/A].</string>
+    <string name="choose_account_screen_subscription_information_description">连续订阅将自动续订，其期限和价格与所选初始订阅期相同。\n\n您可以随时取消您的方案订阅，但不得迟于下次订阅付款到期前24小时。 [A]在设置中了解如何管理您的订阅[/A]。</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]Terms of Service[/A] and [B]Privacy Policy[/B]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]服务条款[/A]和[B]隐私政策[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">通过Pro方案获得更多权益</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -1173,28 +1171,27 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s存储空间</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
-    <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
+    <string name="choose_account_screen_transfer_quota_label">%1$s传输配额</string>
     <!-- General month label -->
-    <string name="general_month">/month</string>
+    <string name="general_month">/月</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
     <string name="choose_account_screen_currency_per_month">%1$s/月</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">%1$s charged yearly</string>
+    <string name="choose_account_screen_billed_yearly">按年收费%1$s</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
-        <item quantity="one">%1$d item unhidden</item>
-        <item quantity="other">%1$d items unhidden</item>
+        <item quantity="other">%1$d个项目取消隐藏</item>
     </plurals>
     <!-- Title for secure slideshow mode tutorial -->
-    <string name="slideshow_tutorial_title">Play slideshows securely</string>
+    <string name="slideshow_tutorial_title">安全地播放幻灯片</string>
     <!-- Step 1 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step1">Press the power button to lock your screen.</string>
+    <string name="slideshow_tutorial_step1">按下电源键锁定屏幕。</string>
     <!-- Step 2 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step2">Wait for 2 seconds.</string>
+    <string name="slideshow_tutorial_step2">请稍等2秒钟。</string>
     <!-- Step 3 for slideshow secure mode tutorial -->
-    <string name="slideshow_tutorial_step3">Press the power button again to turn the screen back on.</string>
+    <string name="slideshow_tutorial_step3">请再次按下电源键重新打开屏幕。</string>
     <!-- Note indicating the slideshow plays securely while locked -->
-    <string name="slideshow_tutorial_note">The slideshow will play while your device remains securely locked.</string>
+    <string name="slideshow_tutorial_note">幻灯片将在您的设备处于安全锁定状态时播放。</string>
     <!-- State to indicate an achievement has applied -->
     <string name="applied_label">已生效</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
@@ -1220,31 +1217,31 @@
     <!-- text of received mega pass free trial in achivements section -->
     <string name="text_received_mega_pass_free_trial">您已开始MEGA&#160;Pass的免费试用，因此您获得了%1$s的存储空间。</string>
     <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
+    <string name="sync_change_root_uri_warning_title">由于MEGA应用程序已失去访问本地文件夹的权限，某些文件夹无法同步或备份。点击“恢复”为每个受影响的文件夹重新添加权限。</string>
     <!-- Title for the free plan card when the user is an existing account -->
-    <string name="free_plan_card_existing_title">Continue with your free plan</string>
+    <string name="free_plan_card_existing_title">继续使用您的免费方案</string>
     <!-- Button text for existing users to continue with the free plan -->
-    <string name="free_plan_card_existing_button">Continue with free plan</string>
+    <string name="free_plan_card_existing_button">继续使用免费方案</string>
     <!-- Storage feature label for the free plan card, e.g. '20 GB of storage' -->
     <string name="free_plan_card_storage_feature_for_existing_user">%1$s存储空间</string>
     <!-- Sort by newest shares -->
-    <string name="general_sort_newest_shares">Newest shares</string>
+    <string name="general_sort_newest_shares">最新的共享</string>
     <!-- Sort by oldest shares -->
-    <string name="general_sort_oldest_shares">Oldest shares</string>
+    <string name="general_sort_oldest_shares">最早的共享</string>
     <!-- Title for recovery key error dialog -->
-    <string name="recovery_key_error_title">Recovery key error</string>
+    <string name="recovery_key_error_title">恢复密钥错误</string>
     <!-- Description for recovery key error dialog -->
-    <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again.</string>
+    <string name="recovery_key_error_description">您提供的恢复密钥要么无效，要么不适用于此帐户。请检查您使用的密钥是否正确，然后重试。</string>
     <!-- Label for the current plan badge in the pro plan card -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">当前方案</string>
     <!-- Error message when achievements status is unavailable -->
-    <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
+    <string name="achievement_status_unavailable">您的成就状态目前无法显示。请稍后再试。</string>
     <!-- Warning indicating that the transfer quota limit has been reached -->
     <string name="transfers_transfer_quota_banner_title">获取更多流量</string>
     <!-- Warning indicating that the storage quota limit has been reached -->
-    <string name="transfers_storage_quota_banner_title">Get more storage quota</string>
+    <string name="transfers_storage_quota_banner_title">获得更多存储容量</string>
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
-    <string name="transfers_storage_and_transfer_quota_banner_title">Get more storage and transfer quota</string>
+    <string name="transfers_storage_and_transfer_quota_banner_title">获得更多存储和传输配额</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">帮助中心</string>
     <!-- Warning informing the transfers queue has been paused -->
@@ -1266,45 +1263,45 @@
     <!-- Label for rubbish bin -->
     <string name="general_section_rubbish_bin">回收站</string>
     <!-- Subtitle for VPN -->
-    <string name="menu_item_vpn_subtitle">High-speed VPN</string>
+    <string name="menu_item_vpn_subtitle">高速VPN</string>
     <!-- Subtitle for MEGA PASS -->
-    <string name="menu_item_mega_pass_subtitle">Securely store and autofill your passwords</string>
+    <string name="menu_item_mega_pass_subtitle">安全地存储和自动填充您的密码</string>
     <!-- Subtitle for transfer.it -->
-    <string name="menu_item_transfer_it_subtitle">Fast, secure file transfers</string>
+    <string name="menu_item_transfer_it_subtitle">快速、安全的文件传输</string>
     <!-- Label for transfer it -->
     <string name="general_section_transfer_it">Transfer.it</string>
     <!-- Label for Menu -->
     <string name="general_menu">菜单</string>
     <!-- Connection type option in Sync Settings Screen -->
-    <string name="settings_sync_connection_type_title">Connection type</string>
+    <string name="settings_sync_connection_type_title">连接类型</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Camera uploads paused</string>
+    <string name="camera_uploads_notification_title_paused_warning">相机上传已暂停</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Connect to WIFI or allow mobile data</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">连接到WIFI或允许使用移动数据</string>
     <!-- The camera uploads notification action text to allow mobile data-->
-    <string name="camera_uploads_notification_action_allow_mobile_data">Allow mobile data</string>
+    <string name="camera_uploads_notification_action_allow_mobile_data">允许移动数据</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Previewing large file</string>
+    <string name="alert_larger_file_preview_title">预览大文件</string>
     <!-- Alert confirm button before download a big file for preview -->
-    <string name="alert_larger_file_preview_confirm_button">Preview now</string>
+    <string name="alert_larger_file_preview_confirm_button">立即预览</string>
     <!-- Alert always allow button before download a big file for preview -->
-    <string name="alert_larger_file_preview_always_allow_button">Always allow previews</string>
+    <string name="alert_larger_file_preview_always_allow_button">始终允许预览</string>
     <!-- The camera uploads notification content to reminder there is no network connection-->
-    <string name="camera_uploads_notification_content_no_network_connection">Waiting for WiFi or mobile data</string>
+    <string name="camera_uploads_notification_content_no_network_connection">等待WiFi或移动数据连接</string>
     <!-- Settings title  for sync power options -->
-    <string name="settings_sync_power_settings_title">Power options</string>
+    <string name="settings_sync_power_settings_title">电源选项</string>
     <!-- Sync always label for sync power options -->
-    <string name="settings_sync_power_always_title">Sync always</string>
+    <string name="settings_sync_power_always_title">始终同步</string>
     <!-- Sync only when charging label for sync power options -->
-    <string name="settings_sync_battery_sync_only_when_charging_title">Sync only when charging</string>
+    <string name="settings_sync_battery_sync_only_when_charging_title">仅在充电时同步</string>
     <!-- Message shown when uploading edited image as a new file -->
-    <string name="photo_editor_upload_message">Uploading edits as a new file</string>
+    <string name="photo_editor_upload_message">将编辑内容作为新文件上传</string>
     <!-- Dialog title asking user to discard changes -->
     <string name="general_dialog_title_discard_changes">放弃更改？</string>
     <!-- Dialog title asking user to disable camera uploads -->
-    <string name="settings_camera_uploads_disable_warning">Disable Camera uploads?</string>
+    <string name="settings_camera_uploads_disable_warning">停用相机上传？</string>
     <!-- Sync settings change message prefix -->
-    <string name="settings_sync_message_prefix">Sync changed to:</string>
+    <string name="settings_sync_message_prefix">同步更改为：</string>
     <!--Title of playback position dialog that is displayed when audio has playback position history. -->
     <string name="audio_playback_position_dialog_title">继续播放？</string>
     <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
@@ -1382,17 +1379,17 @@
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">在文件夹中查看</string>
     <!-- Stop Backup confirmation dialog delete explanation -->
-    <string name="sync_stop_backup_confirm_dialog_delete_explanation">Or delete the folder from MEGA. It won’t be deleted from your device. This action can’t be undone.</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_explanation">或者从MEGA中删除该文件夹。它不会从您的设备中删除。此操作无法撤消。</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">Move folder to Cloud drive</string>
+    <string name="sync_stop_backup_confirm_dialog_move_cloud_drive">将文件夹移至云盘</string>
     <!-- Stop Backup confirmation dialog button option 1 text -->
-    <string name="sync_stop_backup_confirm_dialog_delete_permanently">Delete folder from MEGA</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_permanently">从MEGA中删除文件夹</string>
     <!-- Title of the Camera Uploads complete banner in Photos -->
     <string name="camera_uploads_banner_complete_title">相机上传完成</string>
     <!-- Message of the Camera Uploads no full access warning banner in Photos -->
-    <string name="camera_uploads_banner_no_full_access_message">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
+    <string name="camera_uploads_banner_no_full_access_message">为了确保我们不会错过您的所有回忆，MEGA需要完全访问您的照片库。</string>
     <!-- Message of notice that the zip file format is error -->
-    <string name="message_zip_format_error">File can’t be opened as the file format isn’t supported</string>
+    <string name="message_zip_format_error">无法打开文件，因为不支持该文件格式</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">在您的设备上没有合适的应用程序可以打开此文件</string>
     <!-- A user can mark a folder or file with red colour. -->
@@ -1416,31 +1413,31 @@
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">发生错误，请再试一次。</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="general_select_create_folder">Select or create a new folder</string>
+    <string name="general_select_create_folder">选择或创建新文件夹</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
-    <string name="sync_snackbar_message_confirm_backup_moved">Backup stopped. Folder was moved to %1$s</string>
+    <string name="sync_snackbar_message_confirm_backup_moved">备份已停止。文件夹已移至%1$s</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
-    <string name="sync_snackbar_message_confirm_backup_deleted">Backup stopped. Folder deleted from MEGA.</string>
+    <string name="sync_snackbar_message_confirm_backup_deleted">备份已停止。文件夹已从MEGA中删除。</string>
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_local_file_explanation">The file on MEGA will be replaced with [A]%1$s.[/A] The existing version will be moved to the SyncDebris folder in your Rubbish bin.</string>
+    <string name="sync_stalled_issue_choose_local_file_explanation">MEGA上的文件将被替换为[A]%1$s。[/A]现有版本将移至 “回收站” 中的SyncDebris文件夹。</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_remote_file_explanation">The local file [A]%1$s[/A] will be moved to the .debris folder</string>
+    <string name="sync_stalled_issue_choose_remote_file_explanation">本地文件[A]%1$s[/A]将移至.debris文件夹</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_rename_file_explanation">Files with the same name but different content will have a suffix like (1) added to them</string>
+    <string name="sync_stalled_issue_choose_rename_file_explanation">名称相同但内容不同的文件将添加像(1)这样的后缀</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">All folders will be merged and files with the same name but different content will have a suffix like (1) added.</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">所有文件夹将被合并，名称相同但内容不同的文件将添加像 (1) 这样的后缀</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_last_modified_file_explanation">With this action, the latest file will be chosen.</string>
+    <string name="sync_stalled_issue_choose_last_modified_file_explanation">最近更新的文件将替换两个位置中的旧文件</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict.</string>
+    <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">选择</string>
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">应用于全部</string>
     <!-- Sync message when a single issue resolved -->
-    <string name="sync_stalled_issue_resolved">Issue solved</string>
+    <string name="sync_stalled_issue_resolved">问题已解决</string>
     <!-- Sync message when multiple issues resolved -->
-    <string name="sync_stalled_issues_resolved">Issues have been solved</string>
+    <string name="sync_stalled_issues_resolved">问题已解决</string>
     <!-- Text of the empty playlist in Video Section -->
     <string name="video_section_playlists_video_empty">清空</string>
     <!-- Text of video count of playlist in Video Section -->
@@ -1448,27 +1445,27 @@
         <item quantity="other">%1$d个视频</item>
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
-    <string name="sync_stop_backup_confirm_dialog_move_explanation">Move this folder to your Cloud drive to get full access to your data. It will no longer be backed up to.</string>
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">将此文件夹移至您的云盘即可完全访问您的数据。它将不再被备份。</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visit [A]https://%1$s[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website_domain_placeholder">在您的网页浏览器中1.访问[A]https://%1$s[/A]。</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Checking for uploads&#8230;</string>
+    <string name="camera_uploads_banner_checking_uploads_text">正在检查上传...</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
-    <string name="camera_uploads_banner_uploading_pending_count_text">Uploading: %d items left</string>
+    <string name="camera_uploads_banner_uploading_pending_count_text">正在上传：剩余%d个项目</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
-    <string name="sync_resolve_rename_all_items_title">Rename all items?</string>
+    <string name="sync_resolve_rename_all_items_title">重命名所有项目？</string>
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
-    <string name="sync_stalled_issue_merge_folders_title">Merge folders and rename files?</string>
+    <string name="sync_stalled_issue_merge_folders_title">合并文件夹并重命名文件？</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_local_file_title">Choose the local file?</string>
+    <string name="sync_stalled_issue_choose_local_file_title">选择本地文件？</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">Choose the file stored in MEGA?</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">选择存储在MEGA中的文件？</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_latest_modified_time_title">Choose the last modified file?</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">选择最近修改的文件？</string>
     <!-- Colored folders onboarding title -->
-    <string name="colored_folders_onboarding_title">Colourful folders, clearer organisation</string>
+    <string name="colored_folders_onboarding_title">彩色文件夹，整理更清楚</string>
     <!-- Colored folders onboarding description -->
-    <string name="colored_folders_onboarding_description">When you add a label to a folder, its colour will show up directly on the folder. This helps you find what you need faster.</string>
+    <string name="colored_folders_onboarding_description">当您向文件夹添加标签时，其颜色将直接显示在文件夹上。这可以帮助您更快地找到需要的东西。</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">合并</string>
     <!-- Dialog rename option -->
@@ -1476,7 +1473,9 @@
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">清除已解决的问题</string>
     <!--Sign Up page text field input first name error message when character limit exceeded-->
-    <string name="sign_up_first_name_text_field_char_limit_exceed_error">First name can’t exceed 40 characters</string>
+    <string name="sign_up_first_name_text_field_char_limit_exceed_error">名字不能超出40个字符</string>
     <!--Sign Up page text field input last name error message when character limit exceeded-->
-    <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
+    <string name="sign_up_last_name_text_field_char_limit_exceed_error">姓氏不能超过40个字符</string>
+    <!-- Error message when IP has already sent an issue report and needs to wait -->
+    <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
 </resources>

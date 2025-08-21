@@ -41,7 +41,7 @@
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Rinomina tutti gli oggetti</string>
     <!-- Sync to resolve conflict Merge folders -->
-    <string name="sync_stalled_issue_merge_folders">Merge folders and rename files</string>
+    <string name="sync_stalled_issue_merge_folders">Unisci le cartelle e rinomina i file</string>
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">Scegli il file locale</string>
     <!-- Sync to resolve conflict Choose remote file -->
@@ -133,7 +133,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Un errore locale impedisce l\’accesso alla cartella</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Filesystem error preventing folder access.</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">Errore nel filesystem che impedisce l\’accesso alla cartella.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">L\’obiettivo è troppo profondo nella struttura delle tue cartelle.\nPer favore, spostalo in una posizione profonda meno di 64 cartelle.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -151,5 +151,5 @@
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">In attesa del completamento della scansione per determinare se il file è stato spostato o eliminato.</string>
     <!-- Sync change root path title-->
-    <string name="sync_change_root_uri_warning_title">Some folders are unable to sync or be backed up as the MEGA app has lost permissions to access the local folders. Tap Resume to re-add permissions for each affected folder.</string>
+    <string name="sync_change_root_uri_warning_title">Alcune cartelle non possono essere sincronizzate o non possono effettuare il backup poiché l\’app MEGA ha perso le autorizzazioni per accedere alle cartelle locali. Tocca Riprendi per aggiungere nuovamente le autorizzazioni per ogni cartella interessata.</string>
 </resources>
