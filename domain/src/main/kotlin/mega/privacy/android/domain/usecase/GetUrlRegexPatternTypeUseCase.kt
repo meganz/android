@@ -156,12 +156,9 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          * This Regex Pattern checks for the existence of 'password' link in MEGA Url
          */
         private val PASSWORD_LINK_REGEX = arrayOf(
-            "^https://mega\\.co\\.nz/.*#password.+$",
-            "^https://mega\\.co\\.nz/.*password.+$",
-            "^https://mega\\.nz/.*#password.+$",
-            "^https://mega\\.nz/.*password.+$",
-            "^https://mega\\.app/.*#password.+$",
-            "^https://mega\\.app/.*password.+$"
+            "^https://mega\\.co\\.nz/.*#P!.+$",
+            "^https://mega\\.nz/.*#P!.+$",
+            "^https://mega\\.app/.*#P!.+$"
         )
 
         /**
