@@ -3,6 +3,7 @@ package mega.privacy.android.app.globalmanagement
 import android.app.Application
 import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication
@@ -132,37 +133,43 @@ class BackgroundRequestListener @Inject constructor(
         if (e.errorCode == MegaError.API_OK) {
             if (request.paramType == MegaApiJava.USER_ATTR_FIRSTNAME || request.paramType == MegaApiJava.USER_ATTR_LASTNAME) {
                 request.email?.let { email ->
-                    megaApi.getContact(email)?.let { user ->
-                        Timber.d("User handle: ${user.handle}")
-                        Timber.d("Visibility: ${user.visibility}") //If user visibility == MegaUser.VISIBILITY_UNKNOWN then, non contact
-                        if (user.visibility != MegaUser.VISIBILITY_VISIBLE) {
-                            Timber.d("Non-contact")
-                            when (request.paramType) {
-                                MegaApiJava.USER_ATTR_FIRSTNAME -> {
-                                    dbH.get().setNonContactEmail(
-                                        request.email,
-                                        user.handle.toString() + ""
-                                    )
-                                    dbH.get().setNonContactFirstName(
-                                        request.text,
-                                        user.handle.toString() + ""
-                                    )
-                                }
+                    applicationScope.launch(Dispatchers.IO) {
+                        runCatching {
+                            megaApi.getContact(email)?.let { user ->
+                                Timber.d("User handle: ${user.handle}")
+                                Timber.d("Visibility: ${user.visibility}") //If user visibility == MegaUser.VISIBILITY_UNKNOWN then, non contact
+                                if (user.visibility != MegaUser.VISIBILITY_VISIBLE) {
+                                    Timber.d("Non-contact")
+                                    when (request.paramType) {
+                                        MegaApiJava.USER_ATTR_FIRSTNAME -> {
+                                            dbH.get().setNonContactEmail(
+                                                request.email,
+                                                user.handle.toString() + ""
+                                            )
+                                            dbH.get().setNonContactFirstName(
+                                                request.text,
+                                                user.handle.toString() + ""
+                                            )
+                                        }
 
-                                MegaApiJava.USER_ATTR_LASTNAME -> {
-                                    dbH.get().setNonContactLastName(
-                                        request.text,
-                                        user.handle.toString() + ""
-                                    )
-                                }
+                                        MegaApiJava.USER_ATTR_LASTNAME -> {
+                                            dbH.get().setNonContactLastName(
+                                                request.text,
+                                                user.handle.toString() + ""
+                                            )
+                                        }
 
-                                else -> {}
+                                        else -> {}
+                                    }
+                                } else {
+                                    Timber.d("The user is or was CONTACT:")
+                                }
+                            } ?: run {
+                                Timber.w("User is NULL")
                             }
-                        } else {
-                            Timber.d("The user is or was CONTACT:")
+                        }.onFailure {
+                            Timber.e(it, "Failed handling getContact for ${email}")
                         }
-                    } ?: run {
-                        Timber.w("User is NULL")
                     }
                 }
             }
