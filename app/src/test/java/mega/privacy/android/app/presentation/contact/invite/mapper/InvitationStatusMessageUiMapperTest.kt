@@ -8,6 +8,7 @@ import mega.privacy.android.app.main.model.InviteContactUiState.MessageTypeUiSta
 import mega.privacy.android.app.main.model.InviteContactUiState.MessageTypeUiState.Singular
 import mega.privacy.android.app.presentation.contact.invite.navigation.InviteContactScreenResult
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -23,32 +24,89 @@ class InvitationStatusMessageUiMapperTest {
     }
 
     @Test
-    fun `test that a message with an email is returned when there is only one email invitation`() {
-        val isFromAchievement = false
+    fun `test that the correct InvitationsSent is returned when there is only one email invitation`() {
         val requests = listOf(InviteContactRequest.Sent)
         val emails = listOf("email@email.com")
-
-        val actual = underTest(isFromAchievement, requests, emails)
-
         val expected = InvitationsSent(
             messages = listOf(
-                Singular(
-                    id = R.string.context_contact_request_sent,
-                    argument = emails[0]
-                )
-            )
+                Singular(id = sharedR.string.contacts_invites_sent)
+            ),
+            actionId = R.string.tab_sent_requests,
         )
-        assertThat(actual).isEqualTo(expected)
+
+        assertThat(underTest(isFromAchievement = false, requests = requests, emails = emails))
+            .isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that the correct InvitationsSent is returned when there are more than one email invitation`() {
+        val requests = listOf(InviteContactRequest.Sent, InviteContactRequest.Sent)
+        val emails = listOf("email@email.com", "email2@email.com")
+        val expected = InvitationsSent(
+            messages = listOf(
+                Singular(id = sharedR.string.contacts_invites_sent)
+            ),
+            actionId = R.string.tab_sent_requests,
+        )
+
+        assertThat(underTest(isFromAchievement = false, requests = requests, emails = emails))
+            .isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that the correct InvitationsSent is returned when there is only one email invitation and the user already sent you an invitation`() {
+        val requests = listOf(InviteContactRequest.AlreadyReceived)
+        val emails = listOf("email@email.com")
+        val expected = InvitationsSent(
+            messages = listOf(
+                Singular(id = sharedR.string.contacts_invite_already_received)
+            ),
+            actionId = R.string.tab_received_requests,
+        )
+
+        assertThat(underTest(isFromAchievement = false, requests = requests, emails = emails))
+            .isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that the correct InvitationsSent is returned when there are more than one email invitation and all the users already sent you an invitation`() {
+        val requests =
+            listOf(InviteContactRequest.AlreadyReceived, InviteContactRequest.AlreadyReceived)
+        val emails = listOf("email@email.com", "email2@email.com")
+        val expected = InvitationsSent(
+            messages = listOf(
+                Singular(id = sharedR.string.contacts_invites_already_received)
+            ),
+            actionId = R.string.tab_received_requests,
+        )
+
+        assertThat(underTest(isFromAchievement = false, requests = requests, emails = emails))
+            .isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that the correct InvitationsSent is returned when there are more than one email invitation and some of the users already sent you an invitation`() {
+        val requests =
+            listOf(InviteContactRequest.Sent, InviteContactRequest.AlreadyReceived)
+        val emails = listOf("email@email.com", "email2@email.com")
+        val expected = InvitationsSent(
+            messages = listOf(
+                Plural(
+                    id = sharedR.plurals.contacts_invites_sent_but_others_already_received,
+                    quantity = 1,
+                )
+            ),
+            actionId = R.string.tab_received_requests,
+        )
+
+        assertThat(underTest(isFromAchievement = false, requests = requests, emails = emails))
+            .isEqualTo(expected)
     }
 
     @Test
     fun `test that a message displaying the total number of successful invitations and the total number of failed invitations is returned when there are failed invitations`() {
-        val isFromAchievement = false
         val requests = listOf(InviteContactRequest.Sent, InviteContactRequest.InvalidEmail)
         val emails = listOf("email@email.com", "email2@email.com")
-
-        val actual = underTest(isFromAchievement, requests, emails)
-
         val expected = InvitationsSent(
             messages = listOf(
                 Plural(
@@ -59,44 +117,26 @@ class InvitationStatusMessageUiMapperTest {
                     id = R.plurals.contact_snackbar_invite_contact_requests_not_sent,
                     quantity = 1,
                 )
-            )
+            ),
+            actionId = R.string.tab_sent_requests,
         )
-        assertThat(actual).isEqualTo(expected)
-    }
 
-    @Test
-    fun `test that a message displaying the total number of successful invitations is returned after all invitations have been successfully sent`() {
-        val isFromAchievement = false
-        val requests = listOf(InviteContactRequest.Sent, InviteContactRequest.Sent)
-        val emails = listOf("email@email.com", "email2@email.com")
-
-        val actual = underTest(isFromAchievement, requests, emails)
-
-        val expected = InvitationsSent(
-            messages = listOf(
-                Plural(
-                    id = R.plurals.number_correctly_invite_contact_request,
-                    quantity = emails.size,
-                )
-            )
-        )
-        assertThat(actual).isEqualTo(expected)
+        assertThat(underTest(isFromAchievement = false, requests = requests, emails = emails))
+            .isEqualTo(expected)
     }
 
     @Test
     fun `test that the screen navigates back with a result when the invitations originate from the achievement screen`() {
-        val isFromAchievement = true
         val requests = listOf(InviteContactRequest.Sent, InviteContactRequest.Sent)
         val emails = listOf("email@email.com", "email2@email.com")
-
-        val actual = underTest(isFromAchievement, requests, emails)
-
         val expected = NavigateUpWithResult(
             result = InviteContactScreenResult(
                 key = InviteContactScreenResult.KEY_SENT_NUMBER,
                 totalInvitationsSent = 2
             )
         )
-        assertThat(actual).isEqualTo(expected)
+
+        assertThat(underTest(isFromAchievement = true, requests = requests, emails = emails))
+            .isEqualTo(expected)
     }
 }

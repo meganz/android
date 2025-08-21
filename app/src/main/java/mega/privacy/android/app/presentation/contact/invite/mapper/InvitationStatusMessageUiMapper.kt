@@ -9,6 +9,7 @@ import mega.privacy.android.app.main.model.InviteContactUiState.MessageTypeUiSta
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsRoute
 import mega.privacy.android.app.presentation.contact.invite.navigation.InviteContactScreenResult
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 /**
@@ -29,20 +30,65 @@ class InvitationStatusMessageUiMapper @Inject constructor() {
         emails: List<String>,
     ): InvitationStatusMessageUiState {
         val totalInvitationSent = requests.count { it == InviteContactRequest.Sent }
-        // If the invitation is successful and the total number of invitations is one.
-        if (emails.size == 1 && totalInvitationSent == 1 && !isFromAchievement) {
-            return InvitationsSent(
-                messages = listOf(
-                    Singular(
-                        id = R.string.context_contact_request_sent,
-                        argument = emails[0]
+        val totalAlreadyReceived = requests.count { it == InviteContactRequest.AlreadyReceived }
+        val totalFailedInvitations = emails.size - totalInvitationSent
+
+        return when {
+            isFromAchievement -> {
+                // Sent back the result to the InviteFriendsRoute.
+                NavigateUpWithResult(
+                    result = InviteContactScreenResult(
+                        key = InviteContactScreenResult.KEY_SENT_NUMBER,
+                        totalInvitationsSent = totalInvitationSent
                     )
                 )
-            )
-        } else {
-            val totalFailedInvitations = emails.size - totalInvitationSent
-            // There are failed invitations.
-            if (totalFailedInvitations > 0 && !isFromAchievement) {
+            }
+
+            totalInvitationSent == emails.size -> {
+                // If all the invitations are successful.
+                InvitationsSent(
+                    messages = listOf(
+                        Singular(id = sharedR.string.contacts_invites_sent)
+                    ),
+                    actionId = R.string.tab_sent_requests,
+                )
+            }
+
+            emails.size == 1 && totalAlreadyReceived == 1 -> {
+                //If the user you are trying to invite, already sent you an invitation.
+                InvitationsSent(
+                    messages = listOf(
+                        Singular(id = sharedR.string.contacts_invite_already_received)
+                    ),
+                    actionId = R.string.tab_received_requests,
+                )
+            }
+
+            emails.size == totalAlreadyReceived -> {
+                // If all the users you are trying to invite, already sent you invitations.
+                InvitationsSent(
+                    messages = listOf(
+                        Singular(id = sharedR.string.contacts_invites_already_received)
+                    ),
+                    actionId = R.string.tab_received_requests,
+                )
+            }
+
+            totalAlreadyReceived > 0 && totalInvitationSent + totalAlreadyReceived == emails.size -> {
+                // If some of the users you are trying to invite, already sent you invitations.
+                InvitationsSent(
+                    messages = listOf(
+                        Plural(
+                            id = sharedR.plurals.contacts_invites_sent_but_others_already_received,
+                            quantity = totalInvitationSent,
+                        )
+                    ),
+                    actionId = R.string.tab_received_requests,
+                )
+            }
+
+            else -> {
+                // If some of the invitations were sent successfully, and some failed.
                 val requestsSent = Plural(
                     id = R.plurals.contact_snackbar_invite_contact_requests_sent,
                     quantity = totalInvitationSent,
@@ -51,27 +97,11 @@ class InvitationStatusMessageUiMapper @Inject constructor() {
                     id = R.plurals.contact_snackbar_invite_contact_requests_not_sent,
                     quantity = totalFailedInvitations,
                 )
-                return InvitationsSent(messages = listOf(requestsSent, requestsNotSent))
-            } else {
-                // All invitations are successfully sent.
-                if (!isFromAchievement) {
-                    return InvitationsSent(
-                        messages = listOf(
-                            Plural(
-                                id = R.plurals.number_correctly_invite_contact_request,
-                                quantity = emails.size,
-                            )
-                        )
-                    )
-                } else {
-                    // Sent back the result to the InviteFriendsRoute.
-                    return NavigateUpWithResult(
-                        result = InviteContactScreenResult(
-                            key = InviteContactScreenResult.KEY_SENT_NUMBER,
-                            totalInvitationsSent = totalInvitationSent
-                        )
-                    )
-                }
+
+                InvitationsSent(
+                    messages = listOf(requestsSent, requestsNotSent),
+                    actionId = R.string.tab_sent_requests,
+                )
             }
         }
     }

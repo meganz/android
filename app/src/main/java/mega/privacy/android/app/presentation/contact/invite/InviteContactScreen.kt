@@ -38,6 +38,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -84,6 +85,7 @@ import kotlinx.coroutines.delay
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.main.InvitationContactInfo
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_LETTER_HEADER
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_EMAIL
@@ -212,7 +214,25 @@ internal fun InviteContactRoute(
                             }
                         }
                     }
-                    snackBarHostState.showAutoDurationSnackbar(message)
+                    val action = status.actionId?.let { context.resources.getString(it) }
+
+                    snackBarHostState.showAutoDurationSnackbar(message, action).let { result ->
+                        if (result == SnackbarResult.ActionPerformed && action != null) {
+                            when (status.actionId) {
+                                R.string.tab_sent_requests -> context.startActivity(
+                                    ContactsActivity.getSentRequestsIntent(context).also {
+                                        it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                    }
+                                )
+
+                                R.string.tab_received_requests -> context.startActivity(
+                                    ContactsActivity.getReceivedRequestsIntent(context).also {
+                                        it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
             }
 

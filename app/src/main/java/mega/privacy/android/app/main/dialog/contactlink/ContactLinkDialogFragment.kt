@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.dialog.contactlink
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.presentation.extensions.contacts.getMessage
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaChatApiJava
 import javax.inject.Inject
 
@@ -33,9 +34,6 @@ internal class ContactLinkDialogFragment : DialogFragment() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    @Inject
-    lateinit var inviteContactRequestStringMapper: InviteContactRequestStringMapper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -106,9 +104,9 @@ internal class ContactLinkDialogFragment : DialogFragment() {
             if (sentInviteResult != null) {
                 if (sentInviteResult.isSuccess) {
                     showMessage(
-                        inviteContactRequestStringMapper(
-                            sentInviteResult.getOrThrow(),
-                            contactLinkResult?.getOrNull()?.email.orEmpty()
+                        sentInviteResult.getOrThrow().getMessage(
+                            context = requireContext(),
+                            email = contactLinkResult?.getOrNull()?.email.orEmpty()
                         )
                     )
                 } else {

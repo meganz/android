@@ -48,9 +48,11 @@ data class InviteContactUiState(
          * The invitations sent.
          *
          * @property messages The messages.
+         * @property actionId String id for the action.
          */
         data class InvitationsSent(
             val messages: List<MessageTypeUiState>,
+            @StringRes val actionId: Int? = null,
         ) : InvitationStatusMessageUiState
 
         /**

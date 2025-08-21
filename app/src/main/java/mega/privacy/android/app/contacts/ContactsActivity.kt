@@ -12,9 +12,9 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.contacts.list.ContactListFragment
+import mega.privacy.android.app.contacts.list.ContactListFragmentDirections
 import mega.privacy.android.app.contacts.requests.ContactRequestsFragment
 import mega.privacy.android.app.databinding.ActivityContactsBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
@@ -23,6 +23,7 @@ import mega.privacy.android.app.utils.CallUtil.checkCameraPermission
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Activity that represents the entire UI around contacts for the current user.
@@ -110,6 +111,20 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
         setSupportActionBar(binding.toolbar)
         setupNavigation()
         consumeInsetsWithToolbar(customToolbar = binding.toolbar)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        with(getNavController()) {
+            when {
+                intent.getBooleanExtra(EXTRA_SHOW_SENT_REQUESTS, false) ->
+                    navigate(ContactListFragmentDirections.actionListToRequests(isOutgoing = true))
+
+                intent.getBooleanExtra(EXTRA_SHOW_RECEIVED_REQUESTS, false) ->
+                    navigate(ContactListFragmentDirections.actionListToRequests(isOutgoing = false))
+            }
+        }
     }
 
     private fun setupNavigation() {

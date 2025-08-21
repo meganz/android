@@ -39,6 +39,7 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
+import mega.privacy.android.app.presentation.extensions.contacts.getMessage
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
@@ -65,7 +66,6 @@ import mega.privacy.android.domain.entity.call.ChatSessionChanges
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
-import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.node.NodeId
@@ -2243,30 +2243,10 @@ class MeetingActivityViewModel @Inject constructor(
                         null
                     )
                 }.onSuccess { sentInviteResult ->
-                    val text = when (sentInviteResult) {
-                        InviteContactRequest.Sent -> context.getString(
-                            R.string.context_contact_request_sent,
-                            participant.email
-                        )
-
-                        InviteContactRequest.Resent -> context.getString(R.string.context_contact_invitation_resent)
-                        InviteContactRequest.Deleted -> context.getString(R.string.context_contact_invitation_deleted)
-                        InviteContactRequest.AlreadySent -> context.getString(
-                            R.string.invite_not_sent_already_sent,
-                            participant.email
-                        )
-
-                        InviteContactRequest.AlreadyContact -> context.getString(
-                            R.string.context_contact_already_exists,
-                            participant.email
-                        )
-
-                        InviteContactRequest.InvalidEmail -> context.getString(R.string.error_own_email_as_contact)
-                        InviteContactRequest.InvalidStatus -> context.getString(R.string.general_error)
-                        InviteContactRequest.AlreadyReceived -> TODO()
-                    }
-
-                    showSnackBar(text)
+                    sentInviteResult.getMessage(
+                        context,
+                        participant.email ?: "",
+                    ).let { text -> showSnackBar(text) }
                 }.onFailure {
                     Timber.e(it)
                 }

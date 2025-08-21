@@ -72,14 +72,6 @@
     <string name="general_sync_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
     <string name="general_message_sync_paused_low_battery_level">Syncing paused, battery level too low. Charge battery to resume syncing.</string>
-    <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">Easy, secure file sharing</string>
-    <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">Share large files thanks to a generous transfer quota and ensure security with password-protected links.</string>
-    <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">Never lose data again</string>
-    <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Rewind to restore files and folders back to any date up to 180 days, so your data is accident and tamper-proof.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Type</string>
     <!-- Search drop down chips filter type file type images -->
@@ -200,14 +192,6 @@
     <string name="general_size_giga_byte">%1$s</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">Free</string>
-    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
-    <string name="dialog_onboarding_transfer_quota_free_limited">Limited</string>
-    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
-    <string name="dialog_onboarding_free_account_price">Free</string>
-    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
-    <string name="dialog_onboarding_button_continue">Continue</string>
-    <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">Contains</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
@@ -244,8 +228,6 @@
     <string name="general_giga_byte_standalone">GB</string>
     <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
     <string name="general_tera_byte_standalone">TB</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
-    <string name="dialog_onboarding_feature_storage_description">Starting from %1$s&#160;%2$s, find the perfect fit for your storage needs.</string>
     <!-- Title of the insufficient storage error dialog -->
     <string name="sync_error_dialog_insufficient_storage_title">Insufficient storage space</string>
     <!-- Body text of the insufficient storage error dialog -->
@@ -286,12 +268,6 @@
     <string name="file_info_information_snackbar_description_added">Description added</string>
     <!-- Description updated snack bar for the file info information screen-->
     <string name="file_info_information_snackbar_description_updated">Description updated</string>
-    <!-- Title to mention other features of Pro plans on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_title_additional_features">Plus access to these great benefits:</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_with_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device \n&#8226;&#160;No advertisements</string>
-    <!-- Description to mention other features of Pro plans (e.g. Mega VPN, chats and meetings, Android Sync and no ads) on Onboarding dialog (for user to choose account - Free or Pro). -->
-    <string name="dialog_onboarding_feature_description_additional_features_without_ads">&#8226;&#160;MEGA&#160;VPN \n&#8226;&#160;Unrestricted calls and meetings \n&#8226;&#160;Automatically sync the folders on your mobile device</string>
     <!-- Text for the Sync solved issues list empty state -->
     <string name="device_center_sync_solved_issues_empty_state_text">No solved issues</string>
     <!-- Title of the Raise to Hand Feature Introduction Tooltip -->
@@ -304,8 +280,6 @@
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_no_picker_warning">This device doesn’t have an app to select folders</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Automatically sync the folders on your mobile device</string>
     <!-- Hidden items -->
     <string name="hidden_items">Hidden items</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -892,8 +866,6 @@
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
     <string name="transfers_start_upload_profile_qr_code_message">Saving %1$s to Cloud drive&#8230;</string>
-    <!-- Body for the subscription details section, which is shown to the Indian user to provide details about subscription. This string is shown if user selects yearly subscription and the amount is more than Rs.15,000. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price_for_indian">You will be charged %1$s immediately but your subscription will not automatically renew after 12 months due to government regulations. It will be your responsibility to renew your subscription after it has expired. You can manage or cancel your subscription anytime via Subscriptions in [A]Google&#160;Play[/A]. By upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Uploading&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -1122,8 +1094,6 @@
     <string name="free_plan_card_title">Get started with our free plan</string>
     <!-- Description for the Free Plan card -->
     <string name="free_plan_card_description">You don’t have to commit to a paid plan just yet, our free plan offers generous amounts of storage and transfer quota</string>
-    <!-- Feature text for Free Plan storage -->
-    <string name="free_plan_card_storage_feature">20 GB of storage</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">Limited transfers</string>
     <!-- Button text for Free Plan card -->
@@ -1156,8 +1126,6 @@
     <string name="pro_plan_benefit_password_protected_links">Password-protected links</string>
     <!-- Benefit: Links with expiry dates -->
     <string name="pro_plan_benefit_links_with_expiry_dates">Links with expiry dates</string>
-    <!-- Benefit: Transfer quota sharing -->
-    <string name="pro_plan_benefit_transfer_quota_sharing">Transfer quota sharing</string>
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">Automatically sync the folders on your mobile device</string>
     <!-- Benefit: Rewind up to 180 days of deleted data -->
@@ -1178,10 +1146,6 @@
     <string name="choose_account_screen_get_more_with_pro_plan_title">Get more with a Pro plan</string>
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">Maybe later</string>
-    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_monthly">Monthly</string>
-    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_tab_yearly">Yearly</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Save up to 16% with yearly billing</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
@@ -1190,8 +1154,6 @@
     <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
     <!-- General month label -->
     <string name="general_month">/month</string>
-    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the name of the currency, e.g EUR -->
-    <string name="choose_account_screen_currency_per_month">%1$s per month</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
     <string name="choose_account_screen_billed_yearly">%1$s charged yearly</string>
     <!-- The snackbar message of unhidden nodes operation -->
@@ -1496,4 +1458,15 @@
     <string name="sign_up_last_name_text_field_char_limit_exceed_error">Last name can’t exceed 40 characters</string>
     <!-- Error message when IP has already sent an issue report and needs to wait -->
     <string name="report_issue_too_many_times_error">You’ve already sent an issue report within the last 10 minutes. Please wait before trying again, or contact %1$s for assistance.</string>
+    <!-- The snackbar message for informing the user about the invitation is trying to sent, is already in the received contact requests because the user already invited them. -->
+    <string name="contacts_invite_already_received">This user has already sent you an invitation</string>
+    <!-- The snackbar message for informing the user about the invitations is trying to sent, are already in the received contact requests because the users already invited them. -->
+    <string name="contacts_invites_already_received">All the people you invited have already sent you an invitation</string>
+    <!-- The snackbar message for informing the user about the invitations are correctly sent. -->
+    <string name="contacts_invites_sent">Invitation sent. They’ll appear in Contacts once accepted.</string>
+    <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
+    <plurals name="contacts_invites_sent_but_others_already_received">
+        <item quantity="one">%1$d user invited, but one or more users have already invited you</item>
+        <item quantity="other">%1$d users invited, but one or more users have already invited you</item>
+    </plurals>
 </resources>
