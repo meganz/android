@@ -18,9 +18,9 @@ import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
-This method will show [NodeUIItem] in Grid manner based on span and getting thumbnail using [ThumbnailRequest]
+ * NodeGridView
  *
- * @param nodeUiItems List of [NodeUIItem]
+ * @param nodeUiItems List of [NodeUiItem]
  * @param onMenuClick three dots click
  * @param onItemClicked on item click
  * @param onLongClick on long item click

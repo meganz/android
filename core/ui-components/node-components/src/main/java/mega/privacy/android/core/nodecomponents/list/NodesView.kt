@@ -16,6 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.devicetype.DeviceType
+import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.privacy.android.core.nodecomponents.dialog.TakeDownDialog
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -74,8 +76,6 @@ fun <T : TypedNode> NodesView(
     listContentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
-    val orientation = LocalConfiguration.current.orientation
-    val span = if (orientation == Configuration.ORIENTATION_PORTRAIT) spanCount else 4
     val visibleItems = rememberNodeItems(
         nodeUIItems = items,
         showHiddenItems = showHiddenNodes,
@@ -137,7 +137,7 @@ fun <T : TypedNode> NodesView(
             },
             onLongClick = onLongClicked,
             onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-            spanCount = span,
+            spanCount = spanCount,
             sortOrder = sortOrder,
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClicked,
@@ -180,6 +180,52 @@ internal fun <T : TypedNode> rememberNodeItems(
 }
 
 /**
- * Test tag for nodesView visibility
+ * Responsive grid span count for nodes view based on device type and orientation.
+ *
+ * @param defaultSpanCount fallback span count if no custom logic applies
+ * @param isListView if true, skips complex calculations and returns default span count
+ * @return responsive span count based on device type and orientation
  */
-const val NODES_EMPTY_VIEW_VISIBLE = "Nodes empty view not visible"
+@Composable
+fun rememberDynamicSpanCount(
+    defaultSpanCount: Int = 2,
+    isListView: Boolean = false,
+): Int {
+    // Early return for list view, calculation is not required
+    if (isListView) {
+        return defaultSpanCount
+    }
+
+    val configuration = LocalConfiguration.current
+    val orientation = configuration.orientation
+    val isTablet = LocalDeviceType.current == DeviceType.Tablet
+    val screenWidthDp = configuration.screenWidthDp
+
+    return remember(orientation, isTablet, screenWidthDp) {
+        when {
+            // For phone, 2 span in portrait and 4 in landscape
+            !isTablet && orientation == Configuration.ORIENTATION_PORTRAIT -> 2
+            !isTablet && orientation == Configuration.ORIENTATION_LANDSCAPE -> 4
+            // Span count based on tablet screen size
+            isTablet -> {
+                when {
+                    // Large tablets (10+ inch)
+                    screenWidthDp >= 840 -> {
+                        if (orientation == Configuration.ORIENTATION_PORTRAIT) 5 else 8
+                    }
+                    // Medium tablets (7-9 inch)
+                    screenWidthDp >= 600 -> {
+                        if (orientation == Configuration.ORIENTATION_PORTRAIT) 4 else 6
+                    }
+                    // Small tablets
+                    else -> {
+                        if (orientation == Configuration.ORIENTATION_PORTRAIT) 3 else 5
+                    }
+                }
+            }
+
+            // Fallback
+            else -> defaultSpanCount
+        }
+    }
+}

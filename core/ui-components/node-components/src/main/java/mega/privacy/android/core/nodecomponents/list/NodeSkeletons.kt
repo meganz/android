@@ -45,11 +45,16 @@ fun NodesViewSkeleton(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     isListView: Boolean = true,
+    spanCount: Int = 2,
 ) {
     if (isListView) {
         NodeListViewSkeleton(modifier = modifier, contentPadding = contentPadding)
     } else {
-        NodeGridViewSkeleton(modifier = modifier, contentPadding = contentPadding)
+        NodeGridViewSkeleton(
+            modifier = modifier,
+            spanCount = spanCount,
+            contentPadding = contentPadding
+        )
     }
 }
 
@@ -91,11 +96,12 @@ private fun NodeListViewSkeleton(
 private fun NodeGridViewSkeleton(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    spanCount: Int = 2,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         LazyVerticalGrid(
             contentPadding = contentPadding,
-            columns = GridCells.Fixed(2), // Matches NodeGridViewItem span count
+            columns = GridCells.Fixed(spanCount), // Matches NodeGridViewItem span count
             modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = DSTokens.spacings.s3)
@@ -104,7 +110,7 @@ private fun NodeGridViewSkeleton(
             verticalArrangement = Arrangement.spacedBy(DSTokens.spacings.s3),
         ) {
             // Header skeleton (spans full width)
-            item(span = { GridItemSpan(2) }) {
+            item(span = { GridItemSpan(spanCount) }) {
                 NodeHeaderItemSkeleton()
             }
 

@@ -45,6 +45,7 @@ import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolder
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
+import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.domain.entity.SortOrder
@@ -97,7 +98,6 @@ internal fun CloudDriveContent(
     val megaNavigator = rememberMegaNavigator()
     var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
     var isUploadFolder by rememberSaveable { mutableStateOf(false) }
-
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
     val internalFolderPickerLauncher =
@@ -113,14 +113,12 @@ internal fun CloudDriveContent(
                 }
             }
         }
-
     val openMultipleDocumentLauncher =
         rememberLauncherForActivityResult(megaResultContract.openMultipleDocumentsPersistable) {
             if (it.isNotEmpty()) {
                 uploadUris = it
             }
         }
-
     val uploadFolderLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val intent = it.data
@@ -139,7 +137,6 @@ internal fun CloudDriveContent(
                 )
             }
         }
-
     val manualUploadFilesLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {
@@ -160,7 +157,6 @@ internal fun CloudDriveContent(
             Timber.e(it)
         }
     }
-
     val nameCollisionLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.nameCollisionActivityContract
     ) { message ->
@@ -170,15 +166,6 @@ internal fun CloudDriveContent(
             }
         }
     }
-
-    HandleNodeOptionEvent(
-        megaNavigator = megaNavigator,
-        nodeActionState = nodeActionState,
-        nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-        nameCollisionLauncher = nameCollisionLauncher,
-        snackbarHostState = snackbarHostState,
-    )
-
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.inAppCameraResultContract
     ) { uri: Uri? ->
@@ -186,7 +173,6 @@ internal fun CloudDriveContent(
             uploadUris = listOf(uri)
         }
     }
-
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissionsResult ->
@@ -203,9 +189,18 @@ internal fun CloudDriveContent(
             }
         }
     }
+    HandleNodeOptionEvent(
+        megaNavigator = megaNavigator,
+        nodeActionState = nodeActionState,
+        nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+        nameCollisionLauncher = nameCollisionLauncher,
+        snackbarHostState = snackbarHostState,
+    )
     var visibleNodeOptionId by remember { mutableStateOf<NodeId?>(null) }
     val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var shouldShowSkeleton by remember { mutableStateOf(false) }
+    val isListView = uiState.currentViewType == ViewType.LIST
+    val spanCount = rememberDynamicSpanCount(isListView = isListView)
 
     LaunchedEffect(uiState.isLoading) {
         if (uiState.isLoading) {
@@ -223,7 +218,8 @@ internal fun CloudDriveContent(
             if (shouldShowSkeleton) {
                 NodesViewSkeleton(
                     contentPadding = contentPadding,
-                    isListView = uiState.currentViewType == ViewType.LIST
+                    isListView = isListView,
+                    spanCount = spanCount
                 )
             }
         }
@@ -239,6 +235,7 @@ internal fun CloudDriveContent(
             listContentPadding = contentPadding,
             listState = listState,
             gridState = gridState,
+            spanCount = spanCount,
             items = uiState.items,
             isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
             showHiddenNodes = uiState.showHiddenNodes,
@@ -246,7 +243,7 @@ internal fun CloudDriveContent(
             onItemClicked = { onAction(ItemClicked(it)) },
             onLongClicked = { onAction(ItemLongClicked(it)) },
             sortOrder = "Name", // TODO: Replace with actual sort order from state
-            isListView = uiState.currentViewType == ViewType.LIST,
+            isListView = isListView,
             onSortOrderClick = {}, // TODO: Handle sort order click
             onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
             showMediaDiscoveryButton = false,
