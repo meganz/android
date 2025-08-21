@@ -271,6 +271,7 @@ class VideoPlayerViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val fakeMonitorShowHiddenItemsFlow = MutableSharedFlow<Boolean>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val canRemoveFromChatUseCase = mock<CanRemoveFromChatUseCase>()
     private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
@@ -401,7 +402,9 @@ class VideoPlayerViewModelTest {
         whenever(monitorSubFolderMediaDiscoverySettingsUseCase()).thenReturn(flowOf(true))
         wheneverBlocking { monitorNodeUpdatesUseCase() }.thenReturn(fakeMonitorNodeUpdatesFlow)
         wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(fakeMonitorAccountDetailFlow)
-        wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(flowOf(true))
+        wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(
+            fakeMonitorShowHiddenItemsFlow
+        )
         wheneverBlocking { isHiddenNodesOnboardedUseCase() }.thenReturn(false)
         wheneverBlocking {
             monitorVideoRepeatModeUseCase()
@@ -1072,12 +1075,18 @@ class VideoPlayerViewModelTest {
         }
     }
 
-    private fun initVideoNode(handle: Long) =
+    private fun initVideoNode(
+        handle: Long,
+        isMarkedSensitive: Boolean = false,
+        isSensitiveInherited: Boolean = false,
+    ) =
         mock<TypedVideoNode> {
             on { id }.thenReturn(NodeId(handle))
             on { name }.thenReturn(testFileName)
             on { size }.thenReturn(testSize)
             on { duration }.thenReturn(testDuration)
+            on { this.isMarkedSensitive }.thenReturn(isMarkedSensitive)
+            on { this.isSensitiveInherited }.thenReturn(isSensitiveInherited)
         }
 
     @Test
@@ -1398,6 +1407,7 @@ class VideoPlayerViewModelTest {
                 on { isBusinessAccount }.thenReturn(true)
             }
             whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
+            fakeMonitorShowHiddenItemsFlow.emit(true)
             val testActions = listOf(
                 VideoPlayerDownloadAction,
                 VideoPlayerFileInfoAction,
@@ -2492,6 +2502,169 @@ class VideoPlayerViewModelTest {
                 verify(mediaPlayerGateway).setRepeatToggleMode(mode)
                 cancelAndConsumeRemainingEvents()
             }
+        }
+
+    @Test
+    fun `test that filterNonSensitiveNodes returns all nodes when showHiddenItems is true`() =
+        runTest {
+            val intent = mock<Intent>()
+            val mockAccountType = mock<AccountType> { on { isPaid }.thenReturn(true) }
+            testStateIsUpdatedCorrectlyByLaunchSourceWithSensitive(
+                intent = intent,
+                isSensitive = true,
+                isSensitiveInherited = true,
+                accountType = mockAccountType
+            ) { getVideoNodesUseCase(any()) }
+        }
+
+    private suspend fun testStateIsUpdatedCorrectlyByLaunchSourceWithSensitive(
+        intent: Intent,
+        launchSource: Int = VIDEO_BROWSE_ADAPTER,
+        playingIndex: Int = 1,
+        testArray: IntArray = intArrayOf(1, 2, 3),
+        isSensitive: Boolean = false,
+        isSensitiveInherited: Boolean = false,
+        isShowHiddenItems: Boolean = true,
+        accountType: AccountType? = null,
+        isAccountExpired: Boolean = false,
+        initSourceData: suspend () -> List<TypedVideoNode>?,
+    ) {
+        val testHandle = 2L
+        val testFileName = "test.mp4"
+
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            launchSource = launchSource,
+            data = mock(),
+            handle = testHandle,
+            fileName = testFileName
+        )
+
+        whenever(context.getString(any())).thenReturn(testTitle)
+
+        val testVideoNodes = testArray.mapIndexed { index, it ->
+            initVideoNode(
+                handle = it.toLong(),
+                isMarkedSensitive = index == 2 && isSensitive,
+                isSensitiveInherited = index == 2 && isSensitiveInherited
+            )
+        }
+
+        whenever(initSourceData()).thenReturn(testVideoNodes)
+        whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn(testAbsolutePath)
+        whenever(httpServerIsRunningUseCase(any())).thenReturn(1)
+
+        val testActions = listOf(VideoPlayerDownloadAction, VideoPlayerHideAction)
+        initLaunchSourceMapperReturned(testActions)
+
+        val entities = testVideoNodes.map { initVideoPlayerItem(it.id.longValue, it.name) }
+
+        entities.forEach { entity ->
+            whenever(entity.copy(type = MediaQueueItemType.Playing)).thenReturn(entity)
+            whenever(entity.copy(type = MediaQueueItemType.Previous)).thenReturn(entity)
+            whenever(entity.copy(type = MediaQueueItemType.Next)).thenReturn(entity)
+        }
+
+        testVideoNodes.forEachIndexed { index, node ->
+            whenever(
+                videoPlayerItemMapper(
+                    node.id.longValue,
+                    node.name,
+                    null,
+                    getMediaQueueItemType(index, playingIndex),
+                    node.size,
+                    node.duration
+                )
+            ).thenReturn(entities[index])
+        }
+
+        whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(true)
+
+        mockStatic(Uri::class.java).use {
+            whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
+            accountType?.let { emitAccountDetail(it) }
+            fakeMonitorShowHiddenItemsFlow.emit(isShowHiddenItems)
+            underTest.initVideoPlayerData(intent)
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                val expectedSize =
+                    if (isShowHiddenItems || isAccountExpired || accountType?.isPaid == false) {
+                        testArray.size
+                    } else {
+                        testArray.size - 1
+                    }
+
+                assertThat(actual.items).isNotEmpty()
+                assertThat(actual.items.size).isEqualTo(expectedSize)
+                actual.items.forEachIndexed { index, item ->
+                    assertThat(item).isEqualTo(entities[index])
+                }
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+    }
+
+    @Test
+    fun `test that filterNonSensitiveNodes returns all nodes when accountType is not paid`() =
+        runTest {
+            val intent = mock<Intent>()
+            val mockAccountType = mock<AccountType> { on { isPaid }.thenReturn(false) }
+            testStateIsUpdatedCorrectlyByLaunchSourceWithSensitive(
+                intent = intent,
+                isSensitive = true,
+                isSensitiveInherited = true,
+                isShowHiddenItems = false,
+                accountType = mockAccountType
+            ) { getVideoNodesUseCase(any()) }
+        }
+
+    @Test
+    fun `test that filterNonSensitiveNodes returns all nodes when business account is expired`() =
+        runTest {
+            val intent = mock<Intent>()
+            val mockAccountType = mock<AccountType> {
+                on { isBusinessAccount }.thenReturn(true)
+                on { isPaid }.thenReturn(true)
+            }
+            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
+            testStateIsUpdatedCorrectlyByLaunchSourceWithSensitive(
+                intent = intent,
+                isSensitive = true,
+                isSensitiveInherited = true,
+                isShowHiddenItems = false,
+                isAccountExpired = true,
+                accountType = mockAccountType
+            ) { getVideoNodesUseCase(any()) }
+        }
+
+    @Test
+    fun `test that filterNonSensitiveNodes filters out sensitive nodes when showHiddenItems is false and account is paid`() =
+        runTest {
+            val intent = mock<Intent>()
+            val mockAccountType = mock<AccountType> { on { isPaid }.thenReturn(true) }
+            testStateIsUpdatedCorrectlyByLaunchSourceWithSensitive(
+                intent = intent,
+                isSensitive = true,
+                isSensitiveInherited = false,
+                isShowHiddenItems = false,
+                accountType = mockAccountType
+            ) { getVideoNodesUseCase(any()) }
+        }
+
+    @Test
+    fun `test that filterNonSensitiveNodes filters out nodes with inherited sensitivity when showHiddenItems is false and account is paid`() =
+        runTest {
+            val intent = mock<Intent>()
+            val mockAccountType = mock<AccountType> { on { isPaid }.thenReturn(true) }
+            testStateIsUpdatedCorrectlyByLaunchSourceWithSensitive(
+                intent = intent,
+                isSensitive = false,
+                isSensitiveInherited = true,
+                isShowHiddenItems = false,
+                accountType = mockAccountType
+            ) { getVideoNodesUseCase(any()) }
         }
 
     companion object {

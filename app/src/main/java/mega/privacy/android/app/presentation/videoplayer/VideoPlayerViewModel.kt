@@ -15,6 +15,8 @@ import android.view.PixelCopy
 import android.view.Surface
 import android.view.TextureView
 import android.view.View
+import androidx.core.graphics.createBitmap
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -47,16 +49,11 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartDownloadForOffline
 import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
@@ -73,18 +70,14 @@ import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAc
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
@@ -93,7 +86,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_S
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
-import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
@@ -104,13 +96,10 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTIO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
@@ -118,6 +107,14 @@ import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.BACKUPS_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -132,10 +129,14 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartDownloadForOffline
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
@@ -200,6 +201,7 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
@@ -572,7 +574,7 @@ class VideoPlayerViewModel @Inject constructor(
         when (launchSource) {
             FOLDER_LINK_ADAPTER -> {
                 val url = getLocalFolderLinkUseCase(handle)
-                url?.let { Uri.parse(it) }
+                url?.toUri()
             }
 
             else -> uri
@@ -684,7 +686,7 @@ class VideoPlayerViewModel @Inject constructor(
             }.mapIndexed { index, item ->
                 if (item.handle.toLong() == firstPlayHandle) currentPlayingIndex = index
 
-                runCatching { Uri.parse(item.absolutePath) }.getOrNull()?.let {
+                runCatching { item.absolutePath.toUri() }.getOrNull()?.let {
                     mediaItems.add(
                         MediaItem.Builder()
                             .setUri(it)
@@ -947,8 +949,20 @@ class VideoPlayerViewModel @Inject constructor(
                 "" to emptyList()
             }
         }
-        if (videoNodes.isNotEmpty()) {
-            buildPlaybackSourcesByNodes(title, videoNodes, playingHandle, launchSource)
+        val filteredVideoNodes = filterNonSensitiveNodes(videoNodes)
+        if (filteredVideoNodes.isNotEmpty()) {
+            buildPlaybackSourcesByNodes(title, filteredVideoNodes, playingHandle, launchSource)
+        }
+    }
+
+    private fun filterNonSensitiveNodes(nodes: List<TypedVideoNode>): List<TypedVideoNode> {
+        val showHiddenItems = uiState.value.showHiddenItems == true
+        val accountType = uiState.value.accountType ?: return nodes
+
+        return if (showHiddenItems || !accountType.isPaid || uiState.value.isBusinessAccountExpired) {
+            nodes
+        } else {
+            nodes.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
         }
     }
 
@@ -1015,7 +1029,7 @@ class VideoPlayerViewModel @Inject constructor(
                     else -> getLocalLinkFromMegaApiUseCase(node.id.longValue)
                 }?.let { url ->
                     MediaItem.Builder()
-                        .setUri(Uri.parse(url))
+                        .setUri(url.toUri())
                         .setMediaId(node.id.longValue.toString())
                         .build()
                 }
@@ -1349,7 +1363,7 @@ class VideoPlayerViewModel @Inject constructor(
                         val contentUri =
                             getFileUriUseCase(file, Constants.AUTHORITY_STRING_FILE_PROVIDER)
                         val content =
-                            MenuOptionClickedContent.ShareFile(Uri.parse(contentUri), file.name)
+                            MenuOptionClickedContent.ShareFile(contentUri.toUri(), file.name)
                         uiState.update { it.copy(menuOptionClickedContent = content) }
                     }
                 }.onFailure {
@@ -1566,11 +1580,7 @@ class VideoPlayerViewModel @Inject constructor(
                 width to height
             } ?: (captureView.width to captureView.height)
         try {
-            val screenshotBitmap = Bitmap.createBitmap(
-                captureWidth,
-                captureHeight,
-                Bitmap.Config.ARGB_8888
-            )
+            val screenshotBitmap = createBitmap(captureWidth, captureHeight)
             val surfaceView = Surface(textureView.surfaceTexture)
             PixelCopy.request(
                 surfaceView,

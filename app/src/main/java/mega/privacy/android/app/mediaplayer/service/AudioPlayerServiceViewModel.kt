@@ -2,9 +2,9 @@ package mega.privacy.android.app.mediaplayer.service
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import androidx.annotation.OptIn
+import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import androidx.media3.common.C
@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -29,19 +31,15 @@ import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_P
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
+import mega.privacy.android.app.mediaplayer.model.MediaPlayerState
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.playlist.finalizeItem
 import mega.privacy.android.app.mediaplayer.playlist.updateNodeName
 import mega.privacy.android.app.search.callback.SearchCallback
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
@@ -49,7 +47,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FROM_DOWNLOAD_S
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
-import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
@@ -57,14 +54,11 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HAN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
@@ -73,9 +67,18 @@ import mega.privacy.android.app.utils.FileUtil.getUriForFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.MegaNodeUtil.isInRootLinksLevel
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.BACKUPS_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -85,6 +88,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
@@ -98,6 +102,7 @@ import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
@@ -123,8 +128,10 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuff
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
@@ -183,6 +190,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
     private val saveAudioPlaybackInfoUseCase: SaveAudioPlaybackInfoUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     monitorAudioBackgroundPlayEnabledUseCase: MonitorAudioBackgroundPlayEnabledUseCase,
     monitorAudioShuffleEnabledUseCase: MonitorAudioShuffleEnabledUseCase,
     monitorAudioRepeatModeUseCase: MonitorAudioRepeatModeUseCase,
@@ -257,6 +267,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     private var mediaItemTransitionState = MutableStateFlow<Long?>(null)
 
+    private val mediaPlayerState = MutableStateFlow(MediaPlayerState())
+
     init {
         setupTransferListener()
         cancellableJobs[JOB_KEY_MONITOR_SHUFFLE]?.cancel()
@@ -267,6 +279,32 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 )
             }
         }
+
+        handleHiddenNodesUIFlow()
+    }
+
+    private fun handleHiddenNodesUIFlow() {
+        cancellableJobs[JOB_KEY_ACCOUNT_DETAIL]?.cancel()
+        cancellableJobs[JOB_KEY_ACCOUNT_DETAIL] = combine(
+            monitorAccountDetailUseCase(),
+            monitorShowHiddenItemsUseCase(),
+        ) { accountDetail, showHiddenItems ->
+            val accountType = accountDetail.levelDetail?.accountType
+            val businessStatus =
+                if (accountType?.isBusinessAccount == true) {
+                    getBusinessStatusUseCase()
+                } else null
+
+            mediaPlayerState.update {
+                it.copy(
+                    accountType = accountType,
+                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
+                    hiddenNodeEnabled = true,
+                    showHiddenItems = showHiddenItems,
+                )
+            }
+        }.catch { Timber.e(it) }
+            .launchIn(sharingScope)
     }
 
     override fun setPaused(paused: Boolean) {
@@ -324,9 +362,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 getLocalFolderLinkFromMegaApiFolderUseCase(firstPlayHandle)
             } else {
                 getLocalFolderLinkFromMegaApiUseCase(firstPlayHandle)
-            }?.let { url ->
-                Uri.parse(url)
-            }
+            }?.toUri()
         } else {
             uri
         }
@@ -631,7 +667,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                     firstPlayIndex = index
                 }
 
-                runCatching { Uri.parse(item.absolutePath) }.onSuccess {
+                runCatching { item.absolutePath.toUri() }.onSuccess {
                     mediaItems.add(
                         MediaItem.Builder()
                             .setUri(it)
@@ -681,7 +717,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
         val nodesWithoutThumbnail = ArrayList<Pair<Long, File>>()
 
-        typedAudioNodes.mapIndexed { currentIndex, typedAudioNode ->
+        filterNonSensitiveNodes(typedAudioNodes).mapIndexed { currentIndex, typedAudioNode ->
             getLocalFilePathUseCase(typedAudioNode).let { localPath ->
                 if (localPath != null && isLocalFile(typedAudioNode, localPath)) {
                     mediaItemFromFile(File(localPath), typedAudioNode.id.longValue.toString())
@@ -700,7 +736,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                         null
                     } else {
                         MediaItem.Builder()
-                            .setUri(Uri.parse(url))
+                            .setUri(url.toUri())
                             .setMediaId(typedAudioNode.id.longValue.toString())
                             .build()
                     }
@@ -766,6 +802,17 @@ class AudioPlayerServiceViewModel @Inject constructor(
             cancellableJobs[JOB_KEY_UPDATE_THUMBNAIL] = updateThumbnailJob
         }
         updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
+    }
+
+    private fun filterNonSensitiveNodes(nodes: List<TypedAudioNode>): List<TypedAudioNode> {
+        val showHiddenItems = mediaPlayerState.value.showHiddenItems == true
+        val accountType = mediaPlayerState.value.accountType ?: return nodes
+
+        return if (showHiddenItems || !accountType.isPaid || mediaPlayerState.value.isBusinessAccountExpired) {
+            nodes
+        } else {
+            nodes.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
+        }
     }
 
     /**
@@ -1408,5 +1455,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
         private const val JOB_KEY_SET_AUDIO_REPEAT_MODE = "JOB_KEY_SET_AUDIO_REPEAT_MODE"
         private const val JOB_KEY_MONITOR_TRANSFER = "JOB_KEY_MONITOR_TRANSFER"
         private const val JOB_KEY_AUDIO_PLAYBACK_INFO = "JOB_KEY_AUDIO_PLAYBACK_INFO"
+        private const val JOB_KEY_ACCOUNT_DETAIL = "JOB_KEY_ACCOUNT_DETAIL"
     }
 }
