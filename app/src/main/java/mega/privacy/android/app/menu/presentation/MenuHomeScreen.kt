@@ -17,7 +17,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -106,7 +105,7 @@ fun MenuHomeScreenUi(
             contentPadding = PaddingValues(top = paddingValues.calculateTopPadding()),
         )
         {
-            item {
+            item(key = "${uiState.name} ${uiState.email} ${uiState.avatar?.path}") {
                 FlexibleLineListItem(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -114,14 +113,12 @@ fun MenuHomeScreenUi(
                     title = uiState.name.orEmpty(),
                     subtitle = uiState.email.orEmpty(),
                     leadingElement = {
-                        key(uiState.name, uiState.avatarColor, uiState.avatar) {
-                            MediumProfilePicture(
-                                imageFile = uiState.avatar,
-                                contentDescription = uiState.name,
-                                name = uiState.name,
-                                avatarColor = uiState.avatarColor
-                            )
-                        }
+                        MediumProfilePicture(
+                            imageFile = uiState.avatar,
+                            contentDescription = uiState.name,
+                            name = uiState.name,
+                            avatarColor = uiState.avatarColor
+                        )
                     },
                     trailingElement = {
                         MegaIcon(

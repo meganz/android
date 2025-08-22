@@ -27,12 +27,14 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.AccountStorageDetail
-import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
+import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import org.junit.jupiter.api.AfterAll
@@ -45,6 +47,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -62,7 +65,9 @@ class MenuViewModelTest {
     private val accountNameMapper = mock<AccountNameMapper>()
     private val getStringFromStringResMapper = mock<GetStringFromStringResMapper>()
     private val fileSizeStringMapper = mock<FileSizeStringMapper>()
-    private val monitorUserCredentialsUseCase = mock<MonitorUserCredentialsUseCase>()
+    private val getUserFullNameUseCase = mock<GetUserFullNameUseCase>()
+    private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
+    private val monitorUserUpdates = mock<MonitorUserUpdates>()
 
     private object TestDestination : NavKey
 
@@ -87,7 +92,9 @@ class MenuViewModelTest {
             accountNameMapper,
             getStringFromStringResMapper,
             fileSizeStringMapper,
-            monitorUserCredentialsUseCase
+            getUserFullNameUseCase,
+            getCurrentUserEmail,
+            monitorUserUpdates
         )
     }
 
@@ -164,71 +171,11 @@ class MenuViewModelTest {
         }
 
     @Test
-    fun `test that user credentials are monitored and update state`() = runTest {
-        stubDefaultDependencies()
-        val credentials = UserCredentials(
-            email = "test@example.com",
-            session = "session123",
-            firstName = "John",
-            lastName = "Doe",
-            myHandle = "123456789"
-        )
-
-        monitorUserCredentialsUseCase.stub {
-            on { invoke() }.thenReturn(flowOf(credentials))
-        }
-
-        initUnderTest()
-
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.email).isEqualTo("test@example.com")
-            assertThat(state.name).isEqualTo("John Doe")
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that user credentials with null email are filtered out`() = runTest {
-        stubDefaultDependencies()
-        val credentialsWithNullEmail = UserCredentials(
-            email = null,
-            session = "session123",
-            firstName = "John",
-            lastName = "Doe",
-            myHandle = "123456789"
-        )
-
-        monitorUserCredentialsUseCase.stub {
-            on { invoke() }.thenReturn(flowOf(credentialsWithNullEmail))
-        }
-
-        initUnderTest()
-
-        // The state should not be updated since email is null and filter should exclude it
-        val initialState = underTest.uiState.value
-        assertThat(initialState.email).isNull()
-        assertThat(initialState.name).isNull()
-    }
-
-    @Test
     fun `test that avatar color is fetched and updates state`() = runTest {
         stubDefaultDependencies()
         val expectedColor = -16711936 // Green color value
         getMyAvatarColorUseCase.stub {
             onBlocking { invoke() }.thenReturn(expectedColor)
-        }
-
-        val credentials = UserCredentials(
-            email = "test@example.com",
-            session = "session123",
-            firstName = "John",
-            lastName = "Doe",
-            myHandle = "123456789"
-        )
-
-        monitorUserCredentialsUseCase.stub {
-            on { invoke() }.thenReturn(flowOf(credentials))
         }
 
         initUnderTest()
@@ -258,18 +205,6 @@ class MenuViewModelTest {
     fun `test that avatar file is monitored and updates state`() = runTest {
         stubDefaultDependencies()
         val avatarFile = File("/path/to/avatar.jpg")
-
-        val credentials = UserCredentials(
-            email = "test@example.com",
-            session = "session123",
-            firstName = "John",
-            lastName = "Doe",
-            myHandle = "123456789"
-        )
-
-        monitorUserCredentialsUseCase.stub {
-            on { invoke() }.thenReturn(flowOf(credentials))
-        }
 
         monitorMyAvatarFile.stub {
             on { invoke() }.thenReturn(flowOf(avatarFile))
@@ -314,21 +249,6 @@ class MenuViewModelTest {
         // Should not crash despite error in avatar file monitoring
         val state = underTest.uiState.value
         assertThat(state.avatar).isNull()
-    }
-
-    @Test
-    fun `test that user credentials monitoring handles errors gracefully`() = runTest {
-        stubDefaultDependencies()
-        monitorUserCredentialsUseCase.stub {
-            on { invoke() }.thenReturn(flow { throw RuntimeException("User credentials error") })
-        }
-
-        initUnderTest()
-
-        // Should not crash despite error in user credentials monitoring
-        val state = underTest.uiState.value
-        assertThat(state.email).isNull()
-        assertThat(state.name).isNull()
     }
 
     @Test
@@ -510,7 +430,7 @@ class MenuViewModelTest {
             val storageItem = state.myAccountItems[20]
             val rubbishBinItem = state.myAccountItems[90]
 
-            verify(fileSizeStringMapper, org.mockito.kotlin.times(2)).invoke(0L)
+            verify(fileSizeStringMapper, times(2)).invoke(0L)
             verify(accountNameMapper).invoke(AccountType.FREE)
             verify(getStringFromStringResMapper).invoke(mockAccountTypeName)
 
@@ -568,10 +488,6 @@ class MenuViewModelTest {
             on { invoke() }.thenReturn(flowOf(false))
         }
 
-        monitorUserCredentialsUseCase.stub {
-            on { invoke() }.thenReturn(flowOf(null))
-        }
-
         monitorMyAvatarFile.stub {
             on { invoke() }.thenReturn(flowOf(null))
         }
@@ -583,6 +499,13 @@ class MenuViewModelTest {
         }
 
         whenever(getMyAvatarColorUseCase()).thenReturn(0)
+
+        whenever(getUserFullNameUseCase(forceRefresh = false)).thenReturn("Test User")
+        whenever(getCurrentUserEmail()).thenReturn("test@example.com")
+
+        monitorUserUpdates.stub {
+            on { invoke() }.thenReturn(flow { awaitCancellation() })
+        }
     }
 
     private fun initUnderTest(
@@ -598,7 +521,171 @@ class MenuViewModelTest {
             accountNameMapper = accountNameMapper,
             getStringFromStringResMapper = getStringFromStringResMapper,
             fileSizeStringMapper = fileSizeStringMapper,
-            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase
+            getUserFullNameUseCase = getUserFullNameUseCase,
+            getCurrentUserEmail = getCurrentUserEmail,
+            monitorUserUpdates = monitorUserUpdates
         )
+    }
+
+    @Test
+    fun `test that getUserFullNameUseCase is called and updates state correctly`() = runTest {
+        stubDefaultDependencies()
+        val expectedName = "John Doe"
+
+        whenever(getUserFullNameUseCase(forceRefresh = false)).thenReturn(expectedName)
+
+        initUnderTest()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.name).isEqualTo(expectedName)
+            verify(getUserFullNameUseCase).invoke(forceRefresh = false)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that getCurrentUserEmail is called and updates state correctly`() = runTest {
+        stubDefaultDependencies()
+        val expectedEmail = "user@example.com"
+
+        whenever(getCurrentUserEmail()).thenReturn(expectedEmail)
+
+        initUnderTest()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.email).isEqualTo(expectedEmail)
+            verify(getCurrentUserEmail).invoke()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that monitorUserChanges responds to firstname changes`() = runTest {
+        stubDefaultDependencies()
+        val updatedName = "Jane Smith"
+        val avatarFile = File("/path/to/avatar.jpg")
+
+        whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn(updatedName)
+        whenever(getMyAvatarFileUseCase(isForceRefresh = true)).thenReturn(avatarFile)
+
+        monitorUserUpdates.stub {
+            on { invoke() }.thenReturn(flowOf(UserChanges.Firstname))
+        }
+
+        initUnderTest()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.name).isEqualTo(updatedName)
+            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+            verify(getMyAvatarFileUseCase).invoke(isForceRefresh = true)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that monitorUserChanges responds to lastname changes`() = runTest {
+        stubDefaultDependencies()
+        val updatedName = "John Doe Jr."
+        val avatarFile = File("/path/to/new_avatar.jpg")
+
+        whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn(updatedName)
+        whenever(getMyAvatarFileUseCase(isForceRefresh = true)).thenReturn(avatarFile)
+
+        monitorUserUpdates.stub {
+            on { invoke() }.thenReturn(flowOf(UserChanges.Lastname))
+        }
+
+        initUnderTest()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.name).isEqualTo(updatedName)
+            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+            verify(getMyAvatarFileUseCase).invoke(isForceRefresh = true)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that monitorUserChanges responds to email changes`() = runTest {
+        stubDefaultDependencies()
+        val updatedEmail = "newemail@example.com"
+
+        whenever(getCurrentUserEmail()).thenReturn(updatedEmail)
+
+        monitorUserUpdates.stub {
+            on { invoke() }.thenReturn(flowOf(UserChanges.Email))
+        }
+
+        initUnderTest()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.email).isEqualTo(updatedEmail)
+            verify(getCurrentUserEmail, times(2)).invoke()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that monitorUserChanges ignores other user changes`() = runTest {
+        stubDefaultDependencies()
+
+        monitorUserUpdates.stub {
+            on { invoke() }.thenReturn(flowOf(UserChanges.Avatar))
+        }
+
+        initUnderTest()
+
+        // Should not trigger refreshUserName or refreshCurrentUserEmail for Avatar changes
+        verify(
+            getUserFullNameUseCase,
+            times(1)
+        ).invoke(forceRefresh = false) // Only initial call
+        verify(getCurrentUserEmail, times(1)).invoke() // Only initial call
+    }
+
+    @Test
+    fun `test that monitorUserChanges handles exceptions gracefully`() = runTest {
+        stubDefaultDependencies()
+
+        monitorUserUpdates.stub {
+            on { invoke() }.thenReturn(flow { throw RuntimeException("User updates error") })
+        }
+
+        initUnderTest()
+
+        // Should not crash despite error in user updates monitoring
+        val state = underTest.uiState.value
+        assertThat(state).isNotNull()
+        verify(getUserFullNameUseCase, times(0)).invoke(true)
+    }
+
+    @Test
+    fun `test that getUserFullNameUseCase handles exceptions gracefully`() = runTest {
+        stubDefaultDependencies()
+
+        whenever(getUserFullNameUseCase(forceRefresh = false)).thenThrow(RuntimeException("Get full name error"))
+
+        initUnderTest()
+
+        val state = underTest.uiState.value
+        assertThat(state.name).isNull()
+    }
+
+    @Test
+    fun `test that getCurrentUserEmail handles exceptions gracefully`() = runTest {
+        stubDefaultDependencies()
+
+        whenever(getCurrentUserEmail()).thenThrow(RuntimeException("Get email error"))
+
+        initUnderTest()
+
+        // Should not crash despite error in getting email
+        val state = underTest.uiState.value
+        assertThat(state.email).isNull()
     }
 } 

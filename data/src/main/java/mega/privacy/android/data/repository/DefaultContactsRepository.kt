@@ -626,7 +626,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
                     .also { credentialsPreferencesGateway.get().saveFirstName(it) }
             } else {
-                credentialsPreferencesGateway.get().monitorCredentials().firstOrNull()?.firstName
+                credentialsPreferencesGateway.get().monitorCredentials().firstOrNull()?.firstName.takeIf { !it.isNullOrBlank() }
                     ?: getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
                         .also { credentialsPreferencesGateway.get().saveFirstName(it) }
             }
@@ -638,7 +638,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
                     .also { credentialsPreferencesGateway.get().saveLastName(it) }
             } else {
-                credentialsPreferencesGateway.get().monitorCredentials().firstOrNull()?.lastName
+                credentialsPreferencesGateway.get().monitorCredentials().firstOrNull()?.lastName.takeIf { !it.isNullOrBlank() }
                     ?: getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
                         .also { credentialsPreferencesGateway.get().saveLastName(it) }
             }

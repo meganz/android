@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -20,11 +19,14 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
+import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import timber.log.Timber
@@ -41,9 +43,10 @@ class MenuViewModel @Inject constructor(
     private val accountNameMapper: AccountNameMapper,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val fileSizeStringMapper: FileSizeStringMapper,
-    private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
+    private val getUserFullNameUseCase: GetUserFullNameUseCase,
+    private val getCurrentUserEmail: GetCurrentUserEmail,
+    private val monitorUserUpdates: MonitorUserUpdates,
 ) : ViewModel() {
-
     // Flows for items that need dynamic subtitles
     private val currentPlanSubtitleFlow = MutableStateFlow<String?>(null)
     private val storageSubtitleFlow = MutableStateFlow<String?>(null)
@@ -104,25 +107,56 @@ class MenuViewModel @Inject constructor(
         monitorConnectivity()
         monitorUserDataAndAvatar()
         monitorAccountDetails()
+        refreshUserName(false)
+        refreshCurrentUserEmail()
+        monitorUserChanges()
+    }
+
+    private fun monitorUserChanges() {
+        viewModelScope.launch {
+            monitorUserUpdates()
+                .catch { Timber.w("Exception monitoring user updates: $it") }
+                .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email }
+                .collect {
+                    when (it) {
+                        UserChanges.Email -> refreshCurrentUserEmail()
+                        UserChanges.Firstname,
+                        UserChanges.Lastname,
+                            -> {
+                            refreshUserName(true)
+                            getUserAvatarOrDefault(true)
+                        }
+
+                        else -> Unit
+                    }
+                }
+        }
+    }
+
+
+    private suspend fun getUserAvatarOrDefault(isForceRefresh: Boolean) {
+        val avatarFile = runCatching { getMyAvatarFileUseCase(isForceRefresh) }
+            .onFailure { Timber.e(it) }.getOrNull()
+        val color = runCatching { getMyAvatarColorUseCase() }.getOrNull()
+        _uiState.update {
+            it.copy(
+                avatar = avatarFile,
+                avatarColor = color?.let { color -> Color(color) } ?: Color.Unspecified,
+            )
+        }
     }
 
     private fun monitorUserDataAndAvatar() {
         viewModelScope.launch {
-            combine(
-                monitorUserCredentialsUseCase().filter { it?.email != null },
-                monitorMyAvatarFile().onStart { emit(getMyAvatarFileUseCase(isForceRefresh = false)) }
-            ) { credentials, avatarFile ->
-                Pair(credentials, avatarFile)
-            }
+            monitorMyAvatarFile().onStart { emit(getMyAvatarFileUseCase(isForceRefresh = false)) }
                 .catch { Timber.e(it) }
-                .collectLatest { (credentials, avatarFile) ->
+                .collectLatest { avatarFile ->
                     val color = runCatching { getMyAvatarColorUseCase() }.getOrNull()
                     _uiState.update {
                         it.copy(
-                            email = credentials?.email,
-                            name = "${credentials?.firstName.orEmpty()} ${credentials?.lastName.orEmpty()}",
                             avatar = avatarFile,
-                            avatarColor = color?.let { Color(it) } ?: Color.Unspecified,
+                            avatarColor = color?.let { color -> Color(color) }
+                                ?: Color.Unspecified,
                         )
                     }
                 }
@@ -157,6 +191,28 @@ class MenuViewModel @Inject constructor(
                         it.copy(isConnectedToNetwork = isConnected)
                     }
                 }
+        }
+    }
+
+    private fun refreshUserName(forceRefresh: Boolean) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    name = runCatching {
+                        getUserFullNameUseCase(
+                            forceRefresh = forceRefresh,
+                        )
+                    }.getOrNull()
+                )
+            }
+        }
+    }
+
+    private fun refreshCurrentUserEmail() {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(email = runCatching { getCurrentUserEmail() }.getOrNull())
+            }
         }
     }
 }
