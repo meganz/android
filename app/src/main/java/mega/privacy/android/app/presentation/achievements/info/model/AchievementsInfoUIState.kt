@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementType
  * @param isAchievementAwarded is achievement has been awarded to the user
  * @param isAchievementExpired is the awarded achievement expired
  * @param isAchievementAlmostExpired is the awarded achievement almost expired (below 15 days)
+ * @param durationInDays the duration of the achievements in days
  */
 data class AchievementsInfoUIState(
     val awardId: Int = -1,
@@ -19,5 +20,6 @@ data class AchievementsInfoUIState(
     val awardStorageInBytes: Long = 0,
     val isAchievementAwarded: Boolean = false,
     val isAchievementExpired: Boolean = false,
-    val isAchievementAlmostExpired: Boolean = false
+    val isAchievementAlmostExpired: Boolean = false,
+    val durationInDays: Int = 365
 )

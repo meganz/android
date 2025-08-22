@@ -80,12 +80,15 @@ class AchievementsOverviewViewModel @Inject constructor(
                             hasReferrals = overview.hasAnyReferrals(),
                             referralsStorage = overview.referralsStorage(),
                             referralsAwardStorage = overview.achievedStorageFromReferralsInBytes,
+                            referralsDurationInDays = overview.referralsDurationInDays(),
                             installAppStorage = overview.installAppStorage(),
                             installAppAwardDaysLeft = overview.installAppAwardDaysLeft(),
                             installAppAwardStorage = overview.installAppAwardStorage(),
+                            installAppDurationInDays = overview.installAppDurationInDays(),
                             installDesktopStorage = overview.installDesktopStorage(),
                             installDesktopAwardDaysLeft = overview.installDesktopAwardDaysLeft(),
                             installDesktopAwardStorage = overview.installDesktopAwardStorage(),
+                            installDesktopDurationInDays = overview.installDesktopDurationInDays(),
                             hasRegistrationAward = overview.hasRegistrationAward(),
                             registrationAwardDaysLeft = overview.registrationAwardDaysLeft(),
                             registrationAwardStorage = overview.registrationAwardStorage(),
@@ -97,6 +100,8 @@ class AchievementsOverviewViewModel @Inject constructor(
                             megaPassTrialStorage = overview.megaPassTrialStorage(),
                             megaPassTrialAwardDaysLeft = overview.megaPassTrialAwardDaysLeft(),
                             megaPassTrialAwardStorage = overview.megaPassTrialAwardStorage(),
+                            megaPassTrialDurationInDays = overview.megaPassTrialDurationInDays(),
+                            megaVPNTrialDurationInDays = overview.megaVPNTrialDurationInDays()
                         )
                     }
                 }
@@ -159,9 +164,24 @@ class AchievementsOverviewViewModel @Inject constructor(
         it.type == AchievementType.MEGA_ACHIEVEMENT_MOBILE_INSTALL
     }?.grantStorageInBytes
 
+    private fun AchievementsOverview.installDesktopDurationInDays() =
+        this.allAchievements.firstOrNull {
+            it.type == AchievementType.MEGA_ACHIEVEMENT_DESKTOP_INSTALL
+        }?.durationInDays ?: 365
+
+    private fun AchievementsOverview.installAppDurationInDays() =
+        this.allAchievements.firstOrNull {
+            it.type == AchievementType.MEGA_ACHIEVEMENT_MOBILE_INSTALL
+        }?.durationInDays ?: 365
+
     private fun AchievementsOverview.referralsStorage() = this.allAchievements.firstOrNull {
         it.type == AchievementType.MEGA_ACHIEVEMENT_INVITE
     }?.grantStorageInBytes
+
+    private fun AchievementsOverview.referralsDurationInDays() =
+        this.allAchievements.firstOrNull {
+            it.type == AchievementType.MEGA_ACHIEVEMENT_INVITE
+        }?.durationInDays ?: 365
 
     private fun AchievementsOverview.hasAnyReferrals() =
         this.achievedStorageFromReferralsInBytes > 0 || this.achievedTransferFromReferralsInBytes > 0
@@ -184,6 +204,11 @@ class AchievementsOverviewViewModel @Inject constructor(
             it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_PWM_TRIAL
         }?.rewardedStorageInBytes ?: 0
 
+    private fun AchievementsOverview.megaPassTrialDurationInDays() =
+        this.allAchievements.firstOrNull {
+            it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_PWM_TRIAL
+        }?.durationInDays ?: 365
+
     private fun AchievementsOverview.hasMegaVPNTrial() = this.allAchievements.firstOrNull {
         it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_VPN_TRIAL
     } != null
@@ -201,6 +226,11 @@ class AchievementsOverviewViewModel @Inject constructor(
         this.awardedAchievements.firstOrNull {
             it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_VPN_TRIAL
         }?.rewardedStorageInBytes ?: 0
+
+    private fun AchievementsOverview.megaVPNTrialDurationInDays() =
+        this.allAchievements.firstOrNull {
+            it.type == AchievementType.MEGA_ACHIEVEMENT_MEGA_VPN_TRIAL
+        }?.durationInDays ?: 365
 
     /**
      * Check if all invite achievements are expired

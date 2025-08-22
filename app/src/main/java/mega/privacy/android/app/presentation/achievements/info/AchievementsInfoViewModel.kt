@@ -59,6 +59,7 @@ class AchievementsInfoViewModel @Inject constructor(
             getAccountAchievementsOverviewUseCase().also {
                 updateAchievementsRemainingDays(it)
                 updateAwardedStorage(it)
+                updateDurationInDays(it)
             }
         }.onFailure {
             Timber.e(it)
@@ -110,6 +111,17 @@ class AchievementsInfoViewModel @Inject constructor(
 
             _uiState.update {
                 it.copy(awardStorageInBytes = awardedStorage ?: 0)
+            }
+        }
+
+    private fun updateDurationInDays(achievementsOverview: AchievementsOverview) =
+        viewModelScope.launch {
+            val durationInDays = achievementsOverview.allAchievements.firstOrNull {
+                it.type == achievementType
+            }?.durationInDays ?: 365
+
+            _uiState.update {
+                it.copy(durationInDays = durationInDays)
             }
         }
 }

@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -26,6 +27,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class InviteFriendsViewModelTest {
     private lateinit var underTest: InviteFriendsViewModel
@@ -38,7 +40,7 @@ class InviteFriendsViewModelTest {
                 reward100Mb,
                 0L,
                 AchievementType.MEGA_ACHIEVEMENT_INVITE,
-                expirationInDays
+                expirationInDays,
             )
         ),
         awardedAchievements = emptyList(),
@@ -71,7 +73,10 @@ class InviteFriendsViewModelTest {
             initTestClass()
 
             underTest.uiState.test {
-                assertThat(awaitItem().grantStorageInBytes).isEqualTo(reward100Mb)
+                awaitItem().let {
+                    assertThat(it.grantStorageInBytes).isEqualTo(reward100Mb)
+                    assertThat(it.durationInDays).isEqualTo(expirationInDays)
+                }
             }
         }
 

@@ -64,9 +64,13 @@ class InviteFriendsViewModel @Inject constructor(
                 getAccountAchievementsOverviewUseCase()
                     .allAchievements
                     .first { it.type == AchievementType.MEGA_ACHIEVEMENT_INVITE }
-                    .grantStorageInBytes
             }.onSuccess { value ->
-                _uiState.update { it.copy(grantStorageInBytes = value) }
+                _uiState.update {
+                    it.copy(
+                        grantStorageInBytes = value.grantStorageInBytes,
+                        durationInDays = value.durationInDays
+                    )
+                }
             }.onFailure {
                 Timber.e(it)
             }

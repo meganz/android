@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -251,6 +252,38 @@ class AchievementsInfoViewModelTest {
                 val state = awaitItem()
                 assertThat(state.awardId).isEqualTo(expectedAwardId)
                 assertThat(state.awardStorageInBytes).isEqualTo(expectedRewardedStorage)
+            }
+        }
+
+    @Test
+    fun `test that durationInDays are updated correctly`() =
+        runTest {
+            val expectedAchievementType = AchievementType.MEGA_ACHIEVEMENT_MOBILE_INSTALL
+            val mockDurationInDays = 365
+
+            savedStateHandle = SavedStateHandle.Companion.invoke(
+                route = AchievementMain(achievementType = expectedAchievementType)
+            )
+
+            initViewModel(
+                achievementsOverview =
+                    AchievementsOverview(
+                        allAchievements = listOf(
+                            mock<Achievement> {
+                                on { type }.thenReturn(expectedAchievementType)
+                                on { durationInDays }.thenReturn(mockDurationInDays)
+                            }
+                        ),
+                        awardedAchievements = emptyList(),
+                        currentStorageInBytes = 0,
+                        achievedStorageFromReferralsInBytes = 0,
+                        achievedTransferFromReferralsInBytes = 0
+                    )
+            )
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.durationInDays).isEqualTo(mockDurationInDays)
             }
         }
 }

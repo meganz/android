@@ -164,9 +164,11 @@ class AchievementsOverviewViewModelTest {
     fun `test that values regarding referrals are updated as expected`() =
         runTest {
             val mockStorage = 1000L
+            val mockDurationInDays = 365
             val mockAchievement = mock<Achievement> {
                 on { type }.thenReturn(AchievementType.MEGA_ACHIEVEMENT_INVITE)
                 on { grantStorageInBytes }.thenReturn(mockStorage)
+                on { durationInDays }.thenReturn(mockDurationInDays)
             }
             val mockOverview = initAchievementsOverview(
                 allAchievements = listOf(mockAchievement),
@@ -180,6 +182,7 @@ class AchievementsOverviewViewModelTest {
                 assertThat(state.hasReferrals).isTrue()
                 assertThat(state.referralsStorage).isEqualTo(mockStorage)
                 assertThat(state.referralsAwardStorage).isEqualTo(mockStorage)
+                assertThat(state.referralsDurationInDays).isEqualTo(mockDurationInDays)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -188,9 +191,11 @@ class AchievementsOverviewViewModelTest {
     fun `test that values regarding installApp are updated as expected`() =
         runTest {
             val mockStorage = 1000L
+            val mockDurationInDays = 365
             val mockAchievement = mock<Achievement> {
                 on { type }.thenReturn(AchievementType.MEGA_ACHIEVEMENT_MOBILE_INSTALL)
                 on { grantStorageInBytes }.thenReturn(mockStorage)
+                on { durationInDays }.thenReturn(mockDurationInDays)
             }
 
             val mockAwardedAchievement = mock<AwardedAchievementInvite> {
@@ -208,6 +213,7 @@ class AchievementsOverviewViewModelTest {
                 val state = awaitItem()
                 assertThat(state.installAppStorage).isEqualTo(mockStorage)
                 assertThat(state.installAppAwardStorage).isEqualTo(mockStorage)
+                assertThat(state.installAppDurationInDays).isEqualTo(mockDurationInDays)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -216,9 +222,11 @@ class AchievementsOverviewViewModelTest {
     fun `test that values regarding installDesktop are updated as expected`() =
         runTest {
             val mockStorage = 1000L
+            val mockDurationInDays = 365
             val mockAchievement = mock<Achievement> {
                 on { type }.thenReturn(AchievementType.MEGA_ACHIEVEMENT_DESKTOP_INSTALL)
                 on { grantStorageInBytes }.thenReturn(mockStorage)
+                on { durationInDays }.thenReturn(mockDurationInDays)
             }
 
             val mockAwardedAchievement = mock<AwardedAchievementInvite> {
@@ -236,6 +244,7 @@ class AchievementsOverviewViewModelTest {
                 val state = awaitItem()
                 assertThat(state.installDesktopStorage).isEqualTo(mockStorage)
                 assertThat(state.installDesktopAwardStorage).isEqualTo(mockStorage)
+                assertThat(state.installDesktopDurationInDays).isEqualTo(mockDurationInDays)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -266,9 +275,11 @@ class AchievementsOverviewViewModelTest {
     fun `test that values regarding mega vpn free trial are updated as expected`() =
         runTest {
             val mockStorage = 1000L
+            val mockDurationInDays = 365
             val mockAchievement = mock<Achievement> {
                 on { type }.thenReturn(AchievementType.MEGA_ACHIEVEMENT_MEGA_VPN_TRIAL)
                 on { grantStorageInBytes }.thenReturn(mockStorage)
+                on { durationInDays }.thenReturn(mockDurationInDays)
             }
 
             val mockAwardedAchievement = mock<AwardedAchievementInvite> {
@@ -287,6 +298,7 @@ class AchievementsOverviewViewModelTest {
                 assertThat(state.hasMegaVPNTrial).isTrue()
                 assertThat(state.megaVPNTrialStorage).isEqualTo(mockStorage)
                 assertThat(state.megaVPNTrialAwardStorage).isEqualTo(mockStorage)
+                assertThat(state.megaVPNTrialDurationInDays).isEqualTo(mockDurationInDays)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -295,9 +307,11 @@ class AchievementsOverviewViewModelTest {
     fun `test that values regarding mega pass free trial are updated as expected`() =
         runTest {
             val mockStorage = 1000L
+            val mockDurationInDays = 365
             val mockAchievement = mock<Achievement> {
                 on { type }.thenReturn(AchievementType.MEGA_ACHIEVEMENT_MEGA_PWM_TRIAL)
                 on { grantStorageInBytes }.thenReturn(mockStorage)
+                on { durationInDays }.thenReturn(mockDurationInDays)
             }
 
             val mockAwardedAchievement = mock<AwardedAchievementInvite> {
@@ -316,6 +330,7 @@ class AchievementsOverviewViewModelTest {
                 assertThat(state.hasMegaPassTrial).isTrue()
                 assertThat(state.megaPassTrialStorage).isEqualTo(mockStorage)
                 assertThat(state.megaPassTrialAwardStorage).isEqualTo(mockStorage)
+                assertThat(state.megaPassTrialDurationInDays).isEqualTo(mockDurationInDays)
                 cancelAndIgnoreRemainingEvents()
             }
         }

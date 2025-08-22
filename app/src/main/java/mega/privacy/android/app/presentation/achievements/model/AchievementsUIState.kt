@@ -14,12 +14,15 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
  * @property hasReferrals User has any referrals accomplished
  * @property referralsStorage Storage by referrals
  * @property referralsAwardStorage Storage awarded by referrals
+ * @property referralsDurationInDays Duration in days for referrals
  * @property installAppStorage Storage by installing app
  * @property installAppAwardDaysLeft Storage awarded by installing app days left
  * @property installAppAwardStorage Storage awarded by installing app left
+ * @property installAppDurationInDays Duration in days for installing app
  * @property installDesktopStorage Storage by installing desktop
  * @property installDesktopAwardDaysLeft Storage awarded by installing desktop days left
  * @property installDesktopAwardStorage Storage awarded by installing desktop left
+ * @property installDesktopDurationInDays Duration in days for installing desktop
  * @property hasRegistrationAward User got award for registration
  * @property registrationAwardDaysLeft Storage awarded by registration days left
  * @property registrationAwardStorage Storage awarded by registration left
@@ -29,6 +32,11 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
  * @property megaPassTrialAwardStorage Storage awarded by Mega Pass trial left
  * @property megaVPNTrialAwardDaysLeft Storage awarded by Mega VPN trial days left
  * @property megaVPNTrialAwardStorage Storage awarded by Mega VPN trial left
+ * @property megaPassTrialStorage Storage by Mega Pass trial
+ * @property megaVPNTrialStorage Storage by Mega VPN trial
+ * @property megaPassTrialDurationInDays Duration in days for Mega Pass trial
+ * @property megaVPNTrialDurationInDays Duration in days for Mega VPN trial
+ * @property isFreeTrialAchievementsEnabled Is free trial achievements enabled
  *
  **/
 data class AchievementsUIState(
@@ -39,12 +47,15 @@ data class AchievementsUIState(
     val hasReferrals: Boolean = false,
     val referralsStorage: Long? = null,
     val referralsAwardStorage: Long = 0,
+    val referralsDurationInDays: Int = 365,
     val installAppStorage: Long? = null,
     val installAppAwardDaysLeft: Long? = null,
     val installAppAwardStorage: Long = 0,
+    val installAppDurationInDays: Int = 365,
     val installDesktopStorage: Long? = null,
     val installDesktopAwardDaysLeft: Long? = null,
     val installDesktopAwardStorage: Long = 0,
+    val installDesktopDurationInDays: Int = 365,
     val hasRegistrationAward: Boolean = false,
     val registrationAwardDaysLeft: Long? = null,
     val registrationAwardStorage: Long = 0,
@@ -52,9 +63,11 @@ data class AchievementsUIState(
     val megaPassTrialStorage: Long? = null,
     val megaPassTrialAwardDaysLeft: Long? = null,
     val megaPassTrialAwardStorage: Long = 0,
+    val megaPassTrialDurationInDays: Int = 365,
     val hasMegaVPNTrial: Boolean = false,
     val megaVPNTrialStorage: Long? = null,
     val megaVPNTrialAwardDaysLeft: Long? = null,
     val megaVPNTrialAwardStorage: Long = 0,
+    val megaVPNTrialDurationInDays: Int = 365,
     val isFreeTrialAchievementsEnabled: Boolean = false,
 )
