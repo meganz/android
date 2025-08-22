@@ -98,7 +98,11 @@ internal class DefaultAvatarRepositoryTest {
     fun `when globalUpdates emit OnUsersUpdate with current user then monitorMyAvatarFile emit avatar file`() =
         runTest {
             testScheduler.advanceUntilIdle()
-            whenever(cacheGateway.buildAvatarFile(any())).thenReturn(File(""))
+            val file = mock<File> {
+                on { exists() }.thenReturn(true)
+                on { absolutePath }.thenReturn("path/to/avatar.jpg")
+            }
+            whenever(cacheGateway.buildAvatarFile(any())).thenReturn(file)
             whenever(megaApiGateway.myUser).thenReturn(currentUser)
             val error = mock<MegaError> {
                 on { errorCode }.thenReturn(MegaError.API_OK)
@@ -261,6 +265,7 @@ internal class DefaultAvatarRepositoryTest {
     fun `test that getMyAvatarFile from the sdk when pass isForceRefresh as true`() = runTest {
         val expectedFile = mock<File> {
             on { absolutePath }.thenReturn("path")
+            on { exists() }.thenReturn(true)
         }
         whenever(megaApiGateway.myUser).thenReturn(currentUser)
         whenever(megaApiGateway.accountEmail).thenReturn(CURRENT_USER_EMAIL)

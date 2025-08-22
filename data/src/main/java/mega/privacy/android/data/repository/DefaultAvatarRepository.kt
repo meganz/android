@@ -91,7 +91,7 @@ internal class DefaultAvatarRepository @Inject constructor(
                 ?: return@withContext null
         return@withContext suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("getUserAvatar") {
-                avatarFile
+                avatarFile.takeIf { it.exists() }
             }
 
             megaApiGateway.getUserAvatar(
@@ -125,6 +125,7 @@ internal class DefaultAvatarRepository @Inject constructor(
                 }
             }
             return@withContext cacheGateway.buildAvatarFile(megaApiGateway.accountEmail.orEmpty() + FileConstant.JPG_EXTENSION)
+                ?.takeIf { it.exists() }
         }
 
     override suspend fun getAvatarFile(userHandle: Long, skipCache: Boolean): File =

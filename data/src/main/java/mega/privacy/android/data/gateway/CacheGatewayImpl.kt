@@ -75,7 +75,6 @@ internal class CacheGatewayImpl @Inject constructor(
 
     override suspend fun buildAvatarFile(fileName: String?) =
         fileName?.let { getCacheFile(CacheFolderConstant.AVATAR_FOLDER, it) }
-            ?.takeIf { it.exists() }
 
     override suspend fun clearAppData(excludeFileNames: Set<String>) {
         try {
