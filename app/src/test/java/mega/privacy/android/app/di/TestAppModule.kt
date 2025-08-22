@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import dagger.multibindings.ElementsIntoSet
 import kotlinx.coroutines.flow.emptyFlow
+import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueReceiver
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
@@ -16,6 +17,7 @@ import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.dialog.AppDialogsEventQueue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import org.mockito.kotlin.mock
@@ -65,4 +67,10 @@ object TestAppModule {
 
     @Provides
     fun provideDisableChatApiUseCase(): DisableChatApiUseCase = mock()
+
+    @Provides
+    fun provideAppDialogsEventQueue(): AppDialogsEventQueue = mock()
+
+    @Provides
+    fun provideAppDialogsEventQueueReceiver(): AppDialogsEventQueueReceiver = mock()
 }
