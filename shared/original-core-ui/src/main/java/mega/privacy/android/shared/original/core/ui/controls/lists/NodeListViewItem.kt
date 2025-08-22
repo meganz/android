@@ -133,7 +133,7 @@ fun NodeListViewItem(
                         contentDescription = "Selected",
                     )
                 } else {
-                    key(labelColor, isSensitive) {
+                    key(labelColor, isSensitive, icon) {
                         ThumbnailView(
                             modifier = Modifier
                                 .size(48.dp)

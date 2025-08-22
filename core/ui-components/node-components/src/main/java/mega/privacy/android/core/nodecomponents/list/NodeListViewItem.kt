@@ -174,7 +174,7 @@ fun NodeListViewItem(
             vertical = DSTokens.spacings.s3
         ),
         leadingElement = {
-            key(label) {
+            key(label, icon) {
                 NodeThumbnailView(
                     modifier = Modifier
                         .size(32.dp)
