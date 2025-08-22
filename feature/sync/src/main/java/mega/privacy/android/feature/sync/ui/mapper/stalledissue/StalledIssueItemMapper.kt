@@ -34,7 +34,7 @@ internal class StalledIssueItemMapper @Inject constructor(
         nodes: List<UnTypedNode>,
     ): StalledIssueUiItem {
         val firstNode = nodes.firstOrNull()
-        val areAllNodesFolders = nodes.all { it is FolderNode }
+        val areAllNodesFolders = nodes.isNotEmpty() && nodes.all { it is FolderNode }
         val detailedInfo = stalledIssueDetailInfoMapper(stalledIssueEntity)
         val nameAndPath =
             stalledIssueEntity.nodeNames.takeIf { it.isNotEmpty() }?.firstOrNull()?.split("/")

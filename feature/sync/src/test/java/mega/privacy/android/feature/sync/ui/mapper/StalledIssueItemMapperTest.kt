@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mockStatic
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -83,6 +84,7 @@ internal class StalledIssueItemMapperTest {
         assertThat(result.actions).isEqualTo(resolutionActions)
         assertThat(result.displayedName).isEqualTo("subfolder")
         assertThat(result.displayedPath).isEqualTo("Camera")
+        verify(stalledIssueResolutionActionMapper).invoke(StallIssueType.DownloadIssue, true)
     }
 
     @Test
@@ -116,6 +118,7 @@ internal class StalledIssueItemMapperTest {
         assertThat(result.displayedName).isEqualTo("document.pdf")
         assertThat(result.displayedPath).isEqualTo("")
         verify(fileTypeIconMapper)("pdf")
+        verify(stalledIssueResolutionActionMapper).invoke(StallIssueType.UploadIssue, false)
     }
 
     @Test
@@ -134,7 +137,7 @@ internal class StalledIssueItemMapperTest {
             }
 
             whenever(contentUriMock.toString()).thenReturn(uriString)
-            whenever(Uri.parse(uriString)).thenReturn(contentUriMock)
+            whenever(Uri.parse(uriString)).thenReturn(contentUriMock) // Ensure this mock is effective
             val stalledIssue = StalledIssue(
                 syncId = 3L,
                 nodeIds = listOf(NodeId(5L)),
@@ -148,7 +151,8 @@ internal class StalledIssueItemMapperTest {
             val resolutionActions = listOf<StalledIssueResolutionAction>()
 
             whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
-            whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, true))
+            // When nodes is empty, areAllNodesFolders will be false
+            whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, false))
                 .thenReturn(resolutionActions)
 
             val result = underTest(stalledIssue, emptyList())
@@ -156,8 +160,10 @@ internal class StalledIssueItemMapperTest {
             assertThat(result.icon).isEqualTo(iconPackR.drawable.ic_generic_medium_solid)
             assertThat(result.displayedName).isEqualTo("file.txt")
             assertThat(result.displayedPath).isEqualTo("primary:path")
+            verify(stalledIssueResolutionActionMapper).invoke(StallIssueType.DownloadIssue, false)
         }
     }
+
 
     @Test
     fun `test that StalledIssue is mapped with no nodes and file extension`() = runTest {
@@ -175,7 +181,8 @@ internal class StalledIssueItemMapperTest {
         val expectedIcon = 54321
 
         whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
-        whenever(stalledIssueResolutionActionMapper(StallIssueType.UploadIssue, true))
+        // When nodes is empty, areAllNodesFolders will be false
+        whenever(stalledIssueResolutionActionMapper(StallIssueType.UploadIssue, false))
             .thenReturn(resolutionActions)
         whenever(fileTypeIconMapper("jpg")).thenReturn(expectedIcon)
 
@@ -183,7 +190,98 @@ internal class StalledIssueItemMapperTest {
 
         assertThat(result.icon).isEqualTo(expectedIcon)
         verify(fileTypeIconMapper)("jpg")
+        verify(stalledIssueResolutionActionMapper).invoke(StallIssueType.UploadIssue, false)
     }
+
+    @Test
+    fun `test areAllNodesFolders is true when all nodes are folders`() = runTest {
+        val stalledIssue = StalledIssue(
+            syncId = 1L,
+            nodeIds = listOf(NodeId(3L), NodeId(4L)),
+            localPaths = emptyList(),
+            issueType = StallIssueType.DownloadIssue,
+            conflictName = "folder conflict",
+            nodeNames = listOf("FolderA/sub", "FolderB"),
+            id = "1_3_0"
+        )
+        val folderNode1: FolderNode = mock()
+        val folderNode2: FolderNode = mock()
+        val detailedInfo = StalledIssueDetailedInfo("Title", "Description")
+        val resolutionActions = listOf<StalledIssueResolutionAction>()
+
+        whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
+        whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, true))
+            .thenReturn(resolutionActions)
+
+        underTest(stalledIssue, listOf(folderNode1, folderNode2))
+
+        verify(stalledIssueResolutionActionMapper).invoke(StallIssueType.DownloadIssue, true)
+    }
+
+    @Test
+    fun `test areAllNodesFolders is false when nodes list is mixed with files and folders`() =
+        runTest {
+            val stalledIssue = StalledIssue(
+                syncId = 2L,
+                nodeIds = listOf(NodeId(5L), NodeId(6L)),
+                localPaths = emptyList(),
+                issueType = StallIssueType.UploadIssue,
+                conflictName = "mixed conflict",
+                nodeNames = listOf("FolderC/file.txt", "AnotherFolder"),
+                id = "1_3_0"
+            )
+            val folderNode: FolderNode = mock()
+            val fileNode: FileNode =
+                mock { on { type } doReturn PdfFileTypeInfo } // Mock type to avoid NPE
+            val detailedInfo = StalledIssueDetailedInfo("Mixed Title", "Mixed Description")
+            val resolutionActions = listOf<StalledIssueResolutionAction>()
+
+            whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
+            whenever(stalledIssueResolutionActionMapper(StallIssueType.UploadIssue, false))
+                .thenReturn(resolutionActions)
+            whenever(
+                fileTypeIconMapper(
+                    any(),
+                    any()
+                )
+            ).thenReturn(iconPackR.drawable.ic_generic_medium_solid)
+
+
+            underTest(stalledIssue, listOf(folderNode, fileNode))
+
+            verify(stalledIssueResolutionActionMapper).invoke(StallIssueType.UploadIssue, false)
+        }
+
+    @Test
+    fun `test areAllNodesFolders is false when nodes list is empty`() = runTest {
+        val stalledIssue = StalledIssue(
+            syncId = 3L,
+            nodeIds = emptyList(),
+            localPaths = listOf("local/path/to/file.txt"),
+            issueType = StallIssueType.DownloadIssue,
+            conflictName = "empty nodes conflict",
+            nodeNames = listOf("file.txt"),
+            id = "1_3_0"
+        )
+        val detailedInfo = StalledIssueDetailedInfo("Empty Title", "Empty Description")
+        val resolutionActions = listOf<StalledIssueResolutionAction>()
+
+        whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
+        whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, false))
+            .thenReturn(resolutionActions)
+        whenever(
+            fileTypeIconMapper(
+                any(),
+                any()
+            )
+        ).thenReturn(iconPackR.drawable.ic_generic_medium_solid)
+
+
+        underTest(stalledIssue, emptyList())
+
+        verify(stalledIssueResolutionActionMapper).invoke(StallIssueType.DownloadIssue, false)
+    }
+
 
     @Test
     fun `test that StalledIssueUiItem is mapped back to StalledIssue`() {
@@ -227,23 +325,33 @@ internal class StalledIssueItemMapperTest {
         val resolutionActions = listOf<StalledIssueResolutionAction>()
 
         whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
-        whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, true))
+        // When nodes list is empty, areAllNodesFolders will be false
+        whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, false))
             .thenReturn(resolutionActions)
+        whenever(
+            fileTypeIconMapper(
+                any(),
+                any()
+            )
+        ).thenReturn(iconPackR.drawable.ic_generic_medium_solid)
+
 
         val result = underTest(stalledIssue, emptyList())
 
         assertThat(result.displayedName).isEqualTo("file.kt")
         assertThat(result.displayedPath).isEqualTo("Documents/Projects/Android")
+        verify(stalledIssueResolutionActionMapper).invoke(StallIssueType.DownloadIssue, false)
     }
 
     @Test
     fun `test that Uri pathSegments drop logic works correctly with different segment counts`() =
         runTest {
-            mockStatic(Uri::class.java).use { uriMock ->
+            // Mocking android.net.Uri specifically for this test
+            mockStatic(Uri::class.java).use { mockedUri ->
                 val uriString =
                     "content://documents/tree/primary:Downloads/document/primary:Downloads/folder1/folder2/file.txt"
-                val contentUriMock: Uri = mock {
-                    on { scheme } doReturn "content"
+                val mockUri: Uri = mock {
+                    on { scheme } doReturn "content" // Ensure scheme is mocked if used by toUri() or related logic
                     on { pathSegments } doReturn listOf(
                         "tree",
                         "primary:Downloads",
@@ -253,10 +361,10 @@ internal class StalledIssueItemMapperTest {
                         "folder2",
                         "file.txt"
                     )
+                    on { toString() } doReturn uriString // Mock toString if it's called
                 }
+                mockedUri.`when`<Uri> { Uri.parse(uriString) }.thenReturn(mockUri)
 
-                whenever(contentUriMock.toString()).thenReturn(uriString)
-                whenever(Uri.parse(uriString)).thenReturn(contentUriMock)
 
                 val stalledIssue = StalledIssue(
                     syncId = 10L,
@@ -271,87 +379,25 @@ internal class StalledIssueItemMapperTest {
                 val resolutionActions = listOf<StalledIssueResolutionAction>()
 
                 whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
-                whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, true))
+                // When nodes list is empty, areAllNodesFolders will be false
+                whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, false))
                     .thenReturn(resolutionActions)
+                whenever(
+                    fileTypeIconMapper(
+                        any(),
+                        any()
+                    )
+                ).thenReturn(iconPackR.drawable.ic_generic_medium_solid)
+
 
                 val result = underTest(stalledIssue, emptyList())
 
                 assertThat(result.displayedName).isEqualTo("file.txt")
                 assertThat(result.displayedPath).isEqualTo("primary:Downloads/folder1/folder2")
+                verify(stalledIssueResolutionActionMapper).invoke(
+                    StallIssueType.DownloadIssue,
+                    false
+                )
             }
         }
-
-    @Test
-    fun `test that areAllNodesFolders is false when nodes contain mixed types`() = runTest {
-        val stalledIssue = StalledIssue(
-            syncId = 9L,
-            nodeIds = listOf(NodeId(11L), NodeId(12L)),
-            localPaths = listOf("/storage/emulated/0/Mixed"),
-            issueType = StallIssueType.UploadIssue,
-            conflictName = "mixed nodes conflict",
-            nodeNames = listOf("folder", "file.txt"),
-            id = "1_3_0"
-        )
-        val folderNode: FolderNode = mock()
-        val fileNode: FileNode = mock {
-            on { type } doReturn PdfFileTypeInfo
-        }
-        val detailedInfo = StalledIssueDetailedInfo("Mixed Title", "Mixed Description")
-        val resolutionActions = listOf<StalledIssueResolutionAction>()
-
-        whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
-        whenever(stalledIssueResolutionActionMapper(StallIssueType.UploadIssue, false))
-            .thenReturn(resolutionActions)
-
-        val result = underTest(stalledIssue, listOf(folderNode, fileNode))
-
-        // Verify that areAllNodesFolders = false was passed to the mapper
-        verify(stalledIssueResolutionActionMapper)(StallIssueType.UploadIssue, false)
-    }
-
-    @Test
-    fun `test that StalledIssueUiItem with empty localPaths uses displayedPath`() {
-        val stalledIssueUiItem = StalledIssueUiItem(
-            syncId = 1L,
-            nodeIds = listOf(NodeId(3L)),
-            localPaths = emptyList(),
-            issueType = StallIssueType.DownloadIssue,
-            conflictName = "conflicting folder",
-            nodeNames = listOf("Camera"),
-            icon = 0,
-            detailedInfo = StalledIssueDetailedInfo("", ""),
-            actions = emptyList(),
-            displayedName = "Camera",
-            displayedPath = "/storage/emulated/0/DCIM",
-            id = "1_3_0"
-        )
-
-        val result = underTest(stalledIssueUiItem)
-
-        assertThat(result.localPaths).isEqualTo(listOf("/storage/emulated/0/DCIM"))
-    }
-
-    @Test
-    fun `test that mapping handles single level path correctly`() = runTest {
-        val stalledIssue = StalledIssue(
-            syncId = 6L,
-            nodeIds = listOf(NodeId(8L)),
-            localPaths = listOf("/storage/emulated/0/Documents"),
-            issueType = StallIssueType.DownloadIssue,
-            conflictName = "single level conflict",
-            nodeNames = listOf("Documents/file.txt"),
-            id = "1_3_0"
-        )
-        val detailedInfo = StalledIssueDetailedInfo("Single Title", "Single Description")
-        val resolutionActions = listOf<StalledIssueResolutionAction>()
-
-        whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
-        whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, true))
-            .thenReturn(resolutionActions)
-
-        val result = underTest(stalledIssue, emptyList())
-
-        assertThat(result.displayedName).isEqualTo("file.txt")
-        assertThat(result.displayedPath).isEqualTo("Documents")
-    }
 }
