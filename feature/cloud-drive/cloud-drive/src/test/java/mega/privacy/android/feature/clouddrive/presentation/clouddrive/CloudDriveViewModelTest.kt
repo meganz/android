@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.testing.invoke
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -21,10 +22,6 @@ import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.account.AccountDetail
-import mega.privacy.android.domain.entity.account.AccountLevelDetail
-import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -32,15 +29,14 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -71,8 +67,7 @@ class CloudDriveViewModelTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase = mock()
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
-    private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase = mock()
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
     private val scannerHandler: ScannerHandler = mock()
@@ -97,8 +92,7 @@ class CloudDriveViewModelTest {
             getFeatureFlagValueUseCase,
             isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase,
-            monitorAccountDetailUseCase,
-            getBusinessStatusUseCase,
+            monitorHiddenNodesEnabledUseCase,
             monitorNodeUpdatesByIdUseCase,
             nodeUiItemMapper,
             scannerHandler,
@@ -114,8 +108,7 @@ class CloudDriveViewModelTest {
         getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
         monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-        monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-        getBusinessStatusUseCase = getBusinessStatusUseCase,
+        monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
         monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
         nodeUiItemMapper = nodeUiItemMapper,
         scannerHandler = scannerHandler,
@@ -148,6 +141,7 @@ class CloudDriveViewModelTest {
             )
         ).thenReturn(nodeUiItems)
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf())
     }
 
@@ -166,7 +160,7 @@ class CloudDriveViewModelTest {
             assertThat(initialState.navigateBack).isEqualTo(consumed)
             assertThat(initialState.showHiddenNodes).isFalse()
             assertThat(initialState.isHiddenNodesEnabled).isFalse()
-            assertThat(initialState.isHiddenNodesOnboarded).isFalse()
+            assertThat(initialState.isHiddenNodesOnboarded).isTrue()
         }
     }
 
@@ -771,7 +765,7 @@ class CloudDriveViewModelTest {
             false
         )
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(isHiddenNodesOnboardedUseCase()).thenReturn(true)
 
         val underTest = createViewModel()
@@ -780,7 +774,7 @@ class CloudDriveViewModelTest {
             val finalState = awaitItem()
             assertThat(finalState.showHiddenNodes).isFalse()
             assertThat(finalState.isHiddenNodesEnabled).isFalse()
-            assertThat(finalState.isHiddenNodesOnboarded).isFalse()
+            assertThat(finalState.isHiddenNodesOnboarded).isTrue()
         }
     }
 
@@ -792,7 +786,7 @@ class CloudDriveViewModelTest {
                 true
             )
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
 
             val underTest = createViewModel()
@@ -809,7 +803,7 @@ class CloudDriveViewModelTest {
         setupTestData(emptyList())
         whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
 
         val underTest = createViewModel()
@@ -822,68 +816,54 @@ class CloudDriveViewModelTest {
     }
 
     @Test
-    fun `test that monitorAccountDetail enables hidden nodes for paid account`() = runTest {
-        setupTestData(emptyList())
-        val accountLevelDetail = mock<AccountLevelDetail> {
-            on { accountType } doReturn AccountType.PRO_I
-        }
-        val accountDetail = mock<AccountDetail> {
-            on { levelDetail } doReturn accountLevelDetail
-        }
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
-        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
-        whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
-        whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
-
-        val underTest = createViewModel()
-        advanceUntilIdle()
-
-        underTest.uiState.test {
-            val finalState = awaitItem()
-            assertThat(finalState.isHiddenNodesEnabled).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that monitorAccountDetail disables hidden nodes for free account`() = runTest {
-        setupTestData(emptyList())
-        val accountLevelDetail = mock<AccountLevelDetail> {
-            on { accountType } doReturn AccountType.FREE
-        }
-        val accountDetail = mock<AccountDetail> {
-            on { levelDetail } doReturn accountLevelDetail
-        }
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
-        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
-        whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
-
-        val underTest = createViewModel()
-        advanceUntilIdle()
-
-        underTest.uiState.test {
-            val finalState = awaitItem()
-            assertThat(finalState.isHiddenNodesEnabled).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that monitorAccountDetail disables hidden nodes for expired business account`() =
+    fun `test that monitorHiddenNodesEnabledUseCase enables hidden nodes for paid account`() =
         runTest {
             setupTestData(emptyList())
-            val accountLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.BUSINESS
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn accountLevelDetail
-            }
             whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
                 true
             )
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
-            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val finalState = awaitItem()
+                assertThat(finalState.isHiddenNodesEnabled).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that monitorHiddenNodesEnabledUseCase disables hidden nodes for free account`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                true
+            )
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+            whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val finalState = awaitItem()
+                assertThat(finalState.isHiddenNodesEnabled).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that monitorHiddenNodesEnabledUseCase disables hidden nodes for expired business account`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                true
+            )
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
 
             val underTest = createViewModel()
@@ -897,21 +877,14 @@ class CloudDriveViewModelTest {
         }
 
     @Test
-    fun `test that monitorAccountDetail enables hidden nodes for active business account`() =
+    fun `test that monitorHiddenNodesEnabledUseCase enables hidden nodes for active business account`() =
         runTest {
             setupTestData(emptyList())
-            val accountLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.BUSINESS
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn accountLevelDetail
-            }
             whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
                 true
             )
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
-            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
 
             val underTest = createViewModel()
@@ -931,7 +904,7 @@ class CloudDriveViewModelTest {
                 true
             )
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(isHiddenNodesOnboardedUseCase()).thenReturn(true)
 
             val underTest = createViewModel()
@@ -951,7 +924,7 @@ class CloudDriveViewModelTest {
                 true
             )
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
 
             val underTest = createViewModel()
@@ -972,7 +945,7 @@ class CloudDriveViewModelTest {
                 true
             )
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
 
             val underTest = createViewModel()
@@ -987,14 +960,11 @@ class CloudDriveViewModelTest {
         }
 
     @Test
-    fun `test that monitorAccountDetail handles null account detail gracefully`() = runTest {
+    fun `test that monitorHiddenNodesEnabledUseCase handles disabled state gracefully`() = runTest {
         setupTestData(emptyList())
-        val accountDetail = mock<AccountDetail> {
-            on { levelDetail } doReturn null
-        }
         whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
 
         val underTest = createViewModel()
@@ -1007,17 +977,11 @@ class CloudDriveViewModelTest {
     }
 
     @Test
-    fun `test that monitorAccountDetail handles null account type gracefully`() = runTest {
+    fun `test that monitorHiddenNodesEnabledUseCase handles enabled state correctly`() = runTest {
         setupTestData(emptyList())
-        val accountLevelDetail = mock<AccountLevelDetail> {
-            on { accountType } doReturn null
-        }
-        val accountDetail = mock<AccountDetail> {
-            on { levelDetail } doReturn accountLevelDetail
-        }
         whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
         whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
 
         val underTest = createViewModel()
@@ -1025,7 +989,7 @@ class CloudDriveViewModelTest {
 
         underTest.uiState.test {
             val finalState = awaitItem()
-            assertThat(finalState.isHiddenNodesEnabled).isFalse()
+            assertThat(finalState.isHiddenNodesEnabled).isTrue()
         }
     }
 
@@ -1034,7 +998,7 @@ class CloudDriveViewModelTest {
         setupTestData(emptyList())
         whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(isHiddenNodesOnboardedUseCase()).thenThrow(RuntimeException("Test exception"))
 
         val underTest = createViewModel()
@@ -1042,7 +1006,7 @@ class CloudDriveViewModelTest {
 
         underTest.uiState.test {
             val finalState = awaitItem()
-            assertThat(finalState.isHiddenNodesOnboarded).isFalse()
+            assertThat(finalState.isHiddenNodesOnboarded).isTrue()
         }
     }
 
@@ -1050,18 +1014,11 @@ class CloudDriveViewModelTest {
     fun `test that all hidden nodes properties are updated correctly when feature flag is enabled`() =
         runTest {
             setupTestData(emptyList())
-            val accountLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.PRO_I
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn accountLevelDetail
-            }
             whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
                 true
             )
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
-            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(isHiddenNodesOnboardedUseCase()).thenReturn(true)
 
             val underTest = createViewModel()
@@ -1082,7 +1039,7 @@ class CloudDriveViewModelTest {
             false
         )
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(isHiddenNodesOnboardedUseCase()).thenReturn(true)
 
         val underTest = createViewModel()
@@ -1092,7 +1049,7 @@ class CloudDriveViewModelTest {
             val finalState = awaitItem()
             assertThat(finalState.showHiddenNodes).isFalse()
             assertThat(finalState.isHiddenNodesEnabled).isFalse()
-            assertThat(finalState.isHiddenNodesOnboarded).isFalse()
+            assertThat(finalState.isHiddenNodesOnboarded).isTrue()
         }
     }
 
@@ -1327,7 +1284,7 @@ class CloudDriveViewModelTest {
         whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
         whenever(getNodeByIdUseCase(eq(rootNodeId))).thenReturn(rootNode)
         whenever(getFileBrowserNodeChildrenUseCase(rootNodeId.longValue)).thenReturn(emptyList())
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
         whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
 
@@ -1344,7 +1301,7 @@ class CloudDriveViewModelTest {
         whenever(getRootNodeIdUseCase()).thenReturn(null)
         whenever(getNodeByIdUseCase(eq(NodeId(-1L)))).thenReturn(null)
         whenever(getFileBrowserNodeChildrenUseCase(-1L)).thenReturn(emptyList())
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
         whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
 
@@ -1361,7 +1318,7 @@ class CloudDriveViewModelTest {
         whenever(getRootNodeIdUseCase()).thenReturn(null)
         whenever(getNodeByIdUseCase(eq(NodeId(-1L)))).thenReturn(null)
         whenever(getFileBrowserNodeChildrenUseCase(-1L)).thenReturn(emptyList())
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
         whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
 
@@ -1399,7 +1356,7 @@ class CloudDriveViewModelTest {
             whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
             whenever(getNodeByIdUseCase(eq(rootNodeId))).thenReturn(rootNode)
             whenever(getFileBrowserNodeChildrenUseCase(rootNodeId.longValue)).thenReturn(emptyList())
-            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock<AccountDetail>()))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
             whenever(monitorNodeUpdatesByIdUseCase(any())).thenReturn(flowOf())
 
@@ -1412,4 +1369,232 @@ class CloudDriveViewModelTest {
                 assertThat(state.currentFolderId).isEqualTo(rootNodeId)
             }
         }
+
+    @Test
+    fun `test that setupNodesLoading loads items only once when hidden nodes feature is enabled`() =
+        runTest {
+            val node1 = mock<TypedNode> {
+                on { id } doReturn NodeId(1L)
+                on { name } doReturn "Test Node 1"
+            }
+            val node2 = mock<TypedNode> {
+                on { id } doReturn NodeId(2L)
+                on { name } doReturn "Test Node 2"
+            }
+
+            setupTestData(listOf(node1, node2))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                true
+            )
+
+            // Create flows that emit multiple times to test the conditional logic
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false, true, false))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true, false, true))
+
+            val underTest = createViewModel()
+
+            underTest.uiState.test {
+                // Initial state
+                val initialState = awaitItem()
+                assertThat(initialState.isLoading).isTrue()
+                assertThat(initialState.items).isEmpty()
+
+                // First emission: should load items and set complete state
+                val firstState = awaitItem()
+                assertThat(firstState.isLoading).isFalse()
+                assertThat(firstState.items).hasSize(2)
+                assertThat(firstState.isHiddenNodesEnabled).isFalse()
+                assertThat(firstState.showHiddenNodes).isTrue()
+
+                // Second emission: should only update hidden node flags, not reload items
+                val secondState = awaitItem()
+                assertThat(secondState.isLoading).isFalse() // Should remain false
+                assertThat(secondState.items).hasSize(2) // Should remain the same
+                assertThat(secondState.isHiddenNodesEnabled).isTrue()
+                assertThat(secondState.showHiddenNodes).isFalse()
+
+                // Third emission: should only update hidden node flags, not reload items
+                val thirdState = awaitItem()
+                assertThat(thirdState.isLoading).isFalse() // Should remain false
+                assertThat(thirdState.items).hasSize(2) // Should remain the same
+                assertThat(thirdState.isHiddenNodesEnabled).isFalse()
+                assertThat(thirdState.showHiddenNodes).isTrue()
+            }
+
+            // Verify that getFileBrowserNodeChildrenUseCase was only called once
+            verify(getFileBrowserNodeChildrenUseCase).invoke(folderNodeHandle)
+        }
+
+    @Test
+    fun `test that setupNodesLoading handles hidden node flows correctly`() = runTest {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+            on { name } doReturn "Test Node 1"
+        }
+        val node2 = mock<TypedNode> {
+            on { id } doReturn NodeId(2L)
+            on { name } doReturn "Test Node 2"
+        }
+
+        setupTestData(listOf(node1, node2))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false, true))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true, false))
+
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            // Initial state
+            val initialState = awaitItem()
+            assertThat(initialState.isLoading).isTrue()
+            assertThat(initialState.items).isEmpty()
+
+            // First emission: items loaded with initial hidden node flags
+            val firstState = awaitItem()
+            assertThat(firstState.isLoading).isFalse()
+            assertThat(firstState.items).hasSize(2)
+            assertThat(firstState.isHiddenNodesEnabled).isFalse()
+            assertThat(firstState.showHiddenNodes).isTrue()
+
+            // Second emission: hidden node flags updated
+            val secondState = awaitItem()
+            assertThat(secondState.isHiddenNodesEnabled).isTrue()
+            assertThat(secondState.showHiddenNodes).isFalse()
+
+            // Items should still be present
+            assertThat(secondState.items).hasSize(2)
+        }
+    }
+
+    @Test
+    fun `test that setupNodesLoading handles hidden node flows that emit immediately`() = runTest {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+            on { name } doReturn "Test Node 1"
+        }
+
+        setupTestData(listOf(node1))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+
+        // Flows that emit immediately
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            // Initial state
+            val initialState = awaitItem()
+            assertThat(initialState.isLoading).isTrue()
+            assertThat(initialState.items).isEmpty()
+
+            // Final state: items loaded + hidden node flags set
+            val finalState = awaitItem()
+            assertThat(finalState.isLoading).isFalse()
+            assertThat(finalState.items).hasSize(1)
+            assertThat(finalState.isHiddenNodesEnabled).isTrue()
+            assertThat(finalState.showHiddenNodes).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that setupNodesLoading handles delayed hidden node flow emissions`() = runTest {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+            on { name } doReturn "Test Node 1"
+        }
+
+        setupTestData(listOf(node1))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
+
+        // Create flows that emit after a delay
+        val hiddenNodesFlow = flowOf(false, true)
+        val showHiddenFlow = flowOf(true, false)
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(hiddenNodesFlow)
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(showHiddenFlow)
+
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            // Initial state
+            val initialState = awaitItem()
+            assertThat(initialState.isLoading).isTrue()
+            assertThat(initialState.items).isEmpty()
+
+            // First emission: should load items and set initial hidden node flags
+            val firstState = awaitItem()
+            assertThat(firstState.isLoading).isFalse()
+            assertThat(firstState.items).hasSize(1)
+            assertThat(firstState.isHiddenNodesEnabled).isFalse()
+            assertThat(firstState.showHiddenNodes).isTrue()
+
+            // Second emission: should only update hidden node flags, not reload items
+            val secondState = awaitItem()
+            assertThat(secondState.isLoading).isFalse() // Should remain false
+            assertThat(secondState.items).hasSize(1) // Should remain the same
+            assertThat(secondState.isHiddenNodesEnabled).isTrue()
+            assertThat(secondState.showHiddenNodes).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that setupNodesLoading works correctly when hidden nodes feature is disabled`() =
+        runTest {
+            val node1 = mock<TypedNode> {
+                on { id } doReturn NodeId(1L)
+                on { name } doReturn "Test Node 1"
+            }
+
+            setupTestData(listOf(node1))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(
+                false
+            )
+
+            val underTest = createViewModel()
+
+            underTest.uiState.test {
+                // Initial state
+                val initialState = awaitItem()
+                assertThat(initialState.isLoading).isTrue()
+                assertThat(initialState.items).isEmpty()
+
+                // Final state: items loaded, hidden node flags remain default
+                val finalState = awaitItem()
+                assertThat(finalState.isLoading).isFalse()
+                assertThat(finalState.items).hasSize(1)
+                assertThat(finalState.isHiddenNodesEnabled).isFalse() // Default value
+                assertThat(finalState.showHiddenNodes).isFalse() // Default value
+            }
+
+            // Note: When feature flag is disabled, hidden node monitoring methods are never called
+            // This is the expected behavior
+        }
+
+    @Test
+    fun `test that setupNodesLoading handles feature flag check failure gracefully`() = runTest {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+            on { name } doReturn "Test Node 1"
+        }
+
+        setupTestData(listOf(node1))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease))
+            .thenThrow(RuntimeException("Feature flag check failed"))
+
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            // Initial state
+            val initialState = awaitItem()
+            assertThat(initialState.isLoading).isTrue()
+            assertThat(initialState.items).isEmpty()
+
+            // Final state: items loaded, hidden node flags remain default (feature disabled path)
+            val finalState = awaitItem()
+            assertThat(finalState.isLoading).isFalse()
+            assertThat(finalState.items).hasSize(1)
+            assertThat(finalState.isHiddenNodesEnabled).isFalse() // Default value
+            assertThat(finalState.showHiddenNodes).isFalse() // Default value
+        }
+    }
 } 
