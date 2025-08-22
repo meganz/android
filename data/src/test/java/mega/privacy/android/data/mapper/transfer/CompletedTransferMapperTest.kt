@@ -95,6 +95,25 @@ class CompletedTransferMapperTest {
     }
 
     @Test
+    fun `test that when parent node is null, parent handle from transfer is used`() = runTest {
+        val transfer = mockTransfer()
+        val parentHandle = 123L
+        val node = mock<MegaNode> {
+            on { this.parentHandle } doReturn parentHandle
+        }
+        val parentNode = mock<MegaNode> {
+            on { handle } doReturn parentHandle
+        }
+
+        whenever(megaApiGateway.getMegaNodeByHandle(transfer.parentHandle)).thenReturn(null)
+        whenever(megaApiGateway.getMegaNodeByHandle(transfer.nodeHandle)).thenReturn(node)
+        whenever(megaApiGateway.getParentNode(node)).thenReturn(parentNode)
+        whenever(stringWrapper.getSizeString(any())).thenReturn("10MB")
+
+        assertThat(underTest(transfer, null).parentHandle).isEqualTo(parentHandle)
+    }
+
+    @Test
     fun `test that completed transfer mapper maps error code correctly when there is an ordinary exception`() =
         runTest {
             val transfer = mockTransfer()
@@ -227,7 +246,6 @@ class CompletedTransferMapperTest {
         path: String,
         isInShare: Boolean,
         rootNodeHandle: Long,
-        section: String,
         expected: String,
     ) =
         runTest {
@@ -304,16 +322,10 @@ class CompletedTransferMapperTest {
 
     private fun provideUploadParams() =
         Stream.of(
-            Arguments.of("/Camera Uploads", false, 4L, "Cloud drive", "Cloud drive/Camera Uploads"),
-            Arguments.of("/Rubbishbin/", false, 5L, "Rubbish bin", "Rubbish bin/Rubbish"),
-            Arguments.of(
-                "/:incoming shared",
-                true,
-                6L,
-                "Incoming shares",
-                "Incoming shares/incoming shared"
-            ),
-            Arguments.of("/Other/", false, 6L, "Other", ""),
+            Arguments.of("/Camera Uploads", false, 4L, "Cloud drive/Camera Uploads"),
+            Arguments.of("//bin/Folder one", false, 5L, "Rubbish bin/Folder one"),
+            Arguments.of("/:incoming shared", true, 6L, "Incoming shares/incoming shared"),
+            Arguments.of("/Other/", false, 6L, ""),
         )
 
     private fun mockTransfer(

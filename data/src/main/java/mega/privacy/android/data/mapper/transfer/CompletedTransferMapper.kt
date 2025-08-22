@@ -47,29 +47,31 @@ class CompletedTransferMapper @Inject constructor(
     suspend operator fun invoke(
         transfer: Transfer,
         error: MegaException?,
-    ) =
-        withContext(ioDispatcher) {
-            val isOffline = isOffline(transfer)
-            val transferPath = formatTransferPath(transfer, isOffline)
+    ) = withContext(ioDispatcher) {
+        val isOffline = isOffline(transfer)
+        val parentNode = megaApiGateway.getMegaNodeByHandle(transfer.parentHandle)
+        // If the parent node is not found because it was removed, we try to get it from the transfer node handle
+            ?: getParentNodeFromNodeHandle(transfer.nodeHandle)
+        val transferPath = formatTransferPath(transfer, parentNode, isOffline)
 
-            CompletedTransfer(
-                fileName = transfer.fileName,
-                type = transfer.transferType,
-                state = transfer.state,
-                size = getSizeString(transfer.totalBytes),
-                handle = transfer.nodeHandle,
-                isOffline = isOffline,
-                path = transferPath,
-                timestamp = deviceGateway.now,
-                error = error?.errorString,
-                errorCode = error?.let { getErrorCode(transfer, it) },
-                originalPath = transfer.localPath,
-                parentHandle = transfer.parentHandle,
-                appData = transfer.appData,
-                displayPath = getDisplayPath(transfer, isOffline).takeUnless { it.isNullOrEmpty() }
-                    ?: transferPath,
-            )
-        }
+        CompletedTransfer(
+            fileName = transfer.fileName,
+            type = transfer.transferType,
+            state = transfer.state,
+            size = getSizeString(transfer.totalBytes),
+            handle = transfer.nodeHandle,
+            isOffline = isOffline,
+            path = transferPath,
+            timestamp = deviceGateway.now,
+            error = error?.errorString,
+            errorCode = error?.let { getErrorCode(transfer, it) },
+            originalPath = transfer.localPath,
+            parentHandle = parentNode?.handle ?: transfer.parentHandle,
+            appData = transfer.appData,
+            displayPath = getDisplayPath(transfer, isOffline).takeUnless { it.isNullOrEmpty() }
+                ?: transferPath,
+        )
+    }
 
     /**
      * Get the offline value of the completed transfer
@@ -91,10 +93,14 @@ class CompletedTransferMapper @Inject constructor(
      *
      * @return a formatted String representation of the transfer path
      */
-    private suspend fun formatTransferPath(transfer: Transfer, isOffline: Boolean): String =
+    private suspend fun formatTransferPath(
+        transfer: Transfer,
+        parentNode: MegaNode?,
+        isOffline: Boolean,
+    ): String =
         when (transfer.transferType) {
             TransferType.GENERAL_UPLOAD, TransferType.CU_UPLOAD, TransferType.CHAT_UPLOAD ->
-                formatNodePath(transfer.parentHandle)
+                parentNode?.let { formatParentNodePath(it) } ?: transfer.parentPath
 
             TransferType.DOWNLOAD -> {
                 if (isOffline)
@@ -141,29 +147,33 @@ class CompletedTransferMapper @Inject constructor(
     /**
      * Format the path of a node.
      *
-     * @param handle Handle of the Node
+     * @param parentNode Parent node of the transfer.
      * @return The path of the of the Node.
      */
-    private suspend fun formatNodePath(handle: Long): String = with(megaApiGateway) {
-        val node = getMegaNodeByHandle(handle) ?: return ""
-        val path = getNodePath(node) ?: ""
+    private suspend fun formatParentNodePath(parentNode: MegaNode): String =
+        with(megaApiGateway) {
+            val path = getNodePath(parentNode) ?: ""
+            val rootParent = findRootParentNode(parentNode)
 
-        val rootParent = findRootParentNode(node)
+            return when {
+                rootParent.handle == getRootNode()?.handle ->
+                    stringWrapper.getCloudDriveSection() + path
 
-        return when {
-            rootParent.handle == getRootNode()?.handle ->
-                stringWrapper.getCloudDriveSection() + path
+                rootParent.handle == getRubbishBinNode()?.handle -> {
+                    stringWrapper.getRubbishBinSection() +
+                            path.replace("${File.separator}${File.separator}bin", "")
+                }
 
-            rootParent.handle == getRubbishBinNode()?.handle ->
-                stringWrapper.getRubbishBinSection() +
-                        path.replace("bin${File.separator}", "")
+                parentNode.isInShare || rootParent.isInShare ->
+                    stringWrapper.getTitleIncomingSharesExplorer() + File.separator +
+                            path.substring(path.indexOf(":") + 1)
 
-            node.isInShare || rootParent.isInShare ->
-                stringWrapper.getTitleIncomingSharesExplorer() + File.separator +
-                        path.substring(path.indexOf(":") + 1)
+                else -> ""
+            }.removeLastFileSeparator()
+        }
 
-            else -> ""
-        }.removeLastFileSeparator()
+    private suspend fun getParentNodeFromNodeHandle(nodeHandle: Long) = with(megaApiGateway) {
+        getMegaNodeByHandle(nodeHandle)?.let { getParentNode(it) }
     }
 
     /**
