@@ -202,10 +202,16 @@ class ChooseAccountFragment : Fragment() {
                 chooseAccountActivity.startActivity(intent)
             }
         } else {
-            val intent = Intent(requireContext(), ManagerActivity::class.java)
-                .putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
-                .putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
-                .putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
+            val intent = Intent(chooseAccountActivity, ManagerActivity::class.java).apply {
+                putExtras(chooseAccountActivity.intent)
+                putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+                if (extras?.containsKey(IntentConstants.EXTRA_NEW_ACCOUNT) != true) {
+                    putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
+                }
+                if (extras?.containsKey(ManagerActivity.NEW_CREATION_ACCOUNT) != true) {
+                    putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
+                }
+            }
 
             startActivity(intent)
         }
