@@ -28,7 +28,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * NodesView
  *
  * @param items List of [NodeUiItem]
- * @param onMenuClick three dots click
+ * @param onMenuClicked three dots click
  * @param onItemClicked callback for item click
  * @param onLongClicked callback for long item click
  * @param sortOrder the sort order of the list
@@ -52,7 +52,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 @Composable
 fun <T : TypedNode> NodesView(
     items: List<NodeUiItem<T>>,
-    onMenuClick: (NodeUiItem<T>) -> Unit,
+    onMenuClicked: (NodeUiItem<T>) -> Unit,
     onItemClicked: (NodeUiItem<T>) -> Unit,
     onLongClicked: (NodeUiItem<T>) -> Unit,
     sortOrder: String,
@@ -100,7 +100,7 @@ fun <T : TypedNode> NodesView(
             modifier = modifier,
             listContentPadding = listContentPadding,
             nodeUiItemList = visibleItems,
-            onMenuClick = onMenuClick,
+            onMenuClick = onMenuClicked,
             onItemClicked = {
                 if (it.isTakenDown && it.node !is FolderNode) {
                     showTakenDownDialog = true
@@ -127,7 +127,7 @@ fun <T : TypedNode> NodesView(
             modifier = modifier,
             listContentPadding = listContentPadding,
             nodeUiItems = visibleItems,
-            onMenuClick = onMenuClick,
+            onMenuClicked = onMenuClicked,
             onItemClicked = {
                 if (it.isTakenDown && it.node !is FolderNode) {
                     showTakenDownDialog = true
@@ -135,7 +135,7 @@ fun <T : TypedNode> NodesView(
                     onItemClicked(it)
                 }
             },
-            onLongClick = onLongClicked,
+            onLongClicked = onLongClicked,
             onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
             spanCount = spanCount,
             sortOrder = sortOrder,

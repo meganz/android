@@ -55,9 +55,9 @@ import mega.privacy.android.icon.pack.R
  * @param subtitleColor Color for the subtitle text
  * @param isInSelectionMode if true, the item is in selection mode
  * @param onMoreClicked Callback for when the more options icon is clicked
- * @param onInfoClicked Callback for when the info icon is clicked
  * @param onItemClicked Callback for when the item is clicked
  * @param onLongClicked Callback for when the item is long clicked
+ * @param onInfoClicked Callback for when the info icon is clicked
  */
 @Composable
 fun <T : TypedNode> NodeListViewItem(
@@ -67,10 +67,10 @@ fun <T : TypedNode> NodeListViewItem(
     subtitleColor: TextColor = TextColor.Secondary,
     isInSelectionMode: Boolean = false,
     highlightText: String = "",
-    onMoreClicked: (() -> Unit)? = null,
+    onMoreClicked: ((NodeUiItem<T>) -> Unit),
+    onItemClicked: (NodeUiItem<T>) -> Unit,
+    onLongClicked: ((NodeUiItem<T>) -> Unit),
     onInfoClicked: (() -> Unit)? = null,
-    onItemClicked: () -> Unit,
-    onLongClicked: (() -> Unit)? = null,
 ) {
     NodeListViewItem(
         title = nodeUiItem.title.text,
@@ -96,10 +96,10 @@ fun <T : TypedNode> NodeListViewItem(
         isSensitive = nodeUiItem.isSensitive,
         showBlurEffect = nodeUiItem.showBlurEffect,
         isHighlighted = nodeUiItem.isHighlighted,
-        onMoreClicked = onMoreClicked,
+        onMoreClicked = { onMoreClicked(nodeUiItem) },
         onInfoClicked = onInfoClicked,
-        onItemClicked = onItemClicked,
-        onLongClicked = onLongClicked,
+        onItemClicked = { onItemClicked(nodeUiItem) },
+        onLongClicked = { onLongClicked(nodeUiItem) },
     )
 }
 

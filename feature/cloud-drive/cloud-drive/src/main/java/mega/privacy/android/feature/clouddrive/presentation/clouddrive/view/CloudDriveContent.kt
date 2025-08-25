@@ -239,7 +239,7 @@ internal fun CloudDriveContent(
             items = uiState.items,
             isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
             showHiddenNodes = uiState.showHiddenNodes,
-            onMenuClick = { visibleNodeOptionId = it.id },
+            onMenuClicked = { visibleNodeOptionId = it.id },
             onItemClicked = { onAction(ItemClicked(it)) },
             onLongClicked = { onAction(ItemLongClicked(it)) },
             sortOrder = "Name", // TODO: Replace with actual sort order from state

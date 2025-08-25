@@ -58,9 +58,9 @@ import mega.privacy.android.icon.pack.R as IconPackR
  * @param modifier Optional [Modifier] to be applied to the component
  * @param isInSelectionMode Whether the grid is in selection mode (shows checkbox instead of more menu)
  * @param highlightText Text to highlight in the node name
- * @param onClick Callback invoked when the item is clicked
- * @param onLongClick Callback invoked when the item is long-pressed
- * @param onMenuClick Callback invoked when the more options menu is clicked
+ * @param onItemClicked Callback invoked when the item is clicked
+ * @param onLongClicked Callback invoked when the item is long-pressed
+ * @param onMenuClicked Callback invoked when the more options menu is clicked
  */
 @Composable
 fun <T : TypedNode> NodeGridViewItem(
@@ -68,9 +68,9 @@ fun <T : TypedNode> NodeGridViewItem(
     modifier: Modifier = Modifier,
     isInSelectionMode: Boolean = false,
     highlightText: String = "",
-    onClick: () -> Unit = {},
-    onLongClick: () -> Unit = {},
-    onMenuClick: (() -> Unit) = {},
+    onItemClicked: (NodeUiItem<T>) -> Unit,
+    onLongClicked: (NodeUiItem<T>) -> Unit,
+    onMenuClicked: (NodeUiItem<T>) -> Unit,
 ) {
     NodeGridViewItem(
         name = nodeUiItem.title.text,
@@ -84,9 +84,9 @@ fun <T : TypedNode> NodeGridViewItem(
         isFolderNode = nodeUiItem.isFolderNode,
         isVideoNode = nodeUiItem.isVideoNode,
         highlightText = highlightText,
-        onClick = onClick,
-        onLongClick = onLongClick,
-        onMenuClick = onMenuClick,
+        onClick = { onItemClicked(nodeUiItem) },
+        onLongClick = { onLongClicked(nodeUiItem) },
+        onMenuClick = { onMenuClicked(nodeUiItem) },
         isSensitive = nodeUiItem.isSensitive,
         showBlurEffect = nodeUiItem.showBlurEffect,
         isHighlighted = nodeUiItem.isHighlighted,

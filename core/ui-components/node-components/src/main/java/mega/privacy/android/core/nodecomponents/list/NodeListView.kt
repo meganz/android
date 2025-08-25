@@ -89,14 +89,13 @@ fun <T : TypedNode> NodeListView(
                 nodeUiItemList[it].id.longValue
             }
         ) {
-            val nodeUiItem = nodeUiItemList[it]
             NodeListViewItem(
-                nodeUiItem = nodeUiItem,
+                nodeUiItem = nodeUiItemList[it],
                 isInSelectionMode = inSelectionMode,
                 highlightText = highlightText,
-                onMoreClicked = { onMenuClick(nodeUiItem) }.takeUnless { _ -> inSelectionMode },
-                onItemClicked = { onItemClicked(nodeUiItem) },
-                onLongClicked = { onLongClick(nodeUiItem) },
+                onMoreClicked = onMenuClick,
+                onItemClicked = onItemClicked,
+                onLongClicked = onLongClick,
             )
         }
     }

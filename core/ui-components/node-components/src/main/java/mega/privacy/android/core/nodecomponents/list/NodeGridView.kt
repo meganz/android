@@ -40,9 +40,9 @@ import mega.privacy.android.domain.entity.node.TypedNode
 @Composable
 fun <T : TypedNode> NodeGridView(
     nodeUiItems: List<NodeUiItem<T>>,
-    onMenuClick: (NodeUiItem<T>) -> Unit,
+    onMenuClicked: (NodeUiItem<T>) -> Unit,
     onItemClicked: (NodeUiItem<T>) -> Unit,
-    onLongClick: (NodeUiItem<T>) -> Unit,
+    onLongClicked: (NodeUiItem<T>) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
     sortOrder: String,
     onSortOrderClick: () -> Unit,
@@ -93,14 +93,13 @@ fun <T : TypedNode> NodeGridView(
                 nodeUiItems[it].id.longValue
             },
         ) {
-            val nodeUiItem = nodeUiItems[it]
             NodeGridViewItem(
                 nodeUiItem = nodeUiItems[it],
                 isInSelectionMode = inSelectionMode,
                 highlightText = highlightText,
-                onClick = { onItemClicked(nodeUiItem) },
-                onLongClick = { onLongClick(nodeUiItem) },
-                onMenuClick = { onMenuClick(nodeUiItem) },
+                onItemClicked = onItemClicked,
+                onLongClicked = onLongClicked,
+                onMenuClicked = onMenuClicked,
             )
         }
     }
