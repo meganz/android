@@ -39,20 +39,25 @@ if (!shouldUsePrebuiltSdk() || isServerBuild()) {
     include(":sdk")
 }
 
-include(":core:analytics:analytics-tracker")
 include(":app")
 include(":baselineprofile")
 include(":core-test")
 include(":core-ui-test")
 include(":core:analytics:analytics-test")
+include(":core:analytics:analytics-tracker")
+include(":core:feature-flags")
 include(":core:formatter")
 include(":core:navigation-contract")
 include(":core:navigation-snowflake-components")
+include(":core:ui-components:node-components")
 include(":data")
 include(":domain")
 include(":feature:chat")
+include(":feature:cloud-drive:cloud-drive")
+include(":feature:cloud-drive:cloud-drive-snowflake-components")
 include(":feature:devicecenter")
 include(":feature:example")
+include(":feature:home:home")
 include(":feature:payment:payment")
 include(":feature:payment:payment-snowflake-components")
 include(":feature:sync")
@@ -64,10 +69,6 @@ include(":navigation")
 include(":shared:original-core-ui")
 include(":shared:resources")
 include(":shared:sync")
-include(":feature:cloud-drive:cloud-drive")
-include(":feature:cloud-drive:cloud-drive-snowflake-components")
-include(":core:ui-components:node-components")
-include(":core:feature-flags")
 include(":third-party-lib:pdfiumAndroid")
 
 
@@ -110,3 +111,4 @@ fun shouldUsePrebuiltSdk(): Boolean =
     System.getenv("USE_PREBUILT_SDK")?.let { it != "false" } ?: true
 
 fun isServerBuild(): Boolean = System.getenv("BUILD_NUMBER") != null
+
