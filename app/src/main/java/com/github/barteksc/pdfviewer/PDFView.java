@@ -757,7 +757,7 @@ public class PDFView extends RelativeLayout {
             return;
         }
 
-        if (isAlertDialogShown(pdfViewer.getTakenDownDialog()) || isRecycled()) {
+        if (isAlertDialogShown(pdfViewer.getTakenDownDialog())) {
             return;
         }
 
@@ -821,20 +821,23 @@ public class PDFView extends RelativeLayout {
                 builder.setTitle(getContext().getString(R.string.title_pdf_password))
                         .setMessage(getContext().getString(R.string.text_pdf_password, pdfViewer.getPdfFileName()))
                         .setNegativeButton(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button, (dialogInterface, i) -> pdfViewer.finish())
-                        .setPositiveButton(R.string.contact_accept, (dialogInterface, i) -> pdfViewer.reloadPDFwithPassword(passwordText.getText().toString()))
-                        .show();
+                        .setPositiveButton(R.string.contact_accept, (dialogInterface, i) -> pdfViewer.reloadPDFwithPassword(passwordText.getText().toString()));
             } else {
                 builder.setTitle(getResources().getString(R.string.general_error_word))
                         .setMessage(getResources().getString(R.string.error_max_pdf_password))
-                        .setPositiveButton(R.string.contact_accept, (dialogInterface, i) -> pdfViewer.finish())
-                        .show();
+                        .setPositiveButton(R.string.contact_accept, (dialogInterface, i) -> pdfViewer.finish());
             }
         } else {
             builder.setMessage(isOnline(pdfViewer) ? R.string.corrupt_pdf_dialog_text
-                : R.string.error_fail_to_open_file_no_network)
-                    .setPositiveButton(R.string.general_ok, (dialog, which) -> pdfViewer.finish())
-                    .show();
+                            : R.string.error_fail_to_open_file_no_network)
+                    .setPositiveButton(R.string.general_ok, (dialog, which) -> pdfViewer.finish());
         }
+        try {
+            builder.show();
+        } catch (Exception e) {
+            Timber.e(e, "PDFView.showErrorDialog: Cannot show dialog");
+        }
+
     }
 
     void loadError(Throwable t) {
