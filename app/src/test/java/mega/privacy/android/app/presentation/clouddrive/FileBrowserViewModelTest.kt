@@ -38,6 +38,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -50,6 +51,7 @@ import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibil
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.SetColoredFoldersOnboardingShownUseCase
+import mega.privacy.android.domain.usecase.UpdateNodeFavoriteUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
@@ -80,6 +82,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -115,9 +118,11 @@ class FileBrowserViewModelTest {
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
+    private val updateNodeFavoriteUseCase = mock<UpdateNodeFavoriteUseCase>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
-    private val isColoredFoldersOnboardingShownUseCase = mock<IsColoredFoldersOnboardingShownUseCase>()
+    private val isColoredFoldersOnboardingShownUseCase =
+        mock<IsColoredFoldersOnboardingShownUseCase>()
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
         onBlocking {
             invoke()
@@ -137,7 +142,8 @@ class FileBrowserViewModelTest {
     private val storageCapacityMapper = mock<StorageCapacityMapper>()
     private val setAlmostFullStorageBannerClosingTimestampUseCase =
         mock<SetAlmostFullStorageBannerClosingTimestampUseCase>()
-    private val setColoredFoldersOnboardingShownUseCase = mock<SetColoredFoldersOnboardingShownUseCase>()
+    private val setColoredFoldersOnboardingShownUseCase =
+        mock<SetColoredFoldersOnboardingShownUseCase>()
     private val monitorAlmostFullStorageBannerClosingTimestampUseCase =
         mock<MonitorAlmostFullStorageBannerVisibilityUseCase>()
     private val isInTransferOverQuotaUseCase = mock<IsInTransferOverQuotaUseCase>()
@@ -170,6 +176,7 @@ class FileBrowserViewModelTest {
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
+            updateNodeFavoriteUseCase = updateNodeFavoriteUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isColoredFoldersOnboardingShownUseCase = isColoredFoldersOnboardingShownUseCase,
@@ -780,6 +787,7 @@ class FileBrowserViewModelTest {
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
+            updateNodeFavoriteUseCase = updateNodeFavoriteUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isColoredFoldersOnboardingShownUseCase = isColoredFoldersOnboardingShownUseCase,
@@ -831,6 +839,7 @@ class FileBrowserViewModelTest {
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
+            updateNodeFavoriteUseCase = updateNodeFavoriteUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isColoredFoldersOnboardingShownUseCase = isColoredFoldersOnboardingShownUseCase,
@@ -859,20 +868,129 @@ class FileBrowserViewModelTest {
     }
 
     @Test
-    fun `test onColoredFoldersOnboardingDismissed marks onboarding as shown and updates state`() = runTest {
+    fun `test onColoredFoldersOnboardingDismissed marks onboarding as shown and updates state`() =
+        runTest {
+            // given
+            whenever(setColoredFoldersOnboardingShownUseCase()).thenReturn(Unit)
+
+            // when
+            underTest.onColoredFoldersOnboardingDismissed()
+
+            // then
+            verify(setColoredFoldersOnboardingShownUseCase).invoke()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.showColoredFoldersOnboarding).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test updateNodeFavorite calls use case correctly when adding to favorites`() = runTest {
         // given
-        whenever(setColoredFoldersOnboardingShownUseCase()).thenReturn(Unit)
+        val nodeId = NodeId(123L)
+        val isFavorite = true
 
         // when
-        underTest.onColoredFoldersOnboardingDismissed()
+        underTest.updateNodeFavorite(nodeId, isFavorite)
 
         // then
-        verify(setColoredFoldersOnboardingShownUseCase).invoke()
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.showColoredFoldersOnboarding).isFalse()
-            cancelAndIgnoreRemainingEvents()
+        verify(updateNodeFavoriteUseCase).invoke(nodeId = nodeId, isFavorite = isFavorite)
+    }
+
+    @Test
+    fun `test updateNodeFavorite calls use case correctly when removing from favorites`() =
+        runTest {
+            // given
+            val nodeId = NodeId(456L)
+            val isFavorite = false
+
+            // when
+            underTest.updateNodeFavorite(nodeId, isFavorite)
+
+            // then
+            verify(updateNodeFavoriteUseCase).invoke(nodeId = nodeId, isFavorite = isFavorite)
         }
+
+    @Test
+    fun `test updateNodeFavorite handles errors gracefully`() = runTest {
+        // given
+        val nodeId = NodeId(789L)
+        val isFavorite = true
+        val exception = RuntimeException("Test error")
+        whenever(updateNodeFavoriteUseCase.invoke(nodeId = nodeId, isFavorite = isFavorite))
+            .thenThrow(exception)
+
+        // when
+        underTest.updateNodeFavorite(nodeId, isFavorite)
+
+        // then
+        // The method should not throw an exception and should handle the error gracefully
+        // The error is logged via Timber.e() in the actual implementation
+        verify(updateNodeFavoriteUseCase).invoke(nodeId = nodeId, isFavorite = isFavorite)
+    }
+
+    @Test
+    fun `test updateNodesFavorite calls use case correctly for multiple nodes when adding to favorites`() =
+        runTest {
+            // given
+            val nodes = listOf(
+                mock<TypedNode> { on { id } doReturn NodeId(1L) },
+                mock<TypedNode> { on { id } doReturn NodeId(2L) },
+                mock<TypedNode> { on { id } doReturn NodeId(3L) }
+            )
+            val isFavorite = true
+
+            // when
+            underTest.updateNodesFavorite(nodes, isFavorite)
+
+            // then
+            verify(updateNodeFavoriteUseCase).invoke(nodeId = NodeId(1L), isFavorite = isFavorite)
+            verify(updateNodeFavoriteUseCase).invoke(nodeId = NodeId(2L), isFavorite = isFavorite)
+            verify(updateNodeFavoriteUseCase).invoke(nodeId = NodeId(3L), isFavorite = isFavorite)
+        }
+
+    @Test
+    fun `test updateNodesFavorite calls use case correctly for multiple nodes when removing from favorites`() =
+        runTest {
+            // given
+            val nodes = listOf(
+                mock<TypedNode> { on { id } doReturn NodeId(4L) },
+                mock<TypedNode> { on { id } doReturn NodeId(5L) }
+            )
+            val isFavorite = false
+
+            // when
+            underTest.updateNodesFavorite(nodes, isFavorite)
+
+            // then
+            verify(updateNodeFavoriteUseCase).invoke(nodeId = NodeId(4L), isFavorite = isFavorite)
+            verify(updateNodeFavoriteUseCase).invoke(nodeId = NodeId(5L), isFavorite = isFavorite)
+        }
+
+    @Test
+    fun `test updateNodesFavorite handles errors gracefully for individual nodes`() = runTest {
+        // given
+        val nodes = listOf(
+            mock<TypedNode> { on { id } doReturn NodeId(6L) },
+            mock<TypedNode> { on { id } doReturn NodeId(7L) }
+        )
+        val isFavorite = true
+        val exception = RuntimeException("Test error")
+
+        whenever(updateNodeFavoriteUseCase.invoke(nodeId = NodeId(6L), isFavorite = isFavorite))
+            .thenThrow(exception)
+        whenever(updateNodeFavoriteUseCase.invoke(nodeId = NodeId(7L), isFavorite = isFavorite))
+            .thenReturn(Unit)
+
+        // when
+        underTest.updateNodesFavorite(nodes, isFavorite)
+
+        // then
+        // The method should not throw an exception and should handle the error gracefully
+        // The error is logged via Timber.e() in the actual implementation
+        verify(updateNodeFavoriteUseCase).invoke(nodeId = NodeId(6L), isFavorite = isFavorite)
+        verify(updateNodeFavoriteUseCase).invoke(nodeId = NodeId(7L), isFavorite = isFavorite)
     }
 
     private suspend fun stubCommon() {
@@ -924,6 +1042,7 @@ class FileBrowserViewModelTest {
             fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase,
             monitorConnectivityUseCase,
+            updateNodeFavoriteUseCase,
             monitorStorageStateUseCase,
             getFeatureFlagValueUseCase,
             isColoredFoldersOnboardingShownUseCase,

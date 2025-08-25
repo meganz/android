@@ -98,5 +98,15 @@ enum class OptionItems {
     /**
      * Option item add to
      */
-    ADD_TO;
+    ADD_TO,
+
+    /**
+     * Option item add to favourites clicked
+     */
+    ADD_TO_FAVOURITES_CLICKED,
+
+    /**
+     * Option item remove from favourites clicked
+     */
+    REMOVE_FROM_FAVOURITES_CLICKED;
 }

@@ -474,6 +474,9 @@ class LinksComposeFragment : Fragment() {
 
                 OptionItems.HIDE_CLICKED, OptionItems.UNHIDE_CLICKED -> {}
 
+                // Favorite actions not supported in links compose
+                OptionItems.ADD_TO_FAVOURITES_CLICKED, OptionItems.REMOVE_FROM_FAVOURITES_CLICKED -> {}
+
                 OptionItems.COPY_CLICKED -> {
                     val nC = NodeController(requireActivity())
                     nC.chooseLocationToCopyNodes(viewModel.state.value.selectedNodeHandles)

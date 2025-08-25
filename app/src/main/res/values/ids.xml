@@ -3,4 +3,5 @@
     <item name="pass_code" type="id" />
     <item name="legacy_psa" type="id" />
     <item name="legacy_container" type="id" />
+    <item name="cab_menu_add_favourites" type="id" />
 </resources>

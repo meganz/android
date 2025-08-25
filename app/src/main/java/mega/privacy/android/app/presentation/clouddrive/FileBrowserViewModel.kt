@@ -57,6 +57,7 @@ import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibil
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.SetColoredFoldersOnboardingShownUseCase
+import mega.privacy.android.domain.usecase.UpdateNodeFavoriteUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
@@ -118,6 +119,7 @@ class FileBrowserViewModel @Inject constructor(
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val updateNodeFavoriteUseCase: UpdateNodeFavoriteUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isColoredFoldersOnboardingShownUseCase: IsColoredFoldersOnboardingShownUseCase,
@@ -951,6 +953,30 @@ class FileBrowserViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e(it)
                 }
+            }
+        }
+    }
+
+    /**
+     * Update node favorite status
+     */
+    fun updateNodeFavorite(nodeId: NodeId, isFavorite: Boolean) = viewModelScope.launch {
+        runCatching {
+            updateNodeFavoriteUseCase(nodeId = nodeId, isFavorite = isFavorite)
+        }.onFailure {
+            Timber.e(it, "Error updating node favorite status")
+        }
+    }
+
+    /**
+     * Update multiple nodes favorite status
+     */
+    fun updateNodesFavorite(nodes: List<TypedNode>, isFavorite: Boolean) = viewModelScope.launch {
+        nodes.forEach { node ->
+            runCatching {
+                updateNodeFavoriteUseCase(nodeId = node.id, isFavorite = isFavorite)
+            }.onFailure {
+                Timber.e(it, "Error updating node favorite status for node ${node.id}")
             }
         }
     }

@@ -107,6 +107,7 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.app.features.CloudDriveFeature
 import mega.privacy.android.feature.sync.ui.SyncIssueNotificationViewModel
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
@@ -712,6 +713,7 @@ class CloudDriveSyncsFragment : Fragment() {
 
                     handleHiddenNodes(selected, nodeList, menu)
                     handleAddToAlbum(selected, nodeList, menu)
+                    handleFavourites(selected, nodeList, menu)
                 }.onFailure {
                     Timber.e(it)
                 }
@@ -804,6 +806,36 @@ class CloudDriveSyncsFragment : Fragment() {
                 it.handleShowingAds()
                 actionMode = null
             }
+        }
+
+        private suspend fun handleFavourites(
+            selected: List<Long>,
+            nodeList: List<NodeUIItem<TypedNode>>,
+            menu: Menu,
+        ) {
+            // Check if the bugfix for allowing favorite in multiple selection is enabled
+            val isFavoriteMultipleSelectionEnabled = runCatching {
+                getFeatureFlagValueUseCase(CloudDriveFeature.FAVORITE_MULTIPLE_SELECTION)
+            }.getOrNull() ?: false
+
+            // Only show favorite options when the feature is enabled
+            if (!isFavoriteMultipleSelectionEnabled) {
+                menu.findItem(R.id.cab_menu_add_favourites)?.isVisible = false
+                menu.findItem(R.id.cab_menu_remove_favourites)?.isVisible = false
+                return
+            }
+
+            val selectedNodes = nodeList.filter { it.id.longValue in selected }
+
+            // Count how many are favorites and how many are not
+            val favouriteCount = selectedNodes.count { it.node.isFavourite }
+            val nonFavouriteCount = selectedNodes.size - favouriteCount
+
+            // Show "Add to favourites" if any item is not a favourite
+            menu.findItem(R.id.cab_menu_add_favourites)?.isVisible = nonFavouriteCount > 0
+
+            // Show "Remove from favourites" if all items are favourites
+            menu.findItem(R.id.cab_menu_remove_favourites)?.isVisible = favouriteCount == selectedNodes.size && selectedNodes.isNotEmpty()
         }
     }
 
@@ -954,6 +986,24 @@ class CloudDriveSyncsFragment : Fragment() {
                         putExtra("type", 1)
                     }
                     addToAlbumLauncher.launch(intent)
+                    disableSelectMode()
+                }
+
+                OptionItems.ADD_TO_FAVOURITES_CLICKED -> {
+                    // Add selected nodes to favourites
+                    fileBrowserViewModel.updateNodesFavorite(
+                        nodes = it.selectedNode,
+                        isFavorite = true
+                    )
+                    disableSelectMode()
+                }
+
+                OptionItems.REMOVE_FROM_FAVOURITES_CLICKED -> {
+                    // Remove selected nodes from favourites
+                    fileBrowserViewModel.updateNodesFavorite(
+                        nodes = it.selectedNode,
+                        isFavorite = false
+                    )
                     disableSelectMode()
                 }
             }

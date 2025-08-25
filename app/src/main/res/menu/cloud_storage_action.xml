@@ -184,8 +184,22 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/cab_menu_add_favourites"
+        android:icon="@drawable/ic_star_medium_thin_outline"
+        android:orderInCategory="235"
+        android:title="@string/file_properties_favourite"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
+
+    <item
         android:id="@+id/cab_menu_remove_favourites"
+        android:icon="@drawable/ic_star_medium_thin_outline"
         android:orderInCategory="240"
-        android:title="@string/action_remove_favourites"
-        app:showAsAction="never" />
+        android:title="@string/file_properties_unfavourite"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 </menu>

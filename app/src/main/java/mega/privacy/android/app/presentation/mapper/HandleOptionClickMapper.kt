@@ -57,6 +57,8 @@ class HandleOptionClickMapper @Inject constructor(
             R.id.cab_menu_leave_share -> OptionItems.LEAVE_SHARE_CLICKED
             R.id.cab_menu_add_to_album -> OptionItems.ADD_TO_ALBUM
             R.id.cab_menu_add_to -> OptionItems.ADD_TO
+            R.id.cab_menu_add_favourites -> OptionItems.ADD_TO_FAVOURITES_CLICKED
+            R.id.cab_menu_remove_favourites -> OptionItems.REMOVE_FROM_FAVOURITES_CLICKED
             else -> OptionItems.CLEAR_ALL_CLICKED
         }
         return OptionsItemInfo(
