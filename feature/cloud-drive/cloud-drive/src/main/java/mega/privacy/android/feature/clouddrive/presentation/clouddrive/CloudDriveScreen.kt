@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,7 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
@@ -34,6 +35,7 @@ import mega.privacy.android.shared.original.core.ui.model.TopAppBarActionWithCli
  * @param onTransfer Callback to handle transfer events
  * @param viewModel ViewModel for managing the state of the Cloud Drive screen
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CloudDriveScreen(
     navigationHandler: NavigationHandler,
@@ -53,7 +55,7 @@ fun CloudDriveScreen(
         viewModel.processAction(DeselectAllItems)
     }
 
-    MegaScaffold(
+    MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(

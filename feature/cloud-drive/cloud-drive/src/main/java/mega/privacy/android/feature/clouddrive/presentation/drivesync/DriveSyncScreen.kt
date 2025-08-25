@@ -139,9 +139,9 @@ internal fun DriveSyncScreen(
             hideTabs = cloudDriveUiState.isInSelectionMode,
             pagerScrollEnabled = !cloudDriveUiState.isInSelectionMode,
             cells = {
-                addTextTabWithLazyListState(
+                addTextTab(
                     tabItem = TabItems(stringResource(sharedR.string.general_section_cloud_drive)),
-                ) { _, _, modifier ->
+                ) {
                     CloudDriveContent(
                         navigationHandler = navigationHandler,
                         contentPadding = PaddingValues(
@@ -161,9 +161,9 @@ internal fun DriveSyncScreen(
                         onRenameNode = onRenameNode,
                     )
                 }
-                addTextTabWithLazyListState(
+                addTextTab(
                     tabItem = TabItems(stringResource(sharedR.string.general_syncs)),
-                ) { _, _, modifier ->
+                ) {
                     SyncListRoute(
                         applyRevampStyles = true,
                         isInCloudDrive = true,
