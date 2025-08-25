@@ -1177,50 +1177,10 @@ object MegaNodeUtil {
             if (isIntentAvailable(context, viewIntent)) {
                 activityLauncher.launchActivity(viewIntent)
             } else {
-                sendFile(
-                    context,
-                    nodeName,
-                    localPath,
-                    activityLauncher,
-                    snackbarShower
-                )
+                snackbarShower.showSnackbar(context.getString(R.string.intent_not_available))
             }
         } catch (e: Exception) {
             snackbarShower.showSnackbar(context.getString(R.string.general_already_downloaded))
-        }
-    }
-
-    /**
-     * Create an Intent with ACTION_SEND for an auto play file.
-     *
-     * @param context Android context
-     * @param nodeName Name of the node.
-     * @param localPath Local path of the node.
-     * @param activityLauncher interface to launch activity
-     * @param snackbarShower interface to show snackbar
-     */
-    private fun sendFile(
-        context: Context,
-        nodeName: String,
-        localPath: String,
-        activityLauncher: ActivityLauncher,
-        snackbarShower: SnackbarShower,
-    ) {
-        val intentShare = Intent(Intent.ACTION_SEND)
-
-        if (!setLocalIntentParams(
-                context, nodeName, intentShare,
-                localPath, false, snackbarShower
-            )
-        ) {
-            return
-        }
-
-        intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        if (isIntentAvailable(context, intentShare)) {
-            activityLauncher.launchActivity(intentShare)
-        } else {
-            snackbarShower.showSnackbar(context.getString(R.string.intent_not_available))
         }
     }
 
