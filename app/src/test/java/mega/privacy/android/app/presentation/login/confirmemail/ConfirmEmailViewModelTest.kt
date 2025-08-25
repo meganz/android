@@ -2,10 +2,13 @@ package mega.privacy.android.app.presentation.login.confirmemail
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.presentation.login.confirmemail.mapper.ResendSignUpLinkErrorMapper
+import mega.privacy.android.app.presentation.login.confirmemail.model.ResendSignUpLinkError
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.MegaException
@@ -21,11 +24,16 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -39,6 +47,8 @@ class ConfirmEmailViewModelTest {
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock {
         onBlocking { invoke() } doReturn emptyFlow()
     }
+
+    private val resendSignUpLinkErrorMapper = ResendSignUpLinkErrorMapper()
 
     private lateinit var underTest: ConfirmEmailViewModel
 
@@ -60,7 +70,8 @@ class ConfirmEmailViewModelTest {
             cancelCreateAccountUseCase = cancelCreateAccountUseCase,
             saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
             monitorEphemeralCredentialsUseCase = monitorEphemeralCredentialsUseCase,
-            monitorThemeModeUseCase = monitorThemeModeUseCase
+            monitorThemeModeUseCase = monitorThemeModeUseCase,
+            resendSignUpLinkErrorMapper = resendSignUpLinkErrorMapper
         )
     }
 
@@ -98,42 +109,63 @@ class ConfirmEmailViewModelTest {
             }
         }
 
-    @Test
-    fun `test that account exist event is triggered when AccountAlreadyExists is thrown`() =
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideCreateAccountException")
+    fun `test that the correct resend signup error is triggered for`(error: CreateAccountException) =
         runTest {
             whenever(
                 resendSignUpLinkUseCase(
                     email = email,
                     fullName = fullName
                 )
-            ).thenAnswer {
-                throw CreateAccountException.AccountAlreadyExists
-            }
+            ) doAnswer { throw error }
 
             underTest.resendSignUpLink(email = email, fullName = fullName)
 
             underTest.uiState.test {
-                assertThat(expectMostRecentItem().accountExistEvent).isEqualTo(triggered)
+                val expected = when (error) {
+                    is CreateAccountException.AccountAlreadyExists -> {
+                        ResendSignUpLinkError.AccountExists
+                    }
+
+                    is CreateAccountException.TooManyAttemptsException -> {
+                        ResendSignUpLinkError.TooManyAttempts
+                    }
+
+                    else -> {
+                        ResendSignUpLinkError.Unknown
+                    }
+                }
+                assertThat(expectMostRecentItem().resendSignUpLinkError).isEqualTo(
+                    triggered(
+                        expected
+                    )
+                )
             }
         }
 
+    private fun provideCreateAccountException() = Stream.of(
+        Arguments.of(CreateAccountException.AccountAlreadyExists),
+        Arguments.of(CreateAccountException.TooManyAttemptsException),
+        Arguments.of(CreateAccountException.Unknown(MegaException(1, null)))
+    )
 
     @Test
-    fun `test that general error event is triggered when unknown exception is thrown`() =
-        runTest {
-            whenever(
-                resendSignUpLinkUseCase(
-                    email = email,
-                    fullName = fullName
-                )
-            ) doThrow RuntimeException("Unknown error")
+    fun `test that the resend signup link error is successfully consumed`() = runTest {
+        whenever(
+            resendSignUpLinkUseCase(
+                email = email,
+                fullName = fullName
+            )
+        ) doAnswer { throw CreateAccountException.AccountAlreadyExists }
 
-            underTest.resendSignUpLink(email = email, fullName = fullName)
+        underTest.resendSignUpLink(email = email, fullName = fullName)
+        underTest.onResendSignUpLinkErrorConsumed()
 
-            underTest.uiState.test {
-                assertThat(expectMostRecentItem().generalErrorEvent).isEqualTo(triggered)
-            }
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().resendSignUpLinkError).isEqualTo(consumed())
         }
+    }
 
     @Test
     fun `test that isCreatingAccountCancelled is updated after successfully cancelling the registration process`() =

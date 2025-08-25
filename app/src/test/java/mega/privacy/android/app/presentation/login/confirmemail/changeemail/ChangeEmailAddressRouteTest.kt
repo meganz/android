@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
+import mega.privacy.android.app.presentation.login.confirmemail.model.ResendSignUpLinkError
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test
@@ -91,7 +92,13 @@ class ChangeEmailAddressRouteTest {
     @Test
     fun `test that the correct error message for account exists is displayed`() {
         with(composeRule) {
-            setScreen(uiState = ChangeEmailAddressUIState(accountExistEvent = triggered))
+            setScreen(
+                uiState = ChangeEmailAddressUIState(
+                    resendSignUpLinkError = triggered(
+                        ResendSignUpLinkError.AccountExists
+                    )
+                )
+            )
 
             val text = context.getString(R.string.sign_up_account_existed_error_message)
             onNodeWithText(text).assertIsDisplayed()
@@ -128,13 +135,44 @@ class ChangeEmailAddressRouteTest {
         }
     }
 
+    @Test
+    fun `test that the correct error message for too many attempts is displayed`() {
+        with(composeRule) {
+            setScreen(
+                uiState = ChangeEmailAddressUIState(
+                    resendSignUpLinkError = triggered(
+                        ResendSignUpLinkError.TooManyAttempts
+                    )
+                )
+            )
+
+            val text = context.getString(R.string.resend_signup_link_error)
+            onNodeWithText(text).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that the correct error message for an unknown error is displayed`() {
+        with(composeRule) {
+            setScreen(
+                uiState = ChangeEmailAddressUIState(
+                    resendSignUpLinkError = triggered(
+                        ResendSignUpLinkError.Unknown
+                    )
+                )
+            )
+
+            val text = context.getString(R.string.general_request_failed_message)
+            onNodeWithText(text).assertIsDisplayed()
+        }
+    }
+
     private fun ComposeContentTestRule.setScreen(
         uiState: ChangeEmailAddressUIState = ChangeEmailAddressUIState(),
         onEmailInputChanged: (String?) -> Unit = {},
         onChangeEmailPressed: () -> Unit = {},
-        onResetGeneralErrorEvent: () -> Unit = {},
+        onResendSignUpLinkErrorConsumed: () -> Unit = {},
         onResetChangeEmailAddressSuccessEvent: () -> Unit = {},
-        onResetAccountExistEvent: () -> Unit = {},
         onChangeEmailSuccess: (String) -> Unit = {},
     ) {
         setContent {
@@ -142,9 +180,8 @@ class ChangeEmailAddressRouteTest {
                 uiState = uiState,
                 onEmailInputChanged = onEmailInputChanged,
                 onChangeEmailPressed = onChangeEmailPressed,
-                onResetGeneralErrorEvent = onResetGeneralErrorEvent,
+                onResendSignUpLinkErrorConsumed = onResendSignUpLinkErrorConsumed,
                 onResetChangeEmailAddressSuccessEvent = onResetChangeEmailAddressSuccessEvent,
-                onResetAccountExistEvent = onResetAccountExistEvent,
                 onChangeEmailSuccess = onChangeEmailSuccess
             )
         }

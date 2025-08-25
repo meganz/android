@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -111,6 +112,7 @@ private fun NewConfirmEmailRoute(
     onNavigateToHelpCentre: () -> Unit,
     viewModel: ConfirmEmailViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -147,25 +149,12 @@ private fun NewConfirmEmailRoute(
         }
     }
 
-    val accountExistMessage =
-        stringResource(id = sharedR.string.sign_up_account_existed_error_message)
     EventEffect(
-        event = uiState.accountExistEvent,
-        onConsumed = viewModel::resetAccountExistEvent
+        event = uiState.resendSignUpLinkError,
+        onConsumed = viewModel::onResendSignUpLinkErrorConsumed
     ) {
         snackBarHostState.showSnackbar(
-            message = accountExistMessage
-        )
-    }
-
-    val generalErrorMessage = stringResource(id = sharedR.string.general_request_failed_message)
-    EventEffect(
-        event = uiState.generalErrorEvent,
-        onConsumed = viewModel::resetGeneralErrorEvent
-    ) {
-
-        snackBarHostState.showSnackbar(
-            message = generalErrorMessage
+            message = context.getString(it.messageId)
         )
     }
 

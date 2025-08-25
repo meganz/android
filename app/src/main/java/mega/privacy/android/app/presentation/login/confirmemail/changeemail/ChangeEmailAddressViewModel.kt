@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.exception.account.CreateAccountException
+import mega.privacy.android.app.presentation.login.confirmemail.mapper.ResendSignUpLinkErrorMapper
 import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.login.confirmemail.ResendSignUpLinkUseCase
 import javax.inject.Inject
@@ -21,6 +21,7 @@ internal class ChangeEmailAddressViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val isEmailValidUseCase: IsEmailValidUseCase,
     private val resendSignUpLinkUseCase: ResendSignUpLinkUseCase,
+    private val resendSignUpLinkErrorMapper: ResendSignUpLinkErrorMapper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChangeEmailAddressUIState())
@@ -35,10 +36,6 @@ internal class ChangeEmailAddressViewModel @Inject constructor(
         _uiState.update {
             it.copy(email = savedStateHandle[EMAIL] ?: "")
         }
-    }
-
-    fun resetGeneralErrorEvent() {
-        _uiState.update { it.copy(generalErrorEvent = consumed) }
     }
 
     fun resetChangeEmailAddressSuccessEvent() {
@@ -62,37 +59,38 @@ internal class ChangeEmailAddressViewModel @Inject constructor(
         return isEmailValid
     }
 
-    fun changeEmailAddress() = viewModelScope.launch {
-        val email = savedStateHandle[EMAIL] ?: ""
-        val fullName = savedStateHandle[FULL_NAME] ?: ""
-        if (validateEmail(email).not()) {
-            return@launch
-        }
-        _uiState.update {
-            it.copy(isLoading = true)
-        }
-        runCatching {
-            resendSignUpLinkUseCase(email = email, fullName = fullName)
-        }.onSuccess {
-            _uiState.update {
-                it.copy(changeEmailAddressSuccessEvent = triggered, isLoading = false)
+    fun changeEmailAddress() {
+        viewModelScope.launch {
+            val email = savedStateHandle[EMAIL] ?: ""
+            val fullName = savedStateHandle[FULL_NAME] ?: ""
+            if (validateEmail(email).not()) {
+                return@launch
             }
-        }.onFailure { e ->
-            if (e is CreateAccountException.AccountAlreadyExists) {
+            _uiState.update {
+                it.copy(isLoading = true)
+            }
+            runCatching {
+                resendSignUpLinkUseCase(email = email, fullName = fullName)
+            }.onSuccess {
                 _uiState.update {
-                    it.copy(accountExistEvent = triggered, isLoading = false)
+                    it.copy(changeEmailAddressSuccessEvent = triggered, isLoading = false)
                 }
-            } else {
+            }.onFailure { exception ->
+                val error = resendSignUpLinkErrorMapper(exception = exception)
                 _uiState.update {
-                    it.copy(generalErrorEvent = triggered, isLoading = false)
+                    it.copy(
+                        resendSignUpLinkError = triggered(error),
+                        isLoading = false
+                    )
                 }
             }
         }
     }
 
-    fun resetAccountExistEvent() {
-        _uiState.update {
-            it.copy(accountExistEvent = consumed)
-        }
+    /**
+     * Consume the resend signup link error event.
+     */
+    internal fun onResendSignUpLinkErrorConsumed() {
+        _uiState.update { it.copy(resendSignUpLinkError = consumed()) }
     }
 }

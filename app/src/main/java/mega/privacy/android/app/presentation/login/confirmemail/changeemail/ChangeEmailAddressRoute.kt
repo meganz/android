@@ -57,6 +57,7 @@ import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.app.presentation.login.confirmemail.model.ResendSignUpLinkError
 import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -109,9 +110,8 @@ private fun ChangeEmailAddressRoute(
         uiState = uiState,
         onChangeEmailPressed = viewModel::changeEmailAddress,
         onEmailInputChanged = viewModel::onEmailInputChanged,
-        onResetGeneralErrorEvent = viewModel::resetGeneralErrorEvent,
+        onResendSignUpLinkErrorConsumed = viewModel::onResendSignUpLinkErrorConsumed,
         onResetChangeEmailAddressSuccessEvent = viewModel::resetChangeEmailAddressSuccessEvent,
-        onResetAccountExistEvent = viewModel::resetAccountExistEvent,
         onChangeEmailSuccess = onChangeEmailSuccess,
     )
 }
@@ -122,9 +122,8 @@ internal fun ChangeEmailAddressScreen(
     uiState: ChangeEmailAddressUIState,
     onEmailInputChanged: (String?) -> Unit,
     onChangeEmailPressed: () -> Unit,
-    onResetGeneralErrorEvent: () -> Unit,
+    onResendSignUpLinkErrorConsumed: () -> Unit,
     onResetChangeEmailAddressSuccessEvent: () -> Unit,
-    onResetAccountExistEvent: () -> Unit,
     onChangeEmailSuccess: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -139,10 +138,6 @@ internal fun ChangeEmailAddressScreen(
     val isPhoneLandscape =
         orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
 
-    EventEffect(event = uiState.generalErrorEvent, onConsumed = onResetGeneralErrorEvent) {
-        snackBarHostState.showSnackbar(context.getString(sharedR.string.general_request_failed_message))
-    }
-
     EventEffect(
         event = uiState.changeEmailAddressSuccessEvent,
         onConsumed = onResetChangeEmailAddressSuccessEvent
@@ -150,9 +145,16 @@ internal fun ChangeEmailAddressScreen(
         onChangeEmailSuccess(email)
     }
 
-    EventEffect(event = uiState.accountExistEvent, onConsumed = onResetAccountExistEvent) {
-        accountExists = true
+    EventEffect(
+        event = uiState.resendSignUpLinkError,
+        onConsumed = onResendSignUpLinkErrorConsumed
+    ) {
+        when (it) {
+            ResendSignUpLinkError.AccountExists -> accountExists = true
+            else -> snackBarHostState.showSnackbar(message = context.getString(it.messageId))
+        }
     }
+
     MegaScaffold(
         modifier = modifier
             .systemBarsPadding()
@@ -266,9 +268,8 @@ private fun ChangeEmailAddressPreview() {
             uiState = ChangeEmailAddressUIState(),
             onEmailInputChanged = {},
             onChangeEmailPressed = { String.toString() },
-            onResetGeneralErrorEvent = {},
+            onResendSignUpLinkErrorConsumed = {},
             onResetChangeEmailAddressSuccessEvent = {},
-            onResetAccountExistEvent = {},
             onChangeEmailSuccess = {}
         )
     }
@@ -282,9 +283,8 @@ private fun ChangeEmailAddressTabletPreview() {
             uiState = ChangeEmailAddressUIState(),
             onEmailInputChanged = {},
             onChangeEmailPressed = { String.toString() },
-            onResetGeneralErrorEvent = {},
+            onResendSignUpLinkErrorConsumed = {},
             onResetChangeEmailAddressSuccessEvent = {},
-            onResetAccountExistEvent = {},
             onChangeEmailSuccess = {}
         )
     }

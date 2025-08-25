@@ -1469,4 +1469,6 @@
         <item quantity="one">%1$d user invited, but one or more users have already invited you</item>
         <item quantity="other">%1$d users invited, but one or more users have already invited you</item>
     </plurals>
+    <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
+    <string name="resend_signup_link_error">Email already sent. Please wait a few minutes before trying again.</string>
 </resources>

@@ -9,8 +9,18 @@ sealed class CreateAccountException(message: String) : Exception(message) {
     /**
      * The account already exists
      */
-    object AccountAlreadyExists :
-        CreateAccountException("Account already exists")
+    data object AccountAlreadyExists :
+        CreateAccountException("Account already exists") {
+        private fun readResolve(): Any = AccountAlreadyExists
+    }
+
+    /**
+     * Too many attempts.
+     */
+    data object TooManyAttemptsException :
+        CreateAccountException("Too many concurrent connections or transfers") {
+        private fun readResolve(): Any = TooManyAttemptsException
+    }
 
     /**
      * Other unknown error

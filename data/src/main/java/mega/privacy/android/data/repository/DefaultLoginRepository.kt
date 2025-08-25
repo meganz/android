@@ -425,6 +425,10 @@ internal class DefaultLoginRepository @Inject constructor(
                                 Result.failure(CreateAccountException.AccountAlreadyExists)
                             )
 
+                            MegaError.API_ETOOMANY -> continuation.resumeWith(
+                                Result.failure(CreateAccountException.TooManyAttemptsException)
+                            )
+
                             else -> continuation.failWithError(error, "resendSignupLink")
                         }
                     }

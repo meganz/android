@@ -802,6 +802,35 @@ class DefaultLoginRepositoryTest {
     }
 
     @Test
+    fun `resendSignupLink throws TooManyAttemptsException when API_ETOOMANY error occurs`() =
+        runTest {
+            val email = "test@test.com"
+            val fullName = "fullName"
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_ETOOMANY)
+                on { errorString }.thenReturn("Too many concurrent connections or transfers")
+            }
+            whenever(
+                megaApiGateway.resendSignupLink(
+                    eq(email),
+                    eq(fullName),
+                    any()
+                )
+            ).thenAnswer {
+                ((it.arguments.last()) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    error,
+                )
+            }
+
+            val exception = assertThrows<CreateAccountException.TooManyAttemptsException> {
+                underTest.resendSignupLink(email, fullName)
+            }
+            assertThat(exception.message).isEqualTo("Too many concurrent connections or transfers")
+        }
+
+    @Test
     fun `test that logout successfully then credentialsPreferencesGateway calls clear`() = runTest {
         val error = mock<MegaError> {
             on { errorCode }.thenReturn(MegaError.API_OK)

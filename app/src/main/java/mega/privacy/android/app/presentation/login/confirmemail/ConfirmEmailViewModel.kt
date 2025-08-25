@@ -11,9 +11,9 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.login.confirmemail.mapper.ResendSignUpLinkErrorMapper
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailUiState
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CancelCreateAccountUseCase
 import mega.privacy.android.domain.usecase.createaccount.MonitorAccountConfirmationUseCase
@@ -35,6 +35,7 @@ class ConfirmEmailViewModel @Inject constructor(
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase,
     private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
+    private val resendSignUpLinkErrorMapper: ResendSignUpLinkErrorMapper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ConfirmEmailUiState())
@@ -87,17 +88,10 @@ class ConfirmEmailViewModel @Inject constructor(
                     updateRegisteredEmail(email)
                     showSuccessSnackBar()
                 }
-                .onFailure { error ->
-                    Timber.e("Failed to re-send the sign up link: ${error.message}")
-                    when (error) {
-                        is CreateAccountException.AccountAlreadyExists -> {
-                            _uiState.update { it.copy(accountExistEvent = triggered) }
-                        }
-
-                        else -> {
-                            _uiState.update { it.copy(generalErrorEvent = triggered) }
-                        }
-                    }
+                .onFailure { exception ->
+                    Timber.e("Failed to re-send the sign up link: ${exception.message}")
+                    val error = resendSignUpLinkErrorMapper(exception = exception)
+                    _uiState.update { it.copy(resendSignUpLinkError = triggered(error)) }
                 }
             _uiState.update { it.copy(isLoading = false) }
         }
@@ -112,7 +106,7 @@ class ConfirmEmailViewModel @Inject constructor(
                     _uiState.update { it.copy(isCreatingAccountCancelled = true) }
                 }
                 .onFailure { error ->
-                    Timber.e("Failed to cancel the registration process", error)
+                    Timber.e(error, "Failed to cancel the registration process")
                     if (error is MegaException) {
                         error.errorString?.let {
                             showSnackBar(it)
@@ -157,17 +151,10 @@ class ConfirmEmailViewModel @Inject constructor(
     }
 
     /**
-     * Reset the account exist event
+     * Consume the resend signup link error event.
      */
-    fun resetAccountExistEvent() {
-        _uiState.update { it.copy(accountExistEvent = consumed) }
-    }
-
-    /**
-     * Reset the general error event
-     */
-    fun resetGeneralErrorEvent() {
-        _uiState.update { it.copy(generalErrorEvent = consumed) }
+    internal fun onResendSignUpLinkErrorConsumed() {
+        _uiState.update { it.copy(resendSignUpLinkError = consumed()) }
     }
 
     /**
