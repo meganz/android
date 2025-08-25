@@ -287,7 +287,6 @@ class TimelineViewModel @Inject constructor(
         setCameraUploadsSyncFab(isVisible = true)
         setCameraUploadsPausedMenuIconVisibility(isVisible = false)
         setCameraUploadsCompleteMenu(isVisible = false)
-        setCameraUploadsWarningMenu(isVisible = false)
     }
 
     private fun handleCameraUploadsProgressStatus(info: CameraUploadsStatusInfo.UploadProgress) {
