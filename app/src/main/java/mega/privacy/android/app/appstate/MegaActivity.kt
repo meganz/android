@@ -5,7 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -15,12 +18,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.appstate.content.AppContentStateViewModel
 import mega.privacy.android.app.appstate.content.view.AppContentView
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
+import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
+import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginGraph
@@ -58,8 +64,11 @@ class MegaActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val viewModel = viewModel<GlobalStateViewModel>()
+            val snackbarEventsViewModel = viewModel<SnackbarEventsViewModel>()
             val state = viewModel.state.collectAsStateWithLifecycle()
+            val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
             val navController = rememberNavController()
+            val snackbarHostState = remember { SnackbarHostState() }
             // This is used to recompose the LoginGraph when new login request is made
             keepSplashScreen = state.value is GlobalState.Loading
 
@@ -96,6 +105,12 @@ class MegaActivity : ComponentActivity() {
                 }
             }
 
+            EventEffect(
+                event = snackbarEventsState,
+                onConsumed = snackbarEventsViewModel::consumeEvent,
+                action = { snackbarHostState.show(it) }
+            )
+
             AndroidTheme(isDark = state.value.themeMode.isDarkMode()) {
                 NavHost(
                     navController = navController,
@@ -119,6 +134,7 @@ class MegaActivity : ComponentActivity() {
                         val appContentStateViewModel = hiltViewModel<AppContentStateViewModel>()
                         AppContentView(
                             viewModel = appContentStateViewModel,
+                            snackbarHostState = snackbarHostState,
                         )
                     }
                 }

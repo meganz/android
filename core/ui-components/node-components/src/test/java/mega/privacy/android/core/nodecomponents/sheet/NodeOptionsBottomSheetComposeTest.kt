@@ -11,6 +11,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import mega.android.core.ui.model.LocalizedText
+import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
@@ -41,6 +42,7 @@ class NodeOptionsBottomSheetComposeTest {
         navigationHandler: NavigationHandler = mock(),
         onDismiss: () -> Unit = {},
         onConsumeErrorState: () -> Unit = {},
+        showSnackbar: suspend (SnackbarAttributes) -> Unit = { _ -> }
     ) {
         composeTestRule.setContent {
             val sheetState = rememberModalBottomSheetState(
@@ -59,6 +61,7 @@ class NodeOptionsBottomSheetComposeTest {
                 onDismiss = onDismiss,
                 navigationHandler = navigationHandler,
                 onConsumeErrorState = onConsumeErrorState,
+                showSnackbar = showSnackbar
             )
         }
     }

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
@@ -31,6 +32,8 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -52,6 +55,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
+    private val snackbarEventQueue: SnackbarEventQueue,
     @CloudDrive private val cloudDriveBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
     @RubbishBin private val rubbishBinBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
     @IncomingShares private val incomingSharesBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
@@ -72,6 +76,9 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
             }
         }
     }
+
+    suspend fun showSnackbar(attributes: SnackbarAttributes) =
+        snackbarEventQueue.queueMessage(attributes)
 
     /**
      * Get bottom sheet options

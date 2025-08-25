@@ -33,6 +33,7 @@ import mega.privacy.android.navigation.megaNavigator
 @Composable
 fun MegaApp(
     appContentState: AppContentState.Data,
+    snackbarHostState: SnackbarHostState,
     onInteraction: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -43,7 +44,6 @@ fun MegaApp(
     val navigationHandler = remember { NavigationHandlerImpl(navController) }
     val transferHandler = remember { TransferHandlerImpl(appTransferViewModel) }
     val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
 
     Box(modifier = Modifier.pointerInput(Unit) {
         awaitEachGesture {

@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.core.nodecomponents.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
@@ -13,7 +14,6 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -51,25 +52,12 @@ class NodeOptionsBottomSheetViewModelTest {
         on { isIncomingShare } doReturn false
     }
 
-    private val sampleFolderNode = mock<TypedFolderNode>().stub {
-        on { id } doReturn NodeId(456)
-        on { name } doReturn "test_folder"
-        on { isIncomingShare } doReturn true
-    }
-
-    private val sampleOutShareNode = mock<TypedFolderNode>().stub {
-        on { id } doReturn NodeId(789)
-        on { name } doReturn "shared_file.txt"
-        on { isIncomingShare } doReturn false
-        on { isShared } doReturn true
-    }
-
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
+    private val snackbarEventQueue: SnackbarEventQueue = mock()
 
     @BeforeEach
     fun initViewModel() {
-        // Set up the MonitorConnectivityUseCase mock
-        doReturn(flowOf(true)).whenever(monitorConnectivityUseCase)()
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
 
         viewModel = NodeOptionsBottomSheetViewModel(
             nodeBottomSheetActionMapper = nodeBottomSheetActionMapper,
@@ -84,7 +72,8 @@ class NodeOptionsBottomSheetViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
-            nodeUiItemMapper = nodeUiItemMapper
+            nodeUiItemMapper = nodeUiItemMapper,
+            snackbarEventQueue = snackbarEventQueue
         )
     }
 
@@ -241,5 +230,13 @@ class NodeOptionsBottomSheetViewModelTest {
             val secondState = awaitItem()
             assertThat(secondState.node).isEqualTo(mockNodeUi)
         }
+    }
+
+    @Test
+    fun `test that on show snackbar should call use case`() = runTest {
+        val snackbarAttributes = mock<SnackbarAttributes>()
+        viewModel.showSnackbar(snackbarAttributes)
+
+        verify(snackbarEventQueue).queueMessage(snackbarAttributes)
     }
 }

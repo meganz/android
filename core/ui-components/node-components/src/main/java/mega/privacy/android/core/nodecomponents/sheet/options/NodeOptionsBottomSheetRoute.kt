@@ -18,7 +18,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
-import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.SnackbarDuration as MegaSnackbarDuration
 import mega.android.core.ui.theme.values.TextColor
@@ -67,6 +66,7 @@ fun NodeOptionsBottomSheetRoute(
         navigationHandler = navigationHandler,
         actionHandler = actionHandler,
         onDismiss = onDismiss,
+        showSnackbar = viewModel::showSnackbar,
         onConsumeErrorState = viewModel::onConsumeErrorState,
     )
 }
@@ -83,27 +83,11 @@ internal fun NodeOptionsBottomSheetContent(
     navigationHandler: NavigationHandler,
     actionHandler: NodeActionHandler,
     onDismiss: () -> Unit,
+    showSnackbar: suspend (SnackbarAttributes) -> Unit,
     onConsumeErrorState: () -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState = LocalSnackBarHostState.current
     val context = LocalContext.current
-
-    fun showSnackbar(attributes: SnackbarAttributes) {
-        coroutineScope.launch {
-            attributes.message?.let { message ->
-                snackbarHostState?.showSnackbar(
-                    message = message,
-                    actionLabel = attributes.action,
-                    duration = when (attributes.duration) {
-                        MegaSnackbarDuration.Long -> SnackbarDuration.Long
-                        MegaSnackbarDuration.Short -> SnackbarDuration.Short
-                        MegaSnackbarDuration.Indefinite -> SnackbarDuration.Indefinite
-                    },
-                )
-            }
-        }
-    }
 
     EventEffect(
         event = uiState.error,
@@ -137,7 +121,11 @@ internal fun NodeOptionsBottomSheetContent(
                     navigationHandler = navigationHandler,
                     coroutineScope = coroutineScope,
                     context = context,
-                    snackbarHandler = ::showSnackbar
+                    snackbarHandler = {
+                        coroutineScope.launch {
+                            showSnackbar(it)
+                        }
+                    }
                 )
             )
         }
