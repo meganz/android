@@ -70,3 +70,7 @@ wget-log
 
 credentials.properties
 .kotlin
+
+# Java error artefacts
+hs_err_pid*
+replay_pid*

@@ -9,5 +9,6 @@ class LegacyCoreActivityFeatureGraph : FeatureDestination {
     override val navigationGraph: NavGraphBuilder.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             overDiskQuotaPaywallWarning(navigationHandler::back)
+            webDestinations(navigationHandler::back)
         }
 }
