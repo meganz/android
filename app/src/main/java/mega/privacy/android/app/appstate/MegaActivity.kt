@@ -10,6 +10,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,6 +24,7 @@ import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginGraph
+import mega.privacy.android.app.presentation.login.LoginScreen
 import mega.privacy.android.app.presentation.login.loginNavigationGraph
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.utils.Constants
@@ -41,7 +43,7 @@ class MegaActivity : ComponentActivity() {
     data object LoginLoading
 
     @Serializable
-    data class LoggedInScreens(val session: String)
+    data class LoggedInScreens(val isFromLogin: Boolean = false, val session: String)
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -65,7 +67,14 @@ class MegaActivity : ComponentActivity() {
                 when (val currentState = state.value) {
                     is GlobalState.Loading -> {}
                     is GlobalState.LoggedIn -> {
-                        navController.navigate(route = LoggedInScreens(session = currentState.session)) {
+                        val isFromLogin =
+                            navController.currentBackStackEntry?.destination?.hasRoute<LoginScreen>() == true
+                        navController.navigate(
+                            route = LoggedInScreens(
+                                isFromLogin = isFromLogin,
+                                session = currentState.session
+                            )
+                        ) {
                             popUpTo(0) {
                                 inclusive = true
                             }

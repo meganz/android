@@ -16,12 +16,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.rememberNavController
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.android.core.ui.model.SnackBarAttributes
-import mega.android.core.ui.model.SnackBarDuration
+import mega.android.core.ui.model.SnackbarAttributes
+import mega.android.core.ui.model.SnackbarDuration as MegaSnackbarDuration
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -90,16 +89,16 @@ internal fun NodeOptionsBottomSheetContent(
     val snackbarHostState = LocalSnackBarHostState.current
     val context = LocalContext.current
 
-    fun showSnackbar(attributes: SnackBarAttributes) {
+    fun showSnackbar(attributes: SnackbarAttributes) {
         coroutineScope.launch {
             attributes.message?.let { message ->
                 snackbarHostState?.showSnackbar(
                     message = message,
                     actionLabel = attributes.action,
                     duration = when (attributes.duration) {
-                        SnackBarDuration.Long -> SnackbarDuration.Long
-                        SnackBarDuration.Short -> SnackbarDuration.Short
-                        SnackBarDuration.Indefinite -> SnackbarDuration.Indefinite
+                        MegaSnackbarDuration.Long -> SnackbarDuration.Long
+                        MegaSnackbarDuration.Short -> SnackbarDuration.Short
+                        MegaSnackbarDuration.Indefinite -> SnackbarDuration.Indefinite
                     },
                 )
             }

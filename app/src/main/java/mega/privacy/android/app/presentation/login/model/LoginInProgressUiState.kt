@@ -1,14 +1,10 @@
 package mega.privacy.android.app.presentation.login.model
 
-import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.TemporaryWaitingError
-import timber.log.Timber
 
 /**
  * UI state for the login in progress screen.
@@ -18,6 +14,7 @@ import timber.log.Timber
  * @param requestStatusProgress The current progress of the request status, if available.
  * @param snackbarMessage The message to show in the Snackbar, if any.
  * @param isFastLogin Indicates if it's fast login flow
+ * @param isFromLogin Indicates if the login is initiated from the login screen
  */
 data class LoginInProgressUiState(
     val fetchNodesUpdate: FetchNodesUpdate? = null,
@@ -26,6 +23,7 @@ data class LoginInProgressUiState(
     val requestStatusProgress: Progress? = null,
     val snackbarMessage: StateEventWithContent<Int> = consumed(),
     val isFastLogin: Boolean = false,
+    val isFromLogin: Boolean = false,
 ) {
     /**
      * True if the request status progress event is being processed
@@ -42,12 +40,11 @@ data class LoginInProgressUiState(
      */
     val currentProgress: Float
         get() {
-            val progressAfterLogin = if (!isFastLogin) 0.3f else 0.5f
-            val progressAfterFetchNode = progressAfterLogin + if (!isFastLogin) 0.1f else 0.45f
+            val progressAfterLogin = if (isFromLogin) 0.4f else 0.5f
+            val progressAfterFetchNode = progressAfterLogin + if (isFromLogin) 0.1f else 0.45f
             return when {
                 isFastLoginInProgress -> progressAfterLogin
                 fetchNodesUpdate?.progress != null -> {
-                    Timber.d("CongHai fetchNodesUpdate?.progress  = ${fetchNodesUpdate.progress}")
                     val fetchNodeProgress = fetchNodesUpdate.progress?.floatValue ?: 0f
                     if (fetchNodeProgress > 0f)
                         progressAfterFetchNode + (fetchNodeProgress * (1.0f - progressAfterFetchNode))

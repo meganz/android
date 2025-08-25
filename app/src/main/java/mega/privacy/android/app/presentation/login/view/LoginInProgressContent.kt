@@ -79,6 +79,7 @@ fun LoginInProgressContent(
     currentProgress: Float,
     @StringRes currentStatusText: Int,
     requestStatusProgress: Progress?,
+    startProgress: Float = 0f,
     modifier: Modifier = Modifier,
 ) {
     val isInLandscape =
@@ -111,6 +112,7 @@ fun LoginInProgressContent(
             ) {
                 MegaAnimatedLinearProgressIndicator(
                     indicatorProgress = currentProgress,
+                    startProgress = startProgress,
                     progressAnimDuration = if (currentProgress > 0.5f) 1000 else 3000,
                     modifier = Modifier
                         .testTag(FETCH_NODES_PROGRESS_TEST_TAG)

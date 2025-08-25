@@ -3,7 +3,7 @@ package mega.privacy.android.core.nodecomponents.model
 import android.content.Context
 import androidx.compose.runtime.Composable
 import kotlinx.coroutines.CoroutineScope
-import mega.android.core.ui.model.SnackBarAttributes
+import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
@@ -20,7 +20,7 @@ data class BottomSheetClickHandler(
     val navigationHandler: NavigationHandler,
     val coroutineScope: CoroutineScope,
     val context: Context,
-    val snackbarHandler: (SnackBarAttributes) -> Unit,
+    val snackbarHandler: (SnackbarAttributes) -> Unit,
 )
 
 /**

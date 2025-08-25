@@ -30,6 +30,7 @@ fun FetchingContentView(
         isRequestStatusInProgress = state.isRequestStatusInProgress,
         currentProgress = state.currentProgress,
         currentStatusText = state.currentStatusText,
+        startProgress = if (state.isFromLogin) 0.275f else 0f,
         requestStatusProgress = state.requestStatusProgress,
     )
 }
@@ -45,7 +46,7 @@ val LoginInProgressUiState.currentStatusText: Int
             temporaryError != null && !isRequestStatusInProgress -> temporaryError.messageId
             isFastLoginInProgress -> R.string.login_connecting_to_server
             (fetchNodesUpdate?.progress?.floatValue ?: 0f) > 0f -> R.string.login_preparing_filelist
-            fetchNodesUpdate != null -> R.string.download_updating_filelist
+            isFromLogin || fetchNodesUpdate != null -> R.string.download_updating_filelist
             else -> R.string.login_connecting_to_server
         }
     }

@@ -62,11 +62,11 @@ class LoginInProgressViewModel @Inject constructor(
     private val isMegaApiLoggedInUseCase: IsMegaApiLoggedInUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+    private val route = savedStateHandle.toRoute<MegaActivity.LoggedInScreens>()
 
-    private val _state = MutableStateFlow(LoginInProgressUiState())
+    private val _state = MutableStateFlow(LoginInProgressUiState(isFromLogin = route.isFromLogin))
     val state: StateFlow<LoginInProgressUiState> = _state
 
-    private val route = savedStateHandle.toRoute<MegaActivity.LoggedInScreens>()
 
     /**
      * Is connected
