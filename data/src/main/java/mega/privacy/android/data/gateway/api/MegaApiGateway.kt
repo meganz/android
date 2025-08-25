@@ -3222,13 +3222,22 @@ interface MegaApiGateway {
     /**
      * Get an URL to transfer the current session to the webclient
      *
+     * This function creates a new session for the link so logging out in the web client won't log out
+     * the current session.
      *
      * The associated request type with this request is MegaRequest::TYPE_GET_SESSION_TRANSFER_URL
      * Valid data in the MegaRequest object received in onRequestFinish when the error code
      * is MegaError::API_OK:
      * - MegaRequest::getLink - URL to open the desired page with the same account
      *
-     * @param path Path inside https://mega.nz/# that we want to open with the current session
+     * If the client is logged in, but the account is not fully confirmed (ie. singup not completed yet),
+     * this method will return API_EACCESS.
+     *
+     * If the client is not logged in, there won't be any session to transfer, but this method will still
+     * return the URL followed by /#<path>.
+     *
+     * @param path     Path inside the URL that we want to open with the current session.
+     *                 For example, if you want to open the upgrade page, the parameter of this function should be "pro".
      * @param listener MegaRequestListener to track this request
      */
     fun getSessionTransferURL(path: String, listener: MegaRequestListenerInterface)
