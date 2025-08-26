@@ -18,4 +18,8 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro&#160;III</string>
+    <!--  -->
+    <string name="subscription_type_monthly">Monthly</string>
+    <!--  -->
+    <string name="subscription_type_yearly">Yearly</string>
 </resources>

@@ -1,35 +1,33 @@
-package mega.privacy.android.app.upgradeAccount
+package mega.privacy.android.feature.payment
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.feature.payment.model.LocalisedSubscription
-import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
-import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
-import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
-import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
-import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
-import nz.mega.sdk.MegaApiJava
+import mega.privacy.android.feature.payment.model.LocalisedSubscription
+import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
+import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
+import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
+import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -38,7 +36,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -62,8 +59,6 @@ class ChooseAccountViewModelTest {
         )
     private val getRecommendedSubscriptionUseCase =
         mock<GetRecommendedSubscriptionUseCase>()
-    private val isBillingAvailableUseCase = mock<IsBillingAvailableUseCase>()
-    private val getPaymentMethodUseCase = mock<GetPaymentMethodUseCase>()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
 
     @BeforeEach
@@ -76,8 +71,6 @@ class ChooseAccountViewModelTest {
             formattedSizeMapper,
             getRecommendedSubscriptionUseCase,
             getPricing,
-            getPaymentMethodUseCase,
-            isBillingAvailableUseCase,
             monitorAccountDetailUseCase,
         )
     }
@@ -89,8 +82,6 @@ class ChooseAccountViewModelTest {
             getYearlySubscriptionsUseCase = getYearlySubscriptionsUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
             getRecommendedSubscriptionUseCase = getRecommendedSubscriptionUseCase,
-            getPaymentMethodUseCase = getPaymentMethodUseCase,
-            isBillingAvailableUseCase = isBillingAvailableUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             savedStateHandle = mock { on { get<Boolean>(any()) }.thenReturn(true) }
         )
@@ -103,7 +94,7 @@ class ChooseAccountViewModelTest {
         with(underTest) {
             refreshPricing()
             state.map { it.product }.test {
-                assertEquals(awaitItem(), emptyList())
+                Truth.assertThat(awaitItem()).isEqualTo(emptyList<Product>())
             }
         }
     }
@@ -115,7 +106,7 @@ class ChooseAccountViewModelTest {
         whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
         initViewModel()
         underTest.state.map { it.localisedSubscriptionsList }.test {
-            assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
+            Truth.assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
         }
     }
 
@@ -141,24 +132,9 @@ class ChooseAccountViewModelTest {
         whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
         initViewModel()
         underTest.state.map { it.cheapestSubscriptionAvailable }.test {
-            assertThat(awaitItem()).isEqualTo(expectedResult)
+            Truth.assertThat(awaitItem()).isEqualTo(expectedResult)
         }
     }
-
-    @Test
-    fun `test that isPaymentMethodAvailable returns true when isBillingAvailableUseCase returns true and getPaymentMethodUseCase contains PAYMENT_METHOD_GOOGLE_WALLET`() =
-        runTest {
-            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
-            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
-            whenever(isBillingAvailableUseCase()).thenReturn(true)
-            whenever(getPaymentMethodUseCase(false)).thenReturn(PaymentMethodFlags(1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET))
-            initViewModel()
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.isPaymentMethodAvailable).isTrue()
-            }
-        }
 
     @Test
     fun `test that loadCurrentSubscriptionPlan updates state with current plan and subscription cycle`() =
@@ -180,8 +156,8 @@ class ChooseAccountViewModelTest {
 
             underTest.state.test {
                 val initialState = awaitItem()
-                assertThat(initialState.currentSubscriptionPlan).isEqualTo(expectedPlan)
-                assertThat(initialState.subscriptionCycle).isEqualTo(expectedCycle)
+                Truth.assertThat(initialState.currentSubscriptionPlan).isEqualTo(expectedPlan)
+                Truth.assertThat(initialState.subscriptionCycle).isEqualTo(expectedCycle)
             }
         }
 

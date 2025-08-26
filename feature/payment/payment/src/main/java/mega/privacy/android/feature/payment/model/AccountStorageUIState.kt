@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.account.model
+package mega.privacy.android.feature.payment.model
 
 /**
  * UI state for account storage

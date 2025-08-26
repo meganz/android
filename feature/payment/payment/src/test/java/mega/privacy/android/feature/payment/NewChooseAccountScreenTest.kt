@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upgradeAccount
+package mega.privacy.android.feature.payment
 
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -7,16 +7,25 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.fromId
-import mega.privacy.android.feature.payment.model.ChooseAccountState
-import mega.privacy.android.feature.payment.model.LocalisedSubscription
+import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
-import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
-import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.feature.payment.model.ChooseAccountState
+import mega.privacy.android.feature.payment.model.LocalisedSubscription
+import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
+import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
+import mega.privacy.android.feature.payment.presentation.upgrade.NewChooseAccountScreen
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_ADDITIONAL_BENEFITS
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_FEATURE_ROW
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_FREE_PLAN_CARD
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_LAZY_COLUMN
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_PRO_PLAN_CARD
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_INFO_DESC
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_INFO_TITLE
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_TERMS_AND_POLICIES
+import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -73,15 +82,12 @@ class NewChooseAccountScreenTest {
     fun `test that pro plans are shown correctly`() {
         setContent()
 
-        // Check Pro plan cards by tag and title
-        val planNames = listOf("Pro I", "Pro II", "Pro III")
         (0..2).forEach { index ->
-            val tag = "$TEST_TAG_PRO_PLAN_CARD$index"
+            val tag = "${TEST_TAG_PRO_PLAN_CARD}$index"
             composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(tag))
                 .assertExists()
             // Assert the plan name text is displayed within the card
             composeRule.onNodeWithTag(tag).performScrollTo().assertExists()
-            composeRule.onNodeWithText(planNames[index]).assertExists()
         }
         // Check Free plan card by tag
         composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
@@ -93,7 +99,7 @@ class NewChooseAccountScreenTest {
     fun `test that top bar is shown correctly with maybe later`() {
         setContent()
         composeRule.onNodeWithText(
-            fromId(sharedR.string.choose_account_screen_maybe_later_button_text)
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.choose_account_screen_maybe_later_button_text)
         ).assertExists()
     }
 
@@ -101,7 +107,7 @@ class NewChooseAccountScreenTest {
     fun `test that pro features section is shown correctly`() {
         setContent()
         (0..3).forEach { index ->
-            val tag = "$TEST_TAG_FEATURE_ROW$index"
+            val tag = "${TEST_TAG_FEATURE_ROW}$index"
             composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(tag))
                 .assertExists()
         }

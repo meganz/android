@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upgradeAccount
+package mega.privacy.android.feature.payment.presentation.upgrade
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -13,18 +13,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.feature.payment.model.ChooseAccountState
-import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
-import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
-import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
-import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
-import nz.mega.sdk.MegaApiJava
+import mega.privacy.android.feature.payment.model.ChooseAccountState
+import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -36,20 +32,16 @@ import javax.inject.Inject
  * @param getYearlySubscriptionsUseCase use case to get the list of yearly subscriptions available in the app
  * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
  * @param getRecommendedSubscriptionUseCase use case to get the cheapest subscription available in the app
- * @param isBillingAvailableUseCase use case to check if billing is available
- * @param getPaymentMethodUseCase use case to to get available payment method (Google Wallet)
  *
  * @property state The current UI state
  */
 @HiltViewModel
-internal class ChooseAccountViewModel @Inject constructor(
+class ChooseAccountViewModel @Inject constructor(
     private val getPricing: GetPricing,
     private val getMonthlySubscriptionsUseCase: GetMonthlySubscriptionsUseCase,
     private val getYearlySubscriptionsUseCase: GetYearlySubscriptionsUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
-    private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
-    private val isBillingAvailableUseCase: IsBillingAvailableUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -58,19 +50,19 @@ internal class ChooseAccountViewModel @Inject constructor(
     val state: StateFlow<ChooseAccountState> = _state
 
     private val isUpgradeAccountFlow =
-        savedStateHandle.get<Boolean>(ChooseAccountActivity.EXTRA_IS_UPGRADE_ACCOUNT) ?: false
+        savedStateHandle.get<Boolean>(EXTRA_IS_UPGRADE_ACCOUNT) ?: false
 
     init {
         viewModelScope.launch {
             val monthlySubscriptionsDeferred = async {
                 runCatching { getMonthlySubscriptionsUseCase() }.getOrElse {
-                    Timber.e(it)
+                    Timber.Forest.e(it)
                     emptyList()
                 }
             }
             val yearlySubscriptionsDeferred = async {
                 runCatching { getYearlySubscriptionsUseCase() }.getOrElse {
-                    Timber.e(it)
+                    Timber.Forest.e(it)
                     emptyList()
                 }
             }
@@ -91,7 +83,7 @@ internal class ChooseAccountViewModel @Inject constructor(
         viewModelScope.launch {
             val cheapestSubscriptionAvailable =
                 runCatching { getRecommendedSubscriptionUseCase() }.getOrElse {
-                    Timber.e(it)
+                    Timber.Forest.e(it)
                     null
                 }
             _state.update {
@@ -103,19 +95,6 @@ internal class ChooseAccountViewModel @Inject constructor(
                         )
                     }
                 )
-            }
-        }
-
-        viewModelScope.launch {
-            val paymentMethod =
-                runCatching { getPaymentMethodUseCase(false) }.getOrElse { PaymentMethodFlags(0L) }
-            if (paymentMethod.flag == 0L) {
-                Timber.w("Payment method flag is not received: ${paymentMethod.flag}")
-            }
-            val isBillingAvailable = isBillingAvailableUseCase()
-                    && ((paymentMethod.flag and (1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET)) != 0L) // check bit enable
-            _state.update {
-                it.copy(isPaymentMethodAvailable = isBillingAvailable)
             }
         }
         if (isUpgradeAccountFlow) {
@@ -130,7 +109,7 @@ internal class ChooseAccountViewModel @Inject constructor(
     private fun loadCurrentSubscriptionPlan() {
         viewModelScope.launch {
             monitorAccountDetailUseCase()
-                .catch { Timber.e(it) }
+                .catch { Timber.Forest.e(it) }
                 .mapNotNull { it.levelDetail }
                 .distinctUntilChanged()
                 .collectLatest { levelDetail ->
@@ -150,12 +129,19 @@ internal class ChooseAccountViewModel @Inject constructor(
     fun refreshPricing() {
         viewModelScope.launch {
             val pricing = runCatching { getPricing(false) }.getOrElse {
-                Timber.w(it, "Returning empty pricing as get pricing failed.")
+                Timber.Forest.w(it, "Returning empty pricing as get pricing failed.")
                 Pricing(emptyList())
             }
             _state.update {
                 it.copy(product = pricing.products)
             }
         }
+    }
+
+    companion object {
+        /**
+         * Extra key to indicate if the activity is for upgrading an account.
+         */
+        const val EXTRA_IS_UPGRADE_ACCOUNT = "EXTRA_IS_UPGRADE_ACCOUNT"
     }
 }

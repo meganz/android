@@ -86,8 +86,6 @@ import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionRenewalType
-import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionType
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
 import mega.privacy.android.data.database.DatabaseHandler
@@ -1136,14 +1134,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             val sku = purchase.sku
             if (billingViewModel.isPurchased(purchase)) {
                 //payment has been processed
-                Timber.d(
-                    "Purchase $sku successfully, subscription type is: ${
-                        getSubscriptionType(
-                            sku,
-                            this
-                        )
-                    }, subscription renewal type is: ${getSubscriptionRenewalType(sku, this)}"
-                )
+                Timber.d("Purchase $sku successfully")
                 if (singleActivityFlagEnabled.not()) {
                     RatingHandlerImpl(this).updateTransactionFlag(true)
                 }

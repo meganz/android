@@ -25,14 +25,15 @@ import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
-import mega.privacy.android.app.utils.billing.PaymentUtils
-import mega.privacy.android.app.utils.billing.PaymentUtils.getProductId
+import mega.privacy.android.feature.payment.util.PaymentUtils.getProductId
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel
+import mega.privacy.android.feature.payment.presentation.upgrade.NewChooseAccountScreen
 import mega.privacy.mobile.analytics.event.AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AdsUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.BuyProIEvent
@@ -71,7 +72,7 @@ class ChooseAccountFragment : Fragment() {
     }
 
     private val isUpgradeAccount by lazy {
-        arguments?.getBoolean(ChooseAccountActivity.EXTRA_IS_UPGRADE_ACCOUNT, false) ?: false
+        arguments?.getBoolean(ChooseAccountViewModel.EXTRA_IS_UPGRADE_ACCOUNT, false) ?: false
     }
 
     @Inject
@@ -177,14 +178,7 @@ class ChooseAccountFragment : Fragment() {
             val sku = purchase.sku
             if (billingViewModel.isPurchased(purchase)) {
                 //payment has been processed
-                Timber.d(
-                    "Purchase $sku successfully, subscription type is: "
-                            + PaymentUtils.getSubscriptionType(
-                        sku,
-                        chooseAccountActivity
-                    ) + ", subscription renewal type is: "
-                            + PaymentUtils.getSubscriptionRenewalType(sku, chooseAccountActivity)
-                )
+                Timber.d("Purchase $sku successfully")
                 RatingHandlerImpl(chooseAccountActivity).updateTransactionFlag(true)
             } else {
                 //payment is being processed or in unknown state

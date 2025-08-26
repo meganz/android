@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.advertisements.MonitorAdsClosingTimestampUseCase
+import mega.privacy.android.feature.payment.model.AccountStorageUIState
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.days

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upgradeAccount
+package mega.privacy.android.feature.payment.presentation.upgrade
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -58,22 +58,19 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
-import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
-import mega.privacy.android.app.utils.Constants.PRIVACY_POLICY_URL
-import mega.privacy.android.app.utils.Constants.TERMS_OF_SERVICE_URL
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.feature.payment.R
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
 import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
 import mega.privacy.android.feature.payment.components.ChooseAccountScreenTopBar
 import mega.privacy.android.feature.payment.components.FreePlanCard
 import mega.privacy.android.feature.payment.components.NewFeatureRow
 import mega.privacy.android.feature.payment.components.ProPlanCard
+import mega.privacy.android.feature.payment.model.AccountStorageUIState
 import mega.privacy.android.feature.payment.model.ChooseAccountState
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.ProFeature
@@ -82,12 +79,13 @@ import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyC
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.util.Locale
 
 @Composable
-internal fun NewChooseAccountScreen(
+fun NewChooseAccountScreen(
     onBuyPlanClick: (AccountType, Boolean) -> Unit,
     maybeLaterClicked: () -> Unit,
     onFreePlanClicked: () -> Unit,
@@ -427,9 +425,10 @@ internal fun NewChooseAccountScreen(
                     ),
                     baseStyle = AppTheme.typography.labelLarge,
                     onAnnotationClick = { annotation ->
+                        val megaNavigator = context.megaNavigator
                         when (annotation) {
-                            termsText -> context.launchUrl(TERMS_OF_SERVICE_URL)
-                            privacyText -> context.launchUrl(PRIVACY_POLICY_URL)
+                            termsText -> megaNavigator.launchUrl(context, TERMS_OF_SERVICE_URL)
+                            privacyText -> megaNavigator.launchUrl(context, PRIVACY_POLICY_URL)
                         }
                     }
                 )
@@ -552,6 +551,10 @@ internal class ChooseAccountPreviewProvider :
         )
     }
 }
+
+const val TERMS_OF_SERVICE_URL = "https://mega.io/terms"
+
+const val PRIVACY_POLICY_URL = "https://mega.io/privacy"
 
 /**
  * Test tag for the yearly chip selector

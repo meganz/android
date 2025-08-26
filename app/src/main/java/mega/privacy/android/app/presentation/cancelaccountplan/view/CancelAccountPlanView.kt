@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
+import mega.privacy.android.feature.payment.model.AccountStorageUIState
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancelAccountPlanUiState
 import mega.privacy.android.core.formatter.model.FormattedSize
 import mega.privacy.android.icon.pack.R.drawable

@@ -13,6 +13,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel.Companion.EXTRA_IS_UPGRADE_ACCOUNT
 
 @AndroidEntryPoint
 open class ChooseAccountActivity : AppCompatActivity() {
@@ -94,11 +95,6 @@ open class ChooseAccountActivity : AppCompatActivity() {
     }
 
     companion object {
-        /**
-         * Extra key to indicate if the activity is for upgrading an account.
-         */
-        const val EXTRA_IS_UPGRADE_ACCOUNT = "EXTRA_IS_UPGRADE_ACCOUNT"
-
         /**
          * Extra key to indicate the source of the upgrade account action.
          */
