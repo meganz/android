@@ -20,7 +20,7 @@ class SnackbarEventQueueImpl @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : SnackbarEventQueue {
     private val _events = Channel<SnackbarAttributes>(Channel.UNLIMITED)
-    private val isSingleActivityEnabled = MutableStateFlow(false)
+    private val isSingleActivityEnabled = MutableStateFlow<Boolean?>(null)
 
     init {
         applicationScope.launch {
@@ -45,7 +45,7 @@ class SnackbarEventQueueImpl @Inject constructor(
 
     private suspend inline fun requireFeatureEnabled(send: () -> Unit) {
         // Await for the feature flag to be evaluated
-        if (isSingleActivityEnabled.first()) {
+        if (isSingleActivityEnabled.first { it != null } == true) {
             send()
         } else {
             Timber.e("SnackbarEventQueue: Feature SingleActivity is not enabled.")

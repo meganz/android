@@ -205,7 +205,7 @@ dependencies {
     implementation(project(":feature:transfers:transfers-snowflake-components"))
     implementation(project(":feature:payment:payment-snowflake-components"))
     implementation(project(":feature:payment:payment"))
-    implementation(project(":core:ui-components:snowflake-components"))
+    implementation(project(":core:ui-components:shared-components"))
     implementation(project(":core:navigation-snowflake-components"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:feature-flags"))

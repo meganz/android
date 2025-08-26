@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.model.menuaction.OpenWithMenuAction
-import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode

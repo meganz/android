@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.snackbar
+package mega.privacy.android.core.sharedcomponents.snackbar
 
 /**
  * Enum class to display snackbar duration

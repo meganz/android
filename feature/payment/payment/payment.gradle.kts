@@ -21,7 +21,7 @@ dependencies {
     lintChecks(project(":lint"))
 
     implementation(project(":feature:payment:payment-snowflake-components"))
-    implementation(project(":core:ui-components:snowflake-components"))
+    implementation(project(":core:ui-components:shared-components"))
     implementation(project(":core:formatter"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":shared:resources"))

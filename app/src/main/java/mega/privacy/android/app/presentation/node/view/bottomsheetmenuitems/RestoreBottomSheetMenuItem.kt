@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.RestoreMenuAction
-import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType

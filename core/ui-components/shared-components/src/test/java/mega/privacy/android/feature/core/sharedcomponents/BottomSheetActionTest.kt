@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.core.snowflakecomponents
+package mega.privacy.android.feature.core.sharedcomponents
 
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.test.assertIsDisplayed
@@ -7,10 +7,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.core.snowflakecomponents.BottomSheetAction
-import mega.privacy.android.core.snowflakecomponents.TEST_TAG_BOTTOM_SHEET_ACTION
-import mega.privacy.android.core.snowflakecomponents.TEST_TAG_ICON
-import mega.privacy.android.core.snowflakecomponents.TEST_TAG_NAME
+import mega.privacy.android.core.sharedcomponents.BottomSheetAction
+import mega.privacy.android.core.sharedcomponents.TEST_TAG_BOTTOM_SHEET_ACTION
+import mega.privacy.android.core.sharedcomponents.TEST_TAG_ICON
+import mega.privacy.android.core.sharedcomponents.TEST_TAG_NAME
 import mega.privacy.android.icon.pack.IconPack
 import org.junit.Rule
 import org.junit.Test

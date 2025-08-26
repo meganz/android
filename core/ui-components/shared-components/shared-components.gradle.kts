@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "mega.privacy.android.core.snowflakecomponents"
+    namespace = "mega.privacy.android.core.sharedcomponents"
     testOptions {
         unitTests {
             targetSdk = 34

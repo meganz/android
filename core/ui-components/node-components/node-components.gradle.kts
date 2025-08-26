@@ -21,7 +21,7 @@ dependencies {
     implementation(project(":shared:resources"))
     implementation(project(":core:formatter"))
     implementation(project(":navigation"))
-    implementation(project(":core:ui-components:snowflake-components"))
+    implementation(project(":core:ui-components:shared-components"))
     implementation(project(":core:feature-flags"))
     implementation(project(":core:navigation-contract"))
 

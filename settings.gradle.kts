@@ -72,7 +72,7 @@ include(":shared:sync")
 include(":third-party-lib:pdfiumAndroid")
 
 
-include(":core:ui-components:snowflake-components")
+include(":core:ui-components:shared-components")
 // Configure modules to use their own name as the build file name
 // app/build.gradle.kts -> app/app.gradle.kts
 // features/home/build.gradle.kts -> features/home/home.gradle.kts

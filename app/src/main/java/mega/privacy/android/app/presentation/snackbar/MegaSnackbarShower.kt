@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.snackbar
 
+import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
+
 /**
  * Interface to show snackbar
  */
