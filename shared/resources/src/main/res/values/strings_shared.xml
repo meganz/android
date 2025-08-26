@@ -1473,4 +1473,6 @@
     <string name="resend_signup_link_error">Email already sent. Please wait a few minutes before trying again.</string>
     <!-- success message when renaming a node -->
     <string name="context_correctly_renamed">Item renamed</string>
+    <!-- Homepage section. -->
+    <string name="general_section_home">Home</string>
 </resources>

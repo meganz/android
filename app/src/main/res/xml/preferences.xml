@@ -89,7 +89,7 @@
 			android:defaultValue="default"
 			android:key="settings_start_screen"
 			android:title="@string/start_screen_setting"
-			android:summary="@string/home_section"
+			android:summary="@string/general_section_home"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false"

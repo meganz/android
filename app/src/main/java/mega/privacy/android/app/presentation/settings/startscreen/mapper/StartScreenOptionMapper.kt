@@ -4,6 +4,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenOption
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Map [mega.privacy.android.domain.entity.preference.StartScreen] to [mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenOption]
@@ -35,7 +36,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
     StartScreen.Home -> {
         StartScreenOption(
             startScreen = screen,
-            title = R.string.home_section,
+            title = sharedR.string.general_section_home,
             icon = IconPack.Medium.Thin.Outline.Mega,
         )
     }
