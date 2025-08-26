@@ -19,8 +19,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.extensions.parcelable
-import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.core.sharedcomponents.parcelable
+import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.model.LoginIntentState

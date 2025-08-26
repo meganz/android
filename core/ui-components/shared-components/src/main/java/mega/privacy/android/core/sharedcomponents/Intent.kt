@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.extensions
+package mega.privacy.android.core.sharedcomponents
 
 import android.content.Context
 import android.content.Intent

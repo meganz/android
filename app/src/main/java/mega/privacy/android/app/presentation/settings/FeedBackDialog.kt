@@ -12,7 +12,7 @@ import android.widget.CheckedTextView
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.extensions.canBeHandled
+import mega.privacy.android.core.sharedcomponents.canBeHandled
 import mega.privacy.android.app.service.RATE_APP_URL
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util

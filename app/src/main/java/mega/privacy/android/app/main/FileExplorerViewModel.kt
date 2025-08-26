@@ -24,9 +24,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.app.presentation.extensions.parcelable
-import mega.privacy.android.app.presentation.extensions.parcelableArrayList
-import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.core.sharedcomponents.parcelable
+import mega.privacy.android.core.sharedcomponents.parcelableArrayList
+import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
 import mega.privacy.android.app.presentation.upload.UploadDestinationActivity
 import mega.privacy.android.app.utils.Constants

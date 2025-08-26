@@ -10,7 +10,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.extensions.canBeHandled
+import mega.privacy.android.core.sharedcomponents.canBeHandled
 import mega.privacy.android.app.presentation.featureflag.FeatureFlagActivity
 import mega.privacy.android.app.utils.Constants
 import java.io.File

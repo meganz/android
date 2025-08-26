@@ -5,7 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import dagger.hilt.android.scopes.ActivityScoped
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.login.LoginActivity

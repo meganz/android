@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogState
 import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusViewModel
