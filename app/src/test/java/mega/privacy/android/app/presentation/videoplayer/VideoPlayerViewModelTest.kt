@@ -8,6 +8,8 @@ import androidx.media3.common.MediaItem
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,14 +22,11 @@ import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.data.extensions.observeOnce
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
@@ -54,18 +53,14 @@ import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAc
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerUnhideAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.triggeredContent
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL
@@ -82,17 +77,22 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.BACKUPS_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -116,8 +116,9 @@ import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
-import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
@@ -494,7 +495,9 @@ class VideoPlayerViewModelTest {
         runTest {
             mockBlockedMegaException()
             underTest.uiState.test {
-                assertThat(awaitItem().error).isInstanceOf(BlockedMegaException::class.java)
+                assertThat(awaitItem().blockedError).isEqualTo(triggered)
+                underTest.onBlockedErrorConsumed()
+                assertThat(awaitItem().blockedError).isEqualTo(consumed)
             }
         }
 
@@ -506,30 +509,6 @@ class VideoPlayerViewModelTest {
         val event = mock<TransferEvent.TransferTemporaryErrorEvent> {
             on { transfer }.thenReturn(expectedTransfer)
             on { error }.thenReturn(mock<BlockedMegaException>())
-        }
-        fakeMonitorTransferEventsFlow.emit(event)
-    }
-
-    @Test
-    fun `test that the errorState is updated correctly when emit QuotaExceededMegaException`() =
-        runTest {
-            mockQuotaExceededMegaException()
-            underTest.uiState.test {
-                assertThat(awaitItem().error).isInstanceOf(QuotaExceededMegaException::class.java)
-            }
-        }
-
-    private suspend fun mockQuotaExceededMegaException() {
-        val expectedTransfer = mock<Transfer> {
-            on { isForeignOverQuota }.thenReturn(false)
-            on { nodeHandle }.thenReturn(INVALID_HANDLE)
-        }
-        val expectedError = mock<QuotaExceededMegaException> {
-            on { value }.thenReturn(1)
-        }
-        val event = mock<TransferEvent.TransferTemporaryErrorEvent> {
-            on { transfer }.thenReturn(expectedTransfer)
-            on { error }.thenReturn(expectedError)
         }
         fakeMonitorTransferEventsFlow.emit(event)
     }

@@ -22,7 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,6 +36,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -120,6 +123,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
@@ -263,6 +267,14 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
             val uiState by videoPlayerViewModel.uiState.collectAsStateWithLifecycle()
             val scaffoldState = rememberScaffoldState()
 
+            var showBlockedDialog by rememberSaveable { mutableStateOf(false) }
+
+            EventEffect(
+                event = uiState.blockedError,
+                onConsumed = { videoPlayerViewModel.onBlockedErrorConsumed() }) {
+                showBlockedDialog = true
+            }
+
             val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
                 { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
                 {
@@ -308,6 +320,24 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                     viewModel = nodeAttachmentViewModel,
                     showMessage = ::showSnackbarWithChat
                 )
+
+                if (showBlockedDialog) {
+                    MegaAlertDialog(
+                        title = stringResource(R.string.error_file_not_available),
+                        body = stringResource(R.string.error_takendown_file),
+                        confirmButtonText = stringResource(R.string.general_dismiss),
+                        cancelButtonText = null,
+                        onConfirm = {
+                            if (!isFinishing) {
+                                finish()
+                            }
+                        },
+                        onDismiss = {},
+                        dismissOnClickOutside = false,
+                        dismissOnBackPress = false,
+                        cancelEnabled = false,
+                    )
+                }
             }
         }
         videoPlayerViewModel.initVideoPlayerData(intent)

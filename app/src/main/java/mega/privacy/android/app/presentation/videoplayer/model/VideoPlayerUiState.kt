@@ -1,16 +1,16 @@
 package mega.privacy.android.app.presentation.videoplayer.model
 
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
-import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
 /**
@@ -23,7 +23,6 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property metadata the metadata
  * @property playQueueTitle the play queue title
  * @property isRetry whether it is retry
- * @property error the [MegaException]
  * @property repeatToggleMode the repeat toggle mode
  * @property currentPlayingVideoSize the current playing video size
  * @property mediaPlaybackState the playback state
@@ -56,6 +55,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property matchedSubtitleInfo the matched subtitle info
  * @property addedSubtitleInfo the added subtitle info
  * @property navigateToSelectSubtitleScreen whether to navigate to select subtitle screen
+ * @property blockedError the blocked error event
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -65,7 +65,6 @@ data class VideoPlayerUiState(
     val metadata: Metadata = Metadata(null, null, null, ""),
     val playQueueTitle: String? = null,
     val isRetry: Boolean? = null,
-    val error: MegaException? = null,
     val repeatToggleMode: RepeatToggleMode = RepeatToggleMode.REPEAT_NONE,
     val currentPlayingVideoSize: VideoSize? = null,
     val mediaPlaybackState: MediaPlaybackState = MediaPlaybackState.Playing,
@@ -98,4 +97,5 @@ data class VideoPlayerUiState(
     val matchedSubtitleInfo: SubtitleFileInfo? = null,
     val addedSubtitleInfo: SubtitleFileInfo? = null,
     val navigateToSelectSubtitleScreen: Boolean = false,
+    val blockedError: StateEvent = consumed,
 )

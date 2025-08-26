@@ -415,7 +415,16 @@ class VideoPlayerViewModel @Inject constructor(
                                     && error.value != 0L)
                                     || error is BlockedMegaException)
                         ) {
-                            uiState.update { it.copy(error = error) }
+                            when (error) {
+                                is QuotaExceededMegaException -> {
+                                    // To be completed in a different ticket
+                                }
+
+                                is BlockedMegaException ->
+                                    uiState.update { it.copy(blockedError = triggered) }
+
+                                else -> {}
+                            }
                         }
                     }
                 }
@@ -2135,6 +2144,8 @@ class VideoPlayerViewModel @Inject constructor(
             updatePlaySourcesAfterSubtitleChange(currentPlayingIndex)
         }
     }
+
+    internal fun onBlockedErrorConsumed() = uiState.update { it.copy(blockedError = consumed) }
 
     companion object {
         private const val MEDIA_PLAYER_STATE_ENDED = 4
