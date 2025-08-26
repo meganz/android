@@ -619,4 +619,14 @@ class NodeOptionsActionViewModel @Inject constructor(
             throw IllegalArgumentException("Action $action does not have a handler.")
         }
     }
+
+    fun handleRenameNodeRequest(nodeId: NodeId) {
+        uiState.update { it.copy(renameNodeRequestEvent = triggered(nodeId)) }
+    }
+
+    fun resetRenameNodeRequest() {
+        uiState.update {
+            it.copy(renameNodeRequestEvent = consumed())
+        }
+    }
 }

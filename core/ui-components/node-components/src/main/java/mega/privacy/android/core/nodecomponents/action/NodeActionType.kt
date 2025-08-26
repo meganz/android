@@ -9,6 +9,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuActi
 import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.OpenWithMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RenameMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RestoreMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SelectAllMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
@@ -214,5 +215,14 @@ class ClearSelectionAction @Inject constructor() : MultiNodeAction {
         provider: MultipleNodesActionProvider,
     ) {
         provider.viewModel.clearAllClicked()
+    }
+}
+
+class RenameNodeAction @Inject constructor() : SingleNodeAction {
+    override fun canHandle(action: MenuAction): Boolean =
+        action is RenameMenuAction
+
+    override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
+        provider.viewModel.handleRenameNodeRequest(node.id)
     }
 }

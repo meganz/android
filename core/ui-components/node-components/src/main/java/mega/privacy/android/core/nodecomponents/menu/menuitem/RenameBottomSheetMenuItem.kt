@@ -28,11 +28,10 @@ class RenameBottomSheetMenuItem @Inject constructor(
 
     override fun getOnClickFunction(
         node: TypedNode,
-        handler: BottomSheetClickHandler
+        handler: BottomSheetClickHandler,
     ): () -> Unit = {
+        handler.actionHandler(menuAction, node)
         handler.onDismiss()
-        // Todo: navigationHandler
-//        navController.navigate(searchRenameDialog.plus("/${node.id.longValue}"))
     }
 
     override val groupId = 8

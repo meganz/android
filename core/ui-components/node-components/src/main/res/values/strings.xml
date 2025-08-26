@@ -215,5 +215,11 @@
     <string name="file_without_extension_warning">To proceed you need to type a file extension</string>
     <!-- success message when renaming a node -->
     <string name="context_correctly_renamed">Item renamed</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
+    <string name="action_change_anyway">Change anyway</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
+    <string name="file_extension_change_warning">You might not be able to open this file if you change its extension.</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">File extension change</string>
     <!-- End of Rename dialog resources -->
 </resources>

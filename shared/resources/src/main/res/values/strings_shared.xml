@@ -1471,4 +1471,6 @@
     </plurals>
     <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
     <string name="resend_signup_link_error">Email already sent. Please wait a few minutes before trying again.</string>
+    <!-- success message when renaming a node -->
+    <string name="context_correctly_renamed">Item renamed</string>
 </resources>

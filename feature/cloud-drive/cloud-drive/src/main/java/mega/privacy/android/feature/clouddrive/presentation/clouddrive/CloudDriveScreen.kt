@@ -40,8 +40,8 @@ fun CloudDriveScreen(
     onBack: () -> Unit,
     onNavigateToFolder: (NodeId, String?) -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
-    openNodeOptions: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
+    onRenameNode: (NodeId) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -119,6 +119,7 @@ fun CloudDriveScreen(
                 onNavigateBack = onBack,
                 onTransfer = onTransfer,
                 onCreatedNewFolder = onCreatedNewFolder,
+                onRenameNode = onRenameNode,
             )
         }
     )

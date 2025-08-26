@@ -68,6 +68,7 @@ import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,6 +83,7 @@ internal fun CloudDriveContent(
     onNavigateBack: () -> Unit,
     onCreatedNewFolder: (NodeId) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
+    onRenameNode: (NodeId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
@@ -201,6 +203,14 @@ internal fun CloudDriveContent(
     var shouldShowSkeleton by remember { mutableStateOf(false) }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
+
+    EventEffect(
+        event = nodeActionState.renameNodeRequestEvent,
+        onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
+        action = { nodeId ->
+            onRenameNode(nodeId)
+        }
+    )
 
     LaunchedEffect(uiState.isLoading) {
         if (uiState.isLoading) {

@@ -75,6 +75,7 @@ import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.stream.Stream
 import kotlin.time.Duration
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -469,16 +470,14 @@ class NodeActionsViewModelTest {
     }
 
     @Test
-    fun `test that on rename success should update state`() = runTest {
+    fun `test that on rename success should show snackbar`() = runTest {
         val nodeHandle = 123L
         val newNodeName = "New Node Name"
         whenever(renameNodeUseCase(nodeHandle, newNodeName)).thenReturn(Unit)
         initViewModel()
         viewModel.renameNode(nodeHandle, newNodeName)
-        viewModel.state.test {
-            val state = awaitItem()
-            assertThat(state.onRenameSucceedEvent).isEqualTo(triggered)
-        }
+
+        verify(snackBarHandler).postSnackbarMessage(sharedResR.string.context_correctly_renamed)
     }
 }
 

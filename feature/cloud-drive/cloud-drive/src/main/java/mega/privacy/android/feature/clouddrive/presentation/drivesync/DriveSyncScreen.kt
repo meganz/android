@@ -62,6 +62,7 @@ internal fun DriveSyncScreen(
     viewModel: DriveSyncViewModel = hiltViewModel(),
     cloudDriveViewModel: CloudDriveViewModel = hiltViewModel(),
     onTransfer: (TransferTriggerEvent) -> Unit,
+    onRenameNode: (NodeId) -> Unit,
 ) {
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -157,6 +158,7 @@ internal fun DriveSyncScreen(
                         onDismissUploadOptionsBottomSheet = {
                             showUploadOptionsBottomSheet = false
                         },
+                        onRenameNode = onRenameNode,
                     )
                 }
                 addTextTabWithLazyListState(

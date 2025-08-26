@@ -13,6 +13,7 @@ import mega.privacy.android.core.nodecomponents.action.HideAction
 import mega.privacy.android.core.nodecomponents.action.MoveAction
 import mega.privacy.android.core.nodecomponents.action.MultiNodeAction
 import mega.privacy.android.core.nodecomponents.action.OpenWithAction
+import mega.privacy.android.core.nodecomponents.action.RenameNodeAction
 import mega.privacy.android.core.nodecomponents.action.RestoreAction
 import mega.privacy.android.core.nodecomponents.action.SelectAllAction
 import mega.privacy.android.core.nodecomponents.action.SendToChatAction
@@ -47,6 +48,7 @@ object NodeActionHandlerModule {
         downloadAction: DownloadAction,
         availableOfflineAction: AvailableOfflineAction,
         hideAction: HideAction,
+        renameNodeAction: RenameNodeAction,
     ): Set<SingleNodeAction> {
         return setOf(
             versionsAction,
@@ -59,6 +61,7 @@ object NodeActionHandlerModule {
             downloadAction,
             availableOfflineAction,
             hideAction,
+            renameNodeAction
         )
     }
 

@@ -1,8 +1,10 @@
 package mega.privacy.android.core.nodecomponents.dialog.rename
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
@@ -15,20 +17,26 @@ import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAc
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnLoadNodeName
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameConfirmed
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameValidationPassed
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.node.ValidNameType
+import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
+import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class RenameNodeDialogViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
-    private val checkForValidNameUseCase: CheckForValidNameUseCase
+    private val checkForValidNameUseCase: CheckForValidNameUseCase,
+    private val renameNodeUseCase: RenameNodeUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RenameNodeDialogState())
@@ -105,6 +113,20 @@ class RenameNodeDialogViewModel @Inject constructor(
                         renameValidationPassedEvent = triggered(action.newNodeName)
                     )
                 }
+            }
+        }
+    }
+
+    fun renameNode(nodeId: NodeId, newNodeName: String) {
+        applicationScope.launch {
+            runCatching {
+                renameNodeUseCase(nodeId.longValue, newNodeName)
+            }.onSuccess {
+                snackbarEventQueue.queueMessage(
+                    context.getString(sharedResR.string.context_correctly_renamed)
+                )
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }

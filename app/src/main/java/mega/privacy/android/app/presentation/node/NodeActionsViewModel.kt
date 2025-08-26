@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.model.NodeActionState
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
@@ -57,6 +57,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -578,14 +579,12 @@ class NodeActionsViewModel @Inject constructor(
             runCatching {
                 renameNodeUseCase(nodeId, newNodeName)
             }.onSuccess {
-                _state.update { it.copy(onRenameSucceedEvent = triggered) }
+                snackBarHandler.postSnackbarMessage(
+                    sharedResR.string.context_correctly_renamed,
+                )
             }.onFailure {
                 Timber.e(it)
             }
         }
-    }
-
-    fun resetOnRenameSucceedEvent() {
-        _state.update { it.copy(onRenameSucceedEvent = consumed) }
     }
 }

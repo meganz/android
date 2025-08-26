@@ -393,84 +393,9 @@ class NodeOptionsActionViewModelTest {
         assertThat(result).isFalse()
     }
 
-    private fun provideNodeType() = Stream.of(
-        Arguments.of(
-            mock<TypedFileNode>().stub {
-                on { type } doReturn PdfFileTypeInfo
-            },
-            mock<FileNodeContent.Pdf>()
-        ),
-        Arguments.of(
-            mock<TypedFileNode>().stub {
-                on { type } doReturn VideoFileTypeInfo(
-                    extension = "mp4",
-                    mimeType = "video",
-                    duration = Duration.INFINITE
-                )
-            },
-            mock<FileNodeContent.AudioOrVideo>()
-        ),
-        Arguments.of(
-            mock<TypedFileNode>().stub {
-                on { type } doReturn AudioFileTypeInfo(
-                    extension = "mp3",
-                    mimeType = "audio",
-                    duration = Duration.INFINITE
-                )
-            },
-            mock<FileNodeContent.AudioOrVideo>()
-        ),
-        Arguments.of(
-            mock<TypedFileNode>().stub {
-                on { type } doReturn StaticImageFileTypeInfo(
-                    extension = "jpeg",
-                    mimeType = "image",
-                )
-            },
-            mock<FileNodeContent.ImageForNode>()
-        ),
-        Arguments.of(
-            mock<TypedFileNode>().stub {
-                whenever(it.type).thenReturn(
-                    TextFileTypeInfo(
-                        mimeType = "text/plain",
-                        extension = "txt"
-                    )
-                )
-            },
-            mock<FileNodeContent.TextContent>()
-        ),
-        Arguments.of(
-            mock<TypedFileNode>().stub {
-                whenever(it.type).thenReturn(
-                    ZipFileTypeInfo(
-                        mimeType = "zip",
-                        extension = "zip"
-                    )
-                )
-            }, mock<FileNodeContent.Other>()
-        ), Arguments.of(
-            mock<TypedFileNode>().stub {
-                whenever(it.type).thenReturn(
-                    UnknownFileTypeInfo(
-                        mimeType = "abc",
-                        extension = "abc"
-                    )
-                )
-            }, mock<FileNodeContent.Other>()
-        ),
-        Arguments.of(
-            mock<TypedFileNode>().stub {
-                whenever(it.type).thenReturn(
-                    UrlFileTypeInfo
-                )
-            },
-            mock<FileNodeContent.UrlContent>()
-        )
-    )
-
     @Test
     fun `test getTypeInfo returns the type from the mapper`() = runTest {
+        initViewModel()
         val file = File("/folder/foo.txt")
         val expected = mock<RawFileTypeInfo>()
         whenever(getFileTypeInfoByNameUseCase(file.name)) doReturn expected
@@ -710,4 +635,110 @@ class NodeOptionsActionViewModelTest {
             viewModelWithEmptyHandlers.handleMultipleNodesAction(mock<MoveMenuAction>()) { }
         }
     }
+
+    @Test
+    fun `test handleRenameNodeRequest triggers renameNodeRequestEvent`() = runTest {
+        initViewModel()
+        val nodeId = NodeId(123L)
+
+        viewModel.handleRenameNodeRequest(nodeId)
+
+        viewModel.uiState.test {
+            val uiState = awaitItem()
+            assertThat(uiState.renameNodeRequestEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+        }
+    }
+
+    @Test
+    fun `test resetRenameNodeRequest consumes renameNodeRequestEvent`() = runTest {
+        initViewModel()
+        val nodeId = NodeId(123L)
+
+        // First trigger the event
+        viewModel.handleRenameNodeRequest(nodeId)
+
+        // Then reset it
+        viewModel.resetRenameNodeRequest()
+
+        viewModel.uiState.test {
+            val uiState = awaitItem()
+            assertThat(uiState.renameNodeRequestEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+    }
+
+    private fun provideNodeType() = Stream.of(
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                on { type } doReturn PdfFileTypeInfo
+            },
+            mock<FileNodeContent.Pdf>()
+        ),
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                on { type } doReturn VideoFileTypeInfo(
+                    extension = "mp4",
+                    mimeType = "video",
+                    duration = Duration.INFINITE
+                )
+            },
+            mock<FileNodeContent.AudioOrVideo>()
+        ),
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                on { type } doReturn AudioFileTypeInfo(
+                    extension = "mp3",
+                    mimeType = "audio",
+                    duration = Duration.INFINITE
+                )
+            },
+            mock<FileNodeContent.AudioOrVideo>()
+        ),
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                on { type } doReturn StaticImageFileTypeInfo(
+                    extension = "jpeg",
+                    mimeType = "image",
+                )
+            },
+            mock<FileNodeContent.ImageForNode>()
+        ),
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                whenever(it.type).thenReturn(
+                    TextFileTypeInfo(
+                        mimeType = "text/plain",
+                        extension = "txt"
+                    )
+                )
+            },
+            mock<FileNodeContent.TextContent>()
+        ),
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                whenever(it.type).thenReturn(
+                    ZipFileTypeInfo(
+                        mimeType = "zip",
+                        extension = "zip"
+                    )
+                )
+            }, mock<FileNodeContent.Other>()
+        ), Arguments.of(
+            mock<TypedFileNode>().stub {
+                whenever(it.type).thenReturn(
+                    UnknownFileTypeInfo(
+                        mimeType = "abc",
+                        extension = "abc"
+                    )
+                )
+            }, mock<FileNodeContent.Other>()
+        ),
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                whenever(it.type).thenReturn(
+                    UrlFileTypeInfo
+                )
+            },
+            mock<FileNodeContent.UrlContent>()
+        )
+    )
 } 

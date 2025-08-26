@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.clouddrive.navigation
 
 import androidx.navigation.NavGraphBuilder
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialog
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheet
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDrive
@@ -32,14 +33,11 @@ class CloudDriveFeatureDestination : FeatureDestination {
                         )
                     )
                 },
-                openNodeOptions = { nodeId ->
+                onRenameNode = { nodeId ->
                     navigationHandler.navigate(
-                        NodeOptionsBottomSheet(
-                            nodeHandle = nodeId.longValue,
-                            nodeSourceType = NodeSourceType.CLOUD_DRIVE
-                        )
+                        RenameNodeDialog(nodeId = nodeId.longValue)
                     )
-                },
+                }
             )
         }
 }

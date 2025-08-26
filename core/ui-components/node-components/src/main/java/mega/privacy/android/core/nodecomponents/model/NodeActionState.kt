@@ -5,6 +5,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -40,4 +41,5 @@ data class NodeActionState(
     val selectAll: StateEvent = consumed,
     val clearAll: StateEvent = consumed,
     val infoToShowEvent: StateEventWithContent<LocalizedText> = consumed(),
+    val renameNodeRequestEvent: StateEventWithContent<NodeId> = consumed(),
 )

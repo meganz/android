@@ -311,7 +311,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                         onBackPressedDispatcher.onBackPressed()
                                     }
                                 },
-                                snackbarHostState = snackbarHostState,
                             )
 
                             RequestStatusProgressContainer(

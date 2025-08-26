@@ -129,17 +129,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 val bottomSheetNavigator = rememberBottomSheetNavigator()
                 val navController = rememberNavController(bottomSheetNavigator)
                 val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
-                val context = LocalContext.current
                 val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
-
-                EventEffect(
-                    nodeActionState.onRenameSucceedEvent,
-                    nodeActionsViewModel::resetOnRenameSucceedEvent
-                ) {
-                    snackbarHostState.showSnackbar(
-                        message = context.getString(R.string.context_correctly_renamed)
-                    )
-                }
 
                 MegaBottomSheetLayout(
                     bottomSheetNavigator = bottomSheetNavigator,

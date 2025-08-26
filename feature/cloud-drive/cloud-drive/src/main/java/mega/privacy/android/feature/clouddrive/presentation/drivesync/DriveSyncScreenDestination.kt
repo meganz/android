@@ -19,6 +19,7 @@ fun NavGraphBuilder.driveSyncScreen(
     onCreatedNewFolder: (NodeId) -> Unit,
     setNavigationVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
+    onRenameNode: (NodeId) -> Unit,
 ) {
     composable<DriveSync> {
         val viewModel = hiltViewModel<DriveSyncViewModel>()
@@ -31,6 +32,7 @@ fun NavGraphBuilder.driveSyncScreen(
             onCreatedNewFolder = onCreatedNewFolder,
             setNavigationItemVisibility = setNavigationVisibility,
             onTransfer = onTransfer,
+            onRenameNode = onRenameNode
         )
     }
 }
