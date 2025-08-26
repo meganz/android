@@ -82,6 +82,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -1926,5 +1927,17 @@ class DefaultTransfersRepositoryTest {
 
         verify(megaApiGateway).resumeTransfersForNotLoggedInInstance()
         verifyNoMoreInteractions(megaApiGateway)
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = [123456, 9876543])
+    fun `test that transferOverQuotaTimestamp returns value`(
+        timestamp: Long,
+    ) = runTest {
+        val value = AtomicLong(timestamp)
+
+        underTest.transferOverQuotaTimestamp = value
+
+        assertThat(underTest.transferOverQuotaTimestamp).isEqualTo(value)
     }
 }

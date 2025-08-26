@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -28,6 +29,12 @@ import kotlin.time.Instant
  * Transfer repository of Domain Module
  */
 interface TransferRepository {
+
+    /**
+     * Timestamp of the last transfer over quota event warned
+     */
+    var transferOverQuotaTimestamp: AtomicLong
+
     /**
      * Monitor transfer events
      *
