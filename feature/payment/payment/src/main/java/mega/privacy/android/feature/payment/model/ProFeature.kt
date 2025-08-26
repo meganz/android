@@ -1,10 +1,10 @@
-package mega.privacy.android.app.upgradeAccount.model
+package mega.privacy.android.feature.payment.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-internal data class ProFeature(
+data class ProFeature(
     val icon: ImageVector,
     val title: String,
     val description: String,
-    val testTag: String
+    val testTag: String,
 )

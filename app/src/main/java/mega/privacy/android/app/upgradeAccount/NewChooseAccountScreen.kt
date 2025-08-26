@@ -61,12 +61,6 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
-import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
-import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
-import mega.privacy.android.app.upgradeAccount.model.ProFeature
-import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
-import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
-import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.utils.Constants.PRIVACY_POLICY_URL
 import mega.privacy.android.app.utils.Constants.TERMS_OF_SERVICE_URL
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
@@ -80,6 +74,12 @@ import mega.privacy.android.feature.payment.components.ChooseAccountScreenTopBar
 import mega.privacy.android.feature.payment.components.FreePlanCard
 import mega.privacy.android.feature.payment.components.NewFeatureRow
 import mega.privacy.android.feature.payment.components.ProPlanCard
+import mega.privacy.android.feature.payment.model.ChooseAccountState
+import mega.privacy.android.feature.payment.model.LocalisedSubscription
+import mega.privacy.android.feature.payment.model.ProFeature
+import mega.privacy.android.feature.payment.model.extensions.toUIAccountType
+import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
+import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR

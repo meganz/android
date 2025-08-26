@@ -1,8 +1,8 @@
-package mega.privacy.android.app.upgradeAccount.model.mapper
+package mega.privacy.android.feature.payment.model.mapper
 
-import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import javax.inject.Inject
 
 /**
@@ -11,16 +11,16 @@ import javax.inject.Inject
 class LocalisedSubscriptionMapper @Inject constructor(
     private val localisedPriceStringMapper: LocalisedPriceStringMapper,
     private val localisedPriceCurrencyCodeStringMapper: LocalisedPriceCurrencyCodeStringMapper,
-    private val formattedSizeMapper: FormattedSizeMapper
+    private val formattedSizeMapper: FormattedSizeMapper,
 ) {
     /**
      * Invoke
      * Convert Subscription to LocalisedSubscription
-     * @param monthlySubscription [Subscription]
-     * @param yearlySubscription [Subscription]
-     * @return [LocalisedSubscription]
+     * @param monthlySubscription [mega.privacy.android.domain.entity.Subscription]
+     * @param yearlySubscription [mega.privacy.android.domain.entity.Subscription]
+     * @return [mega.privacy.android.feature.payment.model.LocalisedSubscription]
      */
-    internal operator fun invoke(
+    operator fun invoke(
         monthlySubscription: Subscription,
         yearlySubscription: Subscription,
     ) = LocalisedSubscription(

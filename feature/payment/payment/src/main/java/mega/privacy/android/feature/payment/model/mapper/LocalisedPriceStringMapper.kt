@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upgradeAccount.model.mapper
+package mega.privacy.android.feature.payment.model.mapper
 
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import java.text.NumberFormat
@@ -14,8 +14,8 @@ class LocalisedPriceStringMapper @Inject constructor() {
     /**
      * Invoke
      * Convert CurrencyAmount to String
-     * @param currencyAmount [CurrencyAmount]
-     * @param locale [Locale]
+     * @param currencyAmount [mega.privacy.android.domain.entity.account.CurrencyAmount]
+     * @param locale [java.util.Locale]
      * @return String
      */
     internal operator fun invoke(

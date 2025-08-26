@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upgradeAccount.model
+package mega.privacy.android.feature.payment.model
 
 /**
  * LocalisedProductPrice model to share correctly localised strings for price and for currency code

@@ -1,6 +1,6 @@
 package mega.privacy.android.app.main.ads
 
-import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
+import mega.privacy.android.feature.payment.model.LocalisedSubscription
 
 /**
  * Ads Free Intro UI state

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upgradeAccount.model
+package mega.privacy.android.feature.payment.model
 
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType

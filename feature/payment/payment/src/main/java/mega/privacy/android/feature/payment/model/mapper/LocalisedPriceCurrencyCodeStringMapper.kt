@@ -1,7 +1,7 @@
-package mega.privacy.android.app.upgradeAccount.model.mapper
+package mega.privacy.android.feature.payment.model.mapper
 
-import mega.privacy.android.app.upgradeAccount.model.LocalisedProductPrice
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.feature.payment.model.LocalisedProductPrice
 import java.text.NumberFormat
 import java.util.Currency
 import java.util.Locale

@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
+import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import timber.log.Timber
 import javax.inject.Inject
 

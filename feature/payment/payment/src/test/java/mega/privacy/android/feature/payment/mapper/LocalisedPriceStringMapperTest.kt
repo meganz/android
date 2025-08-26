@@ -1,9 +1,9 @@
-package mega.privacy.android.app.upgradeAccount.model.mapper
+package mega.privacy.android.feature.payment.mapper
 
-import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import org.junit.Test
 import java.util.Locale
 

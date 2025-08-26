@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <!-- Name for Free account -->
+    <string name="general_free_plan_name">Free</string>
+    <!-- PRO Lite account -->
+    <string name="prolite_account">Pro&#160;Lite</string>
+    <!-- Pro I account -->
+    <string name="pro1_account">Pro&#160;I</string>
+    <!-- Pro II account -->
+    <string name="pro2_account">Pro&#160;II</string>
+    <!-- Pro III account -->
+    <string name="pro3_account">Pro&#160;III</string>
+    <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro&#160;Lite</string>
+    <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro&#160;I</string>
+    <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro&#160;II</string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro&#160;III</string>
+</resources>

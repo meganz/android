@@ -1,8 +1,8 @@
-package mega.privacy.android.app.upgradeAccount.model.extensions
+package mega.privacy.android.feature.payment.model.extensions
 
 import androidx.compose.runtime.Composable
-import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.feature.payment.model.UIAccountType
 
 /**
  * Extension function to convert AccountType to UIAccountType.
@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.AccountType
  * @return Converted UIAccountType.
  */
 @Composable
-internal fun AccountType.toUIAccountType(): UIAccountType {
+fun AccountType.toUIAccountType(): UIAccountType {
     return when (this) {
         AccountType.FREE -> UIAccountType.FREE
 
