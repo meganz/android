@@ -14,7 +14,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -69,7 +68,6 @@ import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
-import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
 import mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.LAUNCH_INTENT
@@ -114,7 +112,6 @@ import mega.privacy.mobile.analytics.event.TransferOverQuotaDialogEvent
 import mega.privacy.mobile.analytics.event.TransferOverQuotaUpgradeAccountButtonEvent
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -200,9 +197,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     private var delaySignalPresence = false
     private var isGeneralTransferOverQuotaWarningShown = false
     private var transferGeneralOverQuotaWarning: AlertDialog? = null
-    private var setDownloadLocationDialog: AlertDialog? = null
-    private var confirmationChecked = false
-    private var downloadLocation: String? = null
     private var upgradeAlert: AlertDialog? = null
     private var purchaseType: PurchaseType? = null
     private var activeSubscriptionSku: String? = null
@@ -210,17 +204,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     private var isExpiredBusinessAlertShown = false
 
     protected val outMetrics: DisplayMetrics by lazy { resources.displayMetrics }
-
-    //Indicates when the activity should finish due to some error
-    private var finishActivityAtError = false
-
-    /**
-     * True if is a business account and is expired.
-     */
-    protected val isBusinessExpired: Boolean
-        get() = megaApi.isBusinessAccount &&
-                myAccountInfo.accountType == BUSINESS &&
-                megaApi.businessStatus == MegaApiJava.BUSINESS_STATUS_EXPIRED
 
     /**
      * Get snackbar instance
@@ -238,20 +221,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     protected var isActivityInBackground = false
         private set
 
-    /**
-     * Checks if the current activity is in foreground.
-     *
-     * @return True if the current activity is in foreground, false otherwise.
-     */
-    protected val isActivityInForeground: Boolean
-        get() = !isActivityInBackground
-
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             handleGoBack()
         }
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -338,11 +312,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 showGeneralTransferOverQuotaWarning()
             }
 
-            if (getBoolean(SET_DOWNLOAD_LOCATION_SHOWN, false)) {
-                confirmationChecked = getBoolean(IS_CONFIRMATION_CHECKED, false)
-                showConfirmationSaveInSameLocation(getString(DOWNLOAD_LOCATION))
-            }
-
             if (getBoolean(UPGRADE_ALERT_SHOWN, false)) {
                 purchaseType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     getSerializable(PURCHASE_TYPE, PurchaseType::class.java)
@@ -373,9 +342,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         outState.apply {
             putBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, isExpiredBusinessAlertShown)
             putBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, isGeneralTransferOverQuotaWarningShown)
-            putBoolean(SET_DOWNLOAD_LOCATION_SHOWN, isAlertDialogShown(setDownloadLocationDialog))
-            putBoolean(IS_CONFIRMATION_CHECKED, confirmationChecked)
-            putString(DOWNLOAD_LOCATION, downloadLocation)
             putBoolean(UPGRADE_ALERT_SHOWN, isAlertDialogShown(upgradeAlert))
             putSerializable(PURCHASE_TYPE, purchaseType)
             putString(ACTIVE_SUBSCRIPTION_SKU, activeSubscriptionSku)
@@ -403,7 +369,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     override fun onDestroy() {
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
-        dismissAlertDialogIfExists(setDownloadLocationDialog)
         dismissAlertDialogIfExists(upgradeAlert)
         super.onDestroy()
     }
@@ -809,11 +774,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     setNegativeButton(R.string.account_business_account_deactivated_dialog_button) { dialog, _ ->
                         isExpiredBusinessAlertShown = false
 
-                        if (finishActivityAtError) {
-                            finishActivityAtError = false
-                            finish()
-                        }
-
                         dialog.dismiss()
                     }
 
@@ -896,13 +856,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
             else -> Util.showErrorAlertDialog(accountBlockedEvent.text, false, this)
         }
-    }
-
-    /**
-     * Sets if should finish the activity because of some error.
-     */
-    protected fun setFinishActivityAtError(finishActivityAtError: Boolean) {
-        this.finishActivityAtError = finishActivityAtError
     }
 
     private fun showAccountBlockedDialog(
@@ -1155,9 +1108,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     || this is FileManagementPreferencesActivity && myAccountInfo.isUpgradeFromSettings() -> {
                 purchaseType = type
                 activeSubscriptionSku = activeSubscription?.sku
-                if (!handlePurchased(type)) {
-                    showQueryPurchasesResult(activeSubscription)
-                }
+                showQueryPurchasesResult(activeSubscription)
             }
         }
     }
@@ -1170,45 +1121,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     override fun showSnackbar(type: Int, content: String, action: () -> Unit) {
         val rootView = Util.getRootViewFromContext(this)
         showSnackbar(type = type, view = rootView, s = content, action = action)
-    }
-
-    /**
-     * Shows a dialog when the user is selecting the download location.
-     * It asks if they want to set the current chosen location as default.
-     * It the user enables the checkbox, the dialog should not appear again.
-     *
-     * @param path Download path to set as default location.
-     */
-    fun showConfirmationSaveInSameLocation(path: String?) {
-        if (Util.isAndroid11OrUpper() || isAlertDialogShown(setDownloadLocationDialog)) {
-            return
-        }
-        downloadLocation = path
-        val builder = MaterialAlertDialogBuilder(this)
-        val v = layoutInflater.inflate(R.layout.dialog_general_confirmation, null)
-        builder.setView(v)
-        val text = v.findViewById<TextView>(R.id.confirmation_text)
-        text.setText(R.string.confirmation_download_location)
-        val confirmationButton = v.findViewById<Button>(R.id.positive_button)
-        confirmationButton.setText(R.string.general_yes)
-        confirmationButton.setOnClickListener {
-            setDownloadLocationDialog?.dismiss()
-            dbH.setStorageAskAlways(false)
-            dbH.setStorageDownloadLocation(path)
-        }
-        val cancelButton = v.findViewById<Button>(R.id.negative_button)
-        cancelButton.setText(R.string.general_negative_button)
-        cancelButton.setOnClickListener {
-            setDownloadLocationDialog?.dismiss()
-        }
-        val checkBox = v.findViewById<CheckBox>(R.id.confirmation_checkbox)
-        checkBox.isChecked = confirmationChecked
-        val checkBoxLayout = v.findViewById<LinearLayout>(R.id.confirmation_checkbox_layout)
-        checkBoxLayout.setOnClickListener { checkBox.isChecked = !checkBox.isChecked }
-        setDownloadLocationDialog = builder.setCancelable(false)
-            .setOnDismissListener { dbH.askSetDownloadLocation = !checkBox.isChecked }
-            .create()
-        setDownloadLocationDialog?.show()
     }
 
     /**
@@ -1362,13 +1274,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     }
 
     /**
-     * Handle purchased
-     *
-     * @return true if handled and skip default behavior otherwise false
-     */
-    protected open fun handlePurchased(purchaseType: PurchaseType): Boolean = false
-
-    /**
      * Allow to show the transfer over quota warning.
      */
     open val allowToShowOverQuotaWarning: Boolean = true
@@ -1376,9 +1281,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     companion object {
         private const val EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN"
         private const val TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN"
-        private const val SET_DOWNLOAD_LOCATION_SHOWN = "SET_DOWNLOAD_LOCATION_SHOWN"
-        private const val IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED"
-        private const val DOWNLOAD_LOCATION = "DOWNLOAD_LOCATION"
         private const val UPGRADE_ALERT_SHOWN = "UPGRADE_ALERT_SHOWN"
         private const val PURCHASE_TYPE = "PURCHASE_TYPE"
         private const val ACTIVE_SUBSCRIPTION_SKU = "ACTIVE_SUBSCRIPTION_SKU"
