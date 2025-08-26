@@ -59,6 +59,18 @@ internal class FileWrapperFactory(
                     getChildByNameFunction = { name ->
                         fileGateway.getChildByName(uriPath, name)?.value
                     },
+                    createNestedPathFunction = {
+                            children: List<String>,
+                            createIfMissing: Boolean,
+                            lastAsFolder: Boolean,
+                        ->
+                        fileGateway.createChildrenFilesSync(
+                            parentUri = uriPath,
+                            children = children,
+                            createIfMissing = createIfMissing,
+                            lastAsFolder = lastAsFolder
+                        )?.value
+                    }
                 )
             }
 }

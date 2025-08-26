@@ -25,6 +25,11 @@ class FileWrapper(
     private val deleteFolderIfEmptyFunction: () -> Boolean,
     private val setModificationTimeFunction: (newTime: Long) -> Boolean,
     private val renameFunction: (newName: String) -> FileWrapper?,
+    private val createNestedPathFunction: (
+        children: List<String>,
+        createIfMissing: Boolean,
+        lastAsFolder: Boolean,
+    ) -> String?,
 ) {
 
     /**
@@ -113,6 +118,17 @@ class FileWrapper(
     @Keep
     fun getChildByName(name: String): String? =
         getChildByNameFunction(name)
+
+    @Keep
+    fun createNestedPath(
+        children: List<String>,
+        createIfMissing: Boolean,
+        lastAsFolder: Boolean,
+    ): String? = createNestedPathFunction(
+        children,
+        createIfMissing,
+        lastAsFolder
+    )
 
 
     companion object {

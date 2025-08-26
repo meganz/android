@@ -1088,10 +1088,172 @@ internal class FileFacadeTest {
                 whenever(cursor.getColumnIndex(DATE_MODIFIED)) doReturn -1
                 whenever(cursor.getColumnIndex(DATE_ADDED)) doReturn -1
                 whenever(cursor.getColumnIndex(DATE_TAKEN)) doReturn -1
-
                 assertThat(underTest.getLastModifiedTimeSync(uriPath)).isNull()
             }
         }
+
+    @Test
+    fun `test createChildrenFilesSync returns success when creating single file`() {
+        mockStatic(Uri::class.java).use {
+            mockStatic(MimeTypeMap::class.java).use {
+                val parentUri = UriPath("content://parent")
+                val children = listOf("test.txt")
+                val expectedUri = UriPath("content://parent/test.txt")
+
+                val childUri = mock<Uri>()
+                whenever(childUri.toString()) doReturn expectedUri.value
+                val childDoc = mock<DocumentFile> {
+                    on { name } doReturn "test.txt"
+                    on { uri } doReturn childUri
+                    on { isDirectory } doReturn false
+                }
+
+                val parentDoc = mock<DocumentFile> {
+                    on { isDirectory } doReturn true
+                    on { listFiles() } doReturn arrayOf(childDoc)
+                }
+
+                val mimeTypeMap = mock<MimeTypeMap>()
+                whenever(MimeTypeMap.getSingleton()) doReturn mimeTypeMap
+                whenever(mimeTypeMap.getMimeTypeFromExtension("txt")) doReturn "text/plain"
+                whenever(parentDoc.createFile("text/plain", "test.txt")) doReturn childDoc
+
+                val parentUriMock = mock<Uri>()
+                whenever(Uri.parse(parentUri.value)) doReturn parentUriMock
+                whenever(Uri.fromFile(any())) doReturn parentUriMock
+                whenever(documentFileWrapper.fromUri(parentUriMock)) doReturn parentDoc
+
+                val result = underTest.createChildrenFilesSync(parentUri, children, true, false)
+
+                assertThat(result).isEqualTo(expectedUri)
+            }
+        }
+    }
+
+    @Test
+    fun `test createChildrenFilesSync returns success when creating multiple files`() {
+        mockStatic(Uri::class.java).use {
+            mockStatic(MimeTypeMap::class.java).use {
+                val parentUri = UriPath("content://parent")
+                val children = listOf("folder1", "file.txt")
+                val expectedUri = UriPath("content://parent/folder1/file.txt")
+
+                val fileUri = mock<Uri>()
+                whenever(fileUri.toString()) doReturn expectedUri.value
+                val fileDoc = mock<DocumentFile> {
+                    on { name } doReturn "file.txt"
+                    on { uri } doReturn fileUri
+                    on { isDirectory } doReturn false
+                }
+
+                val folderDoc = mock<DocumentFile> {
+                    on { name } doReturn "folder1"
+                    on { isDirectory } doReturn true
+                    on { listFiles() } doReturn arrayOf(fileDoc)
+                }
+
+                val parentDoc = mock<DocumentFile> {
+                    on { isDirectory } doReturn true
+                    on { listFiles() } doReturn arrayOf(folderDoc)
+                }
+
+                val mimeTypeMap = mock<MimeTypeMap>()
+                whenever(MimeTypeMap.getSingleton()) doReturn mimeTypeMap
+                whenever(mimeTypeMap.getMimeTypeFromExtension("txt")) doReturn "text/plain"
+                whenever(parentDoc.createDirectory("folder1")) doReturn folderDoc
+                whenever(folderDoc.createFile("text/plain", "file.txt")) doReturn fileDoc
+
+                val parentUriMock = mock<Uri>()
+                whenever(Uri.parse(parentUri.value)) doReturn parentUriMock
+                whenever(Uri.fromFile(any())) doReturn parentUriMock
+                whenever(documentFileWrapper.fromUri(parentUriMock)) doReturn parentDoc
+
+                val result = underTest.createChildrenFilesSync(parentUri, children, true, false)
+
+                assertThat(result).isEqualTo(expectedUri)
+            }
+        }
+    }
+
+    @Test
+    fun `test createChildrenFilesSync returns null when children list is empty`() {
+        mockStatic(Uri::class.java).use {
+            val parentUri = UriPath("content://parent")
+            val children = emptyList<String>()
+
+            val parentDoc = mock<DocumentFile> {
+                on { isDirectory } doReturn true
+            }
+
+            val parentUriMock = mock<Uri>()
+            whenever(Uri.parse(parentUri.value)) doReturn parentUriMock
+            whenever(Uri.fromFile(any())) doReturn parentUriMock
+            whenever(documentFileWrapper.fromUri(parentUriMock)) doReturn parentDoc
+
+            val result = underTest.createChildrenFilesSync(parentUri, children, true, false)
+
+            assertThat(result).isNull()
+        }
+    }
+
+    @Test
+    fun `test createChildrenFilesSync returns null when parent is not a directory`() {
+        mockStatic(Uri::class.java).use {
+            val parentUri = UriPath("content://parent")
+            val children = listOf("test.txt")
+
+            val parentDoc = mock<DocumentFile> {
+                on { isDirectory } doReturn false
+            }
+
+            val parentUriMock = mock<Uri>()
+            whenever(Uri.parse(parentUri.value)) doReturn parentUriMock
+            whenever(Uri.fromFile(any())) doReturn parentUriMock
+            whenever(documentFileWrapper.fromUri(parentUriMock)) doReturn parentDoc
+
+            val result = underTest.createChildrenFilesSync(parentUri, children, true, false)
+
+            assertThat(result).isNull()
+        }
+    }
+
+    @Test
+    fun `test createChildrenFilesSync returns null when child has invalid characters`() {
+        mockStatic(Uri::class.java).use {
+            val parentUri = UriPath("content://parent")
+            val children = listOf("invalid/file.txt")
+
+            val parentDoc = mock<DocumentFile> {
+                on { isDirectory } doReturn true
+            }
+
+            val parentUriMock = mock<Uri>()
+            whenever(Uri.parse(parentUri.value)) doReturn parentUriMock
+            whenever(Uri.fromFile(any())) doReturn parentUriMock
+            whenever(documentFileWrapper.fromUri(parentUriMock)) doReturn parentDoc
+
+            val result = underTest.createChildrenFilesSync(parentUri, children, true, false)
+
+            assertThat(result).isNull()
+        }
+    }
+
+    @Test
+    fun `test createChildrenFilesSync returns null when parent document not found`() {
+        mockStatic(Uri::class.java).use {
+            val parentUri = UriPath("content://parent")
+            val children = listOf("test.txt")
+
+            val parentUriMock = mock<Uri>()
+            whenever(Uri.parse(parentUri.value)) doReturn parentUriMock
+            whenever(Uri.fromFile(any())) doReturn parentUriMock
+            whenever(documentFileWrapper.fromUri(parentUriMock)) doReturn null
+
+            val result = underTest.createChildrenFilesSync(parentUri, children, true, false)
+
+            assertThat(result).isNull()
+        }
+    }
 
 
     private fun stubGetDocumentFileFromUri(documentFile: DocumentFile): Uri {

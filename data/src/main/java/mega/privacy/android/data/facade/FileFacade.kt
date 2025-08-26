@@ -1,5 +1,6 @@
 package mega.privacy.android.data.facade
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.ContentValues
@@ -69,6 +70,7 @@ import java.nio.file.Paths
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.Stack
 import javax.inject.Inject
+import kotlin.Result.Companion.failure
 import kotlin.coroutines.coroutineContext
 import kotlin.math.sqrt
 import kotlin.time.ExperimentalTime
@@ -135,7 +137,7 @@ internal class FileFacade @Inject constructor(
         fileName: String,
         fileSize: Long,
         lastModifiedDate: Long,
-    ) = kotlin.runCatching {
+    ) = runCatching {
         val selectionArgs = arrayOf(
             fileName,
             fileSize.toString(),
@@ -368,7 +370,7 @@ internal class FileFacade @Inject constructor(
 
     override suspend fun createNewImageUri(fileName: String): Uri? {
         val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+            put(DISPLAY_NAME, fileName)
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             // use default location for below Android Q
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -385,7 +387,7 @@ internal class FileFacade @Inject constructor(
 
     override suspend fun createNewVideoUri(fileName: String): Uri? {
         val contentValues = ContentValues().apply {
-            put(MediaStore.Video.Media.DISPLAY_NAME, fileName)
+            put(DISPLAY_NAME, fileName)
             put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 put(
@@ -791,7 +793,7 @@ internal class FileFacade @Inject constructor(
     private fun getDocumentFileFromUri(uri: Uri): DocumentFile? =
         documentFileWrapper.fromUri(uri)
 
-    @RequiresPermission(android.Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+    @RequiresPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
     override suspend fun getFileFromUri(uri: Uri): File? {
         runCatching { getRealPathFromUri(context, uri) }
             .onFailure {
@@ -939,7 +941,7 @@ internal class FileFacade @Inject constructor(
 
     override fun deleteIfItIsAnEmptyFolder(uriPath: UriPath): Boolean {
         val documentFile = getDocumentFileFromUri(uriPath.toUri())
-        return if (documentFile?.isDirectory == true && documentFile.listFiles().isNullOrEmpty()) {
+        return if (documentFile?.isDirectory == true && documentFile.listFiles().isEmpty()) {
             documentFile.delete()
         } else {
             false
@@ -1143,6 +1145,107 @@ internal class FileFacade @Inject constructor(
         documentFileWrapper.getDocumentFileForSyncContentUri(uriPath.value)?.lastModified()
             ?.takeIf { it > 0 }
             ?.let { Instant.fromEpochMilliseconds(it) }
+
+    override fun createChildrenFilesSync(
+        parentUri: UriPath,
+        children: List<String>,
+        createIfMissing: Boolean,
+        lastAsFolder: Boolean,
+    ): UriPath? {
+        return createChildrenFiles(parentUri, children, createIfMissing, lastAsFolder).getOrElse {
+            Timber.e(it, "Failed to create children files at $parentUri with children: $children")
+            null
+        }
+    }
+
+    private fun createChildrenFiles(
+        parentUri: UriPath,
+        children: List<String>,
+        createIfMissing: Boolean,
+        lastAsFolder: Boolean,
+    ): Result<UriPath> {
+        if (children.isEmpty()) {
+            return failure(Exception("Children list cannot be empty"))
+        }
+
+        if (children.any { it.isBlank() || it.contains("/") || it.contains("\\") }) {
+            return failure(Exception("Invalid characters in path components"))
+        }
+
+        var currentDocument = getDocumentFileFromUri(parentUri.toUri())
+            ?: return failure(Exception("Invalid parent URI or document not found"))
+
+        if (!currentDocument.isDirectory) {
+            return failure(Exception("Parent URI does not point to a directory"))
+        }
+
+        for ((index, name) in children.withIndex()) {
+            val isLast = index == children.lastIndex
+            val shouldBeDirectory = !isLast || lastAsFolder
+
+            var nextDocument: DocumentFile?
+
+            if (createIfMissing) {
+                // Create directly
+                nextDocument = try {
+                    if (shouldBeDirectory) {
+                        currentDocument.createDirectory(name)
+                    } else {
+                        val mimeType = getMimeTypeFromFileName(name)
+                        currentDocument.createFile(mimeType, name)
+                    }
+                } catch (e: Exception) {
+                    Timber.w(e, "Direct creation failed for '$name'")
+                    null
+                }
+
+                // If the name does not match, delete and fall back to listFiles
+                if (nextDocument != null && nextDocument.name != name) {
+                    Timber.w("Created file '${nextDocument.name}' does not match expected name '$name'. Deleting it.")
+                    try {
+                        nextDocument.delete()
+                    } catch (e: Exception) {
+                        Timber.w(
+                            e,
+                            "Failed to delete incorrectly named document '${nextDocument.name}'"
+                        )
+                    }
+                    nextDocument = null
+                }
+
+                // Find at listFiles
+                if (nextDocument == null) {
+                    nextDocument = currentDocument.listFiles().firstOrNull { it.name == name }
+                    if (nextDocument == null) {
+                        return failure(Exception("Failed to create or locate '$name'"))
+                    }
+                }
+
+                // Check type
+                if (shouldBeDirectory && !nextDocument.isDirectory) {
+                    return failure(Exception("Expected directory but found file: '$name'"))
+                }
+                if (!shouldBeDirectory && nextDocument.isDirectory) {
+                    return failure(Exception("Expected file but found directory: '$name'"))
+                }
+
+            } else {
+                nextDocument = currentDocument.listFiles().firstOrNull { it.name == name }
+                    ?: return failure(Exception("Path component '$name' does not exist"))
+
+                if (shouldBeDirectory && !nextDocument.isDirectory) {
+                    return failure(Exception("Expected directory but found file: '$name'"))
+                }
+                if (!shouldBeDirectory && nextDocument.isDirectory) {
+                    return failure(Exception("Expected file but found directory: '$name'"))
+                }
+            }
+
+            currentDocument = nextDocument
+        }
+
+        return Result.success(UriPath(currentDocument.uri.toString()))
+    }
 
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"

@@ -271,6 +271,56 @@ class FileWrapperFactoryTest {
         return uriPath to uri
     }
 
+    @Test
+    fun `test that createNestedPath invokes the correct gateway method`() =
+        Mockito.mockStatic(Uri::class.java).useNoResult {
+            val (uriPath, _) = commonStub()
+            val children = listOf("folder1", "folder2", "file.txt")
+            val createIfMissing = true
+            val lastAsFolder = false
+            val (expectedUriPath, _) = commonStub("content://nested")
+
+            whenever(
+                fileGateway.createChildrenFilesSync(
+                    parentUri = uriPath,
+                    children = children,
+                    createIfMissing = createIfMissing,
+                    lastAsFolder = lastAsFolder
+                )
+            ) doReturn expectedUriPath
+
+            val actual =
+                underTest(uriPath)?.createNestedPath(children, createIfMissing, lastAsFolder)
+
+            assertThat(actual).isEqualTo(expectedUriPath.value)
+            verify(fileGateway).createChildrenFilesSync(
+                uriPath,
+                children,
+                createIfMissing,
+                lastAsFolder
+            )
+        }
+
+    @Test
+    fun `test that createNestedPath returns null when gateway returns null`() =
+        Mockito.mockStatic(Uri::class.java).useNoResult {
+            val (uriPath, _) = commonStub()
+            val children = listOf("folder1", "file.txt")
+
+            whenever(
+                fileGateway.createChildrenFilesSync(
+                    parentUri = uriPath,
+                    children = children,
+                    createIfMissing = true,
+                    lastAsFolder = false
+                )
+            ) doReturn null
+
+            val actual = underTest(uriPath)?.createNestedPath(children, true, false)
+
+            assertThat(actual).isNull()
+        }
+
     inline fun <T : java.lang.AutoCloseable?, R> T.useNoResult(block: (T) -> R) {
         this.use(block)
     }

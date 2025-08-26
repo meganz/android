@@ -626,4 +626,11 @@ interface FileGateway {
      */
     @ExperimentalTime
     suspend fun getLastModifiedTimeForSyncContentUri(uriPath: UriPath): Instant?
+
+    fun createChildrenFilesSync(
+        parentUri: UriPath,
+        children: List<String>,
+        createIfMissing: Boolean,
+        lastAsFolder: Boolean
+    ): UriPath?
 }
