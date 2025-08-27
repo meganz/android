@@ -37,7 +37,6 @@ internal const val NODE_NAME_INVALID_CHARACTERS = "\" * / : < > ? \\ |"
  *
  * @param nodeId The Node ID of the Node to rename
  * @param onDismiss Lambda that is triggered when the dialog is dismissed
- * @param onRenameNode Lambda that is triggered when the rename operation should be executed
  */
 @Composable
 fun RenameNodeDialogM3(
@@ -51,10 +50,6 @@ fun RenameNodeDialogM3(
         uiState = uiState,
         onLoadNodeName = {
             viewModel.handleAction(OnLoadNodeName(nodeId.longValue))
-        },
-        onRenameValidationPassed = { newNodeName ->
-            viewModel.renameNode(nodeId, newNodeName)
-            onDismiss()
         },
         resetRenameValidationPassed = {
             viewModel.handleAction(OnRenameValidationPassed)
@@ -77,7 +72,6 @@ fun RenameNodeDialogM3(
 internal fun RenameNodeDialogM3View(
     uiState: RenameNodeDialogState,
     onLoadNodeName: () -> Unit,
-    onRenameValidationPassed: (String) -> Unit,
     resetRenameValidationPassed: () -> Unit,
     resetShowChangeNodeExtensionDialog: () -> Unit,
     onRenameConfirmed: (String) -> Unit,
@@ -94,7 +88,7 @@ internal fun RenameNodeDialogM3View(
     EventEffect(
         event = uiState.renameValidationPassedEvent,
         onConsumed = resetRenameValidationPassed,
-        action = onRenameValidationPassed
+        action = onDismiss
     )
 
     EventEffect(
@@ -200,7 +194,6 @@ private fun PreviewRenameNodeDialogM3ViewNormal() {
                 nodeName = "document.pdf"
             ),
             onLoadNodeName = {},
-            onRenameValidationPassed = {},
             resetRenameValidationPassed = {},
             resetShowChangeNodeExtensionDialog = {},
             onRenameConfirmed = {},
@@ -220,7 +213,6 @@ private fun PreviewRenameNodeDialogM3ViewError() {
                 errorMessage = R.string.invalid_characters_defined
             ),
             onLoadNodeName = {},
-            onRenameValidationPassed = {},
             resetRenameValidationPassed = {},
             resetShowChangeNodeExtensionDialog = {},
             onRenameConfirmed = {},
@@ -239,7 +231,6 @@ private fun PreviewRenameNodeDialogM3ViewEmpty() {
                 nodeName = null
             ),
             onLoadNodeName = {},
-            onRenameValidationPassed = {},
             resetRenameValidationPassed = {},
             resetShowChangeNodeExtensionDialog = {},
             onRenameConfirmed = {},
@@ -258,7 +249,6 @@ private fun PreviewRenameNodeDialogM3ViewFolder() {
                 nodeName = "My Documents"
             ),
             onLoadNodeName = {},
-            onRenameValidationPassed = {},
             resetRenameValidationPassed = {},
             resetShowChangeNodeExtensionDialog = {},
             onRenameConfirmed = {},

@@ -16,6 +16,9 @@ internal fun NavGraphBuilder.changeNodeExtensionDialogNavigation(
             navArgument(searchChangeNodeExtensionDialogArgumentNodeNewName) {
                 type = NavType.StringType
             },
+            navArgument(searchChangeNodeExtensionNodeDialogArgumentNodeId) {
+                type = NavType.LongType
+            }
         ),
     ) { backStackEntry ->
         val nodeNewName =

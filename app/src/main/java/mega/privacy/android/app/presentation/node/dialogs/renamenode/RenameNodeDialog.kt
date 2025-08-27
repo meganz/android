@@ -42,7 +42,6 @@ internal const val NODE_NAME_INVALID_CHARACTERS = "\" * / : < > ? \\ |"
 internal fun RenameNodeDialog(
     nodeId: Long,
     onDismiss: () -> Unit,
-    onRenameNode: (nodeId: Long, newNodeName: String) -> Unit,
     onOpenChangeExtensionDialog: (newName: String) -> Unit,
     viewModel: RenameNodeDialogViewModel = hiltViewModel(),
 ) {
@@ -57,18 +56,19 @@ internal fun RenameNodeDialog(
         onConsumed = {
             viewModel.handleAction(OnRenameValidationPassed)
         },
-        action = { newNodeName ->
-            onRenameNode(nodeId, newNodeName)
-            onDismiss()
-        }
+        action = onDismiss
     )
 
-    EventEffect(event = uiState.showChangeNodeExtensionDialogEvent, onConsumed = {
-        viewModel.handleAction(OnChangeNodeExtensionDialogShown)
-    }, action = { newName ->
-        onDismiss()
-        onOpenChangeExtensionDialog(newName)
-    })
+    EventEffect(
+        event = uiState.showChangeNodeExtensionDialogEvent,
+        onConsumed = {
+            viewModel.handleAction(OnChangeNodeExtensionDialogShown)
+        },
+        action = { newName ->
+            onDismiss()
+            onOpenChangeExtensionDialog(newName)
+        }
+    )
 
     uiState.nodeName?.let { nodeName ->
         RenameNodeDialogBody(

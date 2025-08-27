@@ -65,7 +65,6 @@ internal fun SearchNavHostController(
                 handleClick = handleClick,
                 listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
                 fileTypeIconMapper = fileTypeIconMapper,
-                onRenameNode = nodeActionsViewModel::renameNode,
             )
         }
     }

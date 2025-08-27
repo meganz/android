@@ -50,12 +50,12 @@ import mega.privacy.android.app.presentation.search.navigation.searchForeignNode
 import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
 import mega.privacy.android.app.presentation.search.searchRoute
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
-import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
@@ -172,10 +172,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
                             changeLabelBottomSheetNavigation(navController)
 
-                            renameDialogNavigation(
-                                navHostController = navController,
-                                onRenameNode = nodeActionsViewModel::renameNode,
-                            )
+                            renameDialogNavigation(navHostController = navController,)
 
                             changeNodeExtensionDialogNavigation(navController)
 

@@ -17,6 +17,7 @@ import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAc
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnLoadNodeName
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameConfirmed
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameValidationPassed
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -36,7 +37,7 @@ class RenameNodeDialogViewModel @Inject constructor(
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val checkForValidNameUseCase: CheckForValidNameUseCase,
     private val renameNodeUseCase: RenameNodeUseCase,
-    private val snackbarEventQueue: SnackbarEventQueue
+    private val snackBarHandler: SnackBarHandler,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RenameNodeDialogState())
@@ -73,7 +74,7 @@ class RenameNodeDialogViewModel @Inject constructor(
             }
 
             is OnRenameValidationPassed -> {
-                _state.update { it.copy(renameValidationPassedEvent = consumed()) }
+                _state.update { it.copy(renameValidationPassedEvent = consumed) }
             }
 
             is OnChangeNodeExtensionDialogShown -> {
@@ -109,20 +110,20 @@ class RenameNodeDialogViewModel @Inject constructor(
 
             else -> {
                 _state.update {
-                    it.copy(
-                        renameValidationPassedEvent = triggered(action.newNodeName)
-                    )
+                    it.copy(renameValidationPassedEvent = triggered)
                 }
+
+                renameNode(currentNode.id, action.newNodeName)
             }
         }
     }
 
-    fun renameNode(nodeId: NodeId, newNodeName: String) {
+    internal fun renameNode(nodeId: NodeId, newNodeName: String) {
         applicationScope.launch {
             runCatching {
                 renameNodeUseCase(nodeId.longValue, newNodeName)
             }.onSuccess {
-                snackbarEventQueue.queueMessage(
+                snackBarHandler.postSnackbarMessage(
                     context.getString(sharedResR.string.context_correctly_renamed)
                 )
             }.onFailure {

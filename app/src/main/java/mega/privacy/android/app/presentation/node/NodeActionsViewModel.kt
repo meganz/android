@@ -15,11 +15,11 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.node.model.NodeActionState
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -54,10 +54,8 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
-import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -106,7 +104,6 @@ class NodeActionsViewModel @Inject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
-    private val renameNodeUseCase: RenameNodeUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -573,18 +570,4 @@ class NodeActionsViewModel @Inject constructor(
      * return the file type of the given file
      */
     fun getTypeInfo(file: File) = fileTypeInfoMapper(file.name)
-
-    fun renameNode(nodeId: Long, newNodeName: String) {
-        applicationScope.launch {
-            runCatching {
-                renameNodeUseCase(nodeId, newNodeName)
-            }.onSuccess {
-                snackBarHandler.postSnackbarMessage(
-                    sharedResR.string.context_correctly_renamed,
-                )
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
-    }
 }

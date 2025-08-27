@@ -11,6 +11,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -18,7 +19,6 @@ import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.node.ValidNameType
-import mega.privacy.android.navigation.contract.queue.SnackbarEventQueue
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,12 +26,11 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import mega.privacy.android.shared.resources.R as sharedResR
-import org.mockito.kotlin.any
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -44,7 +43,7 @@ class RenameNodeDialogViewModelTest {
     private val checkForValidNameUseCase: CheckForValidNameUseCase = mock()
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val renameNodeUseCase: RenameNodeUseCase = mock()
-    private val snackbarEventQueue: SnackbarEventQueue = mock()
+    private val snackBarHandler: SnackBarHandler = mock()
 
     @BeforeEach
     fun setup() {
@@ -54,7 +53,7 @@ class RenameNodeDialogViewModelTest {
             getNodeByHandleUseCase,
             checkForValidNameUseCase,
             renameNodeUseCase,
-            snackbarEventQueue
+            snackBarHandler
         )
     }
 
@@ -65,7 +64,7 @@ class RenameNodeDialogViewModelTest {
             getNodeByHandleUseCase,
             checkForValidNameUseCase,
             renameNodeUseCase,
-            snackbarEventQueue
+            snackBarHandler
         )
     }
 
@@ -92,6 +91,7 @@ class RenameNodeDialogViewModelTest {
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
             whenever(checkForValidNameUseCase(newNodeName, node)).thenReturn(ValidNameType.NO_ERROR)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
+            whenever(context.getString(any())).thenReturn("")
 
             underTest.handleAction(
                 RenameNodeDialogAction.OnRenameConfirmed(
@@ -100,9 +100,8 @@ class RenameNodeDialogViewModelTest {
                 )
             )
 
-            assertThat(underTest.state.value.renameValidationPassedEvent).isEqualTo(
-                triggered(newNodeName)
-            )
+            assertThat(underTest.state.value.renameValidationPassedEvent)
+                .isEqualTo(triggered)
         }
 
     @ParameterizedTest(name = "test {0} is mapped correctly")
@@ -133,7 +132,7 @@ class RenameNodeDialogViewModelTest {
             underTest.handleAction(RenameNodeDialogAction.OnRenameValidationPassed)
 
             val currentState = underTest.state.value
-            assertThat(currentState.renameValidationPassedEvent).isEqualTo(consumed())
+            assertThat(currentState.renameValidationPassedEvent).isEqualTo(consumed)
         }
 
     @Test
@@ -184,7 +183,7 @@ class RenameNodeDialogViewModelTest {
 
         underTest.renameNode(nodeId, newNodeName)
 
-        verify(snackbarEventQueue).queueMessage(mockMessage)
+        verify(snackBarHandler).postSnackbarMessage(mockMessage)
     }
 
     private fun provideValidationParameters(): List<Pair<ValidNameType, Int>> = listOf(

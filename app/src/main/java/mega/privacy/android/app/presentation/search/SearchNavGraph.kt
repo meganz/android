@@ -50,7 +50,6 @@ internal fun NavGraphBuilder.searchNavGraph(
     handleClick: (TypedNode?) -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
     listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
-    onRenameNode: (nodeId: Long, newNodeName: String) -> Unit,
 ) {
     composable(searchRoute) {
         SearchScreen(
@@ -68,10 +67,7 @@ internal fun NavGraphBuilder.searchNavGraph(
         navHostController = navHostController,
         listToStringWithDelimitersMapper = listToStringWithDelimitersMapper
     )
-    renameDialogNavigation(
-        navHostController = navHostController,
-        onRenameNode = onRenameNode,
-    )
+    renameDialogNavigation(navHostController = navHostController)
     nodeBottomSheetNavigation(
         nodeActionHandler = nodeActionHandler,
         navHostController = navHostController,

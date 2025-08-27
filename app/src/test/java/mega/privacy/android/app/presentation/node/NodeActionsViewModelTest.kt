@@ -6,16 +6,16 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.AccountType
@@ -55,8 +55,6 @@ import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
-import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
-import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -75,7 +73,6 @@ import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.stream.Stream
 import kotlin.time.Duration
-import mega.privacy.android.shared.resources.R as sharedResR
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -110,7 +107,6 @@ class NodeActionsViewModelTest {
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
-    private val renameNodeUseCase = mock<RenameNodeUseCase>()
 
     private fun initViewModel() {
         viewModel = NodeActionsViewModel(
@@ -137,7 +133,6 @@ class NodeActionsViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             fileTypeInfoMapper = fileTypeInfoMapper,
-            renameNodeUseCase = renameNodeUseCase,
         )
     }
 
@@ -467,17 +462,6 @@ class NodeActionsViewModelTest {
         whenever(fileTypeInfoMapper(file.name)) doReturn expected
         val actual = viewModel.getTypeInfo(file)
         assertThat(actual).isEqualTo(expected)
-    }
-
-    @Test
-    fun `test that on rename success should show snackbar`() = runTest {
-        val nodeHandle = 123L
-        val newNodeName = "New Node Name"
-        whenever(renameNodeUseCase(nodeHandle, newNodeName)).thenReturn(Unit)
-        initViewModel()
-        viewModel.renameNode(nodeHandle, newNodeName)
-
-        verify(snackBarHandler).postSnackbarMessage(sharedResR.string.context_correctly_renamed)
     }
 }
 

@@ -9,5 +9,5 @@ data class RenameNodeDialogState(
     val nodeName: String? = null,
     @StringRes val errorMessage: Int? = null,
     val showChangeNodeExtensionDialogEvent: StateEventWithContent<String> = consumed(),
-    val renameValidationPassedEvent: StateEventWithContent<String> = consumed(),
+    val renameValidationPassedEvent: StateEvent = consumed,
 )
