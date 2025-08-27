@@ -10,6 +10,7 @@ import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartIni
 import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginInitialiser
 import mega.privacy.android.app.appstate.initialisation.postlogin.PurchaseReviewInitialiser
+import mega.privacy.android.app.sslverification.initialiser.SSLErrorMonitorInitialiser
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -42,6 +43,11 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun providePurchaseReviewInitialiser(initialiser: PurchaseReviewInitialiser): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideSslErrorMonitorAppStartInitialiser(initialiser: SSLErrorMonitorInitialiser): AppStartInitialiser =
         initialiser
 
 }

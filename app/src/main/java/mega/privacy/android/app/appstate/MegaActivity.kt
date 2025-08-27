@@ -22,8 +22,10 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.appstate.content.AppContentStateViewModel
+import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
 import mega.privacy.android.app.appstate.content.view.AppContentView
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
+import mega.privacy.android.app.appstate.global.event.AppDialogViewModel
 import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.util.show
@@ -34,6 +36,7 @@ import mega.privacy.android.app.presentation.login.LoginScreen
 import mega.privacy.android.app.presentation.login.loginNavigationGraph
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.navigation.contract.AppDialogDestinations
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -44,6 +47,9 @@ class MegaActivity : ComponentActivity() {
 
     @Inject
     lateinit var chatRequestHandler: MegaChatRequestHandler
+
+    @Inject
+    lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
 
     @Serializable
     data object LoginLoading
@@ -64,16 +70,21 @@ class MegaActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val viewModel = viewModel<GlobalStateViewModel>()
+            val appDialogViewModel = hiltViewModel<AppDialogViewModel>()
+
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            val dialogEvents by appDialogViewModel.dialogEvents.collectAsStateWithLifecycle()
+
             val snackbarEventsViewModel = viewModel<SnackbarEventsViewModel>()
-            val state = viewModel.state.collectAsStateWithLifecycle()
             val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
             val navController = rememberNavController()
+            val navigationHandler = remember { NavigationHandlerImpl(navController) }
             val snackbarHostState = remember { SnackbarHostState() }
             // This is used to recompose the LoginGraph when new login request is made
-            keepSplashScreen = state.value is GlobalState.Loading
+            keepSplashScreen = state is GlobalState.Loading
 
-            LaunchedEffect(state.value) {
-                when (val currentState = state.value) {
+            LaunchedEffect(state) {
+                when (val currentState = state) {
                     is GlobalState.Loading -> {}
                     is GlobalState.LoggedIn -> {
                         val isFromLogin =
@@ -105,13 +116,17 @@ class MegaActivity : ComponentActivity() {
                 }
             }
 
+            EventEffect(event = dialogEvents, onConsumed = appDialogViewModel::dialogDisplayed) {
+                navController.navigate(it.dialogDestination)
+            }
+
+            AndroidTheme(isDark = state.themeMode.isDarkMode()) {
             EventEffect(
                 event = snackbarEventsState,
                 onConsumed = snackbarEventsViewModel::consumeEvent,
                 action = { snackbarHostState.show(it) }
             )
 
-            AndroidTheme(isDark = state.value.themeMode.isDarkMode()) {
                 NavHost(
                     navController = navController,
                     startDestination = LoginLoading,
@@ -137,6 +152,15 @@ class MegaActivity : ComponentActivity() {
                             snackbarHostState = snackbarHostState,
                         )
                     }
+
+                    appDialogDestinations.forEach {
+                        it.navigationGraph(
+                            this,
+                            navigationHandler,
+                            appDialogViewModel::eventHandled
+                        )
+                    }
+
                 }
             }
         }

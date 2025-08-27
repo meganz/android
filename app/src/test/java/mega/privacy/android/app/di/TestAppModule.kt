@@ -15,6 +15,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.AppDialogDestinations
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.dialog.AppDialogsEventQueue
@@ -67,6 +68,11 @@ object TestAppModule {
 
     @Provides
     fun provideDisableChatApiUseCase(): DisableChatApiUseCase = mock()
+
+    @Provides
+    @ElementsIntoSet
+    fun provideAppDialogDestinations(): Set<@JvmSuppressWildcards AppDialogDestinations> =
+        emptySet()
 
     @Provides
     fun provideAppDialogsEventQueue(): AppDialogsEventQueue = mock()
