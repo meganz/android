@@ -151,7 +151,7 @@ fun AlbumsView(
 
     if (albumsViewState.removedLinksCount > 0) {
         val snackbarMessage = pluralStringResource(
-            id = R.plurals.context_link_removal_success,
+            id = sharedR.plurals.context_link_removal_success,
             count = albumsViewState.removedLinksCount,
         )
         LaunchedEffect(Unit) {

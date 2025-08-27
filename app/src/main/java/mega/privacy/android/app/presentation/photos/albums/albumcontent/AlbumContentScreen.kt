@@ -66,6 +66,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.mobile.analytics.event.AlbumAddPhotosFABEvent
 import mega.privacy.mobile.analytics.event.RemoveItemsFromAlbumDialogButtonEvent
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun AlbumContentScreen(
@@ -252,7 +253,7 @@ internal fun AlbumContentScreen(
 
             if (userAlbum != null && albumContentState.isLinkRemoved) {
                 val message = pluralStringResource(
-                    id = R.plurals.context_link_removal_success,
+                    id = sharedResR.plurals.context_link_removal_success,
                     count = 1,
                 )
                 Snackbar(

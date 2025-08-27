@@ -1,10 +1,10 @@
-package mega.privacy.android.app.presentation.node.dialogs.removelink
+package mega.privacy.android.core.nodecomponents.dialog.removelink
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
+import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
@@ -22,7 +22,7 @@ import org.mockito.kotlin.whenever
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RemoveToolbarMenuItemNodeLinkViewModelTest {
+class RemoveNodeLinkViewModelTest {
 
     private val disableExportNodesUseCase: DisableExportNodesUseCase = mock()
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper = mock()

@@ -1475,4 +1475,19 @@
     <string name="context_correctly_renamed">Item renamed</string>
     <!-- Homepage section. -->
     <string name="general_section_home">Home</string>
+    <!-- Error message when removing public links of nodes. Plural. -->
+    <plurals name="context_link_removal_error">
+        <item quantity="one">Link removal failed. Please try again later.</item>
+        <item quantity="other">Failed to remove some links. Please try again later.</item>
+    </plurals>
+    <!-- Message when some public links were removed successfully. Plural. -->
+    <plurals name="context_link_removal_success">
+        <item quantity="one">Link removed</item>
+        <item quantity="other">Links removed</item>
+    </plurals>
+    <!-- Warning that appears prior to remove links of files. Plural. -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="one">This link will not be publicly available anymore.</item>
+        <item quantity="other">These links will not be publicly available anymore.</item>
+    </plurals>
 </resources>

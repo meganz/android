@@ -1,6 +1,7 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.dialog.removelink.RemoveNodeLinkDialogArgs
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
@@ -31,18 +32,13 @@ class RemoveLinkBottomSheetMenuItem @Inject constructor(
         handler: BottomSheetClickHandler
     ): () -> Unit = {
         handler.onDismiss()
-        // Todo: navigationHandler
-//        navController.navigate(
-//            removeNodeLinkRoute.plus(File.separator)
-//                .plus(nodeHandlesToJsonMapper(listOf(node.id.longValue)))
-//        )
+        handler.navigationHandler.navigate(
+            RemoveNodeLinkDialogArgs(
+                nodes = nodeHandlesToJsonMapper(listOf(node.id.longValue))
+            )
+        )
     }
 
     override val menuAction = RemoveLinkMenuAction(170)
     override val groupId = 7
-
-    companion object {
-        // Todo duplicate to the one in mega.privacy.android.app.presentation.search.model.navigation.RemoveNodeLinkNavigation.kt
-        private const val removeNodeLinkRoute = "search/node_bottom_sheet/remove_node_link_dialog"
-    }
 }

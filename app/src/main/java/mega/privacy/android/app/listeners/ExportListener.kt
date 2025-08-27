@@ -14,6 +14,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Export listener
@@ -229,7 +230,7 @@ class ExportListener constructor(private val context: Context) :
                             Util.showSnackbar(
                                 context,
                                 context.resources.getQuantityString(
-                                    R.plurals.context_link_removal_success,
+                                    sharedResR.plurals.context_link_removal_success,
                                     numberRemove
                                 )
                             )
