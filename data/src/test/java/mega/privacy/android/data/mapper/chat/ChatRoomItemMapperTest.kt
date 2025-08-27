@@ -109,4 +109,48 @@ class ChatRoomItemMapperTest {
         assertThat(result.highlight).isEqualTo(true)
         assertThat(result.lastTimestamp).isEqualTo(1629158456L)
     }
+
+    @Test
+    fun `test that the highlight is set to False when the unreadCount is 0 and there is no call in progress or started`() {
+        val unreadCount = 0
+        val combinedChatRoom = CombinedChatRoom(
+            chatId = 123L,
+            title = "Meeting Room",
+            isMeeting = true,
+            ownPrivilege = ChatRoomPermission.Moderator,
+            lastMessageType = ChatRoomLastMessage.VoiceClip,
+            unreadCount = unreadCount,
+            isActive = true,
+            isArchived = false,
+            isPublic = false,
+            isCallInProgress = false,
+            lastTimestamp = 1629156234L
+        )
+
+        val result = underTest(chatRoom = combinedChatRoom)
+
+        assertThat(result.highlight).isFalse()
+    }
+
+    @Test
+    fun `test that the highlight is set to True when the unreadCount is not 0`() {
+        val unreadCount = 10
+        val combinedChatRoom = CombinedChatRoom(
+            chatId = 123L,
+            title = "Meeting Room",
+            isMeeting = true,
+            ownPrivilege = ChatRoomPermission.Moderator,
+            lastMessageType = ChatRoomLastMessage.VoiceClip,
+            unreadCount = unreadCount,
+            isActive = true,
+            isArchived = false,
+            isPublic = false,
+            isCallInProgress = false,
+            lastTimestamp = 1629156234L
+        )
+
+        val result = underTest(chatRoom = combinedChatRoom)
+
+        assertThat(result.highlight).isTrue()
+    }
 }

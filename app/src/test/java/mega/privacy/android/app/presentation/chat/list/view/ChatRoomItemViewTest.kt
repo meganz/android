@@ -213,4 +213,70 @@ class ChatRoomItemViewTest {
         composeTestRule.onNodeWithTag(TEST_TAG_BOTTOM_TEXT_CALL_CHRONOMETER, useUnmergedTree = true)
             .assertExists()
     }
+
+    @Test
+    fun `test that the counter badge is not displayed if the unread count is 0 even when the item is not notetoself and not in loading state`() {
+        val item = mock<ChatRoomItem.MeetingChatRoomItem> {
+            on { getDurationFromInitialTimestamp() } doReturn 27.seconds
+            on { hasCallInProgress() } doReturn true
+            on { isPending } doReturn true
+            on { title } doReturn "Title"
+            on { call } doReturn mock()
+            on { isPublic } doReturn false
+            on { chatId } doReturn 123L
+            on { currentCallStatus } doReturn ChatRoomItemStatus.Joined
+            on { highlight } doReturn true
+            on { isPendingMeeting() } doReturn true
+            on { lastTimestampFormatted } doReturn "lastTimestampFormatted"
+            on { unreadCount } doReturn 0
+        }
+
+        composeTestRule.setContent {
+            ChatRoomItemView(
+                item = item,
+                isSelected = true,
+                isSelectionEnabled = true,
+                onItemClick = onItemClick,
+                onItemMoreClick = onItemMoreClick,
+                onItemSelected = onItemSelected,
+            )
+        }
+
+        composeTestRule
+            .onNodeWithTag("chat_room_item:unread_count_icon", useUnmergedTree = true)
+            .assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that the counter badge is displayed if the unread count is not 0 and the item is not notetoself and not in loading state`() {
+        val item = mock<ChatRoomItem.MeetingChatRoomItem> {
+            on { getDurationFromInitialTimestamp() } doReturn 27.seconds
+            on { hasCallInProgress() } doReturn true
+            on { isPending } doReturn true
+            on { title } doReturn "Title"
+            on { call } doReturn mock()
+            on { isPublic } doReturn false
+            on { chatId } doReturn 123L
+            on { currentCallStatus } doReturn ChatRoomItemStatus.Joined
+            on { highlight } doReturn true
+            on { isPendingMeeting() } doReturn true
+            on { lastTimestampFormatted } doReturn "lastTimestampFormatted"
+            on { unreadCount } doReturn 10
+        }
+
+        composeTestRule.setContent {
+            ChatRoomItemView(
+                item = item,
+                isSelected = true,
+                isSelectionEnabled = true,
+                onItemClick = onItemClick,
+                onItemMoreClick = onItemMoreClick,
+                onItemSelected = onItemSelected,
+            )
+        }
+
+        composeTestRule
+            .onNodeWithTag("chat_room_item:unread_count_icon", useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
 }
