@@ -18,8 +18,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeComponentPreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.textColor
 
@@ -43,6 +43,8 @@ fun MegaText(
     minLines: Int = 1,
     style: TextStyle = LocalTextStyle.current,
     textAlign: TextAlign? = null,
+    softWrap: Boolean = true,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
 ) = when (overflow) {
     LongTextBehaviour.MiddleEllipsis -> MiddleEllipsisText(
         text = text,
@@ -50,7 +52,9 @@ fun MegaText(
         modifier = modifier,
         maxLines = overflow.maxLines,
         style = style,
-        textAlign = textAlign
+        textAlign = textAlign,
+        softWrap = softWrap,
+        onTextLayout = onTextLayout
     )
 
     LongTextBehaviour.Marquee -> MarqueeText(
@@ -58,7 +62,9 @@ fun MegaText(
         modifier = Modifier.basicMarquee(),
         color = DSTokens.textColor(textColor = textColor),
         style = style,
-        textAlign = textAlign
+        textAlign = textAlign,
+        softWrap = softWrap,
+        onTextLayout = onTextLayout
     )
 
     else -> Text(
@@ -69,7 +75,9 @@ fun MegaText(
         maxLines = overflow.maxLines,
         minLines = minLines,
         style = style,
-        textAlign = textAlign
+        textAlign = textAlign,
+        softWrap = softWrap,
+        onTextLayout = onTextLayout
     )
 }
 

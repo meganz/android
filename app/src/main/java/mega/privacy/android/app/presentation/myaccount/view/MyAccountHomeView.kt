@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -61,6 +62,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -749,6 +751,10 @@ internal fun UsageMeterSection(
         UsedTransferStatus.AlmostFull -> SupportColor.Warning to TextColor.Warning
         else -> SupportColor.Success to TextColor.Success
     }
+    val defaultTextStyle = MaterialTheme.typography.body2medium
+    var finalTextStyle by remember { mutableStateOf(defaultTextStyle) }
+    var shouldDrawText by remember { mutableStateOf(false) }
+
     if (showProgressBar) {
         //Layout to show Storage/Transfer usage for Free/Pro accounts except Pro Flexi
         ConstraintLayout(
@@ -767,6 +773,7 @@ internal fun UsageMeterSection(
 
             Box(
                 modifier = Modifier
+                    .size(50.dp)
                     .testTag(USAGE_STORAGE_SECTION)
                     .constrainAs(storageLayout) {
                         top.linkTo(parent.top, 14.dp)
@@ -777,7 +784,7 @@ internal fun UsageMeterSection(
                 MegaCircularProgressIndicator(
                     modifier = Modifier
                         .testTag(USAGE_STORAGE_PROGRESS)
-                        .size(50.dp)
+                        .fillMaxSize()
                         .align(Alignment.Center),
                     supportColor = storageColor.first,
                     strokeWidth = 5.dp,
@@ -786,10 +793,25 @@ internal fun UsageMeterSection(
                 )
 
                 MegaText(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(5.dp)
+                        .drawWithContent {
+                            if (shouldDrawText) drawContent()
+                        },
                     text = "$usedStoragePercentage%",
-                    style = MaterialTheme.typography.body2medium,
                     textColor = storageColor.second,
+                    style = finalTextStyle,
+                    softWrap = false,
+                    onTextLayout = { result ->
+                        if (result.didOverflowWidth && defaultTextStyle.fontSize.isSpecified) {
+                            finalTextStyle = finalTextStyle.copy(
+                                fontSize = finalTextStyle.fontSize * 0.8
+                            )
+                        } else {
+                            shouldDrawText = true
+                        }
+                    }
                 )
             }
 

@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import mega.android.core.ui.theme.values.TextColor
@@ -30,11 +31,15 @@ fun MarqueeText(
     color: TextColor,
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
+    softWrap: Boolean = true,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
 ) = MarqueeText(
     text = text,
     color = DSTokens.textColor(color),
     modifier = modifier,
-    style = style
+    style = style,
+    softWrap = softWrap,
+    onTextLayout = onTextLayout
 )
 
 /**
@@ -53,13 +58,17 @@ internal fun MarqueeText(
     color: Color = Color.Unspecified,
     style: TextStyle = LocalTextStyle.current,
     textAlign: TextAlign? = null,
+    softWrap: Boolean = true,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
 ) = Text(
     text = text,
     modifier = modifier.basicMarquee(),
     color = color,
     maxLines = 1,
     style = style,
-    textAlign = textAlign
+    textAlign = textAlign,
+    softWrap = softWrap,
+    onTextLayout = onTextLayout
 )
 
 @CombinedThemePreviews
