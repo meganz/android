@@ -222,4 +222,13 @@
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
     <string name="file_extension_change_title">File extension change</string>
     <!-- End of Rename dialog resources -->
+
+    <!-- Start of Move to rubbish bin dialog resources -->
+    <!-- confirmation message before removing a file -->
+    <string name="confirmation_delete_from_mega">Delete from MEGA?</string>
+    <!-- confirmation message before removing a file -->
+    <string name="confirmation_move_to_rubbish">Move to the Rubbish bin?</string>
+    <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
+    <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Delete</string>
+    <!-- End of Move to rubbish bin dialog resources -->
 </resources>
