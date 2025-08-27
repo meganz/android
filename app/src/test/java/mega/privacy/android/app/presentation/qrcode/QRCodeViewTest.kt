@@ -20,6 +20,8 @@ import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
+import mega.privacy.android.app.presentation.transfers.transferoverquota.TransferOverQuotaViewModel
+import mega.privacy.android.app.presentation.transfers.transferoverquota.model.TransferOverQuotaViewState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,8 +40,12 @@ class QRCodeViewTest {
     private val startTransfersComponentViewModel = mock<StartTransfersComponentViewModel> {
         on { uiState } doReturn MutableStateFlow(StartTransferViewState())
     }
+    private val transfersOverQuotaViewModel = mock<TransferOverQuotaViewModel> {
+        on { uiState } doReturn MutableStateFlow(TransferOverQuotaViewState())
+    }
     private val viewModelStore = mock<ViewModelStore> {
         on { get(argThat<String> { contains(StartTransfersComponentViewModel::class.java.canonicalName.orEmpty()) }) } doReturn startTransfersComponentViewModel
+        on { get(argThat<String> { contains(TransferOverQuotaViewModel::class.java.canonicalName.orEmpty()) }) } doReturn transfersOverQuotaViewModel
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore

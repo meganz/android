@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -23,6 +22,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -31,15 +31,11 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.databinding.TransferOverquotaLayoutBinding
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.PermissionRequester
@@ -49,7 +45,6 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.base.BaseViewModel
-import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
@@ -82,7 +77,6 @@ import mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
@@ -106,10 +100,9 @@ import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorSslVerificationFailedUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
+import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.mobile.analytics.event.TransferOverQuotaDialogEvent
-import mega.privacy.mobile.analytics.event.TransferOverQuotaUpgradeAccountButtonEvent
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApi
@@ -195,8 +188,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     protected var app: MegaApplication = MegaApplication.getInstance()
     private var sslErrorDialog: AlertDialog? = null
     private var delaySignalPresence = false
-    private var isGeneralTransferOverQuotaWarningShown = false
-    private var transferGeneralOverQuotaWarning: AlertDialog? = null
     private var upgradeAlert: AlertDialog? = null
     private var purchaseType: PurchaseType? = null
     private var activeSubscriptionSku: String? = null
@@ -286,30 +277,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             }
         }
 
-        if (allowToShowOverQuotaWarning) {
-            collectFlow(transfersManagementViewModel.state.map { it.transferOverQuotaWarning }
-                .distinctUntilChanged()) { isTransferOverQuotaWarning ->
-                if (isTransferOverQuotaWarning) {
-                    showGeneralTransferOverQuotaWarning()
-                    transfersManagementViewModel.onTransferOverQuotaWarningConsumed()
-                }
-            }
-        }
-
         savedInstanceState?.apply {
             isExpiredBusinessAlertShown =
                 getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false)
 
             if (isExpiredBusinessAlertShown) {
                 showExpiredBusinessAlert()
-            }
-
-            isGeneralTransferOverQuotaWarningShown = getBoolean(
-                TRANSFER_OVER_QUOTA_WARNING_SHOWN, false
-            )
-
-            if (isGeneralTransferOverQuotaWarningShown) {
-                showGeneralTransferOverQuotaWarning()
             }
 
             if (getBoolean(UPGRADE_ALERT_SHOWN, false)) {
@@ -341,7 +314,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     override fun onSaveInstanceState(outState: Bundle) {
         outState.apply {
             putBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, isExpiredBusinessAlertShown)
-            putBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, isGeneralTransferOverQuotaWarningShown)
             putBoolean(UPGRADE_ALERT_SHOWN, isAlertDialogShown(upgradeAlert))
             putSerializable(PURCHASE_TYPE, purchaseType)
             putString(ACTIVE_SUBSCRIPTION_SKU, activeSubscriptionSku)
@@ -367,8 +339,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
 
     override fun onDestroy() {
-        dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
-        dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
         dismissAlertDialogIfExists(upgradeAlert)
         super.onDestroy()
     }
@@ -410,7 +380,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
             openBrowserButton.setOnClickListener {
                 dismiss()
-                val uriUrl = Uri.parse("https://${getDomainNameUseCase()}/")
+                val uriUrl = "https://${getDomainNameUseCase()}/".toUri()
                 val launchBrowser = Intent(Intent.ACTION_VIEW, uriUrl)
                 startActivity(launchBrowser)
             }
@@ -894,64 +864,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     }
 
     /**
-     * Shows a warning indicating transfer over quota occurred.
-     */
-    fun showGeneralTransferOverQuotaWarning() = lifecycleScope.launch {
-        if (isActivityInBackground || transfersManagementViewModel.isInTransfersSection() || transferGeneralOverQuotaWarning != null) return@launch
-        val builder =
-            MaterialAlertDialogBuilder(
-                this@BaseActivity,
-                R.style.ThemeOverlay_Mega_MaterialAlertDialog
-            )
-        val binding = TransferOverquotaLayoutBinding.inflate(layoutInflater)
-        builder.setView(binding.root)
-            .setOnDismissListener {
-                isGeneralTransferOverQuotaWarningShown = false
-                transferGeneralOverQuotaWarning = null
-                transfersManagementViewModel.resetTransferOverQuotaTimestamp()
-            }
-            .setCancelable(false)
-        transferGeneralOverQuotaWarning = builder.create()
-        transferGeneralOverQuotaWarning?.setCanceledOnTouchOutside(false)
-        val stringResource =
-            if (transfersManagementViewModel.isTransferOverQuota()) R.string.current_text_depleted_transfer_overquota else R.string.text_depleted_transfer_overquota
-        binding.textTransferOverquota.text = getString(
-            stringResource, TimeUtils.getHumanizedTime(megaApi.bandwidthOverquotaDelay)
-        )
-        binding.transferOverquotaButtonPayment.apply {
-            val credentials = runCatching { getAccountCredentialsUseCase() }.getOrNull()
-            val isLoggedIn = megaApi.isLoggedIn != 0 && credentials != null
-            text = if (isLoggedIn) {
-                val isFreeAccount =
-                    myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE
-                getString(if (isFreeAccount) sharedR.string.general_upgrade_button else R.string.plans_depleted_transfer_overquota)
-            } else {
-                getString(sharedR.string.login_text)
-            }
-            setOnClickListener {
-                transferGeneralOverQuotaWarning?.dismiss()
-                if (isLoggedIn) {
-                    Analytics.tracker.trackEvent(TransferOverQuotaUpgradeAccountButtonEvent)
-                    navigateToUpgradeAccount()
-                } else {
-                    navigateToLogin()
-                }
-            }
-        }
-        binding.transferOverquotaButtonDissmiss.setOnClickListener {
-            transferGeneralOverQuotaWarning?.dismiss()
-        }
-        TimeUtils.createAndShowCountDownTimer(
-            stringResource,
-            transferGeneralOverQuotaWarning,
-            binding.textTransferOverquota
-        )
-        Analytics.tracker.trackEvent(TransferOverQuotaDialogEvent)
-        transferGeneralOverQuotaWarning?.show()
-        isGeneralTransferOverQuotaWarningShown = true
-    }
-
-    /**
      * Launches an intent to navigate to Login screen.
      */
     @JvmOverloads
@@ -1009,7 +921,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             //If the receiver is not registered, it throws an IllegalArgumentException
             super.unregisterReceiver(receiver)
         } catch (e: IllegalArgumentException) {
-            Timber.w(e, "IllegalArgumentException unregistering transfersUpdateReceiver")
+            Timber.w(e, "IllegalArgumentException unregistering $receiver")
         }
     }
 
@@ -1273,14 +1185,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         showForeignStorageOverQuotaWarningDialog(this)
     }
 
-    /**
-     * Allow to show the transfer over quota warning.
-     */
-    open val allowToShowOverQuotaWarning: Boolean = true
-
     companion object {
         private const val EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN"
-        private const val TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN"
         private const val UPGRADE_ALERT_SHOWN = "UPGRADE_ALERT_SHOWN"
         private const val PURCHASE_TYPE = "PURCHASE_TYPE"
         private const val ACTIVE_SUBSCRIPTION_SKU = "ACTIVE_SUBSCRIPTION_SKU"

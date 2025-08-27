@@ -9,15 +9,14 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
-import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.entity.transfer.CompletedTransferState
+import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.GetNumPendingTransfersUseCase
@@ -25,7 +24,6 @@ import mega.privacy.android.domain.usecase.transfers.MonitorLastTransfersHaveBee
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.IsCompletedTransfersEmptyUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import timber.log.Timber
 import javax.inject.Inject
@@ -50,7 +48,6 @@ class TransfersManagementViewModel @Inject constructor(
     monitorLastTransfersHaveBeenCancelledUseCase: MonitorLastTransfersHaveBeenCancelledUseCase,
     private val monitorCompletedTransfersEventUseCase: MonitorCompletedTransferEventUseCase,
     private val samplePeriod: Long?,
-    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferManagementUiState())
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
@@ -93,7 +90,6 @@ class TransfersManagementViewModel @Inject constructor(
                 }
         }
         monitorFailedTransfers()
-        monitorTransferOverQuota()
     }
 
     private fun monitorFailedTransfers() {
@@ -106,23 +102,6 @@ class TransfersManagementViewModel @Inject constructor(
         }
     }
 
-    private fun monitorTransferOverQuota() {
-        viewModelScope.launch {
-            monitorTransferOverQuotaUseCase().collectLatest { isTransferOverQuota ->
-                _state.update { state -> state.copy(isTransferOverQuota = isTransferOverQuota) }
-
-                if (isTransferOverQuota) {
-                    checkTransferOverQuotaWarning()
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks if the transfer is over quota.
-     */
-    fun isTransferOverQuota() = state.value.isTransferOverQuota
-
     /**
      * Checks if should show transfer errors. If so, updates state as the error is immediately consumed.
      */
@@ -133,8 +112,8 @@ class TransfersManagementViewModel @Inject constructor(
                     if (it.status == TransfersStatus.TransferError) {
                         it.copy(
                             status =
-                            if (it.totalSizeToTransfer == 0L) TransfersStatus.Completed
-                            else TransfersStatus.Transferring
+                                if (it.totalSizeToTransfer == 0L) TransfersStatus.Completed
+                                else TransfersStatus.Transferring
                         )
                     } else {
                         it
@@ -211,60 +190,7 @@ class TransfersManagementViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Gets from the UI state if the app is in the transfers section.
-     */
-    fun isInTransfersSection() = state.value.isInTransfersSection
-
-    /**
-     * Updates UI state to indicate that the app is in the transfers section.
-     */
-    fun setInTransfersSection(isInTransfersSection: Boolean) {
-        _state.update {
-            it.copy(isInTransfersSection = isInTransfersSection)
-        }
-    }
-
-    /**
-     * Resets the transfer over quota timestamp to the default value.
-     */
-    fun resetTransferOverQuotaTimestamp() {
-        _state.update {
-            it.copy(transferOverQuotaTimestamp = INVALID_TIMESTAMP)
-        }
-    }
-
-    /**
-     * Checks if a transfer over quota warning has to be shown.
-     * If so, sets the timestamp to the current time to avoid show duplicated transfer over quota warnings.
-     */
-    private fun checkTransferOverQuotaWarning() {
-        if (state.value.transferOverQuotaTimestamp == INVALID_TIMESTAMP
-            || state.value.transferOverQuotaTimestamp - System.currentTimeMillis() > WAIT_TIME_TO_SHOW_TRANSFER_OVER_QUOTA_WARNING
-        ) {
-            _state.update {
-                it.copy(
-                    transferOverQuotaTimestamp = System.currentTimeMillis(),
-                    transferOverQuotaWarning = true
-                )
-            }
-        } else {
-            onTransferOverQuotaWarningConsumed()
-        }
-    }
-
-    /**
-     * Consumes the transfer over quota warning.
-     */
-    fun onTransferOverQuotaWarningConsumed() {
-        _state.update {
-            it.copy(transferOverQuotaWarning = false)
-        }
-    }
-
     companion object {
-        internal const val INVALID_TIMESTAMP = -1L
-        private const val WAIT_TIME_TO_SHOW_TRANSFER_OVER_QUOTA_WARNING = 60000L
         private const val DEFAULT_SAMPLE_PERIOD = 500L
         internal val waitTimeToShowOffline = 30_000L.milliseconds
     }

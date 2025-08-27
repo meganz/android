@@ -16,6 +16,8 @@ import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.transfers.preview.model.LoadingPreviewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
+import mega.privacy.android.app.presentation.transfers.transferoverquota.TransferOverQuotaViewModel
+import mega.privacy.android.app.presentation.transfers.transferoverquota.model.TransferOverQuotaViewState
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
@@ -34,8 +36,12 @@ class LoadingPreviewViewTest {
     private val startTransfersComponentViewModel = mock<StartTransfersComponentViewModel> {
         on { uiState } doReturn MutableStateFlow(StartTransferViewState())
     }
+    private val transfersOverQuotaViewModel = mock<TransferOverQuotaViewModel> {
+        on { uiState } doReturn MutableStateFlow(TransferOverQuotaViewState())
+    }
     private val viewModelStore = mock<ViewModelStore> {
         on { get(argThat<String> { contains(StartTransfersComponentViewModel::class.java.canonicalName.orEmpty()) }) } doReturn startTransfersComponentViewModel
+        on { get(argThat<String> { contains(TransferOverQuotaViewModel::class.java.canonicalName.orEmpty()) }) } doReturn transfersOverQuotaViewModel
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore

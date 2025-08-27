@@ -17,6 +17,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
@@ -36,7 +37,8 @@ import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
-import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.app.presentation.transfers.transferoverquota.TransferOverQuotaViewModel
+import mega.privacy.android.app.presentation.transfers.transferoverquota.model.TransferOverQuotaViewState
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -81,6 +83,9 @@ class ChatViewTest {
     private val waitingRoomManagementViewModel = mock<WaitingRoomManagementViewModel> {
         on { state } doReturn MutableStateFlow(WaitingRoomManagementState())
     }
+    private val transfersOverQuotaViewModel = mock<TransferOverQuotaViewModel> {
+        on { uiState } doReturn MutableStateFlow(TransferOverQuotaViewState())
+    }
     private val viewModelStore = mock<ViewModelStore> {
         on { get(argThat<String> { contains(ChatGalleryViewModel::class.java.canonicalName.orEmpty()) }) } doReturn chatGalleryViewModel
         on { get(argThat<String> { contains(StartTransfersComponentViewModel::class.java.canonicalName.orEmpty()) }) } doReturn startTransfersComponentViewModel
@@ -88,6 +93,7 @@ class ChatViewTest {
         on { get(argThat<String> { contains(ChatBottomBarViewModel::class.java.canonicalName.orEmpty()) }) } doReturn chatBottomBarViewModel
         on { get(argThat<String> { contains(CallRecordingViewModel::class.java.canonicalName.orEmpty()) }) } doReturn callRecordingViewModel
         on { get(argThat<String> { contains(WaitingRoomManagementViewModel::class.java.canonicalName.orEmpty()) }) } doReturn waitingRoomManagementViewModel
+        on { get(argThat<String> { contains(TransferOverQuotaViewModel::class.java.canonicalName.orEmpty()) }) } doReturn transfersOverQuotaViewModel
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore

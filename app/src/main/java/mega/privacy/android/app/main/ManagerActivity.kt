@@ -172,7 +172,6 @@ import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.documentscanner.dialogs.DocumentScanningErrorDialog
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderFragment
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
@@ -269,6 +268,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -3825,7 +3825,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (item !== DrawerItem.TRANSFERS) {
             transferPageFragment?.destroyActionModeIfNeeded()
         }
-        transfersManagementViewModel.setInTransfersSection(drawerItem == DrawerItem.TRANSFERS)
         when (item) {
             DrawerItem.CLOUD_DRIVE -> {
                 if (deviceCenterFragment?.isVisible == true) {

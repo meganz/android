@@ -47,7 +47,6 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.app.presentation.node.action.HandleFileAction
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
@@ -61,20 +60,22 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransf
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.SaveDestinationInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartUpload
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartUpload.Files
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeChatTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumePreviewTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionDialog
+import mega.privacy.android.app.presentation.transfers.transferoverquota.view.dialog.TransferOverQuotaDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelPreviewDownloadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.LargeDownloadConfirmationDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.NotEnoughSpaceForUploadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartUpload
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartUpload.Files
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
@@ -94,6 +95,7 @@ import java.io.File
 internal fun StartTransferComponent(
     event: StateEventWithContent<TransferTriggerEvent>,
     onConsumeEvent: () -> Unit,
+    areTransferOverQuotaWarningsAllowed: Boolean = true,
     snackBarHostState: SnackbarHostState? = null,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
     viewModel: StartTransfersComponentViewModel = hiltViewModel(),
@@ -182,6 +184,10 @@ internal fun StartTransferComponent(
             onCancelNotEnoughSpaceForUploadDialog()
             showStorageOverQuotaWarning = false
         })
+    }
+
+    if (areTransferOverQuotaWarningsAllowed) {
+        TransferOverQuotaDialog()
     }
 
     StartTransferComponent(
