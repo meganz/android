@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -96,7 +98,6 @@ fun GridThumbnailView(
     data?.let {
         var imageLoaded by remember { mutableStateOf(false) }
         var cornerRadius by remember { mutableStateOf(0.dp) }
-
         val painter = rememberAsyncImagePainter(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(data)
@@ -105,19 +106,20 @@ fun GridThumbnailView(
                 .placeholder(defaultImage)
                 .build()
         )
-
+        val painterState by painter.state.collectAsStateWithLifecycle()
         var finalModifier: Modifier = modifier
             .clip(RoundedCornerShape(cornerRadius))
             .padding(vertical = if (imageLoaded) 0.dp else 34.dp)
 
-        val state = painter.state
-        if (state is AsyncImagePainter.State.Success) {
-            finalModifier = onSuccess(modifier)
-            imageLoaded = true
-            cornerRadius = 4.dp
-        } else if (state is AsyncImagePainter.State.Error) {
-            imageLoaded = false
-            cornerRadius = 0.dp
+        LaunchedEffect(painterState) {
+            if (painterState is AsyncImagePainter.State.Success) {
+                finalModifier = onSuccess(modifier)
+                imageLoaded = true
+                cornerRadius = 4.dp
+            } else if (painterState is AsyncImagePainter.State.Error) {
+                imageLoaded = false
+                cornerRadius = 0.dp
+            }
         }
 
         Image(
