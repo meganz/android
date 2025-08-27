@@ -199,6 +199,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
@@ -298,6 +299,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val savePlaybackTimesUseCase: SavePlaybackTimesUseCase,
     private val deletePlaybackInformationUseCase: DeletePlaybackInformationUseCase,
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
+    private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val uiState: StateFlow<VideoPlayerUiState>
@@ -403,29 +405,26 @@ class VideoPlayerViewModel @Inject constructor(
     private fun setupTransferListener() =
         viewModelScope.launch {
             monitorTransferEventsUseCase()
-                .catch {
-                    Timber.e(it)
-                }.collect { event ->
-                    if (event is TransferEvent.TransferTemporaryErrorEvent) {
-                        val error = event.error
-                        val transfer = event.transfer
-                        if (transfer.nodeHandle == uiState.value.currentPlayingHandle
-                            && ((error is QuotaExceededMegaException
-                                    && !transfer.isForeignOverQuota
-                                    && error.value != 0L)
-                                    || error is BlockedMegaException)
-                        ) {
-                            when (error) {
-                                is QuotaExceededMegaException -> {
-                                    // To be completed in a different ticket
-                                }
+                .filter {
+                    it is TransferEvent.TransferTemporaryErrorEvent
+                            && it.transfer.nodeHandle == uiState.value.currentPlayingHandle
+                }
+                .catch { Timber.e(it) }
+                .collect { event ->
+                    val error = (event as TransferEvent.TransferTemporaryErrorEvent).error
 
-                                is BlockedMegaException ->
-                                    uiState.update { it.copy(blockedError = triggered) }
-
-                                else -> {}
+                    when (error) {
+                        is QuotaExceededMegaException -> {
+                            if (!event.transfer.isForeignOverQuota && error.value != 0L) {
+                                viewModelScope.launch { broadcastTransferOverQuotaUseCase(true) }
                             }
                         }
+
+                        is BlockedMegaException -> {
+                            uiState.update { it.copy(blockedError = triggered) }
+                        }
+
+                        else -> {}
                     }
                 }
         }

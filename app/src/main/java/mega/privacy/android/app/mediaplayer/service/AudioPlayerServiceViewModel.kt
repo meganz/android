@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -131,6 +132,7 @@ import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationById
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -193,6 +195,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
     monitorAudioBackgroundPlayEnabledUseCase: MonitorAudioBackgroundPlayEnabledUseCase,
     monitorAudioShuffleEnabledUseCase: MonitorAudioShuffleEnabledUseCase,
     monitorAudioRepeatModeUseCase: MonitorAudioRepeatModeUseCase,
@@ -900,20 +903,28 @@ class AudioPlayerServiceViewModel @Inject constructor(
         cancellableJobs[JOB_KEY_MONITOR_TRANSFER]?.cancel()
         cancellableJobs[JOB_KEY_MONITOR_TRANSFER] = sharingScope.launch {
             monitorTransferEventsUseCase()
-                .catch {
-                    Timber.e(it)
-                }.collect { event ->
-                    if (event is TransferEvent.TransferTemporaryErrorEvent) {
-                        val megaException = event.error
-                        val transfer = event.transfer
-                        if (transfer.nodeHandle == playingHandle
-                            && ((megaException is QuotaExceededMegaException
-                                    && !transfer.isForeignOverQuota
-                                    && megaException.value != 0L)
-                                    || megaException is BlockedMegaException)
-                        ) {
+                .filter {
+                    it is TransferEvent.TransferTemporaryErrorEvent
+                            && it.transfer.nodeHandle == playingHandle
+                }
+                .catch { Timber.e(it) }
+                .collect { event ->
+                    val megaException = (event as TransferEvent.TransferTemporaryErrorEvent).error
+
+                    when (megaException) {
+                        is QuotaExceededMegaException -> {
+                            if (!event.transfer.isForeignOverQuota && megaException.value != 0L) {
+                                sharingScope.launch {
+                                    broadcastTransferOverQuotaUseCase(true)
+                                }
+                            }
+                        }
+
+                        is BlockedMegaException -> {
                             error.postValue(megaException)
                         }
+
+                        else -> {}
                     }
                 }
         }

@@ -40,7 +40,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -61,16 +60,13 @@ import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -85,11 +81,14 @@ import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.getFragmentFromNavHost
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AudioPlayerHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -799,9 +798,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             ?.onDragActivated(activated = activated)
     }
 
-    private fun onError(megaException: mega.privacy.android.domain.exception.MegaException) {
+    private fun onError(megaException: MegaException) {
         when (megaException) {
-            is QuotaExceededMegaException -> showGeneralTransferOverQuotaWarning()
             is BlockedMegaException -> {
                 if (!AlertDialogUtil.isAlertDialogShown(takenDownDialog)) {
                     takenDownDialog = AlertsAndWarnings.showTakenDownAlert(this)

@@ -358,9 +358,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     }
                 }
             }
-            if (viewModel.isInTransferOverQuota()) {
-                showGeneralTransferOverQuotaWarning()
-            }
         }
 
         pdfFileName = getFileName(uri)
@@ -433,7 +430,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                         Timber.w("Exception loading PDF as stream", e)
                     }
                     viewModel.resetPdfStreamData()
-                    if (loading && viewModel.isInTransferOverQuota().not()) {
+                    if (loading) {
                         binding.pdfViewerProgressBar.isVisible = true
                     }
                 }
@@ -612,9 +609,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 Timber.d("Add transfer listener")
                 megaApi.addTransferListener(this)
                 megaApi.addGlobalListener(this)
-                if (viewModel.isInTransferOverQuota()) {
-                    showGeneralTransferOverQuotaWarning()
-                }
             }
 
             binding.toolbarPdfViewer.isVisible = true
@@ -1770,12 +1764,9 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     override fun onTransferTemporaryError(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
         if (e.errorCode == MegaError.API_EOVERQUOTA) {
-            if (transfer.isForeignOverquota) {
-                return
-            }
-            if (e.value != 0L) {
+            if (transfer.isForeignOverquota.not() && e.value != 0L) {
                 Timber.w("TRANSFER OVERQUOTA ERROR: ${e.errorCode}")
-                showGeneralTransferOverQuotaWarning()
+                viewModel.broadcastTransferOverQuota()
             }
         } else if (e.errorCode == MegaError.API_EBLOCKED && !isAlertDialogShown(takenDownDialog)) {
             takenDownDialog = showTakenDownAlert(this)

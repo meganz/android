@@ -118,6 +118,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
@@ -178,6 +179,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
@@ -207,6 +209,8 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.io.File
@@ -261,8 +265,7 @@ class VideoPlayerViewModelTest {
     private val getLocalFilePathUseCase = mock<GetLocalFilePathUseCase>()
     private val getFingerprintUseCase = mock<GetFingerprintUseCase>()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
-    private val fakeMonitorTransferEventsFlow =
-        MutableSharedFlow<TransferEvent.TransferTemporaryErrorEvent>()
+    private var fakeMonitorTransferEventsFlow = MutableSharedFlow<TransferEvent>()
     private val getFileByPathUseCase = mock<GetFileByPathUseCase>()
     private val monitorVideoRepeatModeUseCase = mock<MonitorVideoRepeatModeUseCase>()
     private val saveVideoRecentlyWatchedUseCase = mock<SaveVideoRecentlyWatchedUseCase>()
@@ -304,7 +307,7 @@ class VideoPlayerViewModelTest {
     private val savePlaybackTimesUseCase = mock<SavePlaybackTimesUseCase>()
     private val deletePlaybackInformationUseCase = mock<DeletePlaybackInformationUseCase>()
     private val getSRTSubtitleFileListUseCase = mock<GetSRTSubtitleFileListUseCase>()
-
+    private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
     private val testHandle: Long = 123456
     private val testFileName = "test.mp4"
     private val testSize = 100L
@@ -318,6 +321,8 @@ class VideoPlayerViewModelTest {
     private val expectedMessageId = 2000L
 
     private fun initViewModel() {
+        fakeMonitorTransferEventsFlow = MutableSharedFlow()
+        whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
         underTest = VideoPlayerViewModel(
             context = context,
             mediaPlayerGateway = mediaPlayerGateway,
@@ -387,7 +392,8 @@ class VideoPlayerViewModelTest {
             monitorPlaybackTimesUseCase = monitorPlaybackTimesUseCase,
             savePlaybackTimesUseCase = savePlaybackTimesUseCase,
             deletePlaybackInformationUseCase = deletePlaybackInformationUseCase,
-            getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase
+            getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
+            broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
         )
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
@@ -486,7 +492,8 @@ class VideoPlayerViewModelTest {
             monitorPlaybackTimesUseCase,
             savePlaybackTimesUseCase,
             deletePlaybackInformationUseCase,
-            getSRTSubtitleFileListUseCase
+            getSRTSubtitleFileListUseCase,
+            broadcastTransferOverQuotaUseCase,
         )
     }
 
@@ -2644,6 +2651,128 @@ class VideoPlayerViewModelTest {
                 isShowHiddenItems = false,
                 accountType = mockAccountType
             ) { getVideoNodesUseCase(any()) }
+        }
+
+    @Test
+    fun `test that monitorTransferEventsUseCase works correctly for correct TransferTemporaryErrorEvent but different playing handle and non TransferTemporaryErrorEvent`() =
+        runTest {
+            val testTransfer = mock<Transfer> {
+                on { isForeignOverQuota } doReturn false
+                on { nodeHandle }.thenReturn(1L)
+            }
+            val quotaException = mock<QuotaExceededMegaException> {
+                on { value }.doReturn(1)
+            }
+            val quotaEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { transfer } doReturn testTransfer
+                on { error } doReturn quotaException
+            }
+            val blockedException = mock<BlockedMegaException>()
+            val blockedEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { transfer } doReturn testTransfer
+                on { error } doReturn blockedException
+            }
+            val updateEvent = mock<TransferEvent.TransferUpdateEvent> {
+                on { transfer } doReturn testTransfer
+            }
+            val testItems = (1..3).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val testItem = initVideoPlayerItem(2.toLong(), "2", MediaQueueItemType.Playing)
+
+            whenever(launchSourceMapper(any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
+            whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
+            whenever(testItems[1].copy(type = MediaQueueItemType.Playing)).thenReturn(testItem)
+
+            initViewModel()
+            underTest.updateCurrentPlayingHandle(testHandle, false, testItems)
+
+
+            fakeMonitorTransferEventsFlow.emit(quotaEvent)
+            advanceUntilIdle()
+
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.blockedError).isEqualTo(consumed)
+                cancelAndConsumeRemainingEvents()
+            }
+
+            fakeMonitorTransferEventsFlow.emit(blockedEvent)
+            advanceUntilIdle()
+
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.blockedError).isEqualTo(consumed)
+                cancelAndConsumeRemainingEvents()
+            }
+
+            fakeMonitorTransferEventsFlow.emit(updateEvent)
+            advanceUntilIdle()
+
+            verifyNoInteractions(broadcastTransferOverQuotaUseCase)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.blockedError).isEqualTo(consumed)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+
+    @Test
+    fun `test that monitorTransferEventsUseCase works correctly for correct TransferTemporaryErrorEvent with current playing handle`() =
+        runTest {
+            val testTransfer = mock<Transfer> {
+                on { isForeignOverQuota } doReturn false
+                on { nodeHandle }.thenReturn(testHandle)
+            }
+            val quotaException = mock<QuotaExceededMegaException> {
+                on { value }.doReturn(1)
+            }
+            val quotaEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { transfer } doReturn testTransfer
+                on { error } doReturn quotaException
+            }
+            val blockedException = mock<BlockedMegaException>()
+            val blockedEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { transfer } doReturn testTransfer
+                on { error } doReturn blockedException
+            }
+            val testItems = (1..3).map {
+                initVideoPlayerItem(it.toLong(), it.toString())
+            }
+            val testItem = initVideoPlayerItem(2.toLong(), "2", MediaQueueItemType.Playing)
+
+            whenever(launchSourceMapper(any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
+            whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
+            whenever(testItems[1].copy(type = MediaQueueItemType.Playing)).thenReturn(testItem)
+
+            initViewModel()
+            underTest.updateCurrentPlayingHandle(testHandle, false, testItems)
+
+
+            fakeMonitorTransferEventsFlow.emit(quotaEvent)
+            advanceUntilIdle()
+
+            verify(broadcastTransferOverQuotaUseCase).invoke(true)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.blockedError).isEqualTo(consumed)
+                cancelAndConsumeRemainingEvents()
+            }
+
+            fakeMonitorTransferEventsFlow.emit(blockedEvent)
+            advanceUntilIdle()
+
+            verifyNoMoreInteractions(broadcastTransferOverQuotaUseCase)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.blockedError).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
         }
 
     companion object {

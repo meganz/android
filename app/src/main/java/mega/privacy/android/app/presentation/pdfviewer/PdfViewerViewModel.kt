@@ -10,7 +10,6 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -33,7 +32,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import java.net.URL
@@ -56,7 +55,7 @@ class PdfViewerViewModel @Inject constructor(
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
+    private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
     private val getLastPageViewedInPdfUseCase: GetLastPageViewedInPdfUseCase,
     private val setOrUpdateLastPageViewedInPdfUseCase: SetOrUpdateLastPageViewedInPdfUseCase,
 ) : ViewModel() {
@@ -77,7 +76,6 @@ class PdfViewerViewModel @Inject constructor(
         monitorAccountDetail()
         monitorIsHiddenNodesOnboarded()
         checkIsNodeInBackups()
-        monitorTransferOverQuota()
     }
 
     private fun checkLastPageViewed() {
@@ -128,18 +126,11 @@ class PdfViewerViewModel @Inject constructor(
         }
     }
 
-    private fun monitorTransferOverQuota() {
+    fun broadcastTransferOverQuota() {
         viewModelScope.launch {
-            monitorTransferOverQuotaUseCase().collectLatest { isInTransferOverQuota ->
-                _state.update { state -> state.copy(isInTransferOverQuota = isInTransferOverQuota) }
-            }
+            broadcastTransferOverQuotaUseCase(true)
         }
     }
-
-    /**
-     * Checks if the account is overquota
-     */
-    fun isInTransferOverQuota() = uiState.value.isInTransferOverQuota
 
     /**
      * Imports a chat node if there is no name collision.
