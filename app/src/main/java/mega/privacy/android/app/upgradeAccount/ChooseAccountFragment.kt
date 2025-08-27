@@ -18,18 +18,17 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.account.AccountStorageViewModel
-import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.container.SharedAppContainer
-import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
+import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
+import mega.privacy.android.feature.payment.presentation.storage.AccountStorageViewModel
 import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel
 import mega.privacy.android.feature.payment.presentation.upgrade.NewChooseAccountScreen
 import mega.privacy.android.feature.payment.util.PaymentUtils.getProductId
@@ -74,9 +73,6 @@ class ChooseAccountFragment : Fragment() {
     private val isUpgradeAccount by lazy {
         arguments?.getBoolean(ChooseAccountViewModel.EXTRA_IS_UPGRADE_ACCOUNT, false) ?: false
     }
-
-    @Inject
-    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="label_file_size_byte" />
-    <string name="label_file_size_kilo_byte" />
-    <string name="label_file_size_mega_byte" />
-    <string name="label_file_size_giga_byte" />
-    <string name="label_file_size_tera_byte" />
-    <string name="label_file_size_peta_byte" />
-    <string name="label_file_size_exa_byte" />
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_byte">%s&#160;B</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_mega_byte">%s&#160;MB</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_tera_byte">%s&#160;TB</string>
+    <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
+    <string name="label_file_speed_byte">%s&#160;B/s</string>
+    <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
+    <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
+    <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
+    <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
+    <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
+    <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
+    <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
 </resources>

@@ -58,6 +58,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
@@ -116,6 +117,12 @@ fun NewChooseAccountScreen(
         stringResource(id = formattedSize.unit, formattedSize.size)
     } else {
         "16 TB"
+    }
+
+    val baseStorageFormatted = remember(accountStorageUiState.baseStorage) {
+        accountStorageUiState.baseStorage?.let {
+            formatFileSize(it, context)
+        }.orEmpty()
     }
 
     val proFeatures = remember(highestStorageString) {
@@ -346,7 +353,7 @@ fun NewChooseAccountScreen(
                             .testTag(TEST_TAG_FREE_PLAN_CARD),
                         onContinue = onFreePlanClicked,
                         isNewCreationAccount = isNewCreationAccount,
-                        storageFormatted = accountStorageUiState.baseStorageFormatted,
+                        storageFormatted = baseStorageFormatted,
                     )
                 }
             }
@@ -457,7 +464,8 @@ internal fun NewChooseAccountScreenPreview(
         NewChooseAccountScreen(
             uiState = state,
             accountStorageUiState = AccountStorageUIState(
-                baseStorageFormatted = "20 GB",
+                baseStorage = 15L * 1024 * 1024 * 1024,
+                totalStorage = 100L * 1024 * 1024 * 1024,
             ),
             isNewCreationAccount = false,
             isUpgradeAccount = false,

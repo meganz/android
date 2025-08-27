@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.billing
+package mega.privacy.android.feature.payment.presentation.billing
 
 import android.app.Activity
 import androidx.lifecycle.ViewModel
@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.usecase.billing.LaunchPurchaseFlow
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
 import mega.privacy.android.domain.usecase.billing.QuerySkus
+import mega.privacy.android.feature.payment.domain.LaunchPurchaseFlowUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,7 +28,7 @@ import javax.inject.Inject
 class BillingViewModel @Inject constructor(
     private val querySkus: QuerySkus,
     private val queryPurchase: QueryPurchase,
-    private val launchPurchaseFlow: LaunchPurchaseFlow,
+    private val launchPurchaseFlowUseCase: LaunchPurchaseFlowUseCase,
     monitorBillingEventUseCase: MonitorBillingEventUseCase,
 ) : ViewModel() {
     private val _skus = MutableStateFlow<List<MegaSku>>(emptyList())
@@ -58,7 +58,7 @@ class BillingViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             monitorBillingEventUseCase()
-                .catch { Timber.e(it, "Failed to monitor billing event") }
+                .catch { Timber.Forest.e(it, "Failed to monitor billing event") }
                 .collect {
                     _billingUpdateEvent.value = it
                 }
@@ -73,7 +73,7 @@ class BillingViewModel @Inject constructor(
         viewModelScope.launch {
             _skus.value = runCatching { querySkus() }
                 .onFailure {
-                    Timber.e(it, "Failed to query SKUs")
+                    Timber.Forest.e(it, "Failed to query SKUs")
                 }
                 .getOrElse { emptyList() }
         }
@@ -87,7 +87,7 @@ class BillingViewModel @Inject constructor(
         viewModelScope.launch {
             _purchases.value = runCatching { queryPurchase() }
                 .onFailure {
-                    Timber.e(it, "Failed to query purchase")
+                    Timber.Forest.e(it, "Failed to query purchase")
                 }
                 .getOrElse { emptyList() }
         }
@@ -100,9 +100,9 @@ class BillingViewModel @Inject constructor(
     fun startPurchase(activity: Activity, productId: String) {
         viewModelScope.launch {
             runCatching {
-                launchPurchaseFlow(activity, productId)
+                launchPurchaseFlowUseCase(activity, productId)
             }.onFailure {
-                Timber.e(it, "Failed to launch purchase flow")
+                Timber.Forest.e(it, "Failed to launch purchase flow")
             }
         }
     }

@@ -1,6 +1,5 @@
-package mega.privacy.android.app.presentation.account
+package mega.privacy.android.feature.payment.presentation.storage
 
-import android.icu.text.DecimalFormat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,9 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -25,12 +21,10 @@ import kotlin.time.Duration.Companion.days
 /**
  * ViewModel for account storage
  *
- * @property state [CallRecordingUIState]
  */
 @HiltViewModel
 class AccountStorageViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val getAccountAchievements: GetAccountAchievements,
     private val monitorAdsClosingTimestampUseCase: MonitorAdsClosingTimestampUseCase,
 ) : ViewModel() {
@@ -50,7 +44,7 @@ class AccountStorageViewModel @Inject constructor(
         viewModelScope.launch {
             monitorAdsClosingTimestampUseCase()
                 .catch {
-                    Timber.e(it)
+                    Timber.Forest.e(it)
                 }
                 .collect { timestamp ->
                     _state.update { state ->
@@ -76,17 +70,13 @@ class AccountStorageViewModel @Inject constructor(
                         _state.update { state ->
                             state.copy(
                                 baseStorage = it,
-                                baseStorageFormatted = getStorageFormatted(
-                                    it,
-                                    DecimalFormat("#.##")
-                                )
                             )
                         }
                     }
 
                 }
             }.onFailure { exception ->
-                Timber.e(exception)
+                Timber.Forest.e(exception)
             }
         }
     }
@@ -99,16 +89,12 @@ class AccountStorageViewModel @Inject constructor(
         monitorStorageJob = viewModelScope.launch {
             monitorAccountDetailUseCase()
                 .catch {
-                    Timber.e(it)
+                    Timber.Forest.e(it)
                 }
                 .collect { accountDetail ->
                     _state.update { state ->
                         state.copy(
                             totalStorage = accountDetail.storageDetail?.totalStorage,
-                            totalStorageFormatted = getStorageFormatted(
-                                accountDetail.storageDetail?.totalStorage,
-                                DecimalFormat("#.##")
-                            ),
                             storageUsedPercentage = accountDetail.storageDetail?.usedPercentage
                                 ?: 0,
                         )
@@ -117,65 +103,12 @@ class AccountStorageViewModel @Inject constructor(
         }
     }
 
-
-    /**
-     * Gets a size string.
-     *
-     * @return The size string.
-     */
-    private fun getStorageFormatted(totalStorage: Long?, df: DecimalFormat): String =
-        when {
-            totalStorage == null -> ""
-            totalStorage < KB -> {
-                getStringFromStringResMapper(
-                    R.string.label_file_size_byte, totalStorage
-                )
-            }
-
-            totalStorage < MB -> {
-                getStringFromStringResMapper(
-                    R.string.label_file_size_kilo_byte, df.format(totalStorage / KB)
-                )
-            }
-
-            totalStorage < GB -> {
-                getStringFromStringResMapper(
-                    R.string.label_file_size_mega_byte, df.format(totalStorage / MB)
-                )
-            }
-
-            totalStorage < TB -> {
-                getStringFromStringResMapper(
-                    R.string.label_file_size_giga_byte, df.format(totalStorage / GB)
-                )
-            }
-
-            totalStorage < PB -> {
-                getStringFromStringResMapper(
-                    R.string.label_file_size_tera_byte, df.format(totalStorage / TB)
-                )
-            }
-
-            totalStorage < EB -> {
-                getStringFromStringResMapper(
-                    R.string.label_file_size_peta_byte, df.format(totalStorage / PB)
-                )
-            }
-
-            else -> {
-                getStringFromStringResMapper(
-                    R.string.label_file_size_exa_byte, df.format(totalStorage / EB)
-
-                )
-            }
-        }
-
     /**
      * Check if the account should be upgraded due to ads.
      */
     fun isUpgradeAccountDueToAds(): Boolean {
         val state = _state.value
-        Timber.d("Storage: ${state.storageUsedPercentage}")
+        Timber.Forest.d("Storage: ${state.storageUsedPercentage}")
         val within2Days =
             System.currentTimeMillis() - state.lastAdsClosingTimestamp <= 2.days.inWholeMicroseconds
         return state.storageUsedPercentage < 50 && within2Days

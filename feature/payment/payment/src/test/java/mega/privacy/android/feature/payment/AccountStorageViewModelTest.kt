@@ -1,17 +1,16 @@
-package test.mega.privacy.android.app.presentation.account
+package mega.privacy.android.feature.payment
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.account.AccountStorageViewModel
-import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountStorageDetail
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.advertisements.MonitorAdsClosingTimestampUseCase
+import mega.privacy.android.feature.payment.presentation.storage.AccountStorageViewModel
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,7 +18,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
@@ -37,7 +35,6 @@ class AccountStorageViewModelTest {
             invoke()
         }.thenReturn(accountDetailsFlow)
     }
-    private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
     private val getAccountAchievements: GetAccountAchievements = mock()
     private val monitorAdsClosingTimestampUseCase: MonitorAdsClosingTimestampUseCase = mock {
         on { invoke() }.thenReturn(flowOf(0L))
@@ -51,7 +48,6 @@ class AccountStorageViewModelTest {
     private fun init() {
         underTest = AccountStorageViewModel(
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            getStringFromStringResMapper = getStringFromStringResMapper,
             getAccountAchievements = getAccountAchievements,
             monitorAdsClosingTimestampUseCase = monitorAdsClosingTimestampUseCase
         )
@@ -59,9 +55,6 @@ class AccountStorageViewModelTest {
 
     @BeforeEach
     internal fun resetMocks() {
-        reset(
-            getStringFromStringResMapper,
-        )
         wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(accountDetailsFlow)
     }
 

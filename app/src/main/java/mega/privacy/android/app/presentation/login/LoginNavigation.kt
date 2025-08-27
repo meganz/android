@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
-import mega.privacy.android.app.presentation.billing.BillingViewModel
+import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailScreen
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountRoute
 import mega.privacy.android.app.presentation.login.onboarding.TourScreen

@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
+    implementation(project(":data"))
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)
     implementation(lib.kotlin.ktx)
@@ -46,6 +47,7 @@ dependencies {
     implementation(androidx.material3.adaptive.navigation.suite)
     implementation(lib.kotlin.serialisation)
     implementation(androidx.navigation3.runtime)
+    implementation(lib.billing.client.ktx)
 
     // test
     testImplementation(project(":core-test"))

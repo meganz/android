@@ -49,7 +49,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.base.BaseViewModel
-import mega.privacy.android.app.presentation.billing.BillingViewModel
+import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity

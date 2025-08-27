@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.cancelaccountplan.view
 
-import mega.privacy.android.shared.resources.R as SharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -20,9 +20,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.feature.payment.model.AccountStorageUIState
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancelAccountPlanUiState
+import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.model.FormattedSize
+import mega.privacy.android.feature.payment.model.AccountStorageUIState
 import mega.privacy.android.icon.pack.R.drawable
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -34,9 +36,9 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeTabletP
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.isScreenOrientationLandscape
 import mega.privacy.android.shared.original.core.ui.utils.isTablet
+import mega.privacy.android.shared.resources.R as SharedR
 
 @Composable
 internal fun CancelAccountPlanView(
@@ -70,7 +72,11 @@ internal fun CancelAccountPlanView(
     } else {
         20.dp
     }
-
+    val baseStorageFormatted = remember(accountUiState.baseStorage) {
+        accountUiState.baseStorage?.let {
+            formatFileSize(it, context)
+        }.orEmpty()
+    }
     Column(
         modifier = Modifier
             .systemBarsPadding()
@@ -148,7 +154,7 @@ internal fun CancelAccountPlanView(
                 cellAlignment = TableCell.CellAlignment.Start,
             ),
             TableCell.TextCell(
-                text = accountUiState.baseStorageFormatted,
+                text = baseStorageFormatted,
                 style = TableCell.TextCellStyle.Normal,
                 cellAlignment = TableCell.CellAlignment.Center,
             ),

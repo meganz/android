@@ -25,7 +25,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.app.presentation.billing.BillingViewModel
+import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.view.NewLoginView

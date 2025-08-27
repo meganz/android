@@ -15,7 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.presentation.account.AccountStorageViewModel
+import mega.privacy.android.feature.payment.presentation.storage.AccountStorageViewModel
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelAccountPlanView
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelSubscriptionSurveyView
