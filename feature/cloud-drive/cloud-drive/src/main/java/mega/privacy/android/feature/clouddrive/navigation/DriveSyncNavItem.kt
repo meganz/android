@@ -17,6 +17,7 @@ import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
+import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
 
 class DriveSyncNavItem : MainNavItem {
     override val destination: NavKey = DriveSync
@@ -58,17 +59,6 @@ class DriveSyncNavItem : MainNavItem {
     override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(1)
     override val availableOffline: Boolean = false
     override val analyticsEventIdentifier: NavigationEventIdentifier =
-        CloudDriveNavigationIdentifier
-}
-
-object CloudDriveNavigationIdentifier : NavigationEventIdentifier {
-    override val navigationElementType: String?
-        get() = "CloudDriveNavigation"
-    override val destination: String?
-        get() = "CloudDrive"
-    override val eventName: String
-        get() = "CloudDriveScreen"
-    override val uniqueIdentifier: Int
-        get() = 100
+        CloudDriveBottomNavigationItemEvent
 }
 

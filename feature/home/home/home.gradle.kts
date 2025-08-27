@@ -13,3 +13,18 @@ android {
     }
     namespace = "mega.privacy.android.feature.home"
 }
+
+dependencies {
+    implementation(project(":core:navigation-contract"))
+    implementation(project(":domain"))
+    implementation(project(":icon-pack"))
+    implementation(project(":shared:resources"))
+
+    implementation(platform(androidx.compose.bom))
+    implementation(androidx.hilt.navigation)
+    implementation(androidx.material3.adaptive.navigation.suite)
+    implementation(androidx.navigation3.runtime)
+    implementation(lib.kotlin.serialisation)
+    implementation(lib.mega.analytics)
+    implementation(lib.mega.core.ui)
+}
