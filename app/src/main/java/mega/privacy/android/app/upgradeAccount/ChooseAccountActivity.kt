@@ -8,12 +8,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel.Companion.EXTRA_IS_UPGRADE_ACCOUNT
+import mega.privacy.android.navigation.ExtraConstant
 
 @AndroidEntryPoint
 open class ChooseAccountActivity : AppCompatActivity() {
@@ -28,8 +28,8 @@ open class ChooseAccountActivity : AppCompatActivity() {
             val fragment = ChooseAccountFragment().apply {
                 arguments = Bundle().apply {
                     putBoolean(
-                        ManagerActivity.NEW_CREATION_ACCOUNT,
-                        intent.getBooleanExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
+                        ExtraConstant.NEW_CREATION_ACCOUNT,
+                        intent.getBooleanExtra(ExtraConstant.NEW_CREATION_ACCOUNT, true)
                     )
                     putBoolean(
                         EXTRA_IS_UPGRADE_ACCOUNT,
@@ -69,15 +69,15 @@ open class ChooseAccountActivity : AppCompatActivity() {
         val accountTypeInt = convertAccountTypeToInt(accountType)
         val intent = Intent(this, ManagerActivity::class.java).apply {
             putExtras(intent)
-            putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
-            if (extras?.containsKey(IntentConstants.EXTRA_NEW_ACCOUNT) != true) {
-                putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
+            putExtra(ExtraConstant.EXTRA_FIRST_LOGIN, true)
+            if (extras?.containsKey(ExtraConstant.EXTRA_NEW_ACCOUNT) != true) {
+                putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, true)
             }
-            if (extras?.containsKey(ManagerActivity.NEW_CREATION_ACCOUNT) != true) {
-                putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
+            if (extras?.containsKey(ExtraConstant.NEW_CREATION_ACCOUNT) != true) {
+                putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, true)
             }
-            putExtra(IntentConstants.EXTRA_UPGRADE_ACCOUNT, accountTypeInt != Constants.FREE)
-            putExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, accountTypeInt)
+            putExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, accountTypeInt != Constants.FREE)
+            putExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE, accountTypeInt)
         }
 
         startActivity(intent)
@@ -111,8 +111,8 @@ open class ChooseAccountActivity : AppCompatActivity() {
         ) {
             val intent = Intent(context, ChooseAccountActivity::class.java).apply {
                 putExtra(EXTRA_IS_UPGRADE_ACCOUNT, true)
-                putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, false)
-                putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, false)
+                putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, false)
+                putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)
                 if (isFromAdsFree) {
                     putExtra(EXTRA_SOURCE, UpgradeAccountSource.ADS_FREE_SCREEN)
                 }

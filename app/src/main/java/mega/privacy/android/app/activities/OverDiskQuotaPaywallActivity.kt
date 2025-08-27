@@ -14,9 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
-import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.overdisk.OverDiskQuotaPaywallViewModel
@@ -26,6 +24,7 @@ import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.TimeUtils.getHumanizedTimeMs
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
+import mega.privacy.android.navigation.ExtraConstant
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -106,8 +105,8 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
                 Timber.i("Starting upgrade process after Over Disk Quota Paywall")
 
                 val intent = Intent(applicationContext, ManagerActivity::class.java)
-                    .putExtra(EXTRA_UPGRADE_ACCOUNT, true)
-                    .putExtra(EXTRA_ACCOUNT_TYPE, proPlanNeeded)
+                    .putExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, true)
+                    .putExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE, proPlanNeeded)
                 startActivity(intent)
                 finish()
             }

@@ -34,14 +34,14 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.ExtraConstant
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -74,7 +74,7 @@ internal class Enable2FADialogFragment : DialogFragment() {
 
     private fun open2FAScreen() {
         val intent = Intent(requireContext(), TwoFactorAuthenticationActivity::class.java)
-        intent.putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
+        intent.putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, true)
         startActivity(intent)
         dismissAllowingStateLoss()
     }

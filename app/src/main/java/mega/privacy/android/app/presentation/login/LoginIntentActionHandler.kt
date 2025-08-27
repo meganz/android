@@ -33,6 +33,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountBlockedType
+import mega.privacy.android.navigation.ExtraConstant
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 
@@ -185,7 +186,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                             }
                             if (loginUiState.isFirstTime) {
                                 Timber.d("First time")
-                                intent.putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+                                intent.putExtra(ExtraConstant.EXTRA_FIRST_LOGIN, true)
                             }
                         } else {
                             var initialCam = false
@@ -201,7 +202,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                                 ManagerActivity::class.java
                                             ).apply {
                                                 putExtra(
-                                                    IntentConstants.EXTRA_FIRST_LOGIN,
+                                                    ExtraConstant.EXTRA_FIRST_LOGIN,
                                                     true
                                                 )
                                             })
@@ -212,7 +213,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                 }
                             } else {
                                 intent = Intent(activity, ManagerActivity::class.java)
-                                intent.putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+                                intent.putExtra(ExtraConstant.EXTRA_FIRST_LOGIN, true)
                                 initialCam = true
                                 viewModel.setStartScreenTimeStamp()
                             }
@@ -270,8 +271,8 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                         activity,
                                         ChooseAccountActivity::class.java
                                     ).apply {
-                                        putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, false)
-                                        putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, false)
+                                        putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, false)
+                                        putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)
                                     }
                                 )
                             } else {

@@ -34,7 +34,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants.Companion.ACTION_OPEN_ACHIEVEMENTS
-import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_MASTER_KEY
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
@@ -70,6 +69,7 @@ import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -197,13 +197,13 @@ internal class MyAccountActivity : PasscodeActivity(),
     }
 
     private fun manageIntentExtras() {
-        val accountType = intent.getIntExtra(EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
+        val accountType = intent.getIntExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
         if (accountType != INVALID_VALUE) {
             megaNavigator.openUpgradeAccount(this)
 
             viewModel.setOpenUpgradeFrom()
 
-            intent.removeExtra(EXTRA_ACCOUNT_TYPE)
+            intent.removeExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE)
         }
 
         when (intent.action) {

@@ -1779,12 +1779,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 drawerItem = startScreenUtil.getStartDrawerItem()
                 if (intent != null) {
                     val upgradeAccount: Boolean =
-                        intent.getBooleanExtra(IntentConstants.EXTRA_UPGRADE_ACCOUNT, false)
+                        intent.getBooleanExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, false)
                     newAccount =
-                        intent.getBooleanExtra(IntentConstants.EXTRA_NEW_ACCOUNT, false)
-                    newCreationAccount = intent.getBooleanExtra(NEW_CREATION_ACCOUNT, false)
+                        intent.getBooleanExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, false)
+                    newCreationAccount = intent.getBooleanExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)
                     firstLogin =
-                        intent.getBooleanExtra(IntentConstants.EXTRA_FIRST_LOGIN, false)
+                        intent.getBooleanExtra(ExtraConstant.EXTRA_FIRST_LOGIN, false)
                     viewModel.setIsFirstLogin(firstLogin)
                     setRequestNotificationsPermissionFirstLogin(savedInstanceState)
                     askPermissions = intent.getBooleanExtra(
@@ -1793,17 +1793,17 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     )
 
                     //reset flag to fix incorrect view loaded when orientation changes
-                    intent.removeExtra(IntentConstants.EXTRA_NEW_ACCOUNT)
-                    intent.removeExtra(IntentConstants.EXTRA_UPGRADE_ACCOUNT)
-                    intent.removeExtra(IntentConstants.EXTRA_FIRST_LOGIN)
+                    intent.removeExtra(ExtraConstant.EXTRA_NEW_ACCOUNT)
+                    intent.removeExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT)
+                    intent.removeExtra(ExtraConstant.EXTRA_FIRST_LOGIN)
                     intent.removeExtra(IntentConstants.EXTRA_ASK_PERMISSIONS)
                     if (upgradeAccount) {
                         val accountType: Int =
-                            intent.getIntExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, 0)
+                            intent.getIntExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE, 0)
                         if (accountType != Constants.FREE) {
                             showMyAccount(
                                 android.util.Pair(
-                                    IntentConstants.EXTRA_ACCOUNT_TYPE,
+                                    ExtraConstant.EXTRA_ACCOUNT_TYPE,
                                     accountType
                                 )
                             )
@@ -1823,14 +1823,14 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 Timber.d("DRAWERITEM NOT NULL: %s", drawerItem)
                 if (intent != null) {
                     val upgradeAccount: Boolean =
-                        intent.getBooleanExtra(IntentConstants.EXTRA_UPGRADE_ACCOUNT, false)
+                        intent.getBooleanExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, false)
                     newAccount =
-                        intent.getBooleanExtra(IntentConstants.EXTRA_NEW_ACCOUNT, false)
-                    newCreationAccount = intent.getBooleanExtra(NEW_CREATION_ACCOUNT, false)
+                        intent.getBooleanExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, false)
+                    newCreationAccount = intent.getBooleanExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)
                     //reset flag to fix incorrect view loaded when orientation changes
-                    intent.removeExtra(IntentConstants.EXTRA_NEW_ACCOUNT)
-                    intent.removeExtra(IntentConstants.EXTRA_UPGRADE_ACCOUNT)
-                    firstLogin = intent.getBooleanExtra(IntentConstants.EXTRA_FIRST_LOGIN, false)
+                    intent.removeExtra(ExtraConstant.EXTRA_NEW_ACCOUNT)
+                    intent.removeExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT)
+                    firstLogin = intent.getBooleanExtra(ExtraConstant.EXTRA_FIRST_LOGIN, false)
                     viewModel.setIsFirstLogin(firstLogin)
                     setRequestNotificationsPermissionFirstLogin(savedInstanceState)
                     askPermissions = intent.getBooleanExtra(
@@ -1840,11 +1840,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     if (upgradeAccount) {
                         closeDrawer()
                         val accountType: Int =
-                            intent.getIntExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, 0)
+                            intent.getIntExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE, 0)
                         if (accountType != Constants.FREE) {
                             showMyAccount(
                                 android.util.Pair(
-                                    IntentConstants.EXTRA_ACCOUNT_TYPE,
+                                    ExtraConstant.EXTRA_ACCOUNT_TYPE,
                                     accountType
                                 )
                             )
@@ -7351,7 +7351,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         const val TRANSFERS_TAB = "TRANSFERS_TAB"
         private const val BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE =
             "BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE"
-        const val NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT"
         const val JOINING_CHAT_LINK = "JOINING_CHAT_LINK"
         const val LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK"
         private const val PROCESS_FILE_DIALOG_SHOWN = "PROGRESS_DIALOG_SHOWN"

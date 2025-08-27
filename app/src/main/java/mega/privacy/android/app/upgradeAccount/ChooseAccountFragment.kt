@@ -15,7 +15,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
@@ -25,7 +24,6 @@ import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
-import mega.privacy.android.feature.payment.util.PaymentUtils.getProductId
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.billing.BillingEvent
@@ -34,6 +32,8 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel
 import mega.privacy.android.feature.payment.presentation.upgrade.NewChooseAccountScreen
+import mega.privacy.android.feature.payment.util.PaymentUtils.getProductId
+import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.mobile.analytics.event.AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AdsUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.BuyProIEvent
@@ -103,7 +103,7 @@ class ChooseAccountFragment : Fragment() {
         val uiState by chooseAccountViewModel.state.collectAsStateWithLifecycle()
         val accountStorageUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()
         val isNewCreationAccount =
-            arguments?.getBoolean(ManagerActivity.NEW_CREATION_ACCOUNT, false) ?: false
+            arguments?.getBoolean(ExtraConstant.NEW_CREATION_ACCOUNT, false) ?: false
 
         val mode by monitorThemeModeUseCase()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -198,12 +198,12 @@ class ChooseAccountFragment : Fragment() {
         } else {
             val intent = Intent(chooseAccountActivity, ManagerActivity::class.java).apply {
                 putExtras(chooseAccountActivity.intent)
-                putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
-                if (extras?.containsKey(IntentConstants.EXTRA_NEW_ACCOUNT) != true) {
-                    putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
+                putExtra(ExtraConstant.EXTRA_FIRST_LOGIN, true)
+                if (extras?.containsKey(ExtraConstant.EXTRA_NEW_ACCOUNT) != true) {
+                    putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, true)
                 }
-                if (extras?.containsKey(ManagerActivity.NEW_CREATION_ACCOUNT) != true) {
-                    putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
+                if (extras?.containsKey(ExtraConstant.NEW_CREATION_ACCOUNT) != true) {
+                    putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, true)
                 }
             }
 
