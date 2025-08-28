@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.transfers
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,16 +12,13 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
-import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.transfers.GetNumPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorLastTransfersHaveBeenCancelledUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.IsCompletedTransfersEmptyUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import timber.log.Timber
@@ -32,15 +28,11 @@ import kotlin.time.Duration.Companion.milliseconds
 /**
  * ViewModel for managing transfers data.
  *
- * @property getNumPendingTransfersUseCase      [GetNumPendingTransfersUseCase]
- * @property isCompletedTransfersEmptyUseCase   [IsCompletedTransfersEmptyUseCase]
  * @property transfersInfoMapper                [TransfersInfoMapper]
  */
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class TransfersManagementViewModel @Inject constructor(
-    private val getNumPendingTransfersUseCase: GetNumPendingTransfersUseCase,
-    private val isCompletedTransfersEmptyUseCase: IsCompletedTransfersEmptyUseCase,
     private val transfersInfoMapper: TransfersInfoMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -50,7 +42,6 @@ class TransfersManagementViewModel @Inject constructor(
     private val samplePeriod: Long?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferManagementUiState())
-    private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
 
     /**
      * Transfers info
@@ -130,11 +121,6 @@ class TransfersManagementViewModel @Inject constructor(
     }
 
     /**
-     * Notifies about updates on if should show or not the Completed tab.
-     */
-    fun onGetShouldCompletedTab(): LiveData<Boolean> = shouldShowCompletedTab
-
-    /**
      * get pending download and upload
      */
     private fun updateUiState(
@@ -159,16 +145,6 @@ class TransfersManagementViewModel @Inject constructor(
                 transfersInfo = newTransferInfo,
                 lastTransfersCancelled = newLastTransfersCancelled,
             )
-        }
-    }
-
-    /**
-     * Checks if should show the Completed tab or not.
-     */
-    fun checkIfShouldShowCompletedTab() {
-        viewModelScope.launch {
-            shouldShowCompletedTab.value = shouldCheckTransferError() ||
-                    !isCompletedTransfersEmptyUseCase() && getNumPendingTransfersUseCase() <= 0
         }
     }
 

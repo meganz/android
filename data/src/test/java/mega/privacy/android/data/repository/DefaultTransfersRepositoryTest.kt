@@ -753,20 +753,6 @@ class DefaultTransfersRepositoryTest {
             verify(megaLocalRoomGateway).insertOrUpdateActiveTransfer(activeTransfer)
         }
 
-    @Test
-    fun `test that isCompletedTransfersEmpty returns false if completed transfers db contains items`() =
-        runTest {
-            whenever(megaLocalRoomGateway.getCompletedTransfersCount()).thenReturn(1)
-            assertThat(underTest.isCompletedTransfersEmpty()).isFalse()
-        }
-
-    @Test
-    fun `test that isCompletedTransfersEmpty returns true if completed transfers db does not contain items`() =
-        runTest {
-            whenever(megaLocalRoomGateway.getCompletedTransfersCount()).thenReturn(0)
-            assertThat(underTest.isCompletedTransfersEmpty()).isTrue()
-        }
-
     @ParameterizedTest(name = "pauseTransfers: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that pauseTransfers returns success when MegaApi returns API_OK`(isPause: Boolean) =
@@ -849,18 +835,6 @@ class DefaultTransfersRepositoryTest {
         underTest.deleteAllCompletedTransfers()
         verify(megaLocalRoomGateway).deleteAllCompletedTransfers()
     }
-
-    @Test
-    fun `test that getCompletedTransfersByState room gateway is called when getFailedOrCanceledTransfers is called`() =
-        runTest {
-            underTest.getFailedOrCanceledTransfers()
-            verify(megaLocalRoomGateway).getCompletedTransfersByState(
-                listOf(
-                    MegaTransfer.STATE_FAILED,
-                    MegaTransfer.STATE_CANCELLED
-                )
-            )
-        }
 
     @Test
     fun `test that deleteCompletedTransfersByState room gateway is called when deleteFailedOrCanceledTransfers is called`() =
@@ -975,14 +949,6 @@ class DefaultTransfersRepositoryTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
-
-    @Test
-    fun `test that getCompletedTransferById invokes when getCompletedTransferById is called`() =
-        runTest {
-            val id = 1
-            underTest.getCompletedTransferById(id)
-            verify(megaLocalRoomGateway).getCompletedTransferById(id)
-        }
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)

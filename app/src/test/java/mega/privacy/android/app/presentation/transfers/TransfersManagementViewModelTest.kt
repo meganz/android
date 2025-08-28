@@ -71,8 +71,6 @@ class TransfersManagementViewModelTest {
         val monitorTransfersStatusUseCase = mock<MonitorTransfersStatusUseCase>()
         whenever(monitorTransfersStatusUseCase()) doReturn monitorTransfersStatusFlow
         underTest = TransfersManagementViewModel(
-            getNumPendingTransfersUseCase = mock(),
-            isCompletedTransfersEmptyUseCase = mock(),
             transfersInfoMapper = transfersInfoMapper,
             ioDispatcher = ioDispatcher,
             monitorConnectivityUseCase = monitorConnectivityUseCase,

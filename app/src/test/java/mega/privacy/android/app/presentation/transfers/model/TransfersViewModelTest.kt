@@ -425,7 +425,7 @@ class TransfersViewModelTest {
     }
 
     @Test
-    fun `test that MonitorCompletedTransfersUseCase updates state with completed and failed transfers`() =
+    fun `test that MonitorCompletedTransfersByStateWithLimitUseCase updates state with completed and failed transfers`() =
         runTest {
             val flowCompleted = MutableSharedFlow<List<CompletedTransfer>>()
             val flowFailed = MutableSharedFlow<List<CompletedTransfer>>()
@@ -470,7 +470,7 @@ class TransfersViewModelTest {
         }
 
     @Test
-    fun `test that MonitorCompletedTransfersUseCase updates state with completed but not failed transfers`() =
+    fun `test that MonitorCompletedTransfersByStateWithLimitUseCase updates state with completed but not failed transfers`() =
         runTest {
             val flow = MutableSharedFlow<List<CompletedTransfer>>()
             val transfer1 = mock<CompletedTransfer> {
@@ -501,7 +501,7 @@ class TransfersViewModelTest {
         }
 
     @Test
-    fun `test that MonitorCompletedTransfersUseCase updates state with failed but not completed transfers`() =
+    fun `test that MonitorCompletedTransfersByStateWithLimitUseCase updates state with failed but not completed transfers`() =
         runTest {
             val flow = MutableSharedFlow<List<CompletedTransfer>>()
             val transfer1 = mock<CompletedTransfer> {

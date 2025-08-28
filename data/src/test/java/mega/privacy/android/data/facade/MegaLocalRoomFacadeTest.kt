@@ -291,21 +291,6 @@ internal class MegaLocalRoomFacadeTest {
         }
 
     @Test
-    fun `test that getCompletedTransferById returns correctly when call getCompletedTransferById`() =
-        runTest {
-            val id = 1
-            val completedTransferEntity = mock<CompletedTransferEntity>()
-            val completedTransferModel = mock<CompletedTransfer>()
-            whenever(completedTransferModelMapper(completedTransferEntity)).thenReturn(
-                completedTransferModel
-            )
-            whenever(completedTransferDao.getCompletedTransferById(id)).thenReturn(
-                completedTransferEntity
-            )
-            assertThat(underTest.getCompletedTransferById(id)).isEqualTo(completedTransferModel)
-        }
-
-    @Test
     fun `test that backupDao delete is invoked with the proper backup when deleteBackupById is invoked`() =
         runTest {
             val id = 1L

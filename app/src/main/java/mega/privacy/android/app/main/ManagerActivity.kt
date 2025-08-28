@@ -4503,6 +4503,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             android.R.id.home -> {
                 if (isFirstNavigationLevel) {
                     when (drawerItem) {
+                        DrawerItem.RUBBISH_BIN -> {
+                            rubbishBinViewModel.resetScrollPosition()
+                            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+                        }
+
                         DrawerItem.DEVICE_CENTER -> handleDeviceCenterBackNavigation()
                         DrawerItem.NOTIFICATIONS -> {
                             handleSuperBackPressed()

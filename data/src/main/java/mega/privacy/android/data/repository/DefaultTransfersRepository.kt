@@ -287,10 +287,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         getNumPendingDownloadsNonBackground() + getNumPendingUploads()
     }
 
-    override suspend fun isCompletedTransfersEmpty(): Boolean = withContext(ioDispatcher) {
-        megaLocalRoomGateway.getCompletedTransfersCount() == 0
-    }
-
     override suspend fun getNumPendingPausedUploads(): Int = withContext(ioDispatcher) {
         getUploadTransfers().count { transfer ->
             !transfer.isFinished && transfer.state == MegaTransfer.STATE_PAUSED
@@ -428,10 +424,6 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override fun monitorCompletedTransfer(): Flow<CompletedTransferState> =
         appEventGateway.monitorCompletedTransfer
-
-    override fun monitorCompletedTransfers(size: Int?): Flow<List<CompletedTransfer>> =
-        megaLocalRoomGateway.getCompletedTransfers(size)
-            .flowOn(ioDispatcher)
 
     override fun monitorCompletedTransfersByStateWithLimit(
         limit: Int,
@@ -636,16 +628,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.deleteAllCompletedTransfers()
     }
 
-    override suspend fun getFailedOrCanceledTransfers(): List<CompletedTransfer> =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.getCompletedTransfersByState(
-                listOf(
-                    MegaTransfer.STATE_FAILED,
-                    MegaTransfer.STATE_CANCELLED
-                )
-            )
-        }
-
     override suspend fun deleteFailedOrCancelledTransfers(): List<CompletedTransfer> =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.deleteCompletedTransfersByState(
@@ -693,10 +675,6 @@ internal class DefaultTransfersRepository @Inject constructor(
                 megaApiGateway.pauseTransferByTag(transferTag, isPause, listener)
             }
         }
-
-    override suspend fun getCompletedTransferById(id: Int) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.getCompletedTransferById(id)
-    }
 
     override suspend fun getCurrentDownloadSpeed() = withContext(ioDispatcher) {
         megaApiGateway.currentDownloadSpeed
@@ -877,9 +855,5 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     private fun MegaTransfer.isCUUpload() =
         appData?.contains(AppDataTypeConstants.CameraUpload.sdkTypeValue) == true
-
-    companion object {
-        internal const val TRANSFERS_SD_TEMPORARY_FOLDER = "transfersSdTempMEGA"
-    }
 }
 

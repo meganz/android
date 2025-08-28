@@ -367,13 +367,14 @@ public class Util {
     }
 
     /**
-     * Gets a speed or size string.
+     * Gets a size string.
      *
-     * @param unit    the unit to show in the string
-     * @param isSpeed true if the string is a speed, false if it is a size
-     * @return The speed or size string.
+     * @param size the size to show in the string
+     * @return The size string.
+     * @deprecated Use [mega.privacy.android.app.presentation.mapper.file.FileSizeMapper] instead
      */
-    private static String getUnitString(long unit, boolean isSpeed, Context context) {
+    @Deprecated
+    public static String getSizeString(long size, Context context) {
         DecimalFormat df = new DecimalFormat("#.##");
 
         float KB = 1024;
@@ -383,43 +384,21 @@ public class Util {
         float PB = TB * 1024;
         float EB = PB * 1024;
 
-        if (unit < KB) {
-            return context.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
-        } else if (unit < MB) {
-            return context.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
-        } else if (unit < GB) {
-            return context.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
-        } else if (unit < TB) {
-            return context.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
-        } else if (unit < PB) {
-            return context.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
-        } else if (unit < EB) {
-            return context.getString(R.string.label_file_size_peta_byte, df.format(unit / PB));
+        if (size < KB) {
+            return context.getString(R.string.label_file_size_byte, Long.toString(size));
+        } else if (size < MB) {
+            return context.getString(R.string.label_file_size_kilo_byte, df.format(size / KB));
+        } else if (size < GB) {
+            return context.getString(R.string.label_file_size_mega_byte, df.format(size / MB));
+        } else if (size < TB) {
+            return context.getString(R.string.label_file_size_giga_byte, df.format(size / GB));
+        } else if (size < PB) {
+            return context.getString(R.string.label_file_size_tera_byte, df.format(size / TB));
+        } else if (size < EB) {
+            return context.getString(R.string.label_file_size_peta_byte, df.format(size / PB));
         } else {
-            return context.getString(R.string.label_file_size_exa_byte, df.format(unit / EB));
+            return context.getString(R.string.label_file_size_exa_byte, df.format(size / EB));
         }
-    }
-
-    /**
-     * Gets a speed string.
-     *
-     * @param speed the speed to show in the string
-     * @return The speed string.
-     * @deprecated Use [mega.privacy.android.app.presentation.mapper.file.FileSpeedMapper] instead
-     */
-    public static String getSpeedString(long speed, Context context) {
-        return getUnitString(speed, true, context);
-    }
-
-    /**
-     * Gets a size string.
-     *
-     * @param size the size to show in the string
-     * @return The size string.
-     * @deprecated Use [mega.privacy.android.app.presentation.mapper.file.FileSizeMapper] instead
-     */
-    public static String getSizeString(long size, Context context) {
-        return getUnitString(size, false, context);
     }
 
     public static String getSizeStringGBBased(long gbSize) {

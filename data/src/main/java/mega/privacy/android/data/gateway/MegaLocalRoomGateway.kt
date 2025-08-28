@@ -289,13 +289,6 @@ interface MegaLocalRoomGateway {
     suspend fun deleteActiveTransferGroup(groupId: Int)
 
     /**
-     * Get completed transfer by id
-     *
-     * @param id the id of the completed transfer
-     */
-    suspend fun getCompletedTransferById(id: Int): CompletedTransfer?
-
-    /**
      * Insert a list of [CameraUploadsRecord] or replace the record if already exists
      *
      * @param records the list to save in the database

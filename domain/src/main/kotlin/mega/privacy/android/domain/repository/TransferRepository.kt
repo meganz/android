@@ -69,13 +69,6 @@ interface TransferRepository {
     suspend fun getNumPendingTransfers(): Int
 
     /**
-     * Checks if the completed transfers list is empty.
-     *
-     * @return True if the completed transfers is empty, false otherwise.
-     */
-    suspend fun isCompletedTransfersEmpty(): Boolean
-
-    /**
      * Gets the number of pending and paused uploads.
      *
      * @return Number of pending and paused uploads.
@@ -214,13 +207,6 @@ interface TransferRepository {
      * @return a flow of [CompletedTransferState]
      */
     fun monitorCompletedTransfer(): Flow<CompletedTransferState>
-
-    /**
-     * Monitors list of completed transfers
-     *
-     * @param size the limit size of the list. If null, the limit does not apply
-     */
-    fun monitorCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
 
     /**
      * Monitors list of completed transfers
@@ -427,13 +413,6 @@ interface TransferRepository {
     suspend fun deleteAllCompletedTransfers()
 
     /**
-     * Get failed or cancel transfers
-     *
-     * @return the failed or cancelled transfer list
-     */
-    suspend fun getFailedOrCanceledTransfers(): List<CompletedTransfer>
-
-    /**
      * Delete completed transfers with MegaTransfer.STATE_FAILED or MegaTransfer.STATE_CANCELLED state.
      *
      * @return the failed or cancelled transfer list that was deleted
@@ -466,13 +445,6 @@ interface TransferRepository {
      * @param isPause
      */
     suspend fun pauseTransferByTag(transferTag: Int, isPause: Boolean): Boolean
-
-    /**
-     * Get completed transfer by id
-     *
-     * @param id id of completed transfer
-     */
-    suspend fun getCompletedTransferById(id: Int): CompletedTransfer?
 
     /**
      * Get current download speed.

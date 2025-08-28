@@ -327,9 +327,6 @@ internal class MegaLocalRoomFacade @Inject constructor(
         activeTransferGroupDao.get().deleteActiveTransfersGroupById(groupId)
     }
 
-    override suspend fun getCompletedTransferById(id: Int) = completedTransferDao.get()
-        .getCompletedTransferById(id)?.let { completedTransferModelMapper(it) }
-
     override suspend fun insertOrUpdateCameraUploadsRecords(records: List<CameraUploadsRecord>) =
         cameraUploadsRecordDao.get().insertOrUpdateCameraUploadsRecords(
             records.map { cameraUploadsRecordEntityMapper(it) }
