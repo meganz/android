@@ -7,6 +7,7 @@ import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.destination.ExampleLegacyScreen
 import mega.privacy.android.navigation.destination.LegacySettings
 import mega.privacy.android.navigation.destination.Secondary
+import mega.privacy.android.navigation.destination.WebSite
 import mega.privacy.android.shared.resources.R as sharedR
 
 object CurrentPlanItem : NavDrawerItem.Account(
@@ -59,7 +60,7 @@ object OfflineFilesItem : NavDrawerItem.Account(
 )
 
 object RubbishBinItem : NavDrawerItem.Account(
-    destination = object : NavKey {},
+    destination = WebSite("https://theuselessweb.com/"),
     icon = IconPack.Medium.Thin.Outline.Trash,
     title = sharedR.string.general_section_rubbish_bin
 )
