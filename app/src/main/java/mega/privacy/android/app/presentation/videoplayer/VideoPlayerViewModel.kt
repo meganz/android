@@ -30,6 +30,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -1720,15 +1721,16 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    internal fun hideOrUnhideNodes(nodeIds: List<NodeId>, hide: Boolean) = viewModelScope.launch {
-        for (nodeId in nodeIds) {
-            async {
-                runCatching {
-                    updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
-                }.onFailure { Timber.e("Update sensitivity failed: $it") }
-            }
+    internal fun hideOrUnhideNode(nodeId: NodeId, hide: Boolean) =
+        viewModelScope.launch {
+            runCatching {
+                updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
+                if (uiState.value.showHiddenItems == false && hide) {
+                    delay(1000)
+                    uiState.update { it.copy(isClosedAfterHidingNode = true) }
+                }
+            }.onFailure { Timber.e("Update sensitivity failed: $it") }
         }
-    }
 
     internal fun setHiddenNodesOnboarded() {
         uiState.update {

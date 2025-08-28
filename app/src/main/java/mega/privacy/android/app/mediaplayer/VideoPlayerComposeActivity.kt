@@ -238,8 +238,8 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
         if (result.resultCode != RESULT_OK) return
 
-        videoPlayerViewModel.hideOrUnhideNodes(
-            nodeIds = listOf(NodeId(videoPlayerViewModel.uiState.value.currentPlayingHandle)),
+        videoPlayerViewModel.hideOrUnhideNode(
+            nodeId = NodeId(videoPlayerViewModel.uiState.value.currentPlayingHandle),
             hide = true,
         )
 
@@ -492,6 +492,13 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                 videoPlayerViewModel.clearMenuOptionClickedContent()
             }
         }
+
+        collectFlow(videoPlayerViewModel.uiState.map { it.isClosedAfterHidingNode }
+            .distinctUntilChanged()) { isClosed ->
+            if (isClosed) {
+                finish()
+            }
+        }
     }
 
     /**
@@ -610,10 +617,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
             hiddenNodesOnboardingLauncher.launch(intent)
             overridePendingTransition(0, 0)
         } else if (isHiddenNodesOnboarded) {
-            videoPlayerViewModel.hideOrUnhideNodes(
-                nodeIds = listOf(NodeId(playingHandle)),
-                hide = true,
-            )
+            videoPlayerViewModel.hideOrUnhideNode(nodeId = NodeId(playingHandle), hide = true)
             val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
             videoPlayerViewModel.updateSnackBarMessage(message)
         } else {
@@ -633,10 +637,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
     }
 
     private fun handleUnhideAction(playingHandle: Long) {
-        videoPlayerViewModel.hideOrUnhideNodes(
-            nodeIds = listOf(NodeId(playingHandle)),
-            hide = false,
-        )
+        videoPlayerViewModel.hideOrUnhideNode(nodeId = NodeId(playingHandle), hide = false)
         val message =
             resources.getQuantityString(sharedR.plurals.unhidden_nodes_result_message, 1, 1)
         videoPlayerViewModel.updateSnackBarMessage(message)

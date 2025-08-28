@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,8 +10,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -34,6 +36,7 @@ import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCo
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -53,6 +56,7 @@ class MediaPlayerViewModel @Inject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val getPublicAlbumNodeDataUseCase: GetPublicAlbumNodeDataUseCase,
     private val getFileUriUseCase: GetFileUriUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -86,7 +90,7 @@ class MediaPlayerViewModel @Inject constructor(
     internal val metadataState: StateFlow<Metadata> = _metadataState
 
     init {
-        monitorAccountDetail()
+        handleHiddenNodesUIFlow()
         monitorIsHiddenNodesOnboarded()
     }
 
@@ -139,6 +143,7 @@ class MediaPlayerViewModel @Inject constructor(
      * @param nodeHandle        Node handle to copy.
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
+    @SuppressLint("TimberArgCount")
     fun copyNode(
         nodeHandle: Long? = null,
         newParentHandle: Long,
@@ -162,7 +167,7 @@ class MediaPlayerViewModel @Inject constructor(
                     }
                 }
             }.onFailure {
-                Timber.e("Error not copied", it)
+                Timber.e(it, "Error not copied")
                 if (it is NodeDoesNotExistsException) {
                     snackbarMessage.value = R.string.general_error
                 } else {
@@ -213,6 +218,7 @@ class MediaPlayerViewModel @Inject constructor(
      * @param nodeHandle        Node handle to move.
      * @param newParentHandle   Parent handle in which the node will be moved.
      */
+    @SuppressLint("TimberArgCount")
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
         viewModelScope.launch {
             runCatching {
@@ -220,11 +226,11 @@ class MediaPlayerViewModel @Inject constructor(
                     nodes = mapOf(nodeHandle to newParentHandle),
                     type = NodeNameCollisionType.MOVE,
                 )
-            }.onSuccess {
-                it.firstNodeCollisionOrNull?.let { item ->
+            }.onSuccess { result ->
+                result.firstNodeCollisionOrNull?.let { item ->
                     collision.value = item
                 }
-                it.moveRequestResult?.let {
+                result.moveRequestResult?.let {
                     if (it.isSuccess) {
                         _itemToRemove.value = nodeHandle
                         snackbarMessage.value = R.string.context_correctly_moved
@@ -233,7 +239,7 @@ class MediaPlayerViewModel @Inject constructor(
                     }
                 }
             }.onFailure {
-                Timber.e("Error not copied", it)
+                Timber.e(it, "Error not copied")
                 if (it is NodeDoesNotExistsException) {
                     snackbarMessage.value = R.string.general_error
                 } else {
@@ -253,23 +259,25 @@ class MediaPlayerViewModel @Inject constructor(
     fun getNodeForAlbumSharing(handle: Long) =
         getPublicAlbumNodeDataUseCase(NodeId(handle))
 
-    private fun monitorAccountDetail() {
-        monitorAccountDetailUseCase()
-            .onEach { accountDetail ->
-                val accountType = accountDetail.levelDetail?.accountType
-                val businessStatus =
-                    if (accountType?.isBusinessAccount == true) {
-                        getBusinessStatusUseCase()
-                    } else null
+    private fun handleHiddenNodesUIFlow() {
+        combine(
+            monitorAccountDetailUseCase(),
+            monitorShowHiddenItemsUseCase(),
+        ) { accountDetail, showHiddenItems ->
+            val accountType = accountDetail.levelDetail?.accountType
+            val businessStatus =
+                if (accountType?.isBusinessAccount == true) {
+                    getBusinessStatusUseCase()
+                } else null
 
-                val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
-                _state.update {
-                    it.copy(
-                        accountType = accountDetail.levelDetail?.accountType,
-                        isBusinessAccountExpired = isBusinessAccountExpired,
-                    )
-                }
+            _state.update {
+                it.copy(
+                    accountType = accountDetail.levelDetail?.accountType,
+                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
+                    showHiddenItems = showHiddenItems,
+                )
             }
+        }.catch { Timber.e(it) }
             .launchIn(viewModelScope)
     }
 

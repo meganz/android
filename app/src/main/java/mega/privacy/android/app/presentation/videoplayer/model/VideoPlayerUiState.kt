@@ -98,4 +98,5 @@ data class VideoPlayerUiState(
     val addedSubtitleInfo: SubtitleFileInfo? = null,
     val navigateToSelectSubtitleScreen: Boolean = false,
     val blockedError: StateEvent = consumed,
+    val isClosedAfterHidingNode: Boolean = false
 )

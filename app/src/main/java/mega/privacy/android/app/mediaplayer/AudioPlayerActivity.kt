@@ -1,8 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
-import android.app.Activity
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Color
@@ -29,6 +27,7 @@ import androidx.media3.common.util.Util
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -250,7 +249,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             }
         }
 
-        bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
+        bindService(playerServiceIntent, connection, BIND_AUTO_CREATE)
         serviceBound = true
 
         setupObserver()
@@ -973,7 +972,9 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
                                     val parentNode = megaApi.getParentNode(node)
                                     val isSensitiveInherited =
-                                        parentNode?.let { megaApi.isSensitiveInherited(it) } == true
+                                        parentNode?.let { node ->
+                                            megaApi.isSensitiveInherited(node)
+                                        } == true
                                     val isRootParentInShare =
                                         megaApi.getRootParentNode(node).isInShare
                                     val accountType = viewModel.state.value.accountType
@@ -1085,9 +1086,19 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             )
             val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
             mega.privacy.android.app.utils.Util.showSnackbar(this, message)
+            stopAudioWhenHiddenNode()
         } else {
             tempNodeId = NodeId(longValue = playingHandle)
             showHiddenNodesOnboarding()
+        }
+    }
+
+    private fun stopAudioWhenHiddenNode() {
+        if (viewModel.state.value.showHiddenItems == false) {
+            lifecycleScope.launch {
+                delay(1000)
+                stopPlayer()
+            }
         }
     }
 
@@ -1109,7 +1120,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         )
 
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
-        if (result.resultCode != Activity.RESULT_OK) return
+        if (result.resultCode != RESULT_OK) return
 
         hideOrUnhideNode(
             playingHandle = tempNodeId?.longValue ?: 0,
@@ -1123,6 +1134,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 1,
             )
         mega.privacy.android.app.utils.Util.showSnackbar(this, message)
+        stopAudioWhenHiddenNode()
     }
 
     private fun hideOrUnhideNode(playingHandle: Long, hide: Boolean) =

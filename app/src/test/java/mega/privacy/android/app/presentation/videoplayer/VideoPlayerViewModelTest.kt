@@ -12,6 +12,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
@@ -1802,9 +1803,25 @@ class VideoPlayerViewModelTest {
     @ParameterizedTest(name = "when hide is {0}")
     @ValueSource(booleans = [true, false])
     fun `test updateNodeSensitiveUseCase is invoked correctly`(hide: Boolean) = runTest {
-        val testNodeIds = listOf(NodeId(1L))
-        underTest.hideOrUnhideNodes(testNodeIds, hide)
-        verify(updateNodeSensitiveUseCase).invoke(testNodeIds.first(), hide)
+        val testNodeId = NodeId(1L)
+        val testActions = listOf(
+            VideoPlayerDownloadAction,
+            VideoPlayerHideAction,
+        )
+        initLaunchSourceMapperReturned(testActions)
+        fakeMonitorShowHiddenItemsFlow.emit(false)
+        fakeMonitorAccountDetailFlow.emit(mock())
+        advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().showHiddenItems).isFalse()
+            underTest.hideOrUnhideNode(testNodeId, hide)
+            verify(updateNodeSensitiveUseCase).invoke(testNodeId, hide)
+            delay(1000)
+            if (hide) {
+                assertThat(awaitItem().isClosedAfterHidingNode).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
     }
 
     @Test

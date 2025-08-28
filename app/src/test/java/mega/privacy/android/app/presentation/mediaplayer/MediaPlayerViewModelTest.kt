@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -14,7 +14,10 @@ import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -29,6 +32,7 @@ import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCo
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -39,6 +43,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @ExperimentalCoroutinesApi
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -52,22 +57,26 @@ internal class MediaPlayerViewModelTest {
         mock<CheckChatNodesNameCollisionAndCopyUseCase>()
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
     private val getChatFileUseCase = mock<GetChatFileUseCase>()
-    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-        on {
-            invoke()
-        }.thenReturn(flowOf(AccountDetail()))
-    }
-    private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        onBlocking {
-            invoke()
-        }.thenReturn(false)
-    }
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val getPublicAlbumNodeDataUseCase = mock<GetPublicAlbumNodeDataUseCase>()
     private val getFileUriUseCase = mock<GetFileUriUseCase>()
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val fakeMonitorShowHiddenItemsFlow = MutableSharedFlow<Boolean>()
+    private val fakeMonitorAccountDetailFlow = MutableSharedFlow<AccountDetail>()
 
     @BeforeEach
     fun setUp() {
+        wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(
+            fakeMonitorShowHiddenItemsFlow
+        )
+        wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(fakeMonitorAccountDetailFlow)
+        wheneverBlocking { isHiddenNodesOnboardedUseCase() }.thenReturn(false)
+        initUnderTest()
+    }
+
+    private fun initUnderTest() {
         underTest = MediaPlayerViewModel(
             checkNodesNameCollisionWithActionUseCase = checkNodesNameCollisionWithActionUseCase,
             checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
@@ -78,6 +87,7 @@ internal class MediaPlayerViewModelTest {
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             getPublicAlbumNodeDataUseCase = getPublicAlbumNodeDataUseCase,
             getFileUriUseCase = getFileUriUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase
         )
     }
 
@@ -86,7 +96,9 @@ internal class MediaPlayerViewModelTest {
         reset(
             checkNodesNameCollisionWithActionUseCase,
             checkChatNodesNameCollisionAndCopyUseCase,
-            getFileUriUseCase
+            getFileUriUseCase,
+            monitorShowHiddenItemsUseCase,
+            monitorAccountDetailUseCase,
         )
     }
 
@@ -404,6 +416,161 @@ internal class MediaPlayerViewModelTest {
         val actual = underTest.getContentUri(mock())
         assertThat(actual).isEqualTo(expectedUri)
     }
+
+    @Test
+    fun `test that handleHiddenNodesUIFlow updates state correctly for paid account`() = runTest {
+        val testAccountType = mock<AccountType> {
+            on { isBusinessAccount }.thenReturn(true)
+            on { isPaid }.thenReturn(true)
+        }
+        initUnderTest()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            fakeMonitorShowHiddenItemsFlow.emit(true)
+            emitAccountDetail(testAccountType)
+            skipItems(1)
+            val actual = awaitItem()
+            assertThat(actual.accountType?.isPaid).isTrue()
+            assertThat(actual.isBusinessAccountExpired).isFalse()
+            assertThat(actual.showHiddenItems).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    private suspend fun emitAccountDetail(accountType: AccountType? = null) {
+        val testLevelDetail = mock<AccountLevelDetail> {
+            on { this.accountType }.thenReturn(accountType)
+        }
+        val testAccountDetail = mock<AccountDetail> {
+            on { levelDetail }.thenReturn(testLevelDetail)
+        }
+        fakeMonitorAccountDetailFlow.emit(testAccountDetail)
+    }
+
+    @Test
+    fun `test that handleHiddenNodesUIFlow updates state correctly for business account`() =
+        runTest {
+            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
+
+            val testAccountType = mock<AccountType> {
+                on { isBusinessAccount }.thenReturn(true)
+                on { isPaid }.thenReturn(true)
+            }
+            initUnderTest()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                emitAccountDetail(testAccountType)
+                fakeMonitorShowHiddenItemsFlow.emit(false)
+                skipItems(1)
+                val actual = awaitItem()
+                assertThat(actual.accountType?.isPaid).isTrue()
+                assertThat(actual.isBusinessAccountExpired).isTrue()
+                assertThat(actual.showHiddenItems).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that handleHiddenNodesUIFlow updates state correctly for free account`() = runTest {
+        val testAccountType = mock<AccountType> {
+            on { isBusinessAccount }.thenReturn(true)
+            on { isPaid }.thenReturn(false)
+        }
+        initUnderTest()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            emitAccountDetail(testAccountType)
+            fakeMonitorShowHiddenItemsFlow.emit(true)
+            skipItems(1)
+            val actual = awaitItem()
+            assertThat(actual.accountType?.isPaid).isFalse()
+            assertThat(actual.isBusinessAccountExpired).isFalse()
+            assertThat(actual.showHiddenItems).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that handleHiddenNodesUIFlow handles null account detail gracefully`() = runTest {
+        initUnderTest()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            fakeMonitorAccountDetailFlow.emit(mock())
+            fakeMonitorShowHiddenItemsFlow.emit(false)
+            skipItems(1)
+            val actual = awaitItem()
+            assertThat(actual.accountType).isNull()
+            assertThat(actual.isBusinessAccountExpired).isFalse()
+            assertThat(actual.showHiddenItems).isFalse()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that handleHiddenNodesUIFlow handles null account level detail gracefully`() =
+        runTest {
+            val mockAccountDetail = mock<AccountDetail> {
+                on { levelDetail }.thenReturn(null)
+            }
+            initUnderTest()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                fakeMonitorAccountDetailFlow.emit(mockAccountDetail)
+                fakeMonitorShowHiddenItemsFlow.emit(true)
+                skipItems(1)
+                val actual = awaitItem()
+                assertThat(actual.accountType).isNull()
+                assertThat(actual.isBusinessAccountExpired).isFalse()
+                assertThat(actual.showHiddenItems).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that handleHiddenNodesUIFlow handles null account type gracefully`() = runTest {
+        whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
+        initUnderTest()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            emitAccountDetail()
+            fakeMonitorShowHiddenItemsFlow.emit(false)
+            skipItems(1)
+            val actual = awaitItem()
+            assertThat(actual.accountType).isNull()
+            assertThat(actual.isBusinessAccountExpired).isFalse()
+            assertThat(actual.showHiddenItems).isFalse()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that handleHiddenNodesUIFlow handles business status for non-business account`() =
+        runTest {
+            whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
+            val testAccountType = mock<AccountType> {
+                on { isPaid }.thenReturn(true)
+                on { isBusinessAccount }.thenReturn(false)
+            }
+            initUnderTest()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                emitAccountDetail(testAccountType)
+                fakeMonitorShowHiddenItemsFlow.emit(true)
+                skipItems(1)
+                val actual = awaitItem()
+                assertThat(actual.accountType?.isPaid).isTrue()
+                assertThat(actual.isBusinessAccountExpired).isFalse()
+                assertThat(actual.showHiddenItems).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 
     companion object {
         @JvmField
