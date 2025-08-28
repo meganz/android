@@ -12,19 +12,14 @@ import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
-import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaAccountDetails
@@ -38,8 +33,8 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val accountInfoFacade: AccountInfoFacade,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
+    private val openTransfersSectionIntentMapper: OpenTransfersSectionIntentMapper,
 ) : OverQuotaNotificationBuilder {
 
     override suspend operator fun invoke(storageOverQuota: Boolean) = if (storageOverQuota) {
@@ -69,20 +64,10 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             intent,
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val clickIntent = if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-            Intent(context, TransfersActivity::class.java).apply {
-                putExtra(EXTRA_TAB, ACTIVE_TAB_INDEX)
-            }
-        } else {
-            Intent(context, ManagerActivity::class.java).apply {
-                action = Constants.ACTION_SHOW_TRANSFERS
-                putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-            }
-        }
         val clickPendingIntent = PendingIntent.getActivity(
             context,
             0,
-            clickIntent,
+            openTransfersSectionIntentMapper(TransfersTab.PENDING_TAB),
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val upgradeButtonText =
@@ -97,9 +82,11 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             setStyle(NotificationCompat.BigTextStyle())
             addAction(iconPackR.drawable.ic_stat_notify, upgradeButtonText, pendingIntent)
             setContentTitle(context.getString(R.string.label_transfer_over_quota))
-            setContentText(context.getString(
-                R.string.current_text_depleted_transfer_overquota,
-                TimeUtils.getHumanizedTime(getBandwidthOverQuotaDelayUseCase().inWholeSeconds))
+            setContentText(
+                context.getString(
+                    R.string.current_text_depleted_transfer_overquota,
+                    TimeUtils.getHumanizedTime(getBandwidthOverQuotaDelayUseCase().inWholeSeconds)
+                )
             )
             setContentIntent(clickPendingIntent)
             setOngoing(false)

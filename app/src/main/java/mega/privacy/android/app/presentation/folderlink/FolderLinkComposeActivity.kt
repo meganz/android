@@ -36,8 +36,6 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -49,7 +47,6 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImag
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
@@ -59,7 +56,6 @@ import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -74,7 +70,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -435,20 +430,12 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 Timber.w("Not logged in, no action.")
                 return@launch
             }
-            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                megaNavigator.openTransfersAndConsumeErrorStatus(
-                    this@FolderLinkComposeActivity,
-                    transfersManagementViewModel
-                )
-            } else {
-                startActivity(
-                    Intent(this@FolderLinkComposeActivity, ManagerActivity::class.java)
-                        .setAction(ACTION_SHOW_TRANSFERS)
-                        .putExtra(TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                )
-            }
+
+            megaNavigator.openTransfersAndConsumeErrorStatus(
+                this@FolderLinkComposeActivity,
+                transfersManagementViewModel
+            )
+
             finish()
         }
     }

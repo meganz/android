@@ -43,7 +43,6 @@ import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -54,7 +53,6 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImag
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
@@ -67,7 +65,6 @@ import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDi
 import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialog
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
-import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
@@ -77,6 +74,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
@@ -88,9 +86,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
@@ -134,12 +130,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
      */
     @Inject
     lateinit var megaNavigator: MegaNavigator
-
-    /**
-     * [GetFeatureFlagValueUseCase]
-     */
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val nameCollisionActivityLauncher = registerForActivityResult(
         NameCollisionActivityContract()
@@ -666,22 +656,11 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     }
 
     private fun transfersWidgetClicked() {
-        lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                megaNavigator.openTransfersAndConsumeErrorStatus(
-                    this@SearchActivity,
-                    transfersManagementViewModel
-                )
-            } else {
-                startActivity(
-                    Intent(this@SearchActivity, ManagerActivity::class.java)
-                        .setAction(Constants.ACTION_SHOW_TRANSFERS)
-                        .putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                )
-            }
-            finish()
-        }
+        megaNavigator.openTransfersAndConsumeErrorStatus(
+            this@SearchActivity,
+            transfersManagementViewModel
+        )
+        finish()
     }
 }
 

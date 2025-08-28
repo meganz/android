@@ -3,23 +3,16 @@ package mega.privacy.android.app.presentation.transfers.notification
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
-import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
 import javax.inject.Inject
 
@@ -29,7 +22,7 @@ import javax.inject.Inject
 class DefaultTransfersFinishedNotificationMapper @Inject constructor(
     @ApplicationContext private val context: Context,
     private val fileSizeStringMapper: FileSizeStringMapper,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val openTransfersSectionIntentMapper: OpenTransfersSectionIntentMapper,
 ) : TransfersFinishedNotificationMapper {
 
     private val resources get() = context.resources
@@ -86,21 +79,10 @@ class DefaultTransfersFinishedNotificationMapper @Inject constructor(
             alreadyTransferredCount > 0 -> alreadyMsg(alreadyTransferredCount, isDownload)
             else -> okayMsg(activeTransferTotals.transferredBytes)
         }
-
-        val intent = if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-            Intent(context, TransfersActivity::class.java).apply {
-                putExtra(EXTRA_TAB, COMPLETED_TAB_INDEX)
-            }
-        } else {
-            Intent(context, ManagerActivity::class.java).apply {
-                action = Constants.ACTION_SHOW_TRANSFERS
-                putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.COMPLETED_TAB)
-            }
-        }
         val pendingIntent = PendingIntent.getActivity(
             context,
             0,
-            intent,
+            openTransfersSectionIntentMapper(TransfersTab.COMPLETED_TAB),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 

@@ -1410,17 +1410,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun onTransfersWidgetClick() {
-        lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                megaNavigator.openTransfersAndConsumeErrorStatus(
-                    this@ManagerActivity,
-                    transfersManagementViewModel,
-                )
-            } else {
-                drawerItem = DrawerItem.TRANSFERS
-                selectDrawerItem(drawerItem)
-            }
-        }
+        megaNavigator.openTransfersAndConsumeErrorStatus(
+            this@ManagerActivity,
+            transfersManagementViewModel,
+        )
     }
 
     private fun initialiseChatBadgeView() {
@@ -1883,27 +1876,19 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     private fun openTransfers() {
         val openTab = intent?.serializable(TRANSFERS_TAB) ?: TransfersTab.PENDING_TAB
-        lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                val tab = openTab.let { tab ->
-                    if (tab == TransfersTab.COMPLETED_TAB) {
-                        COMPLETED_TAB_INDEX
-                    } else {
-                        ACTIVE_TAB_INDEX
-                    }
-                }
-                megaNavigator.openTransfersAndConsumeErrorStatus(
-                    this@ManagerActivity,
-                    transfersManagementViewModel,
-                    tab
-                )
+        val tab = openTab.let { tab ->
+            if (tab == TransfersTab.COMPLETED_TAB) {
+                COMPLETED_TAB_INDEX
             } else {
-                drawerItem = DrawerItem.TRANSFERS
-                transferPageViewModel.setTransfersTab(openTab)
-                selectDrawerItem(drawerItem)
+                ACTIVE_TAB_INDEX
             }
-            intent = null
         }
+        megaNavigator.openTransfersAndConsumeErrorStatus(
+            this@ManagerActivity,
+            transfersManagementViewModel,
+            tab
+        )
+        intent = null
     }
 
     private fun handleRedirectIntentActions(intent: Intent?): Boolean {
@@ -3746,24 +3731,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     override fun drawerItemClicked(item: DrawerItem) {
-        lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection) && item == DrawerItem.TRANSFERS) {
-                megaNavigator.openTransfersAndConsumeErrorStatus(
-                    this@ManagerActivity,
-                    transfersManagementViewModel
-                )
-            } else {
-                val oldDrawerItem = drawerItem
-                isFirstTimeCam
-                checkIfShouldCloseSearchView(oldDrawerItem)
-                if (item == DrawerItem.OFFLINE) {
-                    bottomItemBeforeOpenFullscreenOffline = bottomNavigationCurrentItem
-                    openFullscreenOfflineFragment(pathNavigationOffline)
-                } else {
-                    drawerItem = item
-                }
-                selectDrawerItem(drawerItem)
-            }
+        if (item == DrawerItem.TRANSFERS) {
+            megaNavigator.openTransfersAndConsumeErrorStatus(
+                this@ManagerActivity,
+                transfersManagementViewModel
+            )
         }
     }
 

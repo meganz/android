@@ -24,13 +24,11 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
@@ -53,7 +51,6 @@ import mega.privacy.android.app.presentation.settings.model.storageTargetPrefere
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.domain.entity.ThemeMode
@@ -69,9 +66,7 @@ import mega.privacy.android.domain.entity.photos.Album.RawAlbum
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -89,9 +84,6 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
     @Inject
     lateinit var megaNavigator: MegaNavigator
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper
@@ -278,21 +270,10 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
     }
 
     private fun openTransfersScreen() {
-        lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                megaNavigator.openTransfersAndConsumeErrorStatus(
-                    this@PhotosSearchActivity,
-                    transfersManagementViewModel
-                )
-            } else {
-                startActivity(
-                    Intent(this@PhotosSearchActivity, ManagerActivity::class.java)
-                        .setAction(Constants.ACTION_SHOW_TRANSFERS)
-                        .putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                )
-            }
-        }
+        megaNavigator.openTransfersAndConsumeErrorStatus(
+            this@PhotosSearchActivity,
+            transfersManagementViewModel
+        )
     }
 
     private fun handleNodesNameCollisionResult(result: NodeNameCollisionsResult) {

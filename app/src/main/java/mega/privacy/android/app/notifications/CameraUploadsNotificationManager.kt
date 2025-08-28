@@ -182,7 +182,7 @@ class CameraUploadsNotificationManager @Inject constructor(
         return builder.build()
     }
 
-    private suspend fun getDefaultPendingIntent() = PendingIntent.getActivity(
+    private fun getDefaultPendingIntent() = PendingIntent.getActivity(
         context,
         0,
         openTransfersSectionIntentMapper(TransfersTab.PENDING_TAB),
@@ -253,7 +253,7 @@ class CameraUploadsNotificationManager @Inject constructor(
      *
      *  @progress an Int between 0 and 100
      */
-    private suspend fun showVideoCompressionProgressNotification(
+    private fun showVideoCompressionProgressNotification(
         progress: Int,
         currentFileIndex: Int,
         totalCount: Int,
@@ -280,7 +280,7 @@ class CameraUploadsNotificationManager @Inject constructor(
     /**
      *  Display a notification for checking files to upload
      */
-    private suspend fun showCheckUploadsNotification() {
+    private fun showCheckUploadsNotification() {
         getDefaultPendingIntent()?.let { defaultPendingIntent ->
             val notification = createNotification(
                 title = context.getString(R.string.section_photo_sync),

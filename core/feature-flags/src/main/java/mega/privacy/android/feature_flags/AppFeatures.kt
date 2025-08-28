@@ -149,14 +149,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables new transfers section
-     */
-    TransfersSection(
-        "Enable new transfers fragment",
-        true
-    ),
-
-    /**
      * New import section
      */
     NewUploadDestinationActivity(

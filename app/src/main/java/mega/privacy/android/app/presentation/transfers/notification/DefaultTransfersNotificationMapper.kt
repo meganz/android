@@ -3,22 +3,15 @@ package mega.privacy.android.app.presentation.transfers.notification
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import androidx.core.app.NotificationCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
-import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
 import javax.inject.Inject
 
@@ -27,28 +20,17 @@ import javax.inject.Inject
  */
 class DefaultTransfersNotificationMapper @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val openTransfersSectionIntentMapper: OpenTransfersSectionIntentMapper,
 ) : TransfersNotificationMapper {
 
     override suspend fun invoke(
         activeTransferTotals: ActiveTransferTotals?,
         paused: Boolean,
     ): Notification {
-        val intent = if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-            Intent(context, TransfersActivity::class.java).apply {
-                putExtra(EXTRA_TAB, ACTIVE_TAB_INDEX)
-            }
-        } else {
-            Intent(context, ManagerActivity::class.java).apply {
-                action = Constants.ACTION_SHOW_TRANSFERS
-                putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-            }
-        }
-
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
             context,
             0,
-            intent,
+            openTransfersSectionIntentMapper(TransfersTab.PENDING_TAB),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val content = context.getString(R.string.download_touch_to_show)
