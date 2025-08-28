@@ -3,6 +3,7 @@ package mega.privacy.android.app.appstate
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +48,7 @@ class MainNavigationStateViewModelTest {
     private val monitorStartScreenPreferenceDestinationUseCase =
         mock<MonitorStartScreenPreferenceDestinationUseCase>()
     private val screenPreferenceDestinationMapper = mock<ScreenPreferenceDestinationMapper>()
+    private val defaultStartScreen = mock<NavKey>()
 
     @BeforeAll
     fun initialisation() {
@@ -309,6 +311,31 @@ class MainNavigationStateViewModelTest {
             }
     }
 
+    @Test
+    fun `test that default start screen destination is set if no preference is returned`() =
+        runTest {
+            stubConnectivity()
+            stubAllEnabledFlaggedItems()
+            val expected = defaultStartScreen
+            stubStartScreenPreference(mock<StartScreenDestinationPreference>())
+            screenPreferenceDestinationMapper.stub {
+                on { invoke(any<StartScreenDestinationPreference>()) }.thenReturn(
+                    null
+                )
+            }
+            initUnderTest(
+                mainDestinations = stubDefaultMainNavigationItems()
+            )
+
+            underTest.state
+                .filterIsInstance<MainNavState.Data>()
+                .test {
+                    val item = awaitItem()
+                    assertThat(item.initialDestination).isEqualTo(expected)
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
 
     private fun initUnderTest(
         mainDestinations: Set<MainNavItem>,
@@ -319,6 +346,7 @@ class MainNavigationStateViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorStartScreenPreferenceDestinationUseCase = monitorStartScreenPreferenceDestinationUseCase,
             screenPreferenceDestinationMapper = screenPreferenceDestinationMapper,
+            defaultStartScreen = defaultStartScreen,
         )
     }
 

@@ -22,4 +22,6 @@ dependencies {
 
     // Logging
     implementation(lib.logging.timber)
+
+    implementation(lib.javax.inject)
 }

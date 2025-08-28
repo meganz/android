@@ -70,6 +70,8 @@ class StartScreenViewModelTest {
 
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
+    private val defaultStartScreen = mock<NavKey>()
+
     private fun initViewModel(mainNavItems: Set<MainNavItem> = setOf(mock<MainNavItem>())) {
         underTest = StartScreenViewModel(
             monitorStartScreenPreference = monitorStartScreenPreference,
@@ -82,6 +84,7 @@ class StartScreenViewModelTest {
             startScreenDestinationPreferenceNavKeyMapper = startScreenDestinationPreferenceNavKeyMapper,
             setStartScreenPreferenceDestinationUseCase = setStartScreenPreferenceDestinationUseCase,
             startScreenDestinationOptionMapper = startScreenDestinationOptionMapper,
+            defaultStartScreen = defaultStartScreen,
         )
     }
 
@@ -110,7 +113,7 @@ class StartScreenViewModelTest {
             initViewModel(mainNavItems)
 
             if (singleActivityFlagEnabled) {
-                val expected = mock<NavKey>()
+                val expected = defaultStartScreen
                 val option = mock<StartScreenOption<NavKey>> {
                     on { startScreen } doReturn expected
                 }

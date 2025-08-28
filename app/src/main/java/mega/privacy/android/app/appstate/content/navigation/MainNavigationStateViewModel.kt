@@ -2,6 +2,7 @@ package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableSet
@@ -24,6 +25,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUse
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
 import mega.privacy.android.shared.original.core.ui.utils.asUiStateFlow
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 import timber.log.Timber
@@ -36,6 +38,7 @@ class MainNavigationStateViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorStartScreenPreferenceDestinationUseCase: MonitorStartScreenPreferenceDestinationUseCase,
     private val screenPreferenceDestinationMapper: ScreenPreferenceDestinationMapper,
+    @DefaultStartScreen private val defaultStartScreen: NavKey,
 ) : ViewModel() {
 
     val state: StateFlow<MainNavState> by lazy {
@@ -48,7 +51,7 @@ class MainNavigationStateViewModel @Inject constructor(
                 .log("Main Nav Screens"),
             monitorStartScreenPreferenceDestinationUseCase()
                 .map {
-                    screenPreferenceDestinationMapper(it) ?: mainDestinations.first().destination
+                    screenPreferenceDestinationMapper(it) ?: defaultStartScreen
                 }.take(1)
                 .log("Start Screen Preference Destination"),
         ) { navigationItems, mainScreens, startScreenPreferenceDestination ->
