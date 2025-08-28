@@ -1,6 +1,7 @@
 package mega.privacy.android.app.menu.navigation
 
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.feature.payment.UpgradeAccount
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.destination.ExampleLegacyScreen
@@ -9,7 +10,7 @@ import mega.privacy.android.navigation.destination.Secondary
 import mega.privacy.android.shared.resources.R as sharedR
 
 object CurrentPlanItem : NavDrawerItem.Account(
-    destination = object : NavKey {},
+    destination = UpgradeAccount(),
     icon = IconPack.Medium.Thin.Outline.Shield,
     title = sharedR.string.account_upgrade_account_pro_plan_info_current_plan_label,
     actionLabel = sharedR.string.general_upgrade_button
