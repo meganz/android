@@ -141,7 +141,6 @@ import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogFra
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.listeners.FabButtonListener
 import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDialogActionHandler
-import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
 import mega.privacy.android.app.main.mapper.ManagerRedirectIntentMapper
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
@@ -184,7 +183,6 @@ import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
@@ -224,12 +222,8 @@ import mega.privacy.android.app.presentation.shares.links.LinksViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeViewModel
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
-import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
-import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
-import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
-import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.service.push.MegaMessageService
@@ -365,13 +359,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
     private val callInProgressViewModel: OngoingCallViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
-    private val transferPageViewModel: TransferPageViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
     private val startDownloadViewModel: StartDownloadViewModel by viewModels()
     private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
     private val syncMonitorViewModel: SyncMonitorViewModel by viewModels()
-    private val transfersViewModel: TransfersViewModel by viewModels()
     private val syncPromotionViewModel: SyncPromotionViewModel by viewModels()
     val sharesViewModel: SharesViewModel by viewModels()
 
@@ -1776,7 +1768,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         intent.getBooleanExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, false)
                     newAccount =
                         intent.getBooleanExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, false)
-                    newCreationAccount = intent.getBooleanExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)
+                    newCreationAccount =
+                        intent.getBooleanExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)
                     firstLogin =
                         intent.getBooleanExtra(ExtraConstant.EXTRA_FIRST_LOGIN, false)
                     viewModel.setIsFirstLogin(firstLogin)
@@ -1853,10 +1846,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         }
                     }
                     if (intent?.action != null) {
-                        if (intent.action == Constants.ACTION_SHOW_TRANSFERS) {
-                            selectDrawerItemPending = false
-                            openTransfers()
-                        } else if (intent.action == Constants.ACTION_REFRESH_AFTER_BLOCKED) {
+                        if (intent.action == Constants.ACTION_REFRESH_AFTER_BLOCKED) {
                             drawerItem = DrawerItem.CLOUD_DRIVE
                             intent = null
                         }
@@ -1872,23 +1862,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
         }
         return false
-    }
-
-    private fun openTransfers() {
-        val openTab = intent?.serializable(TRANSFERS_TAB) ?: TransfersTab.PENDING_TAB
-        val tab = openTab.let { tab ->
-            if (tab == TransfersTab.COMPLETED_TAB) {
-                COMPLETED_TAB_INDEX
-            } else {
-                ACTIVE_TAB_INDEX
-            }
-        }
-        megaNavigator.openTransfersAndConsumeErrorStatus(
-            this@ManagerActivity,
-            transfersManagementViewModel,
-            tab
-        )
-        intent = null
     }
 
     private fun handleRedirectIntentActions(intent: Intent?): Boolean {
@@ -2793,10 +2766,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     showOverQuotaAlert(true)
                 }
 
-                Constants.ACTION_SHOW_TRANSFERS -> {
-                    openTransfers()
-                }
-
                 Constants.ACTION_LOCATE_DOWNLOADED_FILE -> {
                     handleLocateFileNavigationFromIntent()
                 }
@@ -3243,12 +3212,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 viewModel.setIsFirstNavigationLevel(true)
             }
 
-            DrawerItem.TRANSFERS -> {
-                supportActionBar?.subtitle = null
-                supportActionBar?.title = getString(sharedR.string.general_section_transfers)
-                isFirstNavigationLevel = true
-            }
-
             DrawerItem.PHOTOS -> {
                 supportActionBar?.subtitle = null
                 if (isInAlbumContent) {
@@ -3323,7 +3286,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         val totalNotifications = numUnreadUserAlerts + totalIncomingContactRequestCount
         if (totalNotifications == 0) {
             if (isFirstNavigationLevel) {
-                if (drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.TRANSFERS) {
+                if (drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN) {
                     supportActionBar?.setHomeAsUpIndicator(
                         tintIcon(
                             this,
@@ -3346,7 +3309,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 setPhotosNavigationToolbarIcon()
             }
             if (isFirstNavigationLevel) {
-                if (drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.TRANSFERS) {
+                if (drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN) {
                     badgeDrawable.progress = 1.0f
                 } else {
                     badgeDrawable.progress = 0.0f
@@ -3534,7 +3497,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
             }
 
-            DrawerItem.TRANSFERS, DrawerItem.NOTIFICATIONS, DrawerItem.BACKUPS -> {
+            DrawerItem.NOTIFICATIONS, DrawerItem.BACKUPS -> {
                 setBottomNavigationMenuItemChecked(NO_BNV)
                 hideAdsView()
             }
@@ -3555,21 +3518,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         )
         setToolbarTitle()
         showFabButton()
-    }
-
-    private fun selectDrawerItemTransfers() {
-        Timber.d("selectDrawerItemTransfers")
-        setAppBarVisibility(true)
-        transfersManagementViewModel.hideTransfersWidget()
-        setBottomNavigationMenuItemChecked(NO_BNV)
-        transfersManagementViewModel.checkIfShouldShowCompletedTab()
-        replaceFragment(
-            transferPageFragment ?: TransferPageFragment.newInstance(),
-            FragmentTag.TRANSFERS_PAGE.tag
-        )
-        setToolbarTitle()
-        showFabButton()
-        closeDrawer()
     }
 
     /**
@@ -3731,12 +3679,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     override fun drawerItemClicked(item: DrawerItem) {
-        if (item == DrawerItem.TRANSFERS) {
-            megaNavigator.openTransfersAndConsumeErrorStatus(
-                this@ManagerActivity,
-                transfersManagementViewModel
-            )
-        }
     }
 
     /**
@@ -3772,18 +3714,13 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         drawerItem = item ?: DrawerItem.CLOUD_DRIVE
         callInProgressViewModel.setShow(
             resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-                    && drawerItem != DrawerItem.TRANSFERS && drawerItem != DrawerItem.NOTIFICATIONS && drawerItem != DrawerItem.HOMEPAGE
+                    && drawerItem != DrawerItem.NOTIFICATIONS && drawerItem != DrawerItem.HOMEPAGE
         )
 
         // Homepage may hide the Appbar before
         setAppBarVisibility(true)
         Util.resetActionBar(supportActionBar)
         updateTransfersWidgetVisibility()
-        if (drawerItem == DrawerItem.TRANSFERS) {
-            transfersViewModel.resetSelectedTab()
-        } else {
-            transfersViewModel.clearSelectedTab()
-        }
         if (item !== DrawerItem.CHAT) {
             //remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
             removeFragment(chatsFragment)
@@ -3794,9 +3731,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (item !== DrawerItem.PHOTOS) {
             resetCUFragment()
             isInAlbumContent = false
-        }
-        if (item !== DrawerItem.TRANSFERS) {
-            transferPageFragment?.destroyActionModeIfNeeded()
         }
         when (item) {
             DrawerItem.CLOUD_DRIVE -> {
@@ -3972,15 +3906,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             DrawerItem.NOTIFICATIONS -> {
                 showHideBottomNavigationView(true)
                 selectDrawerItemNotifications()
-                supportInvalidateOptionsMenu()
-                showFabButton()
-                hideAdsView()
-            }
-
-            DrawerItem.TRANSFERS -> {
-                showHideBottomNavigationView(true)
-                supportActionBar?.subtitle = null
-                selectDrawerItemTransfers()
                 supportInvalidateOptionsMenu()
                 showFabButton()
                 hideAdsView()
@@ -4168,9 +4093,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             return (cloudDriveSyncsFragment != null && cloudDriveSyncsFragment?.isAdded == true)
         }
 
-    private val transferPageFragment: TransferPageFragment?
-        get() = supportFragmentManager.findFragmentByTag(FragmentTag.TRANSFERS_PAGE.tag) as? TransferPageFragment
-
     private val deviceCenterFragment: DeviceCenterFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.DEVICE_CENTER.tag) as? DeviceCenterFragment
 
@@ -4199,8 +4121,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         )
 
     private val isOnFileManagementManagerSection: Boolean
-        get() = drawerItem !== DrawerItem.TRANSFERS
-                && drawerItem !== DrawerItem.NOTIFICATIONS
+        get() = drawerItem !== DrawerItem.NOTIFICATIONS
                 && drawerItem !== DrawerItem.CHAT
                 && drawerItem !== DrawerItem.RUBBISH_BIN
                 && drawerItem !== DrawerItem.PHOTOS
@@ -4229,10 +4150,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
             DrawerItem.CHAT -> {
                 chatTabsFragment = chatsFragment
-            }
-
-            DrawerItem.TRANSFERS -> {
-                transferPageFragment?.updateElevation()
             }
 
             else -> {}
@@ -4486,12 +4403,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     moreMenuItem?.isVisible = false
                 }
 
-                DrawerItem.TRANSFERS -> if (transferPageViewModel.transferTab == TransfersTab.PENDING_TAB
-                    && transfersViewModel.getActiveTransfers().isNotEmpty()
-                ) {
-                    enableSelectMenuItem.isVisible = true
-                }
-
                 DrawerItem.CHAT -> if (searchExpand) {
                     openSearchView()
                 } else {
@@ -4592,11 +4503,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             android.R.id.home -> {
                 if (isFirstNavigationLevel) {
                     when (drawerItem) {
-                        DrawerItem.RUBBISH_BIN, DrawerItem.TRANSFERS -> {
-                            rubbishBinViewModel.resetScrollPosition()
-                            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-                        }
-
                         DrawerItem.DEVICE_CENTER -> handleDeviceCenterBackNavigation()
                         DrawerItem.NOTIFICATIONS -> {
                             handleSuperBackPressed()
@@ -4630,10 +4536,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             it.onBackPressed()
                             return true
                         }
-                    } else if (drawerItem == DrawerItem.TRANSFERS) {
-                        drawerItem = startScreenUtil.getStartDrawerItem()
-                        selectDrawerItem(drawerItem)
-                        return true
                     } else if (drawerItem == DrawerItem.HOMEPAGE) {
                         if (homepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
                             handleBackPressIfFullscreenOfflineFragmentOpened()
@@ -4728,11 +4630,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             R.id.action_return_call -> {
                 Timber.d("Action menu return to call in progress pressed")
                 returnCall()
-                true
-            }
-
-            R.id.action_enable_select -> {
-                transferPageFragment?.activateActionMode()
                 true
             }
 
@@ -4862,8 +4759,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 goBackToBottomNavigationItem(bottomNavigationCurrentItem)
             }
 
-        } else if (drawerItem == DrawerItem.TRANSFERS) {
-            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
         } else if (drawerItem == DrawerItem.BACKUPS) {
             backupsFragment?.onBackPressed() ?: goBackToBottomNavigationItem(
                 bottomNavigationCurrentItem
@@ -5862,9 +5757,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             return
         } else if (Constants.ACTION_SHOW_UPGRADE_ACCOUNT == intent.action) {
             navigateToUpgradeAccount()
-            return
-        } else if (Constants.ACTION_SHOW_TRANSFERS == intent.action) {
-            openTransfers()
             return
         } else if (Constants.ACTION_OPEN_DEVICE_CENTER == intent.action) {
             selectDrawerItem(DrawerItem.DEVICE_CENTER)
@@ -7320,7 +7212,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     companion object {
-        const val TRANSFERS_TAB = "TRANSFERS_TAB"
         private const val BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE =
             "BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE"
         const val JOINING_CHAT_LINK = "JOINING_CHAT_LINK"

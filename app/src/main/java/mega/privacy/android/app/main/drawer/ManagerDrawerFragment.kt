@@ -25,6 +25,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.NavigationViewLayoutBinding
+import mega.privacy.android.app.extensions.openTransfersAndConsumeErrorStatus
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.NavigationDrawerManager
@@ -38,6 +39,7 @@ import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
+import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
@@ -79,6 +81,8 @@ internal class ManagerDrawerFragment : Fragment() {
     private val viewModel: ManagerDrawerViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by activityViewModels()
     private val managerViewModel: ManagerViewModel by activityViewModels()
+
+    private val transfersManagementViewModel: TransfersManagementViewModel by activityViewModels()
 
     private val listener = object : DrawerLayout.DrawerListener {
         override fun onDrawerOpened(drawerView: View) {
@@ -201,7 +205,12 @@ internal class ManagerDrawerFragment : Fragment() {
             Analytics.tracker.trackEvent(DeviceCenterEntrypointButtonEvent)
             drawerManager.drawerItemClicked(DrawerItem.DEVICE_CENTER)
         }
-        binding.transfersSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.TRANSFERS) }
+        binding.transfersSection.setOnClickListener {
+            megaNavigator.openTransfersAndConsumeErrorStatus(
+                requireContext(),
+                transfersManagementViewModel
+            )
+        }
         binding.rubbishBinSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.RUBBISH_BIN) }
         binding.offlineSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.OFFLINE) }
     }

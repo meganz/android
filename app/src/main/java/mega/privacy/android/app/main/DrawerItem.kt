@@ -40,11 +40,6 @@ enum class DrawerItem {
     BACKUPS,
 
     /**
-     * Transfers
-     */
-    TRANSFERS,
-
-    /**
      * Rubbish Bin
      */
     RUBBISH_BIN,

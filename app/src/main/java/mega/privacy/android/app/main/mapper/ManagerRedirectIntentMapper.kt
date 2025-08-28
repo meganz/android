@@ -4,12 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import dagger.hilt.android.scopes.ActivityScoped
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants
 import timber.log.Timber
 import javax.inject.Inject
@@ -67,18 +64,6 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     action = Constants.ACTION_EXPORT_MASTER_KEY
-                }
-
-            Constants.ACTION_SHOW_TRANSFERS -> Intent(activity, LoginActivity::class.java)
-                .apply {
-                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    action = Constants.ACTION_SHOW_TRANSFERS
-                    putExtra(
-                        ManagerActivity.TRANSFERS_TAB,
-                        intent.serializable<TransfersTab>(ManagerActivity.TRANSFERS_TAB)
-                            ?: TransfersTab.NONE
-                    )
                 }
 
             Constants.ACTION_LOCATE_DOWNLOADED_FILE -> Intent(activity, LoginActivity::class.java)

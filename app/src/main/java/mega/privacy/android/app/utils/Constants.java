@@ -114,7 +114,6 @@ public class Constants {
     public static final String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLDER";
     public static final String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
     public static final String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
-    public static final String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
     public static final String ACTION_LOCATE_DOWNLOADED_FILE = "LOCATE_DOWNLOADED_FILE";
     public static final String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
     public static final String ACTION_OPEN_FOLDER = "OPEN_FOLDER";
