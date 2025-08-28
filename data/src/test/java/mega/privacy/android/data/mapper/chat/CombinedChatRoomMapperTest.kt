@@ -15,6 +15,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.spy
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import kotlin.math.abs
 
@@ -59,6 +60,7 @@ internal class CombinedChatRoomMapperTest {
                 on { isOpenInvite }.thenReturn(false)
                 on { isSpeakRequest }.thenReturn(false)
                 on { isNoteToSelf }.thenReturn(false)
+                on { getPeerHandle(any()) }.thenReturn(1L)
             }
             val megaChatListItem = mock<MegaChatListItem> {
                 on { unreadCount }.thenReturn(0)
@@ -104,7 +106,8 @@ internal class CombinedChatRoomMapperTest {
                 isWaitingRoom = megaChatRoom.isWaitingRoom,
                 isOpenInvite = megaChatRoom.isOpenInvite,
                 isSpeakRequest = megaChatRoom.isSpeakRequest,
-                isNoteToSelf = megaChatRoom.isNoteToSelf
+                isNoteToSelf = megaChatRoom.isNoteToSelf,
+                peers = List(megaChatRoom.peerCount.toInt()) { 1L }
             )
             val actual = underTest(megaChatRoom = megaChatRoom, megaChatListItem = megaChatListItem)
 
@@ -113,7 +116,7 @@ internal class CombinedChatRoomMapperTest {
 
     @ParameterizedTest
     @ValueSource(ints = [-3, -2, -1, 0, 1, 2, 3, 4, 5])
-    fun `test that the absolute value of unread count is returned`(unreadCount: Int) {
+    fun `test that the absolute value of unread count is returned`(unreadCount: Int) = runTest {
         val megaChatRoom = mock<MegaChatRoom> {
             on { chatId }.thenReturn(123456L)
             on { changes }.thenReturn(MegaChatRoom.CHANGE_TYPE_ARCHIVE)
@@ -132,6 +135,7 @@ internal class CombinedChatRoomMapperTest {
             on { isOpenInvite }.thenReturn(false)
             on { isSpeakRequest }.thenReturn(false)
             on { isNoteToSelf }.thenReturn(false)
+            on { getPeerHandle(any()) }.thenReturn(1L)
         }
         val megaChatListItem = mock<MegaChatListItem> {
             on { this.unreadCount }.thenReturn(unreadCount)
@@ -179,7 +183,8 @@ internal class CombinedChatRoomMapperTest {
             isWaitingRoom = megaChatRoom.isWaitingRoom,
             isOpenInvite = megaChatRoom.isOpenInvite,
             isSpeakRequest = megaChatRoom.isSpeakRequest,
-            isNoteToSelf = megaChatRoom.isNoteToSelf
+            isNoteToSelf = megaChatRoom.isNoteToSelf,
+            peers = List(megaChatRoom.peerCount.toInt()) { 1L }
         )
         assertThat(actual).isEqualTo(expected)
     }

@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.chat
 
+import kotlinx.coroutines.coroutineScope
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatRoom
@@ -14,40 +15,46 @@ internal class CombinedChatRoomMapper @Inject constructor(
     private val lastMessageTypeMapper: LastMessageTypeMapper,
     private val chatRoomChangesMapper: ChatRoomChangesMapper,
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         megaChatRoom: MegaChatRoom,
         megaChatListItem: MegaChatListItem,
-    ): CombinedChatRoom = CombinedChatRoom(
-        chatId = megaChatRoom.chatId,
-        changes = chatRoomChangesMapper(megaChatRoom.changes),
-        title = megaChatRoom.title,
-        hasCustomTitle = megaChatRoom.hasCustomTitle(),
-        ownPrivilege = chatPermissionsMapper(megaChatRoom.ownPrivilege),
-        unreadCount = getFormattedUnreadCount(megaChatListItem.unreadCount),
-        lastMessage = megaChatListItem.lastMessage,
-        lastMessageId = megaChatListItem.lastMessageId,
-        lastMessageType = lastMessageTypeMapper(megaChatListItem.lastMessageType),
-        lastMessageSender = megaChatListItem.lastMessageSender,
-        lastTimestamp = megaChatListItem.lastTimestamp,
-        peerCount = megaChatRoom.peerCount,
-        isGroup = megaChatRoom.isGroup,
-        isPublic = megaChatRoom.isPublic,
-        isPreview = megaChatRoom.isPreview,
-        isArchived = megaChatRoom.isArchived,
-        isActive = megaChatRoom.isActive,
-        isDeleted = megaChatListItem.isDeleted,
-        isCallInProgress = megaChatListItem.isCallInProgress,
-        peerHandle = megaChatListItem.peerHandle,
-        lastMessagePriv = megaChatListItem.lastMessagePriv,
-        lastMessageHandle = megaChatListItem.lastMessageHandle,
-        numPreviewers = megaChatListItem.numPreviewers,
-        retentionTime = megaChatRoom.retentionTime,
-        isMeeting = megaChatRoom.isMeeting,
-        isWaitingRoom = megaChatRoom.isWaitingRoom,
-        isOpenInvite = megaChatRoom.isOpenInvite,
-        isSpeakRequest = megaChatRoom.isSpeakRequest,
-        isNoteToSelf = megaChatRoom.isNoteToSelf
-    )
+    ): CombinedChatRoom = coroutineScope {
+        val peerIds = (0 until megaChatRoom.peerCount).map { index ->
+            megaChatRoom.getPeerHandle(index)
+        }
+        return@coroutineScope CombinedChatRoom(
+            chatId = megaChatRoom.chatId,
+            changes = chatRoomChangesMapper(megaChatRoom.changes),
+            title = megaChatRoom.title,
+            hasCustomTitle = megaChatRoom.hasCustomTitle(),
+            ownPrivilege = chatPermissionsMapper(megaChatRoom.ownPrivilege),
+            unreadCount = getFormattedUnreadCount(megaChatListItem.unreadCount),
+            lastMessage = megaChatListItem.lastMessage,
+            lastMessageId = megaChatListItem.lastMessageId,
+            lastMessageType = lastMessageTypeMapper(megaChatListItem.lastMessageType),
+            lastMessageSender = megaChatListItem.lastMessageSender,
+            lastTimestamp = megaChatListItem.lastTimestamp,
+            peerCount = megaChatRoom.peerCount,
+            isGroup = megaChatRoom.isGroup,
+            isPublic = megaChatRoom.isPublic,
+            isPreview = megaChatRoom.isPreview,
+            isArchived = megaChatRoom.isArchived,
+            isActive = megaChatRoom.isActive,
+            isDeleted = megaChatListItem.isDeleted,
+            isCallInProgress = megaChatListItem.isCallInProgress,
+            peerHandle = megaChatListItem.peerHandle,
+            lastMessagePriv = megaChatListItem.lastMessagePriv,
+            lastMessageHandle = megaChatListItem.lastMessageHandle,
+            numPreviewers = megaChatListItem.numPreviewers,
+            retentionTime = megaChatRoom.retentionTime,
+            isMeeting = megaChatRoom.isMeeting,
+            isWaitingRoom = megaChatRoom.isWaitingRoom,
+            isOpenInvite = megaChatRoom.isOpenInvite,
+            isSpeakRequest = megaChatRoom.isSpeakRequest,
+            isNoteToSelf = megaChatRoom.isNoteToSelf,
+            peers = peerIds
+        )
+    }
 
     /**
      * Returns the absolute value of the unread count because it can be negative. A negative value doesn't

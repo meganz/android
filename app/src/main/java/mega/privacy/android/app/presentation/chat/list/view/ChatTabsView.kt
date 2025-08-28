@@ -256,8 +256,8 @@ fun ChatTabsView(
 }
 
 private fun ChatRoomItem.matches(searchQuery: String): Boolean =
-    title.contains(searchQuery, true)
-            || title.normalize().contains(searchQuery, true)
+    description.contains(searchQuery, true)
+            || description.normalize().contains(searchQuery, true)
             || lastMessage?.contains(searchQuery, true) == true
             || lastMessage?.normalize()?.contains(searchQuery, true) == true
 

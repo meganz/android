@@ -39,6 +39,7 @@ class ChatRoomItemMapper @Inject constructor() {
                     isArchived = chatRoom.isArchived,
                     lastTimestamp = chatRoom.lastTimestamp,
                     highlight = highLight,
+                    peers = chatRoom.peers
                 )
             }
 
@@ -55,6 +56,7 @@ class ChatRoomItemMapper @Inject constructor() {
                     isArchived = chatRoom.isArchived,
                     lastTimestamp = chatRoom.lastTimestamp,
                     highlight = highLight,
+                    peers = chatRoom.peers
                 )
             }
 
@@ -70,6 +72,7 @@ class ChatRoomItemMapper @Inject constructor() {
                     isArchived = chatRoom.isArchived,
                     lastTimestamp = chatRoom.lastTimestamp,
                     highlight = highLight,
+                    peers = chatRoom.peers
                 )
             }
 
@@ -86,6 +89,7 @@ class ChatRoomItemMapper @Inject constructor() {
                     isArchived = chatRoom.isArchived,
                     lastTimestamp = chatRoom.lastTimestamp,
                     highlight = highLight,
+                    peers = chatRoom.peers
                 )
             }
         }

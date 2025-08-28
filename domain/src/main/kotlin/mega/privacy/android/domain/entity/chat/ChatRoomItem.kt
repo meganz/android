@@ -46,6 +46,8 @@ sealed class ChatRoomItem(
     open val lastTimestampFormatted: String? = null,
     open val highlight: Boolean = false,
     open val header: String? = null,
+    open val description: String = "",
+    open val peers: List<Long> = emptyList(),
 ) {
     /**
      * Check if the last message is voice clip
@@ -102,10 +104,12 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
+        override val description: String = "",
+        override val peers: List<Long> = emptyList(),
     ) : ChatRoomItem(
         call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
-        lastTimestampFormatted, highlight, header
+        lastTimestampFormatted, highlight, header, description, peers
     )
 
     /**
@@ -151,10 +155,12 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
+        override val description: String = "",
+        override val peers: List<Long> = emptyList(),
     ) : ChatRoomItem(
         call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
-        lastTimestampFormatted, highlight, header
+        lastTimestampFormatted, highlight, header, description, peers
     ) {
         /**
          * Check if the note to self chat room is empty
@@ -202,10 +208,12 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
+        override val description: String = "",
+        override val peers: List<Long> = emptyList(),
     ) : ChatRoomItem(
         call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
-        lastTimestampFormatted, highlight, header
+        lastTimestampFormatted, highlight, header, description, peers
     )
 
     /**
@@ -267,10 +275,12 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
+        override val description: String = "",
+        override val peers: List<Long> = emptyList(),
     ) : ChatRoomItem(
         call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
-        lastTimestampFormatted, highlight, header
+        lastTimestampFormatted, highlight, header, description, peers
     ) {
 
         /**
@@ -387,6 +397,7 @@ sealed class ChatRoomItem(
         scheduledTimestampFormatted: String? = null,
         isWaitingRoom: Boolean? = null,
         isCancelled: Boolean? = null,
+        description: String? = null,
     ): ChatRoomItem = when (this) {
         is IndividualChatRoomItem -> copy(
             call = call,
@@ -408,6 +419,7 @@ sealed class ChatRoomItem(
             avatar = avatarItems?.firstOrNull() ?: this.avatar,
             peerHandle = peerHandle ?: this.peerHandle,
             peerEmail = peerEmail ?: this.peerEmail,
+            description = description ?: this.description
         )
 
         is NoteToSelfChatRoomItem -> copy(
@@ -430,6 +442,7 @@ sealed class ChatRoomItem(
             avatar = null,
             peerHandle = peerHandle ?: this.peerHandle,
             peerEmail = peerEmail ?: this.peerEmail,
+            description = description ?: this.description
         )
 
         is GroupChatRoomItem -> copy(
@@ -450,6 +463,7 @@ sealed class ChatRoomItem(
             header = header,
             isPublic = isPublic ?: this.isPublic,
             avatars = avatarItems ?: this.avatars,
+            description = description ?: this.description
         )
 
         is MeetingChatRoomItem -> copy(
@@ -480,7 +494,8 @@ sealed class ChatRoomItem(
             scheduledEndTimestamp = scheduledEndTimestamp ?: this.scheduledEndTimestamp,
             scheduledTimestampFormatted = scheduledTimestampFormatted
                 ?: this.scheduledTimestampFormatted,
-            isCancelled = isCancelled ?: this.isCancelled
+            isCancelled = isCancelled ?: this.isCancelled,
+            description = description ?: this.description
         )
     }
 }

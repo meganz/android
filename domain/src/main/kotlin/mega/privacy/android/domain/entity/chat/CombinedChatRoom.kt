@@ -35,8 +35,9 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
  * @property isOpenInvite       If open invite option in enabled.
  * @property isSpeakRequest     If speaker request in enabled.
  * @property isNoteToSelf       If chat room is note to self.
+ * @property peers              List of peer handles.
  */
-data class CombinedChatRoom constructor(
+data class CombinedChatRoom(
     val chatId: Long,
     val changes: List<ChatRoomChange>? = null,
     val title: String = "",
@@ -66,4 +67,5 @@ data class CombinedChatRoom constructor(
     val isOpenInvite: Boolean = false,
     val isSpeakRequest: Boolean = false,
     val isNoteToSelf: Boolean = false,
+    val peers: List<Long> = emptyList()
 )

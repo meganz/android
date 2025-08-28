@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingData
+import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
@@ -52,6 +53,7 @@ import javax.inject.Inject
 class GetChatsUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
     private val pushesRepository: PushesRepository,
+    private val chatParticipantsRepository: ChatParticipantsRepository,
     private val getScheduleMeetingDataUseCase: GetScheduleMeetingDataUseCase,
     private val getChatGroupAvatarUseCase: GetChatGroupAvatarUseCase,
     private val chatRoomItemMapper: ChatRoomItemMapper,
@@ -201,6 +203,31 @@ class GetChatsUseCase @Inject constructor(
         val call = async { getCall(chatId) }
         val userStatus = async { getUserOnlineStatus() }
         val peerEmail = async { getUserEmail() }
+        val description = async {
+            val emails = peers.map { handle ->
+                chatParticipantsRepository.getUserEmailFromCache(handle)
+                    .takeIf { it?.isNotEmpty() == true } ?: run {
+                    chatParticipantsRepository.loadUserAttributes(
+                        chatId = chatId,
+                        usersHandles = peers
+                    ) // load all the attributes of the user so that in the next iteration other values are fetched form cache
+                    chatParticipantsRepository.getUserEmailFromCache(handle)
+                }
+            }.joinToString(" ")
+
+            val names = peers.map { handle ->
+                chatParticipantsRepository.getUserFullNameFromCache(handle)
+                    .takeIf { it?.isNotEmpty() == true } ?: run {
+                    chatParticipantsRepository.loadUserAttributes(
+                        chatId = chatId,
+                        usersHandles = peers
+                    ) // load all the attributes of the user so that in the next iteration other values are fetched form cache
+                    chatParticipantsRepository.getUserFullNameFromCache(handle)
+                }
+            }.joinToString(" ")
+
+            "$title $emails $names".trim()
+        }
 
         copyChatRoomItem(
             avatarItems = avatarItems.await(),
@@ -213,6 +240,7 @@ class GetChatsUseCase @Inject constructor(
             call = call.await(),
             userChatStatus = userStatus.await(),
             peerEmail = peerEmail.await(),
+            description = description.await()
         )
     }
 
