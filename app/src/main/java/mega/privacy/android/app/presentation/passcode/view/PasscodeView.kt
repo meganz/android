@@ -43,8 +43,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
@@ -74,7 +74,7 @@ import timber.log.Timber
 @Composable
 internal fun PasscodeView(
     cryptObjectFactory: PasscodeCryptObjectFactory,
-    passcodeUnlockViewModel: PasscodeUnlockViewModel = viewModel(),
+    passcodeUnlockViewModel: PasscodeUnlockViewModel = hiltViewModel(),
     biometricAuthIsAvailable: (Context) -> Boolean = ::areBiometricsEnabled,
     showBiometricAuth: (
         onSuccess: () -> Unit,

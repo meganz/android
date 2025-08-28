@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -25,16 +26,18 @@ import mega.privacy.android.app.appstate.content.AppContentStateViewModel
 import mega.privacy.android.app.appstate.content.navigation.NavigationHandlerImpl
 import mega.privacy.android.app.appstate.content.view.AppContentView
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
-import mega.privacy.android.app.appstate.global.event.AppDialogViewModel
 import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
+import mega.privacy.android.app.appstate.global.event.AppDialogViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginGraph
 import mega.privacy.android.app.presentation.login.LoginScreen
 import mega.privacy.android.app.presentation.login.loginNavigationGraph
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.navigation.contract.AppDialogDestinations
 import javax.inject.Inject
@@ -50,6 +53,7 @@ class MegaActivity : ComponentActivity() {
 
     @Inject
     lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
+
 
     @Serializable
     data object LoginLoading
@@ -121,11 +125,11 @@ class MegaActivity : ComponentActivity() {
             }
 
             AndroidTheme(isDark = state.themeMode.isDarkMode()) {
-            EventEffect(
-                event = snackbarEventsState,
-                onConsumed = snackbarEventsViewModel::consumeEvent,
-                action = { snackbarHostState.show(it) }
-            )
+                EventEffect(
+                    event = snackbarEventsState,
+                    onConsumed = snackbarEventsViewModel::consumeEvent,
+                    action = { snackbarHostState.show(it) }
+                )
 
                 NavHost(
                     navController = navController,
@@ -146,11 +150,15 @@ class MegaActivity : ComponentActivity() {
                     )
 
                     composable<LoggedInScreens> {
-                        val appContentStateViewModel = hiltViewModel<AppContentStateViewModel>()
-                        AppContentView(
-                            viewModel = appContentStateViewModel,
-                            snackbarHostState = snackbarHostState,
-                        )
+                        AppContainer(
+                            containers = containers,
+                        ) {
+                            val appContentStateViewModel = hiltViewModel<AppContentStateViewModel>()
+                            AppContentView(
+                                viewModel = appContentStateViewModel,
+                                snackbarHostState = snackbarHostState,
+                            )
+                        }
                     }
 
                     appDialogDestinations.forEach {
@@ -165,4 +173,13 @@ class MegaActivity : ComponentActivity() {
             }
         }
     }
+
+    private val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
+        {
+            PasscodeContainer(
+                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                content = it
+            )
+        },
+    )
 }
