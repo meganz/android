@@ -84,7 +84,7 @@ internal class StalledIssueItemMapperTest {
         assertThat(result.actions).isEqualTo(resolutionActions)
         assertThat(result.displayedName).isEqualTo("subfolder")
         assertThat(result.displayedPath).isEqualTo("Camera")
-        verify(stalledIssueResolutionActionMapper).invoke(StallIssueType.DownloadIssue, true)
+        verify(stalledIssueResolutionActionMapper).invoke(StallIssueType.DownloadIssue, false)
     }
 
     @Test
@@ -346,12 +346,11 @@ internal class StalledIssueItemMapperTest {
     @Test
     fun `test that Uri pathSegments drop logic works correctly with different segment counts`() =
         runTest {
-            // Mocking android.net.Uri specifically for this test
             mockStatic(Uri::class.java).use { mockedUri ->
                 val uriString =
                     "content://documents/tree/primary:Downloads/document/primary:Downloads/folder1/folder2/file.txt"
                 val mockUri: Uri = mock {
-                    on { scheme } doReturn "content" // Ensure scheme is mocked if used by toUri() or related logic
+                    on { scheme } doReturn "content"
                     on { pathSegments } doReturn listOf(
                         "tree",
                         "primary:Downloads",
@@ -379,7 +378,6 @@ internal class StalledIssueItemMapperTest {
                 val resolutionActions = listOf<StalledIssueResolutionAction>()
 
                 whenever(stalledIssueDetailInfoMapper(stalledIssue)).thenReturn(detailedInfo)
-                // When nodes list is empty, areAllNodesFolders will be false
                 whenever(stalledIssueResolutionActionMapper(StallIssueType.DownloadIssue, false))
                     .thenReturn(resolutionActions)
                 whenever(
@@ -400,4 +398,32 @@ internal class StalledIssueItemMapperTest {
                 )
             }
         }
+
+    @Test
+    fun `test mapping back StalledIssueUiItem when localPaths is empty uses displayedPath`() {
+        val stalledIssueUiItem = StalledIssueUiItem(
+            syncId = 9L,
+            nodeIds = listOf(NodeId(11L)),
+            localPaths = emptyList(),
+            issueType = StallIssueType.DownloadIssue,
+            conflictName = "ui conflict name",
+            nodeNames = listOf("SomeNodeNameActuallyNotUsedInReverseMapForLocalPath"),
+            icon = 0,
+            detailedInfo = StalledIssueDetailedInfo("UI Title", "UI Desc"),
+            actions = emptyList(),
+            displayedName = "MyFileFromUI.txt",
+            displayedPath = "my/ui/path", // This should be used for localPaths
+            id = "9_11_0"
+        )
+
+        val result = underTest(stalledIssueUiItem)
+
+        assertThat(result.syncId).isEqualTo(9L)
+        assertThat(result.nodeIds).isEqualTo(listOf(NodeId(11L)))
+        assertThat(result.localPaths).isEqualTo(listOf("my/ui/path"))
+        assertThat(result.issueType).isEqualTo(StallIssueType.DownloadIssue)
+        assertThat(result.conflictName).isEqualTo("ui conflict name")
+        assertThat(result.nodeNames).isEqualTo(listOf("MyFileFromUI.txt"))
+        assertThat(result.id).isEqualTo("9_11_0")
+    }
 }
