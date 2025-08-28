@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
+import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactInfo
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper

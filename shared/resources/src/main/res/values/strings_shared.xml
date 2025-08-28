@@ -1490,4 +1490,25 @@
         <item quantity="one">This link will not be publicly available anymore.</item>
         <item quantity="other">These links will not be publicly available anymore.</item>
     </plurals>
+    <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
+    <string name="context_share_correctly_removed">Share removed</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Yes</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">No</string>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="one">Couldn’t remove access for %1$d contact</item>
+        <item quantity="other">Couldn’t remove access for %1$d contacts</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of a folder -->
+    <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="one">The folder is shared with %1$d contact. Remove share?</item>
+        <item quantity="other">The folder is shared with %1$d contacts. Remove all shares?</item>
+    </plurals>
+    <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Unshare this folder?</item>
+        <item quantity="other">Unshare these %1$d folders?</item>
+    </plurals>
 </resources>

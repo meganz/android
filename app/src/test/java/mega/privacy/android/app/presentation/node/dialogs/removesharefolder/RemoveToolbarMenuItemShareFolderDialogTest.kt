@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fromId
 import mega.privacy.android.app.fromPluralId
+import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderState
+import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderViewModel
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Rule
 import org.junit.Test

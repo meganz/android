@@ -1,6 +1,7 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderDialogArgs
 import mega.privacy.android.core.nodecomponents.extension.isOutShare
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareMenuAction
@@ -35,11 +36,10 @@ class RemoveShareBottomSheetMenuItem @Inject constructor(
         handler.onDismiss()
         val nodeList = listOf(node.id.longValue)
         runCatching { nodeHandlesToJsonMapper(nodeList) }
-            .onSuccess {
-                // Todo: navigationHandler
-//                navController.navigate(
-//                    searchRemoveFolderShareDialog.plus("/${it}")
-//                )
+            .onSuccess { handles ->
+                handler.navigationHandler.navigate(
+                    RemoveShareFolderDialogArgs(nodes = handles)
+                )
             }.onFailure {
                 Timber.e(it)
             }

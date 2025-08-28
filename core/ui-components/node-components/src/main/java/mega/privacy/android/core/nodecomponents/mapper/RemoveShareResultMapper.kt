@@ -1,10 +1,10 @@
-package mega.privacy.android.app.main.dialog.shares
+package mega.privacy.android.core.nodecomponents.mapper
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.node.ResultCount
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Remove share result mapper
@@ -21,10 +21,10 @@ class RemoveShareResultMapper(
     constructor(
         @ApplicationContext context: Context,
     ) : this(
-        successString = { context.getString(R.string.context_share_correctly_removed) },
+        successString = { context.getString(sharedResR.string.context_share_correctly_removed) },
         errorString = { errorCount ->
             context.resources.getQuantityString(
-                R.plurals.shared_items_outgoing_shares_snackbar_remove_contact_access_failed,
+                sharedResR.plurals.shared_items_outgoing_shares_snackbar_remove_contact_access_failed,
                 errorCount,
                 errorCount
             )

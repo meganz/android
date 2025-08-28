@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node.dialogs.removesharefolder
+package mega.privacy.android.core.nodecomponents.dialog.removeshare
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
+import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope

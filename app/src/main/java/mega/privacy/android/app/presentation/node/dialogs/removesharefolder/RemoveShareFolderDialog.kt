@@ -10,6 +10,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
+import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderState
+import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderViewModel
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -19,7 +21,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
  * Dialog to remove folder share
  * @param nodeList List of node to be removed from folder share
  * @param onDismiss
- * @param viewModel [RemoveShareFolderViewModel]
+ * @param viewModel [mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderViewModel]
  */
 @Composable
 fun RemoveShareFolderDialog(

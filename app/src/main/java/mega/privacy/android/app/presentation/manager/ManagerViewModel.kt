@@ -24,7 +24,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
-import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
+import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
