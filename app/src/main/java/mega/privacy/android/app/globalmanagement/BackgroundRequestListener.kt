@@ -202,8 +202,14 @@ class BackgroundRequestListener @Inject constructor(
                 }
             }
             val listener = GetAttrUserListener(application, true)
-            if (dbH.get().myChatFilesFolderHandle == INVALID_HANDLE) {
-                megaApi.getMyChatFilesFolder(listener)
+            applicationScope.launch {
+                runCatching {
+                    if (dbH.get().myChatFilesFolderHandle == INVALID_HANDLE) {
+                        megaApi.getMyChatFilesFolder(listener)
+                    }
+                }.onFailure {
+                    Timber.e(it, "Error getMyChatFilesFolder")
+                }
             }
             MegaApplication.getInstance().setupMegaChatApi()
             applicationScope.launch {
