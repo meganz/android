@@ -30,6 +30,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
 import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.app.presentation.login.view.MEGA_LOGO_TEST_TAG
+import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
@@ -86,17 +87,23 @@ fun NavGraphBuilder.mainNavigationScaffold(
                         currentDestination?.isTopLevelDestinationInHierarchy(destination::class) == true
                     },
                     navContent = { navigationUiController ->
-                        NavHost(
-                            modifier = modifier
-                                .fillMaxSize(),
-                            navController = navController,
-                            startDestination = currentState.initialDestination,
-                            builder = {
-                                currentState.mainNavScreens.forEach {
-                                    it(navigationHandler, navigationUiController, transferHandler)
-                                }
-                            },
-                        )
+                        PsaContainer {
+                            NavHost(
+                                modifier = modifier
+                                    .fillMaxSize(),
+                                navController = navController,
+                                startDestination = currentState.initialDestination,
+                                builder = {
+                                    currentState.mainNavScreens.forEach {
+                                        it(
+                                            navigationHandler,
+                                            navigationUiController,
+                                            transferHandler
+                                        )
+                                    }
+                                },
+                            )
+                        }
                     },
                 )
             }
