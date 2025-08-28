@@ -18,6 +18,7 @@ import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.feature.payment.model.AccountTypeInt
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
@@ -119,11 +120,11 @@ class AccountInfoFacade @Inject constructor(
 
     private fun getAccountTypeLabel(accountType: Int?) = with(context) {
         when (accountType) {
-            Constants.FREE -> getString(R.string.my_account_free)
-            Constants.PRO_I -> getString(R.string.my_account_pro1)
-            Constants.PRO_II -> getString(R.string.my_account_pro2)
-            Constants.PRO_III -> getString(R.string.my_account_pro3)
-            Constants.PRO_LITE -> getString(R.string.my_account_prolite_feedback_email)
+            AccountTypeInt.FREE -> getString(R.string.my_account_free)
+            AccountTypeInt.PRO_I -> getString(R.string.my_account_pro1)
+            AccountTypeInt.PRO_II -> getString(R.string.my_account_pro2)
+            AccountTypeInt.PRO_III -> getString(R.string.my_account_pro3)
+            AccountTypeInt.PRO_LITE -> getString(R.string.my_account_prolite_feedback_email)
             Constants.BUSINESS -> getString(R.string.business_label)
             else -> getString(R.string.my_account_free)
         }

@@ -48,6 +48,7 @@ dependencies {
     implementation(lib.kotlin.serialisation)
     implementation(androidx.navigation3.runtime)
     implementation(lib.billing.client.ktx)
+    implementation(androidx.fragment)
 
     // test
     testImplementation(project(":core-test"))

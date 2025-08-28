@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
 import mega.privacy.android.domain.entity.AccountType
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import java.io.File
 
 /**
@@ -102,7 +104,10 @@ interface AppNavigator {
      * Open upgrade account screen.
      * This screen allows users to upgrade to a paid plan
      */
-    fun openUpgradeAccount(context: Context, isFromAdsFree: Boolean = false)
+    fun openUpgradeAccount(
+        context: Context,
+        source: UpgradeAccountSource = UpgradeAccountSource.UNKNOWN,
+    )
 
     /**
      * Navigates to the Syncs page
@@ -485,4 +490,20 @@ interface AppNavigator {
      * @param accountType The account type
      */
     fun openAskForCustomizedPlan(context: Context, email: String?, accountType: AccountType)
+
+    /**
+     * Open My Account Activity
+     *
+     * @param context The context
+     * @param flags The optional intent flags. If null, defaults to FLAG_ACTIVITY_CLEAR_TOP
+     */
+    fun openMyAccountActivity(context: Context, flags: Int? = null)
+
+    /**
+     * Open Manager Activity
+     *
+     * @param context The context
+     * @param bundle Optional bundle containing extras to be added to the intent
+     */
+    fun openManagerActivity(context: Context, bundle: Bundle? = null)
 }

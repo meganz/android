@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.net.Uri
+import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
@@ -41,7 +42,6 @@ import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
-import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -89,9 +89,11 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
+import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountActivity
 import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.settings.SettingsNavigator
 import timber.log.Timber
 import java.io.File
@@ -139,10 +141,10 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(intent)
     }
 
-    override fun openUpgradeAccount(context: Context, isFromAdsFree: Boolean) {
+    override fun openUpgradeAccount(context: Context, source: UpgradeAccountSource) {
         ChooseAccountActivity.navigateToUpgradeAccount(
             context = context,
-            isFromAdsFree = isFromAdsFree
+            source = source
         )
     }
 
@@ -752,12 +754,26 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openAskForCustomizedPlan(
         context: Context,
         myEmail: String?,
-        accountType: AccountType
+        accountType: AccountType,
     ) {
         AlertsAndWarnings.askForCustomizedPlan(
             context = context,
             myEmail = myEmail,
             accountType = accountType
         )
+    }
+
+    override fun openMyAccountActivity(context: Context, flags: Int?) {
+        val intent = Intent(context, MyAccountActivity::class.java)
+        flags?.let {
+            intent.flags = flags
+        }
+        context.startActivity(intent)
+    }
+
+    override fun openManagerActivity(context: Context, bundle: Bundle?) {
+        val intent = Intent(context, ManagerActivity::class.java)
+        bundle?.let { intent.putExtras(it) }
+        context.startActivity(intent)
     }
 }

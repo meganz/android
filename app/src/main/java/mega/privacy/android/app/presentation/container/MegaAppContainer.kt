@@ -27,7 +27,7 @@ val LocalIsDarkTheme = staticCompositionLocalOf { false }
  * Containers are applied from the last to first.  So each container is wrapped in the one after it.
  */
 @Composable
-internal fun MegaAppContainer(
+fun MegaAppContainer(
     themeMode: ThemeMode,
     passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
     content: @Composable () -> Unit,
@@ -68,7 +68,7 @@ internal fun MegaAppContainer(
  *
  */
 @Composable
-internal fun SharedAppContainer(
+fun SharedAppContainer(
     themeMode: ThemeMode,
     passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
     useLegacyStatusBarColor: Boolean = true,

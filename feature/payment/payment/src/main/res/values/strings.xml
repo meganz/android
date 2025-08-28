@@ -22,4 +22,6 @@
     <string name="subscription_type_monthly">Monthly</string>
     <!--  -->
     <string name="subscription_type_yearly">Yearly</string>
+    <!-- Title of the fragment Choose Account -->
+    <string name="choose_account_fragment">Choose account</string>
 </resources>

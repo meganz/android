@@ -1,38 +1,32 @@
-package mega.privacy.android.app.upgradeAccount
+package mega.privacy.android.feature.payment.presentation.upgrade
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.container.SharedAppContainer
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.service.iar.RatingHandlerImpl
+import mega.privacy.android.core.sharedcomponents.container.AppContainerProvider
+import mega.privacy.android.core.sharedcomponents.coroutine.collectFlow
 import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
-import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.feature.payment.presentation.storage.AccountStorageViewModel
-import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel
-import mega.privacy.android.feature.payment.presentation.upgrade.NewChooseAccountScreen
 import mega.privacy.android.feature.payment.util.PaymentUtils.getProductId
 import mega.privacy.android.navigation.ExtraConstant
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.mobile.analytics.event.AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AdsUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.BuyProIEvent
@@ -47,15 +41,11 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChooseAccountFragment : Fragment() {
+    @Inject
+    lateinit var appContainerProvider: AppContainerProvider
 
     @Inject
-    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    @Inject
-    lateinit var myAccountInfo: MyAccountInfo
-
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+    lateinit var megaNavigator: MegaNavigator
 
     private val chooseAccountViewModel by activityViewModels<ChooseAccountViewModel>()
 
@@ -82,8 +72,17 @@ class ChooseAccountFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ) = ComposeView(requireContext()).apply {
-        setContent { ChooseAccountBody() }
+    ) = appContainerProvider.buildSharedAppContainer(
+        context = requireContext(),
+        useLegacyStatusBarColor = false
+    ) {
+        ChooseAccountBody()
+    }.apply {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.collectFlow(billingViewModel.billingUpdateEvent) {
             if (it is BillingEvent.OnPurchaseUpdate) {
                 onPurchasesUpdated(it.purchases)
@@ -91,7 +90,6 @@ class ChooseAccountFragment : Fragment() {
             }
         }
     }
-
 
     @SuppressLint("ProduceStateDoesNotAssignValue")
     @Composable
@@ -101,47 +99,38 @@ class ChooseAccountFragment : Fragment() {
         val isNewCreationAccount =
             arguments?.getBoolean(ExtraConstant.NEW_CREATION_ACCOUNT, false) ?: false
 
-        val mode by monitorThemeModeUseCase()
-            .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-
         LaunchedEffect(Unit) {
             Analytics.tracker.trackEvent(UpgradeAccountPlanScreenEvent)
         }
 
-        SharedAppContainer(
-            themeMode = mode,
-            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-            useLegacyStatusBarColor = false
-        ) {
-            NewChooseAccountScreen(
-                uiState = uiState,
-                accountStorageUiState = accountStorageUiState,
-                isNewCreationAccount = isNewCreationAccount,
-                isUpgradeAccount = isUpgradeAccount,
-                onFreePlanClicked = {
-                    Analytics.tracker.trackEvent(
-                        GetStartedForFreeUpgradePlanButtonPressedEvent
-                    )
-                    chooseAccountActivity.onFreeClick()
-                },
-                maybeLaterClicked = {
-                    Analytics.tracker.trackEvent(
-                        MaybeLaterUpgradeAccountButtonPressedEvent
-                    )
-                    chooseAccountActivity.onFreeClick()
-                },
-                onBuyPlanClick = { accountType, isMonthly ->
-                    sendAccountTypeAnalytics(accountType)
-                    billingViewModel.startPurchase(
-                        chooseAccountActivity,
-                        getProductId(isMonthly, accountType),
-                    )
-                },
-                onBack = {
-                    requireActivity().finish()
-                }
-            )
-        }
+        NewChooseAccountScreen(
+            uiState = uiState,
+            accountStorageUiState = accountStorageUiState,
+            isNewCreationAccount = isNewCreationAccount,
+            isUpgradeAccount = isUpgradeAccount,
+            onFreePlanClicked = {
+                Analytics.tracker.trackEvent(
+                    GetStartedForFreeUpgradePlanButtonPressedEvent
+                )
+                chooseAccountActivity.onFreeClick()
+            },
+            maybeLaterClicked = {
+                Analytics.tracker.trackEvent(
+                    MaybeLaterUpgradeAccountButtonPressedEvent
+                )
+                chooseAccountActivity.onFreeClick()
+            },
+            onBuyPlanClick = { accountType, isMonthly ->
+                sendAccountTypeAnalytics(accountType)
+                billingViewModel.startPurchase(
+                    chooseAccountActivity,
+                    getProductId(isMonthly, accountType),
+                )
+            },
+            onBack = {
+                requireActivity().finish()
+            }
+        )
     }
 
     private fun sendAccountTypeAnalytics(planType: AccountType) {
@@ -175,7 +164,6 @@ class ChooseAccountFragment : Fragment() {
             if (billingViewModel.isPurchased(purchase)) {
                 //payment has been processed
                 Timber.d("Purchase $sku successfully")
-                RatingHandlerImpl(chooseAccountActivity).updateTransactionFlag(true)
             } else {
                 //payment is being processed or in unknown state
                 Timber.d("Purchase %s is being processed or in unknown state.", sku)
@@ -186,24 +174,26 @@ class ChooseAccountFragment : Fragment() {
         }
 
         if (isUpgradeAccount) {
-            if (myAccountInfo.isUpgradeFromAccount()) {
-                val intent = Intent(chooseAccountActivity, MyAccountActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                chooseAccountActivity.startActivity(intent)
+            if (openFromSource == UpgradeAccountSource.MY_ACCOUNT_SCREEN) {
+                megaNavigator.openMyAccountActivity(
+                    context = chooseAccountActivity,
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                )
             }
+            // other cases stay in the same activity
         } else {
-            val intent = Intent(chooseAccountActivity, ManagerActivity::class.java).apply {
-                putExtras(chooseAccountActivity.intent)
-                putExtra(ExtraConstant.EXTRA_FIRST_LOGIN, true)
-                if (extras?.containsKey(ExtraConstant.EXTRA_NEW_ACCOUNT) != true) {
-                    putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, true)
+            val bundle = Bundle().apply {
+                chooseAccountActivity.intent.extras?.let { putAll(it) }
+                putBoolean(ExtraConstant.EXTRA_FIRST_LOGIN, true)
+                if (!containsKey(ExtraConstant.EXTRA_NEW_ACCOUNT)) {
+                    putBoolean(ExtraConstant.EXTRA_NEW_ACCOUNT, true)
                 }
-                if (extras?.containsKey(ExtraConstant.NEW_CREATION_ACCOUNT) != true) {
-                    putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, true)
+                if (!containsKey(ExtraConstant.NEW_CREATION_ACCOUNT)) {
+                    putBoolean(ExtraConstant.NEW_CREATION_ACCOUNT, true)
                 }
             }
 
-            startActivity(intent)
+            megaNavigator.openManagerActivity(chooseAccountActivity, bundle)
         }
 
         requireActivity().finish()

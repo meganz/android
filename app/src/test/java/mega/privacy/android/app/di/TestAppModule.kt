@@ -8,6 +8,7 @@ import dagger.hilt.testing.TestInstallIn
 import dagger.multibindings.ElementsIntoSet
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueReceiver
+import mega.privacy.android.core.sharedcomponents.container.AppContainerProvider
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
@@ -79,4 +80,7 @@ object TestAppModule {
 
     @Provides
     fun provideAppDialogsEventQueueReceiver(): AppDialogsEventQueueReceiver = mock()
+
+    @Provides
+    fun provideAppContainerProvider(): AppContainerProvider = mock()
 }

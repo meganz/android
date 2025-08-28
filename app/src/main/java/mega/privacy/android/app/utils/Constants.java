@@ -84,11 +84,6 @@ public class Constants {
     public static final int IMPORT_ONLY_OPTION = 0;
     public static final int IMPORT_TO_SHARE_OPTION = 2;
 
-    public static final int FREE = 0;
-    public static final int PRO_I = 1;
-    public static final int PRO_II = 2;
-    public static final int PRO_III = 3;
-    public static final int PRO_LITE = 4;
     public static final int BUSINESS = 100;
     public static final int PRO_FLEXI = 101;
 

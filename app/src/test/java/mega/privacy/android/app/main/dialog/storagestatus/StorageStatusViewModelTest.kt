@@ -3,7 +3,6 @@ package mega.privacy.android.app.main.dialog.storagestatus
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
@@ -13,6 +12,7 @@ import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.account.IsAchievementsEnabled
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.feature.payment.model.AccountTypeInt
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -84,7 +84,7 @@ internal class StorageStatusViewModelTest {
     fun `test that product updated correctly when calling getPricing returns PRO_III product`() =
         runTest {
             val product = mock<Product> {
-                on { level }.thenReturn(Constants.PRO_III)
+                on { level }.thenReturn(AccountTypeInt.PRO_III)
                 on { months }.thenReturn(1)
             }
             val pricing = mock<Pricing> {

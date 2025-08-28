@@ -22,10 +22,10 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.transferoverquota.TransferOverQuotaViewModel
-import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
 import mega.privacy.android.shared.resources.R as sharedR
@@ -63,7 +63,7 @@ internal fun TransferOverQuotaDialog(
             isFreeAccount = uiState.isFreeAccount,
             overQuotaDelay = TimeUtils.getHumanizedTime(overQuotaDelay),
             onNavigateToUpgradeAccount = {
-                ChooseAccountActivity.navigateToUpgradeAccount(context = context)
+                context.megaNavigator.openUpgradeAccount(context)
             },
             onNavigateToLogin = {
                 Intent(context, LoginActivity::class.java).apply {

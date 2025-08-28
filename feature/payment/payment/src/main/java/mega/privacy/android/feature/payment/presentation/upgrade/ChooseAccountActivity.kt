@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upgradeAccount
+package mega.privacy.android.feature.payment.presentation.upgrade
 
 import android.content.Context
 import android.content.Intent
@@ -7,22 +7,25 @@ import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.core.sharedcomponents.serializable
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.feature.payment.model.AccountTypeInt
 import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel.Companion.EXTRA_IS_UPGRADE_ACCOUNT
 import mega.privacy.android.navigation.ExtraConstant
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
+import javax.inject.Inject
 
 @AndroidEntryPoint
 open class ChooseAccountActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
-        setContentView(R.layout.activity_choose_account)
 
         if (savedInstanceState == null) {
             val fragment = ChooseAccountFragment().apply {
@@ -42,7 +45,7 @@ open class ChooseAccountActivity : AppCompatActivity() {
                 }
             }
             supportFragmentManager.beginTransaction()
-                .add(R.id.choose_account_container, fragment)
+                .add(android.R.id.content, fragment)
                 .commit()
         }
     }
@@ -67,30 +70,30 @@ open class ChooseAccountActivity : AppCompatActivity() {
      */
     internal fun onPlanClicked(accountType: AccountType) {
         val accountTypeInt = convertAccountTypeToInt(accountType)
-        val intent = Intent(this, ManagerActivity::class.java).apply {
-            putExtras(intent)
-            putExtra(ExtraConstant.EXTRA_FIRST_LOGIN, true)
-            if (extras?.containsKey(ExtraConstant.EXTRA_NEW_ACCOUNT) != true) {
-                putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, true)
+        val bundle = Bundle().apply {
+            intent.extras?.let { putAll(it) }
+            putBoolean(ExtraConstant.EXTRA_FIRST_LOGIN, true)
+            if (!containsKey(ExtraConstant.EXTRA_NEW_ACCOUNT)) {
+                putBoolean(ExtraConstant.EXTRA_NEW_ACCOUNT, true)
             }
-            if (extras?.containsKey(ExtraConstant.NEW_CREATION_ACCOUNT) != true) {
-                putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, true)
+            if (!containsKey(ExtraConstant.NEW_CREATION_ACCOUNT)) {
+                putBoolean(ExtraConstant.NEW_CREATION_ACCOUNT, true)
             }
-            putExtra(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, accountTypeInt != Constants.FREE)
-            putExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE, accountTypeInt)
+            putBoolean(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, accountType != AccountType.FREE)
+            putInt(ExtraConstant.EXTRA_ACCOUNT_TYPE, accountTypeInt)
         }
 
-        startActivity(intent)
+        megaNavigator.openManagerActivity(this, bundle)
         finish()
     }
 
     private fun convertAccountTypeToInt(accountType: AccountType): Int {
         return when (accountType) {
-            AccountType.PRO_LITE -> Constants.PRO_LITE
-            AccountType.PRO_I -> Constants.PRO_I
-            AccountType.PRO_II -> Constants.PRO_II
-            AccountType.PRO_III -> Constants.PRO_III
-            else -> Constants.FREE
+            AccountType.PRO_LITE -> AccountTypeInt.PRO_LITE
+            AccountType.PRO_I -> AccountTypeInt.PRO_I
+            AccountType.PRO_II -> AccountTypeInt.PRO_II
+            AccountType.PRO_III -> AccountTypeInt.PRO_III
+            else -> AccountTypeInt.FREE
         }
     }
 
@@ -107,15 +110,13 @@ open class ChooseAccountActivity : AppCompatActivity() {
          */
         fun navigateToUpgradeAccount(
             context: Context,
-            isFromAdsFree: Boolean = false,
+            source: UpgradeAccountSource = UpgradeAccountSource.UNKNOWN,
         ) {
             val intent = Intent(context, ChooseAccountActivity::class.java).apply {
                 putExtra(EXTRA_IS_UPGRADE_ACCOUNT, true)
                 putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, false)
                 putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)
-                if (isFromAdsFree) {
-                    putExtra(EXTRA_SOURCE, UpgradeAccountSource.ADS_FREE_SCREEN)
-                }
+                putExtra(EXTRA_SOURCE, source)
             }
             context.startActivity(intent)
         }

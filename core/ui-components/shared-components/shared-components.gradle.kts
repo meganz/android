@@ -19,10 +19,12 @@ dependencies {
 
     implementation(project(":icon-pack"))
     implementation(project(":shared:resources"))
+    implementation(project(":domain"))
 
     //core components
     implementation(lib.mega.core.ui)
     implementation(lib.mega.core.ui.tokens)
+    implementation(lib.logging.timber)
 
     // Compose
     implementation(androidx.bundles.compose.bom)

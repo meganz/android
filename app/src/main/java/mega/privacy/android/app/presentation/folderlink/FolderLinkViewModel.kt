@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.updateItemAt
-import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogState
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -28,6 +27,7 @@ import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogState
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product
@@ -83,6 +83,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature.payment.model.AccountTypeInt
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
@@ -362,7 +363,7 @@ class FolderLinkViewModel @Inject constructor(
         }
 
         val product =
-            getProductAccounts().firstOrNull { it.level == Constants.PRO_III && it.months == 1 }
+            getProductAccounts().firstOrNull { it.level == AccountTypeInt.PRO_III && it.months == 1 }
 
         when (throwable) {
             is QuotaExceededMegaException -> {

@@ -27,6 +27,7 @@ import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -81,7 +82,10 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
         setupView()
         setupObservers()
         binding.upgradeButton.setOnClickListener {
-            megaNavigator.openUpgradeAccount(context = requireActivity())
+            megaNavigator.openUpgradeAccount(
+                context = requireActivity(),
+                source = UpgradeAccountSource.MY_ACCOUNT_SCREEN
+            )
             viewModel.setOpenUpgradeFrom()
         }
     }

@@ -305,6 +305,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
+import mega.privacy.android.feature.payment.model.AccountTypeInt
 import mega.privacy.android.feature.sync.ui.SyncMonitorState
 import mega.privacy.android.feature.sync.ui.SyncMonitorViewModel
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
@@ -1800,7 +1801,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     if (upgradeAccount) {
                         val accountType: Int =
                             intent.getIntExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE, 0)
-                        if (accountType != Constants.FREE) {
+                        if (accountType != AccountTypeInt.FREE) {
                             showMyAccount(
                                 android.util.Pair(
                                     ExtraConstant.EXTRA_ACCOUNT_TYPE,
@@ -1841,7 +1842,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         closeDrawer()
                         val accountType: Int =
                             intent.getIntExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE, 0)
-                        if (accountType != Constants.FREE) {
+                        if (accountType != AccountTypeInt.FREE) {
                             showMyAccount(
                                 android.util.Pair(
                                     ExtraConstant.EXTRA_ACCOUNT_TYPE,

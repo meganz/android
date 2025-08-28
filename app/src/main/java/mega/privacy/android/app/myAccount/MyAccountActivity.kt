@@ -71,6 +71,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CancelSubscriptionMenuToolbarEvent
@@ -199,7 +200,10 @@ internal class MyAccountActivity : PasscodeActivity(),
     private fun manageIntentExtras() {
         val accountType = intent.getIntExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
         if (accountType != INVALID_VALUE) {
-            megaNavigator.openUpgradeAccount(this)
+            megaNavigator.openUpgradeAccount(
+                context = this,
+                source = UpgradeAccountSource.MY_ACCOUNT_SCREEN
+            )
 
             viewModel.setOpenUpgradeFrom()
 
@@ -311,7 +315,10 @@ internal class MyAccountActivity : PasscodeActivity(),
             R.id.action_export_MK -> navController.navigate(R.id.action_my_account_to_export_recovery_key)
             R.id.action_refresh -> viewModel.refresh(this)
             R.id.action_upgrade_account -> {
-                megaNavigator.openUpgradeAccount(context = this)
+                megaNavigator.openUpgradeAccount(
+                    context = this,
+                    source = UpgradeAccountSource.MY_ACCOUNT_SCREEN
+                )
                 viewModel.setOpenUpgradeFrom()
             }
 
@@ -592,7 +599,7 @@ internal class MyAccountActivity : PasscodeActivity(),
         val message = when (type) {
             TYPE_ANDROID_PLATFORM,
             TYPE_ANDROID_PLATFORM_NO_NAVIGATION,
-            ->
+                ->
                 getString(
                     R.string.message_android_platform_subscription,
                     platformInfo.platformName,

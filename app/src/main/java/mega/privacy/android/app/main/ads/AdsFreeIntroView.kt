@@ -31,6 +31,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.original.core.ui.controls.ads.AdsFreeItem
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -181,7 +182,7 @@ internal fun AdsFreeIntroContent(
                         )
                         context.megaNavigator.openUpgradeAccount(
                             context = context,
-                            isFromAdsFree = true
+                            UpgradeAccountSource.ADS_FREE_SCREEN
                         )
                         onDismiss()
                     },

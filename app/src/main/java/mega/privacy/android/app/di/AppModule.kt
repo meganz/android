@@ -20,6 +20,8 @@ import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueImpl
 import mega.privacy.android.app.appstate.global.event.AppDialogsEventQueueReceiver
 import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.app.nav.MegaNavigatorImpl
+import mega.privacy.android.app.presentation.container.MegaAppContainerProvider
+import mega.privacy.android.core.sharedcomponents.container.AppContainerProvider
 import mega.privacy.android.app.sslverification.SSLAppDialogDestinations
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.filewrapper.FileWrapper
@@ -39,7 +41,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class AppModule {
+internal class AppModule {
     @MegaApi
     @Singleton
     @Provides
@@ -153,4 +155,9 @@ class AppModule {
     @Provides
     fun provideAppDialogsEventQueueReceiver(queue: AppDialogsEventQueueImpl): AppDialogsEventQueueReceiver =
         queue
+
+    @Provides
+    fun provideAppContainerProvider(
+        provider: MegaAppContainerProvider,
+    ): AppContainerProvider = provider
 }
