@@ -6,7 +6,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
@@ -20,7 +20,6 @@ import javax.inject.Inject
  */
 class DefaultTransfersNotificationMapper @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val openTransfersSectionIntentMapper: OpenTransfersSectionIntentMapper,
 ) : TransfersNotificationMapper {
 
     override suspend fun invoke(
@@ -30,7 +29,7 @@ class DefaultTransfersNotificationMapper @Inject constructor(
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
             context,
             0,
-            openTransfersSectionIntentMapper(TransfersTab.PENDING_TAB),
+            TransfersActivity.getActiveTabIntent(context),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val content = context.getString(R.string.download_touch_to_show)

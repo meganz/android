@@ -11,7 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.transfers.preview.LoadingPreviewActivity
 import mega.privacy.android.app.presentation.transfers.preview.LoadingPreviewActivity.Companion.EXTRA_TRANSFER_TAG
 import mega.privacy.android.app.utils.Constants
@@ -38,7 +38,6 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
     @ApplicationContext private val context: Context,
     private val isContentUriUseCase: IsContentUriUseCase,
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
-    private val openTransfersSectionIntentMapper: OpenTransfersSectionIntentMapper,
 ) : TransfersActionGroupProgressNotificationBuilder {
     private val resources get() = context.resources
     override suspend fun invoke(
@@ -119,8 +118,7 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
             )
         }
         val (contentPendingIntent, actionIntent) = if (!isPreviewDownload) {
-            val openTransfersSectionIntent =
-                openTransfersSectionIntentMapper(TransfersTab.PENDING_TAB)
+            val openTransfersSectionIntent = TransfersActivity.getActiveTabIntent(context)
             PendingIntent.getActivity(
                 context,
                 0,

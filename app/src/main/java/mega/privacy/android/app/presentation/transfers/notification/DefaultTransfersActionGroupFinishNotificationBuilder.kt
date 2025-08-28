@@ -11,8 +11,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
+import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
@@ -46,7 +46,6 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val actionGroupFinishNotificationActionTextMapper: ActionGroupFinishNotificationActionTextMapper,
     private val actionGroupFinishNotificationTitleMapper: ActionGroupFinishNotificationTitleMapper,
-    private val openTransfersSectionIntentMapper: OpenTransfersSectionIntentMapper,
 ) : TransfersActionGroupFinishNotificationBuilder {
     private val resources get() = context.resources
     override suspend fun invoke(
@@ -96,7 +95,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             if (isPreviewDownload || actionGroup.groupId < 0) { //not a real transfer, will not appear on transfer section -> content intent same as action intent
                 actionIntent
             } else {
-                openTransfersSectionIntentMapper(TransfersTab.COMPLETED_TAB)
+                TransfersActivity.getActiveTabIntent(context)
             }
         val pendingIntent = PendingIntent.getActivity(
             context,

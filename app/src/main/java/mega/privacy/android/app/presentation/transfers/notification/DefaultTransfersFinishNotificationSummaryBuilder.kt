@@ -7,7 +7,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.finalSummaryGroup
@@ -20,7 +20,6 @@ import javax.inject.Inject
  */
 class DefaultTransfersFinishNotificationSummaryBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val openTransfersSectionIntentMapper: OpenTransfersSectionIntentMapper,
 ) : TransfersFinishNotificationSummaryBuilder {
 
     override suspend fun invoke(type: TransferType) =
@@ -36,7 +35,7 @@ class DefaultTransfersFinishNotificationSummaryBuilder @Inject constructor(
             .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
             .setGroup(finalSummaryGroup(type))
             .setGroupSummary(true)
-            .setContentIntent(createPendingIntent(openTransfersSectionIntentMapper(TransfersTab.COMPLETED_TAB)))
+            .setContentIntent(createPendingIntent(TransfersActivity.getCompletedTabIntent(context)))
             .build()
 
     private fun createPendingIntent(intent: Intent) =

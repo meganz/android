@@ -11,7 +11,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
@@ -34,7 +34,6 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val accountInfoFacade: AccountInfoFacade,
     private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
-    private val openTransfersSectionIntentMapper: OpenTransfersSectionIntentMapper,
 ) : OverQuotaNotificationBuilder {
 
     override suspend operator fun invoke(storageOverQuota: Boolean) = if (storageOverQuota) {
@@ -67,7 +66,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
         val clickPendingIntent = PendingIntent.getActivity(
             context,
             0,
-            openTransfersSectionIntentMapper(TransfersTab.PENDING_TAB),
+            TransfersActivity.getActiveTabIntent(context),
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val upgradeButtonText =

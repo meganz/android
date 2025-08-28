@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.transfers
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -19,6 +21,8 @@ import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.navigation.TransfersInfo
 import mega.privacy.android.app.presentation.transfers.view.navigation.transfersScreen
 import mega.privacy.android.domain.entity.ThemeMode
@@ -88,5 +92,26 @@ class TransfersActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun getActiveTabIntent(context: Context): Intent =
+            Intent(context, TransfersActivity::class.java).apply {
+                putExtra(EXTRA_TAB, ACTIVE_TAB_INDEX)
+            }
+
+        @JvmStatic
+        fun getCompletedTabIntent(context: Context): Intent =
+            Intent(context, TransfersActivity::class.java).apply {
+                putExtra(EXTRA_TAB, COMPLETED_TAB_INDEX)
+            }
+
+        @JvmStatic
+        fun getFailedTabIntent(context: Context): Intent =
+            Intent(context, TransfersActivity::class.java).apply {
+                putExtra(EXTRA_TAB, FAILED_TAB_INDEX)
+            }
     }
 }
