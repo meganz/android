@@ -255,14 +255,7 @@ private suspend fun handleOtherFiles(
             context.startActivity(this)
         }.onFailure { error ->
             Timber.e(error)
-            if (resolveActivity(context.packageManager) == null) {
-                action = Intent.ACTION_SEND
-            }
-            safeLaunchActivity(
-                context = context,
-                intent = this,
-                snackBarHostState = snackBarHostState
-            )
+            snackBarHostState?.showAutoDurationSnackbar(message = context.getString(R.string.intent_not_available))
         }
     }
 }
