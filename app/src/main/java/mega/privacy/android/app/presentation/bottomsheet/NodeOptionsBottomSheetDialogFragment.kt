@@ -28,8 +28,10 @@ import coil3.request.transformations
 import coil3.transform.RoundedCornersTransformation
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
@@ -100,6 +102,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as RPack
@@ -142,6 +145,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
@@ -1704,9 +1711,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun showShareFolderOptions(legacyNodeWrapper: LegacyNodeWrapper?) {
         legacyNodeWrapper?.let {
-            val nodeType = checkBackupNodeTypeByHandle(megaApi, it.node)
-            if (it.typedNode.isOutShare()) {
-                viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch  {
+                val nodeType = withContext(ioDispatcher) {
+                    checkBackupNodeTypeByHandle(megaApi, it.node)
+                }
+
+                if (it.typedNode.isOutShare()) {
                     val intent =
                         if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
                             FileContactListComposeActivity.newIntent(
@@ -1720,17 +1730,17 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     intent.putExtra(Constants.NAME, it.typedNode.id.longValue)
                     startActivity(intent)
                     dismissAllowingStateLoss()
-                }
-            } else {
-                if (nodeType != BACKUP_NONE) {
-                    (requireActivity() as ManagerActivity).showShareBackupsFolderWarningDialog(
-                        node = it.node,
-                        nodeType = nodeType,
-                    )
                 } else {
-                    nodeController.selectContactToShareFolder(it.typedNode.id.longValue)
+                    if (nodeType != BACKUP_NONE) {
+                        (requireActivity() as ManagerActivity).showShareBackupsFolderWarningDialog(
+                            node = it.node,
+                            nodeType = nodeType,
+                        )
+                    } else {
+                        nodeController.selectContactToShareFolder(it.typedNode.id.longValue)
+                    }
+                    dismissAllowingStateLoss()
                 }
-                dismissAllowingStateLoss()
             }
         }
     }

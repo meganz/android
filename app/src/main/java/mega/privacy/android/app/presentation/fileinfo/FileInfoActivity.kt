@@ -21,8 +21,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
@@ -73,6 +75,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
@@ -108,6 +111,10 @@ class FileInfoActivity : BaseActivity() {
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
@@ -466,20 +473,24 @@ class FileInfoActivity : BaseActivity() {
     }
 
     private fun showShareFolderDialog() {
-        val nodeType = MegaNodeUtil.checkBackupNodeTypeByHandle(megaApi, viewModel.node)
-        if (nodeType != MegaNodeDialogUtil.BACKUP_NONE) {
-            // Display a warning dialog when sharing a Backup folder and limit folder
-            // access to read-only
-            fileBackupManager?.defaultActionBackupNodeCallback?.let {
-                fileBackupManager?.shareBackupsFolder(
-                    nodeController = nodeController,
-                    megaNode = viewModel.node,
-                    nodeType = nodeType,
-                    actionBackupNodeCallback = it,
-                )
+        lifecycleScope.launch {
+            val nodeType = withContext(ioDispatcher) {
+                MegaNodeUtil.checkBackupNodeTypeByHandle(megaApi, viewModel.node)
             }
-        } else {
-            navigateToShare()
+            if (nodeType != MegaNodeDialogUtil.BACKUP_NONE) {
+                // Display a warning dialog when sharing a Backup folder and limit folder
+                // access to read-only
+                fileBackupManager?.defaultActionBackupNodeCallback?.let {
+                    fileBackupManager?.shareBackupsFolder(
+                        nodeController = nodeController,
+                        megaNode = viewModel.node,
+                        nodeType = nodeType,
+                        actionBackupNodeCallback = it,
+                    )
+                }
+            } else {
+                navigateToShare()
+            }
         }
     }
 
