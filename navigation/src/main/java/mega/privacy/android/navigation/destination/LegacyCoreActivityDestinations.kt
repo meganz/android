@@ -10,4 +10,7 @@ data object OverDiskQuotaPaywallWarning : NavKey
 data object MyAccount : NavKey
 
 @Serializable
+data object Achievement : NavKey
+
+@Serializable
 data class WebSite(val url: String) : NavKey

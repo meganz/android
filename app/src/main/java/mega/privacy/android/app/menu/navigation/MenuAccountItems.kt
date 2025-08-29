@@ -4,10 +4,10 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.payment.UpgradeAccount
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
+import mega.privacy.android.navigation.destination.Achievement
 import mega.privacy.android.navigation.destination.ExampleLegacyScreen
 import mega.privacy.android.navigation.destination.LegacySettings
 import mega.privacy.android.navigation.destination.MyAccount
-import mega.privacy.android.navigation.destination.Secondary
 import mega.privacy.android.navigation.destination.WebSite
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -31,7 +31,7 @@ object ContactsItem : NavDrawerItem.Account(
 )
 
 object AchievementsItem : NavDrawerItem.Account(
-    destination = Secondary,
+    destination = Achievement,
     icon = IconPack.Medium.Thin.Outline.Rocket,
     title = sharedR.string.general_section_achievements,
 )

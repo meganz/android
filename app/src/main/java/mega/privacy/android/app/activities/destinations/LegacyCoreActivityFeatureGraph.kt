@@ -12,6 +12,7 @@ class LegacyCoreActivityFeatureGraph : FeatureDestination {
             overDiskQuotaPaywallWarning(navigationHandler::back)
             upgradeAccount(navigationHandler::back)
             myAccount(navigationHandler::back)
+            achievement(navigationHandler::back)
             webDestinations(navigationHandler::back)
         }
 }
