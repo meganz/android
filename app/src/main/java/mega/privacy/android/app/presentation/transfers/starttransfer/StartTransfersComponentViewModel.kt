@@ -313,14 +313,17 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         if (event.pathsAndNames.isEmpty()) {
                             Timber.e("Paths in $event must exist")
                         } else {
-                            retryUploads = true
-                            add(id)
-                            viewModelScope.launch {
+                            runCatching {
                                 insertPendingUploadsForFilesUseCase(
                                     pathsAndNames = event.pathsAndNames,
                                     parentFolderId = event.destinationId,
                                     isHighPriority = event.isHighPriority
                                 )
+                            }.onSuccess {
+                                retryUploads = true
+                                add(id)
+                            }.onFailure {
+                                Timber.e(it)
                             }
                         }
                     }
