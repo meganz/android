@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.FileNode
@@ -17,7 +16,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentUserStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
@@ -49,7 +48,7 @@ import org.mockito.kotlin.whenever
 internal class ManagerDrawerViewModelTest {
     private lateinit var underTest: ManagerDrawerViewModel
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
-    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
+    private val monitorStorageStateUseCase: MonitorStorageStateUseCase = mock()
     private val getCurrentUserChatStatusUseCase: GetCurrentUserStatusUseCase = mock {
         onBlocking { invoke() }.thenReturn(UserChatStatus.Invalid)
     }
@@ -84,13 +83,10 @@ internal class ManagerDrawerViewModelTest {
         monitorNodeUpdatesUseCase.stub {
             on { invoke() }.thenReturn(emptyFlow())
         }
-        monitorStorageStateEventUseCase.stub {
+        monitorStorageStateUseCase.stub {
             on { invoke() }.thenReturn(
                 MutableStateFlow(
-                    StorageStateEvent(
-                        1L,
-                        StorageState.Change,
-                    )
+                    StorageState.Green
                 )
             )
         }
@@ -101,19 +97,19 @@ internal class ManagerDrawerViewModelTest {
 
     private fun initTestClass() {
         underTest = ManagerDrawerViewModel(
-            isConnectedToInternetUseCase,
-            monitorStorageStateEventUseCase,
-            getCurrentUserChatStatusUseCase,
-            hasBackupsChildren,
-            getBackupsNodeUseCase,
-            monitorNodeUpdatesUseCase,
-            monitorMyChatOnlineStatusUseCase,
-            monitorVerificationStatus,
-            rootNodeExistsUseCase,
-            monitorConnectivityUseCase,
-            getEnabledNotificationsUseCase,
-            monitorFetchNodesFinishUseCase,
-            monitorMyAccountUpdateUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
+            getCurrentUserStatusUseCase = getCurrentUserChatStatusUseCase,
+            hasBackupsChildren = hasBackupsChildren,
+            getBackupsNodeUseCase = getBackupsNodeUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            monitorMyChatOnlineStatusUseCase = monitorMyChatOnlineStatusUseCase,
+            monitorVerificationStatus = monitorVerificationStatus,
+            rootNodeExistsUseCase = rootNodeExistsUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            getEnabledNotificationsUseCase = getEnabledNotificationsUseCase,
+            monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
+            monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase
         )
     }
 
@@ -224,4 +220,17 @@ internal class ManagerDrawerViewModelTest {
         Arguments.of(emptyList<Int>(), false),
         Arguments.of(listOf(1, 2, 3), true),
     )
+
+    @ParameterizedTest
+    @EnumSource(StorageState::class)
+    fun `test that the correct storage state is successfully set`(storageState: StorageState) =
+        runTest {
+            whenever(monitorStorageStateUseCase()).thenReturn(flowOf(storageState))
+
+            initTestClass()
+
+            underTest.state.test {
+                assertThat(expectMostRecentItem().storageState).isEqualTo(storageState)
+            }
+        }
 }

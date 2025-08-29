@@ -239,7 +239,7 @@ internal class ManagerDrawerFragment : Fragment() {
 
     private fun updateAccountDetailsVisibleInfo() {
         Timber.d("updateAccountDetailsVisibleInfo")
-        val storageState = viewModel.getStorageState()
+        val storageState = viewModel.state.value.storageState
         if (isBusinessAccount) {
             binding.nvUsedSpaceLayout.visibility = View.GONE
             binding.upgradeNavigationView.visibility = View.GONE

@@ -60,7 +60,7 @@ class GetFullAccountInfoUseCaseTest {
             underTest()
             verify(getPaymentMethodUseCase).invoke(true)
             verify(getSpecificAccountDetailUseCase).invoke(
-                storage = false,
+                storage = true,
                 transfer = true,
                 pro = true,
             )

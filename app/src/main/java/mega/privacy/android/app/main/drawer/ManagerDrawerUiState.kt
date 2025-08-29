@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.drawer
 
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 
@@ -22,4 +23,5 @@ data class ManagerDrawerUiState(
     val isRootNodeExist: Boolean = false,
     val isConnected: Boolean = false,
     val showPromoTag: Boolean = false,
+    val storageState: StorageState = StorageState.Unknown,
 )

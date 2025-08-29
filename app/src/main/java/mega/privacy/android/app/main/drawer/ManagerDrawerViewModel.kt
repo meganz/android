@@ -6,17 +6,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentUserStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
@@ -32,7 +31,6 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ManagerDrawerViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
-    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val getCurrentUserStatusUseCase: GetCurrentUserStatusUseCase,
     private val hasBackupsChildren: HasBackupsChildren,
     private val getBackupsNodeUseCase: GetBackupsNodeUseCase,
@@ -44,6 +42,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private val getEnabledNotificationsUseCase: GetEnabledNotificationsUseCase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
+    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ManagerDrawerUiState())
     val state = _state.asStateFlow()
@@ -53,11 +52,6 @@ internal class ManagerDrawerViewModel @Inject constructor(
      */
     val isConnected: Boolean
         get() = isConnectedToInternetUseCase()
-
-    /**
-     * Get latest [StorageState]
-     */
-    fun getStorageState() = monitorStorageStateEventUseCase.getState()
 
     /**
      * Monitor My Account Update event
@@ -75,6 +69,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
         observerConnectivityEvent()
         shouldShowPromoTag()
         monitorFetchNodesFinish()
+        monitorStorageState()
     }
 
     private fun observerConnectivityEvent() {
@@ -183,6 +178,18 @@ internal class ManagerDrawerViewModel @Inject constructor(
             monitorFetchNodesFinishUseCase()
                 .catch { Timber.e(it) }
                 .collect { checkRootNode() }
+        }
+    }
+
+    private fun monitorStorageState() {
+        viewModelScope.launch {
+            monitorStorageStateUseCase()
+                .catch { Timber.e(it) }
+                .collectLatest { storageState ->
+                    _state.update {
+                        it.copy(storageState = storageState)
+                    }
+                }
         }
     }
 }
