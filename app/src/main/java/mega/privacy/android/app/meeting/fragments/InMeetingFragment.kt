@@ -127,6 +127,7 @@ import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
@@ -3019,7 +3020,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             R.style.ThemeOverlay_Mega_MaterialAlertDialog
         ).setMessage(getString(R.string.meeting_is_failed_content))
             .setCancelable(false)
-            .setPositiveButton(R.string.general_ok) { _, _ ->
+            .setPositiveButton(sharedResR.string.general_ok) { _, _ ->
                 rtcAudioManagerGateway.removeRTCAudioManager()
                 finishActivity()
             }.show()

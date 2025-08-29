@@ -11,6 +11,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -32,7 +33,7 @@ class SecurityUpgradeDialogTest {
             onNodeWithTag("HeaderImage").assertIsDisplayed()
             onNodeWithText(R.string.shared_items_security_upgrade_dialog_title).assertIsDisplayed()
             onNodeWithText(R.string.shared_items_security_upgrade_dialog_content).assertIsDisplayed()
-            onNodeWithText(R.string.general_ok).assertIsDisplayed()
+            onNodeWithText(sharedResR.string.general_ok).assertIsDisplayed()
         }
     }
 }

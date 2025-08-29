@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
@@ -1051,7 +1052,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setMessage(getString(R.string.error_opening_file))
                 .setCancelable(false)
-                .setPositiveButton(R.string.general_ok) { _, _ ->
+                .setPositiveButton(sharedResR.string.general_ok) { _, _ ->
                     finish()
                 }.show()
 

@@ -47,9 +47,4 @@ class RemoveShareBottomSheetMenuItem @Inject constructor(
 
     override val menuAction = RemoveShareMenuAction(210)
     override val groupId = 7
-
-    companion object {
-        // Todo duplicate to the one in mega.privacy.android.app.presentation.search.model.navigation.RemoveShareFolderNavigation.kt
-        private const val searchRemoveFolderShareDialog = "search/folder_share_remove"
-    }
 }

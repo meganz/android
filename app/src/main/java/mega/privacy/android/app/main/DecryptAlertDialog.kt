@@ -16,6 +16,7 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.DialogErrorHintBinding
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Util
@@ -205,7 +206,7 @@ class DecryptAlertDialog : DialogFragment() {
             showErrorMessage(key)
         }
         editor.imeOptions = EditorInfo.IME_ACTION_DONE
-        editor.setImeActionLabel(getString(R.string.general_ok), EditorInfo.IME_ACTION_DONE)
+        editor.setImeActionLabel(getString(sharedResR.string.general_ok), EditorInfo.IME_ACTION_DONE)
         editor.setOnEditorActionListener(TextView.OnEditorActionListener { _: TextView?, actionId: Int, _: KeyEvent? ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 if (validateInput()) {

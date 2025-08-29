@@ -13,6 +13,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VIDEO_COMPRESSION_SIZE_INPUT_DIALOG
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VideoCompressionSizeInputDialog
 import org.junit.Rule
 import org.junit.Test
@@ -37,7 +38,7 @@ internal class VideoCompressionSizeInputDialogTest {
             onNodeWithTag(VIDEO_COMPRESSION_SIZE_INPUT_DIALOG).assertIsDisplayed()
             onNodeWithText(activity.getString(R.string.settings_video_compression_queue_size_popup_title)).assertIsDisplayed()
             onNodeWithText(activity.getString(R.string.label_mega_byte)).assertIsDisplayed()
-            onNodeWithText(activity.getString(R.string.general_ok)).assertIsDisplayed()
+            onNodeWithText(activity.getString(sharedResR.string.general_ok)).assertIsDisplayed()
             onNodeWithText(activity.getString(android.R.string.cancel)).assertIsDisplayed()
             onNodeWithText(
                 activity.getString(
@@ -129,7 +130,7 @@ internal class VideoCompressionSizeInputDialogTest {
         initializeComposeContent()
 
         with(composeTestRule) {
-            onNodeWithText(activity.getString(R.string.general_ok)).performClick()
+            onNodeWithText(activity.getString(sharedResR.string.general_ok)).performClick()
 
             onNodeWithText(
                 activity.getString(
@@ -147,7 +148,7 @@ internal class VideoCompressionSizeInputDialogTest {
 
         with(composeTestRule) {
             onNode(hasImeAction(ImeAction.Done)).performTextInput("50")
-            onNodeWithText(activity.getString(R.string.general_ok)).performClick()
+            onNodeWithText(activity.getString(sharedResR.string.general_ok)).performClick()
 
             onNodeWithText(
                 activity.getString(
@@ -165,7 +166,7 @@ internal class VideoCompressionSizeInputDialogTest {
 
         with(composeTestRule) {
             onNode(hasImeAction(ImeAction.Done)).performTextInput("2000")
-            onNodeWithText(activity.getString(R.string.general_ok)).performClick()
+            onNodeWithText(activity.getString(sharedResR.string.general_ok)).performClick()
 
             onNodeWithText(
                 activity.getString(
@@ -189,7 +190,7 @@ internal class VideoCompressionSizeInputDialogTest {
 
         with(composeTestRule) {
             onNode(hasImeAction(ImeAction.Done)).performTextInput("500")
-            onNodeWithText(activity.getString(R.string.general_ok)).performClick()
+            onNodeWithText(activity.getString(sharedResR.string.general_ok)).performClick()
         }
 
         verify(onNewSizeProvided).invoke(any())

@@ -105,6 +105,7 @@ import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Add contact activity
@@ -2697,7 +2698,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setTitle(getString(R.string.enter_group_name))
                 .setMessage(getString(R.string.alert_enter_group_name))
-                .setPositiveButton(getString(R.string.general_ok), null)
+                .setPositiveButton(getString(sharedResR.string.general_ok), null)
                 .show()
             return
         }

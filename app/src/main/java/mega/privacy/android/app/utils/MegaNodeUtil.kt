@@ -882,7 +882,7 @@ object MegaNodeUtil {
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         builder.setMessage(urlSpan)
-        builder.setPositiveButton(context.getString(R.string.general_ok)) { dialog, _ ->
+        builder.setPositiveButton(context.getString(sharedR.string.general_ok)) { dialog, _ ->
             dialog.dismiss()
             listener?.onCancelClicked()
         }

@@ -1095,7 +1095,7 @@ public class CallUtil {
     public static void showConfirmationInACall(Context context, String message) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setMessage(message)
-                .setPositiveButton(R.string.general_ok, (dialog, which) -> {
+                .setPositiveButton(mega.privacy.android.shared.resources.R.string.general_ok, (dialog, which) -> {
                     if (context instanceof OpenLinkActivity) {
                         returnActiveCall(context);
                     }

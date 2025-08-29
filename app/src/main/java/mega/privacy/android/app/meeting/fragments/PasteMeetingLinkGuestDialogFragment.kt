@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.shared.resources.R as sharedResR
 
 class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
 
@@ -53,7 +54,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
         builder.setTitle(R.string.paste_meeting_link_guest_dialog_title)
             .setMessage(getString(R.string.paste_meeting_link_guest_instruction))
             .setView(view)
-            .setPositiveButton(R.string.general_ok, null)
+            .setPositiveButton(sharedResR.string.general_ok, null)
             .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
 
         val dialog = builder.create()

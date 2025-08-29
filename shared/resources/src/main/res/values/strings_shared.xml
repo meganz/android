@@ -1541,4 +1541,10 @@
     <string name="backup_share_permission_title">Read-only</string>
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">Continue</string>
+    <!--Dialog title when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
+    <!--Dialog description when the user selected is not on the contact list when sharing a node -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_ok">OK</string>
 </resources>

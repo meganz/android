@@ -678,7 +678,7 @@ public class ChatUtil {
             ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
         });
 
-        dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
+        dialogBuilder.setPositiveButton(context.getString(mega.privacy.android.shared.resources.R.string.general_ok),
                 (dialog, which) -> {
                     ArrayList<Long> chatIds = null;
                     if (chats != null) {

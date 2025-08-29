@@ -11,6 +11,7 @@ import mega.privacy.android.app.presentation.apiserver.model.ApiServerUIState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @RunWith(AndroidJUnit4::class)
 class ChangeApiServerDialogTest {
@@ -70,7 +71,7 @@ class ChangeApiServerDialogTest {
     @Test
     fun `test that OK button is displayed`() {
         initComposeRuleContent()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.general_ok))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.general_ok))
             .assertIsDisplayed()
     }
 

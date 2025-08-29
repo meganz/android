@@ -14,6 +14,7 @@ import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * The class for showing the business or pro flexi expired alert
@@ -59,7 +60,7 @@ class BusinessExpiredAlertActivity : PasscodeActivity() {
             binding.expiredText.text =
                 getString(sharedR.string.account_pro_flexi_account_deactivated_dialog_body)
             binding.expiredSubtext.isVisible = false
-            binding.expiredDismissButton.text = getString(R.string.general_ok)
+            binding.expiredDismissButton.text = getString(sharedResR.string.general_ok)
         } else if (megaApi.isMasterBusinessAccount) {
             binding.expiredImageLayout.background =
                 ContextCompat.getDrawable(this, R.drawable.gradient_business_admin_expired_bg)

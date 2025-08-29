@@ -830,7 +830,7 @@ public class PDFView extends RelativeLayout {
         } else {
             builder.setMessage(isOnline(pdfViewer) ? R.string.corrupt_pdf_dialog_text
                             : R.string.error_fail_to_open_file_no_network)
-                    .setPositiveButton(R.string.general_ok, (dialog, which) -> pdfViewer.finish());
+                    .setPositiveButton(mega.privacy.android.shared.resources.R.string.general_ok, (dialog, which) -> pdfViewer.finish());
         }
         try {
             builder.show();

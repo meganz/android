@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 fun HandleNodeOptionEvent(
@@ -78,7 +79,7 @@ fun HandleNodeOptionEvent(
             onPositiveButtonClicked = {
                 isShowForeignDialog = false
             },
-            positiveButtonText = stringResource(id = R.string.general_ok),
+            positiveButtonText = stringResource(id = sharedResR.string.general_ok),
         )
     }
 

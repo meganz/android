@@ -60,7 +60,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
-
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * View to render the File Link Screen, including toolbar, content, etc.
@@ -238,7 +238,7 @@ internal fun FileLinkView(
     if (showForeignNodeErrorDialog.value) {
         MegaAlertDialog(
             text = stringResource(id = R.string.warning_share_owner_storage_quota),
-            confirmButtonText = stringResource(id = R.string.general_ok),
+            confirmButtonText = stringResource(id = sharedResR.string.general_ok),
             cancelButtonText = null,
             onConfirm = { showForeignNodeErrorDialog.value = false },
             onDismiss = {},

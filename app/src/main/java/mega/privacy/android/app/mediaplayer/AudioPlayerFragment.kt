@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
@@ -205,7 +206,7 @@ class AudioPlayerFragment : Fragment() {
                                         )
                                     )
                                     .setPositiveButton(
-                                        getString(R.string.general_ok)
+                                        getString(sharedResR.string.general_ok)
                                     ) { _, _ ->
                                         serviceGateway?.stopPlayer()
                                         requireActivity().finish()

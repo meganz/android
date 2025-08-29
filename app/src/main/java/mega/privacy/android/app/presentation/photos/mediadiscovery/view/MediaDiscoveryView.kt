@@ -85,6 +85,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 fun MediaDiscoveryView(
@@ -675,7 +676,7 @@ fun OKButton(
         onClick = onOKButtonClicked
     ) {
         Text(
-            text = stringResource(R.string.general_ok),
+            text = stringResource(sharedResR.string.general_ok),
             fontSize = 16.sp
         )
     }

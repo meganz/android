@@ -32,6 +32,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.UiChatStatus
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Contact attachment ui message
@@ -142,7 +143,7 @@ internal fun onUserClick(
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(
                                 context.getString(R.string.contact_invited),
-                                context.getString(R.string.general_ok),
+                                context.getString(sharedResR.string.general_ok),
                                 SnackbarDuration.Indefinite,
                             )
                         }

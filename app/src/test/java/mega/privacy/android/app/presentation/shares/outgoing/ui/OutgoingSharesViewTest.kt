@@ -1,21 +1,23 @@
 package mega.privacy.android.app.presentation.shares.outgoing.ui
 
 import android.os.Build
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
-import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.robolectric.annotation.Config
-import mega.privacy.android.app.onNodeWithText
-import mega.privacy.android.icon.pack.R as iconPackR
 
 @Config(sdk = [Build.VERSION_CODES.Q])
 @RunWith(AndroidJUnit4::class)
@@ -85,7 +87,7 @@ class OutgoingSharesViewTest {
                 fileTypeIconMapper = fileTypeIconMapper,
             )
         }
-        composeTestRule.onNodeWithText(R.string.shared_items_contact_not_in_contact_list_dialog_title)
+        composeTestRule.onNodeWithText(sharedResR.string.shared_items_contact_not_in_contact_list_dialog_title)
             .assertExists()
     }
 }

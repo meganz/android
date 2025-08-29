@@ -72,6 +72,7 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
@@ -470,7 +471,7 @@ class SettingsFragment :
     private fun showInfoDialog(@StringRes title: Int, @StringRes message: Int) {
         requireActivity().hideKeyboard()
         MaterialAlertDialogBuilder(requireContext())
-            .setPositiveButton(R.string.general_ok) { _, _ -> }
+            .setPositiveButton(sharedResR.string.general_ok) { _, _ -> }
             .setTitle(title)
             .setMessage(message)
             .show()

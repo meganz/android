@@ -21,6 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Login Graph Content Composable that handles state management and navigation logic
@@ -106,7 +107,7 @@ fun LoginGraphContent(
             modifier = Modifier.testTag(LOGGED_OUT_DIALOG),
             title = stringResource(id = R.string.title_alert_logged_out),
             description = stringResource(id = R.string.error_server_expired_session),
-            positiveButtonText = stringResource(id = R.string.general_ok),
+            positiveButtonText = stringResource(id = sharedResR.string.general_ok),
             onPositiveButtonClicked = {
                 showLoggedOutDialog = false
             },

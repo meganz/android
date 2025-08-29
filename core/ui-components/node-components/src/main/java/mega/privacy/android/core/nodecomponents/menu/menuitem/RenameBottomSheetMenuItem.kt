@@ -35,9 +35,4 @@ class RenameBottomSheetMenuItem @Inject constructor(
     }
 
     override val groupId = 8
-
-    companion object {
-        // Todo duplicate to the one in mega.privacy.android.app.presentation.search.model.navigation.SearchRenameNavigation.kt
-        private const val searchRenameDialog = "search/rename_dialog"
-    }
 }

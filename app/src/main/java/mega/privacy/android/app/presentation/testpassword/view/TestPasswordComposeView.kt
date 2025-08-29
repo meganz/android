@@ -122,6 +122,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSe
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.io.File
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Test Password Feature in Jetpack Compose
@@ -285,7 +286,7 @@ internal fun TestPasswordComposeView(
         errorAlertMessage?.let { message ->
             MegaAlertDialog(
                 text = message,
-                confirmButtonText = stringResource(id = R.string.general_ok),
+                confirmButtonText = stringResource(id = sharedResR.string.general_ok),
                 cancelButtonText = null,
                 onConfirm = { errorAlertMessage = null },
                 onDismiss = { errorAlertMessage = null }

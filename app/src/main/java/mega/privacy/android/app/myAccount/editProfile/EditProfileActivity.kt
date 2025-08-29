@@ -84,6 +84,7 @@ import nz.mega.sdk.MegaChatApi
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @AndroidEntryPoint
 class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.PhotoCallback,
@@ -817,7 +818,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton(R.string.general_ok) { _, _ ->
+                .setPositiveButton(sharedResR.string.general_ok) { _, _ ->
                     viewModel.resetPhoneNumber(isModify, this)
                 }
                 .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)

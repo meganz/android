@@ -84,6 +84,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Helper compose view to show UI related to starting a download transfer
@@ -413,7 +414,7 @@ private fun StartTransferComponent(
     if (showOfflineAlertDialog) {
         MegaAlertDialog(
             text = stringResource(id = R.string.error_server_connection_problem),
-            confirmButtonText = stringResource(id = R.string.general_ok),
+            confirmButtonText = stringResource(id = sharedResR.string.general_ok),
             cancelButtonText = null,
             onConfirm = { showOfflineAlertDialog = false },
             onDismiss = { showOfflineAlertDialog = false },

@@ -50,6 +50,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaAccountDetails
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * The fragment for file management of settings
@@ -499,7 +500,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
         val builder = MaterialAlertDialogBuilder(activity)
         builder.setTitle(activity.getFormattedStringOrDefault(R.string.settings_rb_scheduler_select_days_title))
         builder.setPositiveButton(
-            activity.getFormattedStringOrDefault(R.string.general_ok)
+            activity.getFormattedStringOrDefault(sharedResR.string.general_ok)
         ) { _: DialogInterface?, _: Int -> }
         builder.setNegativeButton(
             getString(sharedR.string.general_dialog_cancel_button)

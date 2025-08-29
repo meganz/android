@@ -158,7 +158,7 @@ fun LoginScreen(
         BasicDialog(
             title = stringResource(id = sharedR.string.recovery_key_error_title),
             description = stringResource(id = sharedR.string.recovery_key_error_description),
-            positiveButtonText = stringResource(id = R.string.general_ok),
+            positiveButtonText = stringResource(id = sharedR.string.general_ok),
             onPositiveButtonClicked = {
                 showIncorrectRkDialog = false
             }
@@ -177,7 +177,7 @@ fun LoginScreen(
                 if (recoveryKeyError != null) recoveryKeyError = null
             },
             errorText = recoveryKeyError,
-            positiveButtonText = stringResource(id = R.string.general_ok),
+            positiveButtonText = stringResource(id = sharedR.string.general_ok),
             onPositiveButtonClicked = {
                 val value = recoveryKeyInput.trim()
                 if (value.isEmpty()) {

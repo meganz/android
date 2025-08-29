@@ -11,6 +11,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.Confirmatio
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * The dialog to choose different options of mute push notification.
@@ -25,7 +26,7 @@ fun MutePushNotificationDialog(
     ConfirmationDialogWithRadioButtons(
         titleText = getTitle(isMeeting),
         subTitleText = "",
-        confirmButtonText = stringResource(id = R.string.general_ok),
+        confirmButtonText = stringResource(id = sharedResR.string.general_ok),
         cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         radioOptions = state,
         initialSelectedOption = null,

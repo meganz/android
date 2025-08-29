@@ -21,6 +21,7 @@ import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * This function shows TakeDown Dialog when clicked on node which is taken down
@@ -77,7 +78,7 @@ fun TakeDownDialog(
         confirmButton = {
             TextButton(onClick = onConfirm) {
                 Text(
-                    text = stringResource(R.string.general_ok),
+                    text = stringResource(sharedResR.string.general_ok),
                     color = MaterialTheme.colors.accent_900_accent_050
                 )
             }

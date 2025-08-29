@@ -79,7 +79,7 @@ import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionCameraUploadsButt
 import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionCloudDriveButtonEvent
 import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionFilterMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionScreenEvent
-
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -461,7 +461,7 @@ private fun MaxSelectionDialog(
                 onClick = onDialogDismissed,
             ) {
                 MegaText(
-                    text = stringResource(id = R.string.general_ok),
+                    text = stringResource(id = sharedResR.string.general_ok),
                     style = MaterialTheme.typography.button,
                     textColor = TextColor.Primary
                 )

@@ -21,6 +21,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericT
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun PasteMeetingLinkGuestDialog(
@@ -70,7 +71,7 @@ internal fun PasteMeetingLinkGuestDialog(
                 focusRequester.requestFocus()
             }
         },
-        confirmButtonText = stringResource(id = R.string.general_ok),
+        confirmButtonText = stringResource(id = sharedResR.string.general_ok),
         cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = onConfirm,
         onDismiss = onDismiss,

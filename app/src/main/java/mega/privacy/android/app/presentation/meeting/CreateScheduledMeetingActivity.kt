@@ -60,6 +60,7 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Activity which shows scheduled meeting info screen.
@@ -322,7 +323,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
             .setPositiveButtonText(
                 getString(
                     if (currentState.type == ScheduledMeetingType.Creation)
-                        R.string.general_ok
+                        sharedResR.string.general_ok
                     else
                         R.string.meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button
                 )
@@ -380,7 +381,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                 else
                     TimeFormat.CLOCK_12H
             )
-            .setPositiveButtonText(getString(R.string.general_ok))
+            .setPositiveButtonText(getString(sharedResR.string.general_ok))
             .setNegativeButtonText(getString(sharedR.string.general_dialog_cancel_button))
             .setTitleText(getString(R.string.meetings_schedule_meeting_enter_time_title_dialog))
             .build()

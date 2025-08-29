@@ -42,6 +42,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -130,7 +131,7 @@ private fun ZipBrowserAlertDialog(
     MegaAlertDialog(
         modifier = Modifier.testTag(ZIP_BROWSER_ALERT_DIALOG_TEST_TAG),
         text = stringResource(R.string.error_fail_to_open_file_general),
-        confirmButtonText = stringResource(R.string.general_ok),
+        confirmButtonText = stringResource(sharedResR.string.general_ok),
         cancelButtonText = null,
         onConfirm = onDialogDismiss,
         onDismiss = onDialogDismiss

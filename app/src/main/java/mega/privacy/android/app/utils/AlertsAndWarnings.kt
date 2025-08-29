@@ -19,6 +19,7 @@ import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.domain.entity.AccountType
 import timber.log.Timber
+import mega.privacy.android.shared.resources.R as sharedResR
 
 object AlertsAndWarnings {
     private const val REMOVE_LINK_DIALOG_TEXT_MARGIN_LEFT = 25
@@ -111,7 +112,7 @@ object AlertsAndWarnings {
     fun showForeignStorageOverQuotaWarningDialog(context: Context) {
         MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .setMessage(context.getString(R.string.warning_share_owner_storage_quota))
-            .setPositiveButton(context.getString(R.string.general_ok), null)
+            .setPositiveButton(context.getString(sharedResR.string.general_ok), null)
             .setCancelable(false)
             .create()
             .show()

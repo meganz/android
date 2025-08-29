@@ -115,6 +115,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * [BaseBottomSheetDialogFragment] used to display actions of a particular Node
@@ -1753,14 +1754,14 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      */
     private fun showCanNotVerifyContact(email: String?) {
         MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setTitle(getString(R.string.shared_items_contact_not_in_contact_list_dialog_title))
+            .setTitle(getString(sharedR.string.shared_items_contact_not_in_contact_list_dialog_title))
             .setMessage(
                 getString(
-                    R.string.shared_items_contact_not_in_contact_list_dialog_content,
+                    sharedR.string.shared_items_contact_not_in_contact_list_dialog_content,
                     email
                 )
             )
-            .setPositiveButton(getString(R.string.general_ok)) { dialogInterface: DialogInterface, _: Int -> dialogInterface.dismiss() }
+            .setPositiveButton(getString(sharedResR.string.general_ok)) { dialogInterface: DialogInterface, _: Int -> dialogInterface.dismiss() }
             .show()
     }
 

@@ -21,6 +21,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * A [Composable] to display the chat history retention time options in a dialog
@@ -70,7 +71,7 @@ internal fun ChatHistoryRetentionConfirmationDialog(
         confirmButtonText = if (isCustomOptionSelected) {
             stringResource(id = R.string.general_next)
         } else {
-            stringResource(id = R.string.general_ok)
+            stringResource(id = sharedResR.string.general_ok)
         },
         isConfirmButtonEnable = { isConfirmButtonEnable },
         onConfirmRequest = onConfirmClick,

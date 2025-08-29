@@ -7,12 +7,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun ParticipatingInACallDialog(onDismiss: () -> Unit = {}, onConfirm: () -> Unit = {}) {
     MegaAlertDialog(
         text = stringResource(id = R.string.ongoing_call_content),
-        confirmButtonText = stringResource(id = R.string.general_ok),
+        confirmButtonText = stringResource(id = sharedResR.string.general_ok),
         onDismiss = onDismiss,
         cancelButtonText = null,
         onConfirm = onConfirm,

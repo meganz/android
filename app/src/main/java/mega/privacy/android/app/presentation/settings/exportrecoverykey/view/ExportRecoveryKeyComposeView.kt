@@ -45,6 +45,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSe
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.io.File
+import mega.privacy.android.shared.resources.R as sharedResR
 
 private typealias ExportRecoveryAction = () -> Unit
 
@@ -125,7 +126,7 @@ fun ExportRecoveryKeyView(
         errorAlertMessage?.let { message ->
             MegaAlertDialog(
                 text = message,
-                confirmButtonText = stringResource(id = R.string.general_ok),
+                confirmButtonText = stringResource(id = sharedResR.string.general_ok),
                 cancelButtonText = null,
                 onConfirm = { errorAlertMessage = null },
                 onDismiss = { errorAlertMessage = null }

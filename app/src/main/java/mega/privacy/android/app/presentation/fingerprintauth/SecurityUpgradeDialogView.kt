@@ -33,6 +33,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.theme.body2
 import mega.privacy.android.shared.original.core.ui.theme.jade_300
 import mega.privacy.android.shared.original.core.ui.theme.subtitle1
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Security upgrade dialog body
@@ -120,7 +121,7 @@ fun SecurityUpgradeDialogView(
                         shape = RoundedCornerShape(8.dp),
                         content = {
                             Text(
-                                text = stringResource(id = R.string.general_ok),
+                                text = stringResource(id = sharedResR.string.general_ok),
                                 color = Color.White
                             )
                         },

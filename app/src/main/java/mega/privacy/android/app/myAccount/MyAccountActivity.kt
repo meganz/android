@@ -81,6 +81,7 @@ import nz.mega.sdk.MegaError.API_OK
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @AndroidEntryPoint
 internal class MyAccountActivity : PasscodeActivity(),
@@ -621,7 +622,7 @@ internal class MyAccountActivity : PasscodeActivity(),
                 )
             )
             setMessage(message)
-            setPositiveButton(getString(R.string.general_ok)) { dialog, _ ->
+            setPositiveButton(getString(sharedResR.string.general_ok)) { dialog, _ ->
                 viewModel.setCancelAccountDialogState(isVisible = true)
                 dialog.dismiss()
             }

@@ -111,6 +111,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Base activity which includes common behaviors for several activities.
@@ -660,7 +661,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     val snackbarTextView =
                         snackbarLayout.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                     snackbarTextView.maxLines = 5
-                    setAction(R.string.general_ok, SnackbarNavigateOption(view.context, type))
+                    setAction(sharedResR.string.general_ok, SnackbarNavigateOption(view.context, type))
                     show()
                 }
 
@@ -1043,7 +1044,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             return
         }
         val builder = MaterialAlertDialogBuilder(this)
-            .setPositiveButton(getString(R.string.general_ok), null)
+            .setPositiveButton(getString(sharedResR.string.general_ok), null)
         when (purchaseType) {
             PurchaseType.PENDING -> upgradeAlert =
                 builder.setTitle(getString(R.string.title_user_purchased_subscription))

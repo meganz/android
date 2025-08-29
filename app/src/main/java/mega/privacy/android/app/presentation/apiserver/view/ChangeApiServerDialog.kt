@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.apiserver.ApiServer
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Change api server dialog wit radio buttons for each available api server.
@@ -56,7 +57,7 @@ internal fun ChangeApiServerDialog(
     onOptionSelected = onOptionSelected,
     onDismissRequest = onDismissRequest,
     cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
-    confirmButtonText = stringResource(id = R.string.general_ok),
+    confirmButtonText = stringResource(id = sharedResR.string.general_ok),
     onConfirmRequest = onConfirmRequest,
     titleText = stringResource(id = R.string.title_change_server),
     subTitleText = stringResource(id = R.string.staging_api_url_text),

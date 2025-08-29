@@ -43,6 +43,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun ContactInfoListDialog(
@@ -120,7 +121,7 @@ internal fun ContactInfoListDialog(
                     )
                     TextMegaButton(
                         modifier = Modifier.testTag(OK_BUTTON_TAG),
-                        text = stringResource(id = R.string.general_ok),
+                        text = stringResource(id = sharedResR.string.general_ok),
                         onClick = { onConfirm(selectedContactInfo) },
                     )
                 }

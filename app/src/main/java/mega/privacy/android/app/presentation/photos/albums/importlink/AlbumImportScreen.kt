@@ -101,6 +101,7 @@ import mega.privacy.mobile.analytics.event.AlbumsStorageOverQuotaUpgradeAccountB
 import mega.privacy.mobile.analytics.event.ImportAlbumContentLoadedEvent
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
+import mega.privacy.android.shared.resources.R as sharedResR
 
 private typealias ImageDownloader = (
     isPreview: Boolean,
@@ -684,7 +685,7 @@ private fun ErrorAccessDialog(
                 onClick = onDismiss,
                 content = {
                     Text(
-                        text = stringResource(id = R.string.general_ok),
+                        text = stringResource(id = sharedResR.string.general_ok),
                         color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,

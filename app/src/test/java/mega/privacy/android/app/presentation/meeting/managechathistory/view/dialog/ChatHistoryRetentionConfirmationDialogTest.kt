@@ -26,6 +26,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.CONFIRMATIO
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @RunWith(AndroidJUnit4::class)
 class ChatHistoryRetentionConfirmationDialogTest {
@@ -58,7 +59,7 @@ class ChatHistoryRetentionConfirmationDialogTest {
                 onConfirmClick = { confirmOption = it }
             )
 
-            onNodeWithText(R.string.general_ok).performClick()
+            onNodeWithText(sharedResR.string.general_ok).performClick()
 
             assertThat(confirmOption).isEqualTo(currentOption)
         }
@@ -180,7 +181,7 @@ class ChatHistoryRetentionConfirmationDialogTest {
         composeRule.apply {
             setDialog(currentRetentionTime = DISABLED_RETENTION_TIME)
 
-            onNodeWithText(R.string.general_ok).assertIsDisplayed()
+            onNodeWithText(sharedResR.string.general_ok).assertIsDisplayed()
         }
     }
 

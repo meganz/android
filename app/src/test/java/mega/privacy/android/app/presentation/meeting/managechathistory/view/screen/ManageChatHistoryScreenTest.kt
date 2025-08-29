@@ -17,6 +17,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.model.ChatRoomUiState
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ChatHistoryRetentionOption
@@ -265,7 +266,7 @@ class ManageChatHistoryScreenTest {
             setScreen()
 
             selectARetentionTimeOption(ChatHistoryRetentionOption.Custom)
-            onNodeWithText(R.string.general_ok).performClick()
+            onNodeWithText(sharedResR.string.general_ok).performClick()
 
             onNodeWithTag(CUSTOM_TIME_PICKER_TAG).assertIsNotDisplayed()
         }

@@ -101,6 +101,7 @@ import java.io.FileOutputStream
 import java.io.OutputStream
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * View to render the QR code Screen, including toolbar, content, etc.
@@ -462,7 +463,7 @@ private fun InviteResultDialog(
     ConfirmationDialog(
         title = title,
         text = text,
-        confirmButtonText = stringResource(id = R.string.general_ok),
+        confirmButtonText = stringResource(id = sharedResR.string.general_ok),
         cancelButtonText = null,
         onConfirm = onInviteResultDialogDismiss,
         onDismiss = onInviteResultDialogDismiss

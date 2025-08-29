@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedResR
 
 class MeetingHasEndedDialogFragment(
     private val clickCallback: ClickCallback,
@@ -24,7 +25,7 @@ class MeetingHasEndedDialogFragment(
 
         if (isFromGuest) {
             builder.setMessage(getString(R.string.meeting_has_ended))
-                .setPositiveButton(R.string.general_ok, null)
+                .setPositiveButton(sharedResR.string.general_ok, null)
 
         } else {
             builder.setMessage(getString(R.string.meeting_has_ended))

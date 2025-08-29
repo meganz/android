@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.model.rememberListGridNavigationState
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Composable view for Outgoing Shares
@@ -109,12 +110,12 @@ fun OutgoingSharesView(
 
     if (uiState.verifyContactDialog != null) {
         MegaAlertDialog(
-            title = stringResource(id = R.string.shared_items_contact_not_in_contact_list_dialog_title),
+            title = stringResource(id = sharedResR.string.shared_items_contact_not_in_contact_list_dialog_title),
             text = stringResource(
-                id = R.string.shared_items_contact_not_in_contact_list_dialog_content,
+                id = sharedResR.string.shared_items_contact_not_in_contact_list_dialog_content,
                 uiState.verifyContactDialog
             ),
-            confirmButtonText = stringResource(id = R.string.general_ok),
+            confirmButtonText = stringResource(id = sharedResR.string.general_ok),
             cancelButtonText = null,
             onConfirm = onVerifyContactDialogDismissed,
             onDismiss = onVerifyContactDialogDismissed

@@ -15,6 +15,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Dialog to show when a node is taken down
@@ -61,7 +62,7 @@ fun TakeDownDialog(
                 megaNavigator.openTakedownPolicyLink(context)
             }
         ),
-        positiveButtonText = stringResource(R.string.general_ok),
+        positiveButtonText = stringResource(sharedResR.string.general_ok),
         onPositiveButtonClicked = onDismiss,
         negativeButtonText = stringResource(R.string.dispute_takendown_file),
         onNegativeButtonClicked = {

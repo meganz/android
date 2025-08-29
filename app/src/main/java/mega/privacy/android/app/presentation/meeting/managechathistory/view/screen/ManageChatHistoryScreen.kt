@@ -63,6 +63,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.util.Locale
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -359,7 +360,7 @@ private fun ColumnScope.CustomRetentionTimePicker(
 
     TextMegaButton(
         modifier = Modifier.align(Alignment.End),
-        text = stringResource(id = R.string.general_ok),
+        text = stringResource(id = sharedResR.string.general_ok),
         onClick = onOKClick
     )
 

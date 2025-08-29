@@ -35,6 +35,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Activity which shows occurrences of recurring meeting.
@@ -234,7 +235,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
                     )
                     .setHour(localTime.hour)
                     .setMinute(localTime.minute)
-                    .setPositiveButtonText(getString(R.string.general_ok))
+                    .setPositiveButtonText(getString(sharedResR.string.general_ok))
                     .setNegativeButtonText(getString(sharedR.string.general_dialog_cancel_button))
                     .setTitleText(getString(R.string.meetings_schedule_meeting_enter_time_title_dialog))
                     .build()

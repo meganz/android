@@ -15,6 +15,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * A [Composable] Dialog that allows the User to input a new maximum aggregate Video Size that can
@@ -43,7 +44,7 @@ internal fun VideoCompressionSizeInputDialog(
         }),
         keyboardType = KeyboardType.Number,
         hint = stringResource(R.string.label_mega_byte),
-        confirmButtonText = stringResource(R.string.general_ok),
+        confirmButtonText = stringResource(sharedResR.string.general_ok),
         cancelButtonText = stringResource(android.R.string.cancel),
         text = input,
         onInputChange = { input = it },
