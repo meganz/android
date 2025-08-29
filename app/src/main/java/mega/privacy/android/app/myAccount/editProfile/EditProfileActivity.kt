@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import coil3.load
+import coil3.request.addLastModifiedToFileCacheKey
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -520,7 +521,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
      * load avatar and color
      */
     private fun setUpAvatar(avatarFile: File?, color: Int) {
-        binding.headerLayout.toolbarImage.load(avatarFile)
+        binding.headerLayout.toolbarImage.load(avatarFile) {
+            addLastModifiedToFileCacheKey(true)
+        }
         binding.headerLayout.imageLayout.setBackgroundColor(color)
     }
 

@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -31,6 +32,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.addLastModifiedToFileCacheKey
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.model.EmojiAvatarContent
@@ -161,7 +164,10 @@ fun PhotoAvatar(
                         )
                     } else this
                 },
-            model = content.path,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(content.path)
+                .addLastModifiedToFileCacheKey(true)
+                .build(),
             contentDescription = "Photo Avatar"
         )
     }
