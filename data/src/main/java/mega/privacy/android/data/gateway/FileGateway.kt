@@ -432,7 +432,7 @@ interface FileGateway {
      * @param fileNameToFind the name of the file to find
      * @return the file if found, null otherwise
      */
-    suspend fun findFileInDirectory(directoryPath: String, fileNameToFind: String): File?
+    suspend fun findFileInDirectory(directoryPath: UriPath, fileNameToFind: String): DocumentFile?
 
     /**
      * Check if the path is malformed from an external app

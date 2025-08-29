@@ -1,27 +1,34 @@
 package mega.privacy.android.feature.sync.data.repository
 
+import android.net.Uri
+import androidx.documentfile.provider.DocumentFile
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.wrapper.DocumentFileWrapper
+import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.sync.data.gateway.SyncDebrisGateway
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncDebris
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.io.TempDir
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.reset
+import org.mockito.Mockito.mockStatic
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -30,51 +37,85 @@ internal class SyncDebrisRepositoryImplTest {
     private lateinit var underTest: SyncDebrisRepositoryImpl
     private val fileGateway: FileGateway = mock()
     private val syncDebrisGateway: SyncDebrisGateway = mock()
+    private val documentFileWrapper: DocumentFileWrapper = mock()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
-    @TempDir
-    lateinit var temporaryFolderOne: File
+    private val uriMockStatic = mockStatic(Uri::class.java)
 
-    @TempDir
-    lateinit var temporaryFolderTwo: File
+    @AfterAll
+    fun tearDownClass() {
+        uriMockStatic.close()
+    }
 
     @BeforeEach
     fun setUp() {
         underTest = SyncDebrisRepositoryImpl(
             fileGateway,
             syncDebrisGateway,
-            ioDispatcher
+            ioDispatcher,
+            documentFileWrapper
         )
     }
 
     @AfterEach
     fun tearDown() {
-        reset(fileGateway)
+        reset(fileGateway, syncDebrisGateway, documentFileWrapper)
     }
 
     @Test
     fun `test that repository deletes all debris`() = runTest {
+        val debrisPath1 =
+            "content://com.android.externalstorage.documents/tree/primary%3ASync%2Ffolder1%2F.debris"
+        val debrisPath2 =
+            "content://com.android.externalstorage.documents/tree/primary%3ASync%2Ffolder2%2F.debris"
+
         val debris = listOf(
-            SyncDebris(123L, "path1", 1000L),
-            SyncDebris(345L, "path2", 2000L)
+            SyncDebris(123L, UriPath(debrisPath1), 1000L),
+            SyncDebris(345L, UriPath(debrisPath2), 2000L)
         )
+
+        val uri1 = mock<Uri>()
+        val uri2 = mock<Uri>()
+        val documentFile1 = mock<DocumentFile> {
+            on { uri } doReturn uri1
+            on { delete() } doReturn true
+        }
+        val documentFile2 = mock<DocumentFile> {
+            on { uri } doReturn uri2
+            on { delete() } doReturn true
+        }
+
         whenever(syncDebrisGateway.get()).thenReturn(debris)
+        whenever(documentFileWrapper.getDocumentFileForSyncContentUri(debrisPath1)).thenReturn(
+            documentFile1
+        )
+        whenever(documentFileWrapper.getDocumentFileForSyncContentUri(debrisPath2)).thenReturn(
+            documentFile2
+        )
 
         underTest.clear()
 
-        verify(fileGateway).deleteDirectory("path1")
-        verify(fileGateway).deleteDirectory("path2")
+        verify(documentFile1).delete()
+        verify(documentFile2).delete()
         verify(syncDebrisGateway).set(emptyList())
     }
 
     @Test
     fun `test that repository extracts debris folder for each sync`() = runTest {
+        val localFolderPath1 = "content://com.android.externalstorage.documents/tree/primary%3ASync"
+        val localFolderPath2 =
+            "content://com.android.externalstorage.documents/tree/primary%3AAnothersync"
+        val debrisPath1 =
+            "content://com.android.externalstorage.documents/tree/primary%3ASync%2F.debris"
+        val debrisPath2 =
+            "content://com.android.externalstorage.documents/tree/primary%3AAnothersync%2F.debris"
+
         val syncs = listOf(
             FolderPair(
                 id = 123L,
                 syncType = SyncType.TYPE_TWOWAY,
                 pairName = "",
-                localFolderPath = "storage/emulated/0/sync",
+                localFolderPath = localFolderPath1,
                 remoteFolder = RemoteFolder(id = NodeId(12L), name = "some folder"),
                 syncStatus = SyncStatus.SYNCED
             ),
@@ -82,24 +123,64 @@ internal class SyncDebrisRepositoryImplTest {
                 id = 345L,
                 syncType = SyncType.TYPE_TWOWAY,
                 pairName = "",
-                localFolderPath = "storage/emulated/0/anothersync",
+                localFolderPath = localFolderPath2,
                 remoteFolder = RemoteFolder(id = NodeId(434L), name = "some other folder"),
                 syncStatus = SyncStatus.SYNCED
             ),
         )
+
+        val uri1 = mock<Uri> {
+            on { toString() } doReturn debrisPath1
+        }
+        val uri2 = mock<Uri> {
+            on { toString() } doReturn debrisPath2
+        }
+        val debrisFolder1 = mock<DocumentFile> {
+            on { uri } doReturn uri1
+        }
+        val debrisFolder2 = mock<DocumentFile> {
+            on { uri } doReturn uri2
+        }
+
+        val documentEntity1 = mock<DocumentEntity> {
+            on { size } doReturn 400L
+        }
+        val documentEntity2 = mock<DocumentEntity> {
+            on { size } doReturn 600L
+        }
+        val documentEntity3 = mock<DocumentEntity> {
+            on { size } doReturn 800L
+        }
+        val documentEntity4 = mock<DocumentEntity> {
+            on { size } doReturn 1200L
+        }
+
+        val documentFolder1 = DocumentFolder(listOf(documentEntity1, documentEntity2))
+        val documentFolder2 = DocumentFolder(listOf(documentEntity3, documentEntity4))
+
         whenever(
-            fileGateway.findFileInDirectory(syncs[0].localFolderPath, ".debris")
-        ).thenReturn(temporaryFolderOne)
+            fileGateway.findFileInDirectory(UriPath(localFolderPath1), ".debris")
+        ).thenReturn(debrisFolder1)
         whenever(
-            fileGateway.findFileInDirectory(syncs[1].localFolderPath, ".debris")
-        ).thenReturn(temporaryFolderTwo)
-        whenever(fileGateway.getTotalSize(temporaryFolderOne)).thenReturn(1000L)
-        whenever(fileGateway.getTotalSize(temporaryFolderTwo)).thenReturn(2000L)
+            fileGateway.findFileInDirectory(UriPath(localFolderPath2), ".debris")
+        ).thenReturn(debrisFolder2)
+        whenever(fileGateway.getFilesInDocumentFolder(UriPath(debrisPath1))).thenReturn(
+            documentFolder1
+        )
+        whenever(fileGateway.getFilesInDocumentFolder(UriPath(debrisPath2))).thenReturn(
+            documentFolder2
+        )
+
         val expected = listOf(
             SyncDebris(
-                syncId = 123L, path = temporaryFolderOne.absolutePath, sizeInBytes = 1000L
-            ), SyncDebris(
-                syncId = 345L, path = temporaryFolderTwo.absolutePath, sizeInBytes = 2000L
+                syncId = 123L,
+                path = UriPath(debrisPath1),
+                sizeInBytes = 1000L
+            ),
+            SyncDebris(
+                syncId = 345L,
+                path = UriPath(debrisPath2),
+                sizeInBytes = 2000L
             )
         )
 

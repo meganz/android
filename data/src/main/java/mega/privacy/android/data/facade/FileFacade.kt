@@ -748,8 +748,12 @@ internal class FileFacade @Inject constructor(
         return fileName
     }
 
-    override suspend fun findFileInDirectory(directoryPath: String, fileNameToFind: String): File? =
-        File(directoryPath).listFiles()?.toList()?.find { it.name == fileNameToFind }
+    override suspend fun findFileInDirectory(
+        directoryPath: UriPath,
+        fileNameToFind: String,
+    ): DocumentFile? =
+        documentFileWrapper.getDocumentFileForSyncContentUri(directoryPath.value)?.listFiles()
+            ?.toList()?.find { it.name == fileNameToFind }
 
     override fun isPathInsecure(path: String): Boolean = path.contains("../")
             || path.contains(APP_PRIVATE_DIR1)
