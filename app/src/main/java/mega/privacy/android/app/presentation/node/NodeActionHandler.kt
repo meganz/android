@@ -23,6 +23,8 @@ import mega.privacy.android.app.presentation.node.model.menuaction.RestoreMenuAc
 import mega.privacy.android.app.presentation.node.model.menuaction.SelectAllMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.UnhideDropdownMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.UnhideMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -119,7 +121,7 @@ class NodeActionHandler(
         (activity as? AppCompatActivity)?.registerForActivityResult(
             HiddenNodeOnboardingActivityContract()
         ) { result ->
-            nodeActionsViewModel.handleHiddenNodesOnboardingResult(result)
+            nodeActionsViewModel.handleHiddenNodesOnboardingResult(result, true)
         }
 
     /**
@@ -143,11 +145,23 @@ class NodeActionHandler(
                 withStartMessage = false
             )
 
-            is HideMenuAction -> {
-                (activity as? AppCompatActivity)?.lifecycleScope?.launch {
-                    hiddenNodesOnboardingLauncher?.launch(nodeActionsViewModel.isOnboarding())
+            is HideMenuAction -> (activity as? AppCompatActivity)?.lifecycleScope?.launch {
+                val isHiddenNodesOnboarded = nodeActionsViewModel.isHiddenNodesOnboarded()
+                val isOnboarding = nodeActionsViewModel.isOnboarding()
+                if (isOnboarding && isHiddenNodesOnboarded) {
+                    nodeActionsViewModel.handleHiddenNodesOnboardingResult(
+                        isOnboarded = true,
+                        isHidden = true
+                    )
+                } else {
+                    hiddenNodesOnboardingLauncher?.launch(isOnboarding)
                 }
             }
+
+            is UnhideMenuAction -> nodeActionsViewModel.handleHiddenNodesOnboardingResult(
+                isOnboarded = true,
+                isHidden = false
+            )
 
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }
@@ -201,11 +215,23 @@ class NodeActionHandler(
                 restoreFromRubbishLauncher?.launch(nodeHandleArray)
             }
 
-            is HideDropdownMenuAction -> {
-                (activity as? AppCompatActivity)?.lifecycleScope?.launch {
-                    hiddenNodesOnboardingLauncher?.launch(nodeActionsViewModel.isOnboarding())
+            is HideDropdownMenuAction -> (activity as? AppCompatActivity)?.lifecycleScope?.launch {
+                val isHiddenNodesOnboarded = nodeActionsViewModel.isHiddenNodesOnboarded()
+                val isOnboarding = nodeActionsViewModel.isOnboarding()
+                if (isOnboarding && isHiddenNodesOnboarded) {
+                    nodeActionsViewModel.handleHiddenNodesOnboardingResult(
+                        isOnboarded = true,
+                        isHidden = true
+                    )
+                } else {
+                    hiddenNodesOnboardingLauncher?.launch(isOnboarding)
                 }
             }
+
+            is UnhideDropdownMenuAction -> nodeActionsViewModel.handleHiddenNodesOnboardingResult(
+                isOnboarded = true,
+                isHidden = false
+            )
 
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }

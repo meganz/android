@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.node
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
@@ -39,9 +38,11 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
@@ -56,16 +57,20 @@ import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -107,6 +112,7 @@ class NodeActionsViewModelTest {
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
+    private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
 
     private fun initViewModel() {
         viewModel = NodeActionsViewModel(
@@ -133,6 +139,41 @@ class NodeActionsViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             fileTypeInfoMapper = fileTypeInfoMapper,
+            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase
+        )
+    }
+
+    @BeforeEach
+    fun setUp() {
+        initViewModel()
+    }
+
+    @AfterEach
+    fun resetMock() {
+        reset(
+            checkNodesNameCollisionUseCase,
+            moveNodesUseCase,
+            copyNodesUseCase,
+            setMoveLatestTargetPathUseCase,
+            setCopyLatestTargetPathUseCase,
+            deleteNodeVersionsUseCase,
+            nodeMoveRequestMessageMapper,
+            nodeVersionHistoryRemoveMessageMapper,
+            snackBarHandler,
+            checkBackupNodeTypeUseCase,
+            attachMultipleNodesUseCase,
+            nodeSendToChatMessageMapper,
+            listToStringWithDelimitersMapper,
+            getNodeContentUriUseCase,
+            nodeContentUriIntentMapper,
+            getPathFromNodeContentUseCase,
+            getNodePreviewFileUseCase,
+            updateNodeSensitiveUseCase,
+            get1On1ChatIdUseCase,
+            monitorAccountDetailUseCase,
+            getBusinessStatusUseCase,
+            fileTypeInfoMapper,
+            isHiddenNodesOnboardedUseCase
         )
     }
 
@@ -145,8 +186,7 @@ class NodeActionsViewModelTest {
             verify(moveNodesUseCase).invoke(emptyMap())
             viewModel.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.showForeignNodeDialog)
-                    .isInstanceOf(StateEvent.Triggered::class.java)
+                assertThat(state.showForeignNodeDialog).isInstanceOf(StateEvent.Triggered::class.java)
             }
         }
 
@@ -172,14 +212,14 @@ class NodeActionsViewModelTest {
         )
         viewModel.state.test {
             val stateOne = awaitItem()
-            Truth.assertThat(stateOne.nodeNameCollisionsResult).isInstanceOf(
+            assertThat(stateOne.nodeNameCollisionsResult).isInstanceOf(
                 StateEventWithContentTriggered::class.java
             )
         }
         viewModel.markHandleNodeNameCollisionResult()
         viewModel.state.test {
             val stateTwo = awaitItem()
-            Truth.assertThat(stateTwo.nodeNameCollisionsResult).isInstanceOf(
+            assertThat(stateTwo.nodeNameCollisionsResult).isInstanceOf(
                 StateEventWithContentConsumed::class.java
             )
         }
@@ -215,8 +255,7 @@ class NodeActionsViewModelTest {
             verify(copyNodesUseCase).invoke(emptyMap())
             viewModel.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.showForeignNodeDialog)
-                    .isInstanceOf(StateEvent.Triggered::class.java)
+                assertThat(state.showForeignNodeDialog).isInstanceOf(StateEvent.Triggered::class.java)
             }
         }
 
@@ -239,8 +278,7 @@ class NodeActionsViewModelTest {
             )
             viewModel.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.contactsData)
-                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+                assertThat(state.contactsData).isInstanceOf(StateEventWithContentConsumed::class.java)
             }
         }
 
@@ -317,7 +355,7 @@ class NodeActionsViewModelTest {
                     verify(getNodePreviewFileUseCase).invoke(node)
                 }
             }
-            Truth.assertThat(actual).isInstanceOf(expected::class.java)
+            assertThat(actual).isInstanceOf(expected::class.java)
         }
 
     @Test
@@ -334,7 +372,7 @@ class NodeActionsViewModelTest {
         whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
         initViewModel()
         val result = viewModel.isOnboarding()
-        Truth.assertThat(result).isTrue()
+        assertThat(result).isTrue()
     }
 
     @Test
@@ -351,7 +389,7 @@ class NodeActionsViewModelTest {
         whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
         initViewModel()
         val result = viewModel.isOnboarding()
-        Truth.assertThat(result).isFalse()
+        assertThat(result).isFalse()
     }
 
     @Test
@@ -365,7 +403,7 @@ class NodeActionsViewModelTest {
         whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
         initViewModel()
         val result = viewModel.isOnboarding()
-        Truth.assertThat(result).isFalse()
+        assertThat(result).isFalse()
     }
 
     @Test
@@ -376,7 +414,7 @@ class NodeActionsViewModelTest {
         whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
         initViewModel()
         val result = viewModel.isOnboarding()
-        Truth.assertThat(result).isFalse()
+        assertThat(result).isFalse()
     }
 
     private fun provideNodeType() = Stream.of(
@@ -462,6 +500,114 @@ class NodeActionsViewModelTest {
         whenever(fileTypeInfoMapper(file.name)) doReturn expected
         val actual = viewModel.getTypeInfo(file)
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that handleHiddenNodesOnboardingResult updates node sensitivity when onboarded and hidden`() =
+        runTest {
+            val mockNode = mock<TypedNode> {
+                on { id } doReturn NodeId(123L)
+            }
+            val selectedNodes = listOf(mockNode)
+
+            viewModel.updateSelectedNodes(selectedNodes)
+            viewModel.handleHiddenNodesOnboardingResult(isOnboarded = true, isHidden = true)
+
+            verify(updateNodeSensitiveUseCase).invoke(NodeId(123L), true)
+
+            viewModel.state.test {
+                val state = awaitItem()
+                assertThat(state.infoToShowEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that handleHiddenNodesOnboardingResult updates node sensitivity when onboarded and unhidden`() =
+        runTest {
+            val mockNode = mock<TypedNode> {
+                on { id } doReturn NodeId(456L)
+            }
+            val selectedNodes = listOf(mockNode)
+
+            viewModel.updateSelectedNodes(selectedNodes)
+            viewModel.handleHiddenNodesOnboardingResult(isOnboarded = true, isHidden = false)
+
+            verify(updateNodeSensitiveUseCase).invoke(NodeId(456L), false)
+
+            viewModel.state.test {
+                val state = awaitItem()
+                assertThat(state.infoToShowEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that handleHiddenNodesOnboardingResult does not update node sensitivity when not onboarded`() =
+        runTest {
+            val mockNode = mock<TypedNode> {
+                on { id } doReturn NodeId(789L)
+            }
+            val selectedNodes = listOf(mockNode)
+
+            viewModel.updateSelectedNodes(selectedNodes)
+            viewModel.handleHiddenNodesOnboardingResult(isOnboarded = false, isHidden = true)
+
+            verifyNoMoreInteractions(updateNodeSensitiveUseCase)
+
+            viewModel.state.test {
+                val state = awaitItem()
+                assertThat(state.infoToShowEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that handleHiddenNodesOnboardingResult handles multiple selected nodes`() = runTest {
+        val mockNode1 = mock<TypedNode> {
+            on { id } doReturn NodeId(111L)
+        }
+        val mockNode2 = mock<TypedNode> {
+            on { id } doReturn NodeId(222L)
+        }
+        val selectedNodes = listOf(mockNode1, mockNode2)
+
+        viewModel.updateSelectedNodes(selectedNodes)
+        viewModel.handleHiddenNodesOnboardingResult(isOnboarded = true, isHidden = true)
+
+        verify(updateNodeSensitiveUseCase).invoke(NodeId(111L), true)
+        verify(updateNodeSensitiveUseCase).invoke(NodeId(222L), true)
+
+        viewModel.state.test {
+            val state = awaitItem()
+            assertThat(state.infoToShowEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that handleHiddenNodesOnboardingResult handles empty selected nodes`() = runTest {
+        viewModel.updateSelectedNodes(emptyList())
+        viewModel.handleHiddenNodesOnboardingResult(isOnboarded = true, isHidden = true)
+
+        verifyNoMoreInteractions(updateNodeSensitiveUseCase)
+
+        viewModel.state.test {
+            val state = awaitItem()
+            assertThat(state.infoToShowEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test isHiddenNodesOnboarded returns expected result`(expected: Boolean) = runTest {
+        whenever(isHiddenNodesOnboardedUseCase()).thenReturn(expected)
+
+        val result = viewModel.isHiddenNodesOnboarded()
+
+        assertThat(result).isEqualTo(expected)
+        verify(isHiddenNodesOnboardedUseCase).invoke()
     }
 }
 

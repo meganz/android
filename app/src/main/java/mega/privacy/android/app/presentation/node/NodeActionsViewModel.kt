@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.node.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
@@ -104,6 +106,7 @@ class NodeActionsViewModel @Inject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -251,8 +254,8 @@ class NodeActionsViewModel @Inject constructor(
             val isFromBackups = state.value.selectedNodes.find {
                 runCatching {
                     checkBackupNodeTypeUseCase(it) != BackupNodeType.NonBackupNode
-                }.getOrElse {
-                    Timber.e(it)
+                }.getOrElse { error ->
+                    Timber.e(error)
                     false
                 }
             }
@@ -527,23 +530,29 @@ class NodeActionsViewModel @Inject constructor(
         nodeContentUriIntentMapper(intent, content, mimeType, isSupported)
     }
 
-    fun handleHiddenNodesOnboardingResult(isOnboarded: Boolean) {
+    fun handleHiddenNodesOnboardingResult(isOnboarded: Boolean, isHidden: Boolean) {
         viewModelScope.launch {
             runCatching {
                 if (isOnboarded) {
                     val selectedNodes = _state.value.selectedNodes
 
-                    selectedNodes.forEach {
-                        updateNodeSensitiveUseCase(
-                            nodeId = it.id,
-                            isSensitive = true,
-                        )
+                    selectedNodes.forEach { node ->
+                        runCatching {
+                            updateNodeSensitiveUseCase(nodeId = node.id, isSensitive = isHidden)
+                        }.onFailure {
+                            Timber.e(it, "Failed to update node sensitive state for ${node.id}")
+                        }
                     }
                     _state.update { state ->
                         state.copy(
                             infoToShowEvent = triggered(
                                 InfoToShow.QuantityString(
-                                    stringId = R.plurals.hidden_nodes_result_message,
+                                    stringId =
+                                        if (isHidden) {
+                                            R.plurals.hidden_nodes_result_message
+                                        } else {
+                                            sharedR.plurals.unhidden_nodes_result_message
+                                        },
                                     count = selectedNodes.size,
                                 )
                             )
@@ -559,12 +568,18 @@ class NodeActionsViewModel @Inject constructor(
             monitorAccountDetailUseCase().first().levelDetail?.accountType
         val isPaid = accountType?.isPaid ?: false
         val businessStatus =
-            if (isPaid && accountType?.isBusinessAccount == true) {
+            if (isPaid && accountType.isBusinessAccount) {
                 getBusinessStatusUseCase()
-            } else null
+            } else {
+                null
+            }
         val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
         return isPaid && !isBusinessAccountExpired
     }
+
+    suspend fun isHiddenNodesOnboarded(): Boolean = runCatching {
+        isHiddenNodesOnboardedUseCase()
+    }.getOrDefault(false)
 
     /**
      * return the file type of the given file

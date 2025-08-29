@@ -11,7 +11,6 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
@@ -27,7 +26,6 @@ class UnhideDropdownMenuItem @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : NodeToolbarMenuItem<MenuAction> {
 
@@ -45,11 +43,23 @@ class UnhideDropdownMenuItem @Inject constructor(
         val isHiddenNodesEnabled = isHiddenNodesActive()
         if (!isHiddenNodesEnabled) return false
 
-        val isPaid = monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
-        val isBusinessAccountExpired = getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+        val isPaid = runCatching {
+            monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
+        }.getOrDefault(false)
+
+        val isBusinessAccountExpired = runCatching {
+            getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+        }.getOrDefault(false)
+
         if (!isPaid || isBusinessAccountExpired) return false
 
-        if (selectedNodes.any { !isHidingActionAllowedUseCase(it.id) }) return false
+        val hasNotAllowedNode = selectedNodes.any { node ->
+            runCatching { !isHidingActionAllowedUseCase(node.id) }.getOrDefault(true)
+        }
+
+        if (hasNotAllowedNode) {
+            return false
+        }
 
         return selectedNodes.all { it.isMarkedSensitive } && selectedNodes.none { it.isSensitiveInherited }
     }
@@ -62,9 +72,7 @@ class UnhideDropdownMenuItem @Inject constructor(
         parentScope: CoroutineScope,
     ): () -> Unit = {
         parentScope.launch {
-            selectedNodes.forEach {
-                updateNodeSensitiveUseCase(it.id, false)
-            }
+            actionHandler(menuAction, selectedNodes)
         }
         onDismiss()
     }

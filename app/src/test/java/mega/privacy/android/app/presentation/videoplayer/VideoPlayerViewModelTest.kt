@@ -15,6 +15,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -922,6 +923,8 @@ class VideoPlayerViewModelTest {
     fun `test that state is updated correctly when launch source is VIDEO_BROWSE_ADAPTER`() =
         runTest {
             val intent = mock<Intent>()
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
             testStateIsUpdatedCorrectlyByLaunchSource(
                 intent = intent,
                 launchSource = VIDEO_BROWSE_ADAPTER
@@ -935,6 +938,8 @@ class VideoPlayerViewModelTest {
     fun `test that state is updated correctly with node handles`(launchSource: Int) =
         runTest {
             val intent = mock<Intent>()
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
             whenever(intent.getLongArrayExtra(any())).thenReturn(longArrayOf(1, 2, 3))
             testStateIsUpdatedCorrectlyByLaunchSource(
                 intent = intent,
@@ -956,6 +961,8 @@ class VideoPlayerViewModelTest {
             val testParentNode = mock<FileNode> {
                 on { name }.thenReturn(testTitle)
             }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
             whenever(
                 intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
             ).thenReturn(parentHandle)
@@ -1080,6 +1087,8 @@ class VideoPlayerViewModelTest {
     fun `test that state is updated correctly when launch source is SEARCH_BY_ADAPTER`() =
         runTest {
             val intent = mock<Intent>()
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
             whenever(intent.getStringExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE)).thenReturn(testTitle)
             whenever(intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)).thenReturn(
                 longArrayOf(1, 2, 3)
@@ -1096,6 +1105,8 @@ class VideoPlayerViewModelTest {
     fun `test that state is updated correctly when launch source is CONTACT_FILE_ADAPTER and parentHandle is INVALID_HANDLE`() =
         runTest {
             val intent = mock<Intent>()
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
             whenever(intent.getStringExtra(INTENT_EXTRA_KEY_CONTACT_EMAIL)).thenReturn("email")
             whenever(getUserNameByEmailUseCase(any())).thenReturn(testTitle)
             initTestDataByParentNode(intent, INVALID_HANDLE) {
@@ -1120,6 +1131,8 @@ class VideoPlayerViewModelTest {
         getVideoNodes: suspend () -> List<TypedVideoNode>?,
     ) = runTest {
         val intent = mock<Intent>()
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
         initTestDataByParentNode(intent, parentHandle) {
             initParentNode()
         }

@@ -41,6 +41,7 @@ import mega.privacy.android.app.main.IncomingSharesExplorerFragment
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.Companion.ITEM_VIEW_TYPE_GRID
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.Companion.ITEM_VIEW_TYPE_HEADER
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.Companion.ITEM_VIEW_TYPE_LIST
+import mega.privacy.android.app.utils.BlurTransformation
 import mega.privacy.android.app.utils.Constants.ICON_MARGIN_DP
 import mega.privacy.android.app.utils.Constants.ICON_SIZE_DP
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
@@ -547,10 +548,10 @@ class MegaExplorerAdapter(
          */
         fun bind(position: Int, node: MegaNode) {
             with(binding) {
-                itemView.alpha = 0.5f.takeIf {
+                val isHiddenNode =
                     !node.isInShare && accountDetail?.levelDetail?.accountType?.isPaid == true &&
                             (node.isMarkedSensitive || megaApi.isSensitiveInherited(node))
-                } ?: 1f
+                itemView.alpha = 0.5f.takeIf { isHiddenNode } ?: 1f
                 imageView = binding.fileExplorerThumbnail
                 itemView.setOnClickListener(null)
                 itemView.setOnLongClickListener(null)
@@ -568,12 +569,11 @@ class MegaExplorerAdapter(
                     binding.fileExplorerFilename.setOnClickListener { itemView.performClick() }
                     binding.fileExplorerPermissions.isVisible = false
                     binding.fileExplorerFilesize.text = getMegaNodeFolderInfo(node, context)
-                    imageView.setImageResource(
-                        getFolderIcon(
-                            node,
-                            DrawerItem.CLOUD_DRIVE
-                        )
-                    )
+                    imageView.load(getFolderIcon(node, DrawerItem.CLOUD_DRIVE)) {
+                        if (isHiddenNode) {
+                            transformations(BlurTransformation(context, radius = 16f))
+                        }
+                    }
 
                     if (node.isInShare) {
                         if (context.resources.configuration.orientation == ORIENTATION_LANDSCAPE) {
@@ -647,9 +647,14 @@ class MegaExplorerAdapter(
                         ) {
                             crossfade(false)
                             transformations(
-                                RoundedCornersTransformation(
-                                    dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
-                                )
+                                buildList {
+                                    add(
+                                        RoundedCornersTransformation(dp2px(THUMB_CORNER_RADIUS_DP).toFloat())
+                                    )
+                                    if (isHiddenNode) {
+                                        add(BlurTransformation(context, radius = 16f))
+                                    }
+                                }
                             )
                             listener(
                                 onSuccess = { _, _ ->

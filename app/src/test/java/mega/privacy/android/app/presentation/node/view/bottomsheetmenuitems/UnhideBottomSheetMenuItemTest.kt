@@ -12,7 +12,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
@@ -33,7 +32,6 @@ class UnhideBottomSheetMenuItemTest {
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
-    private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val accountType = mock<AccountType> {
         on { isPaid } doReturn true
@@ -52,7 +50,6 @@ class UnhideBottomSheetMenuItemTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }

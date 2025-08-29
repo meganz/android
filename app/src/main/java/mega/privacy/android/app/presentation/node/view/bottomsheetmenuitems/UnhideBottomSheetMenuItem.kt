@@ -12,11 +12,9 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -29,7 +27,6 @@ class UnhideBottomSheetMenuItem @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
@@ -43,9 +40,15 @@ class UnhideBottomSheetMenuItem @Inject constructor(
         if (!isHiddenNodesEnabled) return false
         if (isNodeInRubbish || accessPermission != AccessPermission.OWNER || node.isTakenDown)
             return false
-        val isPaid =
+
+        val isPaid = runCatching {
             monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
-        val isBusinessAccountExpired = getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+        }.getOrDefault(false)
+
+        val isBusinessAccountExpired = runCatching {
+            getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+        }.getOrDefault(false)
+
         if (!isPaid || isBusinessAccountExpired)
             return false
 
@@ -60,9 +63,7 @@ class UnhideBottomSheetMenuItem @Inject constructor(
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         parentCoroutineScope.launch {
-            runCatching {
-                updateNodeSensitiveUseCase(node.id, false)
-            }.onFailure { Timber.e(it) }
+            actionHandler(menuAction, node)
         }
         onDismiss()
     }

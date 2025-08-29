@@ -12,25 +12,23 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.node.model.menuaction.HideMenuAction
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
-import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.android.core.ui.model.menu.MenuAction
-import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_070
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_070
 import mega.privacy.mobile.analytics.event.HideNodeMenuItemEvent
@@ -46,8 +44,6 @@ class HideBottomSheetMenuItem @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
-    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     private var isPaid: Boolean = false
@@ -104,11 +100,21 @@ class HideBottomSheetMenuItem @Inject constructor(
         if (isNodeInRubbish || accessPermission != AccessPermission.OWNER || node.isTakenDown || isInBackups)
             return false
 
-        if (!isHidingActionAllowedUseCase(node.id))
+        val hasNotAllowedNode =
+            runCatching { !isHidingActionAllowedUseCase(node.id) }.getOrDefault(true)
+
+        if (hasNotAllowedNode) {
             return false
-        this.isPaid =
+        }
+
+        val isPaid = runCatching {
             monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
-        this.isBusinessAccountExpired = getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+        }.getOrDefault(false)
+
+        val isBusinessAccountExpired = runCatching {
+            getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+        }.getOrDefault(false)
+
         if (!isPaid || isBusinessAccountExpired)
             return true
 
@@ -124,14 +130,7 @@ class HideBottomSheetMenuItem @Inject constructor(
     ): () -> Unit = {
         parentCoroutineScope.launch {
             Analytics.tracker.trackEvent(HideNodeMenuItemEvent)
-            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
-            if (!this@HideBottomSheetMenuItem.isPaid || isBusinessAccountExpired) {
-                actionHandler(menuAction, node)
-            } else if (node.isMarkedSensitive || isHiddenNodesOnboarded) {
-                updateNodeSensitiveUseCase(node.id, true)
-            } else {
-                actionHandler(menuAction, node)
-            }
+            actionHandler(menuAction, node)
         }
         onDismiss()
     }

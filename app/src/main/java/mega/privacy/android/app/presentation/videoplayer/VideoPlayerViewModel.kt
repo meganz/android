@@ -118,6 +118,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
@@ -958,20 +959,42 @@ class VideoPlayerViewModel @Inject constructor(
                 "" to emptyList()
             }
         }
-        val filteredVideoNodes = filterNonSensitiveNodes(videoNodes)
-        if (filteredVideoNodes.isNotEmpty()) {
-            buildPlaybackSourcesByNodes(title, filteredVideoNodes, playingHandle, launchSource)
+
+        if (videoNodes.isNotEmpty()) {
+            val filteredVideoNodes = filterNonSensitiveNodes(videoNodes)
+            if (filteredVideoNodes.isNotEmpty()) {
+                buildPlaybackSourcesByNodes(title, filteredVideoNodes, playingHandle, launchSource)
+            }
         }
     }
 
-    private fun filterNonSensitiveNodes(nodes: List<TypedVideoNode>): List<TypedVideoNode> {
-        val showHiddenItems = uiState.value.showHiddenItems == true
-        val accountType = uiState.value.accountType ?: return nodes
+    private suspend fun filterNonSensitiveNodes(nodes: List<TypedVideoNode>): List<TypedVideoNode> {
+        val state = uiState.value
+        val showHiddenItems = runCatching {
+            (state.showHiddenItems ?: monitorShowHiddenItemsUseCase().firstOrNull()) == true
+        }.getOrDefault(false)
 
-        return if (showHiddenItems || !accountType.isPaid || uiState.value.isBusinessAccountExpired) {
-            nodes
-        } else {
-            nodes.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
+        val (accountType, isExpired) = runCatching {
+            state.accountType?.let {
+                it to state.isBusinessAccountExpired
+            } ?: run {
+                val account = monitorAccountDetailUseCase().firstOrNull()?.levelDetail?.accountType
+                val businessStatus = if (account?.isBusinessAccount == true) {
+                    getBusinessStatusUseCase()
+                } else null
+                account to (businessStatus == BusinessAccountStatus.Expired)
+            }
+        }.getOrDefault(null to false)
+
+        return when {
+            accountType == null -> if (showHiddenItems) {
+                nodes
+            } else {
+                nodes.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
+            }
+
+            showHiddenItems || !accountType.isPaid || isExpired -> nodes
+            else -> nodes.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
         }
     }
 

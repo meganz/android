@@ -12,8 +12,6 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
-import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
@@ -30,13 +28,8 @@ class HideDropdownMenuItem @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
-    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : NodeToolbarMenuItem<MenuAction> {
-    private var isPaid: Boolean = false
-    private var isBusinessAccountExpired: Boolean = false
-
     override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
         selectedNodes: List<TypedNode>,
@@ -52,12 +45,22 @@ class HideDropdownMenuItem @Inject constructor(
             return false
         }
 
-        if (selectedNodes.any { !isHidingActionAllowedUseCase(it.id) }) {
+        val hasNotAllowedNode = selectedNodes.any { node ->
+            runCatching { !isHidingActionAllowedUseCase(node.id) }.getOrDefault(true)
+        }
+
+        if (hasNotAllowedNode) {
             return false
         }
 
-        isPaid = monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
-        isBusinessAccountExpired = getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+        val isPaid = runCatching {
+            monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
+        }.getOrDefault(false)
+
+        val isBusinessAccountExpired = runCatching {
+            getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+        }.getOrDefault(false)
+
         if (!isPaid || isBusinessAccountExpired) {
             return true
         }
@@ -74,16 +77,7 @@ class HideDropdownMenuItem @Inject constructor(
     ): () -> Unit = {
         parentScope.launch {
             Analytics.tracker.trackEvent(HideNodeMultiSelectMenuItemEvent)
-            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
-            if (!this@HideDropdownMenuItem.isPaid || isBusinessAccountExpired) {
-                actionHandler(menuAction, selectedNodes)
-            } else if (isHiddenNodesOnboarded) {
-                selectedNodes.forEach {
-                    updateNodeSensitiveUseCase(it.id, true)
-                }
-            } else {
-                actionHandler(menuAction, selectedNodes)
-            }
+            actionHandler(menuAction, selectedNodes)
         }
         onDismiss()
     }

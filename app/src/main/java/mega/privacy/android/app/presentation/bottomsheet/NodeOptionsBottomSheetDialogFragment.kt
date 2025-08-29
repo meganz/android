@@ -956,11 +956,13 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 originShares = drawerItem == DrawerItem.SHARED_ITEMS,
                 fileTypeIconMapper = FileTypeIconMapper(),
             )
+            val isBusinessAccountExpired =
+                nodeOptionsViewModel.state.value.isBusinessAccountExpired
             if (typedNode is TypedFolderNode) {
                 load(
                     iconResource
                 ) {
-                    if (typedNode.isMarkedSensitive || typedNode.isSensitiveInherited) {
+                    if ((typedNode.isMarkedSensitive || typedNode.isSensitiveInherited) && !isBusinessAccountExpired) {
                         transformations(
                             BlurTransformation(
                                 requireContext(),
@@ -977,7 +979,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                         transformations(
                             buildList {
-                                if (typedNode.isMarkedSensitive || typedNode.isSensitiveInherited) {
+                                if ((typedNode.isMarkedSensitive || typedNode.isSensitiveInherited) && !isBusinessAccountExpired) {
                                     add(BlurTransformation(requireContext(), radius = 16f))
                                 }
                                 add(

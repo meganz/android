@@ -202,6 +202,8 @@ class FavouritesFragment : Fragment() {
                     ) { favouritesState, sortByHeaderState ->
                         Pair(favouritesState, sortByHeaderState)
                     }.collect { (favouritesState, sortByHeaderState) ->
+                        val firstVisiblePosition =
+                            binding.fileListViewBrowser.findFirstVisibleItemPosition()
                         val isList = sortByHeaderState.viewType == ViewType.LIST
 
                         handleConnectivityState(favouritesState.isConnected)
@@ -225,6 +227,7 @@ class FavouritesFragment : Fragment() {
                                 )
                                 gridAdapter.submitList(formatGridList(favouritesState))
                             }
+                            binding.fileListViewBrowser.scrollToPosition(firstVisiblePosition)
                             handleSelectedItems(favouritesState.selectedItems)
                         }
                     }
