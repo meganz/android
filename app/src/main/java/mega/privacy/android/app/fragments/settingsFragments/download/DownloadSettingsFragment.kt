@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.viewModels
+import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
@@ -14,6 +15,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.TwoLineCheckPreference
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_ASK_ME_ALWAYS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD_LOCATION
+import mega.privacy.android.app.presentation.settings.MegaSwitchPreference
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
@@ -27,7 +29,7 @@ class DownloadSettingsFragment : PreferenceFragmentCompat() {
     private val viewModel by viewModels<DownloadSettingsViewModel>()
 
     private var downloadLocation: Preference? = null
-    private var storageAskMeAlways: TwoLineCheckPreference? = null
+    private var storageAskMeAlways: MegaSwitchPreference? = null
 
     private lateinit var rootView: View
 

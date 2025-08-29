@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaCheckbox
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
@@ -35,11 +36,10 @@ internal fun KeepFileNamesTile(
             modifier = Modifier.testTag(KEEP_FILE_NAMES_TILE),
             title = stringResource(R.string.settings_keep_file_names),
             trailingIcons = {
-                MegaCheckbox(
+                MegaSwitch(
                     modifier = Modifier.testTag(KEEP_FILE_NAMES_TILE_CHECKBOX),
                     checked = isChecked,
                     onCheckedChange = onCheckedChange,
-                    rounded = false,
                 )
             }
         )

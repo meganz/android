@@ -407,15 +407,13 @@ class NameCollisionActivity : PasscodeActivity() {
             if (isFile) viewModel.pendingFileCollisions
             else viewModel.pendingFolderCollisions
 
-        binding.applyForAllCheck.apply {
-            isVisible = pendingCollisions > 0
+        binding.applyForAllCheckLayout.isVisible = pendingCollisions > 0
 
-            if (isVisible) {
-                text = context.resources.getQuantityString(
-                    R.plurals.general_name_collision_file_apply_for_all,
-                    pendingCollisions, pendingCollisions,
-                )
-            }
+        if (pendingCollisions > 0) {
+            binding.applyForAllCheckMsg.text = this.resources.getQuantityString(
+                R.plurals.general_name_collision_file_apply_for_all,
+                pendingCollisions, pendingCollisions,
+            )
         }
     }
 

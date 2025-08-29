@@ -37,7 +37,7 @@
         app:iconSpaceReserved="false" />
 
     <!--  Status persistence  -->
-    <mega.privacy.android.app.components.TwoLineCheckPreference
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="settings_chat_persistence"
         android:title="@string/settings_persistence_title"
         android:summary="@string/settings_persistence_subtitle"

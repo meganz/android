@@ -11,7 +11,7 @@ import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.TwoLineCheckPreference
+import mega.privacy.android.app.presentation.settings.MegaSwitchPreference
 
 @AndroidEntryPoint
 class SettingsAdvancedFragment : PreferenceFragmentCompat(), Preference.OnPreferenceClickListener {
@@ -26,7 +26,7 @@ class SettingsAdvancedFragment : PreferenceFragmentCompat(), Preference.OnPrefer
     override fun onPreferenceClick(preference: Preference): Boolean {
         when (preference.key) {
             keyHttpsOnly -> {
-                viewModel.useHttpsPreferenceChanged((preference as TwoLineCheckPreference).isChecked)
+                viewModel.useHttpsPreferenceChanged((preference as MegaSwitchPreference).isChecked)
             }
         }
         return true
@@ -37,7 +37,7 @@ class SettingsAdvancedFragment : PreferenceFragmentCompat(), Preference.OnPrefer
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED){
                 viewModel.state.collect{ (useHttpsChecked, useHttpsEnabled) ->
-                    findPreference<TwoLineCheckPreference>(keyHttpsOnly)?.let {
+                    findPreference<MegaSwitchPreference>(keyHttpsOnly)?.let {
                         it.onPreferenceClickListener = this@SettingsAdvancedFragment
                         it.isEnabled = useHttpsEnabled
                         it.isChecked = useHttpsChecked

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
-    <mega.privacy.android.app.components.TwoLineCheckPreference
+    <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="settings_use_https_only"
         android:title="@string/setting_title_use_https_only"
         android:summary="@string/setting_subtitle_use_https_only"

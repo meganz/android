@@ -24,6 +24,7 @@ import mega.privacy.android.app.components.TwoLineCheckPreference
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.presentation.extensions.title
+import mega.privacy.android.app.presentation.settings.MegaSwitchPreference
 import mega.privacy.android.app.presentation.settings.chat.imagequality.SettingsChatImageQualityActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
@@ -58,7 +59,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
     private var statusChatListPreference: ListPreference? = null
     private var autoAwaySwitch: SwitchPreferenceCompat? = null
     private var chatAutoAwayPreference: Preference? = null
-    private var chatPersistenceCheck: TwoLineCheckPreference? = null
+    private var chatPersistenceCheck: MegaSwitchPreference? = null
     private var enableLastGreenChatSwitch: SwitchPreferenceCompat? = null
     private var chatAttachmentsChatListPreference: ListPreference? = null
     private var richLinksSwitch: SwitchPreferenceCompat? = null
@@ -104,7 +105,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
             }
 
         chatPersistenceCheck =
-            findPreference<TwoLineCheckPreference?>(SettingsConstants.KEY_CHAT_PERSISTENCE)?.apply {
+            findPreference<MegaSwitchPreference?>(SettingsConstants.KEY_CHAT_PERSISTENCE)?.apply {
                 onPreferenceClickListener = this@SettingsChatFragment
             }
 

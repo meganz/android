@@ -177,14 +177,30 @@
                 tools:text="DON'T UPLOAD" />
 
 
-            <CheckBox
-                android:id="@+id/apply_for_all_check"
+            <LinearLayout
+                android:id="@+id/apply_for_all_check_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
-                app:layout_constraintTop_toBottomOf="@+id/cancel_button"
-                tools:text="Apply this option to the next 5 conflicts" />
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@+id/cancel_button">
+
+                <mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
+                    android:id="@+id/apply_for_all_check"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/apply_for_all_check_msg"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:paddingHorizontal="8dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
+                    tools:text="Apply this option to the next 5 conflicts" />
+
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

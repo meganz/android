@@ -341,7 +341,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     private var ekrSwitch: MegaSwitch? = null
     private var isEKREnabled = false
     private var getChatLinkLayout: RelativeLayout? = null
-    private var getChatLinkBox: CheckBox? = null
+    private var getChatLinkBox: MegaSwitch? = null
     private var allowAddParticipantsSwitch: MegaSwitch? = null
     private var isAllowAddParticipantsEnabled = true
     private var newGroupLinearLayoutManager: LinearLayoutManager? = null
@@ -1206,7 +1206,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         newGroupLayout?.visibility = View.GONE
         ekrSwitch = findViewById<View>(R.id.ekr_switch) as MegaSwitch
         ekrSwitch?.setOnClickListener(this)
-        getChatLinkBox = findViewById<View>(R.id.get_chat_link_checkbox) as CheckBox
+        getChatLinkBox = findViewById<View>(R.id.get_chat_link_checkbox) as MegaSwitch
         getChatLinkLayout = findViewById<View>(R.id.get_chat_link_layout) as RelativeLayout
         newGroupHeaderList = findViewById<View>(R.id.new_group_text_header_list) as TextView
         allowAddParticipantsSwitch = findViewById(R.id.allow_add_participants_switch)
