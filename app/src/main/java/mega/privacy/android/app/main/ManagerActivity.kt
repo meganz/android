@@ -3679,6 +3679,18 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     override fun drawerItemClicked(item: DrawerItem) {
+        lifecycleScope.launch {
+            val oldDrawerItem = drawerItem
+            isFirstTimeCam
+            checkIfShouldCloseSearchView(oldDrawerItem)
+            if (item == DrawerItem.OFFLINE) {
+                bottomItemBeforeOpenFullscreenOffline = bottomNavigationCurrentItem
+                openFullscreenOfflineFragment(pathNavigationOffline)
+            } else {
+                drawerItem = item
+            }
+            selectDrawerItem(drawerItem)
+        }
     }
 
     /**
