@@ -7,11 +7,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.R
@@ -21,6 +23,7 @@ import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMe
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -33,6 +36,7 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -56,6 +60,7 @@ import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -105,6 +110,8 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
+    private val createShareKeyUseCase: CreateShareKeyUseCase,
+    private val snackBarHandler: SnackBarHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -234,8 +241,7 @@ class NodeOptionsActionViewModel @Inject constructor(
             deleteNodeVersionsUseCase(NodeId(it))
         }
         versionHistoryRemoveMessageMapper(result.exceptionOrNull()).let {
-            // Todo handle snackbar
-            // snackBarHandler.postSnackbarMessage(it)
+            snackBarHandler.postSnackbarMessage(it)
         }
     }
 
@@ -251,6 +257,56 @@ class NodeOptionsActionViewModel @Inject constructor(
      */
     fun markQuotaDialogShown() {
         uiState.update { it.copy(showQuotaDialog = consumed()) }
+    }
+
+    fun verifyShareFolderAction(node: TypedNode) {
+        verifyShareFolderAction(listOf(node))
+    }
+
+    fun verifyShareFolderAction(nodes: List<TypedNode>) {
+        viewModelScope.launch {
+            withContext(NonCancellable) {
+                val filteredFolderNodes = nodes.filterIsInstance<TypedFolderNode>()
+
+                filteredFolderNodes.forEach { folderNode ->
+                    runCatching { createShareKeyUseCase(folderNode) }.onFailure { Timber.e(it) }
+                }
+
+                val hasBackUpNodes = filteredFolderNodes
+                    .any { folderNode ->
+                        runCatching {
+                            checkBackupNodeTypeUseCase(folderNode) != BackupNodeType.NonBackupNode
+                        }.getOrElse {
+                            Timber.e(it)
+                            false
+                        }
+                    }
+
+                val nodeIds = filteredFolderNodes.map { it.id.longValue }
+
+                if (hasBackUpNodes) {
+                    uiState.update { state ->
+                        state.copy(shareFolderDialogEvent = triggered(nodeIds))
+                    }
+                } else {
+                    uiState.update { state ->
+                        state.copy(shareFolderEvent = triggered(nodeIds))
+                    }
+                }
+            }
+        }
+    }
+
+    fun resetShareFolderDialogEvent() {
+        uiState.update {
+            it.copy(shareFolderDialogEvent = consumed())
+        }
+    }
+
+    fun resetShareFolderEvent() {
+        uiState.update {
+            it.copy(shareFolderEvent = consumed())
+        }
     }
 
     /**
@@ -318,8 +374,7 @@ class NodeOptionsActionViewModel @Inject constructor(
                     )
                 val message = nodeSendToChatMessageMapper(attachNodeRequest)
                 message?.let {
-                    // Todo handle snackbar
-                    // snackBarHandler.postSnackbarMessage(it)
+                    snackBarHandler.postSnackbarMessage(it)
                 }
             }
         }

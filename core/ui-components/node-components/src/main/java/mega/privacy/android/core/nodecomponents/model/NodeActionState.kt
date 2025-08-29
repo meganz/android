@@ -42,4 +42,6 @@ data class NodeActionState(
     val clearAll: StateEvent = consumed,
     val infoToShowEvent: StateEventWithContent<LocalizedText> = consumed(),
     val renameNodeRequestEvent: StateEventWithContent<NodeId> = consumed(),
+    val shareFolderDialogEvent: StateEventWithContent<List<Long>> = consumed(),
+    val shareFolderEvent: StateEventWithContent<List<Long>> = consumed()
 )

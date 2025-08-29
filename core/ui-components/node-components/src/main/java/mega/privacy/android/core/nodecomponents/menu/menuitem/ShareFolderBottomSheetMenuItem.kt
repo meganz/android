@@ -1,22 +1,13 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.extension.isOutShare
-import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareFolderMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
-import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -26,9 +17,6 @@ import javax.inject.Inject
  */
 class ShareFolderBottomSheetMenuItem @Inject constructor(
     override val menuAction: ShareFolderMenuAction,
-    private val createShareKeyUseCase: CreateShareKeyUseCase,
-    private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase,
-    private val nodeHandlesToJsonMapper: NodeHandlesToJsonMapper,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -47,40 +35,8 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         handler: BottomSheetClickHandler
     ): () -> Unit = {
-        handler.onDismiss()
-        handler.coroutineScope.launch {
-            withContext(NonCancellable) {
-                if (node is TypedFolderNode) {
-                    runCatching { createShareKeyUseCase(node) }.onFailure { Timber.e(it) }
-                    val backupType =
-                        runCatching { checkBackupNodeTypeUseCase(node) }
-                            .onFailure { Timber.e(it) }.getOrNull()
-                    if (backupType != BackupNodeType.NonBackupNode) {
-                        val handles = listOf(node.id.longValue)
-                        runCatching {
-                            nodeHandlesToJsonMapper(handles)
-                        }.onSuccess { handle ->
-                            handler.coroutineScope.ensureActive()
-                            // Todo: navigationHandler
-//                            navController.navigate(
-//                                searchFolderShareDialog.plus("/${handle}")
-//                            )
-                        }.onFailure {
-                            Timber.e(it)
-                        }
-                    } else {
-                        handler.coroutineScope.ensureActive()
-                        handler.actionHandler(menuAction, node)
-                    }
-                }
-            }
-        }
+        handler.actionHandler(menuAction, node)
     }
 
     override val groupId = 7
-
-    companion object {
-        // Todo duplicate to the one in mega.privacy.android.app.presentation.search.model.navigation.SearchFolderShareNavigation.kt
-        private const val searchFolderShareDialog = "search/folder_share"
-    }
 }

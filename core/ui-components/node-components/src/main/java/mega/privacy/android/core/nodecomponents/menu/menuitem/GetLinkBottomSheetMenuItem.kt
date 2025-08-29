@@ -17,7 +17,6 @@ import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
  * @param menuAction [GetLinkMenuAction]
  */
 class GetLinkBottomSheetMenuItem @Inject constructor(
-    @ApplicationContext private val context: Context,
     override val menuAction: GetLinkMenuAction,
     private val megaNavigator: MegaNavigator
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
@@ -38,7 +37,7 @@ class GetLinkBottomSheetMenuItem @Inject constructor(
     ): () -> Unit = {
         handler.onDismiss()
         megaNavigator.openGetLinkActivity(
-            context = context,
+            context = handler.context,
             handle = node.id.longValue
         )
     }

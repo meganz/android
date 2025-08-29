@@ -1,18 +1,14 @@
-package mega.privacy.android.app.presentation.node.dialogs.sharefolder.warning
+package mega.privacy.android.core.nodecomponents.dialog.sharefolder
 
-import com.google.common.truth.Truth
-import kotlinx.coroutines.CoroutineScope
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.R
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
-import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -27,10 +23,8 @@ import org.mockito.kotlin.whenever
 class ShareFolderDialogViewModelTest {
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase = mock()
-    private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val underTest = ShareFolderDialogViewModel(
-        applicationScope = applicationScope,
         getNodeByIdUseCase = getNodeByIdUseCase,
         checkBackupNodeTypeUseCase = checkBackupNodeTypeUseCase
     )
@@ -44,9 +38,8 @@ class ShareFolderDialogViewModelTest {
             whenever(checkBackupNodeTypeUseCase(node)).thenReturn(BackupNodeType.FolderNode)
             underTest.getDialogContents(listOf(NodeId(handle)))
             val state = underTest.state.value
-            Truth.assertThat(state.info).isEqualTo(R.string.backup_share_permission_text)
-            Truth.assertThat(state.positiveButton).isEqualTo(R.string.button_permission_info)
-            Truth.assertThat(state.negativeButton).isEqualTo(null)
+
+            assertThat(state.dialogType).isInstanceOf(ShareFolderDialogType.Single::class.java)
         }
 
     @Test
@@ -58,9 +51,8 @@ class ShareFolderDialogViewModelTest {
             whenever(checkBackupNodeTypeUseCase(node)).thenReturn(BackupNodeType.RootNode)
             underTest.getDialogContents(listOf(NodeId(handle), NodeId(2345L)))
             val state = underTest.state.value
-            Truth.assertThat(state.info).isEqualTo(R.string.backup_multi_share_permission_text)
-            Truth.assertThat(state.positiveButton).isEqualTo(R.string.general_positive_button)
-            Truth.assertThat(state.negativeButton).isEqualTo(sharedR.string.general_dialog_cancel_button)
+
+            assertThat(state.dialogType).isInstanceOf(ShareFolderDialogType.Multiple::class.java)
         }
 
     @AfterEach

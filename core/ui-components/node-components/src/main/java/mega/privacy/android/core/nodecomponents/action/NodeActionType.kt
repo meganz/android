@@ -81,7 +81,7 @@ class ShareFolderAction @Inject constructor() : SingleNodeAction, MultiNodeActio
     override fun canHandle(action: MenuAction): Boolean = action is ShareFolderMenuAction
 
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
-        provider.shareFolderLauncher.launch(longArrayOf(node.id.longValue))
+        provider.viewModel.verifyShareFolderAction(node)
     }
 
     override fun handle(
@@ -89,8 +89,7 @@ class ShareFolderAction @Inject constructor() : SingleNodeAction, MultiNodeActio
         nodes: List<TypedNode>,
         provider: MultipleNodesActionProvider,
     ) {
-        val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
-        provider.shareFolderLauncher.launch(nodeHandleArray)
+        provider.viewModel.verifyShareFolderAction(nodes)
     }
 }
 

@@ -1,13 +1,16 @@
 package mega.privacy.android.core.nodecomponents.sheet.options
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,19 +22,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
-import mega.android.core.ui.model.SnackbarDuration as MegaSnackbarDuration
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogM3
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.text
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.megaActivityResultContract
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,6 +54,19 @@ fun NodeOptionsBottomSheetRoute(
     val keyboardController = LocalSoftwareKeyboardController.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val nodeOptionActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+    var shareNodeHandles by remember { mutableStateOf<List<Long>>(emptyList()) }
+    val context = LocalContext.current
+    val megaActivityResultContract = remember { context.megaActivityResultContract }
+    val shareFolderLauncher = rememberLauncherForActivityResult(
+        contract = megaActivityResultContract.shareFolderActivityResultContract
+    ) { result ->
+        result?.let { (contactIds, nodeHandles) ->
+            nodeOptionsActionViewModel.contactSelectedForShareFolder(
+                contactIds,
+                nodeHandles
+            )
+        }
+    }
 
     LaunchedEffect(Unit) {
         keyboardController?.hide()
@@ -61,6 +79,38 @@ fun NodeOptionsBottomSheetRoute(
         action = onTransfer
     )
 
+    EventEffect(
+        event = nodeOptionActionState.shareFolderDialogEvent,
+        onConsumed = nodeOptionsActionViewModel::resetShareFolderDialogEvent,
+        action = { handles ->
+            shareNodeHandles = handles
+        }
+    )
+
+    EventEffect(
+        event = nodeOptionActionState.shareFolderEvent,
+        onConsumed = nodeOptionsActionViewModel::resetShareFolderEvent,
+        action = { handles ->
+            shareFolderLauncher.launch(handles.toLongArray())
+        }
+    )
+
+    EventEffect(
+        event = nodeOptionActionState.contactsData,
+        onConsumed = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
+        action = { (contactData, isFromBackups, nodeHandles) ->
+            onDismiss()
+            // Todo: NavigationHandler implement share folder access dialog. M3 version of this dialog is not available yet
+//            val contactList =
+//                contactData.joinToString(separator = contactArraySeparator)
+//            navHostController.navigate(
+//                shareFolderAccessDialog.plus("/${contactList}")
+//                    .plus("/${isFromBackups}")
+//                    .plus("/${nodeHandles}")
+//            )
+        },
+    )
+
     NodeOptionsBottomSheetContent(
         uiState = uiState,
         navigationHandler = navigationHandler,
@@ -69,6 +119,23 @@ fun NodeOptionsBottomSheetRoute(
         showSnackbar = viewModel::showSnackbar,
         onConsumeErrorState = viewModel::onConsumeErrorState,
     )
+
+    if (shareNodeHandles.isNotEmpty()) {
+        // We cannot provide navigation to this dialog, because it requires injecting shareFolderLauncher
+        // to the menu item. Instead the menu item will call the view model to trigger StateEvent
+        // to show this dialog, and the onConfirm callback will use the launcher to start the activity for result
+        ShareFolderDialogM3(
+            nodeIds = shareNodeHandles.map { NodeId(it) },
+            onDismiss = {
+                shareNodeHandles = emptyList()
+                onDismiss()
+            },
+            onConfirm = { nodes ->
+                val handles = nodes.map { it.id.longValue }.toLongArray()
+                shareFolderLauncher.launch(handles)
+            }
+        )
+    }
 }
 
 /**

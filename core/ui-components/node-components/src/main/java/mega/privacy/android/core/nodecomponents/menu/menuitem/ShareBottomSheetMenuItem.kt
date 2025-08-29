@@ -3,14 +3,14 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -21,7 +21,6 @@ import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 
 /**
  * Share bottom sheet menu item
@@ -33,7 +32,6 @@ class ShareBottomSheetMenuItem @Inject constructor(
     private val getLocalFilePathUseCase: GetLocalFilePathUseCase,
     private val exportNodesUseCase: ExportNodeUseCase,
     private val getFileUriUseCase: GetFileUriUseCase,
-    @ApplicationContext private val context: Context,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -62,7 +60,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
                     null
                 }
                 if (node is TypedFileNode && path != null) {
-                    getLocalFileUri(path)?.let {
+                    getLocalFileUri(handler.context, path)?.let {
                         val shareIntent = Intent(Intent.ACTION_SEND).apply {
                             type = node.type.mimeType
                             putExtra(Intent.EXTRA_STREAM, Uri.parse(it))
@@ -72,10 +70,10 @@ class ShareBottomSheetMenuItem @Inject constructor(
                             )
                         }
                         handler.coroutineScope.ensureActive()
-                        context.startActivity(
+                        handler.context.startActivity(
                             Intent.createChooser(
                                 shareIntent,
-                                context.getString(sharedResR.string.general_share)
+                                handler.context.getString(sharedResR.string.general_share)
                             )
                         )
                     }
@@ -84,7 +82,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
                     if (publicLink != null) {
                         handler.coroutineScope.ensureActive()
                         startShareIntent(
-                            context = context,
+                            context = handler.context,
                             path = publicLink,
                             name = node.name
                         )
@@ -92,7 +90,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
                         val exportPath = exportNodesUseCase(node.id)
                         handler.coroutineScope.ensureActive()
                         startShareIntent(
-                            context = context,
+                            context = handler.context,
                             path = exportPath,
                             name = node.name
                         )
@@ -118,7 +116,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
         )
     }
 
-    private suspend fun getLocalFileUri(filePath: String) = runCatching {
+    private suspend fun getLocalFileUri(context: Context, filePath: String) = runCatching {
         val fileProviderAuthority = context.packageName + ".providers.fileprovider"
         getFileUriUseCase(File(filePath), fileProviderAuthority)
     }.onFailure { Timber.e("Error getting local file uri: ${it.message}") }.getOrNull()

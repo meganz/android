@@ -50,7 +50,10 @@ internal fun NavGraphBuilder.shareFolderDialogNavigation(
                         navHostController.navigateUp()
                     },
                     onOkClicked = { typeNodeList ->
-                        nodeActionHandler.handleAction(ShareFolderMenuAction(), typeNodeList)
+                        nodeActionHandler.handleAction(
+                            ShareFolderMenuAction(),
+                            typeNodeList
+                        )
                     }
                 )
             }

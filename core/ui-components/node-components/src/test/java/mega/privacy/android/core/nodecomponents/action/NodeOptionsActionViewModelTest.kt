@@ -17,6 +17,7 @@ import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMes
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
+import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -39,6 +40,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
@@ -56,6 +59,7 @@ import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
@@ -91,7 +95,7 @@ class NodeOptionsActionViewModelTest {
     private val nodeVersionHistoryRemoveMessageMapper =
         mock<NodeVersionHistoryRemoveMessageMapper>()
 
-    // private val snackBarHandler = mock<SnackBarHandler>()
+    private val snackBarHandler = mock<SnackBarHandler>()
     private val checkBackupNodeTypeUseCase: CheckBackupNodeTypeUseCase = mock()
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
     private val nodeSendToChatMessageMapper: NodeSendToChatMessageMapper = mock()
@@ -109,6 +113,7 @@ class NodeOptionsActionViewModelTest {
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
+    private val createShareKeyUseCase = mock<CreateShareKeyUseCase>()
 
     // Mock action handlers for testing
     private val mockSingleNodeActionHandler = mock<SingleNodeAction>()
@@ -126,7 +131,7 @@ class NodeOptionsActionViewModelTest {
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
             moveRequestMessageMapper = moveRequestMessageMapper,
             versionHistoryRemoveMessageMapper = nodeVersionHistoryRemoveMessageMapper,
-            // snackBarHandler = snackBarHandler,
+            snackBarHandler = snackBarHandler,
             checkBackupNodeTypeUseCase = checkBackupNodeTypeUseCase,
             attachMultipleNodesUseCase = attachMultipleNodesUseCase,
             nodeSendToChatMessageMapper = nodeSendToChatMessageMapper,
@@ -143,6 +148,7 @@ class NodeOptionsActionViewModelTest {
             getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = multipleNodesActionHandlers,
+            createShareKeyUseCase = createShareKeyUseCase
         )
     }
 
@@ -499,6 +505,8 @@ class NodeOptionsActionViewModelTest {
             getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
             singleNodeActionHandlers = multipleHandlers,
             multipleNodesActionHandlers = multipleNodesActionHandlers,
+            createShareKeyUseCase = createShareKeyUseCase,
+            snackBarHandler = snackBarHandler
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -549,6 +557,8 @@ class NodeOptionsActionViewModelTest {
             getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = multipleHandlers,
+            createShareKeyUseCase = createShareKeyUseCase,
+            snackBarHandler = snackBarHandler
         )
 
         val mockAction = mock<MoveMenuAction>()
@@ -593,6 +603,8 @@ class NodeOptionsActionViewModelTest {
             getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
             singleNodeActionHandlers = emptySet(),
             multipleNodesActionHandlers = multipleNodesActionHandlers,
+            createShareKeyUseCase = createShareKeyUseCase,
+            snackBarHandler = snackBarHandler
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -629,6 +641,8 @@ class NodeOptionsActionViewModelTest {
             getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = emptySet(),
+            createShareKeyUseCase = createShareKeyUseCase,
+            snackBarHandler = snackBarHandler
         )
 
         assertThrows<IllegalArgumentException> {
@@ -665,6 +679,143 @@ class NodeOptionsActionViewModelTest {
             assertThat(uiState.renameNodeRequestEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
         }
     }
+
+    @Test
+    fun `test verifyShareFolderAction triggers shareFolderDialogEvent when node is TypedFolderNode and backup type is not NonBackupNode`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode)).thenReturn(BackupNodeType.RootNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+
+            viewModel.uiState.test {
+                assertThat(awaitItem().shareFolderDialogEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+
+            verify(createShareKeyUseCase).invoke(mockFolderNode)
+            verify(checkBackupNodeTypeUseCase).invoke(mockFolderNode)
+        }
+
+    @Test
+    fun `test verifyShareFolderAction triggers shareFolderEvent when node is TypedFolderNode and backup type is NonBackupNode`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(456L)
+            }
+
+            whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode)).thenReturn(BackupNodeType.NonBackupNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+
+            viewModel.uiState.test {
+                assertThat(awaitItem().shareFolderEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+
+            verify(createShareKeyUseCase).invoke(mockFolderNode)
+            verify(checkBackupNodeTypeUseCase).invoke(mockFolderNode)
+        }
+
+    @Test
+    fun `test verifyShareFolderAction handles createShareKeyUseCase failure gracefully`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(createShareKeyUseCase(mockFolderNode)).thenThrow(RuntimeException("Test exception"))
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode)).thenReturn(BackupNodeType.RootNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+
+            viewModel.uiState.test {
+                assertThat(awaitItem().shareFolderDialogEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+        }
+
+    @Test
+    fun `test verifyShareFolderAction with multiple nodes triggers shareFolderDialogEvent when any node is backup node`() =
+        runTest {
+            val mockFolderNode1 = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+            val mockFolderNode2 = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(456L)
+            }
+            val mockFileNode = mock<TypedFileNode>().stub {
+                on { id } doReturn NodeId(789L)
+            }
+
+            whenever(createShareKeyUseCase(mockFolderNode1)).thenReturn(Unit)
+            whenever(createShareKeyUseCase(mockFolderNode2)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode1)).thenReturn(BackupNodeType.NonBackupNode)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode2)).thenReturn(BackupNodeType.RootNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(
+                listOf(
+                    mockFolderNode1,
+                    mockFolderNode2,
+                    mockFileNode
+                )
+            )
+
+            viewModel.uiState.test {
+                assertThat(awaitItem().shareFolderDialogEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+        }
+
+    @Test
+    fun `test verifyShareFolderAction with multiple nodes triggers shareFolderEvent when no nodes are backup nodes`() =
+        runTest {
+            val mockFolderNode1 = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+            val mockFolderNode2 = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(456L)
+            }
+            val mockFileNode = mock<TypedFileNode>().stub {
+                on { id } doReturn NodeId(789L)
+            }
+
+            whenever(createShareKeyUseCase(mockFolderNode1)).thenReturn(Unit)
+            whenever(createShareKeyUseCase(mockFolderNode2)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode1)).thenReturn(BackupNodeType.NonBackupNode)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode2)).thenReturn(BackupNodeType.NonBackupNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(
+                listOf(
+                    mockFolderNode1,
+                    mockFolderNode2,
+                    mockFileNode
+                )
+            )
+
+            viewModel.uiState.test {
+                assertThat(awaitItem().shareFolderEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+        }
 
     private fun provideNodeType() = Stream.of(
         Arguments.of(

@@ -1531,4 +1531,14 @@
         <item quantity="one">Unshare this folder?</item>
         <item quantity="other">Unshare these %1$d folders?</item>
     </plurals>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">These folders can only be shared as read-only; as they are backup folders, any changes to their content could disable the backups.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">This folder can only be shared as read-only; as this is a backup folder, any changes to its content could disable the backup.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">Got it</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Read-only</string>
+    <!-- dialog option continue in alert dialog -->
+    <string name="button_continue">Continue</string>
 </resources>
