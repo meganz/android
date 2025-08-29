@@ -9,17 +9,17 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.app.fromId
 import mega.privacy.android.app.presentation.achievements.view.AchievementView
 import mega.privacy.android.app.presentation.achievements.view.AchievementViewTestTags
+import mega.privacy.android.domain.entity.achievement.AchievementType
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
-import mega.privacy.android.app.fromId
-import mega.privacy.android.domain.entity.achievement.AchievementType
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w720dp-h1280dp-xhdpi")
@@ -52,8 +52,13 @@ internal class AchievementScreenTest {
         isAchievementEnabled: Boolean = false,
         onShowInfoAchievementsClicked: (achievementType: AchievementType) -> Unit = {},
         onReferBonusesClicked: () -> Unit = {},
-        onMegaVPNFreeTrialClicked: (Boolean, Long, Long) -> Unit = {_, _, _ ->},
-        onMegaPassFreeTrialClicked: (Boolean, Long, Long) -> Unit = {_, _, _ ->},
+        onMegaVPNFreeTrialClicked: (Boolean, Long, Long, Int) -> Unit = { _, _, _, _ -> },
+        onMegaPassFreeTrialClicked: (Boolean, Long, Long, Int) -> Unit = { _, _, _, _ -> },
+        referralsDurationInDays: Int = 365,
+        installAppDurationInDays: Int = 365,
+        installDesktopDurationInDays: Int = 365,
+        megaVPNTrialDurationInDays: Int = 365,
+        megaPassTrialDurationInDays: Int = 365,
     ) {
         composeTestRule.setContent {
             AchievementView(
@@ -83,6 +88,11 @@ internal class AchievementScreenTest {
                 onReferBonusesClicked = onReferBonusesClicked,
                 onMegaVPNFreeTrialClicked = onMegaVPNFreeTrialClicked,
                 onMegaPassFreeTrialClicked = onMegaPassFreeTrialClicked,
+                referralsDurationInDays = referralsDurationInDays,
+                installAppDurationInDays = installAppDurationInDays,
+                installDesktopDurationInDays = installDesktopDurationInDays,
+                megaVPNTrialDurationInDays = megaVPNTrialDurationInDays,
+                megaPassTrialDurationInDays = megaPassTrialDurationInDays
             )
         }
     }
@@ -156,7 +166,7 @@ internal class AchievementScreenTest {
 
     @Test
     fun `test that mega vpn trial reward is visible`() {
-        val onMegaVPNFreeTrialClicked = mock<(Boolean, Long, Long) -> Unit>()
+        val onMegaVPNFreeTrialClicked = mock<(Boolean, Long, Long, Int) -> Unit>()
         setComposeContent(
             isAchievementEnabled = true,
             hasMegaVPNTrial = true,
@@ -169,12 +179,12 @@ internal class AchievementScreenTest {
                 performClick()
             }
 
-        verify(onMegaVPNFreeTrialClicked).invoke(false, 0, 0)
+        verify(onMegaVPNFreeTrialClicked).invoke(false, 0, 0, 365)
     }
 
     @Test
     fun `test that mega pass trial reward is visible`() {
-        val onMegaPassFreeTrialClicked = mock<(Boolean, Long, Long) -> Unit>()
+        val onMegaPassFreeTrialClicked = mock<(Boolean, Long, Long, Int) -> Unit>()
         setComposeContent(
             isAchievementEnabled = true,
             hasMegaPassTrial = true,
@@ -187,6 +197,6 @@ internal class AchievementScreenTest {
                 performClick()
             }
 
-        verify(onMegaPassFreeTrialClicked).invoke(false, 0, 0)
+        verify(onMegaPassFreeTrialClicked).invoke(false, 0, 0, 365)
     }
 }

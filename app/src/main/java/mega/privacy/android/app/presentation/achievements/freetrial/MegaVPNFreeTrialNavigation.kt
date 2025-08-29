@@ -15,6 +15,7 @@ data class MegaVPNFreeTrial(
     val isReceivedAward: Boolean,
     val storageAmount: Long,
     val awardStorageAmount: Long,
+    val durationInDays: Int,
 )
 
 /**
@@ -28,6 +29,7 @@ fun NavGraphBuilder.megaVPNFreeTrialScreen() {
             isReceivedAward = megaVPNFreeTrial.isReceivedAward,
             storageAmount = megaVPNFreeTrial.storageAmount,
             awardStorageAmount = megaVPNFreeTrial.awardStorageAmount,
+            durationInDays = megaVPNFreeTrial.durationInDays,
             onInstallButtonClicked = {
                 openInSpecificApp(context, MEGA_VPN_PACKAGE_NAME)
             }
@@ -42,10 +44,16 @@ fun NavController.navigateToMegaVPNFreeTrial(
     isReceivedAward: Boolean,
     storageAmount: Long,
     awardStorageAmount: Long,
+    durationInDays: Int,
     navOptions: NavOptions? = null,
 ) {
     this.navigate(
-        route = MegaVPNFreeTrial(isReceivedAward, storageAmount, awardStorageAmount),
+        route = MegaVPNFreeTrial(
+            isReceivedAward,
+            storageAmount,
+            awardStorageAmount,
+            durationInDays
+        ),
         navOptions = navOptions
     )
 }

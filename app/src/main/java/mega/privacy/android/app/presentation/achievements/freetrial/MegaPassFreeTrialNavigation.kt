@@ -17,7 +17,8 @@ import mega.privacy.android.app.utils.Constants.MEGA_PASS_PACKAGE_NAME
 data class MegaPassFreeTrial(
     val isReceivedAward: Boolean,
     val storageAmount: Long,
-    val awardStorageAmount: Long
+    val awardStorageAmount: Long,
+    val durationInDays: Int,
 )
 
 /**
@@ -31,6 +32,7 @@ fun NavGraphBuilder.megaPassFreeTrialScreen() {
             isReceivedAward = megaPassFreeTrial.isReceivedAward,
             storageAmount = megaPassFreeTrial.storageAmount,
             awardStorageAmount = megaPassFreeTrial.awardStorageAmount,
+            durationInDays = megaPassFreeTrial.durationInDays,
             onInstallButtonClicked = {
                 openInSpecificApp(context, MEGA_PASS_PACKAGE_NAME)
             }
@@ -45,10 +47,16 @@ fun NavController.navigateToMegaPassFreeTrial(
     isReceivedAward: Boolean,
     storageAmount: Long,
     awardStorageAmount: Long,
+    durationInDays: Int,
     navOptions: NavOptions? = null,
 ) {
     this.navigate(
-        route = MegaPassFreeTrial(isReceivedAward, storageAmount, awardStorageAmount),
+        route = MegaPassFreeTrial(
+            isReceivedAward,
+            storageAmount,
+            awardStorageAmount,
+            durationInDays
+        ),
         navOptions = navOptions
     )
 }

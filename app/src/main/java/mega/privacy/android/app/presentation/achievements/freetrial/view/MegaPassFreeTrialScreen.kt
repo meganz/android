@@ -12,14 +12,32 @@ internal fun MegaPassFreeTrialScreen(
     isReceivedAward: Boolean = false,
     storageAmount: Long = 0,
     awardStorageAmount: Long = 0,
+    durationInDays: Int,
     onInstallButtonClicked: () -> Unit = {},
 ) {
     FreeTrialView(
         icon = iconPackR.drawable.ic_mega_pass_free_trial,
-        freeTrialText = stringResource(
-            sharedR.string.text_start_mega_pass_free_trial,
-            storageAmount.toUnitString(LocalContext.current)
-        ),
+        freeTrialText =
+            if (durationInDays == 0) {
+                stringResource(
+                    if (isReceivedAward) {
+                        sharedR.string.figures_storage_achievements_awarded_text_permanent
+                    } else {
+                        sharedR.string.figures_storage_achievements_text_permanent
+                    },
+                    storageAmount.toUnitString(LocalContext.current)
+                )
+            } else {
+                stringResource(
+                    if (isReceivedAward) {
+                        sharedR.string.figures_storage_achievements_awarded_text
+                    } else {
+                        sharedR.string.figures_storage_achievements_text
+                    },
+                    storageAmount.toUnitString(LocalContext.current),
+                    durationInDays
+                )
+            },
         installButtonText = sharedR.string.button_text_install_mega_pass,
         howItWorksText = if (isReceivedAward) {
             stringResource(

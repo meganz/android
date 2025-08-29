@@ -1475,6 +1475,26 @@
     <string name="context_correctly_renamed">Item renamed</string>
     <!-- Homepage section. -->
     <string name="general_section_home">Home</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
+    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
+    <string name="figures_storage_referrals_achievements_text_permanent">%1$s extra storage for each invitation, valid permanently</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_text_permanent">%1$s extra storage, valid permanently</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_awarded_text_permanent">%1$s storage bonus applied, valid permanently</string>
+    <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install megasync with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid permanently. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid permanently. The mobile apps are available for iOS and Android.</string>
     <!-- Error message when removing public links of nodes. Plural. -->
     <plurals name="context_link_removal_error">
         <item quantity="one">Link removal failed. Please try again later.</item>

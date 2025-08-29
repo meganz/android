@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.achievements.invites
+package test.mega.privacy.android.app.presentation.achievements.invites
 
 import android.app.Activity
 import android.content.ComponentName
@@ -18,6 +18,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteConfirmationDialog
@@ -68,14 +69,47 @@ class InviteFriendsViewTest {
     @Test
     fun `test that invite friends view should render correctly on first load`() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val durationInDays = 365
         val formattedSize = oneHundredMbInBytes.toUnitString(context)
         val expectedDescription =
-            context.getString(R.string.figures_achievements_text_referrals, formattedSize)
+            context.getString(
+                sharedR.string.figures_storage_referrals_achievements_text,
+                formattedSize,
+                durationInDays
+            )
 
         composeTestRule.setContent {
             InviteFriendsView(
                 modifier = Modifier,
-                uiState = InviteFriendsUIState(oneHundredMbInBytes)
+                uiState = InviteFriendsUIState(oneHundredMbInBytes, durationInDays)
+            )
+        }
+
+        composeTestRule.onNodeWithTag(IMAGE_MAIN).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(DESCRIPTION)
+            .assertIsDisplayed()
+            .assert(hasText(expectedDescription))
+        composeTestRule.onNodeWithTag(INVITE_CONTACTS_BUTTON).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(HOW_IT_WORKS_TITLE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(HOW_IT_WORKS_DESCRIPTION).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(FOOTER).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that invite friends view should render correctly on first load when valid duration is permanent`() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val durationInDays = 0
+        val formattedSize = oneHundredMbInBytes.toUnitString(context)
+        val expectedDescription =
+            context.getString(
+                sharedR.string.figures_storage_referrals_achievements_text_permanent,
+                formattedSize
+            )
+
+        composeTestRule.setContent {
+            InviteFriendsView(
+                modifier = Modifier,
+                uiState = InviteFriendsUIState(oneHundredMbInBytes, durationInDays)
             )
         }
 

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.data.extensions
 
 import android.content.Context
+import androidx.annotation.StringRes
 import mega.privacy.android.app.R
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
@@ -149,3 +150,24 @@ fun Long.toUnitString(context: Context): String {
 }
 
 internal fun Long.toMillis() = TimeUnit.SECONDS.toMillis(this)
+
+/**
+ * Get the corresponding text by duration in days
+ *
+ * @param context       Context
+ * @param daysStringId  String resource id for dynamic days
+ * @param permanentStringId String resource id for permanent
+ * @param storage       Storage string
+ * @return              The corresponding text by duration in days
+ */
+internal fun Int.getTextByDurationInDays(
+    context: Context,
+    @StringRes daysStringId: Int,
+    @StringRes permanentStringId: Int,
+    storage: String,
+) =
+    if (this == 0) {
+        context.getString(permanentStringId, storage)
+    } else {
+        context.getString(daysStringId, storage, this)
+    }

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.achievements.info.view
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,11 +33,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.app.data.extensions.getTextByDurationInDays
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel
 import mega.privacy.android.app.presentation.achievements.info.model.AchievementsInfoUIState
 import mega.privacy.android.app.presentation.achievements.info.util.toAchievementsInfoAttribute
+import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
@@ -46,7 +48,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_transparent
-import mega.privacy.android.domain.entity.achievement.AchievementType
+import mega.privacy.android.shared.resources.R as sharedR
 
 internal object AchievementsInfoViewTestTags {
     private const val ACHIEVEMENTS_INFO_VIEW = "achievements_info_view"
@@ -76,8 +78,10 @@ internal fun AchievementsInfoView(
     modifier: Modifier = Modifier,
     uiState: AchievementsInfoUIState,
 ) {
-    val attributes =
-        uiState.achievementType.toAchievementsInfoAttribute(uiState.isAchievementAwarded)
+    val attributes = uiState.achievementType.toAchievementsInfoAttribute(
+        uiState.isAchievementAwarded,
+        uiState.durationInDays
+    )
 
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val scrollState = rememberScrollState()
@@ -163,7 +167,10 @@ internal fun AchievementsInfoView(
                         .padding(vertical = 8.dp, horizontal = 12.dp)
                         .align(Alignment.Center),
                     text = getAchievementTitle(uiState = uiState),
-                    style = MaterialTheme.typography.body2.copy(letterSpacing = 0.sp, color = getAchievementTitleColor(uiState = uiState))
+                    style = MaterialTheme.typography.body2.copy(
+                        letterSpacing = 0.sp,
+                        color = getAchievementTitleColor(uiState = uiState)
+                    )
                 )
             }
 
@@ -188,10 +195,24 @@ internal fun AchievementsInfoView(
                         .testTag(AchievementsInfoViewTestTags.SUBTITLE)
                         .padding(24.dp)
                         .align(Alignment.CenterHorizontally),
-                    text = stringResource(
-                        id = attributes.subtitleTextResourceId,
-                        uiState.awardStorageInBytes.toUnitString(LocalContext.current)
-                    ),
+                    text = if (uiState.isAchievementAwarded) {
+                        stringResource(
+                            id = attributes.subtitleTextResourceId,
+                            uiState.awardStorageInBytes.toUnitString(LocalContext.current)
+                        )
+                    } else {
+                        val durationInDays = uiState.durationInDays
+                        val storage = uiState.awardStorageInBytes.toUnitString(LocalContext.current)
+                        if (durationInDays == 0) {
+                            stringResource(attributes.subtitleTextResourceId, storage)
+                        } else {
+                            stringResource(
+                                attributes.subtitleTextResourceId,
+                                storage,
+                                durationInDays
+                            )
+                        }
+                    },
                     style = MaterialTheme.typography.body2.copy(letterSpacing = 0.sp),
                     color = MaterialTheme.colors.textColorSecondary,
                 )
@@ -203,10 +224,16 @@ internal fun AchievementsInfoView(
 @Composable
 private fun getAchievementTitle(uiState: AchievementsInfoUIState): String {
     return when {
-        uiState.isAchievementAwarded.not() -> stringResource(
-            id = R.string.figures_achievements_text,
-            uiState.awardStorageInBytes.toUnitString(LocalContext.current)
-        )
+        uiState.isAchievementAwarded.not() -> {
+            val durationInDays = uiState.durationInDays
+            val storage = uiState.awardStorageInBytes.toUnitString(LocalContext.current)
+            durationInDays.getTextByDurationInDays(
+                context = LocalContext.current,
+                daysStringId = sharedR.string.figures_storage_achievements_text,
+                permanentStringId = sharedR.string.figures_storage_achievements_text_permanent,
+                storage = storage
+            )
+        }
 
         uiState.isAchievementExpired.not() -> pluralStringResource(
             id = R.plurals.account_achievements_bonus_expiration_date,
@@ -235,10 +262,11 @@ internal fun AchievementsInfoViewPreview() {
         uiState = AchievementsInfoUIState(
             achievementType = AchievementType.MEGA_ACHIEVEMENT_MOBILE_INSTALL,
             achievementRemainingDays = 16,
-            awardStorageInBytes = 178347128371,
+            awardStorageInBytes = 1 * 1024 * 1024 * 1024,
             isAchievementAwarded = false,
             isAchievementExpired = false,
-            isAchievementAlmostExpired = false
+            isAchievementAlmostExpired = false,
+            durationInDays = 365
         )
     )
 }

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.achievements.info
+package test.mega.privacy.android.app.presentation.achievements.info
 
 import android.content.Context
 import androidx.compose.ui.Modifier
@@ -103,6 +103,7 @@ class AchievementsInfoViewTest {
     @Test
     fun `test that title should render with correct value when achievement hasn't been awarded`() {
         val expectedType = achievementType.random()
+        val expectedDurationInDays = 365
         lateinit var context: Context
 
         composeTestRule.setContent {
@@ -112,7 +113,8 @@ class AchievementsInfoViewTest {
                 uiState = AchievementsInfoUIState(
                     achievementType = expectedType,
                     awardStorageInBytes = oneHundredMbInBytes,
-                    isAchievementAwarded = false
+                    isAchievementAwarded = false,
+                    durationInDays = expectedDurationInDays
                 )
             )
         }
@@ -121,7 +123,38 @@ class AchievementsInfoViewTest {
             .assert(
                 hasText(
                     fromId(
-                        R.string.figures_achievements_text,
+                        sharedR.string.figures_storage_achievements_text,
+                        oneHundredMbInBytes.toUnitString(context),
+                        expectedDurationInDays
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun `test that title should render with correct value when achievement hasn't been awarded and valid duration is permanent`() {
+        val expectedType = achievementType.random()
+        val expectedDurationInDays = 0
+        lateinit var context: Context
+
+        composeTestRule.setContent {
+            context = LocalContext.current
+            AchievementsInfoView(
+                modifier = Modifier,
+                uiState = AchievementsInfoUIState(
+                    achievementType = expectedType,
+                    awardStorageInBytes = oneHundredMbInBytes,
+                    isAchievementAwarded = false,
+                    durationInDays = expectedDurationInDays
+                )
+            )
+        }
+
+        composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.TITLE).assertIsDisplayed()
+            .assert(
+                hasText(
+                    fromId(
+                        sharedR.string.figures_storage_achievements_text_permanent,
                         oneHundredMbInBytes.toUnitString(context)
                     )
                 )
@@ -228,8 +261,12 @@ class AchievementsInfoViewTest {
     fun `test that subtitle should render with correct value based on achievement type`() {
         val expectedType = achievementType.random()
         val randomIsAwarded = Random.nextBoolean()
+        val durationInDays = 365
         val textResourceId =
-            expectedType.toAchievementsInfoAttribute(randomIsAwarded).subtitleTextResourceId
+            expectedType.toAchievementsInfoAttribute(
+                randomIsAwarded,
+                durationInDays
+            ).subtitleTextResourceId
         lateinit var context: Context
 
         composeTestRule.setContent {
@@ -245,8 +282,52 @@ class AchievementsInfoViewTest {
                 )
             }
         }
-
         composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.SUBTITLE).assertIsDisplayed()
-            .assert(hasText(fromId(textResourceId, oneHundredMbInBytes.toUnitString(context))))
+            .assert(
+                hasText(
+                    fromId(
+                        textResourceId,
+                        oneHundredMbInBytes.toUnitString(context),
+                        durationInDays
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun `test that subtitle should render with correct value when valid duration is permanent based on achievement type`() {
+        val expectedType = achievementType.random()
+        val randomIsAwarded = Random.nextBoolean()
+        val durationInDays = 0
+        val textResourceId =
+            expectedType.toAchievementsInfoAttribute(
+                randomIsAwarded,
+                durationInDays
+            ).subtitleTextResourceId
+        lateinit var context: Context
+
+        composeTestRule.setContent {
+            context = LocalContext.current
+            OriginalTheme(isDark = true) {
+                AchievementsInfoView(
+                    modifier = Modifier,
+                    uiState = AchievementsInfoUIState(
+                        achievementType = expectedType,
+                        awardStorageInBytes = oneHundredMbInBytes,
+                        isAchievementAwarded = randomIsAwarded,
+                        durationInDays = durationInDays
+                    )
+                )
+            }
+        }
+        composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.SUBTITLE).assertIsDisplayed()
+            .assert(
+                hasText(
+                    fromId(
+                        textResourceId,
+                        oneHundredMbInBytes.toUnitString(context)
+                    )
+                )
+            )
     }
 }

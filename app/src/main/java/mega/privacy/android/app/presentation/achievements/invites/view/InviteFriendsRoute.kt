@@ -24,6 +24,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,6 +43,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
+import mega.privacy.android.app.data.extensions.getTextByDurationInDays
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
@@ -92,7 +95,7 @@ internal fun InviteFriendsView(
 ) {
     val context = LocalContext.current
     var isDialogVisible by remember { mutableStateOf(false) }
-    var numberOfInvites by remember { mutableStateOf(0) }
+    var numberOfInvites by remember { mutableIntStateOf(0) }
     val storageFormatted = remember(uiState.grantStorageInBytes) {
         uiState.grantStorageInBytes.toUnitString(context)
     }
@@ -150,9 +153,11 @@ internal fun InviteFriendsView(
                         .testTag(InviteFriendsViewTestTags.DESCRIPTION)
                         .padding(top = 24.dp, start = 24.dp, end = 24.dp)
                         .align(Alignment.CenterHorizontally),
-                    text = stringResource(
-                        id = R.string.figures_achievements_text_referrals,
-                        storageFormatted
+                    text = uiState.durationInDays.getTextByDurationInDays(
+                        context = context,
+                        daysStringId = sharedR.string.figures_storage_referrals_achievements_text,
+                        permanentStringId = sharedR.string.figures_storage_referrals_achievements_text_permanent,
+                        storage = storageFormatted
                     ),
                     color = MaterialTheme.colors.textColorSecondary,
                     textAlign = TextAlign.Center
