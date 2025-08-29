@@ -7,4 +7,7 @@ import kotlinx.serialization.Serializable
 data object OverDiskQuotaPaywallWarning : NavKey
 
 @Serializable
+data object MyAccount : NavKey
+
+@Serializable
 data class WebSite(val url: String) : NavKey

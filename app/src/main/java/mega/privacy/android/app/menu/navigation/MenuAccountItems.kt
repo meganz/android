@@ -6,6 +6,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.navigation.destination.ExampleLegacyScreen
 import mega.privacy.android.navigation.destination.LegacySettings
+import mega.privacy.android.navigation.destination.MyAccount
 import mega.privacy.android.navigation.destination.Secondary
 import mega.privacy.android.navigation.destination.WebSite
 import mega.privacy.android.shared.resources.R as sharedR
@@ -18,7 +19,7 @@ object CurrentPlanItem : NavDrawerItem.Account(
 )
 
 object StorageItem : NavDrawerItem.Account(
-    destination = object : NavKey {},
+    destination = MyAccount,
     icon = IconPack.Medium.Thin.Outline.HardDrive,
     title = sharedR.string.account_cancel_account_screen_plan_storage
 )

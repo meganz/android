@@ -11,6 +11,7 @@ class LegacyCoreActivityFeatureGraph : FeatureDestination {
         { navigationHandler, transferHandler ->
             overDiskQuotaPaywallWarning(navigationHandler::back)
             upgradeAccount(navigationHandler::back)
+            myAccount(navigationHandler::back)
             webDestinations(navigationHandler::back)
         }
 }

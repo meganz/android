@@ -52,6 +52,7 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLB
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavDrawerItem
+import mega.privacy.android.navigation.destination.MyAccount
 import timber.log.Timber
 
 @Composable
@@ -128,7 +129,7 @@ fun MenuHomeScreenUi(
                         )
                     },
                     onClickListener = {
-                        Timber.d("My account item clicked")
+                        navigateToFeature(MyAccount)
                     }
                 )
             }
