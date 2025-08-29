@@ -485,12 +485,26 @@ object MegaNodeUtil {
         } else if (isOutShare(node)) {
             IconPackR.drawable.ic_folder_outgoing_medium_solid
         } else if (isRootBackupFolder(node)) {
-            IconPackR.drawable.ic_folder_medium_solid
+            IconPackR.drawable.ic_backup_medium_solid
         } else if (isDeviceBackupFolder(node)) {
             getMyBackupSubFolderIcon(node)
         } else {
-            IconPackR.drawable.ic_folder_medium_solid
+            getFolderIconByLabel(node.label)
         }
+    }
+
+    /**
+     * Temporary replicated method for legacy adapters
+     */
+    private fun getFolderIconByLabel(nodeLabel: Int) = when (nodeLabel) {
+        MegaNode.NODE_LBL_RED -> IconPackR.drawable.ic_folder_red_medium_solid
+        MegaNode.NODE_LBL_GREEN -> IconPackR.drawable.ic_folder_green_medium_solid
+        MegaNode.NODE_LBL_PURPLE -> IconPackR.drawable.ic_folder_purple_medium_solid
+        MegaNode.NODE_LBL_BLUE -> IconPackR.drawable.ic_folder_blue_medium_solid
+        MegaNode.NODE_LBL_YELLOW -> IconPackR.drawable.ic_folder_yellow_medium_solid
+        MegaNode.NODE_LBL_ORANGE -> IconPackR.drawable.ic_folder_orange_medium_solid
+        MegaNode.NODE_LBL_GREY -> IconPackR.drawable.ic_folder_grey_medium_solid
+        else -> IconPackR.drawable.ic_folder_medium_solid
     }
 
     /**
