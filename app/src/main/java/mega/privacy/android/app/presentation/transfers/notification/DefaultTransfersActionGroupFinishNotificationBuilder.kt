@@ -95,7 +95,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             if (isPreviewDownload || actionGroup.groupId < 0) { //not a real transfer, will not appear on transfer section -> content intent same as action intent
                 actionIntent
             } else {
-                TransfersActivity.getActiveTabIntent(context)
+                TransfersActivity.getCompletedTabIntent(context)
             }
         val pendingIntent = PendingIntent.getActivity(
             context,
