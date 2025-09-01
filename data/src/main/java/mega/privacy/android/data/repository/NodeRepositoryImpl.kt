@@ -8,6 +8,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -67,6 +68,8 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.extension.ConcurrencyStrategy
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaApiJava
@@ -1244,4 +1247,45 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getNodeNameById(nodeId: NodeId): String? = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.name
     }
+
+    override suspend fun getNodeChildrenInChunks(
+        nodeId: NodeId,
+        order: SortOrder?,
+        initialBatchSize: Int,
+    ): Flow<List<UnTypedNode>> = flow {
+        val token = cancelTokenProvider.getOrCreateCancelToken()
+        val filter = megaSearchFilterMapper(parentHandle = nodeId)
+        val offlineItems = getAllOfflineNodeHandle()
+        val allChildren = megaApiGateway.getChildren(
+            filter,
+            sortOrderIntMapper(order ?: SortOrder.ORDER_NONE),
+            token
+        )
+
+        // Emit initial batch immediately
+        val initialNodes = allChildren
+            .take(initialBatchSize)
+            .mapAsync(ConcurrencyStrategy.Parallel) { megaNode ->
+                convertToUnTypedNode(
+                    node = megaNode,
+                    offline = offlineItems[megaNode.handle.toString()]
+                )
+            }
+        emit(initialNodes)
+
+        // If there are more nodes, process them and emit the complete list
+        if (allChildren.size > initialBatchSize) {
+            // Process remaining nodes in chunks
+            val remainingNodes = allChildren
+                .drop(initialBatchSize)
+                .mapAsync(ConcurrencyStrategy.ChunkedSequential(2000)) { megaNode ->
+                    convertToUnTypedNode(
+                        node = megaNode,
+                        offline = offlineItems[megaNode.handle.toString()]
+                    )
+                }
+            // Second emit: Complete list (initial + remaining)
+            emit(initialNodes + remainingNodes)
+        }
+    }.flowOn(ioDispatcher)
 }

@@ -139,6 +139,24 @@ interface NodeRepository {
     suspend fun getNodeChildren(nodeId: NodeId, order: SortOrder? = null): List<UnTypedNode>
 
     /**
+     * Get node children in chunks for progressive loading
+     *
+     * This method returns a Flow that emits:
+     * 1. Initial batch of nodes immediately for fast UI display
+     * 2. Remaining nodes is emitted later on
+     *
+     * @param nodeId [NodeId] The parent node ID
+     * @param order [SortOrder] Optional sorting order
+     * @param initialBatchSize [Int] Size of initial batch (default: 1000)
+     * @return Flow of node lists for progressive loading
+     */
+    suspend fun getNodeChildrenInChunks(
+        nodeId: NodeId,
+        order: SortOrder? = null,
+        initialBatchSize: Int = 1000,
+    ): Flow<List<UnTypedNode>>
+
+    /**
      * Get node children file types
      * @param nodeId [NodeId]
      * @param order [SortOrder]

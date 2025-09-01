@@ -164,7 +164,8 @@ class CloudDriveUiStateTest {
 
         val state = CloudDriveUiState(
             items = items,
-            isLoading = false,
+            isNodesLoading = false,
+            isHiddenNodeSettingsLoading = false,
             showHiddenNodes = false,
             isHiddenNodesEnabled = true
         )
@@ -181,7 +182,8 @@ class CloudDriveUiStateTest {
 
         val state = CloudDriveUiState(
             items = items,
-            isLoading = true,
+            isNodesLoading = true,
+            isHiddenNodeSettingsLoading = false,
             showHiddenNodes = false,
             isHiddenNodesEnabled = true
         )
@@ -198,7 +200,8 @@ class CloudDriveUiStateTest {
 
         val state = CloudDriveUiState(
             items = items,
-            isLoading = false,
+            isNodesLoading = false,
+            isHiddenNodeSettingsLoading = false,
             showHiddenNodes = false,
             isHiddenNodesEnabled = true
         )
@@ -251,7 +254,8 @@ class CloudDriveUiStateTest {
 
         val state = CloudDriveUiState(
             items = items,
-            isLoading = false,
+            isNodesLoading = false,
+            isHiddenNodeSettingsLoading = false,
             showHiddenNodes = false,
             isHiddenNodesEnabled = true
         )
@@ -269,7 +273,8 @@ class CloudDriveUiStateTest {
     fun `test that edge case with empty items list works correctly`() {
         val state = CloudDriveUiState(
             items = emptyList(),
-            isLoading = false,
+            isNodesLoading = false,
+            isHiddenNodeSettingsLoading = false,
             showHiddenNodes = false,
             isHiddenNodesEnabled = true
         )

@@ -7,7 +7,6 @@ import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -33,6 +32,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
+import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -57,6 +57,7 @@ class CloudDriveViewModel @Inject constructor(
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val scannerHandler: ScannerHandler,
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
+    private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -100,7 +101,31 @@ class CloudDriveViewModel @Inject constructor(
 
     private fun setupNodesLoading() {
         viewModelScope.launch {
-            val nodeUiItems = async { getNodeUiItems() }
+            val folderId = uiState.value.currentFolderId
+            val folderOrRootNodeId = if (folderId.longValue == -1L) {
+                getRootNodeIdUseCase() ?: folderId
+            } else {
+                folderId
+            }
+            getNodesByIdInChunkUseCase(folderOrRootNodeId)
+                .collect {
+                    val nodeUiItems = nodeUiItemMapper(
+                        nodeList = it,
+                        nodeSourceType = nodeSourceType,
+                        highlightedNodeId = highlightedNodeId,
+                        highlightedNames = highlightedNodeNames,
+                        existingItems = uiState.value.items,
+                    )
+                    _uiState.update { state ->
+                        state.copy(
+                            items = nodeUiItems,
+                            isNodesLoading = false,
+                            currentFolderId = folderOrRootNodeId
+                        )
+                    }
+                }
+        }
+        viewModelScope.launch {
             if (isHiddenNodeFeatureFlagEnabled()) {
                 combine(
                     monitorHiddenNodesEnabledUseCase()
@@ -108,38 +133,22 @@ class CloudDriveViewModel @Inject constructor(
                     monitorShowHiddenItemsUseCase()
                         .catch { Timber.e(it) },
                     ::Pair
-                ).collectLatest { (isHiddenNodesEnabled, showHiddenItems) ->
-                    if (uiState.value.isLoading) {
-                        // First time: load items and set complete state
-                        val (currentFolderId, items) = nodeUiItems.await()
-                        _uiState.update { state ->
-                            state.copy(
-                                isLoading = false,
-                                items = items,
-                                currentFolderId = currentFolderId,
-                                isHiddenNodesEnabled = isHiddenNodesEnabled,
-                                showHiddenNodes = showHiddenItems
-                            )
-                        }
-                    } else {
-                        // Subsequent times: only update hidden node flags
-                        _uiState.update { state ->
-                            state.copy(
-                                isHiddenNodesEnabled = isHiddenNodesEnabled,
-                                showHiddenNodes = showHiddenItems
-                            )
-                        }
+                ).collectLatest { pair ->
+                    val isHiddenNodesEnabled = pair.first
+                    val showHiddenItems = pair.second
+                    _uiState.update { state ->
+                        state.copy(
+                            isHiddenNodeSettingsLoading = false,
+                            isHiddenNodesEnabled = isHiddenNodesEnabled,
+                            showHiddenNodes = showHiddenItems
+                        )
                     }
                 }
                 checkIfHiddenNodeIsOnboarded()
             } else {
-                val (currentFolderId, items) = nodeUiItems.await()
+                // Hidden nodes disabled, set loading state to false
                 _uiState.update { state ->
-                    state.copy(
-                        isLoading = false,
-                        items = items,
-                        currentFolderId = currentFolderId,
-                    )
+                    state.copy(isHiddenNodeSettingsLoading = false)
                 }
             }
         }
@@ -148,13 +157,8 @@ class CloudDriveViewModel @Inject constructor(
     private suspend fun getNodeUiItems() = run {
         val folderId = uiState.value.currentFolderId
         runCatching {
-            val folderOrRootNodeId = if (folderId.longValue == -1L) {
-                getRootNodeIdUseCase() ?: folderId
-            } else {
-                folderId
-            }
-            folderOrRootNodeId to nodeUiItemMapper(
-                nodeList = getFileBrowserNodeChildrenUseCase(folderOrRootNodeId.longValue),
+            nodeUiItemMapper(
+                nodeList = getFileBrowserNodeChildrenUseCase(folderId.longValue),
                 nodeSourceType = nodeSourceType,
                 highlightedNodeId = highlightedNodeId,
                 highlightedNames = highlightedNodeNames,
@@ -162,7 +166,7 @@ class CloudDriveViewModel @Inject constructor(
             )
         }.onFailure {
             Timber.e(it)
-        }.getOrDefault(folderId to emptyList())
+        }.getOrDefault(emptyList())
     }
 
     private fun monitorNodeUpdates() {
@@ -175,12 +179,11 @@ class CloudDriveViewModel @Inject constructor(
                     }
                 } else {
                     // If nodes are currently loading, ignore updates
-                    if (!uiState.value.isLoading) {
-                        val (folderOrRootNodeId, children) = getNodeUiItems()
+                    if (!uiState.value.isNodesLoading) {
+                        val nodeUiItems = getNodeUiItems()
                         _uiState.update { state ->
                             state.copy(
-                                items = children,
-                                currentFolderId = folderOrRootNodeId,
+                                items = nodeUiItems,
                             )
                         }
                     }

@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 /**
  * UI state for Cloud Drive
  * @param title Name of the folder
- * @property isLoading True if nodes are loading
+ * @property isNodesLoading True if nodes are loading
  * @property currentFolderId The current folder id being displayed
  * @property isCloudDriveRoot True if the current folder is the root of the Cloud Drive
  * @property items List of nodes in the current folder
@@ -29,7 +29,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
  */
 data class CloudDriveUiState(
     val title: LocalizedText = LocalizedText.Literal(""),
-    val isLoading: Boolean = true,
+    val isNodesLoading: Boolean = true,
+    val isHiddenNodeSettingsLoading: Boolean = true,
     val currentFolderId: NodeId = NodeId(-1L),
     val isCloudDriveRoot: Boolean = false,
     val items: List<NodeUiItem<TypedNode>> = emptyList(),
@@ -43,6 +44,12 @@ data class CloudDriveUiState(
     val gmsDocumentScanner: GmsDocumentScanner? = null,
     val documentScanningError: DocumentScanningError? = null,
 ) {
+
+    /**
+     * True if nodes or hidden node settings are loading
+     */
+    val isLoading = isNodesLoading || isHiddenNodeSettingsLoading
+
     /**
      * Count of visible items based on hidden nodes settings
      */
