@@ -24,6 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import androidx.navigation.navigation
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.R
@@ -38,6 +39,10 @@ import kotlin.reflect.KClass
 
 @Serializable
 data object MainNavigationScaffoldDestination : NavKey
+
+@Serializable
+data object MainGraph : NavKey
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun NavGraphBuilder.mainNavigationScaffold(
@@ -73,8 +78,8 @@ fun NavGraphBuilder.mainNavigationScaffold(
                     mainNavItems = currentState.mainNavItems,
                     onDestinationClick = { destination ->
                         navController.navigate(destination, navOptions {
-                            popUpTo(navController.graph.id) {
-                                inclusive = true
+                            popUpTo(MainGraph) {
+                                inclusive = false
                                 saveState = true
                             }
 
@@ -92,14 +97,18 @@ fun NavGraphBuilder.mainNavigationScaffold(
                                 modifier = modifier
                                     .fillMaxSize(),
                                 navController = navController,
-                                startDestination = currentState.initialDestination,
+                                startDestination = MainGraph,
                                 builder = {
-                                    currentState.mainNavScreens.forEach {
-                                        it(
-                                            navigationHandler,
-                                            navigationUiController,
-                                            transferHandler
-                                        )
+                                    navigation<MainGraph>(
+                                        startDestination = currentState.initialDestination
+                                    ) {
+                                        currentState.mainNavScreens.forEach {
+                                            it(
+                                                navigationHandler,
+                                                navigationUiController,
+                                                transferHandler
+                                            )
+                                        }
                                     }
                                 },
                             )
