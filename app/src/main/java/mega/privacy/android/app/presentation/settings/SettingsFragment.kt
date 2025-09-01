@@ -143,10 +143,7 @@ class SettingsFragment :
                         isEnabled = state.deleteEnabled
                     }
 
-
-                    val startScreenSummary =
-                        resources.getStringArray(R.array.settings_start_screen)[state.startScreen]
-                    findPreference<Preference>(KEY_START_SCREEN)?.summary = startScreenSummary
+                    findPreference<Preference>(KEY_START_SCREEN)?.summary = state.startScreenSummary
 
                     findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.takeIf { it.isChecked != state.hideRecentActivityChecked }
                         ?.let { it.isChecked = state.hideRecentActivityChecked }
@@ -292,12 +289,13 @@ class SettingsFragment :
             )
 
             KEY_2FA -> if (viewModel.uiState.value.multiFactorAuthChecked) {
-                twoFactorAuthenticationLauncher.launch(Intent(
-                    context,
-                    VerifyTwoFactorActivity::class.java
-                ).apply {
-                    putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, Constants.DISABLE_2FA)
-                })
+                twoFactorAuthenticationLauncher.launch(
+                    Intent(
+                        context,
+                        VerifyTwoFactorActivity::class.java
+                    ).apply {
+                        putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, Constants.DISABLE_2FA)
+                    })
             } else {
                 twoFactorAuthenticationLauncher.launch(
                     Intent(

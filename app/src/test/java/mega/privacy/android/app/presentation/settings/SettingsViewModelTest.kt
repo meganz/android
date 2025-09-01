@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings
 
+import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -15,11 +16,14 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TEST_USER_ACCOUNT
+import mega.privacy.android.app.appstate.content.mapper.ScreenPreferenceDestinationMapper
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
+import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenSummaryMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.preference.StartScreen
+import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
@@ -38,6 +42,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorContactLinksOptionUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -45,6 +50,8 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.ToggleContactLinksOptionUseCase
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.MainNavItem
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -55,6 +62,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -93,6 +101,16 @@ class SettingsViewModelTest {
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase>()
 
+    private val startScreenSummaryMapper = mock<StartScreenSummaryMapper>()
+
+
+    private val monitorStartScreenPreferenceDestinationUseCase =
+        mock<MonitorStartScreenPreferenceDestinationUseCase>()
+
+    private val screenPreferenceDestinationMapper = mock<ScreenPreferenceDestinationMapper>()
+
+    private val defaultStartScreen = mock<NavKey>()
+
     @BeforeEach
     fun setUp() {
         monitorContactLinksOptionUseCase.stub {
@@ -124,6 +142,10 @@ class SettingsViewModelTest {
             on { invoke() }.thenReturn(
                 emptyFlow()
             )
+
+            startScreenSummaryMapper.stub {
+                on { invoke(any<StartScreen>()) } doReturn "Start Screen"
+            }
         }
 
         getAccountDetailsUseCase.stub { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
@@ -145,11 +167,14 @@ class SettingsViewModelTest {
         monitorAccountDetailUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
         whenever(monitorMyAccountUpdateUseCase()).thenReturn(emptyFlow())
 
-        initViewModel()
+        whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(emptyFlow())
+        isMultiFactorAuthEnabledUseCase.stub {
+            onBlocking { invoke() }.thenReturn(false)
+        }
+
     }
 
-
-    private fun initViewModel() {
+    private fun initViewModel(mainNavItems: Set<MainNavItem> = emptySet()) {
         underTest = SettingsViewModel(
             getAccountDetailsUseCase = getAccountDetailsUseCase,
             canDeleteAccount = mock { on { invoke(TEST_USER_ACCOUNT) }.thenReturn(true) },
@@ -178,6 +203,11 @@ class SettingsViewModelTest {
             setAudioBackgroundPlayEnabledUseCase = setAudioBackgroundPlayEnabledUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
+            startScreenSummaryMapper = startScreenSummaryMapper,
+            mainDestinations = mainNavItems,
+            monitorStartScreenPreferenceDestinationUseCase = monitorStartScreenPreferenceDestinationUseCase,
+            screenPreferenceDestinationMapper = screenPreferenceDestinationMapper,
+            defaultStartScreen = defaultStartScreen
         )
     }
 
@@ -191,6 +221,23 @@ class SettingsViewModelTest {
             monitorSubFolderMediaDiscoverySettingsUseCase,
             getSessionTransferURLUseCase,
             setAudioBackgroundPlayEnabledUseCase,
+            startScreenSummaryMapper,
+            monitorStartScreenPreferenceDestinationUseCase,
+            screenPreferenceDestinationMapper,
+            defaultStartScreen,
+            isCameraUploadsEnabledUseCase,
+            monitorContactLinksOptionUseCase,
+            isMultiFactorAuthEnabledUseCase,
+            monitorStartScreenPreference,
+            monitorMediaDiscoveryView,
+            toggleContactLinksOptionUseCase,
+            monitorConnectivityUseCase,
+            monitorPasscodeLockPreferenceUseCase,
+            setSubFolderMediaDiscoveryEnabledUseCase,
+            monitorShowHiddenItemsUseCase,
+            monitorAccountDetailUseCase,
+            getBusinessStatusUseCase,
+            monitorMyAccountUpdateUseCase,
         )
     }
 
@@ -207,25 +254,25 @@ class SettingsViewModelTest {
         whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(emptyFlow())
         isMultiFactorAuthEnabledUseCase.stub {
             onBlocking { invoke() }.thenReturn(false)
-            monitorContactLinksOptionUseCase.stub {
-                on { invoke() }.thenReturn(
-                    flow {
-                        emit(true)
-                        emit(false)
-                    }
-                )
-            }
-
-            initViewModel()
-            underTest.uiState
-                .map { it.autoAcceptChecked }
-                .distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isFalse()
-                    assertThat(awaitItem()).isTrue()
-                    assertThat(awaitItem()).isFalse()
-                }
         }
+        monitorContactLinksOptionUseCase.stub {
+            on { invoke() }.thenReturn(
+                flow {
+                    emit(true)
+                    emit(false)
+                }
+            )
+        }
+
+        initViewModel()
+        underTest.uiState
+            .map { it.autoAcceptChecked }
+            .distinctUntilChanged()
+            .test {
+                assertThat(awaitItem()).isFalse()
+                assertThat(awaitItem()).isTrue()
+                assertThat(awaitItem()).isFalse()
+            }
     }
 
     @Test
@@ -250,6 +297,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `test that chat is enabled by default`() = runTest {
+        initViewModel()
         underTest.uiState
             .map { it.chatEnabled }
             .test {
@@ -524,6 +572,127 @@ class SettingsViewModelTest {
         initViewModel()
         advanceUntilIdle()
         verify(getAccountDetailsUseCase).invoke(true)
+    }
+
+    @Test
+    fun `test that start screen summary is correct when single activity flag is false`() = runTest {
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(false)
+        }
+
+        val expected = "Expected Start Screen"
+        startScreenSummaryMapper.stub {
+            on { invoke(any<StartScreen>()) } doReturn expected
+        }
+
+        initViewModel()
+
+        underTest.uiState.map { it.startScreenSummary }
+            .distinctUntilChanged()
+            .test {
+                assertThat(awaitItem()).isEmpty()
+                advanceUntilIdle()
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+    }
+
+    @Test
+    fun `test that start screen summary is correct when single activity flag is true and no value is set`() =
+        runTest {
+            getFeatureFlagValueUseCase.stub {
+                onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(true)
+            }
+
+            val expected = "Default Single activity Start Screen"
+
+            monitorStartScreenPreferenceDestinationUseCase.stub {
+                on { invoke() } doReturn flow {
+                    emit(null)
+                    awaitCancellation()
+                }
+            }
+
+            val expectedMainNavItem = mock<MainNavItem> {
+                on { destination } doReturn defaultStartScreen
+            }
+
+            val mainNavItems = setOf(
+                mock<MainNavItem> {
+                    on { destination } doReturn mock<NavKey>()
+                },
+                mock<MainNavItem> {
+                    on { destination } doReturn mock<NavKey>()
+                },
+                expectedMainNavItem,
+            )
+
+            screenPreferenceDestinationMapper.stub {
+                on { invoke(null) } doReturn null
+            }
+
+            startScreenSummaryMapper.stub {
+                on { invoke(expectedMainNavItem) } doReturn expected
+            }
+
+            initViewModel(mainNavItems)
+
+            underTest.uiState
+//                .test { cancelAndConsumeRemainingEvents().forEach { println(it) } }
+                .map { it.startScreenSummary }
+                .distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEmpty()
+                    advanceUntilIdle()
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+        }
+
+    @Test
+    fun `test that start screen summary is correct when single activity flag is true`() = runTest {
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(true)
+        }
+
+        val expected = "Expected Single activity Start Screen"
+
+        monitorStartScreenPreferenceDestinationUseCase.stub {
+            on { invoke() } doReturn flow {
+                emit(mock<StartScreenDestinationPreference>())
+                awaitCancellation()
+            }
+        }
+
+        val selectedOption = mock<NavKey>()
+        val expectedMainNavItem = mock<MainNavItem> {
+            on { destination } doReturn selectedOption
+        }
+        val mainNavItems = setOf(
+            mock<MainNavItem> {
+                on { destination } doReturn mock<NavKey>()
+            },
+            mock<MainNavItem> {
+                on { destination } doReturn mock<NavKey>()
+            },
+            expectedMainNavItem,
+        )
+
+        screenPreferenceDestinationMapper.stub {
+            on { invoke(any()) } doReturn selectedOption
+        }
+
+        startScreenSummaryMapper.stub {
+            on { invoke(expectedMainNavItem) } doReturn expected
+        }
+
+        initViewModel(mainNavItems)
+
+        underTest.uiState.map { it.startScreenSummary }
+            .distinctUntilChanged()
+            .test {
+                assertThat(awaitItem()).isEmpty()
+                advanceUntilIdle()
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
     }
 
     companion object {

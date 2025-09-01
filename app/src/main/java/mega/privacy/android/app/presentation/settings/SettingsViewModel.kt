@@ -2,25 +2,31 @@ package mega.privacy.android.app.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.app.appstate.content.mapper.ScreenPreferenceDestinationMapper
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.SettingsState
+import mega.privacy.android.app.presentation.settings.startscreen.mapper.StartScreenSummaryMapper
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -40,6 +46,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.preference.MonitorStartScreenPreferenceDestinationUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorContactLinksOptionUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -48,9 +55,13 @@ import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.ToggleContactLinksOptionUseCase
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.MainNavItem
+import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
 import timber.log.Timber
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
@@ -79,7 +90,12 @@ class SettingsViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val setAudioBackgroundPlayEnabledUseCase: SetAudioBackgroundPlayEnabledUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    private val monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase
+    private val monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
+    private val startScreenSummaryMapper: StartScreenSummaryMapper,
+    private val mainDestinations: Set<@JvmSuppressWildcards MainNavItem>,
+    private val monitorStartScreenPreferenceDestinationUseCase: MonitorStartScreenPreferenceDestinationUseCase,
+    private val screenPreferenceDestinationMapper: ScreenPreferenceDestinationMapper,
+    @DefaultStartScreen private val defaultStartScreen: NavKey,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
@@ -101,7 +117,7 @@ class SettingsViewModel @Inject constructor(
             cameraUploadsOn = false,
             chatEnabled = true,
             callsEnabled = true,
-            startScreen = 0,
+            startScreenSummary = "",
             hideRecentActivityChecked = false,
             mediaDiscoveryViewState = MediaDiscoveryViewSettings.INITIAL.ordinal,
             email = "",
@@ -150,10 +166,7 @@ class SettingsViewModel @Inject constructor(
                             )
                         }
                     },
-                startScreen()
-                    .map { screen ->
-                        { state: SettingsState -> state.copy(startScreen = screen.id) }
-                    },
+                monitorStartScreenSummary(),
                 monitorHideRecentActivityUseCase()
                     .map { hide ->
                         { state: SettingsState -> state.copy(hideRecentActivityChecked = hide) }
@@ -210,6 +223,32 @@ class SettingsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun monitorStartScreenSummary(): Flow<(SettingsState) -> SettingsState> {
+        return flow { emit(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) }
+            .flatMapLatest { singleActivityFlagEnabled ->
+                if (singleActivityFlagEnabled) {
+                    monitorStartScreenPreferenceDestinationUseCase()
+                        .map { destinationPreference ->
+                            screenPreferenceDestinationMapper(destinationPreference)
+                                ?: defaultStartScreen
+                        }.map { destination ->
+                            startScreenSummaryMapper(mainDestinations.first { it.destination == destination })
+                        }.map { screenName ->
+                            { state: SettingsState -> state.copy(startScreenSummary = screenName) }
+                        }
+                } else {
+                    startScreen()
+                        .map { startScreen ->
+                            startScreenSummaryMapper(startScreen)
+                        }.map { screenName ->
+                            { state: SettingsState -> state.copy(startScreenSummary = screenName) }
+                        }
+                }
+
+            }
+
     }
 
     private suspend fun isHiddenNodesActive(): Boolean {
