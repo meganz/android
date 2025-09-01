@@ -1,10 +1,11 @@
-package mega.privacy.android.app.presentation.node.dialogs.leaveshare
+package mega.privacy.android.core.nodecomponents.dialog.leaveshare
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.movenode.mapper.LeaveShareRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.LeaveShareRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogViewModel
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.MoveRequestResult

@@ -1045,10 +1045,6 @@
     <string name="option_to_retry_transfers">Retry all transfers</string>
     <!-- Button to confirm the action of restarting one transfer -->
     <string name="button_resume_individual_transfer">Resume</string>
-    <!-- Dialog to confirm before removing completed transfers -->
-    <string name="confirmation_to_clear_completed_transfers">Clear all transfers?</string>
-    <!-- Title of the tab section for transfers in progress -->
-    <string name="title_tab_in_progress_transfers">In progress</string>
     <!-- Title of the tab section for completed transfers -->
     <string name="title_tab_completed_transfers">Completed</string>
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
@@ -1061,8 +1057,6 @@
     <string name="transfer_retrying">Retrying</string>
     <!-- Possible state of a transfer. When the transfer was cancelled -->
     <string name="transfer_cancelled">Cancelled</string>
-    <!-- Possible state of a transfer -->
-    <string name="transfer_unknown">Unknown</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">Uploading files: %1$d of %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1251,10 +1245,6 @@
     <string name="title_properties_contact_notifications_for_chat">Chat notifications</string>
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invite friends and get rewards</string>
-    <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each invitation. Valid for 365 days.</string>
-    <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">%1$s of storage. Valid for 365 days.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Unlocked rewards</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1285,10 +1275,6 @@
     <string name="subtitle_confirmation_invite_friends">Invitation sent</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Email address is malformed</string>
-    <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">When you install the MEGA Desktop App you get %1$s of complimentary storage space, valid for 365 days. The MEGA Desktop App is available for Windows, macOS and most Linux distributions.</string>
-    <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">When you install the MEGA Mobile App you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS and Android.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA Desktop App.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
@@ -1654,10 +1640,6 @@
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_new_contact_request_notification">New contact request</string>
-    <!-- Empty state message shown in the screen when there are not any active transfer -->
-    <string name="transfers_empty_new">[B]No active[/B][A] Transfers[/A]</string>
-    <!-- Empty state message shown in the screen when there are not any active transfer -->
-    <string name="completed_transfers_empty_new">[B]No completed[/B][A] Transfers[/A]</string>
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[B]Empty[/B][A] Folder[/A]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
@@ -2441,8 +2423,6 @@
     </plurals>
     <!-- Download location label -->
     <string name="download_location">Download location</string>
-    <!-- Text asking confirmation for download location -->
-    <string name="confirmation_download_location">Always save to this location?</string>
     <!-- Action to show any file in its location -->
     <string name="view_in_folder_label">View in folder</string>
     <!-- Title of a screen to browse files -->
@@ -2457,8 +2437,6 @@
     <string name="label_transfer_over_quota">Transfer quota exceeded</string>
     <!-- Label indicating storage over quota -->
     <string name="label_storage_over_quota">Storage quota exceeded</string>
-    <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
-    <string name="label_get_more_transfer_quota">Get more transfer quota</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">The file cannot be found in your Cloud drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -2549,8 +2527,6 @@
     <string name="option_cancel_transfer">Cancel transfer</string>
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">Unpause transfers to proceed with your upload.</string>
-    <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
-    <string name="progress_size_indicator">%1$d%% of %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Debugging info for chat messages enabled</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
@@ -2624,8 +2600,6 @@
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Select transfers</string>
-    <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Unable to change priority of the transfer “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Send decryption key separately</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3001,8 +2975,6 @@
     <string name="change_setting_action">Change setting</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
     <string name="configure_start_screen">Configure default start screen</string>
-    <!-- Homepage section. -->
-    <string name="home_section">Home</string>
     <!-- Action button which allows to show the recent activity. -->
     <string name="show_activity_action">Show activity</string>
     <!-- Text informing the recent activity is hidden. -->

@@ -761,10 +761,6 @@
     <string name="general_drive">Drive</string>
     <!-- Tab bar title of Syncs tab -->
     <string name="general_syncs">Syncs</string>
-    <!-- Warning shown to the user when tries to retry a cancelled or failed transfer but it cannot be retried because app does not have read permission over the file anymore -->
-    <string name="transfers_completed_one_read_error_retrying">Your upload can’t be completed or retried, because MEGA can no longer access the file</string>
-    <!-- Warning shown to the user when tries to retry some or all of cancelled or failed transfer but they cannot be retried because app does not have read permission over the files anymore -->
-    <string name="transfers_completed_some_read_error_retrying">Some or all of your uploads can’t be completed or retried, because MEGA can no longer access the files</string>
     <!-- Title for Offline Folder exposed via SAF -->
     <string name="general_mega_offline">MEGA Offline files</string>
     <!-- Notification content for download final notification. It will inform the user about the location where file/s were downloaded -->
@@ -1179,8 +1175,6 @@
     <string name="text_start_mega_vpn_free_trial">%1$s of storage. Valid permanently.</string>
     <!-- title of the section for start mega pass free trial in achivements section -->
     <string name="title_start_mega_pass_free_trial">Start MEGA&#160;Pass free trial</string>
-    <!-- Text of the section for start mega pass free trial in achivements section -->
-    <string name="text_start_mega_pass_free_trial">%1$s of storage. Valid permanently.</string>
     <!-- Text of the button for install mega vpn in achivements section -->
     <string name="button_text_install_mega_vpn">Install MEGA&#160;VPN</string>
     <!-- Text of the button for install mega pass in achivements section -->
@@ -1475,26 +1469,6 @@
     <string name="context_correctly_renamed">Item renamed</string>
     <!-- Homepage section. -->
     <string name="general_section_home">Home</string>
-    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
-    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
-    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
-    <string name="figures_storage_referrals_achievements_text_permanent">%1$s extra storage for each invitation, valid permanently</string>
-    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
-    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
-    <string name="figures_storage_achievements_text_permanent">%1$s extra storage, valid permanently</string>
-    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
-    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
-    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
-    <string name="figures_storage_achievements_awarded_text_permanent">%1$s storage bonus applied, valid permanently</string>
-    <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
-    <!-- info paragraph about the achievement install megasync with permanent valid duration -->
-    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid permanently. The desktop app is available for Windows, macOS and Linux.</string>
-    <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
-    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
-    <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
-    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid permanently. The mobile apps are available for iOS and Android.</string>
     <!-- Error message when removing public links of nodes. Plural. -->
     <plurals name="context_link_removal_error">
         <item quantity="one">Link removal failed. Please try again later.</item>
@@ -1531,6 +1505,26 @@
         <item quantity="one">Unshare this folder?</item>
         <item quantity="other">Unshare these %1$d folders?</item>
     </plurals>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
+    <string name="figures_storage_referrals_achievements_text">%1$s extra storage for each invitation, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
+    <string name="figures_storage_referrals_achievements_text_permanent">%1$s extra storage for each invitation, valid permanently</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_text">%1$s extra storage, valid for %2$d days</string>
+    <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_text_permanent">%1$s extra storage, valid permanently</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with dynamic valid duration -->
+    <string name="figures_storage_achievements_awarded_text">%1$s storage bonus applied, valid for %2$d days</string>
+    <!-- sentence to detail the figures of awarded text related to VPN/Pass achievement with permanent valid duration -->
+    <string name="figures_storage_achievements_awarded_text_permanent">%1$s storage bonus applied, valid permanently</string>
+    <!-- info paragraph about the achievement install megasync with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_dynamic_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid for %2$s days. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install megasync with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_desktop_permanent_duration">Install the MEGA desktop app and get %1$s of free additional storage space, valid permanently. The desktop app is available for Windows, macOS and Linux.</string>
+    <!-- info paragraph about the achievement install mobile app with dynamic valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_dynamic_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid for %2$s days. The mobile apps are available for iOS and Android.</string>
+    <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
+    <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid permanently. The mobile apps are available for iOS and Android.</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">These folders can only be shared as read-only; as they are backup folders, any changes to their content could disable the backups.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -1547,4 +1541,31 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_ok">OK</string>
+    <!-- Item menu option upon right click on one or multiple files. -->
+    <string name="general_leave">Leave</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="one">Left %1$d shared folder</item>
+        <item quantity="other">Left %1$d shared folders</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="one">Couldn’t leave %1$d shared folder</item>
+        <item quantity="other">Couldn’t leave %1$d shared folders</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="one">Left %1$d shared folder,&#160;</item>
+        <item quantity="other">Left %1$d shared folders,&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="one">couldn’t leave %1$d shared folder</item>
+        <item quantity="other">couldn’t leave %1$d shared folders</item>
+    </plurals>
+    <!-- confirmation message before leaving some incoming shared folders -->
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="one">If you leave the folder, you will not be able to see it again.</item>
+        <item quantity="other">If you leave these folders, you will not be able to see them again.</item>
+    </plurals>
 </resources>

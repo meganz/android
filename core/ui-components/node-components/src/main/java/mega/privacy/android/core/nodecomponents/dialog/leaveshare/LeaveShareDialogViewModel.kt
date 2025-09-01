@@ -1,10 +1,10 @@
-package mega.privacy.android.app.presentation.node.dialogs.leaveshare
+package mega.privacy.android.core.nodecomponents.dialog.leaveshare
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.movenode.mapper.LeaveShareRequestMessageMapper
+import mega.privacy.android.core.nodecomponents.mapper.LeaveShareRequestMessageMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -14,10 +14,10 @@ import javax.inject.Inject
 
 /**
  * View Model for Leave Share dialog
- * @property leaveSharesUseCase [LeaveSharesUseCase]
- * @property applicationScope [CoroutineScope]
- * @property leaveShareRequestMessageMapper [LeaveShareRequestMessageMapper]
- * @property snackBarHandler [SnackBarHandler]
+ * @property leaveSharesUseCase [mega.privacy.android.domain.usecase.node.LeaveSharesUseCase]
+ * @property applicationScope [kotlinx.coroutines.CoroutineScope]
+ * @property leaveShareRequestMessageMapper [mega.privacy.android.app.presentation.movenode.mapper.LeaveShareRequestMessageMapper]
+ * @property snackBarHandler [mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler]
  */
 @HiltViewModel
 class LeaveShareDialogViewModel @Inject constructor(
@@ -40,7 +40,7 @@ class LeaveShareDialogViewModel @Inject constructor(
                     val message = leaveShareRequestMessageMapper(it)
                     snackBarHandler.postSnackbarMessage(message = message)
                 }.onFailure {
-                    Timber.e(it)
+                    Timber.Forest.e(it)
                 }
 
         }

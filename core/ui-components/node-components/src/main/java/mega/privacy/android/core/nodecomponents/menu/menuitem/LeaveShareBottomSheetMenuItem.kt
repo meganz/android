@@ -1,13 +1,14 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogArgs
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.LeaveShareMenuAction
+import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 
 /**
  * Leave share bottom sheet menu item
@@ -32,25 +33,18 @@ class LeaveShareBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         handler: BottomSheetClickHandler
     ): () -> Unit = {
-        handler.onDismiss()
-        val nodeHandleList = listOf(node.id.longValue)
         runCatching {
-            nodeHandlesToJsonMapper(nodeHandleList)
+            nodeHandlesToJsonMapper(listOf(node.id.longValue))
         }.onSuccess {
-            // Todo: navigationHandler
-//            navController.navigate(
-//                searchLeaveShareFolderDialog.plus("/${it}")
-//            )
+            handler.navigationHandler.navigate(
+                LeaveShareDialogArgs(handles = it)
+            )
         }
+        handler.onDismiss()
     }
 
     override val isDestructiveAction: Boolean
         get() = true
     override val groupId: Int
         get() = 9
-
-    companion object {
-        // Todo duplicate routes to the one in mega.privacy.android.app.presentation.search.navigation.LeaveShareFolderNavigation
-        private const val searchLeaveShareFolderDialog = "search/leave_share_folder"
-    }
 }
