@@ -2,18 +2,17 @@ package mega.privacy.android.shared.original.core.ui.controls.images
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -21,8 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import coil3.compose.AsyncImagePainter
-import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
@@ -36,7 +33,7 @@ import java.io.File
  * Thumbnail view
  *
  * @param contentDescription content description
- * @param data any data [File], [Uri], [Bitmap], [ThumbnailRequest]
+ * @param data any data [File], Uri, Bitmap, ThumbnailRequest
  * @param defaultImage default image
  * @param modifier
  * @param contentScale content scale
@@ -98,35 +95,30 @@ fun GridThumbnailView(
     data?.let {
         var imageLoaded by remember { mutableStateOf(false) }
         var cornerRadius by remember { mutableStateOf(0.dp) }
-        val painter = rememberAsyncImagePainter(
+        var finalModifier by remember { mutableStateOf(modifier) }
+
+        AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(data)
                 .crossfade(true)
                 .error(defaultImage)
                 .placeholder(defaultImage)
-                .build()
-        )
-        val painterState by painter.state.collectAsStateWithLifecycle()
-        var finalModifier: Modifier = modifier
-            .clip(RoundedCornerShape(cornerRadius))
-            .padding(vertical = if (imageLoaded) 0.dp else 34.dp)
-
-        LaunchedEffect(painterState) {
-            if (painterState is AsyncImagePainter.State.Success) {
+                .build(),
+            contentDescription = contentDescription,
+            contentScale = if (imageLoaded) contentScale else ContentScale.Fit,
+            modifier = finalModifier
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(cornerRadius))
+                .padding(vertical = if (imageLoaded) 0.dp else 34.dp),
+            onSuccess = {
                 finalModifier = onSuccess(modifier)
                 imageLoaded = true
                 cornerRadius = 4.dp
-            } else if (painterState is AsyncImagePainter.State.Error) {
+            },
+            onError = {
                 imageLoaded = false
                 cornerRadius = 0.dp
             }
-        }
-
-        Image(
-            painter = painter,
-            modifier = finalModifier,
-            contentScale = if (imageLoaded) contentScale else ContentScale.Fit,
-            contentDescription = contentDescription
         )
     } ?: Image(
         modifier = modifier

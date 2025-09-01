@@ -58,7 +58,7 @@ fun ThumbnailView(
  * Thumbnail view
  *
  * @param contentDescription content description
- * @param data any data [File], [Uri], [Bitmap], [ThumbnailRequest]
+ * @param data any data [File], Uri, Bitmap, ThumbnailRequest
  * @param defaultImage default image
  * @param modifier
  * @param contentScale content scale
@@ -112,7 +112,7 @@ fun ThumbnailView(
  * Thumbnail view
  *
  * @param contentDescription content description
- * @param data any data [File], [Uri], [Bitmap], [ThumbnailRequest]
+ * @param data any data [File], Uri, Bitmap, ThumbnailRequest
  * @param defaultImage default image
  * @param modifier
  * @param contentScale content scale
