@@ -4,11 +4,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,6 +23,7 @@ import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
@@ -46,6 +50,7 @@ class MenuViewModel @Inject constructor(
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val monitorUserUpdates: MonitorUserUpdates,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     // Flows for items that need dynamic subtitles
     private val currentPlanSubtitleFlow = MutableStateFlow<String?>(null)
@@ -148,15 +153,21 @@ class MenuViewModel @Inject constructor(
 
     private fun monitorUserDataAndAvatar() {
         viewModelScope.launch {
-            monitorMyAvatarFile().onStart { emit(getMyAvatarFileUseCase(isForceRefresh = false)) }
-                .catch { Timber.e(it) }
-                .collectLatest { avatarFile ->
+            monitorMyAvatarFile().onStart {
+                // emit from cache first and then from remote
+                emit(getMyAvatarFileUseCase(isForceRefresh = false))
+                emit(getMyAvatarFileUseCase(isForceRefresh = true))
+            }.map { file ->
+                file to (file?.lastModified() ?: 0L)
+            }.flowOn(ioDispatcher).catch { Timber.e(it) }
+                .collectLatest { (avatarFile, lastModified) ->
                     val color = runCatching { getMyAvatarColorUseCase() }.getOrNull()
                     _uiState.update {
                         it.copy(
                             avatar = avatarFile,
                             avatarColor = color?.let { color -> Color(color) }
                                 ?: Color.Unspecified,
+                            lastModifiedTime = lastModified
                         )
                     }
                 }

@@ -44,6 +44,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -68,12 +69,13 @@ class MenuViewModelTest {
     private val getUserFullNameUseCase = mock<GetUserFullNameUseCase>()
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
+    private val ioDispatcher = UnconfinedTestDispatcher()
 
     private object TestDestination : NavKey
 
     @BeforeAll
     fun initialisation() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
+        Dispatchers.setMain(ioDispatcher)
     }
 
     @AfterAll
@@ -211,7 +213,7 @@ class MenuViewModelTest {
         }
 
         getMyAvatarFileUseCase.stub {
-            onBlocking { invoke(false) }.thenReturn(avatarFile)
+            onBlocking { invoke(any()) }.thenReturn(avatarFile)
         }
 
         initUnderTest()
@@ -523,7 +525,8 @@ class MenuViewModelTest {
             fileSizeStringMapper = fileSizeStringMapper,
             getUserFullNameUseCase = getUserFullNameUseCase,
             getCurrentUserEmail = getCurrentUserEmail,
-            monitorUserUpdates = monitorUserUpdates
+            monitorUserUpdates = monitorUserUpdates,
+            ioDispatcher = ioDispatcher,
         )
     }
 
@@ -580,7 +583,6 @@ class MenuViewModelTest {
             val state = awaitItem()
             assertThat(state.name).isEqualTo(updatedName)
             verify(getUserFullNameUseCase).invoke(forceRefresh = true)
-            verify(getMyAvatarFileUseCase).invoke(isForceRefresh = true)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -604,7 +606,6 @@ class MenuViewModelTest {
             val state = awaitItem()
             assertThat(state.name).isEqualTo(updatedName)
             verify(getUserFullNameUseCase).invoke(forceRefresh = true)
-            verify(getMyAvatarFileUseCase).invoke(isForceRefresh = true)
             cancelAndIgnoreRemainingEvents()
         }
     }

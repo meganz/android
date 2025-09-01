@@ -106,7 +106,7 @@ fun MenuHomeScreenUi(
             contentPadding = PaddingValues(top = paddingValues.calculateTopPadding()),
         )
         {
-            item(key = "${uiState.name} ${uiState.email} ${uiState.avatar?.path}") {
+            item(key = "${uiState.name} ${uiState.email} ${uiState.lastModifiedTime}") {
                 FlexibleLineListItem(
                     modifier = Modifier
                         .fillMaxWidth()

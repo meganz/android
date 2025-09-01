@@ -10,6 +10,7 @@ data class MenuUiState(
     val name: String? = null,
     val email: String? = null,
     val avatar: File? = null,
+    val lastModifiedTime: Long = 0L,
     val avatarColor: Color = Color.Unspecified,
     val isConnectedToNetwork: Boolean = true,
 )
