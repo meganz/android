@@ -344,6 +344,7 @@ internal fun VideoPlayerScreen(
                                 isControllerViewVisible = true
                                 systemUiController.isSystemBarsVisible = true
                                 playerComposeView.showController()
+                                playerComposeView.controllerAutoShow = false
 
                                 autoHideJob = coroutineScope.launch {
                                     delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
