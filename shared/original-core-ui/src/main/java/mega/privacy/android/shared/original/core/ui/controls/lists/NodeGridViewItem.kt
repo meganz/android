@@ -25,6 +25,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -123,24 +124,27 @@ fun NodeGridViewItem(
                         .fillMaxWidth()
                         .height(172.dp)
                 ) {
-                    GridThumbnailView(
-                        data = thumbnailData,
-                        defaultImage = iconRes,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .align(Alignment.Center)
-                            .testTag(THUMBNAIL_FILE_TEST_TAG),
-                        contentDescription = name,
-                        contentScale = ContentScale.Crop,
-                        onSuccess = { modifier ->
-                            if (!showBlurEffect) {
-                                modifier
-                            } else {
-                                modifier
-                                    .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
+                    key(isSensitive) {
+                        GridThumbnailView(
+                            data = thumbnailData,
+                            defaultImage = iconRes,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .align(Alignment.Center)
+                                .testTag(THUMBNAIL_FILE_TEST_TAG),
+                            contentDescription = name,
+                            contentScale = ContentScale.Crop,
+                            onSuccess = { modifier ->
+                                if (!showBlurEffect) {
+                                    modifier
+                                } else {
+                                    modifier
+                                        .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
+
                     if (isVideoNode) {
                         Box(
                             modifier = Modifier
