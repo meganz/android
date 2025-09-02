@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -38,11 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -62,7 +59,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -71,9 +67,6 @@ import androidx.navigation.NavController
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import mega.android.core.ui.theme.values.BackgroundColor
-import mega.android.core.ui.theme.values.SupportColor
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
@@ -122,8 +115,6 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -740,20 +731,16 @@ internal fun UsageMeterSection(
     modifier: Modifier = Modifier,
 ) {
     val isStorageOverQuota = storageState == StorageState.Red
-    val storageColor = when (storageState) {
-        StorageState.Red -> SupportColor.Error to TextColor.Error
-        StorageState.Orange -> SupportColor.Warning to TextColor.Warning
-        else -> SupportColor.Success to TextColor.Success
+    val storageQuotaLevel = when (storageState) {
+        StorageState.Red -> QuotaLevel.Error
+        StorageState.Orange -> QuotaLevel.Warning
+        else -> QuotaLevel.Success
     }
-
-    val transferColor = when (usedTransferStatus) {
-        UsedTransferStatus.Full -> SupportColor.Error to TextColor.Error
-        UsedTransferStatus.AlmostFull -> SupportColor.Warning to TextColor.Warning
-        else -> SupportColor.Success to TextColor.Success
+    val transferQuotaLevel = when (usedTransferStatus) {
+        UsedTransferStatus.Full -> QuotaLevel.Error
+        UsedTransferStatus.AlmostFull -> QuotaLevel.Warning
+        else -> QuotaLevel.Success
     }
-    val defaultTextStyle = MaterialTheme.typography.body2medium
-    var finalTextStyle by remember { mutableStateOf(defaultTextStyle) }
-    var shouldDrawText by remember { mutableStateOf(false) }
 
     if (showProgressBar) {
         //Layout to show Storage/Transfer usage for Free/Pro accounts except Pro Flexi
@@ -771,49 +758,18 @@ internal fun UsageMeterSection(
             val transferChain =
                 createVerticalChain(transferTop, transferBottom, chainStyle = ChainStyle.Packed)
 
-            Box(
+            MyAccountQuotaProgressBar(
                 modifier = Modifier
-                    .size(50.dp)
-                    .testTag(USAGE_STORAGE_SECTION)
                     .constrainAs(storageLayout) {
                         top.linkTo(parent.top, 14.dp)
                         bottom.linkTo(parent.bottom, 14.dp)
                         start.linkTo(parent.start, 14.dp)
                     }
-            ) {
-                MegaCircularProgressIndicator(
-                    modifier = Modifier
-                        .testTag(USAGE_STORAGE_PROGRESS)
-                        .fillMaxSize()
-                        .align(Alignment.Center),
-                    supportColor = storageColor.first,
-                    strokeWidth = 5.dp,
-                    progress = (usedStoragePercentage.toFloat() / 100).coerceAtMost(1f),
-                    backgroundColor = BackgroundColor.Surface3,
-                )
-
-                MegaText(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(5.dp)
-                        .drawWithContent {
-                            if (shouldDrawText) drawContent()
-                        },
-                    text = "$usedStoragePercentage%",
-                    textColor = storageColor.second,
-                    style = finalTextStyle,
-                    softWrap = false,
-                    onTextLayout = { result ->
-                        if (result.didOverflowWidth && defaultTextStyle.fontSize.isSpecified) {
-                            finalTextStyle = finalTextStyle.copy(
-                                fontSize = finalTextStyle.fontSize * 0.8
-                            )
-                        } else {
-                            shouldDrawText = true
-                        }
-                    }
-                )
-            }
+                    .testTag(USAGE_STORAGE_SECTION),
+                level = storageQuotaLevel,
+                progress = usedStoragePercentage,
+                progressIndicatorTestTag = USAGE_STORAGE_PROGRESS
+            )
 
             constrain(storageChain) {
                 top.linkTo(storageLayout.top)
@@ -857,33 +813,18 @@ internal fun UsageMeterSection(
             )
 
             if (showTransfer) {
-                Box(
+                MyAccountQuotaProgressBar(
                     modifier = Modifier
-                        .testTag(USAGE_TRANSFER_SECTION)
-                        .wrapContentSize()
                         .constrainAs(transferLayout) {
                             top.linkTo(parent.top, 14.dp)
                             bottom.linkTo(parent.bottom, 14.dp)
                             start.linkTo(guideline)
                         }
-                ) {
-                    MegaCircularProgressIndicator(
-                        modifier = Modifier
-                            .size(50.dp)
-                            .testTag(USAGE_TRANSFER_PROGRESS),
-                        supportColor = transferColor.first,
-                        strokeWidth = 6.dp,
-                        progress = (usedTransferPercentage.toFloat() / 100).coerceAtMost(1f),
-                        backgroundColor = BackgroundColor.Surface3,
-                    )
-
-                    MegaText(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = "$usedTransferPercentage%",
-                        style = MaterialTheme.typography.body2medium,
-                        textColor = transferColor.second,
-                    )
-                }
+                        .testTag(USAGE_TRANSFER_SECTION),
+                    level = transferQuotaLevel,
+                    progress = usedTransferPercentage,
+                    progressIndicatorTestTag = USAGE_TRANSFER_PROGRESS
+                )
 
                 constrain(transferChain) {
                     top.linkTo(transferLayout.top)

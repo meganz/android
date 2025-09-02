@@ -1,15 +1,23 @@
 package mega.privacy.android.app.myAccount.util
 
 import android.content.Context
-import androidx.core.content.ContextCompat
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.Flow
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.myaccount.view.MyAccountQuotaProgressBar
+import mega.privacy.android.app.presentation.myaccount.view.QuotaLevel
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -28,8 +36,6 @@ object MyAccountViewUtil {
     /**
      * Updates the views related to usage of storage and transfers
      * for all type of accounts except business ones.
-     *
-     * @param viewModel MyAccountViewModel to check the data.
      */
     fun MyAccountUsageContainerBinding.update(
         context: Context,
@@ -42,44 +48,18 @@ object MyAccountViewUtil {
         usedTransfer: String,
         usedTransferPercentage: Int,
         usedTransferStatus: UsedTransferStatus,
+        themeMode: Flow<ThemeMode>,
     ) {
         usageLayoutBusiness.isVisible = false
         storageLayout.isVisible = true
         transferLayout.isVisible = true
 
+        var storageProgressValue = 0
         if (usedStorage.isEmpty()) {
-            storageProgressPercentage.isVisible = false
-            storageProgressBar.progress = 0
             storageProgress.text = getGettingInfo(context)
         } else {
             val isStorageOverQuota = storageState == StorageState.Red
-
-            storageProgressPercentage.apply {
-                isVisible = true
-                text = context.getString(
-                    R.string.used_storage_transfer_percentage,
-                    usedStoragePercentage.toString()
-                )
-            }
-
-            storageProgressBar.progress = usedStoragePercentage
-
-            val storageColors = when (storageState) {
-                StorageState.Red -> ContextCompat.getColorStateList(
-                    context,
-                    R.color.color_support_error
-                )
-
-                StorageState.Orange -> ContextCompat.getColorStateList(
-                    context,
-                    R.color.color_support_warning
-                )
-
-                else -> ContextCompat.getColorStateList(context, R.color.color_support_success)
-            }
-            storageProgressBar.progressTintList = storageColors
-            storageProgressPercentage.setTextColor(storageColors)
-
+            storageProgressValue = usedStoragePercentage
             storageProgress.text = context.getString(
                 R.string.used_storage_transfer,
                 usedStorage,
@@ -94,46 +74,58 @@ object MyAccountViewUtil {
                 }
             }
         }
+        storageProgressLayout.apply {
+            val storageQuotaLevel = when (storageState) {
+                StorageState.Red -> QuotaLevel.Error
+                StorageState.Orange -> QuotaLevel.Warning
+                else -> QuotaLevel.Success
+            }
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                    MyAccountQuotaProgressBar(
+                        level = storageQuotaLevel,
+                        progress = storageProgressValue,
+                        progressIndicatorTestTag = "storage_progress_bar",
+                        progressTextTestTag = "storage_progress_percentage"
+                    )
+                }
+            }
+        }
 
         transferLayout.isVisible = !isFreeAccount
 
+        var transferProgressValue = 0
         if (usedTransfer.isEmpty()) {
-            transferProgressPercentage.isVisible = false
-            transferProgressBar.progress = 0
             transferProgress.text = getGettingInfo(context)
         } else {
-            transferProgressPercentage.apply {
-                isVisible = true
-                text = context.getString(
-                    R.string.used_storage_transfer_percentage,
-                    usedTransferPercentage.toString()
-                )
-            }
-
-            transferProgressBar.progress = usedTransferPercentage
-
-            val transferColors = when (usedTransferStatus) {
-                UsedTransferStatus.Full -> ContextCompat.getColorStateList(
-                    context,
-                    R.color.color_support_error
-                )
-
-                UsedTransferStatus.AlmostFull -> ContextCompat.getColorStateList(
-                    context,
-                    R.color.color_support_warning
-                )
-
-                else -> ContextCompat.getColorStateList(context, R.color.color_support_success)
-            }
-            transferProgressBar.progressTintList = transferColors
-            transferProgressPercentage.setTextColor(transferColors)
-
+            transferProgressValue = usedTransferPercentage
             transferProgress.text = context.getString(
                 R.string.used_storage_transfer,
                 usedTransfer,
                 totalTransfer
             ).replace("[A]", "")
                 .replace("[/A]", "")
+        }
+        transferProgressLayout.apply {
+            val transferQuotaLevel = when (usedTransferStatus) {
+                UsedTransferStatus.Full -> QuotaLevel.Error
+                UsedTransferStatus.AlmostFull -> QuotaLevel.Warning
+                else -> QuotaLevel.Success
+            }
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                    MyAccountQuotaProgressBar(
+                        level = transferQuotaLevel,
+                        progress = transferProgressValue,
+                        progressIndicatorTestTag = "transfer_progress_bar",
+                        progressTextTestTag = "transfer_progress_percentage"
+                    )
+                }
+            }
         }
 
         root.post { checkImagesOrProgressBarVisibility(isFreeAccount) }
@@ -142,8 +134,6 @@ object MyAccountViewUtil {
     /**
      * Updates the views related to usage of storage and transfers
      * for only business accounts.
-     *
-     * @param viewModel MyAccountViewModel to check the data.
      */
     fun MyAccountUsageContainerBinding.updateBusinessOrProFlexi(
         context: Context,
@@ -161,7 +151,6 @@ object MyAccountViewUtil {
     /**
      * Updates the views related to payments for all type of accounts except business ones.
      *
-     * @param viewModel MyAccountViewModel to check the data.
      * @param fragment Value from `ActiveFragment` enum indicating what is the active fragment.
      */
     fun MyAccountPaymentInfoContainerBinding.update(
@@ -184,7 +173,6 @@ object MyAccountViewUtil {
      * Updates the views related to payments for only business accounts.
      *
      * @param megaApi       MegaApiAndroid to check business status.
-     * @param viewModel     MyAccountViewModel to check the data.
      * @param expandedView  True if the binding is in the expanded view, false otherwise.
      * @param fragment      Value from `ActiveFragment` enum indicating what is the active fragment.
      */
@@ -223,7 +211,6 @@ object MyAccountViewUtil {
     /**
      * Updates the views related to payments for all type of accounts.
      *
-     * @param viewModel MyAccountViewModel to check the data.
      * @param renewable True if the subscriptions is renewable, false otherwise.
      * @param fragment  Value from `ActiveFragment` enum indicating what is the active fragment.
      */

@@ -26,6 +26,7 @@ import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.MyAccountUpdate
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import nz.mega.sdk.MegaApiAndroid
@@ -46,6 +47,9 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     private val viewModel: MyAccountViewModel by activityViewModels()
 
@@ -189,16 +193,17 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
             binding.upgradeButton.isVisible = false
         } else {
             usageBinding.update(
-                requireContext(),
-                viewModel.getStorageState(),
-                viewModel.isFreeAccount(),
-                viewModel.getTotalStorage(),
-                viewModel.getTotalTransfer(),
-                viewModel.getUsedStorage(),
-                viewModel.getUsedStoragePercentage(),
-                viewModel.getUsedTransfer(),
-                viewModel.getUsedTransferPercentage(),
-                viewModel.getUsedTransferStatus()
+                context = requireContext(),
+                storageState = viewModel.getStorageState(),
+                isFreeAccount = viewModel.isFreeAccount(),
+                totalStorage = viewModel.getTotalStorage(),
+                totalTransfer = viewModel.getTotalTransfer(),
+                usedStorage = viewModel.getUsedStorage(),
+                usedStoragePercentage = viewModel.getUsedStoragePercentage(),
+                usedTransfer = viewModel.getUsedTransfer(),
+                usedTransferPercentage = viewModel.getUsedTransferPercentage(),
+                usedTransferStatus = viewModel.getUsedTransferStatus(),
+                themeMode = monitorThemeModeUseCase()
             )
             paymentAlertBinding.root.isVisible = paymentAlertBinding.update(
                 viewModel.getRenewTime(),

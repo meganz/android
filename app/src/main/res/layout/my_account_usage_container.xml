@@ -21,30 +21,13 @@
         android:layout_marginStart="12dp"
         android:layout_weight="1">
 
-        <RelativeLayout
+        <androidx.compose.ui.platform.ComposeView
             android:id="@+id/storage_progress_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="9dp">
-
-            <ProgressBar
-                android:id="@+id/storage_progress_bar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:layout_centerVertical="true"
-                android:progressDrawable="@drawable/storage_transfer_circular_progress_bar" />
-
-            <TextView
-                android:id="@+id/storage_progress_percentage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
-                tools:text="30%" />
-
-        </RelativeLayout>
+            android:layout_marginEnd="9dp"
+            tools:composableName="mega.privacy.android.app.presentation.myaccount.view.MyAccountQuotaProgressBarKt.MyAccountQuotaProgressBarPreview" />
 
         <TextView
             android:id="@+id/storage_progress"
@@ -72,31 +55,13 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-        <RelativeLayout
+        <androidx.compose.ui.platform.ComposeView
             android:id="@+id/transfer_progress_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="9dp">
-
-            <ProgressBar
-                android:id="@+id/transfer_progress_bar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:layout_centerVertical="true"
-                android:progressDrawable="@drawable/storage_transfer_circular_progress_bar" />
-
-            <TextView
-                android:id="@+id/transfer_progress_percentage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginStart="12.5dp"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
-                tools:text="30%" />
-
-        </RelativeLayout>
+            android:layout_marginEnd="9dp"
+            tools:composableName="mega.privacy.android.app.presentation.myaccount.view.MyAccountQuotaProgressBarKt.MyAccountQuotaProgressBarPreview" />
 
         <TextView
             android:id="@+id/transfer_progress"
