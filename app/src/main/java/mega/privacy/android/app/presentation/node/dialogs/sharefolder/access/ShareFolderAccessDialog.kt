@@ -4,11 +4,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import mega.privacy.android.app.R
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogViewModel
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Share folder access dialog to show access dialog to share folder
@@ -61,15 +62,15 @@ private fun ShareFolderAccessDialogBody(
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         ConfirmationDialogWithRadioButtons(
             radioOptions = radioButtonOptions,
-            titleText = stringResource(id = R.string.dialog_select_permissions),
+            titleText = stringResource(id = sharedResR.string.dialog_select_permissions),
             onOptionSelected = {
                 onItemSelected(it)
             },
             optionDescriptionMapper = {
                 when (it) {
-                    AccessPermission.READ -> stringResource(id = R.string.file_properties_shared_folder_read_only)
-                    AccessPermission.READWRITE -> stringResource(id = R.string.file_properties_shared_folder_read_write)
-                    else -> stringResource(id = R.string.file_properties_shared_folder_full_access)
+                    AccessPermission.READ -> stringResource(id = sharedResR.string.file_properties_shared_folder_read_only)
+                    AccessPermission.READWRITE -> stringResource(id = sharedResR.string.file_properties_shared_folder_read_write)
+                    else -> stringResource(id = sharedResR.string.file_properties_shared_folder_full_access)
                 }
             },
             onDismissRequest = onDismiss,

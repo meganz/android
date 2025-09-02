@@ -3,12 +3,13 @@ package mega.privacy.android.app.presentation.node.dialogs.sharefolder.access
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.R
+import mega.privacy.android.app.fromId
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogViewModel
+import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
-import mega.privacy.android.app.fromId
 
 @RunWith(AndroidJUnit4::class)
 class ShareFolderAccessDialogTest {
@@ -30,17 +31,17 @@ class ShareFolderAccessDialogTest {
         }
         composeTestRule.onNodeWithText(
             fromId(
-                R.string.file_properties_shared_folder_read_only,
+                sharedResR.string.file_properties_shared_folder_read_only,
             )
         ).assertExists()
         composeTestRule.onNodeWithText(
             fromId(
-                R.string.file_properties_shared_folder_read_write,
+                sharedResR.string.file_properties_shared_folder_read_write,
             )
         ).assertExists()
         composeTestRule.onNodeWithText(
             fromId(
-                R.string.file_properties_shared_folder_full_access,
+                sharedResR.string.file_properties_shared_folder_full_access,
             )
         ).assertExists()
     }

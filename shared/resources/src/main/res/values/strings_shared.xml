@@ -277,7 +277,7 @@
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your Camera uploads folder and secondary media uploads folder cannot be related to each other. Choose a different folder.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">OK, got it</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_no_picker_warning">This device doesn’t have an app to select folders</string>
     <!-- Hidden items -->
@@ -1497,8 +1497,8 @@
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="one">The folder is shared with %1$d contact. Remove share?</item>
-        <item quantity="other">The folder is shared with %1$d contacts. Remove all shares?</item>
+        <item quantity="one">This folder is shared with %1$d contact. Stop sharing?</item>
+        <item quantity="other">This folder is shared with %1$d contacts. Stop sharing?</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
     <plurals name="alert_remove_several_shares">
@@ -1526,13 +1526,13 @@
     <!-- info paragraph about the achievement install mobile app with permanent valid duration -->
     <string name="paragraph_info_achievement_install_mobile_app_permanent_duration">Install one of the MEGA mobile apps and get %1$s of free additional storage space, valid permanently. The mobile apps are available for iOS and Android.</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">These folders can only be shared as read-only; as they are backup folders, any changes to their content could disable the backups.</string>
+    <string name="backup_multi_share_permission_text">These are backup folders and can only be shared as read-only</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">This folder can only be shared as read-only; as this is a backup folder, any changes to its content could disable the backup.</string>
+    <string name="backup_share_permission_text">This is a backup folder and can only be shared as read-only</string>
     <!-- Button to confirm the action of restarting one transfer-->
-    <string name="button_permission_info">Got it</string>
+    <string name="button_permission_info">OK, got it</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_title">Read-only</string>
+    <string name="backup_share_permission_title">Backup folders are read-only</string>
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">Continue</string>
     <!--Dialog title when the user selected is not on the contact list when sharing a node -->
@@ -1568,4 +1568,12 @@
         <item quantity="one">If you leave the folder, you will not be able to see it again.</item>
         <item quantity="other">If you leave these folders, you will not be able to see them again.</item>
     </plurals>
+    <!-- Title of the dialog to choose permissions when sharing. -->
+    <string name="dialog_select_permissions">Share permissions</string>
+    <!-- Refers to access rights for a file folder. -->
+    <string name="file_properties_shared_folder_full_access">Full access</string>
+    <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
+    <string name="file_properties_shared_folder_read_only">Read-only</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="file_properties_shared_folder_read_write">Read and write</string>
 </resources>

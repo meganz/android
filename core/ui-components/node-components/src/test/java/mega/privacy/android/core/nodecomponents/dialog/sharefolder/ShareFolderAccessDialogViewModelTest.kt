@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node.dialogs.sharefolder.access
+package mega.privacy.android.core.nodecomponents.dialog.sharefolder
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi

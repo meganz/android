@@ -26,6 +26,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogArgs
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogM3
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
@@ -99,15 +100,14 @@ fun NodeOptionsBottomSheetRoute(
         event = nodeOptionActionState.contactsData,
         onConsumed = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
         action = { (contactData, isFromBackups, nodeHandles) ->
+            navigationHandler.navigate(
+                ShareFolderAccessDialogArgs(
+                    nodes = nodeHandles,
+                    contacts = contactData.joinToString(separator = ","),
+                    isFromBackups = isFromBackups
+                )
+            )
             onDismiss()
-            // Todo: NavigationHandler implement share folder access dialog. M3 version of this dialog is not available yet
-//            val contactList =
-//                contactData.joinToString(separator = contactArraySeparator)
-//            navHostController.navigate(
-//                shareFolderAccessDialog.plus("/${contactList}")
-//                    .plus("/${isFromBackups}")
-//                    .plus("/${nodeHandles}")
-//            )
         },
     )
 

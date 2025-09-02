@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.node.dialogs.sharefolder.access
+package mega.privacy.android.core.nodecomponents.dialog.sharefolder
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,10 +14,10 @@ import javax.inject.Inject
 
 /**
  * View model for share folder access dialog
- * @property applicationScope [CoroutineScope]
- * @property sharedFolderUseCase [ShareFolderUseCase]
- * @property nodeMoveRequestMessageMapper [NodeMoveRequestMessageMapper]
- * @property snackBarHandler [SnackBarHandler]
+ * @property applicationScope [kotlinx.coroutines.CoroutineScope]
+ * @property sharedFolderUseCase [mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase]
+ * @property nodeMoveRequestMessageMapper [mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper]
+ * @property snackBarHandler [mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler]
  */
 @HiltViewModel
 class ShareFolderAccessDialogViewModel @Inject constructor(
@@ -31,7 +31,7 @@ class ShareFolderAccessDialogViewModel @Inject constructor(
      * Share folders to contacts with access rights
      * @param handles list of folders to be shared
      * @param contactData list of users
-     * @param accessPermission [AccessPermission]
+     * @param accessPermission [mega.privacy.android.domain.entity.shares.AccessPermission]
      */
     fun shareFolder(
         handles: List<Long>,
