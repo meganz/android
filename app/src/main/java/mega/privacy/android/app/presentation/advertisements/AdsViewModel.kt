@@ -2,20 +2,20 @@ package mega.privacy.android.app.presentation.advertisements
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.ads.admanager.AdManagerAdRequest
+import com.google.android.ump.ConsentInformation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
-import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
-import mega.privacy.android.domain.entity.advertisements.FetchAdDetailRequest
-import mega.privacy.android.domain.entity.preference.StartScreen
-import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
-import mega.privacy.android.domain.usecase.advertisements.FetchAdDetailUseCase
-import mega.privacy.android.domain.usecase.advertisements.IsAccountNewUseCase
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,166 +24,80 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AdsViewModel @Inject constructor(
-    private val fetchAdDetailUseCase: FetchAdDetailUseCase,
-    private val isAccountNewUseCase: IsAccountNewUseCase,
-    private val monitorStartScreenPreference: MonitorStartScreenPreference,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val consentInformation: ConsentInformation,
 ) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(AdsUIState())
-    private var isPortrait = true
-
-    /**
-     * Ads state
-     */
-    val uiState = _uiState.asStateFlow()
+    private val _request = MutableStateFlow<AdManagerAdRequest?>(null)
+    private val _isAdsFeatureEnabled = MutableStateFlow<Boolean?>(null)
 
     /**
-     * Feature Flag for InAppAdvertisement
+     * Flow to provide the AdRequest to be used in the AdManager.
      */
-    private var isAdsFeatureEnabled: Boolean = false
-    private var isAccountNew: Boolean = false
-    private var fetchAdUrlJob: Job? = null
+    val request = _request.asStateFlow()
 
-
-    fun isAdsFeatureEnabled() = isAdsFeatureEnabled
-    /**
-     * Enable the ads feature
-     */
-    fun enableAdsFeature() {
-        isAdsFeatureEnabled = true
-        checkIsNewAccount()
-    }
+    private var refreshAdsJob: Job? = null
+    private var lastFetchTime = -1L
+    private val mutex = Mutex()
 
     /**
-     * Disable the ads feature
+     * Schedule periodic refresh of ads if ads are enabled and user consent is given.
      */
-    fun disableAdsFeature() {
-        cancelFetchingAds()
-        isAdsFeatureEnabled = false
-        _uiState.update { state ->
-            state.copy(showAdsView = false, slotId = "", adsBannerUrl = "")
-        }
-    }
-
-    /**
-     * Mark the ad slot as consumed
-     */
-    fun onAdConsumed() {
-        val consumedSlots = _uiState.value.consumedAdSlots
-        consumedSlots.add(_uiState.value.slotId)
-        _uiState.update { state ->
-            state.copy(consumedAdSlots = consumedSlots, showAdsView = false)
-        }
-        if (canConsumeAdSlot(_uiState.value.slotId))
-            fetchNewAd()
-    }
-
-    /**
-     * Checks if the ad slot can be consumed
-     * @param adSlot  The ad slot id to check
-     * @return true if the ad slot can be consumed, false otherwise
-     */
-    fun canConsumeAdSlot(adSlot: String): Boolean {
-        return if (isAccountNew.not()) {
-            true
-        } else {
-            _uiState.value.consumedAdSlots.contains(adSlot).not()
-        }
-    }
-
-    /**
-     * Update the ads visibility when configuration changes and cancels any ongoing fetching ad's job
-     */
-    fun onScreenOrientationChanged(isPortrait: Boolean) {
-        this.isPortrait = isPortrait
-        if (isPortrait.not())
-            cancelFetchingAds()
-        _uiState.update { state ->
-            state.copy(
-                showAdsView = isPortrait
-                        && canConsumeAdSlot(_uiState.value.slotId)
-                        && isAdsFeatureEnabled
-            )
-        }
-    }
-
-
-    /**
-     * Check for the status of the account if new or not
-     */
-    private fun checkIsNewAccount() {
-        viewModelScope.launch {
-            runCatching {
-                isAccountNew = isAccountNewUseCase()
-            }.onFailure {
-                Timber.e("Failed to fetch isNewAccount with error: ${it.message}")
-            }
-        }
-    }
-
-    /**
-     * gets the default start screen and fetch the Ad based on the assigned slot
-     */
-    fun getDefaultStartScreen() {
-        viewModelScope.launch {
-            when (monitorStartScreenPreference().firstOrNull()) {
-                StartScreen.CloudDrive -> {
-                    fetchNewAd(AdsSlotIDs.TAB_CLOUD_SLOT_ID)
-                }
-
-                StartScreen.Photos -> {
-                    fetchNewAd(AdsSlotIDs.TAB_PHOTOS_SLOT_ID)
-                }
-
-                StartScreen.Home -> {
-                    fetchNewAd(AdsSlotIDs.TAB_HOME_SLOT_ID)
-                }
-
-                else -> {}
-            }
-        }
-    }
-
-    /**
-     * Cancel fetching any ongoing ads job
-     */
-    fun cancelFetchingAds() {
-        fetchAdUrlJob?.cancel()
-    }
-
-    /**
-     * Update the url in AdsUIState
-     * @param slotId  The ad slot id to fetch ad
-     * @param linkHandle  The public handle for file/folder link if user visits Share Link screen, this parameter is optional
-     */
-    fun fetchNewAd(
-        slotId: String = uiState.value.slotId,
-        linkHandle: Long? = null,
-    ) {
-        if (fetchAdUrlJob?.isActive == true && slotId == _uiState.value.slotId) return
-
-        if (isAdsFeatureEnabled && canConsumeAdSlot(slotId)) {
-            _uiState.update { it.copy(slotId = slotId) }
-            val fetchAdDetailRequest = FetchAdDetailRequest(slotId, linkHandle)
-            fetchAdUrlJob?.cancel()
-            fetchAdUrlJob = viewModelScope.launch {
-                runCatching {
-                    val url = fetchAdDetailUseCase(fetchAdDetailRequest)?.url
-                    _uiState.update {
-                        it.copy(
-                            showAdsView = url != null && isPortrait && canConsumeAdSlot(slotId),
-                            slotId = slotId,
-                            adsBannerUrl = url.orEmpty()
-                        )
-                    }
-                }.onFailure { e ->
-                    Timber.e(e)
+    fun scheduleRefreshAds() {
+        if (refreshAdsJob?.isActive == true) return
+        refreshAdsJob?.cancel()
+        refreshAdsJob = viewModelScope.launch {
+            if (isAdsEnabled() && consentInformation.canRequestAds()) {
+                createNewAdRequestIfNeeded()
+                while (isActive) {
+                    delay(MINIMUM_AD_REFRESH_INTERVAL)
+                    Timber.d("Refreshing AdRequest")
+                    createNewAdRequestIfNeeded()
                 }
             }
-        } else {
-            _uiState.update {
-                it.copy(showAdsView = false, slotId = slotId, adsBannerUrl = "")
-            }
         }
+    }
+
+    fun cancelRefreshAds() {
+        refreshAdsJob?.cancel()
+    }
+
+    private fun createNewAdRequestIfNeeded() {
+        Timber.d("Checking if a new AdRequest is needed")
+        if (_request.value == null || System.currentTimeMillis() - lastFetchTime > MINIMUM_AD_REFRESH_INTERVAL) {
+            Timber.d("Creating new AdRequest")
+            _request.update { AdManagerAdRequest.Builder().build() }
+            lastFetchTime = System.currentTimeMillis()
+        }
+    }
+
+    private suspend fun isAdsEnabled(): Boolean = mutex.withLock {
+        if (_isAdsFeatureEnabled.value == null) {
+            checkForAdsAvailability()
+        }
+        return _isAdsFeatureEnabled.value ?: false
+    }
+
+    /**
+     * Check if the ads feature is enabled.
+     */
+    private suspend fun checkForAdsAvailability() {
+        runCatching {
+            _isAdsFeatureEnabled.update {
+                getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
+            }
+            Timber.d("Ads feature enabled: ${_isAdsFeatureEnabled.value}")
+        }.onFailure {
+            _isAdsFeatureEnabled.update { false }
+            Timber.e(it, "Error getting feature flag value")
+        }
+    }
+
+    companion object {
+        /**
+         * Minimum interval for ad refresh in milliseconds.
+         *
+         * https://support.google.com/admanager/answer/6022114?hl=en
+         */
+        const val MINIMUM_AD_REFRESH_INTERVAL = 30_000L // 30 seconds
     }
 }

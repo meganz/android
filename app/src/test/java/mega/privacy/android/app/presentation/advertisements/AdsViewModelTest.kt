@@ -1,219 +1,144 @@
 package mega.privacy.android.app.presentation.advertisements
 
-import app.cash.turbine.test
+import com.google.android.gms.ads.admanager.AdManagerAdRequest
+import com.google.android.ump.ConsentInformation
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.advertisements.AdsViewModel
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.advertisements.AdDetails
-import mega.privacy.android.domain.entity.advertisements.FetchAdDetailRequest
-import mega.privacy.android.domain.entity.preference.StartScreen
-import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
-import mega.privacy.android.domain.usecase.advertisements.FetchAdDetailUseCase
-import mega.privacy.android.domain.usecase.advertisements.IsAccountNewUseCase
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.util.stream.Stream
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AdsViewModelTest {
     private lateinit var underTest: AdsViewModel
-    private val fetchAdDetailUseCase = mock<FetchAdDetailUseCase>()
-    private val monitorStartScreenPreference = mock<MonitorStartScreenPreference>()
-    private val isAccountNewUseCase = mock<IsAccountNewUseCase>()
-
-    private val slotId = "ANDFB"
-    private val url = "https://megaad.nz/#z_xyz"
-    private val fetchedAdDetail = AdDetails(slotId, url)
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val consentInformation: ConsentInformation = mock()
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            fetchAdDetailUseCase,
-            isAccountNewUseCase,
-            monitorStartScreenPreference
+            getFeatureFlagValueUseCase,
+            consentInformation,
         )
     }
 
     private fun initTestClass() {
         underTest = AdsViewModel(
-            fetchAdDetailUseCase = fetchAdDetailUseCase,
-            isAccountNewUseCase = isAccountNewUseCase,
-            monitorStartScreenPreference = monitorStartScreenPreference
+            getFeatureFlagValueUseCase,
+            consentInformation,
         )
     }
 
-    private fun provideAdReConsumptionParameters() = Stream.of(
-        Arguments.of(true, false),
-        Arguments.of(false, true),
-    )
-
-    @ParameterizedTest(name = "when Ad is consumed while accountIsNew is: {0},then showAdsView is {1}")
-    @MethodSource("provideAdReConsumptionParameters")
-    fun `test that showAdsView will be updated after Ad slot is consumed when accountIsNew is equal to the returned values`(
-        input: Boolean,
-        expected: Boolean,
-    ) = runTest {
+    @Test
+    fun `test initial state should have null request`() {
         initTestClass()
-        whenever(isAccountNewUseCase()).thenReturn(input)
-        whenever(fetchAdDetailUseCase(any())).thenReturn(fetchedAdDetail)
-        underTest.enableAdsFeature()
-        underTest.fetchNewAd(slotId)
-        testScheduler.advanceUntilIdle()
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.showAdsView).isTrue()
-        }
-        underTest.onAdConsumed()
-        underTest.fetchNewAd(slotId)
-        testScheduler.advanceUntilIdle()
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.showAdsView).isEqualTo(expected)
-        }
+
+        assertThat(underTest.request.value).isNull()
     }
 
-    private fun provideMonitorStartScreenParameters() = Stream.of(
-        Arguments.of(StartScreen.Home, AdsSlotIDs.TAB_HOME_SLOT_ID, true),
-        Arguments.of(StartScreen.Photos, AdsSlotIDs.TAB_PHOTOS_SLOT_ID, true),
-        Arguments.of(StartScreen.CloudDrive, AdsSlotIDs.TAB_CLOUD_SLOT_ID, true),
-        Arguments.of(StartScreen.Chat, "", false),
-        Arguments.of(StartScreen.SharedItems, AdsSlotIDs.SHARED_LINK_SLOT_ID, false),
-    )
-
-
-    @ParameterizedTest(name = "when monitorStartScreenPreference flow return start screen: {0}, emits {1}")
-    @MethodSource("provideMonitorStartScreenParameters")
-    fun `test showAdsView will be updated with the right value when monitorStartScreenPreference flow  return it`(
-        startScreen: StartScreen,
-        assignedAdSlot: String,
-        expected: Boolean,
-    ) =
+    @Test
+    fun `test scheduleRefreshAds when ads enabled and consent given should create ad request`() =
         runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
+            whenever(consentInformation.canRequestAds()).thenReturn(true)
             initTestClass()
-            whenever(isAccountNewUseCase()).thenReturn(false)
-            whenever(monitorStartScreenPreference()).thenReturn(flowOf(startScreen))
-            whenever(fetchAdDetailUseCase(FetchAdDetailRequest(assignedAdSlot, null))).thenReturn(
-                fetchedAdDetail
-            )
-            underTest.enableAdsFeature()
-            underTest.getDefaultStartScreen()
-            testScheduler.advanceUntilIdle()
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.showAdsView).isEqualTo(expected)
-                if (state.showAdsView)
-                    assertThat(state.slotId).isEqualTo(assignedAdSlot)
-            }
-        }
 
-    private fun provideOrientationParameters() = Stream.of(
-        Arguments.of(true, true),
-        Arguments.of(false, false),
-    )
+            underTest.scheduleRefreshAds()
+            delay(1000L)
+            underTest.cancelRefreshAds()
 
-    @ParameterizedTest(name = "when screen orientation isPortrait is: {0}, showAdsView is {1}")
-    @MethodSource("provideOrientationParameters")
-    fun `test that showAdsView will be updated with the right value when screen orientation changes`(
-        input: Boolean,
-        expected: Boolean,
-    ) =
-        runTest {
-            whenever(isAccountNewUseCase()).thenReturn(false)
-            initTestClass()
-            underTest.enableAdsFeature()
-            testScheduler.advanceUntilIdle()
-            underTest.onScreenOrientationChanged(input)
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.showAdsView).isEqualTo(expected)
-            }
+            assertThat(underTest.request.value).isNotNull()
+            assertThat(underTest.request.value).isInstanceOf(AdManagerAdRequest::class.java)
+            verify(consentInformation).canRequestAds()
         }
 
     @Test
-    fun `test that showAdsView will be false when fetchAdDetailUseCase returns null`() =
-        runTest {
-            whenever(isAccountNewUseCase()).thenReturn(false)
-            initTestClass()
-            underTest.enableAdsFeature()
-            whenever(fetchAdDetailUseCase(any())).thenReturn(null)
-            underTest.fetchNewAd(slotId)
-            testScheduler.advanceUntilIdle()
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.showAdsView).isFalse()
-            }
-        }
+    fun `test scheduleRefreshAds when ads disabled should not create ad request`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(false)
+        whenever(consentInformation.canRequestAds()).thenReturn(true)
+        initTestClass()
+
+        underTest.scheduleRefreshAds()
+        delay(1000L)
+        underTest.cancelRefreshAds()
+
+        assertThat(underTest.request.value).isNull()
+    }
 
     @Test
-    fun `test that showAdsView will be true when fetchAdDetailUseCase is successful`() =
-        runTest {
-            whenever(isAccountNewUseCase()).thenReturn(false)
-            initTestClass()
-            underTest.enableAdsFeature()
-            whenever(fetchAdDetailUseCase(FetchAdDetailRequest(slotId, null))).thenReturn(
-                fetchedAdDetail
-            )
-            underTest.fetchNewAd(slotId)
-            testScheduler.advanceUntilIdle()
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.showAdsView).isTrue()
-                assertThat(state.adsBannerUrl).isEqualTo(fetchedAdDetail.url)
-            }
-        }
+    fun `test scheduleRefreshAds when consent not given should not create ad request`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
+        whenever(consentInformation.canRequestAds()).thenReturn(false)
+        initTestClass()
+
+        underTest.scheduleRefreshAds()
+        delay(1000L)
+        underTest.cancelRefreshAds()
+
+        assertThat(underTest.request.value).isNull()
+        verify(consentInformation).canRequestAds()
+    }
+
 
     @Test
-    fun `test that showAdsView will be false when Ads feature is not enabled`() =
-        runTest {
-            whenever(isAccountNewUseCase()).thenReturn(false)
-            initTestClass()
-            whenever(fetchAdDetailUseCase(FetchAdDetailRequest(slotId, null))).thenReturn(
-                fetchedAdDetail
-            )
-            underTest.fetchNewAd(slotId)
-            testScheduler.advanceUntilIdle()
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.showAdsView).isFalse()
-            }
-        }
+    fun `test cancelRefreshAds should stop periodic refresh`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
+        whenever(consentInformation.canRequestAds()).thenReturn(true)
+        initTestClass()
+
+        underTest.scheduleRefreshAds()
+        delay(1000L)
+        underTest.cancelRefreshAds()
+
+        val requestAfterCancel = underTest.request.value
+
+        advanceTimeBy(AdsViewModel.MINIMUM_AD_REFRESH_INTERVAL * 2)
+
+        assertThat(underTest.request.value).isSameInstanceAs(requestAfterCancel)
+    }
 
     @Test
-    fun `test that showAdsView is false when the Ads feature is disabled`() =
-        runTest {
-            whenever(isAccountNewUseCase()).thenReturn(false)
-            initTestClass()
-            whenever(fetchAdDetailUseCase(FetchAdDetailRequest(slotId, null))).thenReturn(
-                fetchedAdDetail
-            )
-            underTest.enableAdsFeature()
-            underTest.fetchNewAd(slotId)
-            testScheduler.advanceUntilIdle()
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.showAdsView).isTrue()
-            }
-            underTest.disableAdsFeature()
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.showAdsView).isFalse()
-            }
-        }
+    fun `test multiple scheduleRefreshAds calls should not create multiple jobs`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
+        whenever(consentInformation.canRequestAds()).thenReturn(true)
+        initTestClass()
+
+        underTest.scheduleRefreshAds()
+        underTest.scheduleRefreshAds()
+        underTest.scheduleRefreshAds()
+        delay(1000L)
+        underTest.cancelRefreshAds()
+
+        assertThat(underTest.request.value).isNotNull()
+    }
+
+    @Test
+    fun `test error handling when feature flag fetch fails should disable ads`() = runTest {
+        whenever(getFeatureFlagValueUseCase(any())).doThrow(RuntimeException("Feature flag error"))
+        whenever(consentInformation.canRequestAds()).thenReturn(true)
+        initTestClass()
+
+        underTest.scheduleRefreshAds()
+        delay(1000L)
+        underTest.cancelRefreshAds()
+
+        assertThat(underTest.request.value).isNull()
+    }
 
     companion object {
         @JvmField

@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.advertisements.AdsViewModel.Companion.MINIMUM_AD_REFRESH_INTERVAL
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
@@ -191,14 +192,5 @@ class GoogleAdsManager @Inject constructor(
             _request.update { AdManagerAdRequest.Builder().build() }
             lastFetchTime = System.currentTimeMillis()
         }
-    }
-
-    companion object {
-        /**
-         * Minimum interval for ad refresh in milliseconds.
-         *
-         * https://support.google.com/admanager/answer/6022114?hl=en
-         */
-        private const val MINIMUM_AD_REFRESH_INTERVAL = 30_000L // 30 seconds
     }
 }
