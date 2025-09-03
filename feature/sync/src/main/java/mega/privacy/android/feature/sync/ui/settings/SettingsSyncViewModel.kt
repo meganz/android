@@ -222,7 +222,10 @@ internal class SettingsSyncViewModel @Inject constructor(
                 clearSyncDebrisUseCase()
             }.onSuccess {
                 _uiState.update {
-                    it.copy(snackbarMessage = listOf(R.string.settings_sync_debris_cleared_message))
+                    it.copy(
+                        snackbarMessage = listOf(R.string.settings_sync_debris_cleared_message),
+                        syncDebrisSizeInBytes = null
+                    )
                 }
                 fetchSyncDebris()
             }.onFailure(Timber::e)

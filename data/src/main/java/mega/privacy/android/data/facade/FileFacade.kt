@@ -105,6 +105,33 @@ internal class FileFacade @Inject constructor(
             .sumOf { it.length() }
     }
 
+    override suspend fun getTotalSizeRecursive(folderPath: UriPath): Long {
+        return try {
+            val documentFolder = getFilesInDocumentFolder(folderPath)
+            calculateRecursiveSize(documentFolder.files)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to calculate recursive size for $folderPath")
+            0L
+        }
+    }
+
+    private suspend fun calculateRecursiveSize(files: List<DocumentEntity>): Long {
+        var totalSize = 0L
+        for (file in files) {
+            if (file.isFolder) {
+                // Skip tmp folders as they contain temporary files that shouldn't be counted as debris
+                if (file.name.lowercase() != TMP_FOLDER_NAME) {
+                    // Recursively calculate size for subdirectories
+                    totalSize += getTotalSizeRecursive(file.uri)
+                }
+            } else {
+                // Add file size
+                totalSize += file.size
+            }
+        }
+        return totalSize
+    }
+
     override fun deleteFolderAndSubFolders(folder: File?): Boolean {
         folder ?: return false
         Timber.d("deleteFolderAndSubFolders: ${folder.absolutePath}")
@@ -1257,6 +1284,7 @@ internal class FileFacade @Inject constructor(
         const val OFFLINE_DIR = "MEGA Offline"
         const val LAT_LNG = "0/1,0/1,0/1000"
         const val REF_LAT_LNG = "0"
+        const val TMP_FOLDER_NAME = "tmp"
 
         @SuppressLint("SdCardPath")
         const val APP_PRIVATE_DIR1: String = "/data/data/mega.privacy.android.app"

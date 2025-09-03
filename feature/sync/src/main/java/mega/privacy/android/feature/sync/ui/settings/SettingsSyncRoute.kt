@@ -105,7 +105,7 @@ internal fun SettingSyncScreen(
                     },
                 )
                 SyncDebrisView(
-                    size = uiState.syncDebrisSizeInBytes ?: 0,
+                    size = uiState.syncDebrisSizeInBytes,
                     clearDebrisClicked = {
                         showClearSyncDebrisDialog = true
                     }

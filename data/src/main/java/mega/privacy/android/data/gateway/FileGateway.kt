@@ -35,6 +35,14 @@ interface FileGateway {
     suspend fun getTotalSize(file: File?): Long
 
     /**
+     * Get total size of a document folder recursively including all subdirectories
+     *
+     * @param folderPath The URI path to the folder
+     * @return total size of folder and all its contents in bytes
+     */
+    suspend fun getTotalSizeRecursive(folderPath: UriPath): Long
+
+    /**
      * Delete folder and sub folders
      *
      */

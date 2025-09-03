@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.data.repository
 
+import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.FileGateway
@@ -23,13 +24,27 @@ internal class SyncDebrisRepositoryImpl @Inject constructor(
     override suspend fun clear() {
         withContext(ioDispatcher) {
             syncDebrisGateway.get().forEach { debris ->
-                documentFileWrapper.getDocumentFileForSyncContentUri(debris.path.value).let {
-                    Timber.d("Deleting debris  folder: $debris, uri: ${it?.uri}")
-                    it?.delete() == true
-                }
+                documentFileWrapper.getDocumentFileForSyncContentUri(debris.path.value)
+                    ?.let { debrisFolder ->
+                        Timber.d("Clearing debris folder: $debris, uri: ${debrisFolder.uri}")
+                        clearDebrisFolderSelectively(debrisFolder)
+                    }
             }.also {
                 syncDebrisGateway.set(emptyList())
             }
+        }
+    }
+
+    private fun clearDebrisFolderSelectively(debrisFolder: DocumentFile) {
+        val files = debrisFolder.listFiles().takeIf { it.isNotEmpty() } ?: return
+
+        files.forEach { file ->
+            // Skip tmp folders - they contain temporary files that shouldn't be deleted
+            if (file.isDirectory && file.name?.lowercase() == TMP_FOLDER_NAME) {
+                Timber.d("Skipping tmp folder: ${file.name}")
+                return@forEach
+            }
+            file.delete()
         }
     }
 
@@ -42,8 +57,7 @@ internal class SyncDebrisRepositoryImpl @Inject constructor(
                         DEBRIS_FOLDER_NAME
                     ) ?: return@mapNotNull null
                 val debrisSize =
-                    fileGateway.getFilesInDocumentFolder(UriPath(syncDebrisFolder.uri.toString()))
-                        .files.sumOf { it.size }
+                    fileGateway.getTotalSizeRecursive(UriPath(syncDebrisFolder.uri.toString()))
                 SyncDebris(
                     syncId = sync.id,
                     path = UriPath(syncDebrisFolder.uri.toString()),
@@ -54,5 +68,6 @@ internal class SyncDebrisRepositoryImpl @Inject constructor(
 
     private companion object {
         private const val DEBRIS_FOLDER_NAME = ".debris"
+        private const val TMP_FOLDER_NAME = "tmp"
     }
 }

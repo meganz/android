@@ -30,6 +30,7 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -47,6 +48,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -1255,6 +1257,84 @@ internal class FileFacadeTest {
         }
     }
 
+    @Test
+    fun `test that getTotalSizeRecursive returns correct total size excluding tmp folders`() =
+        runTest {
+            val rootPath =
+                UriPath("content://com.android.externalstorage.documents/tree/primary%3AFolderA")
+            val file1Uri =
+                UriPath("content://com.android.externalstorage.documents/tree/primary%3AFolderA%2Ffile1.txt")
+            val folderBPath =
+                UriPath("content://com.android.externalstorage.documents/tree/primary%3AFolderA%2FFolderB")
+            val file2Uri =
+                UriPath("content://com.android.externalstorage.documents/tree/primary%3AFolderA%2FFolderB%2Ffile2.txt")
+            val tmpFolderPath =
+                UriPath("content://com.android.externalstorage.documents/tree/primary%3AFolderA%2Ftmp")
+            val fileInTmpUri =
+                UriPath("content://com.android.externalstorage.documents/tree/primary%3AFolderA%2Ftmp%2Ffile3.txt")
+
+            val file1 = DocumentEntity(
+                uri = file1Uri,
+                name = "file1.txt",
+                size = 1000L,
+                lastModified = 0L,
+                isFolder = false,
+            )
+            val file2 = DocumentEntity(
+                uri = file2Uri,
+                name = "file2.txt",
+                size = 1500L,
+                lastModified = 0L,
+                isFolder = false,
+            )
+            val fileInTmp = DocumentEntity(
+                uri = fileInTmpUri,
+                name = "file3.txt",
+                size = 500L,
+                lastModified = 0L,
+                isFolder = false,
+            )
+
+            val folderB = DocumentEntity(
+                uri = folderBPath,
+                name = "FolderB",
+                size = 0L,
+                lastModified = 0L,
+                isFolder = true
+            )
+            val tmpFolder = DocumentEntity(
+                uri = tmpFolderPath,
+                name = "tmp",
+                size = 0L,
+                lastModified = 0L,
+                isFolder = true
+            )
+
+            val rootDocumentFolder = DocumentFolder(
+                files = listOf(file1, folderB, tmpFolder)
+            )
+            val folderBDocumentFolder = DocumentFolder(
+                files = listOf(file2)
+            )
+            val tmpDocumentFolder = DocumentFolder( // This folder's contents should be ignored
+                files = listOf(fileInTmp)
+            )
+
+            // Create a spy of the FileFacade to intercept method calls
+            val spyUnderTest = spy(underTest)
+
+            // Mock the calls to getFilesInDocumentFolder using the spy
+            doReturn(rootDocumentFolder).whenever(spyUnderTest).getFilesInDocumentFolder(rootPath)
+            doReturn(folderBDocumentFolder).whenever(spyUnderTest)
+                .getFilesInDocumentFolder(folderBPath)
+            doReturn(tmpDocumentFolder).whenever(spyUnderTest)
+                .getFilesInDocumentFolder(tmpFolderPath)
+
+            val actualSize = spyUnderTest.getTotalSizeRecursive(rootPath)
+
+            // Expected size is file1 (1000L) + file2 (1500L) = 2500L. fileInTmp (500L) should be excluded.
+            assertThat(actualSize).isEqualTo(2500L)
+        }
 
     private fun stubGetDocumentFileFromUri(documentFile: DocumentFile): Uri {
         val uri = mock<Uri> {
