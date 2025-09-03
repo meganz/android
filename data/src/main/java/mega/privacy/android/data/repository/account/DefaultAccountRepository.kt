@@ -39,7 +39,6 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
-import mega.privacy.android.data.gateway.user.UserLoginPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
@@ -179,7 +178,6 @@ internal class DefaultAccountRepository @Inject constructor(
     private val userMapper: UserMapper,
     private val storageStateMapper: StorageStateMapper,
     private val uiPreferencesGateway: UIPreferencesGateway,
-    private val userLoginPreferenceGateway: UserLoginPreferenceGateway,
     @ExcludeFileName val excludeFileNames: Set<String>,
     private val getDomainNameUseCase: GetDomainNameUseCase,
 ) : AccountRepository {
@@ -225,15 +223,6 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override fun isMultiFactorAuthAvailable(): Boolean = megaApiGateway.multiFactorAuthAvailable()
-
-    override suspend fun hasUserLoggedInBefore(): Boolean = withContext(ioDispatcher) {
-        val userHandle = megaApiGateway.myUser?.handle ?: return@withContext false
-        userLoginPreferenceGateway.hasUserLoggedInBefore(userHandle)
-    }
-
-    override suspend fun addLoggedInUserHandle(userHandle: Long) = withContext(ioDispatcher) {
-        userLoginPreferenceGateway.addLoggedInUserHandle(userHandle)
-    }
 
     @Throws(MegaException::class)
     override suspend fun isMultiFactorAuthEnabled(): Boolean = withContext(ioDispatcher) {

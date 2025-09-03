@@ -82,7 +82,6 @@ import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGatewa
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.gateway.psa.PsaPreferenceGateway
 import mega.privacy.android.data.gateway.security.PasscodeStoreGateway
-import mega.privacy.android.data.gateway.user.UserLoginPreferenceGateway
 import mega.privacy.android.data.preferences.AccountPreferencesDataStore
 import mega.privacy.android.data.preferences.AppPreferencesDatastore
 import mega.privacy.android.data.preferences.CallsPreferencesDataStore
@@ -99,7 +98,6 @@ import mega.privacy.android.data.preferences.TransfersPreferencesDataStore
 import mega.privacy.android.data.preferences.UIPreferencesDatastore
 import mega.privacy.android.data.preferences.psa.PsaPreferenceDataStore
 import mega.privacy.android.data.preferences.security.PasscodeDataStore
-import mega.privacy.android.data.preferences.user.UserLoginPreferenceDataStore
 import javax.inject.Singleton
 
 @Module
@@ -322,8 +320,4 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindTransfersPreferencesDataStoreGateway(implementation: TransfersPreferencesDataStore): TransfersPreferencesGateway
-
-    @Binds
-    @Singleton
-    abstract fun bindUserLoginPreferenceGateway(implementation: UserLoginPreferenceDataStore): UserLoginPreferenceGateway
 }

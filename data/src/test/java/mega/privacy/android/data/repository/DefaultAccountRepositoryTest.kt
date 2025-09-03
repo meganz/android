@@ -24,7 +24,6 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
-import mega.privacy.android.data.gateway.user.UserLoginPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
@@ -186,8 +185,6 @@ class DefaultAccountRepositoryTest {
         "test1.txt",
     )
 
-    private val userLoginPreferenceGateway = mock<UserLoginPreferenceGateway>()
-
     @BeforeEach
     fun resetMocks() {
         reset(
@@ -220,7 +217,6 @@ class DefaultAccountRepositoryTest {
             credentialsPreferencesGateway,
             storageStateMapper,
             uiPreferencesGateway,
-            userLoginPreferenceGateway,
             getDomainNameUseCase,
         )
     }
@@ -267,7 +263,6 @@ class DefaultAccountRepositoryTest {
             storageStateMapper = storageStateMapper,
             uiPreferencesGateway = uiPreferencesGateway,
             excludeFileNames = excludeFileNames,
-            userLoginPreferenceGateway = userLoginPreferenceGateway,
             getDomainNameUseCase = getDomainNameUseCase,
         )
 
@@ -2357,52 +2352,4 @@ class DefaultAccountRepositoryTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
-
-    @Test
-    fun `test that hasUserLoggedInBefore returns true when user has logged in before`() = runTest {
-        val userHandle = 123L
-        val user = mock<MegaUser> {
-            on { handle }.thenReturn(userHandle)
-            on { email }.thenReturn(mockEmail)
-        }
-        whenever(megaApiGateway.myUser).thenReturn(user)
-        whenever(userLoginPreferenceGateway.hasUserLoggedInBefore(userHandle)).thenReturn(true)
-
-        val result = underTest.hasUserLoggedInBefore()
-
-        assertThat(result).isTrue()
-    }
-
-    @Test
-    fun `test that hasUserLoggedInBefore returns false when user has not logged in before`() =
-        runTest {
-            val userHandle = 123L
-            val user = mock<MegaUser> {
-                on { handle }.thenReturn(userHandle)
-                on { email }.thenReturn(mockEmail)
-            }
-            whenever(megaApiGateway.myUser).thenReturn(user)
-            whenever(userLoginPreferenceGateway.hasUserLoggedInBefore(userHandle)).thenReturn(false)
-
-            val result = underTest.hasUserLoggedInBefore()
-
-            assertThat(result).isFalse()
-        }
-
-    @Test
-    fun `test that hasUserLoggedInBefore returns false when myUser is null`() = runTest {
-        whenever(megaApiGateway.myUser).thenReturn(null)
-
-        val result = underTest.hasUserLoggedInBefore()
-
-        assertThat(result).isFalse()
-        verify(userLoginPreferenceGateway, never()).hasUserLoggedInBefore(any())
-    }
-
-    @Test
-    fun `test that addLoggedInUserHandle adds user handle to preferences`() = runTest {
-        val userHandle = 123L
-        underTest.addLoggedInUserHandle(userHandle)
-        verify(userLoginPreferenceGateway).addLoggedInUserHandle(userHandle)
-    }
 }

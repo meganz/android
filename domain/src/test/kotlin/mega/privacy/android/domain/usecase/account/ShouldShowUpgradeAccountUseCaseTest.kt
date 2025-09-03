@@ -6,16 +6,12 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.user.UserId
-import mega.privacy.android.domain.repository.AccountRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 /**
@@ -25,30 +21,18 @@ import org.mockito.kotlin.whenever
 internal class ShouldShowUpgradeAccountUseCaseTest {
     private lateinit var underTest: ShouldShowUpgradeAccountUseCase
 
-    private val accountRepository = mock<AccountRepository>()
     private val getSpecificAccountDetailUseCase = mock<GetSpecificAccountDetailUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = ShouldShowUpgradeAccountUseCase(
             getSpecificAccountDetailUseCase = getSpecificAccountDetailUseCase,
-            accountRepository = accountRepository
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(accountRepository, getSpecificAccountDetailUseCase)
-    }
-
-    @Test
-    fun `test that returns false when user has logged in before`() = runTest {
-        whenever(accountRepository.hasUserLoggedInBefore()).thenReturn(true)
-
-        val result = underTest.invoke()
-
-        assertThat(result).isFalse()
-        verify(getSpecificAccountDetailUseCase, never()).invoke(any(), any(), any())
+        reset( getSpecificAccountDetailUseCase)
     }
 
     @Test
@@ -62,8 +46,6 @@ internal class ShouldShowUpgradeAccountUseCaseTest {
                 on { this.levelDetail }.thenReturn(levelDetail)
             }
 
-            whenever(accountRepository.hasUserLoggedInBefore()).thenReturn(false)
-            whenever(accountRepository.getLoggedInUserId()).thenReturn(userId)
             whenever(
                 getSpecificAccountDetailUseCase(
                     storage = false,
@@ -75,7 +57,6 @@ internal class ShouldShowUpgradeAccountUseCaseTest {
             val result = underTest.invoke()
 
             assertThat(result).isTrue()
-            verify(accountRepository).addLoggedInUserHandle(userId.id)
         }
 
     @Test
@@ -89,8 +70,6 @@ internal class ShouldShowUpgradeAccountUseCaseTest {
                 on { this.levelDetail }.thenReturn(levelDetail)
             }
 
-            whenever(accountRepository.hasUserLoggedInBefore()).thenReturn(false)
-            whenever(accountRepository.getLoggedInUserId()).thenReturn(userId)
             whenever(
                 getSpecificAccountDetailUseCase(
                     storage = false,
@@ -102,6 +81,5 @@ internal class ShouldShowUpgradeAccountUseCaseTest {
             val result = underTest.invoke()
 
             assertThat(result).isFalse()
-            verify(accountRepository).addLoggedInUserHandle(userId.id)
         }
 }

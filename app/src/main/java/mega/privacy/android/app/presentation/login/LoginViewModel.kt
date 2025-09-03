@@ -890,7 +890,12 @@ class LoginViewModel @Inject constructor(
      * Should show upgrade account
      */
     suspend fun shouldShowUpgradeAccount() {
-        _state.update { it.copy(shouldShowUpgradeAccount = shouldShowUpgradeAccountUseCase()) }
+        val shouldShow = runCatching {
+            shouldShowUpgradeAccountUseCase()
+        }.onFailure {
+            Timber.e("Failed to check if should show upgrade account: ${it.message}")
+        }.getOrDefault(false)
+        _state.update { it.copy(shouldShowUpgradeAccount = shouldShow) }
         Timber.d("Should show upgrade account: ${state.value.shouldShowUpgradeAccount}")
     }
 
