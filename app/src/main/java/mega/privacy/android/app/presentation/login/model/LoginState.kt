@@ -54,6 +54,14 @@ import mega.privacy.android.domain.exception.LoginException
  * @property requestStatusProgress      Progress of the request status, 0 to 1000, hide progress bar if -1
  * @property isFirstTimeLaunch          True if it is the first time the app is launched.
  * @property themeMode                 [ThemeMode] of the app.
+ * @property accountBlockedEvent
+ * @property resendVerificationEmailEvent
+ * @property checkRecoveryKeyEvent
+ * @property openRecoveryUrlEvent
+ * @property miscFlagLoaded
+ * @property shouldShowUpgradeAccount
+ * @property recoveryKeyLink
+ * @property shouldShowNotificationPermission
 
  */
 data class LoginState(
@@ -95,6 +103,8 @@ data class LoginState(
     val accountBlockedEvent: StateEventWithContent<AccountBlockedEvent> = consumed(),
     val resendVerificationEmailEvent: StateEventWithContent<Boolean> = consumed(),
     val checkRecoveryKeyEvent: StateEventWithContent<Result<RkLink>> = consumed(),
+    val openRecoveryUrlEvent: StateEventWithContent<String> = consumed(),
+    val miscFlagLoaded: Boolean = false,
     val shouldShowUpgradeAccount: Boolean = false,
     val recoveryKeyLink: String? = null,
     val shouldShowNotificationPermission: Boolean = false,

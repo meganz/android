@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login
 
+import android.util.Base64
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -41,6 +43,8 @@ import mega.privacy.android.app.presentation.settings.startscreen.util.StartScre
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
+import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrlWithEmail
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
@@ -75,6 +79,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -98,6 +103,8 @@ import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationR
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
+import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
@@ -169,6 +176,9 @@ class LoginViewModel @Inject constructor(
     private val resumeTransfersForNotLoggedInInstanceUseCase: ResumeTransfersForNotLoggedInInstanceUseCase,
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
     private val startScreenUtil: StartScreenUtil,
+    private val getMiscFlagsUseCase: GetMiscFlagsUseCase,
+    private val getDomainNameUseCase: GetDomainNameUseCase,
+    private val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -204,6 +214,13 @@ class LoginViewModel @Inject constructor(
                 getHistoricalProcessExitReasonsUseCase()
             }.onFailure {
                 Timber.e(it)
+            }
+        }
+        viewModelScope.launch {
+            monitorMiscLoadedUseCase().collect {
+                _state.update {
+                    it.copy(miscFlagLoaded = true)
+                }
             }
         }
         setupInitialState()
@@ -1269,6 +1286,46 @@ class LoginViewModel @Inject constructor(
      */
     fun setStartScreenTimeStamp() {
         startScreenUtil.setStartScreenTimeStamp()
+    }
+
+    fun onForgotPassword() {
+        viewModelScope.launch {
+            waitMiscFlagsLoaded()
+            val domain = getDomainNameUseCase()
+            val typedEmail = _state.value.accountSession?.email
+            val url = if (typedEmail.isNullOrEmpty()) {
+                recoveryUrl(domain)
+            } else {
+                val email = runCatching {
+                    Base64.encodeToString(typedEmail.toByteArray(), Base64.DEFAULT)
+                        .replace("\n", "")
+                }.onFailure { Timber.e(it) }
+                    .getOrNull() ?: ""
+
+                recoveryUrlWithEmail(domain) + email
+            }
+            _state.update { it.copy(openRecoveryUrlEvent = triggered(url)) }
+        }
+    }
+
+    fun onLostAuthenticationDevice() {
+        viewModelScope.launch {
+            waitMiscFlagsLoaded()
+            val domain = getDomainNameUseCase()
+            val url = recoveryUrl(domain)
+            _state.update { it.copy(openRecoveryUrlEvent = triggered(url)) }
+        }
+    }
+
+    fun onOpenRecoveryUrlEventConsumed() {
+        _state.update { it.copy(openRecoveryUrlEvent = consumed()) }
+    }
+
+    private suspend fun waitMiscFlagsLoaded() {
+        if (!_state.value.miscFlagLoaded) {
+            getMiscFlagsUseCase()
+            _state.first { it.miscFlagLoaded }
+        }
     }
 
     companion object {

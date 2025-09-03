@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.login
 
 import android.content.Context
 import android.content.Intent
-import android.util.Base64
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -25,15 +24,12 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.view.NewLoginView
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
-import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrlWithEmail
-import mega.privacy.android.app.utils.DomainNameFacade
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.LoginScreenEvent
 import nz.mega.sdk.MegaError
@@ -82,6 +78,10 @@ fun LoginScreen(
         }
     }
 
+    EventEffect(uiState.openRecoveryUrlEvent, viewModel::onOpenRecoveryUrlEventConsumed) {
+        openRecoveryUrl(context, it)
+    }
+
     BackHandler {
         with(uiState) {
             when {
@@ -116,13 +116,13 @@ fun LoginScreen(
             billingViewModel.loadSkus()
             billingViewModel.loadPurchases()
         },
-        onForgotPassword = { onForgotPassword(context, uiState.accountSession?.email) },
+        onForgotPassword = viewModel::onForgotPassword,
         onCreateAccount = {
             viewModel.setPendingFragmentToShow(LoginFragmentType.CreateAccount)
         },
         onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
         on2FAChanged = viewModel::on2FAChanged,
-        onLostAuthenticatorDevice = { onLostAuthenticationDevice(context) },
+        onLostAuthenticatorDevice = viewModel::onLostAuthenticationDevice,
         onBackPressed = {
             onBackPressedDispatcher?.onBackPressed()
         },
@@ -214,23 +214,7 @@ private fun navigateToChangePassword(context: Context, link: String, value: Stri
     context.startActivity(intent)
 }
 
-private fun onLostAuthenticationDevice(context: Context) {
-    context.launchUrl(recoveryUrl(DomainNameFacade.getDomainName()))
-}
-
-private fun onForgotPassword(context: Context, typedEmail: String?) {
-    Timber.d("Click on button_forgot_pass")
-    context.launchUrl(
-        if (typedEmail.isNullOrEmpty()) {
-            recoveryUrl(DomainNameFacade.getDomainName())
-        } else {
-            val email = runCatching {
-                Base64.encodeToString(typedEmail.toByteArray(), Base64.DEFAULT)
-                    .replace("\n", "")
-            }.onFailure { Timber.e(it) }
-                .getOrNull() ?: ""
-
-            recoveryUrlWithEmail(DomainNameFacade.getDomainName()) + email
-        }
-    )
+private fun openRecoveryUrl(context: Context, url: String) {
+    Timber.d("Open recovery url $url")
+    context.launchUrl(url)
 }

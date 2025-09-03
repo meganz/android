@@ -295,11 +295,11 @@ class GlobalListener @Inject constructor(
             MegaEvent.EVENT_BUSINESS_STATUS -> sendBroadcastUpdateAccountDetails()
             MegaEvent.EVENT_MISC_FLAGS_READY -> {
                 applicationScope.launch {
+                    updateDomainName()
                     broadcastMiscLoadedUseCase()
                 }
                 getInstance().checkEnabledCookies()
                 initialiseAdsIfNeeded()
-                updateDomainName()
             }
 
             MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()
@@ -470,10 +470,8 @@ class GlobalListener @Inject constructor(
         }
     }
 
-    private fun updateDomainName() {
-        applicationScope.launch {
-            runCatching { updateDomainNameUseCase() }
-                .onFailure { Timber.e(it, "UpdateDomainNameUseCase failed") }
-        }
+    private suspend fun updateDomainName() {
+        runCatching { updateDomainNameUseCase() }
+            .onFailure { Timber.e(it, "UpdateDomainNameUseCase failed") }
     }
 }

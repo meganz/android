@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.login
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -73,6 +75,8 @@ import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationR
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
+import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
@@ -170,6 +174,10 @@ internal class LoginViewModelTest {
     private val updateCrashAndPerformanceReportersUseCase =
         mock<UpdateCrashAndPerformanceReportersUseCase>()
     private val startScreenUtil = mock<StartScreenUtil>()
+    private val getMiscFlagsUseCase = mock<GetMiscFlagsUseCase>()
+    private val getDomainNameUseCase = mock<GetDomainNameUseCase>()
+    private val monitorMiscLoadedUseCase = mock<MonitorMiscLoadedUseCase>()
+    private val monitorMiscLoadedFlow = MutableSharedFlow<Unit>()
 
     @BeforeEach
     fun setUp() {
@@ -226,7 +234,10 @@ internal class LoginViewModelTest {
             ephemeralCredentialManager = ephemeralCredentialManager,
             resumeTransfersForNotLoggedInInstanceUseCase = resumeTransfersForNotLoggedInInstanceUseCase,
             updateCrashAndPerformanceReportersUseCase = updateCrashAndPerformanceReportersUseCase,
-            startScreenUtil = startScreenUtil
+            startScreenUtil = startScreenUtil,
+            getMiscFlagsUseCase = getMiscFlagsUseCase,
+            getDomainNameUseCase = getDomainNameUseCase,
+            monitorMiscLoadedUseCase = monitorMiscLoadedUseCase,
         )
     }
 
@@ -246,6 +257,8 @@ internal class LoginViewModelTest {
         whenever(isFirstLaunchUseCase()).thenReturn(false)
         whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
         whenever(monitorThemeModeUseCase()).thenReturn(flowOf(ThemeMode.System))
+        whenever(monitorMiscLoadedUseCase()).thenReturn(monitorMiscLoadedFlow)
+        whenever(getDomainNameUseCase()).thenReturn("mega.foo")
     }
 
     @AfterEach
@@ -263,6 +276,9 @@ internal class LoginViewModelTest {
             resumeTransfersForNotLoggedInInstanceUseCase,
             startScreenUtil,
             updateCrashAndPerformanceReportersUseCase,
+            getMiscFlagsUseCase,
+            getDomainNameUseCase,
+            monitorMiscLoadedUseCase,
         )
     }
 
@@ -740,6 +756,21 @@ internal class LoginViewModelTest {
 
             verify(updateCrashAndPerformanceReportersUseCase).invoke()
         }
+
+    @Test
+    fun `test that openRecoveryUrlEvent is not triggered until the feature flags are loaded`() = runTest {
+
+        underTest.state.test {
+            assertThat(awaitItem().miscFlagLoaded).isFalse()
+            assertThat(awaitItem().openRecoveryUrlEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
+            underTest.onForgotPassword()
+            this.expectNoEvents()
+
+            monitorMiscLoadedFlow.emit(Unit)
+            assertThat(awaitItem().miscFlagLoaded).isTrue()
+            assertThat(awaitItem().openRecoveryUrlEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+        }
+    }
 
     companion object {
         private val scheduler = TestCoroutineScheduler()
