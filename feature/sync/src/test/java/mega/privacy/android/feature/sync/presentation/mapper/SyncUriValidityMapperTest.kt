@@ -179,6 +179,165 @@ class SyncUriValidityMapperTest {
         assertThat(result).isEqualTo(SyncUriValidityResult.Invalid)
     }
 
+    @Test
+    fun `test determinePathRelationship with exact match`() = runTest {
+        val documentUri = "content://storage/emulated/0/Photos"
+        val folderPath = "/storage/emulated/0/Photos"
+        val folderPairs = listOf(
+            FolderPair(
+                id = 1234L,
+                syncType = SyncType.TYPE_TWOWAY,
+                pairName = "Photos Sync",
+                localFolderPath = "content://storage/emulated/0/Photos",
+                remoteFolder = RemoteFolder(id = NodeId(5678L), name = "Photos"),
+                syncStatus = SyncStatus.SYNCED
+            )
+        )
+
+        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
+        whenever(getPathByDocumentContentUriUseCase("content://storage/emulated/0/Photos")).thenReturn(
+            folderPath
+        )
+        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
+        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
+        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
+
+        val result = underTest(documentUri)
+
+        assertThat(result).isInstanceOf(SyncUriValidityResult.ShowSnackbar::class.java)
+        val snackbarResult = result as SyncUriValidityResult.ShowSnackbar
+        assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.sync_local_device_folder_currently_synced_message)
+    }
+
+    @Test
+    fun `test determinePathRelationship with external path as subfolder of local path`() = runTest {
+        val documentUri = "content://storage/emulated/0/Photos/Vacation"
+        val externalPath = "/storage/emulated/0/Photos/Vacation"
+        val localPath = "/storage/emulated/0/Photos"
+        val folderPairs = listOf(
+            FolderPair(
+                id = 1234L,
+                syncType = SyncType.TYPE_TWOWAY,
+                pairName = "Photos Sync",
+                localFolderPath = "content://storage/emulated/0/Photos",
+                remoteFolder = RemoteFolder(id = NodeId(5678L), name = "Photos"),
+                syncStatus = SyncStatus.SYNCED
+            )
+        )
+
+        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(externalPath)
+        whenever(getPathByDocumentContentUriUseCase("content://storage/emulated/0/Photos")).thenReturn(
+            localPath
+        )
+        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
+        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
+        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
+
+        val result = underTest(documentUri)
+
+        assertThat(result).isInstanceOf(SyncUriValidityResult.ShowSnackbar::class.java)
+        val snackbarResult = result as SyncUriValidityResult.ShowSnackbar
+        assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.general_sync_active_sync_below_path)
+    }
+
+    @Test
+    fun `test determinePathRelationship with local path as subfolder of external path`() = runTest {
+        val documentUri = "content://storage/emulated/0/Photos"
+        val externalPath = "/storage/emulated/0/Photos"
+        val localPath = "/storage/emulated/0/Photos/Vacation"
+        val folderPairs = listOf(
+            FolderPair(
+                id = 1234L,
+                syncType = SyncType.TYPE_TWOWAY,
+                pairName = "Vacation Sync",
+                localFolderPath = "content://storage/emulated/0/Photos/Vacation",
+                remoteFolder = RemoteFolder(id = NodeId(5678L), name = "Vacation"),
+                syncStatus = SyncStatus.SYNCED
+            )
+        )
+
+        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(externalPath)
+        whenever(getPathByDocumentContentUriUseCase("content://storage/emulated/0/Photos/Vacation")).thenReturn(
+            localPath
+        )
+        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
+        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
+        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
+
+        val result = underTest(documentUri)
+
+        assertThat(result).isInstanceOf(SyncUriValidityResult.ShowSnackbar::class.java)
+        val snackbarResult = result as SyncUriValidityResult.ShowSnackbar
+        assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder)
+    }
+
+    @Test
+    fun `test determinePathRelationship handles trailing slashes correctly`() = runTest {
+        val documentUri = "content://storage/emulated/0/Photos/"
+        val externalPath = "/storage/emulated/0/Photos/"
+        val localPath = "/storage/emulated/0/Photos"
+        val folderPairs = listOf(
+            FolderPair(
+                id = 1234L,
+                syncType = SyncType.TYPE_BACKUP,
+                pairName = "Photos Sync",
+                localFolderPath = "content://storage/emulated/0/Photos",
+                remoteFolder = RemoteFolder(id = NodeId(5678L), name = "Photos"),
+                syncStatus = SyncStatus.SYNCED
+            )
+        )
+
+        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(externalPath)
+        whenever(getPathByDocumentContentUriUseCase("content://storage/emulated/0/Photos")).thenReturn(
+            localPath
+        )
+        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
+        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
+        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
+
+        val result = underTest(documentUri)
+
+        assertThat(result).isInstanceOf(SyncUriValidityResult.ShowSnackbar::class.java)
+        val snackbarResult = result as SyncUriValidityResult.ShowSnackbar
+        assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.sync_local_device_folder_currently_backed_up_message)
+    }
+
+    @Test
+    fun `test determinePathRelationship prevents false positives with similar names`() = runTest {
+        val documentUri = "content://storage/emulated/0/Photos2"
+        val externalPath = "/storage/emulated/0/Photos2"
+        val localPath = "/storage/emulated/0/Photos"
+        val folderPairs = listOf(
+            FolderPair(
+                id = 1234L,
+                syncType = SyncType.TYPE_TWOWAY,
+                pairName = "Photos Sync",
+                localFolderPath = "content://storage/emulated/0/Photos",
+                remoteFolder = RemoteFolder(id = NodeId(5678L), name = "Photos"),
+                syncStatus = SyncStatus.SYNCED
+            )
+        )
+
+        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(externalPath)
+        whenever(getPathByDocumentContentUriUseCase("content://storage/emulated/0/Photos")).thenReturn(
+            localPath
+        )
+        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
+        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
+        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
+
+        val result = underTest(documentUri)
+
+        assertThat(result).isInstanceOf(SyncUriValidityResult.ValidFolderSelected::class.java)
+        val validResult = result as SyncUriValidityResult.ValidFolderSelected
+        assertThat(validResult.folderName).isEqualTo("Photos2")
+    }
+
     private fun syncTypeParameters(): Stream<Arguments> = Stream.of(
         Arguments.of(SyncType.TYPE_TWOWAY),
         Arguments.of(SyncType.TYPE_BACKUP),

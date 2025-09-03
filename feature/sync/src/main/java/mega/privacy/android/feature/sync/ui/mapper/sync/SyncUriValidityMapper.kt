@@ -124,12 +124,27 @@ class SyncUriValidityMapper @Inject constructor(
         localPath: String,
         externalPath: String,
     ): PathRelationship {
+        val normalizedLocal = localPath.trimEnd('/')
+        val normalizedExternal = externalPath.trimEnd('/')
+
         return when {
-            localPath == externalPath -> PathRelationship.EXACT_MATCH
-            localPath.contains(externalPath) -> PathRelationship.LOCAL_CONTAINS_EXTERNAL // externalPath is "under" localPath
-            externalPath.contains(localPath) -> PathRelationship.EXTERNAL_CONTAINS_LOCAL // localPath is "under" externalPath
+            normalizedLocal == normalizedExternal -> PathRelationship.EXACT_MATCH
+            isSubPath(
+                normalizedExternal,
+                normalizedLocal
+            ) -> PathRelationship.LOCAL_CONTAINS_EXTERNAL
+
+            isSubPath(
+                normalizedLocal,
+                normalizedExternal
+            ) -> PathRelationship.EXTERNAL_CONTAINS_LOCAL
+
             else -> PathRelationship.NO_MATCH
         }
+    }
+
+    private fun isSubPath(childPath: String, parentPath: String): Boolean {
+        return childPath.startsWith("$parentPath/") || childPath.startsWith("$parentPath${File.separator}")
     }
 }
 
